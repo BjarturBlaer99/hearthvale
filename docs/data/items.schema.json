@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "items.schema.json",
+  "title": "Items file (data/items/*.json)",
+  "type": "object",
+  "required": ["items"],
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "type"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "name": { "type": "string" },
+          "type": { "enum": ["quest", "part", "trade", "ammo", "weapon_melee", "weapon_ranged"] },
+          "stackable": { "type": "boolean", "default": false },
+          "max_stack": { "type": "integer", "minimum": 1 },
+          "stats": {
+            "type": "object",
+            "description": "Weapon stats. Ranged weapons name their ammo item id in 'ammo'.",
+            "properties": {
+              "damage": { "type": "number", "minimum": 0 },
+              "stagger": { "type": "number", "minimum": 0 },
+              "stamina_cost": { "type": "number", "minimum": 0 },
+              "magazine": { "type": "integer", "minimum": 1 },
+              "ammo": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

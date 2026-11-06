@@ -1,0 +1,10 @@
+{
+  "factions": [
+    { "id": "reclamation", "name": "The Reclamation", "start_reputation": 0 },
+    { "id": "summit_holds", "name": "Summit Holds", "start_reputation": 10 }
+  ],
+  "companions": [
+    { "id": "mara", "name": "Mara", "faction_leaning": "summit_holds", "start_approval": 0,
+      "leaves_below": -50 }
+  ]
+}

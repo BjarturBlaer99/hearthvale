@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dialogue.schema.json",
+  "title": "Dialogue file (data/dialogue/<id>.json, one conversation per file)",
+  "description": "Node graph (TECH_DESIGN §6). An option either has 'next' (a node id, or null to end) or a 'check' with 'success' and 'failure' node ids. Checks are deterministic: attribute >= difficulty.",
+  "type": "object",
+  "required": ["id", "start", "nodes"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "start": { "type": "string", "description": "A key of 'nodes'." },
+    "nodes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["speaker", "text", "options"],
+        "properties": {
+          "speaker": { "type": "string" },
+          "text": { "type": "string" },
+          "on_enter": { "$ref": "conditions_and_effects.schema.json#/$defs/effects" },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["text"],
+              "properties": {
+                "text": { "type": "string" },
+                "conditions": { "$ref": "conditions_and_effects.schema.json#/$defs/conditions" },
+                "effects": { "$ref": "conditions_and_effects.schema.json#/$defs/effects" },
+                "next": { "type": ["string", "null"] },
+                "check": {
+                  "type": "object",
+                  "required": ["attribute", "difficulty"],
+                  "properties": {
+                    "attribute": { "$ref": "conditions_and_effects.schema.json#/$defs/attribute" },
+                    "difficulty": { "type": "integer", "minimum": 0 }
+                  }
+                },
+                "success": { "type": "string" },
+                "failure": { "type": "string" }
+              },
+              "oneOf": [
+                { "required": ["next"], "not": { "required": ["check"] } },
+                { "required": ["check", "success", "failure"] }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "quest.schema.json",
+  "title": "Quest file (data/quests/<id>.json, one quest per file)",
+  "description": "Stages with objectives and transitions (TECH_DESIGN §5). Transitions are evaluated top to bottom; the first match wins, so put the best outcome first.",
+  "type": "object",
+  "required": ["id", "title", "start_stage", "stages"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string" },
+    "giver": { "type": "string", "description": "NPC id; not cross-checked until NPCs are data (M8)." },
+    "start_stage": { "type": "string", "description": "A key of 'stages'." },
+    "stages": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["journal"],
+        "properties": {
+          "journal": { "type": "string" },
+          "objectives": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "text", "complete_when"],
+              "properties": {
+                "id": { "type": "string", "minLength": 1 },
+                "text": { "type": "string" },
+                "optional": { "type": "boolean", "default": false },
+                "complete_when": { "$ref": "conditions_and_effects.schema.json#/$defs/condition" }
+              }
+            }
+          },
+          "transitions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["when", "to"],
+              "properties": {
+                "when": { "$ref": "conditions_and_effects.schema.json#/$defs/condition" },
+                "to": { "type": "string", "description": "A key of 'stages'." }
+              }
+            }
+          },
+          "on_enter": { "$ref": "conditions_and_effects.schema.json#/$defs/effects" }
+        }
+      }
+    }
+  }
+}

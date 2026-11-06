@@ -1,0 +1,78 @@
+{
+  "id": "bitter_medicine",
+  "title": "Bitter Medicine",
+  "giver": "spire_nine_doctor",
+  "start_stage": "learn_outbreak",
+  "stages": {
+    "learn_outbreak": {
+      "journal": "Spire Nine has a fever outbreak. The medicine is in drowned St. Aud Hospital.",
+      "objectives": [
+        { "id": "talk_greenterrace", "text": "Ask Greenterrace about the pump", "optional": true,
+          "complete_when": { "type": "flag", "flag": "talked_greenterrace_elder", "value": true } }
+      ],
+      "transitions": [
+        { "when": { "type": "water_level", "district": "st_aud", "level": "drained" },
+          "to": "retrieve_medicine" },
+        { "when": { "type": "flag", "flag": "partial_cache_found", "value": true },
+          "to": "resolved_refused" }
+      ]
+    },
+    "retrieve_medicine": {
+      "journal": "St. Aud is drained. Get the medicine.",
+      "objectives": [
+        { "id": "get_meds", "text": "Recover the medicine crate",
+          "complete_when": { "type": "has_item", "item": "fever_medicine", "count": 1 } }
+      ],
+      "transitions": [
+        { "when": { "type": "all", "of": [
+            { "type": "has_item", "item": "fever_medicine", "count": 1 },
+            { "type": "water_level", "district": "greenterrace", "level": "dry" } ] },
+          "to": "resolved_third_outlet" },
+        { "when": { "type": "all", "of": [
+            { "type": "has_item", "item": "fever_medicine", "count": 1 },
+            { "type": "flag", "flag": "greenterrace_evacuated", "value": true } ] },
+          "to": "resolved_evacuated" },
+        { "when": { "type": "has_item", "item": "fever_medicine", "count": 1 },
+          "to": "resolved_drained" }
+      ]
+    },
+    "resolved_drained": {
+      "journal": "Spire Nine is saved. Greenterrace is underwater.",
+      "on_enter": [
+        { "type": "take_item", "item": "fever_medicine", "count": 1 },
+        { "type": "reputation", "faction": "reclamation", "delta": 15 },
+        { "type": "reputation", "faction": "summit_holds", "delta": -25 },
+        { "type": "set_flag", "flag": "greenterrace_refugees", "value": true },
+        { "type": "complete_quest" }
+      ]
+    },
+    "resolved_refused": {
+      "journal": "You found only part of a cache. Not everyone in Spire Nine will recover.",
+      "on_enter": [
+        { "type": "set_flag", "flag": "spire_nine_losses", "value": true },
+        { "type": "reputation", "faction": "summit_holds", "delta": 10 },
+        { "type": "complete_quest" }
+      ]
+    },
+    "resolved_evacuated": {
+      "journal": "Greenterrace moved its people first. Both settlements survived, but Greenterrace is changed.",
+      "on_enter": [
+        { "type": "take_item", "item": "fever_medicine", "count": 1 },
+        { "type": "reputation", "faction": "summit_holds", "delta": 5 },
+        { "type": "reputation", "faction": "reclamation", "delta": 5 },
+        { "type": "complete_quest" }
+      ]
+    },
+    "resolved_third_outlet": {
+      "journal": "The third outlet works again. Someone had deliberately jammed it.",
+      "on_enter": [
+        { "type": "take_item", "item": "fever_medicine", "count": 1 },
+        { "type": "reputation", "faction": "summit_holds", "delta": 15 },
+        { "type": "reputation", "faction": "reclamation", "delta": 15 },
+        { "type": "set_flag", "flag": "clue_sabotage_1", "value": true },
+        { "type": "complete_quest" }
+      ]
+    }
+  },
+  "_notes": "Transitions are evaluated top to bottom; first match wins. Order matters: the best outcome is checked first. Flags like greenterrace_evacuated are set by dialogue effects."
+}

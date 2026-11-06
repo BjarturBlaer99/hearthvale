@@ -1,0 +1,98 @@
+{
+  "region": "spillway",
+  "districts": [
+    {
+      "id": "st_aud",
+      "name": "St. Aud Hospital",
+      "levels": [
+        {
+          "id": "flooded",
+          "water_height": 4
+        },
+        {
+          "id": "waist",
+          "water_height": 2
+        },
+        {
+          "id": "drained",
+          "water_height": 0
+        }
+      ],
+      "start_level": "flooded",
+      "water_volume_per_step": 50,
+      "outflows": [
+        "greenterrace",
+        "old_reservoir"
+      ]
+    },
+    {
+      "id": "greenterrace",
+      "name": "Greenterrace",
+      "levels": [
+        {
+          "id": "flooded",
+          "water_height": 3
+        },
+        {
+          "id": "dry",
+          "water_height": 1
+        }
+      ],
+      "start_level": "dry",
+      "water_volume_per_step": 100,
+      "outflows": []
+    }
+  ],
+  "basins": [
+    {
+      "id": "old_reservoir",
+      "name": "Old Reservoir",
+      "capacity": 100,
+      "start_stored": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "st_aud_pump",
+      "type": "pump",
+      "district": "st_aud",
+      "target": "greenterrace",
+      "start_state": "broken",
+      "repair_requires": [
+        {
+          "type": "has_item",
+          "item": "pump_valve",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "third_outlet",
+      "type": "outlet",
+      "district": "st_aud",
+      "target": "old_reservoir",
+      "start_state": "broken",
+      "repair_requires": [
+        {
+          "type": "flag",
+          "flag": "tunnel_reached_outlet",
+          "value": true
+        }
+      ]
+    }
+  ],
+  "_notes": "Levels are ordered from MOST water to LEAST; water_height must strictly decrease. A tile is dry if its terrain height >= water_height, shallow if 1 below, deep if 2+ below. Draining st_aud fully (2 steps x 50 = 100 units) via the pump raises greenterrace by exactly 1 step (flooded). Via third_outlet the same 100 units fill old_reservoir exactly to capacity, so Greenterrace stays dry. If no target has room, the solver rejects the change.",
+  "interiors": [
+    {
+      "id": "st_aud_ground_floor",
+      "district": "st_aud",
+      "dive_when": [
+        "flooded",
+        "waist"
+      ],
+      "dry_when": [
+        "drained"
+      ]
+    }
+  ]
+}

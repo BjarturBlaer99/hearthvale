@@ -1,0 +1,21 @@
+# Godot 4
+.godot/
+/android/
+*.translation
+
+# gdUnit4 test reports
+reports/
+
+# Exported builds
+build/
+export/
+*.exe
+*.pck
+*.zip
+
+# OS / editor
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/

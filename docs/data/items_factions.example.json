@@ -1,0 +1,20 @@
+{
+  "items": [
+    { "id": "fever_medicine", "name": "Fever Medicine Crate", "type": "quest", "stackable": false },
+    { "id": "pump_valve", "name": "Pump Valve", "type": "part", "stackable": false },
+    { "id": "food_crate", "name": "Food Crate", "type": "trade", "stackable": true, "max_stack": 50 },
+    { "id": "pipe_wrench", "name": "Pipe Wrench", "type": "weapon_melee",
+      "stats": { "damage": 12, "stagger": 20, "stamina_cost": 10 } },
+    { "id": "rivet_pistol", "name": "Rivet Pistol", "type": "weapon_ranged",
+      "stats": { "damage": 9, "stagger": 5, "magazine": 8, "ammo": "rivets" } },
+    { "id": "rivets", "name": "Rivets", "type": "ammo", "stackable": true, "max_stack": 99 }
+  ],
+  "factions": [
+    { "id": "reclamation", "name": "The Reclamation", "start_reputation": 0 },
+    { "id": "summit_holds", "name": "Summit Holds", "start_reputation": 10 }
+  ],
+  "companions": [
+    { "id": "mara", "name": "Mara", "faction_leaning": "summit_holds", "start_approval": 0,
+      "leaves_below": -50 }
+  ]
+}

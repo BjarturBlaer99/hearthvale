@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "conditions_and_effects.schema.json",
+  "title": "Low Tide condition and effect vocabulary",
+  "description": "Shared by quests, dialogue, network nodes and world objects (see CONDITIONS_AND_EFFECTS.md). Editor/documentation aid: the authoritative check is autoload/data_registry.gd, which also resolves ids. Keep both in sync when adding a type.",
+  "$defs": {
+    "id": { "type": "string", "minLength": 1 },
+    "attribute": { "enum": ["grit", "wits", "charm", "tech"] },
+    "condition": {
+      "type": "object",
+      "required": ["type"],
+      "oneOf": [
+        {
+          "properties": { "type": { "const": "flag" }, "flag": { "$ref": "#/$defs/id" }, "value": {} },
+          "required": ["flag", "value"]
+        },
+        {
+          "properties": { "type": { "const": "water_level" }, "district": { "$ref": "#/$defs/id" }, "level": { "$ref": "#/$defs/id" } },
+          "required": ["district", "level"]
+        },
+        {
+          "properties": { "type": { "const": "has_item" }, "item": { "$ref": "#/$defs/id" }, "count": { "type": "integer", "minimum": 1 } },
+          "required": ["item", "count"]
+        },
+        {
+          "properties": { "type": { "const": "reputation_gte" }, "faction": { "$ref": "#/$defs/id" }, "value": { "type": "integer", "minimum": -100, "maximum": 100 } },
+          "required": ["faction", "value"]
+        },
+        {
+          "properties": { "type": { "const": "attribute_gte" }, "attribute": { "$ref": "#/$defs/attribute" }, "value": { "type": "integer", "minimum": 0 } },
+          "required": ["attribute", "value"]
+        },
+        {
+          "properties": { "type": { "const": "quest_stage" }, "quest": { "$ref": "#/$defs/id" }, "stage": { "$ref": "#/$defs/id" } },
+          "required": ["quest", "stage"]
+        },
+        {
+          "properties": { "type": { "enum": ["all", "any"] }, "of": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/condition" } } },
+          "required": ["of"]
+        },
+        {
+          "properties": { "type": { "const": "not" }, "condition": { "$ref": "#/$defs/condition" } },
+          "required": ["condition"]
+        }
+      ]
+    },
+    "conditions": { "type": "array", "items": { "$ref": "#/$defs/condition" } },
+    "effect": {
+      "type": "object",
+      "required": ["type"],
+      "oneOf": [
+        {
+          "properties": { "type": { "const": "set_flag" }, "flag": { "$ref": "#/$defs/id" }, "value": {} },
+          "required": ["flag", "value"]
+        },
+        {
+          "properties": { "type": { "enum": ["give_item", "take_item"] }, "item": { "$ref": "#/$defs/id" }, "count": { "type": "integer", "minimum": 1 } },
+          "required": ["item", "count"]
+        },
+        {
+          "properties": { "type": { "const": "reputation" }, "faction": { "$ref": "#/$defs/id" }, "delta": { "type": "integer" } },
+          "required": ["faction", "delta"]
+        },
+        {
+          "properties": { "type": { "const": "approval" }, "companion": { "$ref": "#/$defs/id" }, "delta": { "type": "integer" } },
+          "required": ["companion", "delta"]
+        },
+        {
+          "properties": { "type": { "const": "set_quest_stage" }, "quest": { "$ref": "#/$defs/id" }, "stage": { "$ref": "#/$defs/id" } },
+          "required": ["quest", "stage"]
+        },
+        {
+          "properties": { "type": { "const": "complete_quest" } }
+        },
+        {
+          "properties": { "type": { "const": "water_lock" }, "district": { "$ref": "#/$defs/id" }, "locked": { "type": "boolean" } },
+          "required": ["district", "locked"]
+        },
+        {
+          "properties": { "type": { "const": "spawn_npc_group" }, "group": { "$ref": "#/$defs/id" }, "location": { "$ref": "#/$defs/id" } },
+          "required": ["group", "location"]
+        }
+      ]
+    },
+    "effects": { "type": "array", "items": { "$ref": "#/$defs/effect" } }
+  }
+}

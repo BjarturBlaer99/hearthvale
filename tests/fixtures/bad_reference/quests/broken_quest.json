@@ -1,0 +1,13 @@
+{
+  "id": "broken_quest",
+  "title": "Quest that refers to things that do not exist",
+  "start_stage": "begin",
+  "stages": {
+    "begin": {
+      "journal": "Needs an item nobody defined and leads to a stage that is not there.",
+      "transitions": [
+        { "when": { "type": "has_item", "item": "unobtainium", "count": 1 }, "to": "nowhere" }
+      ]
+    }
+  }
+}
