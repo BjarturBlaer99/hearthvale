@@ -25,6 +25,27 @@ func test_slot_round_trip() -> void:
 	assert_str(JSON.stringify(GameState.to_dict(), "", true)).is_equal(JSON.stringify(before, "", true))
 
 
+func test_water_state_survives_a_save_and_load() -> void:
+	GameState.new_game()
+	GameState.network_nodes[&"third_outlet"] = WaterNetwork.STATE_REPAIRED
+	var solver: WaterSolver = WaterSolver.new()
+	var drained_once: bool = GameState.apply_water_change(solver.preview(GameState.water_network(), &"third_outlet", WaterSolver.LOWER))
+	assert_bool(drained_once).is_true()
+	var saved: String = JSON.stringify(GameState.water_network().get_state(), "", true)
+
+	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
+	GameState.new_game()
+	assert_that(GameState.get_water_level(&"st_aud")).is_equal(&"flooded")
+	assert_int(SaveSystem.load_from_slot(TEST_SLOT)).is_equal(OK)
+
+	assert_str(JSON.stringify(GameState.water_network().get_state(), "", true)).is_equal(saved)
+	assert_that(GameState.get_water_level(&"st_aud")).is_equal(&"waist")
+	assert_int(GameState.basins[&"old_reservoir"]).is_equal(50)
+	# The loaded state is live: the outlet is still repaired and can drain the last step.
+	var next: WaterChangeResult = solver.preview(GameState.water_network(), &"third_outlet", WaterSolver.LOWER)
+	assert_str(next.rejected_reason).is_empty()
+
+
 func test_missing_slot_is_not_found() -> void:
 	assert_int(SaveSystem.load_from_slot(TEST_SLOT)).is_equal(ERR_FILE_NOT_FOUND)
 

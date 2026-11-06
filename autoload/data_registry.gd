@@ -120,6 +120,15 @@ func ids(collection: StringName) -> Array[StringName]:
 	return out
 
 
+## Every entry in `collection`, ordered by id.
+func entries(collection: StringName) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	var source: Dictionary = _collections.get(collection, {})
+	for id: StringName in ids(collection):
+		out.append(source[id])
+	return out
+
+
 func get_district(id: StringName) -> Dictionary:
 	return get_entry(&"districts", id)
 
@@ -191,7 +200,7 @@ func _load_file(path: String, kind: StringName) -> void:
 			if not data.has("region"):
 				errors.append("%s: a water network file needs a 'region'." % path)
 			_load_list(path, data, "districts", &"district", &"districts", _check_district)
-			_load_list(path, data, "basins", &"basin", &"basins")
+			_load_list(path, data, "basins", &"basin", &"basins", _check_basin)
 			_load_list(path, data, "nodes", &"node", &"nodes")
 			_load_list(path, data, "interiors", &"interior", &"interiors")
 		KIND_ITEMS:
@@ -261,8 +270,8 @@ func _check_district(path: String, district: Dictionary) -> void:
 		var level: Dictionary = element
 		if not _has_required(path, level, &"level", "%s/%s" % [district["id"], level.get("id", "?")]):
 			continue
-		if not _is_number(level["water_height"]):
-			errors.append("%s: %s level '%s' needs a numeric water_height." % [path, label, level["id"]])
+		if not _is_whole(level["water_height"]):
+			errors.append("%s: %s level '%s' water_height must be a whole number." % [path, label, level["id"]])
 			continue
 		var height: float = level["water_height"]
 		if height >= previous_height:
@@ -271,11 +280,25 @@ func _check_district(path: String, district: Dictionary) -> void:
 		seen.append(str(level["id"]))
 	if not seen.has(str(district["start_level"])):
 		errors.append("%s: %s start_level '%s' is not one of its levels %s." % [path, label, district["start_level"], seen])
-	if not _is_number(district["water_volume_per_step"]) or float(district["water_volume_per_step"]) <= 0.0:
-		errors.append("%s: %s water_volume_per_step must be a positive number." % [path, label])
+	# Water is counted in whole units so the solver conserves it exactly.
+	if not _is_whole(district["water_volume_per_step"]) or float(district["water_volume_per_step"]) <= 0.0:
+		errors.append("%s: %s water_volume_per_step must be a positive whole number." % [path, label])
 	if typeof(district["outflows"]) != TYPE_ARRAY:
 		errors.append("%s: %s outflows must be an array (it may be empty)." % [path, label])
 		district["outflows"] = []
+	elif (district["outflows"] as Array).has(district["id"]):
+		errors.append("%s: %s outflows into itself." % [path, label])
+
+
+func _check_basin(path: String, basin: Dictionary) -> void:
+	var label: String = "basin '%s'" % basin["id"]
+	if not _is_whole(basin["capacity"]) or float(basin["capacity"]) < 0.0:
+		errors.append("%s: %s capacity must be a whole number, 0 or more." % [path, label])
+		return
+	if not _is_whole(basin["start_stored"]) or float(basin["start_stored"]) < 0.0:
+		errors.append("%s: %s start_stored must be a whole number, 0 or more." % [path, label])
+	elif float(basin["start_stored"]) > float(basin["capacity"]):
+		errors.append("%s: %s start_stored %d is more than its capacity %d." % [path, label, int(basin["start_stored"]), int(basin["capacity"])])
 
 
 # --- Cross-references ------------------------------------------------------
@@ -285,10 +308,16 @@ func _validate_references() -> void:
 		var where: String = "district '%s'" % district["id"]
 		for target: Variant in district["outflows"]:
 			_check_water_target(district["_source"], where + " outflow", str(target))
+	# Water targets are looked up by id in districts *or* basins, so ids must not collide.
+	for id: StringName in _collections[&"basins"]:
+		if _collections[&"districts"].has(id):
+			errors.append("%s: '%s' is both a district and a basin; water targets need unique ids." % [_collections[&"basins"][id]["_source"], id])
 	for node: Dictionary in _collections[&"nodes"].values():
 		var where: String = "node '%s'" % node["id"]
 		_check_id(node["_source"], where, &"districts", str(node["district"]))
 		_check_water_target(node["_source"], where + " target", str(node["target"]))
+		if str(node["target"]) == str(node["district"]):
+			errors.append("%s: %s targets its own district." % [node["_source"], where])
 		if not NODE_STATES.has(str(node["start_state"])):
 			errors.append("%s: %s start_state must be one of %s." % [node["_source"], where, NODE_STATES])
 		_check_condition_list(node["_source"], where + " repair_requires", node.get("repair_requires", []))
@@ -504,3 +533,8 @@ func _check_stage(path: String, where: String, quest_id: String, stage_id: Strin
 
 static func _is_number(value: Variant) -> bool:
 	return typeof(value) == TYPE_INT or typeof(value) == TYPE_FLOAT
+
+
+## JSON may parse 50 as 50.0, so "whole" means numeric with no fractional part.
+static func _is_whole(value: Variant) -> bool:
+	return _is_number(value) and float(value) == floorf(float(value))

@@ -28,7 +28,7 @@
             }
           },
           "start_level": { "type": "string", "description": "One of this district's level ids." },
-          "water_volume_per_step": { "type": "number", "exclusiveMinimum": 0 },
+          "water_volume_per_step": { "type": "integer", "minimum": 1, "description": "Whole units, so water is conserved exactly." },
           "outflows": {
             "type": "array",
             "description": "District or basin ids that overflow cascades into, in order.",
@@ -45,8 +45,8 @@
         "properties": {
           "id": { "type": "string", "minLength": 1 },
           "name": { "type": "string" },
-          "capacity": { "type": "number", "minimum": 0 },
-          "start_stored": { "type": "number", "minimum": 0 }
+          "capacity": { "type": "integer", "minimum": 0 },
+          "start_stored": { "type": "integer", "minimum": 0, "description": "At most capacity." }
         }
       }
     },

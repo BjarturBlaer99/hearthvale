@@ -68,6 +68,23 @@ func test_unresolved_references_are_reported() -> void:
 	_assert_reported(errors, "unknown stage 'nowhere'")
 
 
+func test_bad_water_numbers_and_ids_are_reported() -> void:
+	var errors: PackedStringArray = _registry.load_all(FIXTURES.path_join("bad_water"))
+	_assert_reported(errors, "water_volume_per_step must be a positive whole number")
+	_assert_reported(errors, "outflows into itself")
+	_assert_reported(errors, "start_stored 20 is more than its capacity 10")
+	_assert_reported(errors, "is both a district and a basin")
+	_assert_reported(errors, "targets its own district")
+
+
+func test_entries_come_in_id_order() -> void:
+	_registry.load_all()
+	var found: Array = []
+	for entry: Dictionary in _registry.entries(&"districts"):
+		found.append(entry["id"])
+	assert_array(found).is_equal(["greenterrace", "st_aud"])
+
+
 func test_missing_data_root_is_reported() -> void:
 	var errors: PackedStringArray = _registry.load_all(FIXTURES.path_join("does_not_exist"))
 	_assert_reported(errors, "data directory does not exist")

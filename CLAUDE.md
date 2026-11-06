@@ -22,8 +22,8 @@ anything outside the current milestone. Scope creep is the main risk on this pro
 ```bash
 # Run the game
 godot --path .
-# Run all tests headless (gdUnit4; exit code 0 = green)
-godot --headless --path . -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add res://tests --ignoreHeadlessMode
+# Run all tests headless (gdUnit4; exit code 0 = green; --continue reports every failure)
+godot --headless --path . -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add res://tests --ignoreHeadlessMode --continue
 # Import / validate project without opening the editor
 godot --headless --path . --import
 # Boot the game headless for a few frames (prints the smoke report, catches autoload errors)
@@ -39,7 +39,8 @@ removes the shim, so recreate it after upgrading.
 
 **Testing gotchas:**
 - `--ignoreHeadlessMode` is required headless. InputEvents aren't delivered headless, so tests that need input must run windowed.
-- gdUnit4's test discovery silently stops at a `\` line continuation. Never use them in `tests/`.
+- gdUnit4's CLI is **fail-fast by default**: it stops at the first failing test, and "Executed test cases (n/n)"
+  only counts what ran. Always pass `--continue` (`-c`) to see every failure.
 - `StringName` sorts by internal pointer, not text. Compare as `String` when order matters.
 
 ## Code conventions

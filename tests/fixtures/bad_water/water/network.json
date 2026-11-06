@@ -1,0 +1,29 @@
+{
+  "region": "fixture",
+  "districts": [
+    {
+      "id": "loop",
+      "name": "Fractional volume, outflows into itself",
+      "levels": [
+        { "id": "high", "water_height": 2 },
+        { "id": "low", "water_height": 0 }
+      ],
+      "start_level": "high",
+      "water_volume_per_step": 12.5,
+      "outflows": ["loop"]
+    }
+  ],
+  "basins": [
+    { "id": "overfull", "name": "Starts with more than it holds", "capacity": 10, "start_stored": 20 },
+    { "id": "loop", "name": "Shares an id with a district", "capacity": 10, "start_stored": 0 }
+  ],
+  "nodes": [
+    {
+      "id": "self_pump",
+      "type": "pump",
+      "district": "loop",
+      "target": "loop",
+      "start_state": "broken"
+    }
+  ]
+}

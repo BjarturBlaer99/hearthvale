@@ -11,8 +11,12 @@ const REPUTATION_MAX: int = 100
 
 ## district id -> current level id
 var water: Dictionary[StringName, StringName] = {}
+## district id -> water units received toward its next level (see WaterNetwork)
+var water_pending: Dictionary[StringName, int] = {}
 ## basin id -> stored water units
 var basins: Dictionary[StringName, int] = {}
+## flood network node id -> &"broken" or &"repaired"
+var network_nodes: Dictionary[StringName, StringName] = {}
 ## flag -> value. A missing flag reads as false.
 var flags: Dictionary[StringName, Variant] = {}
 ## quest id -> current stage id
@@ -25,6 +29,15 @@ var inventory: Array[Dictionary] = []
 var player: Dictionary = {}
 ## Boat upgrades and position (filled in from M3).
 var boat: Dictionary = {}
+
+
+# --- New game --------------------------------------------------------------
+
+## Starts a fresh game from the start values in res://data. Each system adds its seeding
+## here as it arrives; so far that is the flood network.
+func new_game() -> void:
+	clear()
+	set_water_state(_water_topology().get_state())
 
 
 # --- Flags -----------------------------------------------------------------
@@ -51,6 +64,66 @@ func set_water_level(district_id: StringName, level_id: StringName) -> void:
 
 func get_water_level(district_id: StringName) -> StringName:
 	return water.get(district_id, &"")
+
+
+## The flood network in its current state, built fresh from data plus this state so it
+## can never drift from what gets saved. Preview on it with WaterSolver, then record the
+## result with apply_water_change().
+func water_network() -> WaterNetwork:
+	var network: WaterNetwork = _water_topology()
+	network.set_state(water_state())
+	return network
+
+
+## Records a change previewed on water_network(). Emits water_level_changed for each
+## district whose level changed, in flow order; water that only builds up toward a level
+## changes no map, so emits nothing. Returns false, changing nothing, if the change was
+## rejected or the state moved on since the preview.
+func apply_water_change(change: WaterChangeResult) -> bool:
+	var network: WaterNetwork = water_network()
+	if not WaterSolver.new().apply(network, change):
+		return false
+	set_water_state(network.get_state())
+	var changed: Dictionary[StringName, StringName] = change.level_changes()
+	for district_id: StringName in changed:
+		EventBus.water_level_changed.emit(district_id, changed[district_id])
+	return true
+
+
+## Water levels, pending water, basins and node states, in WaterNetwork's state shape.
+func water_state() -> Dictionary:
+	return {
+		"water": water.duplicate(),
+		"water_pending": water_pending.duplicate(),
+		"basins": basins.duplicate(),
+		"network_nodes": network_nodes.duplicate(),
+	}
+
+
+## Replaces all water state (new game, load). Does not emit signals.
+func set_water_state(state: Dictionary) -> void:
+	water.clear()
+	water_pending.clear()
+	basins.clear()
+	network_nodes.clear()
+	var src_water: Dictionary = state.get("water", {})
+	for key: Variant in src_water:
+		water[StringName(str(key))] = StringName(str(src_water[key]))
+	var src_pending: Dictionary = state.get("water_pending", {})
+	for key: Variant in src_pending:
+		water_pending[StringName(str(key))] = int(src_pending[key])
+	var src_basins: Dictionary = state.get("basins", {})
+	for key: Variant in src_basins:
+		basins[StringName(str(key))] = int(src_basins[key])
+	var src_nodes: Dictionary = state.get("network_nodes", {})
+	for key: Variant in src_nodes:
+		network_nodes[StringName(str(key))] = StringName(str(src_nodes[key]))
+
+
+## The network as data builds it, in its start state.
+func _water_topology() -> WaterNetwork:
+	return WaterNetwork.from_entries(
+		DataRegistry.entries(&"districts"), DataRegistry.entries(&"basins"), DataRegistry.entries(&"nodes"))
 
 
 # --- Quests ----------------------------------------------------------------
@@ -124,7 +197,9 @@ func _find_stack(item_id: StringName) -> int:
 ## Empties all state. Does not emit signals: callers reload whatever reads it.
 func clear() -> void:
 	water.clear()
+	water_pending.clear()
 	basins.clear()
+	network_nodes.clear()
 	flags.clear()
 	quests.clear()
 	reputation.clear()
@@ -141,7 +216,9 @@ func to_dict() -> Dictionary:
 	return {
 		"version": SAVE_VERSION,
 		"water": _json_safe(water),
+		"water_pending": _json_safe(water_pending),
 		"basins": _json_safe(basins),
+		"network_nodes": _json_safe(network_nodes),
 		"flags": _json_safe(flags),
 		"quests": _json_safe(quests),
 		"reputation": _json_safe(reputation),
@@ -155,12 +232,7 @@ func to_dict() -> Dictionary:
 ## Does not emit signals: the caller reloads the world after loading.
 func from_dict(data: Dictionary) -> void:
 	clear()
-	var src_water: Dictionary = data.get("water", {})
-	for key: Variant in src_water:
-		water[StringName(str(key))] = StringName(str(src_water[key]))
-	var src_basins: Dictionary = data.get("basins", {})
-	for key: Variant in src_basins:
-		basins[StringName(str(key))] = int(src_basins[key])
+	set_water_state(data)
 	var src_flags: Dictionary = data.get("flags", {})
 	for key: Variant in src_flags:
 		flags[StringName(str(key))] = src_flags[key]

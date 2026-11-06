@@ -40,7 +40,7 @@ res://
 - **District**: `id`, ordered list of `levels` (most water → least), each with a `water_height` (int), `current_level`, `water_volume_per_step`, `outflows`.
 - **Basin**: a sink/source with `capacity` and `stored` (e.g. an empty reservoir, the sea).
 - **Node** (pump/sluice/outlet): connects a district to a target (district or basin). Has `state`: `broken | repaired`, and `repair_requires` (conditions).
-- **Conservation rule**: lowering a district by one step moves `water_volume_per_step` into the node's target. If the target is a district, its level rises by `ceil(volume / target.water_volume_per_step)` steps, clamped; overflow cascades along that district's outflows. If no valid target has capacity, the change is rejected.
+- **Conservation rule**: lowering a district by one step moves its `water_volume_per_step` into the node's target. A target district keeps incoming water as `pending` and rises one level each time a full `water_volume_per_step` *of its own* has arrived (so 2 × 50 units into a 100-per-step district raises it exactly one level). At its highest level it passes the rest along its `outflows`, in order. Each district is visited at most once per change, and water never flows back into the district being changed. If water is left with nowhere to go, the change is rejected. Raising a district pulls one step of its volume back from the node's target only. Volumes are whole numbers and total water is conserved exactly. *(This replaced a `ceil(volume / target step)` rule, which created water and contradicted the worked example in `water_network.example.json`; see DECISIONS 2026-11-06.)*
 
 ```gdscript
 class_name WaterSolver extends RefCounted
