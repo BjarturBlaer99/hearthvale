@@ -126,3 +126,33 @@ Visual check (`tools/capture_world.gd`): open sea with labelled approaches; the 
 - Sailing hasn't been tried by hand with a real keyboard or gamepad; the tunables are first guesses.
 
 **Next:** M4, the Network Key and the consequence preview.
+
+## 2026-11-07 — M4 Network Key & consequence preview — done
+
+**Built**
+- **Pump in the world:** a `NetworkNodeMarker` for `st_aud_pump` on St. Aud's lookout tower (red wheel when broken, teal when working). Its behaviour comes from `data/water/spillway.json`.
+- **Repair:** `ConditionEvaluator` (pure, the whole condition vocabulary) and `GameState.repair_network_node()` / `unmet_repair_requirements()`. Requirements are checked, items used up, and `EventBus.network_node_repaired` emitted. The message names what's missing ("It needs: Pump Valve").
+- **The valve:** an `ItemPickup` on Spire Nine's platform, remembered by a flag. The HUD shows "Carrying: ...".
+- **Preview:** `ui/network_panel` plus `RegionMap`. Up/Down chooses Raise or Lower; the text and the mini-map show every consequence (before/after gauges, pipes, a flow arrow, amber for changes, red for floods). Rejections show their reason and can't be confirmed. E applies through `GameState.apply_water_change()`, Esc cancels, and the game pauses while it's open.
+- **Data:** optional `"map": [x, y]` on districts and basins, validated and added to the schema.
+- 143 tests in 19 suites (11 new). The README explains the pump.
+
+**Acceptance criteria**
+- [x] Draining St. Aud from the pump visibly floods Greenterrace, and the preview warned about it first. Tested end to end through the real scenes:
+  1. Broken without the valve.
+  2. Repaired with it (the valve is used up).
+  3. The first preview lists *St. Aud Hospital: flooded -> waist* and *Greenterrace: water rising, 50 of 100*.
+  4. The second preview warns *Greenterrace: dry -> flooded*, with Greenterrace outlined red on the mini-map, while Greenterrace is still dry. After confirming, Greenterrace is flooded.
+  5. The Greenterrace scene goes from 0 to 744 deep-water cells.
+
+Mutation check: with no red outline for flooding districts, the acceptance test fails.
+
+Visual check (`tools/capture_world.gd`, shots 7–8): both pump previews with the mini-map, gauges, arrow and legend.
+
+**Known issues / notes**
+- Only the pump is in the world; the third outlet and its tunnel come in M9.
+- The preview is a pause menu: no animation of the water changing yet (TECH_DESIGN §3.3 allows instant + fade for the slice).
+- The Network Key isn't an item and has no upgrades.
+- I haven't played it by hand with a real keyboard or gamepad (Up/Down/E/Esc in the panel).
+
+**Next:** M5, diving and interiors.

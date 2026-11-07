@@ -99,6 +99,32 @@ func apply_water_change(change: WaterChangeResult) -> bool:
 	return true
 
 
+func is_network_node_repaired(node_id: StringName) -> bool:
+	return network_nodes.get(node_id, WaterNetwork.STATE_BROKEN) == WaterNetwork.STATE_REPAIRED
+
+
+## The node's `repair_requires` conditions (res://data/water) that aren't met yet.
+func unmet_repair_requirements(node_id: StringName) -> Array[Dictionary]:
+	var requires: Array = DataRegistry.get_entry(&"nodes", node_id).get("repair_requires", [])
+	return ConditionEvaluator.new(to_dict()).unmet(requires)
+
+
+## Repairs a node if its requirements are met. The items they ask for are used up (fitted
+## into the machine). Emits network_node_repaired. Returns whether the node now works.
+func repair_network_node(node_id: StringName) -> bool:
+	if is_network_node_repaired(node_id):
+		return true
+	if not DataRegistry.has_entry(&"nodes", node_id) or not unmet_repair_requirements(node_id).is_empty():
+		return false
+	for condition: Variant in DataRegistry.get_entry(&"nodes", node_id).get("repair_requires", []):
+		var requirement: Dictionary = condition
+		if str(requirement.get("type", "")) == "has_item":
+			add_item(StringName(str(requirement["item"])), -int(requirement["count"]))
+	network_nodes[node_id] = WaterNetwork.STATE_REPAIRED
+	EventBus.network_node_repaired.emit(node_id)
+	return true
+
+
 ## Water levels, pending water, basins and node states, in WaterNetwork's state shape.
 func water_state() -> Dictionary:
 	return {

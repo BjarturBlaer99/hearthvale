@@ -8,8 +8,13 @@ extends Node2D
 ## the nearest deep cell; with no deep water left it waits at sea off the Harbour, and the
 ## player walks out from there to board it. Sailing off the map's edge goes to the sea.
 ##
+## Network nodes (M4): standing on a NetworkNodeMarker and pressing interact repairs a broken
+## node (if its requirements are met) or opens the Network Key preview on a working one.
+##
 ## Expects children: Height, HeightShading, Water, PointsOfInterest, Harbour, Mooring, Boat,
 ## Player, HUD. PlayerSpawn is optional (where a new game starts).
+
+const NETWORK_PANEL: PackedScene = preload("res://ui/network_panel.tscn")
 
 @export var district_id: StringName = &"st_aud"
 
@@ -19,6 +24,8 @@ var terrain: TerrainQuery
 var last_redraw_usec: int = 0
 ## Changes scene. Tests replace it to watch travel without leaving the scene.
 var travel: Callable
+## The Network Key preview, made the first time a node is used.
+var network_panel: NetworkPanel = null
 
 var _leaving: bool = false
 
@@ -57,6 +64,7 @@ func _ready() -> void:
 		_restore_boat()
 	EventBus.water_level_changed.connect(_on_water_level_changed)
 	EventBus.flag_set.connect(_on_flag_set)
+	EventBus.network_node_repaired.connect(_on_network_node_repaired)
 	_refresh_points()
 	_update_hud()
 
@@ -100,7 +108,8 @@ func cycle_water_level() -> void:
 # --- Interacting -----------------------------------------------------------
 
 ## Does the one thing interact means right now: go ashore, board, walk out to the waiting
-## boat, or use the point of interest underfoot. Returns true if something happened.
+## boat, or use what's underfoot (a network node, an item, a point of interest).
+## Returns true if something happened.
 func interact() -> bool:
 	if boat.rider != null:
 		return disembark()
@@ -108,7 +117,12 @@ func interact() -> bool:
 		return board()
 	if can_walk_out_to_boat():
 		return walk_out_to_boat()
-	var point: PointOfInterest = point_under_player()
+	var thing: Node2D = interactable_under_player()
+	if thing is NetworkNodeMarker:
+		return use_network_node(thing as NetworkNodeMarker)
+	if thing is ItemPickup:
+		return pick_up(thing as ItemPickup)
+	var point: PointOfInterest = thing as PointOfInterest
 	if point == null or not point.usable or player.motor.state_name != PlayerMotor.GROUND:
 		return false
 	GameState.set_flag(point.visited_flag, true)
@@ -116,13 +130,74 @@ func interact() -> bool:
 	return true
 
 
+## Whatever usable thing the player is standing on (PointsOfInterest children), or null.
+func interactable_under_player() -> Node2D:
+	for child: Node in points.get_children():
+		if child.has_method(&"covers") and child.call(&"covers", player.motor.cell):
+			return child as Node2D
+	return null
+
+
 ## The point of interest the player is standing on, or null.
 func point_under_player() -> PointOfInterest:
-	for child: Node in points.get_children():
-		var point: PointOfInterest = child as PointOfInterest
-		if point != null and point.covers(player.motor.cell):
-			return point
-	return null
+	return interactable_under_player() as PointOfInterest
+
+
+## A broken node is repaired if its requirements are met (using up the items); a working
+## one opens the Network Key preview. Needs the player on their feet.
+func use_network_node(marker: NetworkNodeMarker) -> bool:
+	if player.motor.state_name != PlayerMotor.GROUND:
+		return false
+	var node_id: StringName = marker.node_id
+	var node_type: String = str(DataRegistry.get_entry(&"nodes", node_id).get("type", "node"))
+	if not GameState.is_network_node_repaired(node_id):
+		var parts: String = requirements_text(DataRegistry.get_entry(&"nodes", node_id).get("repair_requires", []))
+		if GameState.repair_network_node(node_id):
+			_hud.show_message("You fit the %s. The %s works again." % [parts, node_type])
+			return true
+		_hud.show_message("The %s is broken. It needs: %s." % [node_type, requirements_text(GameState.unmet_repair_requirements(node_id))])
+		return false
+	open_network_panel(node_id)
+	return true
+
+
+## Opens the Network Key preview for `node_id` (pausing the game until it closes).
+func open_network_panel(node_id: StringName) -> NetworkPanel:
+	if network_panel == null:
+		network_panel = NETWORK_PANEL.instantiate()
+		add_child(network_panel)
+		network_panel.closed.connect(_on_network_panel_closed)
+	network_panel.open(node_id)
+	return network_panel
+
+
+func pick_up(pickup: ItemPickup) -> bool:
+	if player.motor.state_name != PlayerMotor.GROUND or not pickup.take():
+		return false
+	_hud.show_message("You pick up the %s." % pickup.item_name())
+	return true
+
+
+## Requirements in words: item names (with counts over one), anything else by its flag or type.
+static func requirements_text(conditions: Array) -> String:
+	var parts: PackedStringArray = []
+	for condition: Variant in conditions:
+		var requirement: Dictionary = condition
+		if str(requirement.get("type", "")) == "has_item":
+			var item_name: String = str(DataRegistry.get_item(StringName(str(requirement["item"]))).get("name", requirement["item"]))
+			parts.append(item_name if int(requirement["count"]) == 1 else "%d x %s" % [int(requirement["count"]), item_name])
+		else:
+			parts.append(str(requirement.get("flag", requirement.get("type", "?"))).replace("_", " "))
+	return ", ".join(parts)
+
+
+## "Carrying: ..." for the HUD, from the inventory in GameState.
+static func carrying_text() -> String:
+	var names: PackedStringArray = []
+	for stack: Dictionary in GameState.inventory:
+		var item_name: String = str(DataRegistry.get_item(stack["id"]).get("name", stack["id"]))
+		names.append(item_name if int(stack["count"]) == 1 else "%s x%d" % [item_name, int(stack["count"])])
+	return "Carrying: %s" % (", ".join(names) if not names.is_empty() else "nothing")
 
 
 func can_board() -> bool:
@@ -274,8 +349,16 @@ func _keep_boat_afloat(announce: bool) -> void:
 
 
 func _on_flag_set(_flag: StringName, _value: Variant) -> void:
-	for child: Node in points.get_children():
-		(child as Node2D).queue_redraw()
+	_redraw_points()
+
+
+func _on_network_node_repaired(_node_id: StringName) -> void:
+	_redraw_points()
+
+
+func _on_network_panel_closed(applied: bool) -> void:
+	if applied:
+		_hud.show_message("   ".join(network_panel.change.describe()))
 
 
 func _on_player_fell(levels: int, damaging: bool) -> void:
@@ -304,6 +387,11 @@ func _refresh_points() -> void:
 		var point: PointOfInterest = child as PointOfInterest
 		if point != null:
 			point.usable = point.is_usable_at(terrain, height)
+
+
+func _redraw_points() -> void:
+	for child: Node in points.get_children():
+		(child as Node2D).queue_redraw()
 
 
 # --- Starting positions ----------------------------------------------------
@@ -335,6 +423,7 @@ func _update_hud() -> void:
 	_hud.set_water("%s   water: %s (height %d)" % [district_name, GameState.get_water_level(district_id), water_height()])
 	_hud.set_status("%s   level %d   cell %d,%d" % [_activity(motor), motor.level, motor.cell.x, motor.cell.y])
 	_hud.set_stamina(motor.stamina / PlayerMotor.STAMINA_MAX, motor.exhausted)
+	_hud.set_items(carrying_text())
 	_hud.set_prompt(_prompt_text(motor))
 
 
@@ -358,10 +447,27 @@ func _prompt_text(motor: PlayerMotor) -> String:
 		return "[E] Board the boat"
 	if can_walk_out_to_boat():
 		return "[E] Walk out to the boat"
-	var point: PointOfInterest = point_under_player()
+	var thing: Node2D = interactable_under_player()
+	if thing is NetworkNodeMarker:
+		return _node_prompt(thing as NetworkNodeMarker, motor)
+	if thing is ItemPickup:
+		return "[E] Pick up the %s" % (thing as ItemPickup).item_name()
+	var point: PointOfInterest = thing as PointOfInterest
 	if point == null:
 		return ""
 	var done: String = "  (done)" if point.visited() else ""
 	if not point.usable or motor.state_name != PlayerMotor.GROUND:
 		return "%s: needs dry ground%s" % [point.label, done]
 	return "[E] %s%s" % [point.label, done]
+
+
+func _node_prompt(marker: NetworkNodeMarker, motor: PlayerMotor) -> String:
+	var node_type: String = str(DataRegistry.get_entry(&"nodes", marker.node_id).get("type", "node"))
+	if motor.state_name != PlayerMotor.GROUND:
+		return "The %s: get onto your feet to use it" % node_type
+	if GameState.is_network_node_repaired(marker.node_id):
+		return "[E] Use the Network Key on the %s" % node_type
+	var unmet: Array[Dictionary] = GameState.unmet_repair_requirements(marker.node_id)
+	if unmet.is_empty():
+		return "[E] Repair the %s" % node_type
+	return "Broken %s: needs %s" % [node_type, requirements_text(unmet)]

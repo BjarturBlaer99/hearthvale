@@ -26,6 +26,12 @@ press. Press E again to go ashore. Sail off the edge of a district to reach the 
 marked approach to visit St. Aud, Spire Nine or Greenterrace. If the water's too low for the boat, it waits at
 sea off the district's harbour (the anchor): walk there and press E to board it.
 
+**The Network Key:** St. Aud's pump is on the lookout tower (the red valve wheel), but it's broken. Sail to Spire
+Nine and pick up the Pump Valve on the platform, bring it back, and press E on the pump to fit it. Press E again
+to open the Network Key: **Up/Down** picks Raise or Lower, the mini-map and text show everything that will change
+(red means a district floods), **E** confirms and **Esc** cancels. Draining St. Aud pushes its water into
+Greenterrace: sail there afterwards to see it flooded.
+
 ## Docs
 - `CLAUDE.md` — rules for Claude Code
 - `docs/GDD.md` — game design

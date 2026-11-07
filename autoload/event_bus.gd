@@ -19,3 +19,6 @@ signal item_added(item_id: StringName, count: int)
 
 ## A world flag was written.
 signal flag_set(flag: StringName, value: Variant)
+
+## A flood-network node (pump, sluice, outlet) was repaired and can now be used.
+signal network_node_repaired(node_id: StringName)

@@ -88,10 +88,12 @@ func _can_use(point: PointOfInterest, on_foot: Dictionary, water_height: int) ->
 	return false
 
 
+## The level-gated places only: other interactables (the pump) live alongside them.
 func _points() -> Array[PointOfInterest]:
 	var out: Array[PointOfInterest] = []
 	for child: Node in _scene.get_node("PointsOfInterest").get_children():
-		out.append(child as PointOfInterest)
+		if child is PointOfInterest:
+			out.append(child as PointOfInterest)
 	return out
 
 

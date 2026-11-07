@@ -288,10 +288,21 @@ func _check_district(path: String, district: Dictionary) -> void:
 		district["outflows"] = []
 	elif (district["outflows"] as Array).has(district["id"]):
 		errors.append("%s: %s outflows into itself." % [path, label])
+	_check_map(path, label, district)
+
+
+## Optional "map": [x, y], a place on the region mini-map in the Network Key preview.
+func _check_map(path: String, label: String, entry: Dictionary) -> void:
+	if not entry.has("map"):
+		return
+	var map: Variant = entry["map"]
+	if typeof(map) != TYPE_ARRAY or (map as Array).size() != 2 or not _is_number(map[0]) or not _is_number(map[1]):
+		errors.append("%s: %s map must be [x, y] (its place on the region mini-map)." % [path, label])
 
 
 func _check_basin(path: String, basin: Dictionary) -> void:
 	var label: String = "basin '%s'" % basin["id"]
+	_check_map(path, label, basin)
 	if not _is_whole(basin["capacity"]) or float(basin["capacity"]) < 0.0:
 		errors.append("%s: %s capacity must be a whole number, 0 or more." % [path, label])
 		return

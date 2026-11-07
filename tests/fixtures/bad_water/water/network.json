@@ -14,7 +14,7 @@
     }
   ],
   "basins": [
-    { "id": "overfull", "name": "Starts with more than it holds", "capacity": 10, "start_stored": 20 },
+    { "id": "overfull", "name": "Starts with more than it holds", "capacity": 10, "start_stored": 20, "map": [1] },
     { "id": "loop", "name": "Shares an id with a district", "capacity": 10, "start_stored": 0 }
   ],
   "nodes": [

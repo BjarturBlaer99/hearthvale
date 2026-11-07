@@ -1,0 +1,46 @@
+class_name ItemPickup
+extends Node2D
+## An item lying in the world. Stand on it and press interact to take it; `taken_flag` in
+## GameState remembers it's gone, on every visit. Position = the cell's top-left corner.
+
+@export var item_id: StringName
+@export var count: int = 1
+@export var taken_flag: StringName
+
+
+func cell() -> Vector2i:
+	return PlayerMotor.cell_of(position + Vector2(0.5, 0.5))
+
+
+## Taken items cover nothing: there's nothing left to stand on.
+func covers(at: Vector2i) -> bool:
+	return not taken() and at == cell()
+
+
+func taken() -> bool:
+	return GameState.get_flag(taken_flag) == true
+
+
+func item_name() -> String:
+	return str(DataRegistry.get_item(item_id).get("name", item_id))
+
+
+## Puts the item in the inventory. Returns false if it was already taken.
+func take() -> bool:
+	if taken():
+		return false
+	GameState.add_item(item_id, count)
+	GameState.set_flag(taken_flag, true)
+	queue_redraw()
+	return true
+
+
+func _draw() -> void:
+	if taken():
+		return
+	# A brass valve with a glint, on a faint glow so it can be spotted.
+	draw_circle(Vector2(8, 9), 6.0, Color(1.0, 0.85, 0.4, 0.18))
+	draw_circle(Vector2(8, 9), 4.5, Color(0.10, 0.08, 0.12))
+	draw_circle(Vector2(8, 9), 3.5, Color(0.86, 0.66, 0.26))
+	draw_circle(Vector2(8, 9), 1.2, Color(0.30, 0.20, 0.10))
+	draw_line(Vector2(6, 7), Vector2(7, 6), Color(1, 0.95, 0.75), 1.0)

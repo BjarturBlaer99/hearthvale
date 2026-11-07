@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://ui/district_hud.tscn" id="6_hud"]
 [ext_resource type="Script" path="res://world/districts/harbour_marker.gd" id="7_harbour"]
 [ext_resource type="PackedScene" path="res://gameplay/boat/boat.tscn" id="8_boat"]
+[ext_resource type="Script" path="res://gameplay/interactables/network_node_marker.gd" id="9_node"]
 
 [node name="StAud" type="Node2D" unique_id=882623080]
 script = ExtResource("1_district")
@@ -47,6 +48,11 @@ used_message = "The subway stairs lead down into the dark. (Interiors arrive in 
 visited_flag = &"st_aud_subway_entered"
 footprint = Vector2i(2, 2)
 color = Color(1, 0.55, 0.45, 1)
+
+[node name="StAudPump" type="Node2D" parent="PointsOfInterest"]
+position = Vector2(160, 112)
+script = ExtResource("9_node")
+node_id = &"st_aud_pump"
 
 [node name="Harbour" type="Node2D" parent="." unique_id=956503182]
 position = Vector2(0, 144)

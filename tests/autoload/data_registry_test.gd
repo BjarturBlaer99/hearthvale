@@ -75,6 +75,7 @@ func test_bad_water_numbers_and_ids_are_reported() -> void:
 	_assert_reported(errors, "start_stored 20 is more than its capacity 10")
 	_assert_reported(errors, "is both a district and a basin")
 	_assert_reported(errors, "targets its own district")
+	_assert_reported(errors, "map must be [x, y]")
 
 
 func test_entries_come_in_id_order() -> void:

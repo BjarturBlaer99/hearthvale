@@ -121,4 +121,5 @@ func _update_hud() -> void:
 	_hud.set_water("The Spillway   open sea")
 	_hud.set_status("Sailing   cell %d,%d" % [boat.motor.cell.x, boat.motor.cell.y])
 	_hud.set_stamina(player.motor.stamina / PlayerMotor.STAMINA_MAX, player.motor.exhausted)
+	_hud.set_items(DistrictController.carrying_text())
 	_hud.set_prompt("Sail into a marked approach to go ashore")

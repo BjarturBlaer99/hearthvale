@@ -14,6 +14,7 @@ var _stamina_width: float = 0.0
 
 @onready var _water: Label = $Panel/Water
 @onready var _status: Label = $Panel/Status
+@onready var _items: Label = $Panel/Items
 @onready var _stamina_fill: ColorRect = $Panel/StaminaBack/StaminaFill
 @onready var _prompt: Label = $Prompt
 @onready var _message: Label = $Message
@@ -32,6 +33,10 @@ func set_water(text: String) -> void:
 
 func set_status(text: String) -> void:
 	_status.text = text
+
+
+func set_items(text: String) -> void:
+	_items.text = text
 
 
 func set_stamina(fraction: float, exhausted: bool) -> void:

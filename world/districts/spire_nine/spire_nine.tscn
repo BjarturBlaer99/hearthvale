@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://gameplay/boat/boat.tscn" id="5_boat"]
 [ext_resource type="PackedScene" path="res://gameplay/player/player.tscn" id="6_player"]
 [ext_resource type="PackedScene" path="res://ui/district_hud.tscn" id="7_hud"]
+[ext_resource type="Script" path="res://gameplay/interactables/item_pickup.gd" id="8_pickup"]
 
 [node name="SpireNine" type="Node2D" unique_id=1101607794]
 script = ExtResource("1_district")
@@ -23,6 +24,12 @@ script = ExtResource("3_shading")
 tile_set = ExtResource("2_tiles")
 
 [node name="PointsOfInterest" type="Node2D" parent="." unique_id=2055580090]
+
+[node name="PumpValve" type="Node2D" parent="PointsOfInterest"]
+position = Vector2(160, 240)
+script = ExtResource("8_pickup")
+item_id = &"pump_valve"
+taken_flag = &"spire_nine_pump_valve_taken"
 
 [node name="Harbour" type="Node2D" parent="." unique_id=845292304]
 position = Vector2(0, 240)

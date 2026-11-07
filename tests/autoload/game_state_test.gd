@@ -103,6 +103,31 @@ func test_setting_sail_marks_the_player_as_arriving_aboard() -> void:
 	assert_bool(_state.player.has("cell")).is_false()
 
 
+func test_the_pump_needs_its_valve_to_be_repaired() -> void:
+	_state.new_game()
+	var unmet: Array = _state.unmet_repair_requirements(&"st_aud_pump")
+	assert_int(unmet.size()).is_equal(1)
+	assert_that(str(unmet[0]["item"])).is_equal("pump_valve")
+	assert_bool(_state.repair_network_node(&"st_aud_pump")).is_false()
+	assert_bool(_state.is_network_node_repaired(&"st_aud_pump")).is_false()
+
+
+func test_repairing_uses_up_the_valve_and_announces_it() -> void:
+	_state.new_game()
+	_state.add_item(&"pump_valve", 1)
+	var repaired: Array = []
+	var on_repaired: Callable = func(node_id: StringName) -> void: repaired.append(node_id)
+	EventBus.network_node_repaired.connect(on_repaired)
+	var first: bool = _state.repair_network_node(&"st_aud_pump")
+	var again: bool = _state.repair_network_node(&"st_aud_pump")
+	EventBus.network_node_repaired.disconnect(on_repaired)
+	assert_bool(first).is_true()
+	assert_bool(again).override_failure_message("already repaired stays repaired").is_true()
+	assert_bool(_state.is_network_node_repaired(&"st_aud_pump")).is_true()
+	assert_int(_state.item_count(&"pump_valve")).is_equal(0)
+	assert_array(repaired).is_equal([&"st_aud_pump"])
+
+
 func test_rejected_water_changes_are_not_recorded() -> void:
 	_state.new_game()
 	var change: WaterChangeResult = WaterSolver.new().preview(_state.water_network(), &"st_aud_pump", WaterSolver.LOWER)
