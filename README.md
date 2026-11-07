@@ -16,10 +16,15 @@ Run `godot --path .` to start in the greybox St. Aud district.
 |---|---|---|
 | Move (8 directions) | WASD / arrow keys | Left stick / d-pad |
 | Sprint (uses stamina) | Shift | LB or L3 |
-| Use what you're standing on | E | A |
+| Use what you're standing on · board the boat · go ashore | E | A |
 | Cycle the water level (debug builds) | F2 | Back / Select |
 
 Walk into a climbable (ivy) wall to climb it; walking off a ledge drops you.
+
+**The boat:** stand next to it (or swim beside it) and press E to board. It steers toward the direction you
+press. Press E again to go ashore. Sail off the edge of a district to reach the open sea, then sail into a
+marked approach to visit St. Aud, Spire Nine or Greenterrace. If the water's too low for the boat, it waits at
+sea off the district's harbour (the anchor): walk there and press E to board it.
 
 ## Docs
 - `CLAUDE.md` — rules for Claude Code

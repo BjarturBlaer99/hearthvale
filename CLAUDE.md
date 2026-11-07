@@ -30,18 +30,20 @@ godot --headless --path . -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add res://tes
 godot --headless --path . --import
 # Boot the game headless for a few frames (catches script and autoload errors)
 godot --headless --path . --quit-after 30
-# Screenshots of St. Aud at every water level, for review (needs a window, not --headless)
+# Screenshots for review (need a window, not --headless): St. Aud at every water level; boat and travel
 godot --path . -s res://tools/capture_st_aud.gd -- <output_dir>
+godot --path . -s res://tools/capture_world.gd -- <output_dir>
 # Repaint the player sprite sheet after editing its ASCII art (optional 8x preview), then re-import
 godot --headless --path . -s res://tools/art/make_player_sprite.gd -- <preview.png>
 godot --headless --path . --import
 # Rewrite the input map after editing tools/setup_input_map.gd
 godot --headless --path . -s res://tools/setup_input_map.gd
-# Greybox: regenerate the tiles and re-bake St. Aud's Height layer (OVERWRITES editor painting of that layer)
+# Greybox: regenerate the tiles and re-bake the maps' Height layers (OVERWRITES editor painting of those layers).
+# build_maps.gd bakes every map, or only those named: -- st_aud spire_nine greenterrace sea
 godot --headless --path . -s res://tools/greybox/make_tile_texture.gd
 godot --headless --path . --import
 godot --headless --path . -s res://tools/greybox/build_tileset.gd
-godot --headless --path . -s res://tools/greybox/build_st_aud.gd
+godot --headless --path . -s res://tools/greybox/build_maps.gd
 ```
 If `godot` is not on PATH, ask the user for the binary path and record it here.
 

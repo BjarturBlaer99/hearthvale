@@ -8,6 +8,8 @@ extends Node
 const SAVE_VERSION: int = 1
 const REPUTATION_MIN: int = -100
 const REPUTATION_MAX: int = 100
+## "No cell": the map decides (e.g. the boat comes out of a district at its sea port).
+const NO_CELL: Vector2i = Vector2i(-1, -1)
 
 ## district id -> current level id
 var water: Dictionary[StringName, StringName] = {}
@@ -25,9 +27,12 @@ var quests: Dictionary[StringName, StringName] = {}
 var reputation: Dictionary[StringName, int] = {}
 ## Stacks of { "id": StringName, "count": int }, in pickup order.
 var inventory: Array[Dictionary] = []
-## Where the player is: { "district", "cell": [x, y], "height" }.
+## Where the player is: { "district" (a district id or "sea"), "cell": [x, y], "height",
+## "stamina", "on_boat", "arriving" (just set sail for "district"), "came_from" }.
 var player: Dictionary = {}
-## Boat upgrades and position (filled in from M3).
+## Where the boat is: { "where" (district id or "sea"), "cell": [x, y] or [] (the map
+## decides), "heading" (radians), "moored_at" (district it waits outside, at sea) }.
+## Empty in a new game: the first district puts it at its mooring.
 var boat: Dictionary = {}
 
 
@@ -132,13 +137,45 @@ func _water_topology() -> WaterNetwork:
 
 # --- Player ----------------------------------------------------------------
 
-## Records where the player is and how much stamina they have. The district calls this
-## every frame; it emits nothing.
-func update_player(district_id: StringName, cell: Vector2i, height: int, stamina: float) -> void:
+## Records where the player is, how much stamina they have, and whether they're aboard.
+## The current map calls this every frame; it emits nothing.
+func update_player(district_id: StringName, cell: Vector2i, height: int, stamina: float, on_boat: bool = false) -> void:
 	player["district"] = String(district_id)
 	player["cell"] = [cell.x, cell.y]
 	player["height"] = height
 	player["stamina"] = stamina
+	player["on_boat"] = on_boat
+
+
+## Sets sail for `destination` (a district id or "sea") from `came_from`, aboard. The
+## destination map decides where the player and boat appear, then clears "arriving".
+func begin_voyage(destination: StringName, came_from: StringName) -> void:
+	player["district"] = String(destination)
+	player["came_from"] = String(came_from)
+	player["arriving"] = true
+	player["on_boat"] = true
+	player.erase("cell")
+
+
+# --- Boat ------------------------------------------------------------------
+
+## Records where the boat is. `cell` NO_CELL lets that map decide; `moored_at` names the
+## district the boat waits outside of when it is at sea.
+func set_boat(where: StringName, cell: Vector2i, heading: float, moored_at: StringName = &"") -> void:
+	boat = {
+		"where": String(where),
+		"cell": [] if cell == NO_CELL else [cell.x, cell.y],
+		"heading": heading,
+		"moored_at": String(moored_at),
+	}
+
+
+## The boat's cell on its current map, or NO_CELL.
+func boat_cell() -> Vector2i:
+	var cell: Array = boat.get("cell", [])
+	if cell.size() != 2:
+		return NO_CELL
+	return Vector2i(int(cell[0]), int(cell[1]))
 
 
 # --- Quests ----------------------------------------------------------------

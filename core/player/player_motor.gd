@@ -34,6 +34,7 @@ const CLIMB_PUSH: float = 0.9
 const GROUND: StringName = &"ground"
 const SWIM: StringName = &"swim"
 const CLIMB: StringName = &"climb"
+const ON_BOAT: StringName = &"on_boat"
 
 const DIRECTIONS: Array[Vector2] = [
 	Vector2(1, 0), Vector2(0.70710678, 0.70710678), Vector2(0, 1), Vector2(-0.70710678, 0.70710678),
@@ -62,7 +63,12 @@ var _states: Dictionary[StringName, PlayerState] = {}
 func _init(terrain_query: TerrainQuery = null, current_water_height: int = 0) -> void:
 	terrain = terrain_query
 	water_height = current_water_height
-	_states = {GROUND: PlayerGroundState.new(), SWIM: PlayerSwimState.new(), CLIMB: PlayerClimbState.new()}
+	_states = {
+		GROUND: PlayerGroundState.new(),
+		SWIM: PlayerSwimState.new(),
+		CLIMB: PlayerClimbState.new(),
+		ON_BOAT: PlayerBoatState.new(),
+	}
 
 
 static func cell_of(point: Vector2) -> Vector2i:
@@ -96,8 +102,12 @@ func step(input: Vector2, sprint: bool, delta: float) -> void:
 
 
 ## The district's water moved. A climb is abandoned; ground vs swim follows the new water.
+## Aboard, the player stays aboard (the district decides what happens to the boat).
 func set_water_height(height: int) -> void:
 	water_height = height
+	if state_name == ON_BOAT:
+		level = height
+		return
 	if state_name == CLIMB:
 		change_state(GROUND)
 	settle()
@@ -105,7 +115,7 @@ func set_water_height(height: int) -> void:
 
 ## Matches state and level to the cell underfoot: swim in deep water, ground otherwise.
 func settle() -> void:
-	if state_name == CLIMB:
+	if state_name == CLIMB or state_name == ON_BOAT:
 		return
 	level = terrain.standing_level(cell, water_height)
 	var deep: bool = terrain.cell_kind(cell, water_height) == TerrainQuery.CellKind.DEEP
@@ -121,6 +131,28 @@ func change_state(next: StringName, data: Dictionary = {}) -> void:
 	state = _states[next]
 	state.enter(self, data)
 	state_changed.emit(next)
+
+
+## Steps aboard the boat; from now on ride() keeps the player on it.
+func board(boat_position: Vector2, boat_heading: float) -> void:
+	change_state(ON_BOAT)
+	ride(boat_position, boat_heading)
+
+
+## Follows the boat while aboard: same position, at the water surface, facing its heading.
+func ride(boat_position: Vector2, boat_heading: float) -> void:
+	position = boat_position
+	level = water_height
+	facing = Vector2.from_angle(boat_heading)
+	var now: Vector2i = cell_of(position)
+	if now != cell:
+		cell = now
+		cell_changed.emit(now)
+
+
+## Steps ashore onto `landing`, normally a cell next to the boat (see BoatRules.landing_cell).
+func disembark(landing: Vector2i) -> void:
+	place(landing)
 
 
 ## 0..1 of the way up the current climb, or 0 when not climbing.

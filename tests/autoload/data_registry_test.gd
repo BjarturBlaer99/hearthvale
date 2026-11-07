@@ -21,7 +21,7 @@ func test_project_data_loads_without_errors() -> void:
 func test_slice_content_is_registered() -> void:
 	_registry.load_all()
 	var expected: Dictionary = {
-		&"districts": [&"greenterrace", &"st_aud"],
+		&"districts": [&"greenterrace", &"spire_nine", &"st_aud"],
 		&"basins": [&"old_reservoir"],
 		&"nodes": [&"st_aud_pump", &"third_outlet"],
 		&"interiors": [&"st_aud_ground_floor"],
@@ -82,7 +82,7 @@ func test_entries_come_in_id_order() -> void:
 	var found: Array = []
 	for entry: Dictionary in _registry.entries(&"districts"):
 		found.append(entry["id"])
-	assert_array(found).is_equal(["greenterrace", "st_aud"])
+	assert_array(found).is_equal(["greenterrace", "spire_nine", "st_aud"])
 
 
 func test_missing_data_root_is_reported() -> void:

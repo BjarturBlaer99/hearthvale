@@ -186,6 +186,43 @@ func test_rising_water_ends_a_climb() -> void:
 	assert_int(motor.level).is_equal(4)
 
 
+# --- Boat ------------------------------------------------------------------
+
+func test_boarding_puts_the_player_on_the_boat() -> void:
+	var motor: PlayerMotor = _motor(["0 0 0"], 4, Vector2i(0, 0))
+	motor.board(Vector2(40, 8), PI / 2.0)
+	assert_that(motor.state_name).is_equal(PlayerMotor.ON_BOAT)
+	assert_that(motor.position).is_equal(Vector2(40, 8))
+	assert_that(motor.cell).is_equal(Vector2i(2, 0))
+	assert_int(motor.level).is_equal(4)
+	assert_float(motor.facing.y).is_equal_approx(1.0, 0.001)
+
+
+func test_aboard_movement_input_steers_the_boat_not_the_player() -> void:
+	var motor: PlayerMotor = _motor(["0 0 0"], 4, Vector2i(0, 0))
+	motor.board(Vector2(8, 8), 0.0)
+	_hold(motor, Vector2.RIGHT, 0.5, true)
+	assert_that(motor.position).is_equal(Vector2(8, 8))
+	assert_that(motor.state_name).is_equal(PlayerMotor.ON_BOAT)
+
+
+func test_water_changes_keep_a_rider_aboard() -> void:
+	var motor: PlayerMotor = _motor(["0 0 0"], 4, Vector2i(0, 0))
+	motor.board(Vector2(8, 8), 0.0)
+	motor.set_water_height(2)
+	assert_that(motor.state_name).is_equal(PlayerMotor.ON_BOAT)
+	assert_int(motor.level).is_equal(2)
+
+
+func test_disembarking_puts_the_player_ashore() -> void:
+	var motor: PlayerMotor = _motor(["4 0 4"], 4, Vector2i(1, 0))
+	motor.board(PlayerMotor.cell_center(Vector2i(1, 0)), 0.0)
+	motor.disembark(Vector2i(2, 0))
+	assert_that(motor.state_name).is_equal(PlayerMotor.GROUND)
+	assert_that(motor.cell).is_equal(Vector2i(2, 0))
+	assert_int(motor.level).is_equal(4)
+
+
 # --- Helpers ---------------------------------------------------------------
 
 func _motor(rows: Array, water_height: int, start: Vector2i) -> PlayerMotor:

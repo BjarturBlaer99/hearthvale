@@ -3,7 +3,7 @@ extends SceneTree
 ##   godot --headless --path . -s res://tools/greybox/make_tile_texture.gd
 ##   godot --headless --path . --import
 ##   godot --headless --path . -s res://tools/greybox/build_tileset.gd
-##   godot --headless --path . -s res://tools/greybox/build_st_aud.gd
+##   godot --headless --path . -s res://tools/greybox/build_maps.gd
 
 const T: int = GreyboxTiles.TILE_SIZE
 

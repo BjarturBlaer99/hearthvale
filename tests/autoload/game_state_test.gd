@@ -81,7 +81,26 @@ func test_setting_a_level_directly_clears_pending_water() -> void:
 
 func test_the_players_position_is_recorded_for_saving() -> void:
 	_state.update_player(&"st_aud", Vector2i(8, 9), 5, 72.5)
-	assert_dict(_state.to_dict()["player"]).is_equal({"district": "st_aud", "cell": [8, 9], "height": 5, "stamina": 72.5})
+	assert_dict(_state.to_dict()["player"]).is_equal({"district": "st_aud", "cell": [8, 9], "height": 5, "stamina": 72.5, "on_boat": false})
+
+
+func test_the_boat_is_recorded_with_or_without_a_cell() -> void:
+	_state.set_boat(&"st_aud", Vector2i(1, 10), 0.5)
+	assert_that(_state.boat_cell()).is_equal(Vector2i(1, 10))
+	assert_dict(_state.to_dict()["boat"]).is_equal({"where": "st_aud", "cell": [1, 10], "heading": 0.5, "moored_at": ""})
+	_state.set_boat(&"sea", GameState.NO_CELL, 0.0, &"greenterrace")
+	assert_that(_state.boat_cell()).is_equal(GameState.NO_CELL)
+	assert_that(str(_state.boat["moored_at"])).is_equal("greenterrace")
+
+
+func test_setting_sail_marks_the_player_as_arriving_aboard() -> void:
+	_state.update_player(&"st_aud", Vector2i(1, 9), 4, 100.0)
+	_state.begin_voyage(&"sea", &"st_aud")
+	assert_that(str(_state.player["district"])).is_equal("sea")
+	assert_that(str(_state.player["came_from"])).is_equal("st_aud")
+	assert_bool(_state.player["arriving"]).is_true()
+	assert_bool(_state.player["on_boat"]).is_true()
+	assert_bool(_state.player.has("cell")).is_false()
 
 
 func test_rejected_water_changes_are_not_recorded() -> void:

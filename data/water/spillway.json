@@ -23,6 +23,16 @@
       "start_level": "dry",
       "water_volume_per_step": 100,
       "outflows": []
+    },
+    {
+      "id": "spire_nine",
+      "name": "Spire Nine",
+      "levels": [
+        { "id": "sea", "water_height": 4 }
+      ],
+      "start_level": "sea",
+      "water_volume_per_step": 100,
+      "outflows": []
     }
   ],
   "basins": [

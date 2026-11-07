@@ -43,6 +43,24 @@ func setup(terrain: TerrainQuery, water_height: int, start_cell: Vector2i, stami
 	sync_from_motor()
 
 
+## Steps aboard `boat`. While aboard, movement input steers the boat (BoatController).
+func board(boat: BoatController) -> void:
+	motor.board(boat.motor.position, boat.motor.heading)
+	sync_from_motor()
+
+
+## Keeps the player on `boat`; the boat calls this whenever it moves.
+func ride(boat: BoatController) -> void:
+	motor.ride(boat.motor.position, boat.motor.heading)
+	sync_from_motor()
+
+
+## Steps ashore onto `landing`.
+func disembark(landing: Vector2i) -> void:
+	motor.disembark(landing)
+	sync_from_motor()
+
+
 ## Moves the node to the motor's position and redraws (after anything outside the
 ## physics step changes the motor, such as a water change).
 func sync_from_motor() -> void:
@@ -62,10 +80,13 @@ func _physics_process(delta: float) -> void:
 
 func _update_visuals(delta: float) -> void:
 	var swimming: bool = motor.state_name == PlayerMotor.SWIM
+	var riding: bool = motor.state_name == PlayerMotor.ON_BOAT
 	var climbing: bool = motor.state_name == PlayerMotor.CLIMB
 	var moved: float = motor.position.distance_to(_last_position)
 	if climbing:
 		moved = absf(motor.climb_progress() - _last_climb) * CLIMB_STRIDE_PX
+	if riding:
+		moved = 0.0
 	_last_position = motor.position
 	_last_climb = motor.climb_progress()
 	_animator.update(motor.facing, moved, climbing)
@@ -74,7 +95,11 @@ func _update_visuals(delta: float) -> void:
 	if _hop_left > 0.0:
 		lift += sin(_hop_left / HOP_TIME * PI) * HOP_HEIGHT
 	var top: int
-	if swimming:
+	if riding:
+		# Sitting in the hull: head and shoulders show.
+		_sprite.region_rect = _animator.region(PlayerAnimator.SWIM_ROWS)
+		top = -PlayerAnimator.SWIM_ROWS + 1
+	elif swimming:
 		_swim_time += delta
 		_sprite.region_rect = _animator.region(PlayerAnimator.SWIM_ROWS)
 		top = -PlayerAnimator.SWIM_ROWS + SWIM_SINK + roundi(sin(_swim_time * SWIM_BOB_SPEED))
@@ -84,7 +109,7 @@ func _update_visuals(delta: float) -> void:
 	_sprite.position = Vector2(-PlayerAnimator.FRAME_SIZE.x / 2.0, top - roundi(lift))
 	_sprite.flip_h = _animator.flip_h
 	_sprite.modulate = EXHAUSTED_TINT if motor.exhausted else Color.WHITE
-	_shadow.visible = not swimming
+	_shadow.visible = not swimming and not riding
 	_ripple.visible = swimming
 
 
