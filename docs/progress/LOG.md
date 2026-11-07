@@ -86,3 +86,10 @@ Visual check: screenshots at each level (`tools/capture_st_aud.gd`) show the gat
 - `tools/` scripts can't reference autoload-using classes at compile time; see CLAUDE.md.
 
 **Next:** M3, the boat and the sea map.
+
+## 2026-11-07 — Player sprite (between M2 and M3, at the user's request)
+- The placeholder polygon is replaced by an original Zelda-style 16×24 pixel-art hero: green hooded salvager's coat, tan trousers, boots, and the Network Key glowing on the belt. 9 frames: down/up/side × idle and two walk steps, with the side row flipped for right.
+- Art lives as ASCII in `tools/art/make_player_sprite.gd`, which writes `gameplay/player/player_sheet.png` (and an optional 8× preview).
+- `PlayerAnimator` (pure, 7 tests) handles facing, the walk cycle by distance, the back view while climbing, and head-and-shoulders above a ripple while swimming. Sprinting and wading animate at the right pace automatically.
+- 97 tests green. Checked in-game: standing, swimming and side view.
+- Known: the sprite is 16 px wide but movement still keeps the player's centre 4 px from walls, so the hood can overlap a wall by about 3 px sideways. There's no Y-sorting yet, so the player draws over everything.

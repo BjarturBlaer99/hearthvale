@@ -17,6 +17,8 @@ anything outside the current milestone. Scope creep is the main risk on this pro
 - Before a milestone, write a short plan in `docs/progress/M<n>-plan.md`. After it, append results and known issues to `docs/progress/LOG.md`.
 - If a design question isn't answered in the docs, pick the simplest option that keeps systems data-driven, note it in `docs/DECISIONS.md`, and continue.
 - Use placeholder art: flat-colored 16×16 tiles generated in code or as tiny PNGs you create, `ColorRect`/`Polygon2D` for actors. No external art, audio or asset-store dependencies until the roadmap says so.
+  **Exception (user's request, 2026-11-07):** the player is a Zelda-style pixel-art sprite, painted from ASCII art by
+  `tools/art/make_player_sprite.gd`. Keep it; edit the art in that tool, never the PNG. Other actors stay placeholders.
 
 ## Commands
 ```bash
@@ -30,6 +32,9 @@ godot --headless --path . --import
 godot --headless --path . --quit-after 30
 # Screenshots of St. Aud at every water level, for review (needs a window, not --headless)
 godot --path . -s res://tools/capture_st_aud.gd -- <output_dir>
+# Repaint the player sprite sheet after editing its ASCII art (optional 8x preview), then re-import
+godot --headless --path . -s res://tools/art/make_player_sprite.gd -- <preview.png>
+godot --headless --path . --import
 # Rewrite the input map after editing tools/setup_input_map.gd
 godot --headless --path . -s res://tools/setup_input_map.gd
 # Greybox: regenerate the tiles and re-bake St. Aud's Height layer (OVERWRITES editor painting of that layer)

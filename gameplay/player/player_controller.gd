@@ -1,24 +1,29 @@
 class_name PlayerController
 extends CharacterBody2D
 ## The player in a district: reads input, steps the grid-checked PlayerMotor, and draws the
-## result (docs/TECH_DESIGN.md §4). Position comes from the motor, not from physics; the
-## collision shape is here for enemies and hitboxes later (M7).
+## result with the sprite sheet (docs/TECH_DESIGN.md §4). Position comes from the motor,
+## not from physics; the collision shape is here for enemies and hitboxes later (M7).
 
 const HOP_TIME: float = 0.22
 const HOP_HEIGHT: float = 4.0
-## Pixels the body rises over a full climb.
+## Pixels the sprite rises over a full climb.
 const CLIMB_LIFT: float = 10.0
-const COLOR_GROUND: Color = Color(0.93, 0.55, 0.25)
-const COLOR_SWIM: Color = Color(0.98, 0.74, 0.48)
-const COLOR_CLIMB: Color = Color(0.96, 0.66, 0.32)
-const COLOR_EXHAUSTED: Color = Color(0.72, 0.36, 0.30)
+## Animation pace while climbing: pixels of "walk" per full climb.
+const CLIMB_STRIDE_PX: float = 24.0
+## How far the swimmer sits below the surface line, and how fast they bob.
+const SWIM_SINK: int = 4
+const SWIM_BOB_SPEED: float = 5.0
+const EXHAUSTED_TINT: Color = Color(1.0, 0.62, 0.58)
 
 var motor: PlayerMotor
 
+var _animator: PlayerAnimator = PlayerAnimator.new()
+var _last_position: Vector2 = Vector2.ZERO
+var _last_climb: float = 0.0
 var _hop_left: float = 0.0
+var _swim_time: float = 0.0
 
-@onready var _body: Polygon2D = $Body
-@onready var _facing: Polygon2D = $Body/Facing
+@onready var _sprite: Sprite2D = $Sprite
 @onready var _shadow: Polygon2D = $Shadow
 @onready var _ripple: Polygon2D = $Ripple
 @onready var _camera: Camera2D = $Camera2D
@@ -34,6 +39,7 @@ func setup(terrain: TerrainQuery, water_height: int, start_cell: Vector2i, stami
 	_camera.limit_top = bounds.position.y
 	_camera.limit_right = bounds.end.x
 	_camera.limit_bottom = bounds.end.y
+	_last_position = motor.position
 	sync_from_motor()
 
 
@@ -41,7 +47,7 @@ func setup(terrain: TerrainQuery, water_height: int, start_cell: Vector2i, stami
 ## physics step changes the motor, such as a water change).
 func sync_from_motor() -> void:
 	position = motor.position
-	_update_visuals()
+	_update_visuals(0.0)
 
 
 func _physics_process(delta: float) -> void:
@@ -50,27 +56,36 @@ func _physics_process(delta: float) -> void:
 	var input: Vector2 = Input.get_vector(&"move_left", &"move_right", &"move_up", &"move_down")
 	motor.step(input, Input.is_action_pressed(&"sprint"), delta)
 	_hop_left = maxf(0.0, _hop_left - delta)
-	sync_from_motor()
+	position = motor.position
+	_update_visuals(delta)
 
 
-func _update_visuals() -> void:
+func _update_visuals(delta: float) -> void:
 	var swimming: bool = motor.state_name == PlayerMotor.SWIM
+	var climbing: bool = motor.state_name == PlayerMotor.CLIMB
+	var moved: float = motor.position.distance_to(_last_position)
+	if climbing:
+		moved = absf(motor.climb_progress() - _last_climb) * CLIMB_STRIDE_PX
+	_last_position = motor.position
+	_last_climb = motor.climb_progress()
+	_animator.update(motor.facing, moved, climbing)
+
 	var lift: float = motor.climb_progress() * CLIMB_LIFT
 	if _hop_left > 0.0:
 		lift += sin(_hop_left / HOP_TIME * PI) * HOP_HEIGHT
-	_body.position = Vector2(0.0, (3.0 if swimming else 0.0) - lift)
-	_body.scale = Vector2(1.0, 0.6 if swimming else 1.0)
-	if motor.exhausted:
-		_body.color = COLOR_EXHAUSTED
-	elif swimming:
-		_body.color = COLOR_SWIM
-	elif motor.state_name == PlayerMotor.CLIMB:
-		_body.color = COLOR_CLIMB
+	var top: int
+	if swimming:
+		_swim_time += delta
+		_sprite.region_rect = _animator.region(PlayerAnimator.SWIM_ROWS)
+		top = -PlayerAnimator.SWIM_ROWS + SWIM_SINK + roundi(sin(_swim_time * SWIM_BOB_SPEED))
 	else:
-		_body.color = COLOR_GROUND
+		_sprite.region_rect = _animator.region()
+		top = -PlayerAnimator.FRAME_SIZE.y + _animator.bob()
+	_sprite.position = Vector2(-PlayerAnimator.FRAME_SIZE.x / 2.0, top - roundi(lift))
+	_sprite.flip_h = _animator.flip_h
+	_sprite.modulate = EXHAUSTED_TINT if motor.exhausted else Color.WHITE
 	_shadow.visible = not swimming
 	_ripple.visible = swimming
-	_facing.rotation = motor.facing.angle() + PI / 2.0
 
 
 func _on_fell(_levels: int, _damaging: bool) -> void:
