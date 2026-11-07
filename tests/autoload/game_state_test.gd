@@ -71,6 +71,19 @@ func test_applied_water_changes_are_recorded_and_announced() -> void:
 	assert_int(_state.water_pending[&"greenterrace"]).is_equal(0)
 
 
+func test_setting_a_level_directly_clears_pending_water() -> void:
+	_state.new_game()
+	_state.water_pending[&"greenterrace"] = 50
+	_state.set_water_level(&"greenterrace", &"flooded")
+	assert_int(_state.water_pending[&"greenterrace"]).is_equal(0)
+	assert_int(_state.water_network().get_district(&"greenterrace").pending).is_equal(0)
+
+
+func test_the_players_position_is_recorded_for_saving() -> void:
+	_state.update_player(&"st_aud", Vector2i(8, 9), 5, 72.5)
+	assert_dict(_state.to_dict()["player"]).is_equal({"district": "st_aud", "cell": [8, 9], "height": 5, "stamina": 72.5})
+
+
 func test_rejected_water_changes_are_not_recorded() -> void:
 	_state.new_game()
 	var change: WaterChangeResult = WaterSolver.new().preview(_state.water_network(), &"st_aud_pump", WaterSolver.LOWER)

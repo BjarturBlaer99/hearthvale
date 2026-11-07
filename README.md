@@ -9,6 +9,18 @@ after a catastrophic flood. Changing the water level changes the world.
 3. Run `claude` here and say: **"Read CLAUDE.md and the docs, then start milestone M0."**
 4. After each milestone, review `docs/progress/LOG.md`, play the build, commit, then ask for the next one.
 
+## Playing the current build
+Run `godot --path .` to start in the greybox St. Aud district.
+
+| Action | Keyboard | Gamepad |
+|---|---|---|
+| Move (8 directions) | WASD / arrow keys | Left stick / d-pad |
+| Sprint (uses stamina) | Shift | LB or L3 |
+| Use what you're standing on | E | A |
+| Cycle the water level (debug builds) | F2 | Back / Select |
+
+Walk into a climbable (ivy) wall to climb it; walking off a ledge drops you.
+
 ## Docs
 - `CLAUDE.md` — rules for Claude Code
 - `docs/GDD.md` — game design

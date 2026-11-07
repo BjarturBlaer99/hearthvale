@@ -55,10 +55,14 @@ func get_flag(flag: StringName, default: Variant = false) -> Variant:
 
 # --- Water -----------------------------------------------------------------
 
+## Sets a district's level directly, bypassing the flood network's conservation: for debug
+## tools and scripted events only. Players change water through apply_water_change().
+## Clears the district's pending water so the network stays valid.
 func set_water_level(district_id: StringName, level_id: StringName) -> void:
 	if water.get(district_id, &"") == level_id:
 		return
 	water[district_id] = level_id
+	water_pending[district_id] = 0
 	EventBus.water_level_changed.emit(district_id, level_id)
 
 
@@ -124,6 +128,17 @@ func set_water_state(state: Dictionary) -> void:
 func _water_topology() -> WaterNetwork:
 	return WaterNetwork.from_entries(
 		DataRegistry.entries(&"districts"), DataRegistry.entries(&"basins"), DataRegistry.entries(&"nodes"))
+
+
+# --- Player ----------------------------------------------------------------
+
+## Records where the player is and how much stamina they have. The district calls this
+## every frame; it emits nothing.
+func update_player(district_id: StringName, cell: Vector2i, height: int, stamina: float) -> void:
+	player["district"] = String(district_id)
+	player["cell"] = [cell.x, cell.y]
+	player["height"] = height
+	player["stamina"] = stamina
 
 
 # --- Quests ----------------------------------------------------------------

@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/player/player_controller.gd" id="1_player"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_feet"]
+radius = 4.0
+
+[node name="Player" type="CharacterBody2D"]
+motion_mode = 1
+script = ExtResource("1_player")
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_feet")
+
+[node name="Shadow" type="Polygon2D" parent="."]
+color = Color(0, 0, 0, 0.35)
+polygon = PackedVector2Array(-5, 0, -3.5, -1.8, 0, -2.5, 3.5, -1.8, 5, 0, 3.5, 1.8, 0, 2.5, -3.5, 1.8)
+
+[node name="Ripple" type="Polygon2D" parent="."]
+visible = false
+color = Color(0.78, 0.96, 0.93, 0.55)
+polygon = PackedVector2Array(-7, 0, -5, -2, 0, -3, 5, -2, 7, 0, 5, 2, 0, 3, -5, 2)
+
+[node name="Body" type="Polygon2D" parent="."]
+color = Color(0.93, 0.55, 0.25, 1)
+polygon = PackedVector2Array(-4, 0, -4, -9, -3, -11, 3, -11, 4, -9, 4, 0)
+
+[node name="Facing" type="Polygon2D" parent="Body"]
+position = Vector2(0, -5)
+color = Color(0.22, 0.13, 0.08, 1)
+polygon = PackedVector2Array(-2, 1, 2, 1, 0, -2.5)
+
+[node name="Camera2D" type="Camera2D" parent="."]

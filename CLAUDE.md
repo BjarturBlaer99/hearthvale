@@ -26,8 +26,17 @@ godot --path .
 godot --headless --path . -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add res://tests --ignoreHeadlessMode --continue
 # Import / validate project without opening the editor
 godot --headless --path . --import
-# Boot the game headless for a few frames (prints the smoke report, catches autoload errors)
+# Boot the game headless for a few frames (catches script and autoload errors)
 godot --headless --path . --quit-after 30
+# Screenshots of St. Aud at every water level, for review (needs a window, not --headless)
+godot --path . -s res://tools/capture_st_aud.gd -- <output_dir>
+# Rewrite the input map after editing tools/setup_input_map.gd
+godot --headless --path . -s res://tools/setup_input_map.gd
+# Greybox: regenerate the tiles and re-bake St. Aud's Height layer (OVERWRITES editor painting of that layer)
+godot --headless --path . -s res://tools/greybox/make_tile_texture.gd
+godot --headless --path . --import
+godot --headless --path . -s res://tools/greybox/build_tileset.gd
+godot --headless --path . -s res://tools/greybox/build_st_aud.gd
 ```
 If `godot` is not on PATH, ask the user for the binary path and record it here.
 
@@ -42,6 +51,17 @@ removes the shim, so recreate it after upgrading.
 - gdUnit4's CLI is **fail-fast by default**: it stops at the first failing test, and "Executed test cases (n/n)"
   only counts what ran. Always pass `--continue` (`-c`) to see every failure.
 - `StringName` sorts by internal pointer, not text. Compare as `String` when order matters.
+- Headless, drive input with `Input.action_press()` / `action_release()` (sets action state directly);
+  gdUnit4's `simulate_action_*` sends InputEvents, which headless mode drops.
+
+**Tool-script gotchas (`-s res://tools/...`):**
+- A `-s` script compiles before the autoloads exist. Never name a class that uses an autoload (e.g.
+  `DistrictController`) or the autoload itself in a tool script; look things up at runtime
+  (`root.get_node("GameState")`, untyped `Node`).
+- When a tool re-saves a scene, instantiate it with `PackedScene.GEN_EDIT_STATE_MAIN`, or `pack()` pins every
+  inherited property of instanced children (Player, HUD) as an override.
+- Windows PowerShell 5.1's `Set-Content -Encoding utf8` writes a byte-order mark. Edit text files with the Edit
+  tool or `sed`, not PowerShell.
 
 ## Code conventions
 - **Typed GDScript everywhere**: `var hp: int = 10`, typed function signatures, `class_name` on reusable scripts.
