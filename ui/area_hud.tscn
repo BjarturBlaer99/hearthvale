@@ -43,7 +43,7 @@ theme_override_font_sizes/font_size = 8
 text = "Carrying: nothing"
 
 [node name="Hint" type="Label" parent="."]
-offset_left = 236.0
+offset_left = 164.0
 offset_top = 4.0
 offset_right = 476.0
 offset_bottom = 15.0
@@ -51,7 +51,7 @@ theme_override_colors/font_color = Color(0.95, 0.95, 0.9, 0.85)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 8
-text = "WASD: move   E: talk / use"
+text = "WASD: move   Shift: sprint   E: talk / use   Space: sword"
 horizontal_alignment = 2
 
 [node name="Message" type="Label" parent="."]

@@ -16,6 +16,11 @@ func covers(at: Vector2i) -> bool:
 	return at == cell()
 
 
+## It stands in its cell: the area marks the cell occupied.
+func occupies() -> bool:
+	return true
+
+
 ## The conversation's data from DataRegistry (empty if the id is unknown).
 func dialogue() -> Dictionary:
 	return DataRegistry.get_dialogue(dialogue_id)

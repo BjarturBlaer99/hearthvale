@@ -51,6 +51,20 @@ func test_villagers_and_signs_have_their_conversations() -> void:
 		assert_bool(_registry.has_entry(&"dialogues", id)).override_failure_message("dialogue '%s'" % id).is_true()
 
 
+func test_enemies_are_registered() -> void:
+	_registry.load_all()
+	assert_array(Array(_registry.ids(&"enemies")).map(func(id: StringName) -> String: return String(id))).is_equal(["bat", "goblin_archer", "slime"])
+	assert_str(str(_registry.get_enemy(&"slime").get("behaviour", ""))).is_equal("hopper")
+
+
+func test_bad_enemies_are_reported() -> void:
+	var errors: PackedStringArray = _registry.load_all(FIXTURES.path_join("bad_enemy"))
+	_assert_reported(errors, "unknown behaviour 'teleporter'")
+	_assert_reported(errors, "unknown item id 'ruby'")
+	_assert_reported(errors, "unknown type 'treasure'")
+	_assert_reported(errors, "needs a 'weight' above 0")
+
+
 func test_dialogue_speakers_must_be_a_map() -> void:
 	var errors: PackedStringArray = _registry.load_all(FIXTURES.path_join("bad_speakers"))
 	_assert_reported(errors, "'speakers' must be an object")

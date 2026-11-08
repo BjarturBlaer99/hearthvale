@@ -218,6 +218,88 @@ hearts. The finished water version (M4 included) is committed on the **`water-ve
 - Villagers always face down and don't turn to the hero.
 - Text appears all at once; long text isn't paged (the box fits about three lines plus four answers).
 - The dialogue box covers the bottom of a room. That's fine for these rooms, but worth watching as rooms grow.
-- Not played by hand yet with a real keyboard or gamepad (answer cursor and walking through doors).
+- Played by hand on 2026-11-08: walking through doors, talking, the answer cursor and the flag all feel right.
 
 **Next:** H2, sword and hearts.
+
+## 2026-11-08 — H2 Sword & hearts — done
+
+**Built**
+- **Combat rules** (`core/combat/`, pure): `CombatRules` covers sword-arc and circle contact, knockback away from the blow, choosing the strongest held sword from data, and weapon stats with defaults. `Hit` holds damage, push and source.
+- **Hero states:** `attack` (stands still for the swing), `hurt` (knockback through the terrain rules) and `dead`, plus 1 s of invincibility (the sprite blinks; tinted when hurt or down).
+- **HitBox / HurtBox** (`gameplay/combat/`) on `hero` and `enemy` teams. The area resolves contacts in code every physics frame. `Sword` is an arc HitBox drawn as a blade sweeping 120°, behind the hero when they face up.
+- **Attack action:** Space / J / gamepad X, via `tools/setup_input_map.gd`. Wooden Sword stats in `data/items/items.json` (damage 2, knockback 40, cooldown 0.3).
+- **Death and respawn:** at zero hearts the hero lies still for 1 s, then returns to the area entrance (where they arrived) with full hearts.
+- **Training yard** in the village's fenced field: the Wooden Sword pickup, a training dummy (wobbles and flashes, blocks its cell), three brambles, and a recovery heart (+1, back each visit).
+- 97 tests in 16 suites (+17). New: `combat_rules_test` and `combat_test` (village); additions to the motor and input-map suites.
+
+**Acceptance criteria**
+- [x] The sword hits the dummy only in front of the hero. `combat_test` swings from seven spots: ahead, beside and behind, facing toward and away, and out of reach. Each swing lands exactly once or not at all.
+- [x] Touching a hazard costs half a heart with knockback and invincibility frames. The hero walks into the brambles: 6 → 5 half hearts, pushed back about 32 px. Walking straight back in costs nothing while invincible, and the thorns bite again (→ 4) once it wears off.
+- [x] At zero hearts the hero respawns at the area entrance with full hearts. With one half heart left, the brambles knock the hero down: they lie still, can't swing, and after the delay are back at the spawn with 3 hearts. A second test enters the village through the elder's door and respawns at that door.
+- Mutation checks: six deliberate bugs, each caught by the expected test, files restored byte for byte:
+  - the arc check ignored
+  - the sword hitting every frame
+  - no invincibility
+  - no knockback
+  - respawning at the spawn instead of the entrance
+  - no refill on respawn
+- Visual check (`tools/capture.gd`, 11 shots): the training yard, and a swing from the side landing on the dummy as it flashes.
+
+**Known issues / notes**
+- The hero sprite has no attack frames; the blade is drawn in code. Facing up, it's mostly hidden behind the hero.
+- Respawning re-places the hero in the same scene; nothing else resets (there's nothing to reset until enemies, H3).
+- No sound, no game-over screen, no damage numbers (by design: damage is shown in hearts).
+- Recovery hearts can be farmed by walking out and back in. That's fine for now, as hearts will drop from enemies.
+- Played by hand on 2026-11-08: the swing, knockback, invincibility blinking and respawn all feel right.
+
+**Next:** H3, enemies.
+
+## 2026-11-08 — H3 Enemies — done
+
+**Built**
+- **Enemy data:** `data/enemies/` has `slime`, `goblin_archer` and `bat`, with `docs/data/enemy.schema.json` and an example. DataRegistry validates the behaviour id, the numbers, drop types and weights, and item references; a bad fixture checks the errors.
+- **Shared movement:** `GridBody` (the hero's grid movement, now shared). Enemies keep to their level; bats fly over heights but not solid tiles (`TerrainQuery.check_flight`).
+- **Brains** (`core/enemies/`, pure, seeded): `EnemyBrain` with `HopperBrain`, `ArcherBrain` and `FlierBrain`, made by `EnemyBrains` from the behaviour id. `DropTable` rolls weighted drops.
+- **Nodes:**
+  - `Enemy`: placeholder art per behaviour, flashing when hit and a poof on death; a HurtBox, and a contact HitBox that hurts on touch.
+  - `Arrow`, and `ItemDrop` (coins by touch).
+  - The area sets enemies up and collects touch pickups.
+- **South Field:** a 40×28 greybox reached by the village's south road. It has slimes in the meadow (with a pond), a goblin archer on a plateau with stairs and a ledge all round, and bats in a stone ruin.
+- 115 tests in 18 suites (+18). New: `enemy_brain_test` (behaviours, terrain rules, hits, drop table) and `south_field_test`; additions to the DataRegistry and doors suites.
+
+**Acceptance criteria**
+- [x] Each enemy patrols, notices, attacks and can be beaten.
+  - Brain tests: a slime wanders near home and never chases with nobody around, then notices, hops after the hero and lunges, and gives up when they leave. An archer backs off when crowded, lines up, draws its bow for at least 0.4 s, shoots along the line, and waits out its cooldown. A bat rests until the hero comes near, then zigzags in and swoops.
+  - In the field, the goblin shoots by itself and its arrow costs half a heart; touching a slime costs half a heart; the sword beats a slime and a bat in one hit and the goblin in two.
+- [x] Drops follow data. Each kind is beaten with a chosen roll, and what it leaves matches its data's table: the slime's coin, the goblin's three coins, nothing from the bat. The coins land in the inventory when walked over. Drop-table tests check the weights at the boundaries.
+- [x] Enemies respect cliffs, ledges and solid tiles. For slime and archer, on small grids: they never climb a cliff, hop down a ledge or pass a solid tile, even while chasing the hero just beyond. A bat crosses a height-3 ridge but not a solid wall. In the field over 12 s of play, no enemy enters a solid tile, walkers never change level, and the goblin is still on its plateau with the hero waiting below. Arrows stop in solid tiles.
+- Mutation checks: six deliberate bugs, each caught, files restored byte for byte:
+  - enemies hopping down ledges
+  - bats flying through walls
+  - drops ignoring the table
+  - health not from data
+  - no draw before shooting
+  - enemies never noticing
+
+  "No draw" first slipped through: the test compared against the constant it was testing. It now requires a visible tell of at least 0.4 s.
+- Two test mistakes found and fixed along the way:
+  - A slime needs over 2 s to cover four tiles.
+  - The slime's and the goblin's coins land on the same spot when both are beaten there.
+
+  One real fix: the archer used to shoot point-blank; it now backs off to its range first.
+- Visual check (`tools/capture.gd`, 14 shots): slimes in the meadow, the goblin on its plateau with an arrow in flight, and a bat resting in the ruin while another flies.
+
+**Known issues / notes**
+- No pathfinding: enemies head straight for the hero and can get stuck behind rocks or ponds (fine for this greybox; revisit if dungeon rooms need it).
+- Arrows fly only in four directions, and the sword doesn't deflect them.
+- Enemies have no sprites or sounds yet. Drops don't time out.
+- Bats ignore occupied cells (villagers, the dummy); there are none in the field.
+- Played by hand on 2026-11-08: the slimes, goblin archer, bats and drops all feel right.
+
+**Next:** H4, items and weapons.
+
+## 2026-11-08 — Sprint (user request)
+- Hold **Shift** (gamepad **B**) to sprint at 120 px/s (walking is 72); no stamina. GDD §5 and CLAUDE.md now allow it. The HUD hint lists it.
+- Tests: sprinting covers 120 px/s in all eight directions while walking stays at 72, a swing still roots a sprinting hero, and Shift is bound. 118 tests, all green. A deliberate bug (sprint not faster) was caught.
+- Not played by hand yet.

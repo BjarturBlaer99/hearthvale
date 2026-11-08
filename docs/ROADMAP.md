@@ -20,14 +20,14 @@ GameState and on the HUD; the Hearthvale village greybox as the start.
 **Done when**: you can enter two houses and come out the same door; a villager's dialogue (with a choice that sets
 a flag) plays from data; the flag survives leaving the area.
 
-## H2 — Sword & hearts
+## H2 — Sword & hearts ✅
 - The Wooden Sword (picked up in the village), an arc swing, hitboxes and hurtboxes.
 - Taking damage: knockback, brief invincibility, hearts going down; heart pickups; death and respawn.
 - A training dummy to hit.
 **Done when**: the sword hits the dummy only in front of the hero; touching a hazard costs half a heart with
 knockback and invincibility frames; at zero hearts the hero respawns at the area entrance with full hearts.
 
-## H3 — Enemies
+## H3 — Enemies ✅
 - Slime, goblin archer and bat from `data/enemies/*.json` (health, speed, damage, behaviour, drops).
 - An AI state machine (idle, wander, chase, attack, hurt); grid-checked movement like the hero's.
 - Drops: hearts and coins.

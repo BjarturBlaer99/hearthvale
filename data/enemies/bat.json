@@ -1,0 +1,14 @@
+{
+  "id": "bat",
+  "name": "Bat",
+  "behaviour": "flier",
+  "health": 1,
+  "speed": 60,
+  "sight": 64,
+  "contact_damage": 1,
+  "knockback": 20,
+  "drops": [
+    { "type": "heart", "weight": 1 },
+    { "type": "nothing", "weight": 2 }
+  ]
+}

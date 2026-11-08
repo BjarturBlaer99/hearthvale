@@ -3,13 +3,21 @@ extends Node2D
 ## Runs one area scene: the village, house interiors, later the countryside and dungeon rooms
 ## (docs/TECH_DESIGN.md §3). Builds the HeightGrid from the `Height` layer, places the hero,
 ## shows hearts and prompts on the HUD, and handles interacting: picking up what's underfoot,
-## talking to whoever the hero faces, and leaving through exits.
+## talking to whoever the hero faces, and leaving through exits. Every physics frame it lets
+## HitBoxes hit HurtBoxes and the hero collect hearts; at zero hearts the hero falls and comes
+## back at the area's entrance (where they arrived) with full hearts.
 ##
 ## Expects children: Height, HeightShading, Interactables, PlayerSpawn, Player, HUD, and
-## optionally Entries. Interactables holds ItemPickups, Talkables (villagers, signs) and
-## AreaExits. Entries holds a Marker2D per entry point, named by id, at a cell's centre and
+## optionally Entries. Interactables holds ItemPickups, Talkables (villagers, signs),
+## AreaExits, combat pieces (training dummy, brambles, hearts) and Enemies, which the area
+## sets up with its terrain, the hero and its random numbers. Any child whose occupies() is
+## true stands in its cell; any with touches() and collect() (hearts, coins) is picked up by
+## touch. Entries holds a Marker2D per entry point, named by id, at a cell's centre and
 ## rotated the way the hero should face on arrival (0 = right, 90 = down). PlayerSpawn is
 ## where a new game (or a first visit with no entry) puts the hero.
+
+## Seconds the hero lies still after falling, before coming back at the entrance.
+const RESPAWN_DELAY: float = 1.0
 
 @export var area_id: StringName = &"village"
 @export var area_name: String = "Hearthvale"
@@ -18,8 +26,15 @@ var grid: HeightGrid
 var terrain: TerrainQuery
 ## Changes the scene when the hero takes an exit (gets the scene path). Tests replace it.
 var travel: Callable
+## Random numbers for enemies (wandering, drops). Randomised on load; tests can seed it.
+var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 var _travelling: bool = false
+var _dying: bool = false
+var _respawn_left: float = 0.0
+## Where the hero arrived in this area, facing which way: where they come back after falling.
+var _entrance_cell: Vector2i = Vector2i.ZERO
+var _entrance_facing: Vector2 = Vector2.DOWN
 
 @onready var height_layer: TileMapLayer = $Height
 @onready var player: PlayerController = $Player
@@ -41,15 +56,19 @@ func _ready() -> void:
 	interactables.y_sort_enabled = true
 	grid = HeightGridBuilder.from_layer(height_layer)
 	terrain = TerrainQuery.new(grid)
-	for talkable: Talkable in talkables():
-		terrain.set_occupied(talkable.cell())
+	for child: Node in interactables.get_children():
+		if child.has_method(&"occupies") and child.call(&"occupies"):
+			terrain.set_occupied(child.call(&"cell"))
 	_shading.show_grid(grid)
 	var arrival: Dictionary = _arrival()
-	var start_cell: Vector2i = arrival["cell"]
-	var facing: Vector2 = arrival["facing"]
-	player.setup(terrain, start_cell, Rect2i(Vector2i.ZERO, grid.size * GreyboxTiles.TILE_SIZE))
-	player.face(facing)
+	_entrance_cell = arrival["cell"]
+	_entrance_facing = arrival["facing"]
+	player.setup(terrain, _entrance_cell, Rect2i(Vector2i.ZERO, grid.size * GreyboxTiles.TILE_SIZE))
+	player.face(_entrance_facing)
 	player.motor.cell_changed.connect(_on_cell_changed)
+	rng.randomize()
+	for enemy: Enemy in enemies():
+		enemy.setup(terrain, player, rng)
 	hud.dialogue.closed.connect(_on_dialogue_closed)
 	EventBus.health_changed.connect(_on_health_changed)
 	EventBus.flag_set.connect(_on_flag_set)
@@ -61,11 +80,22 @@ func _ready() -> void:
 	_update_hud()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if _travelling:
 		return
+	if _dying:
+		_respawn_left -= delta
+		if _respawn_left <= 0.0:
+			respawn()
 	GameState.update_player(area_id, player.motor.cell)
 	_update_hud()
+
+
+func _physics_process(_delta: float) -> void:
+	if _travelling:
+		return
+	resolve_combat()
+	collect_pickups()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -76,7 +106,7 @@ func _unhandled_input(event: InputEvent) -> void:
 ## Picks up what's underfoot, else talks to whoever the hero faces. Returns true if
 ## something happened.
 func interact() -> bool:
-	if _travelling or is_talking():
+	if _travelling or _dying or is_talking():
 		return false
 	var pickup: ItemPickup = pickup_under_player()
 	if pickup != null:
@@ -129,6 +159,62 @@ func talk_to(talkable: Talkable) -> bool:
 
 func is_talking() -> bool:
 	return hud.dialogue.is_open()
+
+
+## Lets every active HitBox in this area hit the HurtBoxes it touches (TECH_DESIGN §4).
+## Returns how many hits landed.
+func resolve_combat() -> int:
+	var hit_boxes: Array[HitBox] = []
+	for node: Node in get_tree().get_nodes_in_group(HitBox.GROUP):
+		if node is HitBox and is_ancestor_of(node) and (node as HitBox).active:
+			hit_boxes.append(node as HitBox)
+	var hurt_boxes: Array[HurtBox] = []
+	for node: Node in get_tree().get_nodes_in_group(HurtBox.GROUP):
+		if node is HurtBox and is_ancestor_of(node):
+			hurt_boxes.append(node as HurtBox)
+	var landed: int = 0
+	for hit_box: HitBox in hit_boxes:
+		for hurt_box: HurtBox in hurt_boxes:
+			if hit_box.try_hit(hurt_box):
+				landed += 1
+	return landed
+
+
+## The hero picks up every heart and coin they touch. Returns how many.
+func collect_pickups() -> int:
+	if _dying:
+		return 0
+	var collected: int = 0
+	var at: Vector2 = player.hurt_box.global_position
+	for child: Node in interactables.get_children():
+		if child.has_method(&"touches") and child.has_method(&"collect") \
+				and child.call(&"touches", at, player.hurt_box.radius) and child.call(&"collect"):
+			collected += 1
+	return collected
+
+
+func enemies() -> Array[Enemy]:
+	var out: Array[Enemy] = []
+	for child: Node in interactables.get_children():
+		if child is Enemy:
+			out.append(child as Enemy)
+	return out
+
+
+## True from the moment the hero runs out of hearts until they come back.
+func is_dying() -> bool:
+	return _dying
+
+
+## Brings the hero back at the area's entrance with full hearts.
+func respawn() -> void:
+	_dying = false
+	GameState.set_health(GameState.max_health())
+	player.motor.place(_entrance_cell)
+	player.face(_entrance_facing)
+	player.controls_enabled = not is_talking()
+	hud.flash()
+	hud.show_message("You wake up back at the entrance.")
 
 
 ## Leaves through `exit`: records where the hero is going in GameState, then changes scene.
@@ -215,6 +301,17 @@ func _on_dialogue_closed() -> void:
 
 func _on_health_changed(current: int, maximum: int) -> void:
 	hud.set_health(current, maximum)
+	if GameState.is_dead() and not _dying:
+		_fall()
+
+
+## Out of hearts: the hero lies still for RESPAWN_DELAY, then respawn().
+func _fall() -> void:
+	_dying = true
+	_respawn_left = RESPAWN_DELAY
+	player.controls_enabled = false
+	player.motor.die()
+	player.sync_from_motor()
 
 
 func _on_flag_set(_flag: StringName, _value: Variant) -> void:

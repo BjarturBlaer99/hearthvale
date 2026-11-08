@@ -2,8 +2,8 @@ extends GdUnitTestSuite
 ## The input map in project.godot: every action works from the keyboard (physical keys,
 ## so any layout) and from a gamepad, and actions from the old design are gone.
 
-const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down", &"interact"]
-const RETIRED: Array[StringName] = [&"sprint", &"debug_cycle_water"]
+const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down", &"interact", &"attack", &"sprint"]
+const RETIRED: Array[StringName] = [&"debug_cycle_water"]
 
 
 func test_every_action_has_a_physical_key_and_a_gamepad_binding() -> void:
@@ -36,6 +36,14 @@ func test_wasd_and_the_left_stick_move() -> void:
 	assert_object(stick).is_not_null()
 	assert_int(stick.axis).is_equal(JOY_AXIS_LEFT_X)
 	assert_float(stick.axis_value).is_equal(1.0)
+
+
+func test_shift_sprints() -> void:
+	assert_array(_physical_keys(&"sprint")).contains(KEY_SHIFT)
+
+
+func test_space_or_j_swings_the_sword() -> void:
+	assert_array(_physical_keys(&"attack")).contains(KEY_SPACE, KEY_J)
 
 
 func _physical_keys(action: StringName) -> Array:

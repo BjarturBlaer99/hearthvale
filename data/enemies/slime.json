@@ -1,0 +1,15 @@
+{
+  "id": "slime",
+  "name": "Slime",
+  "behaviour": "hopper",
+  "health": 2,
+  "speed": 44,
+  "sight": 72,
+  "contact_damage": 1,
+  "knockback": 24,
+  "drops": [
+    { "type": "heart", "weight": 1 },
+    { "type": "item", "item": "coin", "count": 1, "weight": 2 },
+    { "type": "nothing", "weight": 2 }
+  ]
+}

@@ -6,7 +6,7 @@ extends GdUnitTestSuite
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
 const VILLAGE: String = "res://world/areas/village/village.tscn"
-const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house"]
+const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"south_field"]
 ## [house, the cell just outside its door]
 const HOUSES: Array = [
 	[&"elder_house", Vector2i(30, 15)],
@@ -102,4 +102,4 @@ func test_every_exit_leads_to_an_entry_point_and_every_talker_has_a_conversation
 			for other: Node in target.get_node(^"Interactables").get_children():
 				if other is AreaExit:
 					assert_bool((other as AreaExit).covers(entry_cell)).override_failure_message(where + ": arrives on another exit").is_false()
-	assert_int(exits).override_failure_message("two doors in, two doormats out").is_equal(4)
+	assert_int(exits).override_failure_message("two doors and two doormats, and the south road both ways").is_equal(6)

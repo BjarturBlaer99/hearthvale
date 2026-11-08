@@ -26,7 +26,8 @@ item, the boss) → heart container and a new item that opens new paths → back
 - **The first dungeon:** an old keep north of the village (working name).
 
 ## 5. The hero
-- Moves in 8 directions and faces 4. **E / A** interacts. No sprint, climbing or stamina.
+- Moves in 8 directions and faces 4. **E / A** interacts. Hold **Shift / B** to sprint (no stamina: it never
+  runs out). No climbing or stamina.
 - **Life: hearts.** Start with **3**. Most hits cost **half a heart**. A **heart container** (from a boss) adds a
   heart and refills you; four **heart pieces** make a container (after the slice). Hearts drop from enemies,
   grass and pots. At zero hearts you return to the area's entrance with full hearts.

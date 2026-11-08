@@ -7,7 +7,7 @@ extends SceneTree
 
 const DEADZONE: float = 0.25
 ## Actions from earlier designs, cleared if present.
-const RETIRED: Array[String] = ["sprint", "debug_cycle_water"]
+const RETIRED: Array[String] = ["debug_cycle_water"]
 
 
 func _initialize() -> void:
@@ -16,6 +16,8 @@ func _initialize() -> void:
 	_action("move_up", [_key(KEY_W), _key(KEY_UP), _axis(JOY_AXIS_LEFT_Y, -1.0), _button(JOY_BUTTON_DPAD_UP)])
 	_action("move_down", [_key(KEY_S), _key(KEY_DOWN), _axis(JOY_AXIS_LEFT_Y, 1.0), _button(JOY_BUTTON_DPAD_DOWN)])
 	_action("interact", [_key(KEY_E), _button(JOY_BUTTON_A)])
+	_action("attack", [_key(KEY_SPACE), _key(KEY_J), _button(JOY_BUTTON_X)])
+	_action("sprint", [_key(KEY_SHIFT), _button(JOY_BUTTON_B)])
 	for action_name: String in RETIRED:
 		if ProjectSettings.has_setting("input/" + action_name):
 			ProjectSettings.clear("input/" + action_name)

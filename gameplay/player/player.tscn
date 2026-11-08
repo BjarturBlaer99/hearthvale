@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" path="res://gameplay/player/player_controller.gd" id="1_player"]
 [ext_resource type="Texture2D" path="res://gameplay/player/player_sheet.png" id="2_sheet"]
+[ext_resource type="Script" path="res://gameplay/combat/hurt_box.gd" id="3_hurt"]
+[ext_resource type="Script" path="res://gameplay/player/sword.gd" id="4_sword"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_feet"]
 radius = 4.0
@@ -25,3 +27,10 @@ region_enabled = true
 region_rect = Rect2(0, 0, 16, 24)
 
 [node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="HurtBox" type="Node2D" parent="."]
+script = ExtResource("3_hurt")
+team = &"hero"
+
+[node name="Sword" type="Node2D" parent="."]
+script = ExtResource("4_sword")

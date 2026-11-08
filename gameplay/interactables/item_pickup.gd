@@ -38,9 +38,27 @@ func take() -> bool:
 func _draw() -> void:
 	if taken():
 		return
-	# A brass valve with a glint, on a faint glow so it can be spotted.
-	draw_circle(Vector2(8, 9), 6.0, Color(1.0, 0.85, 0.4, 0.18))
+	# A faint glow so it can be spotted, then the item by type.
+	draw_circle(Vector2(8, 9), 6.5, Color(1.0, 0.85, 0.4, 0.18))
+	match str(DataRegistry.get_item(item_id).get("type", "")):
+		"weapon_melee":
+			_draw_sword()
+		_:
+			_draw_token()
+
+
+## A short sword lying on the ground, point up and to the right.
+func _draw_sword() -> void:
+	var outline: Color = Color(0.10, 0.08, 0.12)
+	draw_line(Vector2(4, 13), Vector2(13, 4), outline, 3.0)
+	draw_line(Vector2(6, 11), Vector2(13, 4), Color(0.86, 0.88, 0.92), 1.0)
+	draw_line(Vector2(3, 9), Vector2(8, 14), outline, 3.0)
+	draw_line(Vector2(4, 10), Vector2(7, 13), Color(0.55, 0.36, 0.18), 1.0)
+	draw_line(Vector2(3, 14), Vector2(5, 12), Color(0.55, 0.36, 0.18), 2.0)
+
+
+## A brass token with a glint, for anything without its own picture yet.
+func _draw_token() -> void:
 	draw_circle(Vector2(8, 9), 4.5, Color(0.10, 0.08, 0.12))
 	draw_circle(Vector2(8, 9), 3.5, Color(0.86, 0.66, 0.26))
-	draw_circle(Vector2(8, 9), 1.2, Color(0.30, 0.20, 0.10))
 	draw_line(Vector2(6, 7), Vector2(7, 6), Color(1, 0.95, 0.75), 1.0)

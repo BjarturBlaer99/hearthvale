@@ -1,0 +1,13 @@
+{
+  "id": "gremlin",
+  "name": "Gremlin",
+  "behaviour": "teleporter",
+  "health": 2,
+  "speed": 30,
+  "contact_damage": 1,
+  "drops": [
+    { "type": "item", "item": "ruby", "weight": 1 },
+    { "type": "treasure", "weight": 1 },
+    { "type": "heart", "weight": 0 }
+  ]
+}

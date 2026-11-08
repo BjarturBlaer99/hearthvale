@@ -15,12 +15,23 @@ Run `godot --path .` to start in Hearthvale.
 | Action | Keyboard | Gamepad |
 |---|---|---|
 | Move (8 directions) | WASD / arrow keys | Left stick / d-pad |
+| Sprint (hold) | Shift | B |
 | Talk / read / pick up | E | A |
 | Choose an answer | W / S or arrows, then E | d-pad, then A |
+| Swing the sword (once you have it) | Space / J | X |
 
 Read the sign in the square, then walk into a door: Elder Bram lives in the blue-roofed house, Wenna the weaver
-in the house west of the road. Take the stairs up to the chapel on the north rise, or to the meadow in the east;
-hop down a ledge to come back. Combat, enemies, items and dungeons arrive milestone by milestone
+in the house west of the road. The Wooden Sword lies in the fenced training yard south-west of the square, next
+to a straw dummy to practise on. Mind the brambles (half a heart each touch); the red heart heals. At zero hearts
+you wake up back where you entered the area. Take the stairs up to the chapel on the north rise, or to the meadow
+in the east; hop down a ledge to come back.
+
+Follow the road south out of the village to the **South Field**:
+- slimes hop about the meadow
+- a goblin archer guards the plateau (take its stairs, and watch for it drawing its bow)
+- bats roost in the old ruin
+
+Beaten enemies sometimes drop hearts or coins. Items and dungeons arrive milestone by milestone
 (`docs/ROADMAP.md`).
 
 ## Docs

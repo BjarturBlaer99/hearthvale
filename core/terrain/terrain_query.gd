@@ -35,6 +35,20 @@ func standing_level(cell: Vector2i) -> int:
 	return grid.height_at(cell)
 
 
+## For things that fly (bats): heights, stairs and ledges don't matter; solid cells and the
+## map edge still block. Occupied cells don't (they fly over villagers and dummies).
+func check_flight(from_cell: Vector2i, to_cell: Vector2i) -> MoveResult:
+	var result: MoveResult = MoveResult.new()
+	if not grid.in_bounds(from_cell) or not grid.in_bounds(to_cell):
+		result.reason = "out of bounds"
+	elif grid.is_solid(to_cell):
+		result.reason = "solid"
+	else:
+		result.kind = MoveResult.Kind.WALK
+		result.to_level = grid.height_at(to_cell)
+	return result
+
+
 func check_move(from_cell: Vector2i, to_cell: Vector2i) -> MoveResult:
 	var result: MoveResult = MoveResult.new()
 	if not grid.in_bounds(from_cell) or not grid.in_bounds(to_cell):

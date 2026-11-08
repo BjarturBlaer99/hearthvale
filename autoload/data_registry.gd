@@ -16,12 +16,14 @@ const DATA_ROOT: String = "res://data"
 const KIND_ITEMS: StringName = &"items"
 const KIND_QUEST: StringName = &"quest"
 const KIND_DIALOGUE: StringName = &"dialogue"
+const KIND_ENEMY: StringName = &"enemy"
 
 ## Directory under DATA_ROOT -> the kind of file it holds.
 const DIRECTORY_KINDS: Dictionary = {
 	"items": KIND_ITEMS,
 	"quests": KIND_QUEST,
 	"dialogue": KIND_DIALOGUE,
+	"enemies": KIND_ENEMY,
 }
 
 const REQUIRED_FIELDS: Dictionary = {
@@ -32,7 +34,12 @@ const REQUIRED_FIELDS: Dictionary = {
 	&"transition": ["when", "to"],
 	&"dialogue": ["id", "start", "nodes"],
 	&"dialogue_node": ["speaker", "text", "options"],
+	&"enemy": ["id", "name", "behaviour", "health", "speed", "contact_damage"],
 }
+
+## Enemy behaviour ids (EnemyBrains makes one brain per id) and drop-table entry types.
+const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier"]
+const DROP_TYPES: Array[String] = ["heart", "item", "nothing"]
 
 ## Condition type -> required fields (docs/data/CONDITIONS_AND_EFFECTS.md).
 const CONDITION_FIELDS: Dictionary = {
@@ -116,13 +123,17 @@ func get_dialogue(id: StringName) -> Dictionary:
 	return get_entry(&"dialogues", id)
 
 
+func get_enemy(id: StringName) -> Dictionary:
+	return get_entry(&"enemies", id)
+
+
 # --- Loading ---------------------------------------------------------------
 
 ## Clears everything and loads all JSON under `root`. Returns the problems found;
 ## an empty result means every file is valid and every reference resolves.
 func load_all(root: String = DATA_ROOT) -> PackedStringArray:
 	errors = []
-	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}}
+	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}}
 	if not DirAccess.dir_exists_absolute(root):
 		errors.append("%s: data directory does not exist." % root)
 		return errors
@@ -161,6 +172,8 @@ func _load_file(path: String, kind: StringName) -> void:
 			_register(path, data, &"quest", &"quests")
 		KIND_DIALOGUE:
 			_register(path, data, &"dialogue", &"dialogues")
+		KIND_ENEMY:
+			_register(path, data, &"enemy", &"enemies")
 
 
 ## Registers every object in the array `data[key]`.
@@ -206,6 +219,8 @@ func _validate_references() -> void:
 		_check_quest(quest)
 	for dialogue: Dictionary in _collections[&"dialogues"].values():
 		_check_dialogue(dialogue)
+	for enemy: Dictionary in _collections[&"enemies"].values():
+		_check_enemy(enemy)
 
 
 func _check_quest(quest: Dictionary) -> void:
@@ -269,6 +284,34 @@ func _check_dialogue(dialogue: Dictionary) -> void:
 				errors.append("%s: %s needs 'next' (a node id, or null to end)." % [path, o_where])
 			elif option["next"] != null and not nodes.has(str(option["next"])):
 				errors.append("%s: %s 'next' points to unknown node '%s'." % [path, o_where, option["next"]])
+
+
+func _check_enemy(enemy: Dictionary) -> void:
+	var path: String = enemy["_source"]
+	var label: String = "enemy '%s'" % enemy["id"]
+	if not ENEMY_BEHAVIOURS.has(str(enemy["behaviour"])):
+		errors.append("%s: %s has unknown behaviour '%s'. Known: %s." % [path, label, enemy["behaviour"], ", ".join(ENEMY_BEHAVIOURS)])
+	for field: String in ["health", "speed", "contact_damage"]:
+		var value: Variant = enemy[field]
+		if (typeof(value) != TYPE_INT and typeof(value) != TYPE_FLOAT) or float(value) < 0.0:
+			errors.append("%s: %s '%s' must be a number of 0 or more." % [path, label, field])
+	var drops: Array = _array_field(path, label, enemy, "drops")
+	for i: int in drops.size():
+		var where: String = "%s drop %d" % [label, i]
+		if typeof(drops[i]) != TYPE_DICTIONARY:
+			errors.append("%s: %s must be an object." % [path, where])
+			continue
+		var drop: Dictionary = drops[i]
+		if not DROP_TYPES.has(str(drop.get("type", ""))):
+			errors.append("%s: %s has unknown type '%s'. Known: %s." % [path, where, drop.get("type", ""), ", ".join(DROP_TYPES)])
+		var weight: Variant = drop.get("weight")
+		if (typeof(weight) != TYPE_INT and typeof(weight) != TYPE_FLOAT) or float(weight) <= 0.0:
+			errors.append("%s: %s needs a 'weight' above 0." % [path, where])
+		if str(drop.get("type", "")) == "item":
+			if not drop.has("item"):
+				errors.append("%s: %s of type 'item' needs 'item'." % [path, where])
+			else:
+				_check_id(path, where + " item", &"items", str(drop["item"]))
 
 
 # --- Conditions & effects --------------------------------------------------

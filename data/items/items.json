@@ -1,6 +1,6 @@
 {
   "items": [
-    { "id": "wooden_sword", "name": "Wooden Sword", "type": "weapon_melee", "stats": { "damage": 2 } },
+    { "id": "wooden_sword", "name": "Wooden Sword", "type": "weapon_melee", "stats": { "damage": 2, "knockback": 40, "cooldown": 0.3 } },
     { "id": "small_key", "name": "Small Key", "type": "key", "stackable": true, "max_stack": 9 },
     { "id": "coin", "name": "Coin", "type": "currency", "stackable": true, "max_stack": 999 }
   ]

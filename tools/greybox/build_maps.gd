@@ -13,6 +13,9 @@ extends SceneTree
 ## - two houses have a door in their front wall (tests/world/doors_test.gd).
 ## House interiors are 11x9 rooms: log walls, the way out a doormat in the middle of the
 ## bottom wall at (5, 8).
+## The South Field (H3's enemy ground, tests/world/south_field_test.gd): the road from the
+## village comes in at the top; slimes in the western meadow; a goblin archer on the eastern
+## plateau, reached by its stairs, with a one-way ledge all round; bats in the stone ruin.
 
 ## Each area: scene, size in cells, blocks, and optionally the base kind (default grass).
 ## Block = [x, y, width, height, terrain height, kind]; kind is "ground", "stairs", "path" (at
@@ -109,6 +112,36 @@ const MAPS: Dictionary = {
 			[1, 5, 1, 1, 0, "bed"],
 			[3, 4, 3, 2, 0, "rug"],
 			[8, 5, 1, 2, 0, "barrel"],
+		],
+	},
+	"south_field": {
+		"scene": "res://world/areas/south_field/south_field.tscn",
+		"size": Vector2i(40, 28),
+		"blocks": [
+			# The road down from the village, then east toward the ruin.
+			[18, 0, 4, 16, 0, "path"],
+			[18, 14, 14, 2, 0, "path"],
+			# The plateau: a raised meadow with a ledge all round, stairs on its west side.
+			[26, 3, 12, 9, 2, "ground"],
+			[25, 6, 1, 2, 1, "stairs"],
+			[33, 4, 2, 2, 2, "tree"],
+			[28, 9, 1, 1, 2, "rock"],
+			# The meadow in the west, with a pond.
+			[5, 17, 6, 4, 0, "water"],
+			[4, 6, 2, 2, 0, "tree"],
+			[10, 11, 1, 1, 0, "rock"],
+			[14, 21, 1, 1, 0, "rock"],
+			[12, 24, 2, 2, 0, "tree"],
+			# The old ruin, open to the south.
+			[27, 18, 9, 1, 0, "stone"],
+			[27, 18, 1, 6, 0, "stone"],
+			[35, 18, 1, 6, 0, "stone"],
+			# Woods round the edges; the road comes in from the north.
+			[0, 0, 18, 2, 0, "tree"],
+			[22, 0, 18, 2, 0, "tree"],
+			[0, 2, 2, 26, 0, "tree"],
+			[38, 2, 2, 26, 0, "tree"],
+			[0, 26, 40, 2, 0, "tree"],
 		],
 	},
 }

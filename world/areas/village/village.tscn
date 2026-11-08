@@ -7,6 +7,10 @@
 [ext_resource type="PackedScene" path="res://ui/area_hud.tscn" id="5_hud"]
 [ext_resource type="Script" path="res://gameplay/interactables/area_exit.gd" id="6_exit"]
 [ext_resource type="Script" path="res://gameplay/interactables/signpost.gd" id="7_sign"]
+[ext_resource type="Script" path="res://gameplay/interactables/item_pickup.gd" id="8_pickup"]
+[ext_resource type="PackedScene" path="res://gameplay/interactables/training_dummy.tscn" id="9_dummy"]
+[ext_resource type="PackedScene" path="res://gameplay/interactables/brambles.tscn" id="10_brambles"]
+[ext_resource type="Script" path="res://gameplay/interactables/heart_pickup.gd" id="11_heart"]
 
 [node name="Village" type="Node2D" unique_id=1908186768]
 script = ExtResource("1_area")
@@ -37,6 +41,35 @@ position = Vector2(416, 288)
 script = ExtResource("7_sign")
 dialogue_id = &"sign_welcome"
 
+[node name="WoodenSword" type="Node2D" parent="Interactables"]
+position = Vector2(96, 464)
+script = ExtResource("8_pickup")
+item_id = &"wooden_sword"
+taken_flag = &"took_wooden_sword"
+
+[node name="TrainingDummy" parent="Interactables" instance=ExtResource("9_dummy")]
+position = Vector2(160, 464)
+
+[node name="BramblesA" parent="Interactables" instance=ExtResource("10_brambles")]
+position = Vector2(176, 512)
+
+[node name="BramblesB" parent="Interactables" instance=ExtResource("10_brambles")]
+position = Vector2(192, 512)
+
+[node name="BramblesC" parent="Interactables" instance=ExtResource("10_brambles")]
+position = Vector2(192, 496)
+
+[node name="Heart" type="Node2D" parent="Interactables"]
+position = Vector2(80, 512)
+script = ExtResource("11_heart")
+
+[node name="SouthRoad" type="Node2D" parent="Interactables"]
+position = Vector2(352, 560)
+script = ExtResource("6_exit")
+target_area = &"south_field"
+target_entry = &"north_road"
+size = Vector2i(4, 1)
+
 [node name="Entries" type="Node2D" parent="." unique_id=885840115]
 
 [node name="weaver_door" type="Marker2D" parent="Entries" unique_id=735700195]
@@ -46,6 +79,10 @@ rotation = 1.5707964
 [node name="elder_door" type="Marker2D" parent="Entries" unique_id=878345081]
 position = Vector2(488, 248)
 rotation = 1.5707964
+
+[node name="south_road" type="Marker2D" parent="Entries"]
+position = Vector2(376, 536)
+rotation = -1.5707964
 
 [node name="PlayerSpawn" type="Marker2D" parent="." unique_id=573120596]
 position = Vector2(376, 328)

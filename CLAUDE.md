@@ -86,6 +86,7 @@ removes the shim, so recreate it after upgrading.
 
 ## Do not
 - Do not hand-edit `.import` files or anything under `.godot/`.
-- Do not add swimming, climbing, sprint or stamina: the hero moves like classic Zelda (stairs, ledge hops, solid tiles). Change the GDD first if that should change.
+- Do not add swimming, climbing or stamina: the hero moves like classic Zelda (stairs, ledge hops, solid tiles),
+  plus a hold-to-sprint the user asked for on 2026-11-08 (no stamina). Change the GDD first if that should change.
 - Do not add a dependency/addon without noting why in `docs/DECISIONS.md`. Allowed now: gdUnit4.
 - Do not write story, dialogue or quest content beyond what the current milestone needs.
