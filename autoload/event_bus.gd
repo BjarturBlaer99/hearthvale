@@ -5,14 +5,8 @@ extends Node
 ## Anything that must survive a save belongs in GameState, which is the only emitter
 ## of the state signals below.
 
-## A district's water level changed. Emitted after the change is applied.
-signal water_level_changed(district_id: StringName, level: StringName)
-
 ## A quest moved to a new stage.
 signal quest_updated(quest_id: StringName)
-
-## A faction's reputation changed; `value` is the new, clamped total.
-signal reputation_changed(faction_id: StringName, value: int)
 
 ## Items entered the inventory. A negative `count` means items were removed.
 signal item_added(item_id: StringName, count: int)
@@ -20,5 +14,5 @@ signal item_added(item_id: StringName, count: int)
 ## A world flag was written.
 signal flag_set(flag: StringName, value: Variant)
 
-## A flood-network node (pump, sluice, outlet) was repaired and can now be used.
-signal network_node_repaired(node_id: StringName)
+## The hero's health changed. Both values are in half hearts.
+signal health_changed(current: int, maximum: int)

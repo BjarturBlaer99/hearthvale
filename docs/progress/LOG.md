@@ -156,3 +156,68 @@ Visual check (`tools/capture_world.gd`, shots 7–8): both pump previews with th
 - I haven't played it by hand with a real keyboard or gamepad (Up/Down/E/Esc in the panel).
 
 **Next:** M5, diving and interiors.
+
+## 2026-11-07 — Pivot to Hearthvale · H0 Land reset — done
+
+At the user's request the game changes from a water-level RPG (Low Tide) to **Hearthvale**, a land-based
+*A Link to the Past*-style action-adventure: a village start, dungeons, enemies, puzzles, multiple weapons and
+hearts. The finished water version (M4 included) is committed on the **`water-version`** branch; this work is on
+`hearthvale`, branched from it.
+
+**Built / changed**
+- **Removed:** the water network and solver, boat, sea map, Network Key, swimming/climbing/boat states, stamina and sprint, the three flooded districts, their data, tests and tools.
+- **Terrain:** land-only rules. Stairs bridge one level, ledges are one-way hops down from any height, solid tiles block. `HeightGrid` has `solid`/`ramp` flags.
+- **Hero:** `PlayerMotor` has just the ground state; the sprite and animator are kept (no swim/climb poses).
+- **Hearts:** GameState `hearts_max` + `health` (half hearts), `damage`/`heal`/`add_heart_container`, `EventBus.health_changed`, and a `HeartsBar` on the new `AreaHud`.
+- **Data:** items/quests/dialogue only; a trimmed condition vocabulary; starting items (Wooden Sword, Small Key, Coin).
+- **Hearthvale village greybox** (48×36), now the main scene: north rise with chapel and stairs; east meadow with a one-way ledge; four houses; roads; a well; a fenced field; a pond; woods with the south road leading out.
+- **Medieval greybox atlas;** `AreaController`; `tools/capture.gd`; the input map cleaned up (move + interact).
+- **Docs** rewritten: GDD, ROADMAP (H0–H9), TECH_DESIGN, CLAUDE.md, README, data examples and schemas.
+- 58 tests in 11 suites.
+
+**Acceptance criteria**
+- [x] Tests green: 58/58.
+- [x] The game starts in the village with 3 hearts: scene test plus screenshot.
+- [x] Stairs and ledges work, and buildings are solid: the village layout test (1,231 cells reachable from the square) and screenshots.
+
+**Known issues / notes**
+- Houses have no doors yet (H1). No combat yet, so hearts only change in tests (H2).
+- Solid tiles have a meadow-green background, so trees on the rise sit on slightly darker grass.
+- Not yet played by hand after the pivot.
+
+**Next:** H1, village life (house interiors, villagers, dialogue).
+
+## 2026-11-08 — H1 Village life — done
+
+**Built**
+- **Doors and interiors:** door tiles in two village houses and two interiors: Elder Bram's house and Wenna's house. These are 11×9 rooms with log walls, a hearth, shelves, a bed, a rug and barrels. `AreaExit` takes the hero to a named entry point, and `GameState.go_to` records the target area and entry. The arriving `AreaController` places the hero at the `Entries` marker, facing the way it points, and flashes the screen. Rooms are centred on screen.
+- **Dialogue:**
+  - `DialogueRunner` (`core/dialogue/`, pure) and `EffectApplier` (`core/quests/`).
+  - `DialogueBox` in the HUD: speaker, text, a cursor over the answers, "[E]" when there are none.
+  - `Talkable` → `Villager` / `Signpost`, which occupy their cell.
+  - Interact picks up what's underfoot, else talks to whatever the hero faces. The HUD prompt says what E will do.
+- **Content:** `data/dialogue/` has `elder_bram`, `wenna_weaver` and `sign_welcome`. An optional `speakers` map in dialogue files is validated by DataRegistry and covered by the schema.
+- **Tiles:** two new atlas rows (walkable door/floor/rug/doormat; solid inner wall/table/bed/shelf/barrel/hearth). `build_maps.gd` bakes the houses, with an optional base kind per map.
+- **Look:** areas are y-sorted; villagers and signs are drawn feet-mid-cell like the hero.
+- 80 tests in 14 suites (+22). New: `dialogue_runner_test` (runner and effects), `doors_test`, `village_life_test`, plus additions to the terrain, GameState, DataRegistry and village suites.
+
+**Acceptance criteria**
+- [x] You can enter two houses and come out the same door. `doors_test` walks the hero up into each door, checks the interior's arrival cell and facing, walks out over the doormat, and checks they stand outside that same door facing away. It also checks every exit leads to a real entry point on open ground.
+- [x] A villager's dialogue, with a choice that sets a flag, plays from data. `village_life_test` checks Bram's name, text and answers against `elder_bram.json`; "I'll keep watch." sets `promised_elder_keep`, and talking again shows the new answer.
+- [x] The flag survives leaving the area. The same suite walks out to the village, through a JSON save and load, into Wenna's house (her extra answer appears), and back to Bram, who remembers.
+- Mutation checks: five deliberate bugs, each caught by the expected test, files restored byte for byte:
+  - arrival ignores the entry
+  - a doormat pointing at the wrong door
+  - `set_flag` doing nothing
+  - option conditions ignored
+  - occupied cells ignored
+- Visual check (`tools/capture.gd`, 9 shots): doors in the village, reading the sign, both interiors, and talking to Bram.
+
+**Known issues / notes**
+- The other two village houses and the chapel have no doors yet.
+- Villagers always face down and don't turn to the hero.
+- Text appears all at once; long text isn't paged (the box fits about three lines plus four answers).
+- The dialogue box covers the bottom of a room. That's fine for these rooms, but worth watching as rooms grow.
+- Not played by hand yet with a real keyboard or gamepad (answer cursor and walking through doors).
+
+**Next:** H2, sword and hearts.

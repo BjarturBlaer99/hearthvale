@@ -18,48 +18,25 @@ func test_project_data_loads_without_errors() -> void:
 	assert_array(Array(errors)).override_failure_message("\n".join(errors)).is_empty()
 
 
-func test_slice_content_is_registered() -> void:
+func test_starting_items_are_registered_in_id_order() -> void:
 	_registry.load_all()
-	var expected: Dictionary = {
-		&"districts": [&"greenterrace", &"spire_nine", &"st_aud"],
-		&"basins": [&"old_reservoir"],
-		&"nodes": [&"st_aud_pump", &"third_outlet"],
-		&"interiors": [&"st_aud_ground_floor"],
-		&"factions": [&"reclamation", &"summit_holds"],
-		&"companions": [&"mara"],
-		&"quests": [&"bitter_medicine"],
-		&"dialogues": [&"greenterrace_elder"],
-	}
-	for collection: StringName in expected:
-		assert_array(_registry.ids(collection)).is_equal(expected[collection])
-	assert_str(_registry.get_item(&"fever_medicine").get("name", "")).is_equal("Fever Medicine Crate")
-
-
-func test_district_levels_go_from_most_to_least_water() -> void:
-	_registry.load_all()
-	for district_id: StringName in _registry.ids(&"districts"):
-		var previous: float = INF
-		for level: Dictionary in _registry.get_district(district_id)["levels"]:
-			var height: float = level["water_height"]
-			var message: String = "%s/%s water_height %s does not decrease" % [district_id, level["id"], height]
-			assert_bool(height < previous).override_failure_message(message).is_true()
-			previous = height
-
-
-func test_level_ids_keep_data_order() -> void:
-	_registry.load_all()
-	assert_array(Array(_registry.level_ids(&"st_aud"))).is_equal(["flooded", "waist", "drained"])
+	assert_array(_registry.ids(&"items")).is_equal([&"coin", &"small_key", &"wooden_sword"])
+	assert_str(_registry.get_item(&"wooden_sword").get("name", "")).is_equal("Wooden Sword")
+	var found: Array = []
+	for entry: Dictionary in _registry.entries(&"items"):
+		found.append(entry["id"])
+	assert_array(found).is_equal(["coin", "small_key", "wooden_sword"])
 
 
 func test_missing_required_field_is_reported_and_not_loaded() -> void:
 	var errors: PackedStringArray = _registry.load_all(FIXTURES.path_join("missing_field"))
-	_assert_reported(errors, "missing required field 'start_level'")
-	assert_bool(_registry.has_entry(&"districts", &"no_start")).is_false()
+	_assert_reported(errors, "missing required field 'name'")
+	assert_bool(_registry.has_entry(&"items", &"nameless")).is_false()
 
 
-func test_levels_that_do_not_decrease_are_reported() -> void:
-	var errors: PackedStringArray = _registry.load_all(FIXTURES.path_join("rising_levels"))
-	_assert_reported(errors, "does not decrease")
+func test_duplicate_ids_are_reported() -> void:
+	var errors: PackedStringArray = _registry.load_all(FIXTURES.path_join("duplicate"))
+	_assert_reported(errors, "duplicate item id 'twin'")
 
 
 func test_unresolved_references_are_reported() -> void:
@@ -68,22 +45,21 @@ func test_unresolved_references_are_reported() -> void:
 	_assert_reported(errors, "unknown stage 'nowhere'")
 
 
-func test_bad_water_numbers_and_ids_are_reported() -> void:
-	var errors: PackedStringArray = _registry.load_all(FIXTURES.path_join("bad_water"))
-	_assert_reported(errors, "water_volume_per_step must be a positive whole number")
-	_assert_reported(errors, "outflows into itself")
-	_assert_reported(errors, "start_stored 20 is more than its capacity 10")
-	_assert_reported(errors, "is both a district and a basin")
-	_assert_reported(errors, "targets its own district")
-	_assert_reported(errors, "map must be [x, y]")
-
-
-func test_entries_come_in_id_order() -> void:
+func test_villagers_and_signs_have_their_conversations() -> void:
 	_registry.load_all()
-	var found: Array = []
-	for entry: Dictionary in _registry.entries(&"districts"):
-		found.append(entry["id"])
-	assert_array(found).is_equal(["greenterrace", "spire_nine", "st_aud"])
+	for id: StringName in [&"elder_bram", &"wenna_weaver", &"sign_welcome"]:
+		assert_bool(_registry.has_entry(&"dialogues", id)).override_failure_message("dialogue '%s'" % id).is_true()
+
+
+func test_dialogue_speakers_must_be_a_map() -> void:
+	var errors: PackedStringArray = _registry.load_all(FIXTURES.path_join("bad_speakers"))
+	_assert_reported(errors, "'speakers' must be an object")
+
+
+func test_unknown_data_folders_are_reported() -> void:
+	# The old water network folder is no longer a kind of content.
+	var errors: PackedStringArray = _registry.load_all(FIXTURES.path_join("old_water"))
+	_assert_reported(errors, "unknown data directory")
 
 
 func test_missing_data_root_is_reported() -> void:

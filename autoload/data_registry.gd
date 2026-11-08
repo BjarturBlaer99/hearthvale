@@ -5,39 +5,27 @@ extends Node
 ## never means touching this script. Only a new *kind* of content, or a new condition or
 ## effect type, does.
 ##
-## Validation runs in two passes: required fields and self-contained rules while loading,
-## then cross-references once everything is registered. Problems are collected in
-## `errors` instead of thrown, so tests can load bad fixtures; `_ready()` reports them
-## and stops a debug build.
+## Validation runs in two passes: required fields while loading, then cross-references
+## once everything is registered. Problems are collected in `errors` instead of thrown, so
+## tests can load bad fixtures; `_ready()` reports them and stops a debug build.
 ##
 ## Lookups return the stored dictionaries directly. Treat them as read-only.
 
 const DATA_ROOT: String = "res://data"
 
-const KIND_NETWORK: StringName = &"network"
 const KIND_ITEMS: StringName = &"items"
-const KIND_FACTIONS: StringName = &"factions"
 const KIND_QUEST: StringName = &"quest"
 const KIND_DIALOGUE: StringName = &"dialogue"
 
 ## Directory under DATA_ROOT -> the kind of file it holds.
 const DIRECTORY_KINDS: Dictionary = {
-	"water": KIND_NETWORK,
 	"items": KIND_ITEMS,
-	"factions": KIND_FACTIONS,
 	"quests": KIND_QUEST,
 	"dialogue": KIND_DIALOGUE,
 }
 
 const REQUIRED_FIELDS: Dictionary = {
-	&"district": ["id", "name", "levels", "start_level", "water_volume_per_step", "outflows"],
-	&"level": ["id", "water_height"],
-	&"basin": ["id", "name", "capacity", "start_stored"],
-	&"node": ["id", "type", "district", "target", "start_state"],
-	&"interior": ["id", "district"],
 	&"item": ["id", "name", "type"],
-	&"faction": ["id", "name", "start_reputation"],
-	&"companion": ["id", "name", "faction_leaning", "start_approval"],
 	&"quest": ["id", "title", "start_stage", "stages"],
 	&"stage": ["journal"],
 	&"objective": ["id", "text", "complete_when"],
@@ -49,10 +37,7 @@ const REQUIRED_FIELDS: Dictionary = {
 ## Condition type -> required fields (docs/data/CONDITIONS_AND_EFFECTS.md).
 const CONDITION_FIELDS: Dictionary = {
 	"flag": ["flag", "value"],
-	"water_level": ["district", "level"],
 	"has_item": ["item", "count"],
-	"reputation_gte": ["faction", "value"],
-	"attribute_gte": ["attribute", "value"],
 	"quest_stage": ["quest", "stage"],
 	"all": ["of"],
 	"any": ["of"],
@@ -64,26 +49,16 @@ const EFFECT_FIELDS: Dictionary = {
 	"set_flag": ["flag", "value"],
 	"give_item": ["item", "count"],
 	"take_item": ["item", "count"],
-	"reputation": ["faction", "delta"],
-	"approval": ["companion", "delta"],
 	"set_quest_stage": ["quest", "stage"],
 	"complete_quest": [],
-	"water_lock": ["district", "locked"],
-	"spawn_npc_group": ["group", "location"],
 }
 
 ## A field with one of these names, inside a condition or effect, must name an id
 ## registered in the given collection.
 const REFERENCE_FIELDS: Dictionary = {
 	"item": &"items",
-	"faction": &"factions",
-	"companion": &"companions",
-	"district": &"districts",
 	"quest": &"quests",
 }
-
-const ATTRIBUTES: PackedStringArray = ["grit", "wits", "charm", "tech"]
-const NODE_STATES: PackedStringArray = ["broken", "repaired"]
 
 ## Problems found by the last load_all(), as "file: what is wrong" lines.
 var errors: PackedStringArray = []
@@ -102,7 +77,7 @@ func _ready() -> void:
 
 # --- Lookups ---------------------------------------------------------------
 
-## The entry with `id` in `collection` (e.g. &"districts"), or an empty dictionary.
+## The entry with `id` in `collection` (e.g. &"items"), or an empty dictionary.
 func get_entry(collection: StringName, id: StringName) -> Dictionary:
 	return _collections.get(collection, {}).get(id, {})
 
@@ -129,10 +104,6 @@ func entries(collection: StringName) -> Array[Dictionary]:
 	return out
 
 
-func get_district(id: StringName) -> Dictionary:
-	return get_entry(&"districts", id)
-
-
 func get_item(id: StringName) -> Dictionary:
 	return get_entry(&"items", id)
 
@@ -145,25 +116,13 @@ func get_dialogue(id: StringName) -> Dictionary:
 	return get_entry(&"dialogues", id)
 
 
-## Level ids of a district, ordered from most water to least.
-func level_ids(district_id: StringName) -> PackedStringArray:
-	var out: PackedStringArray = []
-	for level: Variant in get_district(district_id).get("levels", []):
-		out.append(str((level as Dictionary).get("id", "")))
-	return out
-
-
 # --- Loading ---------------------------------------------------------------
 
 ## Clears everything and loads all JSON under `root`. Returns the problems found;
 ## an empty result means every file is valid and every reference resolves.
 func load_all(root: String = DATA_ROOT) -> PackedStringArray:
 	errors = []
-	_collections = {
-		&"districts": {}, &"basins": {}, &"nodes": {}, &"interiors": {},
-		&"items": {}, &"factions": {}, &"companions": {},
-		&"quests": {}, &"dialogues": {},
-	}
+	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}}
 	if not DirAccess.dir_exists_absolute(root):
 		errors.append("%s: data directory does not exist." % root)
 		return errors
@@ -196,28 +155,16 @@ func _load_file(path: String, kind: StringName) -> void:
 		return
 	var data: Dictionary = json.data
 	match kind:
-		KIND_NETWORK:
-			if not data.has("region"):
-				errors.append("%s: a water network file needs a 'region'." % path)
-			_load_list(path, data, "districts", &"district", &"districts", _check_district)
-			_load_list(path, data, "basins", &"basin", &"basins", _check_basin)
-			_load_list(path, data, "nodes", &"node", &"nodes")
-			_load_list(path, data, "interiors", &"interior", &"interiors")
 		KIND_ITEMS:
 			_load_list(path, data, "items", &"item", &"items")
-		KIND_FACTIONS:
-			_load_list(path, data, "factions", &"faction", &"factions")
-			_load_list(path, data, "companions", &"companion", &"companions")
 		KIND_QUEST:
 			_register(path, data, &"quest", &"quests")
 		KIND_DIALOGUE:
 			_register(path, data, &"dialogue", &"dialogues")
 
 
-## Registers every object in the array `data[key]`. `extra_check` runs on each entry
-## that passed the required-field check.
-func _load_list(path: String, data: Dictionary, key: String, kind: StringName,
-		collection: StringName, extra_check: Callable = Callable()) -> void:
+## Registers every object in the array `data[key]`.
+func _load_list(path: String, data: Dictionary, key: String, kind: StringName, collection: StringName) -> void:
 	if not data.has(key):
 		return
 	if typeof(data[key]) != TYPE_ARRAY:
@@ -227,9 +174,7 @@ func _load_list(path: String, data: Dictionary, key: String, kind: StringName,
 		if typeof(element) != TYPE_DICTIONARY:
 			errors.append("%s: every entry in '%s' must be an object." % [path, key])
 			continue
-		var entry: Dictionary = element
-		if _register(path, entry, kind, collection) and extra_check.is_valid():
-			extra_check.call(path, entry)
+		_register(path, element, kind, collection)
 
 
 ## Checks required fields and id uniqueness, then stores the entry. Returns success.
@@ -254,93 +199,9 @@ func _has_required(path: String, entry: Dictionary, kind: StringName, label: Str
 	return ok
 
 
-## Self-contained district rules: levels exist, water heights strictly decrease,
-## and the start level is one of them.
-func _check_district(path: String, district: Dictionary) -> void:
-	var label: String = "district '%s'" % district["id"]
-	if typeof(district["levels"]) != TYPE_ARRAY or (district["levels"] as Array).is_empty():
-		errors.append("%s: %s needs at least one level." % [path, label])
-		return
-	var previous_height: float = INF
-	var seen: PackedStringArray = []
-	for element: Variant in (district["levels"] as Array):
-		if typeof(element) != TYPE_DICTIONARY:
-			errors.append("%s: %s has a level that is not an object." % [path, label])
-			continue
-		var level: Dictionary = element
-		if not _has_required(path, level, &"level", "%s/%s" % [district["id"], level.get("id", "?")]):
-			continue
-		if not _is_whole(level["water_height"]):
-			errors.append("%s: %s level '%s' water_height must be a whole number." % [path, label, level["id"]])
-			continue
-		var height: float = level["water_height"]
-		if height >= previous_height:
-			errors.append("%s: %s levels must go from most water to least; water_height %s at '%s' does not decrease." % [path, label, height, level["id"]])
-		previous_height = height
-		seen.append(str(level["id"]))
-	if not seen.has(str(district["start_level"])):
-		errors.append("%s: %s start_level '%s' is not one of its levels %s." % [path, label, district["start_level"], seen])
-	# Water is counted in whole units so the solver conserves it exactly.
-	if not _is_whole(district["water_volume_per_step"]) or float(district["water_volume_per_step"]) <= 0.0:
-		errors.append("%s: %s water_volume_per_step must be a positive whole number." % [path, label])
-	if typeof(district["outflows"]) != TYPE_ARRAY:
-		errors.append("%s: %s outflows must be an array (it may be empty)." % [path, label])
-		district["outflows"] = []
-	elif (district["outflows"] as Array).has(district["id"]):
-		errors.append("%s: %s outflows into itself." % [path, label])
-	_check_map(path, label, district)
-
-
-## Optional "map": [x, y], a place on the region mini-map in the Network Key preview.
-func _check_map(path: String, label: String, entry: Dictionary) -> void:
-	if not entry.has("map"):
-		return
-	var map: Variant = entry["map"]
-	if typeof(map) != TYPE_ARRAY or (map as Array).size() != 2 or not _is_number(map[0]) or not _is_number(map[1]):
-		errors.append("%s: %s map must be [x, y] (its place on the region mini-map)." % [path, label])
-
-
-func _check_basin(path: String, basin: Dictionary) -> void:
-	var label: String = "basin '%s'" % basin["id"]
-	_check_map(path, label, basin)
-	if not _is_whole(basin["capacity"]) or float(basin["capacity"]) < 0.0:
-		errors.append("%s: %s capacity must be a whole number, 0 or more." % [path, label])
-		return
-	if not _is_whole(basin["start_stored"]) or float(basin["start_stored"]) < 0.0:
-		errors.append("%s: %s start_stored must be a whole number, 0 or more." % [path, label])
-	elif float(basin["start_stored"]) > float(basin["capacity"]):
-		errors.append("%s: %s start_stored %d is more than its capacity %d." % [path, label, int(basin["start_stored"]), int(basin["capacity"])])
-
-
 # --- Cross-references ------------------------------------------------------
 
 func _validate_references() -> void:
-	for district: Dictionary in _collections[&"districts"].values():
-		var where: String = "district '%s'" % district["id"]
-		for target: Variant in district["outflows"]:
-			_check_water_target(district["_source"], where + " outflow", str(target))
-	# Water targets are looked up by id in districts *or* basins, so ids must not collide.
-	for id: StringName in _collections[&"basins"]:
-		if _collections[&"districts"].has(id):
-			errors.append("%s: '%s' is both a district and a basin; water targets need unique ids." % [_collections[&"basins"][id]["_source"], id])
-	for node: Dictionary in _collections[&"nodes"].values():
-		var where: String = "node '%s'" % node["id"]
-		_check_id(node["_source"], where, &"districts", str(node["district"]))
-		_check_water_target(node["_source"], where + " target", str(node["target"]))
-		if str(node["target"]) == str(node["district"]):
-			errors.append("%s: %s targets its own district." % [node["_source"], where])
-		if not NODE_STATES.has(str(node["start_state"])):
-			errors.append("%s: %s start_state must be one of %s." % [node["_source"], where, NODE_STATES])
-		_check_condition_list(node["_source"], where + " repair_requires", node.get("repair_requires", []))
-	for interior: Dictionary in _collections[&"interiors"].values():
-		var where: String = "interior '%s'" % interior["id"]
-		var district_id: String = str(interior["district"])
-		if _check_id(interior["_source"], where, &"districts", district_id):
-			for key: String in ["dive_when", "dry_when"]:
-				for level_id: Variant in interior.get(key, []):
-					_check_level(interior["_source"], "%s %s" % [where, key], district_id, str(level_id))
-	for companion: Dictionary in _collections[&"companions"].values():
-		_check_id(companion["_source"], "companion '%s'" % companion["id"], &"factions", str(companion["faction_leaning"]))
 	for quest: Dictionary in _collections[&"quests"].values():
 		_check_quest(quest)
 	for dialogue: Dictionary in _collections[&"dialogues"].values():
@@ -363,8 +224,7 @@ func _check_quest(quest: Dictionary) -> void:
 			continue
 		var stage: Dictionary = stages[stage_id]
 		_has_required(path, stage, &"stage", "%s/%s" % [quest["id"], stage_id])
-		var objectives: Array = _array_field(path, where, stage, "objectives")
-		for element: Variant in objectives:
+		for element: Variant in _array_field(path, where, stage, "objectives"):
 			var objective: Dictionary = element if typeof(element) == TYPE_DICTIONARY else {}
 			if _has_required(path, objective, &"objective", "%s/%s" % [stage_id, objective.get("id", "?")]):
 				_check_condition(path, "%s objective '%s'" % [where, objective["id"]], objective["complete_when"])
@@ -387,6 +247,8 @@ func _check_dialogue(dialogue: Dictionary) -> void:
 		errors.append("%s: %s needs a non-empty 'nodes' object." % [path, label])
 		return
 	var nodes: Dictionary = dialogue["nodes"]
+	if dialogue.has("speakers") and typeof(dialogue["speakers"]) != TYPE_DICTIONARY:
+		errors.append("%s: %s 'speakers' must be an object (speaker id -> display name)." % [path, label])
 	if not nodes.has(str(dialogue["start"])):
 		errors.append("%s: %s start '%s' is not a node." % [path, label, dialogue["start"]])
 	for node_id: Variant in nodes:
@@ -403,28 +265,10 @@ func _check_dialogue(dialogue: Dictionary) -> void:
 				errors.append("%s: %s needs 'text'." % [path, o_where])
 			_check_condition_list(path, o_where + " conditions", option.get("conditions", []))
 			_check_effect_list(path, o_where + " effects", option.get("effects", []))
-			if option.has("check"):
-				var check: Dictionary = option["check"] if typeof(option["check"]) == TYPE_DICTIONARY else {}
-				if not ATTRIBUTES.has(str(check.get("attribute", ""))):
-					errors.append("%s: %s check attribute must be one of %s." % [path, o_where, ATTRIBUTES])
-				if not _is_number(check.get("difficulty")):
-					errors.append("%s: %s check needs a numeric difficulty." % [path, o_where])
-				for key: String in ["success", "failure"]:
-					_check_dialogue_target(path, o_where, nodes, option, key, false)
-			else:
-				_check_dialogue_target(path, o_where, nodes, option, "next", true)
-
-
-## `option[key]` must name a node in `nodes`; null ends the conversation when allowed.
-func _check_dialogue_target(path: String, where: String, nodes: Dictionary, option: Dictionary,
-		key: String, null_ends: bool) -> void:
-	if not option.has(key):
-		errors.append("%s: %s needs '%s'." % [path, where, key])
-	elif option[key] == null:
-		if not null_ends:
-			errors.append("%s: %s '%s' cannot be null." % [path, where, key])
-	elif not nodes.has(str(option[key])):
-		errors.append("%s: %s '%s' points to unknown node '%s'." % [path, where, key, option[key]])
+			if not option.has("next"):
+				errors.append("%s: %s needs 'next' (a node id, or null to end)." % [path, o_where])
+			elif option["next"] != null and not nodes.has(str(option["next"])):
+				errors.append("%s: %s 'next' points to unknown node '%s'." % [path, o_where, option["next"]])
 
 
 # --- Conditions & effects --------------------------------------------------
@@ -454,13 +298,8 @@ func _check_condition(path: String, where: String, raw: Variant) -> void:
 			_check_condition_list(path, "%s %s" % [where, type_name], condition["of"])
 		"not":
 			_check_condition(path, where + " not", condition["condition"])
-		"water_level":
-			_check_level(path, where, str(condition["district"]), str(condition["level"]))
 		"quest_stage":
 			_check_stage(path, where, str(condition["quest"]), str(condition["stage"]))
-		"attribute_gte":
-			if not ATTRIBUTES.has(str(condition["attribute"])):
-				errors.append("%s: %s: attribute must be one of %s." % [path, where, ATTRIBUTES])
 
 
 func _check_effect_list(path: String, where: String, list: Variant) -> void:
@@ -517,22 +356,6 @@ func _array_field(path: String, where: String, entry: Dictionary, key: String) -
 	return []
 
 
-## A water target is a district or a basin.
-func _check_water_target(path: String, where: String, id: String) -> void:
-	var key: StringName = StringName(id)
-	if not _collections[&"districts"].has(key) and not _collections[&"basins"].has(key):
-		errors.append("%s: %s refers to '%s', which is neither a district nor a basin." % [path, where, id])
-
-
-## Missing districts are reported by _check_reference_fields; this only checks the level.
-func _check_level(path: String, where: String, district_id: String, level_id: String) -> void:
-	if not _collections[&"districts"].has(StringName(district_id)):
-		return
-	var levels: PackedStringArray = level_ids(StringName(district_id))
-	if not levels.has(level_id):
-		errors.append("%s: %s: district '%s' has no level '%s' (levels: %s)." % [path, where, district_id, level_id, levels])
-
-
 ## Missing quests are reported by _check_reference_fields; this only checks the stage.
 func _check_stage(path: String, where: String, quest_id: String, stage_id: String) -> void:
 	var quest: Dictionary = get_quest(StringName(quest_id))
@@ -540,12 +363,3 @@ func _check_stage(path: String, where: String, quest_id: String, stage_id: Strin
 		return
 	if not (quest["stages"] as Dictionary).has(stage_id):
 		errors.append("%s: %s: quest '%s' has no stage '%s'." % [path, where, quest_id, stage_id])
-
-
-static func _is_number(value: Variant) -> bool:
-	return typeof(value) == TYPE_INT or typeof(value) == TYPE_FLOAT
-
-
-## JSON may parse 50 as 50.0, so "whole" means numeric with no fractional part.
-static func _is_whole(value: Variant) -> bool:
-	return _is_number(value) and float(value) == floorf(float(value))

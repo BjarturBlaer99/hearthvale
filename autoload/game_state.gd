@@ -6,43 +6,67 @@ extends Node
 ## save format from TECH_DESIGN §9; SaveSystem handles files and version migration.
 
 const SAVE_VERSION: int = 1
-const REPUTATION_MIN: int = -100
-const REPUTATION_MAX: int = 100
-## "No cell": the map decides (e.g. the boat comes out of a district at its sea port).
-const NO_CELL: Vector2i = Vector2i(-1, -1)
+const HALVES_PER_HEART: int = 2
+const START_HEARTS: int = 3
+const MAX_HEARTS: int = 20
 
-## district id -> current level id
-var water: Dictionary[StringName, StringName] = {}
-## district id -> water units received toward its next level (see WaterNetwork)
-var water_pending: Dictionary[StringName, int] = {}
-## basin id -> stored water units
-var basins: Dictionary[StringName, int] = {}
-## flood network node id -> &"broken" or &"repaired"
-var network_nodes: Dictionary[StringName, StringName] = {}
+## Heart containers the hero has (0 until a game starts).
+var hearts_max: int = 0
+## Health in half hearts, 0..max_health().
+var health: int = 0
 ## flag -> value. A missing flag reads as false.
 var flags: Dictionary[StringName, Variant] = {}
 ## quest id -> current stage id
 var quests: Dictionary[StringName, StringName] = {}
-## faction id -> reputation, clamped to REPUTATION_MIN..REPUTATION_MAX
-var reputation: Dictionary[StringName, int] = {}
 ## Stacks of { "id": StringName, "count": int }, in pickup order.
 var inventory: Array[Dictionary] = []
-## Where the player is: { "district" (a district id or "sea"), "cell": [x, y], "height",
-## "stamina", "on_boat", "arriving" (just set sail for "district"), "came_from" }.
+## Where the hero is: { "area", "cell": [x, y] }, or { "area", "entry" } on the way into an
+## area through one of its entry points (go_to), until the area places them.
 var player: Dictionary = {}
-## Where the boat is: { "where" (district id or "sea"), "cell": [x, y] or [] (the map
-## decides), "heading" (radians), "moored_at" (district it waits outside, at sea) }.
-## Empty in a new game: the first district puts it at its mooring.
-var boat: Dictionary = {}
 
 
-# --- New game --------------------------------------------------------------
-
-## Starts a fresh game from the start values in res://data. Each system adds its seeding
-## here as it arrives; so far that is the flood network.
+## Starts a fresh game: full health with the starting hearts, nothing else.
 func new_game() -> void:
 	clear()
-	set_water_state(_water_topology().get_state())
+	hearts_max = START_HEARTS
+	health = max_health()
+
+
+func is_started() -> bool:
+	return hearts_max > 0
+
+
+# --- Health ----------------------------------------------------------------
+
+func max_health() -> int:
+	return hearts_max * HALVES_PER_HEART
+
+
+func damage(halves: int) -> void:
+	set_health(health - maxi(halves, 0))
+
+
+func heal(halves: int) -> void:
+	set_health(health + maxi(halves, 0))
+
+
+## A heart container: one more heart, and health refills (as in classic Zeldas).
+func add_heart_container() -> void:
+	hearts_max = mini(hearts_max + 1, MAX_HEARTS)
+	health = max_health()
+	EventBus.health_changed.emit(health, max_health())
+
+
+func set_health(value: int) -> void:
+	var clamped: int = clampi(value, 0, max_health())
+	if clamped == health:
+		return
+	health = clamped
+	EventBus.health_changed.emit(health, max_health())
+
+
+func is_dead() -> bool:
+	return is_started() and health <= 0
 
 
 # --- Flags -----------------------------------------------------------------
@@ -58,150 +82,17 @@ func get_flag(flag: StringName, default: Variant = false) -> Variant:
 	return flags.get(flag, default)
 
 
-# --- Water -----------------------------------------------------------------
-
-## Sets a district's level directly, bypassing the flood network's conservation: for debug
-## tools and scripted events only. Players change water through apply_water_change().
-## Clears the district's pending water so the network stays valid.
-func set_water_level(district_id: StringName, level_id: StringName) -> void:
-	if water.get(district_id, &"") == level_id:
-		return
-	water[district_id] = level_id
-	water_pending[district_id] = 0
-	EventBus.water_level_changed.emit(district_id, level_id)
-
-
-func get_water_level(district_id: StringName) -> StringName:
-	return water.get(district_id, &"")
-
-
-## The flood network in its current state, built fresh from data plus this state so it
-## can never drift from what gets saved. Preview on it with WaterSolver, then record the
-## result with apply_water_change().
-func water_network() -> WaterNetwork:
-	var network: WaterNetwork = _water_topology()
-	network.set_state(water_state())
-	return network
-
-
-## Records a change previewed on water_network(). Emits water_level_changed for each
-## district whose level changed, in flow order; water that only builds up toward a level
-## changes no map, so emits nothing. Returns false, changing nothing, if the change was
-## rejected or the state moved on since the preview.
-func apply_water_change(change: WaterChangeResult) -> bool:
-	var network: WaterNetwork = water_network()
-	if not WaterSolver.new().apply(network, change):
-		return false
-	set_water_state(network.get_state())
-	var changed: Dictionary[StringName, StringName] = change.level_changes()
-	for district_id: StringName in changed:
-		EventBus.water_level_changed.emit(district_id, changed[district_id])
-	return true
-
-
-func is_network_node_repaired(node_id: StringName) -> bool:
-	return network_nodes.get(node_id, WaterNetwork.STATE_BROKEN) == WaterNetwork.STATE_REPAIRED
-
-
-## The node's `repair_requires` conditions (res://data/water) that aren't met yet.
-func unmet_repair_requirements(node_id: StringName) -> Array[Dictionary]:
-	var requires: Array = DataRegistry.get_entry(&"nodes", node_id).get("repair_requires", [])
-	return ConditionEvaluator.new(to_dict()).unmet(requires)
-
-
-## Repairs a node if its requirements are met. The items they ask for are used up (fitted
-## into the machine). Emits network_node_repaired. Returns whether the node now works.
-func repair_network_node(node_id: StringName) -> bool:
-	if is_network_node_repaired(node_id):
-		return true
-	if not DataRegistry.has_entry(&"nodes", node_id) or not unmet_repair_requirements(node_id).is_empty():
-		return false
-	for condition: Variant in DataRegistry.get_entry(&"nodes", node_id).get("repair_requires", []):
-		var requirement: Dictionary = condition
-		if str(requirement.get("type", "")) == "has_item":
-			add_item(StringName(str(requirement["item"])), -int(requirement["count"]))
-	network_nodes[node_id] = WaterNetwork.STATE_REPAIRED
-	EventBus.network_node_repaired.emit(node_id)
-	return true
-
-
-## Water levels, pending water, basins and node states, in WaterNetwork's state shape.
-func water_state() -> Dictionary:
-	return {
-		"water": water.duplicate(),
-		"water_pending": water_pending.duplicate(),
-		"basins": basins.duplicate(),
-		"network_nodes": network_nodes.duplicate(),
-	}
-
-
-## Replaces all water state (new game, load). Does not emit signals.
-func set_water_state(state: Dictionary) -> void:
-	water.clear()
-	water_pending.clear()
-	basins.clear()
-	network_nodes.clear()
-	var src_water: Dictionary = state.get("water", {})
-	for key: Variant in src_water:
-		water[StringName(str(key))] = StringName(str(src_water[key]))
-	var src_pending: Dictionary = state.get("water_pending", {})
-	for key: Variant in src_pending:
-		water_pending[StringName(str(key))] = int(src_pending[key])
-	var src_basins: Dictionary = state.get("basins", {})
-	for key: Variant in src_basins:
-		basins[StringName(str(key))] = int(src_basins[key])
-	var src_nodes: Dictionary = state.get("network_nodes", {})
-	for key: Variant in src_nodes:
-		network_nodes[StringName(str(key))] = StringName(str(src_nodes[key]))
-
-
-## The network as data builds it, in its start state.
-func _water_topology() -> WaterNetwork:
-	return WaterNetwork.from_entries(
-		DataRegistry.entries(&"districts"), DataRegistry.entries(&"basins"), DataRegistry.entries(&"nodes"))
-
-
 # --- Player ----------------------------------------------------------------
 
-## Records where the player is, how much stamina they have, and whether they're aboard.
-## The current map calls this every frame; it emits nothing.
-func update_player(district_id: StringName, cell: Vector2i, height: int, stamina: float, on_boat: bool = false) -> void:
-	player["district"] = String(district_id)
-	player["cell"] = [cell.x, cell.y]
-	player["height"] = height
-	player["stamina"] = stamina
-	player["on_boat"] = on_boat
+## Records which area the hero is in and where. The area calls this every frame.
+func update_player(area_id: StringName, cell: Vector2i) -> void:
+	player = {"area": String(area_id), "cell": [cell.x, cell.y]}
 
 
-## Sets sail for `destination` (a district id or "sea") from `came_from`, aboard. The
-## destination map decides where the player and boat appear, then clears "arriving".
-func begin_voyage(destination: StringName, came_from: StringName) -> void:
-	player["district"] = String(destination)
-	player["came_from"] = String(came_from)
-	player["arriving"] = true
-	player["on_boat"] = true
-	player.erase("cell")
-
-
-# --- Boat ------------------------------------------------------------------
-
-## Records where the boat is. `cell` NO_CELL lets that map decide; `moored_at` names the
-## district the boat waits outside of when it is at sea.
-func set_boat(where: StringName, cell: Vector2i, heading: float, moored_at: StringName = &"") -> void:
-	boat = {
-		"where": String(where),
-		"cell": [] if cell == NO_CELL else [cell.x, cell.y],
-		"heading": heading,
-		"moored_at": String(moored_at),
-	}
-
-
-## The boat's cell on its current map, or NO_CELL.
-func boat_cell() -> Vector2i:
-	var cell: Array = boat.get("cell", [])
-	if cell.size() != 2:
-		return NO_CELL
-	return Vector2i(int(cell[0]), int(cell[1]))
+## Sends the hero to the entry point `entry` of `area_id` (a door, a doormat); the area
+## places them there when it loads. The caller changes the scene.
+func go_to(area_id: StringName, entry: StringName) -> void:
+	player = {"area": String(area_id), "entry": String(entry)}
 
 
 # --- Quests ----------------------------------------------------------------
@@ -215,24 +106,6 @@ func set_quest_stage(quest_id: StringName, stage_id: StringName) -> void:
 
 func get_quest_stage(quest_id: StringName) -> StringName:
 	return quests.get(quest_id, &"")
-
-
-# --- Reputation ------------------------------------------------------------
-
-func set_reputation(faction_id: StringName, value: int) -> void:
-	var clamped: int = clampi(value, REPUTATION_MIN, REPUTATION_MAX)
-	if reputation.has(faction_id) and reputation[faction_id] == clamped:
-		return
-	reputation[faction_id] = clamped
-	EventBus.reputation_changed.emit(faction_id, clamped)
-
-
-func change_reputation(faction_id: StringName, delta: int) -> void:
-	set_reputation(faction_id, get_reputation(faction_id) + delta)
-
-
-func get_reputation(faction_id: StringName) -> int:
-	return reputation.get(faction_id, 0)
 
 
 # --- Inventory -------------------------------------------------------------
@@ -274,16 +147,12 @@ func _find_stack(item_id: StringName) -> int:
 
 ## Empties all state. Does not emit signals: callers reload whatever reads it.
 func clear() -> void:
-	water.clear()
-	water_pending.clear()
-	basins.clear()
-	network_nodes.clear()
+	hearts_max = 0
+	health = 0
 	flags.clear()
 	quests.clear()
-	reputation.clear()
 	inventory.clear()
 	player.clear()
-	boat.clear()
 
 
 ## The whole state as JSON-safe data (String keys, no StringNames).
@@ -293,16 +162,12 @@ func to_dict() -> Dictionary:
 		stacks.append({"id": String(stack["id"]), "count": int(stack["count"])})
 	return {
 		"version": SAVE_VERSION,
-		"water": _json_safe(water),
-		"water_pending": _json_safe(water_pending),
-		"basins": _json_safe(basins),
-		"network_nodes": _json_safe(network_nodes),
+		"hearts_max": hearts_max,
+		"health": health,
 		"flags": _json_safe(flags),
 		"quests": _json_safe(quests),
-		"reputation": _json_safe(reputation),
 		"inventory": stacks,
 		"player": _json_safe(player),
-		"boat": _json_safe(boat),
 	}
 
 
@@ -310,26 +175,23 @@ func to_dict() -> Dictionary:
 ## Does not emit signals: the caller reloads the world after loading.
 func from_dict(data: Dictionary) -> void:
 	clear()
-	set_water_state(data)
+	hearts_max = clampi(int(data.get("hearts_max", 0)), 0, MAX_HEARTS)
+	health = clampi(int(data.get("health", 0)), 0, max_health())
 	var src_flags: Dictionary = data.get("flags", {})
 	for key: Variant in src_flags:
 		flags[StringName(str(key))] = src_flags[key]
 	var src_quests: Dictionary = data.get("quests", {})
 	for key: Variant in src_quests:
 		quests[StringName(str(key))] = StringName(str(src_quests[key]))
-	var src_reputation: Dictionary = data.get("reputation", {})
-	for key: Variant in src_reputation:
-		reputation[StringName(str(key))] = clampi(int(src_reputation[key]), REPUTATION_MIN, REPUTATION_MAX)
 	var src_inventory: Array = data.get("inventory", [])
 	for stack: Variant in src_inventory:
 		var entry: Dictionary = stack
 		inventory.append({"id": StringName(str(entry["id"])), "count": int(entry["count"])})
 	player = _whole_numbers_as_int(data.get("player", {}))
-	boat = _whole_numbers_as_int(data.get("boat", {}))
 
 
-## JSON may return 12 as 12.0. Cells, heights and counts are ints, so turn whole floats
-## back into ints, recursively, leaving real fractions alone.
+## JSON may return 12 as 12.0. Cells and counts are ints, so turn whole floats back into
+## ints, recursively, leaving real fractions alone.
 func _whole_numbers_as_int(value: Variant) -> Variant:
 	match typeof(value):
 		TYPE_FLOAT:

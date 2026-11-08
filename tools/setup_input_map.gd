@@ -1,11 +1,13 @@
 extends SceneTree
-## Writes Low Tide's input actions (and pixel snapping) into project.godot.
-## Re-run after changing an action:
+## Writes Hearthvale's input actions (and pixel snapping) into project.godot, and removes
+## actions the game no longer has. Re-run after changing an action:
 ##   godot --headless --path . -s res://tools/setup_input_map.gd
 ## Keys are physical, so WASD sits in the same place on any keyboard layout.
 ## Gamepad events apply to every connected device.
 
 const DEADZONE: float = 0.25
+## Actions from earlier designs, cleared if present.
+const RETIRED: Array[String] = ["sprint", "debug_cycle_water"]
 
 
 func _initialize() -> void:
@@ -13,10 +15,11 @@ func _initialize() -> void:
 	_action("move_right", [_key(KEY_D), _key(KEY_RIGHT), _axis(JOY_AXIS_LEFT_X, 1.0), _button(JOY_BUTTON_DPAD_RIGHT)])
 	_action("move_up", [_key(KEY_W), _key(KEY_UP), _axis(JOY_AXIS_LEFT_Y, -1.0), _button(JOY_BUTTON_DPAD_UP)])
 	_action("move_down", [_key(KEY_S), _key(KEY_DOWN), _axis(JOY_AXIS_LEFT_Y, 1.0), _button(JOY_BUTTON_DPAD_DOWN)])
-	_action("sprint", [_key(KEY_SHIFT), _button(JOY_BUTTON_LEFT_SHOULDER), _button(JOY_BUTTON_LEFT_STICK)])
 	_action("interact", [_key(KEY_E), _button(JOY_BUTTON_A)])
-	_action("debug_cycle_water", [_key(KEY_F2), _button(JOY_BUTTON_BACK)])
-	# Crisp pixel art: no sub-pixel jitter when the camera follows the player.
+	for action_name: String in RETIRED:
+		if ProjectSettings.has_setting("input/" + action_name):
+			ProjectSettings.clear("input/" + action_name)
+	# Crisp pixel art: no sub-pixel jitter when the camera follows the hero.
 	ProjectSettings.set_setting("rendering/2d/snap/snap_2d_transforms_to_pixel", true)
 	var error: Error = ProjectSettings.save()
 	print("tools/setup_input_map: project.godot saved (%s)" % error_string(error))

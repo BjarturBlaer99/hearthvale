@@ -1,13 +1,12 @@
 class_name PlayerAnimator
 extends RefCounted
-## Chooses the frame of the player sheet to show (gameplay/player/player_sheet.png, painted
-## by tools/art/make_player_sprite.gd). Pure, so it is unit-tested: tell it how the player
+## Chooses the frame of the hero's sheet to show (gameplay/player/player_sheet.png, painted
+## by tools/art/make_player_sprite.gd). Pure, so it is unit-tested: tell it how the hero
 ## moved each frame, then read region(), flip_h and bob().
 ##
 ## Facing follows movement, four ways. A diagonal keeps the current facing when it matches
 ## one of its two directions (as in classic top-down Zeldas), otherwise faces up or down.
-## The walk cycle (idle, step A, idle, step B) advances by distance travelled, so sprinting
-## and wading animate at the right pace.
+## The walk cycle (idle, step A, idle, step B) advances by distance travelled.
 
 ## Rows of the sheet.
 enum Facing { DOWN, UP, SIDE }
@@ -17,8 +16,6 @@ const FRAME_SIZE: Vector2i = Vector2i(16, 24)
 const STRIDE: float = 7.0
 ## Sheet columns in walk order: idle, step A, idle, step B.
 const CYCLE: Array[int] = [0, 1, 0, 2]
-## Rows of the frame that show above the water while swimming: head and shoulders.
-const SWIM_ROWS: int = 14
 
 var facing: Facing = Facing.DOWN
 ## True when facing right; the sheet's side row faces left.
@@ -28,19 +25,13 @@ var _step: int = 0
 var _travel: float = 0.0
 
 
-## `direction` is where the player is trying to go (zero when idle) and `distance` the
-## pixels actually moved this frame. Climbing shows the player's back and holds the pose
-## while hanging still.
-func update(direction: Vector2, distance: float, climbing: bool) -> void:
-	if climbing:
-		facing = Facing.UP
-		flip_h = false
-	else:
-		_face(direction)
+## `direction` is where the hero is trying to go (or last went) and `distance` the pixels
+## actually moved this frame. Standing still shows the idle frame.
+func update(direction: Vector2, distance: float) -> void:
+	_face(direction)
 	if distance <= 0.0:
-		if not climbing:
-			_step = 0
-			_travel = 0.0
+		_step = 0
+		_travel = 0.0
 		return
 	_travel += distance
 	while _travel >= STRIDE:
@@ -53,9 +44,9 @@ func frame() -> int:
 	return CYCLE[_step]
 
 
-## Texture region of the current frame. Fewer `rows` crops from the top (swimming).
-func region(rows: int = FRAME_SIZE.y) -> Rect2:
-	return Rect2(frame() * FRAME_SIZE.x, int(facing) * FRAME_SIZE.y, FRAME_SIZE.x, rows)
+## Texture region of the current frame.
+func region() -> Rect2:
+	return Rect2(frame() * FRAME_SIZE.x, int(facing) * FRAME_SIZE.y, FRAME_SIZE.x, FRAME_SIZE.y)
 
 
 ## The classic walking bob: 1 px down on step frames.

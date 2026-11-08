@@ -24,10 +24,4 @@ centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 16, 24)
 
-[node name="Ripple" type="Polygon2D" parent="."]
-visible = false
-position = Vector2(0, 3)
-color = Color(0.78, 0.96, 0.93, 0.55)
-polygon = PackedVector2Array(-9, 0, -6.5, -2.2, 0, -3, 6.5, -2.2, 9, 0, 6.5, 2.2, 0, 3, -6.5, 2.2)
-
 [node name="Camera2D" type="Camera2D" parent="."]

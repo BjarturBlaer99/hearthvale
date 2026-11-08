@@ -1,0 +1,50 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://world/areas/area_controller.gd" id="1_area"]
+[ext_resource type="TileSet" path="res://world/tiles/greybox_tiles.tres" id="2_tiles"]
+[ext_resource type="Script" path="res://world/areas/height_shading.gd" id="3_shading"]
+[ext_resource type="PackedScene" path="res://gameplay/player/player.tscn" id="4_player"]
+[ext_resource type="PackedScene" path="res://ui/area_hud.tscn" id="5_hud"]
+[ext_resource type="Script" path="res://gameplay/interactables/area_exit.gd" id="6_exit"]
+[ext_resource type="Script" path="res://gameplay/interactables/villager.gd" id="7_villager"]
+
+[node name="ElderHouse" type="Node2D" unique_id=815360012]
+script = ExtResource("1_area")
+area_id = &"elder_house"
+area_name = "Elder Bram's house"
+
+[node name="Height" type="TileMapLayer" parent="." unique_id=1087763489]
+tile_map_data = PackedByteArray("AAAAAAAAAAAAAAUAAAABAAAAAAAAAAUAAAACAAAAAAAAAAUAAAADAAAAAAAAAAUAAAAEAAAAAAAAAAUAAAAFAAAAAAAAAAUAAAAGAAAAAAAAAAUAAAAHAAAAAAAAAAUAAAAIAAAAAAAAAAUAAAAJAAAAAAAAAAUAAAAKAAAAAAAAAAUAAAAAAAEAAAAAAAUAAAABAAEAAAAAAAUAAAACAAEAAAAAAAUAAAADAAEAAAAAAAUAAAAEAAEAAAAAAAUAAAAFAAEAAAAFAAUAAAAGAAEAAAAAAAUAAAAHAAEAAAAAAAUAAAAIAAEAAAAAAAUAAAAJAAEAAAAAAAUAAAAKAAEAAAAAAAUAAAAAAAIAAAAAAAUAAAABAAIAAAADAAUAAAACAAIAAAADAAUAAAADAAIAAAADAAUAAAAEAAIAAAABAAQAAAAFAAIAAAABAAQAAAAGAAIAAAABAAQAAAAHAAIAAAABAAQAAAAIAAIAAAACAAUAAAAJAAIAAAABAAQAAAAKAAIAAAAAAAUAAAAAAAMAAAAAAAUAAAABAAMAAAABAAQAAAACAAMAAAABAAQAAAADAAMAAAABAAQAAAAEAAMAAAABAAQAAAAFAAMAAAABAAQAAAAGAAMAAAABAAQAAAAHAAMAAAABAAQAAAAIAAMAAAABAAQAAAAJAAMAAAABAAQAAAAKAAMAAAAAAAUAAAAAAAQAAAAAAAUAAAABAAQAAAABAAQAAAACAAQAAAABAAQAAAADAAQAAAABAAQAAAAEAAQAAAACAAQAAAAFAAQAAAACAAQAAAAGAAQAAAACAAQAAAAHAAQAAAABAAQAAAAIAAQAAAABAAQAAAAJAAQAAAABAAQAAAAKAAQAAAAAAAUAAAAAAAUAAAAAAAUAAAABAAUAAAABAAUAAAACAAUAAAABAAUAAAADAAUAAAABAAQAAAAEAAUAAAACAAQAAAAFAAUAAAACAAQAAAAGAAUAAAACAAQAAAAHAAUAAAABAAQAAAAIAAUAAAABAAQAAAAJAAUAAAABAAQAAAAKAAUAAAAAAAUAAAAAAAYAAAAAAAUAAAABAAYAAAABAAQAAAACAAYAAAABAAQAAAADAAYAAAABAAQAAAAEAAYAAAABAAQAAAAFAAYAAAABAAQAAAAGAAYAAAABAAQAAAAHAAYAAAABAAQAAAAIAAYAAAABAAQAAAAJAAYAAAABAAQAAAAKAAYAAAAAAAUAAAAAAAcAAAAAAAUAAAABAAcAAAAEAAUAAAACAAcAAAABAAQAAAADAAcAAAABAAQAAAAEAAcAAAABAAQAAAAFAAcAAAABAAQAAAAGAAcAAAABAAQAAAAHAAcAAAABAAQAAAAIAAcAAAABAAQAAAAJAAcAAAAEAAUAAAAKAAcAAAAAAAUAAAAAAAgAAAAAAAUAAAABAAgAAAAAAAUAAAACAAgAAAAAAAUAAAADAAgAAAAAAAUAAAAEAAgAAAAAAAUAAAAFAAgAAAADAAQAAAAGAAgAAAAAAAUAAAAHAAgAAAAAAAUAAAAIAAgAAAAAAAUAAAAJAAgAAAAAAAUAAAAKAAgAAAAAAAUAAAA=")
+tile_set = ExtResource("2_tiles")
+
+[node name="HeightShading" type="Node2D" parent="." unique_id=1370354265]
+script = ExtResource("3_shading")
+
+[node name="Interactables" type="Node2D" parent="." unique_id=1516783224]
+
+[node name="Doormat" type="Node2D" parent="Interactables" unique_id=1739355026]
+position = Vector2(80, 128)
+script = ExtResource("6_exit")
+target_area = &"village"
+target_entry = &"elder_door"
+
+[node name="Bram" type="Node2D" parent="Interactables" unique_id=982404309]
+position = Vector2(80, 48)
+script = ExtResource("7_villager")
+robe_color = Color(0.36, 0.42, 0.55, 1)
+hair_color = Color(0.9, 0.9, 0.88, 1)
+beard = true
+dialogue_id = &"elder_bram"
+
+[node name="Entries" type="Node2D" parent="." unique_id=2487782]
+
+[node name="door" type="Marker2D" parent="Entries" unique_id=740511064]
+position = Vector2(88, 120)
+rotation = -1.5707964
+
+[node name="PlayerSpawn" type="Marker2D" parent="." unique_id=942478924]
+position = Vector2(88, 120)
+
+[node name="Player" parent="." unique_id=1708407166 instance=ExtResource("4_player")]
+
+[node name="HUD" parent="." unique_id=1560657964 instance=ExtResource("5_hud")]

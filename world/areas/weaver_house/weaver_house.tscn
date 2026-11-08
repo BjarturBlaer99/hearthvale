@@ -1,0 +1,49 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://world/areas/area_controller.gd" id="1_area"]
+[ext_resource type="TileSet" path="res://world/tiles/greybox_tiles.tres" id="2_tiles"]
+[ext_resource type="Script" path="res://world/areas/height_shading.gd" id="3_shading"]
+[ext_resource type="PackedScene" path="res://gameplay/player/player.tscn" id="4_player"]
+[ext_resource type="PackedScene" path="res://ui/area_hud.tscn" id="5_hud"]
+[ext_resource type="Script" path="res://gameplay/interactables/area_exit.gd" id="6_exit"]
+[ext_resource type="Script" path="res://gameplay/interactables/villager.gd" id="7_villager"]
+
+[node name="WeaverHouse" type="Node2D" unique_id=1070897450]
+script = ExtResource("1_area")
+area_id = &"weaver_house"
+area_name = "Wenna's house"
+
+[node name="Height" type="TileMapLayer" parent="." unique_id=1643893894]
+tile_map_data = PackedByteArray("AAAAAAAAAAAAAAUAAAABAAAAAAAAAAUAAAACAAAAAAAAAAUAAAADAAAAAAAAAAUAAAAEAAAAAAAAAAUAAAAFAAAAAAAAAAUAAAAGAAAAAAAAAAUAAAAHAAAAAAAAAAUAAAAIAAAAAAAAAAUAAAAJAAAAAAAAAAUAAAAKAAAAAAAAAAUAAAAAAAEAAAAAAAUAAAABAAEAAAAAAAUAAAACAAEAAAAAAAUAAAADAAEAAAAAAAUAAAAEAAEAAAAAAAUAAAAFAAEAAAAAAAUAAAAGAAEAAAAAAAUAAAAHAAEAAAAAAAUAAAAIAAEAAAAAAAUAAAAJAAEAAAAAAAUAAAAKAAEAAAAAAAUAAAAAAAIAAAAAAAUAAAABAAIAAAADAAUAAAACAAIAAAADAAUAAAADAAIAAAABAAQAAAAEAAIAAAABAAQAAAAFAAIAAAABAAQAAAAGAAIAAAABAAUAAAAHAAIAAAABAAUAAAAIAAIAAAABAAUAAAAJAAIAAAAEAAUAAAAKAAIAAAAAAAUAAAAAAAMAAAAAAAUAAAABAAMAAAABAAQAAAACAAMAAAABAAQAAAADAAMAAAABAAQAAAAEAAMAAAABAAQAAAAFAAMAAAABAAQAAAAGAAMAAAABAAQAAAAHAAMAAAABAAQAAAAIAAMAAAABAAQAAAAJAAMAAAABAAQAAAAKAAMAAAAAAAUAAAAAAAQAAAAAAAUAAAABAAQAAAABAAQAAAACAAQAAAABAAQAAAADAAQAAAACAAQAAAAEAAQAAAACAAQAAAAFAAQAAAACAAQAAAAGAAQAAAABAAQAAAAHAAQAAAABAAQAAAAIAAQAAAABAAQAAAAJAAQAAAABAAQAAAAKAAQAAAAAAAUAAAAAAAUAAAAAAAUAAAABAAUAAAACAAUAAAACAAUAAAABAAQAAAADAAUAAAACAAQAAAAEAAUAAAACAAQAAAAFAAUAAAACAAQAAAAGAAUAAAABAAQAAAAHAAUAAAABAAQAAAAIAAUAAAAEAAUAAAAJAAUAAAABAAQAAAAKAAUAAAAAAAUAAAAAAAYAAAAAAAUAAAABAAYAAAABAAQAAAACAAYAAAABAAQAAAADAAYAAAABAAQAAAAEAAYAAAABAAQAAAAFAAYAAAABAAQAAAAGAAYAAAABAAQAAAAHAAYAAAABAAQAAAAIAAYAAAAEAAUAAAAJAAYAAAABAAQAAAAKAAYAAAAAAAUAAAAAAAcAAAAAAAUAAAABAAcAAAABAAQAAAACAAcAAAABAAQAAAADAAcAAAABAAQAAAAEAAcAAAABAAQAAAAFAAcAAAABAAQAAAAGAAcAAAABAAQAAAAHAAcAAAABAAQAAAAIAAcAAAABAAQAAAAJAAcAAAABAAQAAAAKAAcAAAAAAAUAAAAAAAgAAAAAAAUAAAABAAgAAAAAAAUAAAACAAgAAAAAAAUAAAADAAgAAAAAAAUAAAAEAAgAAAAAAAUAAAAFAAgAAAADAAQAAAAGAAgAAAAAAAUAAAAHAAgAAAAAAAUAAAAIAAgAAAAAAAUAAAAJAAgAAAAAAAUAAAAKAAgAAAAAAAUAAAA=")
+tile_set = ExtResource("2_tiles")
+
+[node name="HeightShading" type="Node2D" parent="." unique_id=853800834]
+script = ExtResource("3_shading")
+
+[node name="Interactables" type="Node2D" parent="." unique_id=1833671141]
+
+[node name="Doormat" type="Node2D" parent="Interactables" unique_id=1267407744]
+position = Vector2(80, 128)
+script = ExtResource("6_exit")
+target_area = &"village"
+target_entry = &"weaver_door"
+
+[node name="Wenna" type="Node2D" parent="Interactables" unique_id=71857656]
+position = Vector2(112, 48)
+script = ExtResource("7_villager")
+robe_color = Color(0.58, 0.3, 0.5, 1)
+hair_color = Color(0.62, 0.3, 0.14, 1)
+dialogue_id = &"wenna_weaver"
+
+[node name="Entries" type="Node2D" parent="." unique_id=1990198747]
+
+[node name="door" type="Marker2D" parent="Entries" unique_id=2058533520]
+position = Vector2(88, 120)
+rotation = -1.5707964
+
+[node name="PlayerSpawn" type="Marker2D" parent="." unique_id=113946839]
+position = Vector2(88, 120)
+
+[node name="Player" parent="." unique_id=612730627 instance=ExtResource("4_player")]
+
+[node name="HUD" parent="." unique_id=1507750292 instance=ExtResource("5_hud")]

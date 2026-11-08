@@ -13,17 +13,16 @@
         "properties": {
           "id": { "type": "string", "minLength": 1 },
           "name": { "type": "string" },
-          "type": { "enum": ["quest", "part", "trade", "ammo", "weapon_melee", "weapon_ranged"] },
+          "type": { "enum": ["weapon_melee", "weapon_ranged", "ammo", "bomb", "key", "currency", "consumable", "quest", "heart"] },
           "stackable": { "type": "boolean", "default": false },
           "max_stack": { "type": "integer", "minimum": 1 },
           "stats": {
             "type": "object",
-            "description": "Weapon stats. Ranged weapons name their ammo item id in 'ammo'.",
+            "description": "Weapon stats. Damage is in enemy health points; ranged weapons name their ammo item id.",
             "properties": {
               "damage": { "type": "number", "minimum": 0 },
-              "stagger": { "type": "number", "minimum": 0 },
-              "stamina_cost": { "type": "number", "minimum": 0 },
-              "magazine": { "type": "integer", "minimum": 1 },
+              "knockback": { "type": "number", "minimum": 0 },
+              "cooldown": { "type": "number", "minimum": 0 },
               "ammo": { "type": "string" }
             }
           }

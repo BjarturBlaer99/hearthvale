@@ -1,23 +1,27 @@
-# CLAUDE.md — Low Tide
+# CLAUDE.md — Hearthvale
 
-You are building **Low Tide**, a **2D top-down** open-world RPG in **Godot 4.x (latest stable) using typed GDScript**.
-Read these before writing any code:
+You are building **Hearthvale**, a **2D top-down action-adventure** (A Link to the Past style) in
+**Godot 4.x (latest stable) using typed GDScript**. Read these before writing any code:
 
 1. `docs/GDD.md` — what the game is (design source of truth)
 2. `docs/TECH_DESIGN.md` — how it is built (architecture source of truth)
-3. `docs/ROADMAP.md` — what to build next, milestone by milestone
+3. `docs/ROADMAP.md` — what to build next, milestone by milestone (H0–H9)
 4. `docs/data/` — example data files showing the schemas content must follow
 
 ## Current goal
-Build the **vertical slice** described in `docs/ROADMAP.md` (region: *The Spillway*). Do not build
-anything outside the current milestone. Scope creep is the main risk on this project.
+Build the **vertical slice** in `docs/ROADMAP.md`: Hearthvale, the countryside and the first dungeon. Do not
+build anything outside the current milestone. Scope creep is the main risk on this project.
+
+History: the project began as "Low Tide", a water-level game (milestones M0–M4 in `docs/progress/LOG.md`). It
+pivoted to Hearthvale on 2026-11-07; the last water version is on the `water-version` branch. Water-era entries
+in `docs/DECISIONS.md` are superseded.
 
 ## How to work
 - Work one milestone at a time, in order. Each milestone has acceptance criteria — meet them, then stop and summarize.
-- Before a milestone, write a short plan in `docs/progress/M<n>-plan.md`. After it, append results and known issues to `docs/progress/LOG.md`.
+- Before a milestone, write a short plan in `docs/progress/H<n>-plan.md`. After it, append results and known issues to `docs/progress/LOG.md`.
 - If a design question isn't answered in the docs, pick the simplest option that keeps systems data-driven, note it in `docs/DECISIONS.md`, and continue.
 - Use placeholder art: flat-colored 16×16 tiles generated in code or as tiny PNGs you create, `ColorRect`/`Polygon2D` for actors. No external art, audio or asset-store dependencies until the roadmap says so.
-  **Exception (user's request, 2026-11-07):** the player is a Zelda-style pixel-art sprite, painted from ASCII art by
+  **Exception (user's request, 2026-11-07):** the hero is a Zelda-style pixel-art sprite, painted from ASCII art by
   `tools/art/make_player_sprite.gd`. Keep it; edit the art in that tool, never the PNG. Other actors stay placeholders.
 
 ## Commands
@@ -30,16 +34,15 @@ godot --headless --path . -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add res://tes
 godot --headless --path . --import
 # Boot the game headless for a few frames (catches script and autoload errors)
 godot --headless --path . --quit-after 30
-# Screenshots for review (need a window, not --headless): St. Aud at every water level; boat and travel
-godot --path . -s res://tools/capture_st_aud.gd -- <output_dir>
-godot --path . -s res://tools/capture_world.gd -- <output_dir>
-# Repaint the player sprite sheet after editing its ASCII art (optional 8x preview), then re-import
+# Screenshots for review (needs a window, not --headless)
+godot --path . -s res://tools/capture.gd -- <output_dir>
+# Repaint the hero's sprite sheet after editing its ASCII art (optional 8x preview), then re-import
 godot --headless --path . -s res://tools/art/make_player_sprite.gd -- <preview.png>
 godot --headless --path . --import
 # Rewrite the input map after editing tools/setup_input_map.gd
 godot --headless --path . -s res://tools/setup_input_map.gd
-# Greybox: regenerate the tiles and re-bake the maps' Height layers (OVERWRITES editor painting of those layers).
-# build_maps.gd bakes every map, or only those named: -- st_aud spire_nine greenterrace sea
+# Greybox: regenerate the tiles and re-bake the areas' Height layers (OVERWRITES editor painting of those layers).
+# build_maps.gd bakes every area, or only those named: -- village
 godot --headless --path . -s res://tools/greybox/make_tile_texture.gd
 godot --headless --path . --import
 godot --headless --path . -s res://tools/greybox/build_tileset.gd
@@ -60,10 +63,12 @@ removes the shim, so recreate it after upgrading.
 - `StringName` sorts by internal pointer, not text. Compare as `String` when order matters.
 - Headless, drive input with `Input.action_press()` / `action_release()` (sets action state directly);
   gdUnit4's `simulate_action_*` sends InputEvents, which headless mode drops.
+- Area scene tests: load areas one at a time with `tests/support/area_steps.gd` (a loaded area writes
+  `GameState.player` every frame) and let it replace `AreaController.travel`, so taking an exit stays in the test.
 
 **Tool-script gotchas (`-s res://tools/...`):**
 - A `-s` script compiles before the autoloads exist. Never name a class that uses an autoload (e.g.
-  `DistrictController`) or the autoload itself in a tool script; look things up at runtime
+  `AreaController`) or the autoload itself in a tool script; look things up at runtime
   (`root.get_node("GameState")`, untyped `Node`).
 - When a tool re-saves a scene, instantiate it with `PackedScene.GEN_EDIT_STATE_MAIN`, or `pack()` pins every
   inherited property of instanced children (Player, HUD) as an override.
@@ -75,13 +80,12 @@ removes the shim, so recreate it after upgrading.
 - snake_case files and functions, PascalCase classes/nodes, UPPER_SNAKE constants.
 - Use `TileMapLayer` (not the deprecated `TileMap` node). Use 2D nodes only (`CharacterBody2D`, `Area2D`, `Camera2D`).
 - One responsibility per script. Systems talk through **signals on `EventBus`**, not direct references across scenes.
-- **Gameplay content is data, not code**: quests, dialogue, items, factions and water states live in `data/` as JSON validated against schemas in `docs/data/`. Adding a quest must never require a new script unless it needs a new *type* of step.
+- **Gameplay content is data, not code**: items, quests, dialogue and enemies live in `data/` as JSON validated against schemas in `docs/data/`. Adding a quest must never require a new script unless it needs a new *type* of step.
 - All game state that must persist goes through `GameState` and is serializable to a Dictionary. No state hidden in scene nodes.
-- Pure logic (water solver, height/terrain queries, quest evaluation, faction reputation, inventory) lives in plain `RefCounted` classes with **unit tests**. Scenes stay thin.
+- Pure logic (terrain rules, player motor, combat rules, quest evaluation, inventory, puzzles) lives in plain `RefCounted` classes with **unit tests**. Scenes stay thin.
 
 ## Do not
 - Do not hand-edit `.import` files or anything under `.godot/`.
-- Do not simulate water as fluid physics. Water is a discrete per-district water height compared against per-cell terrain height (see TECH_DESIGN §3).
-- Do not build a separate scene per water level. One district map; the water height decides what is land, shallows and deep water.
+- Do not add swimming, climbing, sprint or stamina: the hero moves like classic Zelda (stairs, ledge hops, solid tiles). Change the GDD first if that should change.
 - Do not add a dependency/addon without noting why in `docs/DECISIONS.md`. Allowed now: gdUnit4.
-- Do not write lore, dialogue or quest content beyond what the current milestone needs.
+- Do not write story, dialogue or quest content beyond what the current milestone needs.

@@ -1,126 +1,114 @@
 extends SceneTree
-## Fills the Height layer of each greybox map with its layout below. Step 4 of 4 (see
-## make_tile_texture.gd). Bakes every map, or just the ones named:
-##   godot --headless --path . -s res://tools/greybox/build_maps.gd [-- st_aud sea ...]
+## Fills the Height layer of each greybox area with its layout below. Step 4 of 4 (see
+## make_tile_texture.gd). Bakes every area, or just the ones named:
+##   godot --headless --path . -s res://tools/greybox/build_maps.gd [-- village ...]
 ## It OVERWRITES each Height layer, including anything painted in the editor since. The rest
 ## of each scene is hand-written and kept as it is.
 ##
-## Layout rules the tests check (tests/world/):
-## - St. Aud: the east wing roof (rooftop door) is reachable on foot only when flooded, the
-##   clinic roof only at waist, the subway only when drained. The pier (Harbour) is dry at
-##   every level; the Mooring beside it is deep when flooded or at waist.
-## - Greenterrace: the quay (Harbour) is dry at both levels; the Mooring is deep only when flooded.
-## - Spire Nine: one water level; the dock (Harbour) is dry and the Mooring deep.
-## - Sea: every port can be reached from every other port's exit.
+## Layout rules the tests check (tests/world/village_test.gd):
+## - the north rise is reached by its stairs; the east meadow by the stairs at its south end,
+##   and its long west edge is a one-way ledge down to the road;
+## - houses, the chapel, the well, the pond and the woods are solid;
+## - the south road leaves the map through a gap in the woods;
+## - two houses have a door in their front wall (tests/world/doors_test.gd).
+## House interiors are 11x9 rooms: log walls, the way out a doormat in the middle of the
+## bottom wall at (5, 8).
 
-## Each map: scene, size in cells, and blocks. Block = [x, y, width, height, terrain height,
-## kind]; kind "" plain, "c" climbable, "r" ramp. Everything else is height 0. Later blocks win.
+## Each area: scene, size in cells, blocks, and optionally the base kind (default grass).
+## Block = [x, y, width, height, terrain height, kind]; kind is "ground", "stairs", "path" (at
+## that height) or a fixed-height kind from GreyboxTiles (solid, floor or furniture; the
+## height is then ignored). Everything else is the base at height 0. Later blocks win.
 const MAPS: Dictionary = {
-	"st_aud": {
-		"scene": "res://world/districts/st_aud/st_aud.tscn",
-		"size": Vector2i(64, 64),
+	"village": {
+		"scene": "res://world/areas/village/village.tscn",
+		"size": Vector2i(48, 36),
 		"blocks": [
-			# Lookout tower, where a new game starts: ivy up its west face, stairs down its south side.
-			[6, 6, 6, 6, 5, ""],
-			[6, 6, 1, 6, 5, "c"],
-			[8, 12, 2, 1, 4, "r"],
-			[8, 13, 2, 1, 3, "r"],
-			[8, 14, 2, 1, 2, "r"],
-			[8, 15, 2, 1, 1, "r"],
-			# Pier from the tower to the west edge: the Harbour is at its end.
-			[0, 9, 6, 1, 4, ""],
-			# Rubble field: wade through it at waist level.
-			[13, 17, 6, 4, 1, "r"],
-			# Block with an ivy-covered west face.
-			[20, 6, 4, 8, 3, ""],
-			[20, 6, 1, 8, 3, "c"],
-			# Low warehouse with a step up from the street.
-			[30, 4, 6, 6, 2, ""],
-			[30, 10, 6, 1, 1, "r"],
-			# Low roof north of the hospital.
-			[40, 6, 8, 8, 2, ""],
-			# Tall tower with ivy on its south face.
-			[52, 4, 8, 10, 7, ""],
-			[52, 13, 8, 1, 7, "c"],
-			# St. Aud Hospital, main block.
-			[24, 18, 14, 12, 6, ""],
-			# Hospital east wing: the rooftop door is up here.
-			[42, 20, 8, 8, 4, ""],
-			# West apartments.
-			[4, 24, 6, 8, 4, ""],
-			# East block.
-			[52, 30, 8, 8, 3, ""],
-			# Clinic: its balcony hatch is up here.
-			[12, 36, 6, 6, 2, ""],
-			# Rubble south of the hospital.
-			[22, 40, 10, 6, 1, "r"],
-			# Shops around the subway plaza.
-			[36, 44, 4, 8, 3, ""],
-			[50, 44, 6, 6, 1, "r"],
-			# South-west tower with ivy on its east face, south row, south-east tower.
-			[4, 46, 6, 10, 6, ""],
-			[9, 46, 1, 10, 6, "c"],
-			[24, 52, 10, 8, 4, ""],
-			[54, 52, 8, 8, 5, ""],
+			# The north rise, wooded along the top, with the old chapel on it.
+			[0, 0, 48, 8, 2, "ground"],
+			[0, 0, 48, 2, 2, "tree"],
+			[18, 2, 12, 3, 3, "roof_blue"],
+			[18, 5, 12, 1, 3, "wall"],
+			[22, 8, 4, 1, 1, "stairs"],
+			# The east meadow: a long ledge down to the road, stairs at its south end.
+			[38, 12, 9, 18, 1, "ground"],
+			[40, 30, 3, 1, 1, "stairs"],
+			[42, 15, 2, 2, 1, "tree"],
+			[44, 22, 2, 2, 1, "tree"],
+			[40, 25, 1, 1, 1, "rock"],
+			# Houses: a roof over a timber front wall.
+			[6, 11, 6, 3, 3, "roof"],
+			[6, 14, 6, 1, 3, "wall"],
+			[14, 11, 6, 3, 3, "roof"],
+			[14, 14, 6, 1, 3, "wall"],
+			[28, 11, 6, 3, 3, "roof_blue"],
+			[28, 14, 6, 1, 3, "wall"],
+			[6, 21, 6, 3, 3, "roof"],
+			[6, 24, 6, 1, 3, "wall"],
+			# Doors: the weaver's and the elder's.
+			[16, 14, 1, 1, 0, "door"],
+			[30, 14, 1, 1, 0, "door"],
+			# Roads: north-south from the stairs out through the woods; east-west across.
+			[22, 9, 4, 27, 0, "path"],
+			[3, 16, 35, 2, 0, "path"],
+			# The well.
+			[18, 19, 2, 2, 2, "stone"],
+			# A fenced field with a gate.
+			[4, 27, 10, 1, 1, "fence"],
+			[4, 33, 10, 1, 1, "fence"],
+			[4, 27, 1, 7, 1, "fence"],
+			[13, 27, 1, 7, 1, "fence"],
+			[8, 27, 2, 1, 0, "ground"],
+			# The pond.
+			[28, 26, 6, 4, 0, "water"],
+			# Rocks and trees about the village.
+			[33, 20, 1, 1, 0, "rock"],
+			[16, 26, 1, 1, 0, "rock"],
+			[3, 9, 2, 2, 0, "tree"],
+			[34, 31, 2, 2, 0, "tree"],
+			# Woods round the edges; the south road leaves through a gap.
+			[0, 8, 2, 26, 0, "tree"],
+			[46, 8, 2, 4, 0, "tree"],
+			[47, 12, 1, 18, 0, "tree"],
+			[44, 30, 4, 4, 0, "tree"],
+			[0, 34, 22, 2, 0, "tree"],
+			[26, 34, 22, 2, 0, "tree"],
 		],
 	},
-	"spire_nine": {
-		"scene": "res://world/districts/spire_nine/spire_nine.tscn",
-		"size": Vector2i(32, 32),
+	"elder_house": {
+		"scene": "res://world/areas/elder_house/elder_house.tscn",
+		"size": Vector2i(11, 9),
+		"base": "floor",
 		"blocks": [
-			# The settlement platform, at the surface, ringed by open water.
-			[8, 8, 16, 16, 4, ""],
-			# The spire, with a ramp up its north face.
-			[13, 13, 6, 6, 6, ""],
-			[15, 12, 2, 1, 5, "r"],
-			# Shacks on the platform.
-			[9, 9, 2, 2, 5, ""],
-			[19, 9, 3, 2, 5, ""],
-			[21, 20, 2, 2, 5, ""],
-			# Dock out to the west edge: the Harbour is at its end.
-			[0, 15, 8, 2, 4, ""],
+			[0, 0, 11, 2, 0, "inner_wall"],
+			[0, 0, 1, 9, 0, "inner_wall"],
+			[10, 0, 1, 9, 0, "inner_wall"],
+			[0, 8, 11, 1, 0, "inner_wall"],
+			[5, 8, 1, 1, 0, "doormat"],
+			[5, 1, 1, 1, 0, "hearth"],
+			[1, 2, 3, 1, 0, "shelf"],
+			[8, 2, 1, 1, 0, "bed"],
+			[4, 4, 3, 2, 0, "rug"],
+			[1, 5, 2, 1, 0, "table"],
+			[1, 7, 1, 1, 0, "barrel"],
+			[9, 7, 1, 1, 0, "barrel"],
 		],
 	},
-	"greenterrace": {
-		"scene": "res://world/districts/greenterrace/greenterrace.tscn",
-		"size": Vector2i(32, 32),
+	"weaver_house": {
+		"scene": "res://world/areas/weaver_house/weaver_house.tscn",
+		"size": Vector2i(11, 9),
+		"base": "floor",
 		"blocks": [
-			# Quay on the west edge (height 3: dry at both levels), with steps down to the street.
-			[0, 14, 5, 3, 3, ""],
-			[5, 14, 1, 3, 2, "r"],
-			[6, 14, 1, 3, 1, "r"],
-			# Terraced farm roofs, each with stairs up from the street.
-			[9, 4, 8, 8, 2, ""],
-			[12, 12, 2, 1, 1, "r"],
-			[20, 4, 8, 8, 3, ""],
-			[23, 12, 2, 1, 2, "r"],
-			[23, 13, 2, 1, 1, "r"],
-			[9, 19, 8, 8, 4, ""],
-			[12, 16, 2, 1, 1, "r"],
-			[12, 17, 2, 1, 2, "r"],
-			[12, 18, 2, 1, 3, "r"],
-			[20, 19, 8, 8, 5, ""],
-			[20, 19, 1, 8, 5, "c"],
-		],
-	},
-	"sea": {
-		"scene": "res://world/sea/sea.tscn",
-		"size": Vector2i(48, 30),
-		"blocks": [
-			# St. Aud (east): high ground ringed by shallows.
-			[29, 7, 14, 16, 3, ""],
-			[30, 8, 12, 14, 6, ""],
-			# Spire Nine (north-west): a lone spire.
-			[7, 2, 7, 7, 3, ""],
-			[8, 3, 5, 5, 7, ""],
-			# Greenterrace (south-west): stepped roofs.
-			[5, 18, 12, 10, 3, ""],
-			[6, 19, 10, 8, 4, ""],
-			[8, 20, 6, 6, 5, ""],
-			[10, 21, 2, 4, 6, ""],
-			# Reefs.
-			[20, 5, 3, 2, 3, ""],
-			[22, 26, 3, 2, 3, ""],
+			[0, 0, 11, 2, 0, "inner_wall"],
+			[0, 0, 1, 9, 0, "inner_wall"],
+			[10, 0, 1, 9, 0, "inner_wall"],
+			[0, 8, 11, 1, 0, "inner_wall"],
+			[5, 8, 1, 1, 0, "doormat"],
+			[1, 2, 2, 1, 0, "shelf"],
+			[6, 2, 3, 1, 0, "table"],
+			[9, 2, 1, 1, 0, "barrel"],
+			[1, 5, 1, 1, 0, "bed"],
+			[3, 4, 3, 2, 0, "rug"],
+			[8, 5, 1, 2, 0, "barrel"],
 		],
 	},
 }
@@ -132,7 +120,7 @@ func _initialize() -> void:
 		names = PackedStringArray(MAPS.keys())
 	for map_name: String in names:
 		if not MAPS.has(map_name):
-			push_error("tools/greybox: no map '%s'. Maps: %s" % [map_name, ", ".join(MAPS.keys())])
+			push_error("tools/greybox: no area '%s'. Areas: %s" % [map_name, ", ".join(MAPS.keys())])
 			quit(1)
 			return
 		if _bake(MAPS[map_name]) != OK:
@@ -147,17 +135,23 @@ func _bake(map: Dictionary) -> Error:
 	if packed == null:
 		push_error("tools/greybox: cannot load %s" % path)
 		return ERR_CANT_OPEN
-	# Edit state MAIN (as the editor opens scenes) keeps instanced children (Player, HUD,
-	# Boat) as clean instances; without it pack() pins every inherited property.
+	# Edit state MAIN (as the editor opens scenes) keeps instanced children (Player, HUD) as
+	# clean instances; without it pack() pins every inherited property.
 	var root: Node = packed.instantiate(PackedScene.GEN_EDIT_STATE_MAIN)
 	var layer: TileMapLayer = root.get_node("Height")
 	var size: Vector2i = map["size"]
+	var base: Vector2i = GreyboxTiles.coords(str(map.get("base", "ground")), 0)
 	layer.clear()
 	for y: int in size.y:
 		for x: int in size.x:
-			layer.set_cell(Vector2i(x, y), GreyboxTiles.SOURCE_ID, GreyboxTiles.terrain_coords(0, false, false))
+			layer.set_cell(Vector2i(x, y), GreyboxTiles.SOURCE_ID, base)
 	for block: Array in map["blocks"]:
-		var coords: Vector2i = GreyboxTiles.terrain_coords(block[4], block[5] == "c", block[5] == "r")
+		var kind: String = block[5]
+		if not GreyboxTiles.is_known_kind(kind):
+			push_error("tools/greybox: unknown tile kind '%s' in %s" % [kind, block])
+			root.free()
+			return ERR_INVALID_DATA
+		var coords: Vector2i = GreyboxTiles.coords(kind, block[4])
 		for y: int in range(block[1], block[1] + block[3]):
 			for x: int in range(block[0], block[0] + block[2]):
 				layer.set_cell(Vector2i(x, y), GreyboxTiles.SOURCE_ID, coords)

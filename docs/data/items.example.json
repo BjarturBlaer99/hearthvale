@@ -1,0 +1,12 @@
+{
+  "items": [
+    { "id": "wooden_sword", "name": "Wooden Sword", "type": "weapon_melee", "stats": { "damage": 2, "knockback": 40, "cooldown": 0.3 } },
+    { "id": "iron_sword", "name": "Iron Sword", "type": "weapon_melee", "stats": { "damage": 4, "knockback": 50, "cooldown": 0.3 } },
+    { "id": "bow", "name": "Bow", "type": "weapon_ranged", "stats": { "damage": 2, "cooldown": 0.5, "ammo": "arrow" } },
+    { "id": "arrow", "name": "Arrows", "type": "ammo", "stackable": true, "max_stack": 30 },
+    { "id": "bomb", "name": "Bombs", "type": "bomb", "stackable": true, "max_stack": 10, "stats": { "damage": 4 } },
+    { "id": "small_key", "name": "Small Key", "type": "key", "stackable": true, "max_stack": 9 },
+    { "id": "coin", "name": "Coin", "type": "currency", "stackable": true, "max_stack": 999 },
+    { "id": "heart_container", "name": "Heart Container", "type": "heart" }
+  ]
+}

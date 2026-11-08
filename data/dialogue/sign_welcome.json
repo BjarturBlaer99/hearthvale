@@ -1,0 +1,11 @@
+{
+  "id": "sign_welcome",
+  "start": "read",
+  "nodes": {
+    "read": {
+      "speaker": "",
+      "text": "HEARTHVALE\nNorth: the old chapel.   South: the countryside.",
+      "options": []
+    }
+  }
+}

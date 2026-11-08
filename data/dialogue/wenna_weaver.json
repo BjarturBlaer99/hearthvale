@@ -1,0 +1,22 @@
+{
+  "id": "wenna_weaver",
+  "start": "greet",
+  "speakers": { "wenna": "Wenna" },
+  "nodes": {
+    "greet": {
+      "speaker": "wenna",
+      "text": "Mind the loom! This cloth is for the chapel.",
+      "options": [
+        { "text": "Bram asked me to keep watch.",
+          "conditions": [{ "type": "flag", "flag": "promised_elder_keep", "value": true }],
+          "next": "watch" },
+        { "text": "Goodbye.", "next": null }
+      ]
+    },
+    "watch": {
+      "speaker": "wenna",
+      "text": "Did he now? Then take care on the north road. My brother saw lights there too.",
+      "options": [{ "text": "Goodbye.", "next": null }]
+    }
+  }
+}

@@ -1,41 +1,30 @@
 {
-  "id": "greenterrace_elder",
+  "id": "village_elder",
   "start": "greet",
+  "speakers": { "village_elder": "Village Elder" },
   "nodes": {
     "greet": {
-      "speaker": "greenterrace_elder",
-      "text": "You're the one with the old key. If you start that pump, our fields go under.",
-      "on_enter": [{ "type": "set_flag", "flag": "talked_greenterrace_elder", "value": true }],
+      "speaker": "village_elder",
+      "text": "Ah, you're up early. I've gone and lost the chapel key in the field.",
       "options": [
-        { "text": "People in Spire Nine are dying.", "next": "plea" },
-        { "text": "[Charm 4] Move your people to higher terraces first. I'll help.",
-          "check": { "attribute": "charm", "difficulty": 4 },
-          "success": "agree_evacuate", "failure": "refuse" },
-        { "text": "Give them 20 food crates to start over.",
-          "conditions": [{ "type": "has_item", "item": "food_crate", "count": 20 }],
-          "effects": [{ "type": "take_item", "item": "food_crate", "count": 20 }],
-          "next": "agree_evacuate" },
-        { "text": "Leave.", "next": null }
+        { "text": "I'll look for it.", "effects": [{ "type": "set_quest_stage", "quest": "lost_key", "stage": "find_key" }], "next": "thanks" },
+        { "text": "Here it is.",
+          "conditions": [{ "type": "has_item", "item": "small_key", "count": 1 }],
+          "effects": [{ "type": "set_flag", "flag": "returned_chapel_key", "value": true }],
+          "next": "grateful" },
+        { "text": "Not now.", "next": null }
       ]
     },
-    "plea": {
-      "speaker": "greenterrace_elder",
-      "text": "And we'll starve instead. Find another way.",
-      "options": [{ "text": "Back.", "next": "greet" }]
+    "thanks": {
+      "speaker": "village_elder",
+      "text": "Bless you. It's a small brass one.",
+      "options": [{ "text": "Goodbye.", "next": null }]
     },
-    "agree_evacuate": {
-      "speaker": "greenterrace_elder",
-      "text": "Give us a day. Then do what you must.",
-      "on_enter": [
-        { "type": "set_flag", "flag": "greenterrace_evacuated", "value": true },
-        { "type": "approval", "companion": "mara", "delta": 10 }
-      ],
+    "grateful": {
+      "speaker": "village_elder",
+      "text": "That's it! Take these coins for your trouble.",
       "options": [{ "text": "Thank you.", "next": null }]
-    },
-    "refuse": {
-      "speaker": "greenterrace_elder",
-      "text": "Pretty words. No.",
-      "options": [{ "text": "Leave.", "next": null }]
     }
-  }
+  },
+  "_notes": "Example only (not loaded)."
 }

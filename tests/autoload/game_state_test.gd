@@ -1,6 +1,5 @@
 extends GdUnitTestSuite
-## GameState: survives a JSON round trip, clamps reputation, keeps inventory counts sane,
-## and announces changes on EventBus.
+## GameState: hearts, flags, inventory, the player's position, and a JSON round trip.
 
 const GameStateScript: GDScript = preload("res://autoload/game_state.gd")
 
@@ -11,16 +10,95 @@ func before_test() -> void:
 	_state = auto_free(GameStateScript.new())
 
 
+# --- Hearts ----------------------------------------------------------------
+
+func test_a_new_game_starts_with_three_full_hearts() -> void:
+	assert_bool(_state.is_started()).is_false()
+	_state.new_game()
+	assert_bool(_state.is_started()).is_true()
+	assert_int(_state.hearts_max).is_equal(3)
+	assert_int(_state.health).is_equal(6)
+	assert_int(_state.max_health()).is_equal(6)
+
+
+func test_damage_and_healing_stay_within_the_hearts() -> void:
+	_state.new_game()
+	_state.damage(1)
+	assert_int(_state.health).is_equal(5)
+	_state.heal(10)
+	assert_int(_state.health).is_equal(6)
+	_state.damage(99)
+	assert_int(_state.health).is_equal(0)
+	assert_bool(_state.is_dead()).is_true()
+
+
+func test_a_heart_container_adds_a_heart_and_refills() -> void:
+	_state.new_game()
+	_state.damage(3)
+	_state.add_heart_container()
+	assert_int(_state.hearts_max).is_equal(4)
+	assert_int(_state.health).is_equal(8)
+
+
+func test_health_changes_are_announced_once() -> void:
+	_state.new_game()
+	var announced: Array = []
+	var on_health: Callable = func(current: int, maximum: int) -> void: announced.append([current, maximum])
+	EventBus.health_changed.connect(on_health)
+	_state.damage(1)
+	_state.heal(0)
+	_state.heal(5)
+	_state.heal(5)
+	EventBus.health_changed.disconnect(on_health)
+	assert_array(announced).is_equal([[5, 6], [6, 6]])
+
+
+# --- Everything else -------------------------------------------------------
+
+func test_missing_flag_reads_as_false() -> void:
+	assert_bool(_state.get_flag(&"never_set")).is_false()
+
+
+func test_flag_changes_are_announced_once() -> void:
+	var received: Array = []
+	var on_flag: Callable = func(flag: StringName, value: Variant) -> void: received.append([flag, value])
+	EventBus.flag_set.connect(on_flag)
+	_state.set_flag(&"door_open", true)
+	_state.set_flag(&"door_open", true)
+	EventBus.flag_set.disconnect(on_flag)
+	assert_array(received).is_equal([[&"door_open", true]])
+
+
+func test_removing_more_than_held_empties_the_stack() -> void:
+	_state.add_item(&"coin", 10)
+	_state.add_item(&"coin", -25)
+	assert_int(_state.item_count(&"coin")).is_equal(0)
+	assert_array(_state.inventory).is_empty()
+
+
+func test_the_heros_position_is_recorded_for_saving() -> void:
+	_state.update_player(&"village", Vector2i(8, 9))
+	assert_dict(_state.to_dict()["player"]).is_equal({"area": "village", "cell": [8, 9]})
+
+
+func test_going_through_a_door_records_the_entry_until_the_area_places_the_hero() -> void:
+	_state.update_player(&"village", Vector2i(30, 15))
+	_state.go_to(&"elder_house", &"door")
+	assert_dict(_state.to_dict()["player"]).is_equal({"area": "elder_house", "entry": "door"})
+	var restored: Node = auto_free(GameStateScript.new())
+	restored.from_dict(JSON.parse_string(JSON.stringify(_state.to_dict())))
+	assert_dict(restored.player).override_failure_message("a save taken mid-door keeps the entry").is_equal({"area": "elder_house", "entry": "door"})
+	_state.update_player(&"elder_house", Vector2i(5, 7))
+	assert_dict(_state.to_dict()["player"]).is_equal({"area": "elder_house", "cell": [5, 7]})
+
+
 func test_state_survives_a_json_round_trip() -> void:
-	_state.set_water_level(&"st_aud", &"waist")
-	_state.water_pending[&"greenterrace"] = 50
-	_state.basins[&"old_reservoir"] = 50
-	_state.network_nodes[&"third_outlet"] = WaterNetwork.STATE_REPAIRED
-	_state.set_flag(&"talked_greenterrace_elder", true)
-	_state.set_quest_stage(&"bitter_medicine", &"retrieve_medicine")
-	_state.set_reputation(&"summit_holds", 35)
-	_state.add_item(&"food_crate", 20)
-	_state.player = {"district": "st_aud", "cell": [12, 8], "height": 2}
+	_state.new_game()
+	_state.damage(3)
+	_state.set_flag(&"talked_to_elder", true)
+	_state.set_quest_stage(&"lost_key", &"find_key")
+	_state.add_item(&"coin", 20)
+	_state.update_player(&"village", Vector2i(12, 8))
 
 	var first_save: String = JSON.stringify(_state.to_dict(), "", true)
 	var restored: Node = auto_free(GameStateScript.new())
@@ -28,137 +106,8 @@ func test_state_survives_a_json_round_trip() -> void:
 	var second_save: String = JSON.stringify(restored.to_dict(), "", true)
 
 	assert_str(second_save).is_equal(first_save)
-	assert_that(restored.get_water_level(&"st_aud")).is_equal(&"waist")
-	assert_that(restored.get_quest_stage(&"bitter_medicine")).is_equal(&"retrieve_medicine")
-	assert_int(restored.item_count(&"food_crate")).is_equal(20)
-	assert_int(restored.player["height"]).is_equal(2)
-	assert_bool(restored.get_flag(&"talked_greenterrace_elder")).is_true()
-	assert_int(restored.water_pending[&"greenterrace"]).is_equal(50)
-	assert_that(restored.network_nodes[&"third_outlet"]).is_equal(WaterNetwork.STATE_REPAIRED)
-
-
-func test_new_game_starts_the_flood_network_from_data() -> void:
-	_state.new_game()
-	assert_that(_state.get_water_level(&"st_aud")).is_equal(&"flooded")
-	assert_that(_state.get_water_level(&"greenterrace")).is_equal(&"dry")
-	assert_int(_state.basins[&"old_reservoir"]).is_equal(0)
-	assert_that(_state.network_nodes[&"st_aud_pump"]).is_equal(WaterNetwork.STATE_BROKEN)
-	assert_int(_state.water_network().total_water()).is_equal(100)
-
-
-func test_applied_water_changes_are_recorded_and_announced() -> void:
-	_state.new_game()
-	_state.network_nodes[&"st_aud_pump"] = WaterNetwork.STATE_REPAIRED
-	var solver: WaterSolver = WaterSolver.new()
-	var announced: Array = []
-	var on_level: Callable = func(district_id: StringName, level: StringName) -> void: announced.append([district_id, level])
-	EventBus.water_level_changed.connect(on_level)
-	var first: WaterChangeResult = solver.preview(_state.water_network(), &"st_aud_pump", WaterSolver.LOWER)
-	var first_applied: bool = _state.apply_water_change(first)
-	var pending_after_first: int = _state.water_pending[&"greenterrace"]
-	var second: WaterChangeResult = solver.preview(_state.water_network(), &"st_aud_pump", WaterSolver.LOWER)
-	var second_applied: bool = _state.apply_water_change(second)
-	var stale_applied: bool = _state.apply_water_change(first)
-	EventBus.water_level_changed.disconnect(on_level)
-
-	assert_bool(first_applied).is_true()
-	assert_bool(second_applied).is_true()
-	assert_bool(stale_applied).is_false()
-	assert_int(pending_after_first).is_equal(50)
-	# Water building up in Greenterrace changes no map, so only level changes are announced.
-	assert_array(announced).is_equal([[&"st_aud", &"waist"], [&"st_aud", &"drained"], [&"greenterrace", &"flooded"]])
-	assert_that(_state.get_water_level(&"greenterrace")).is_equal(&"flooded")
-	assert_int(_state.water_pending[&"greenterrace"]).is_equal(0)
-
-
-func test_setting_a_level_directly_clears_pending_water() -> void:
-	_state.new_game()
-	_state.water_pending[&"greenterrace"] = 50
-	_state.set_water_level(&"greenterrace", &"flooded")
-	assert_int(_state.water_pending[&"greenterrace"]).is_equal(0)
-	assert_int(_state.water_network().get_district(&"greenterrace").pending).is_equal(0)
-
-
-func test_the_players_position_is_recorded_for_saving() -> void:
-	_state.update_player(&"st_aud", Vector2i(8, 9), 5, 72.5)
-	assert_dict(_state.to_dict()["player"]).is_equal({"district": "st_aud", "cell": [8, 9], "height": 5, "stamina": 72.5, "on_boat": false})
-
-
-func test_the_boat_is_recorded_with_or_without_a_cell() -> void:
-	_state.set_boat(&"st_aud", Vector2i(1, 10), 0.5)
-	assert_that(_state.boat_cell()).is_equal(Vector2i(1, 10))
-	assert_dict(_state.to_dict()["boat"]).is_equal({"where": "st_aud", "cell": [1, 10], "heading": 0.5, "moored_at": ""})
-	_state.set_boat(&"sea", GameState.NO_CELL, 0.0, &"greenterrace")
-	assert_that(_state.boat_cell()).is_equal(GameState.NO_CELL)
-	assert_that(str(_state.boat["moored_at"])).is_equal("greenterrace")
-
-
-func test_setting_sail_marks_the_player_as_arriving_aboard() -> void:
-	_state.update_player(&"st_aud", Vector2i(1, 9), 4, 100.0)
-	_state.begin_voyage(&"sea", &"st_aud")
-	assert_that(str(_state.player["district"])).is_equal("sea")
-	assert_that(str(_state.player["came_from"])).is_equal("st_aud")
-	assert_bool(_state.player["arriving"]).is_true()
-	assert_bool(_state.player["on_boat"]).is_true()
-	assert_bool(_state.player.has("cell")).is_false()
-
-
-func test_the_pump_needs_its_valve_to_be_repaired() -> void:
-	_state.new_game()
-	var unmet: Array = _state.unmet_repair_requirements(&"st_aud_pump")
-	assert_int(unmet.size()).is_equal(1)
-	assert_that(str(unmet[0]["item"])).is_equal("pump_valve")
-	assert_bool(_state.repair_network_node(&"st_aud_pump")).is_false()
-	assert_bool(_state.is_network_node_repaired(&"st_aud_pump")).is_false()
-
-
-func test_repairing_uses_up_the_valve_and_announces_it() -> void:
-	_state.new_game()
-	_state.add_item(&"pump_valve", 1)
-	var repaired: Array = []
-	var on_repaired: Callable = func(node_id: StringName) -> void: repaired.append(node_id)
-	EventBus.network_node_repaired.connect(on_repaired)
-	var first: bool = _state.repair_network_node(&"st_aud_pump")
-	var again: bool = _state.repair_network_node(&"st_aud_pump")
-	EventBus.network_node_repaired.disconnect(on_repaired)
-	assert_bool(first).is_true()
-	assert_bool(again).override_failure_message("already repaired stays repaired").is_true()
-	assert_bool(_state.is_network_node_repaired(&"st_aud_pump")).is_true()
-	assert_int(_state.item_count(&"pump_valve")).is_equal(0)
-	assert_array(repaired).is_equal([&"st_aud_pump"])
-
-
-func test_rejected_water_changes_are_not_recorded() -> void:
-	_state.new_game()
-	var change: WaterChangeResult = WaterSolver.new().preview(_state.water_network(), &"st_aud_pump", WaterSolver.LOWER)
-	assert_bool(change.is_rejected()).is_true()
-	assert_bool(_state.apply_water_change(change)).is_false()
-	assert_that(_state.get_water_level(&"st_aud")).is_equal(&"flooded")
-
-
-func test_missing_flag_reads_as_false() -> void:
-	assert_bool(_state.get_flag(&"never_set")).is_false()
-
-
-func test_reputation_is_clamped() -> void:
-	_state.set_reputation(&"reclamation", 250)
-	assert_int(_state.get_reputation(&"reclamation")).is_equal(100)
-	_state.change_reputation(&"reclamation", -500)
-	assert_int(_state.get_reputation(&"reclamation")).is_equal(-100)
-
-
-func test_removing_more_than_held_empties_the_stack() -> void:
-	_state.add_item(&"rivets", 10)
-	_state.add_item(&"rivets", -25)
-	assert_int(_state.item_count(&"rivets")).is_equal(0)
-	assert_array(_state.inventory).is_empty()
-
-
-func test_changes_are_announced_once_on_event_bus() -> void:
-	var received: Array = []
-	var on_flag: Callable = func(flag: StringName, value: Variant) -> void: received.append([flag, value])
-	EventBus.flag_set.connect(on_flag)
-	_state.set_flag(&"door_open", true)
-	_state.set_flag(&"door_open", true) # unchanged, so no second signal
-	EventBus.flag_set.disconnect(on_flag)
-	assert_array(received).is_equal([[&"door_open", true]])
+	assert_int(restored.health).is_equal(3)
+	assert_int(restored.hearts_max).is_equal(3)
+	assert_that(restored.get_quest_stage(&"lost_key")).is_equal(&"find_key")
+	assert_int(restored.item_count(&"coin")).is_equal(20)
+	assert_array(restored.player["cell"]).is_equal([12, 8])

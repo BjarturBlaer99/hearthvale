@@ -1,7 +1,7 @@
 extends SceneTree
 ## Builds the greybox TileSet from the imported atlas. Step 3 of 4 (see make_tile_texture.gd).
-## Terrain tiles carry the custom data DistrictController reads (TECH_DESIGN §3.2):
-## height (int), climbable (bool), ramp (bool), dive_point (String; set per cell later).
+## Every tile carries the custom data HeightGridBuilder reads (TECH_DESIGN §3):
+## height (int), ramp (bool: stairs), solid (bool: never entered).
 
 
 func _initialize() -> void:
@@ -14,9 +14,8 @@ func _initialize() -> void:
 	tile_set.tile_size = Vector2i(GreyboxTiles.TILE_SIZE, GreyboxTiles.TILE_SIZE)
 	var layers: Array = [
 		[GreyboxTiles.DATA_HEIGHT, TYPE_INT],
-		[GreyboxTiles.DATA_CLIMBABLE, TYPE_BOOL],
 		[GreyboxTiles.DATA_RAMP, TYPE_BOOL],
-		[GreyboxTiles.DATA_DIVE_POINT, TYPE_STRING],
+		[GreyboxTiles.DATA_SOLID, TYPE_BOOL],
 	]
 	for layer: Array in layers:
 		var index: int = tile_set.get_custom_data_layers_count()
@@ -28,17 +27,32 @@ func _initialize() -> void:
 	source.texture = texture
 	source.texture_region_size = Vector2i(GreyboxTiles.TILE_SIZE, GreyboxTiles.TILE_SIZE)
 	tile_set.add_source(source, GreyboxTiles.SOURCE_ID)
-	for row: int in [GreyboxTiles.ROW_PLAIN, GreyboxTiles.ROW_CLIMBABLE, GreyboxTiles.ROW_RAMP]:
+	for row: int in [GreyboxTiles.ROW_GROUND, GreyboxTiles.ROW_STAIRS, GreyboxTiles.ROW_PATH]:
 		for height: int in GreyboxTiles.COLUMNS:
-			var coords: Vector2i = Vector2i(height, row)
-			source.create_tile(coords)
-			var data: TileData = source.get_tile_data(coords, 0)
+			var data: TileData = _tile(source, Vector2i(height, row))
 			data.set_custom_data(GreyboxTiles.DATA_HEIGHT, height)
-			data.set_custom_data(GreyboxTiles.DATA_CLIMBABLE, row == GreyboxTiles.ROW_CLIMBABLE)
-			data.set_custom_data(GreyboxTiles.DATA_RAMP, row == GreyboxTiles.ROW_RAMP)
-	source.create_tile(GreyboxTiles.WATER_SHALLOW)
-	source.create_tile(GreyboxTiles.WATER_DEEP)
+			data.set_custom_data(GreyboxTiles.DATA_RAMP, row == GreyboxTiles.ROW_STAIRS)
+			data.set_custom_data(GreyboxTiles.DATA_SOLID, false)
+	for index: int in GreyboxTiles.SOLID_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_SOLID), GreyboxTiles.SOLID_HEIGHTS[index], true)
+	for index: int in GreyboxTiles.FLOOR_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_FLOOR), 0, false)
+	for index: int in GreyboxTiles.FURNITURE_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_FURNITURE), GreyboxTiles.FURNITURE_HEIGHTS[index], true)
 
 	var error: Error = ResourceSaver.save(tile_set, GreyboxTiles.TILESET_PATH)
 	print("tools/greybox: wrote %s (%s)" % [GreyboxTiles.TILESET_PATH, error_string(error)])
 	quit(0 if error == OK else 1)
+
+
+## A tile whose height doesn't depend on its column: solids, floors, furniture.
+func _fixed(source: TileSetAtlasSource, coords: Vector2i, height: int, solid: bool) -> void:
+	var data: TileData = _tile(source, coords)
+	data.set_custom_data(GreyboxTiles.DATA_HEIGHT, height)
+	data.set_custom_data(GreyboxTiles.DATA_RAMP, false)
+	data.set_custom_data(GreyboxTiles.DATA_SOLID, solid)
+
+
+func _tile(source: TileSetAtlasSource, coords: Vector2i) -> TileData:
+	source.create_tile(coords)
+	return source.get_tile_data(coords, 0)

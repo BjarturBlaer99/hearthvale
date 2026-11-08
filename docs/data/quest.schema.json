@@ -2,13 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "quest.schema.json",
   "title": "Quest file (data/quests/<id>.json, one quest per file)",
-  "description": "Stages with objectives and transitions (TECH_DESIGN §5). Transitions are evaluated top to bottom; the first match wins, so put the best outcome first.",
+  "description": "Stages with objectives and transitions (TECH_DESIGN §7). Transitions are evaluated top to bottom; the first match wins, so put the best outcome first.",
   "type": "object",
   "required": ["id", "title", "start_stage", "stages"],
   "properties": {
     "id": { "type": "string", "minLength": 1 },
     "title": { "type": "string" },
-    "giver": { "type": "string", "description": "NPC id; not cross-checked until NPCs are data (M8)." },
+    "giver": { "type": "string", "description": "NPC id; not cross-checked until villagers are data (H1)." },
     "start_stage": { "type": "string", "description": "A key of 'stages'." },
     "stages": {
       "type": "object",

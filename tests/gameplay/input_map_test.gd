@@ -1,10 +1,9 @@
 extends GdUnitTestSuite
 ## The input map in project.godot: every action works from the keyboard (physical keys,
-## so any layout) and from a gamepad.
+## so any layout) and from a gamepad, and actions from the old design are gone.
 
-const ACTIONS: Array[StringName] = [
-	&"move_left", &"move_right", &"move_up", &"move_down", &"sprint", &"interact", &"debug_cycle_water",
-]
+const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down", &"interact"]
+const RETIRED: Array[StringName] = [&"sprint", &"debug_cycle_water"]
 
 
 func test_every_action_has_a_physical_key_and_a_gamepad_binding() -> void:
@@ -18,6 +17,11 @@ func test_every_action_has_a_physical_key_and_a_gamepad_binding() -> void:
 			if event is InputEventJoypadButton or event is InputEventJoypadMotion:
 				has_pad = true
 		assert_bool(has_key and has_pad).override_failure_message("%s: key=%s pad=%s" % [action, has_key, has_pad]).is_true()
+
+
+func test_retired_actions_are_gone() -> void:
+	for action: StringName in RETIRED:
+		assert_bool(InputMap.has_action(action)).override_failure_message("%s should be gone" % action).is_false()
 
 
 func test_wasd_and_the_left_stick_move() -> void:

@@ -1,13 +1,9 @@
 class_name WorldPaths
 extends RefCounted
-## Where each map's scene lives. Districts follow TECH_DESIGN §1:
-## res://world/districts/<id>/<id>.tscn. The sea is its own map, id "sea".
+## Where each area's scene lives (TECH_DESIGN §1): res://world/areas/<id>/<id>.tscn.
 
-const SEA_ID: StringName = &"sea"
-const SEA_SCENE: String = "res://world/sea/sea.tscn"
+const START_AREA: StringName = &"village"
 
 
-static func scene_for(map_id: StringName) -> String:
-	if map_id == SEA_ID:
-		return SEA_SCENE
-	return "res://world/districts/%s/%s.tscn" % [map_id, map_id]
+static func scene_for(area_id: StringName) -> String:
+	return "res://world/areas/%s/%s.tscn" % [area_id, area_id]

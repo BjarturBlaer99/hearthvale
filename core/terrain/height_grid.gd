@@ -1,18 +1,21 @@
 class_name HeightGrid
 extends RefCounted
-## Terrain height and traversal flags for every cell of one district
-## (docs/TECH_DESIGN.md §3.2). Plain data, so terrain rules are testable without scenes.
-## Districts build it from their `Height` TileMapLayer (from M2); tests use from_rows().
+## Terrain height and traversal flags for every cell of one area (docs/TECH_DESIGN.md §3).
+## Plain data, so terrain rules are testable without scenes. Areas build it from their
+## `Height` TileMapLayer (HeightGridBuilder); tests use from_rows().
+##
+## Heights 0-7 are ground levels: cliffs, plateaus, ledges. Flags: `solid` cells (trees,
+## walls, roofs, water, fences) can never be entered; `ramp` cells are stairs, which let you
+## walk up or down one level.
 
 const MAX_HEIGHT: int = 7
-const FLAG_CLIMBABLE: int = 1
+const FLAG_SOLID: int = 1
 const FLAG_RAMP: int = 2
 
 var size: Vector2i = Vector2i.ZERO
 
 var _heights: PackedByteArray = PackedByteArray()
 var _flags: PackedByteArray = PackedByteArray()
-var _dive_points: Dictionary[Vector2i, StringName] = {}
 
 
 func _init(grid_size: Vector2i = Vector2i.ZERO, fill_height: int = 0) -> void:
@@ -24,7 +27,7 @@ func _init(grid_size: Vector2i = Vector2i.ZERO, fill_height: int = 0) -> void:
 
 
 ## Builds a grid from text rows. Each row is space-separated cells: a height digit 0-7,
-## then optional flags, `c` climbable and `r` ramp. Example: "0 0 1r 2 4c".
+## then optional flags, `s` solid and `r` ramp (stairs). Example: "0 0 1r 2 0s".
 ## Returns null (with an error) if the rows are malformed or of different lengths.
 static func from_rows(rows: PackedStringArray) -> HeightGrid:
 	var parsed: Array[PackedStringArray] = []
@@ -46,8 +49,8 @@ static func from_rows(rows: PackedStringArray) -> HeightGrid:
 			grid.set_height(cell, height)
 			for flag: String in token.substr(1):
 				match flag:
-					"c":
-						grid.set_climbable(cell, true)
+					"s":
+						grid.set_solid(cell, true)
 					"r":
 						grid.set_ramp(cell, true)
 					_:
@@ -70,35 +73,22 @@ func set_height(cell: Vector2i, height: int) -> void:
 		_heights[_index(cell)] = clampi(height, 0, MAX_HEIGHT)
 
 
-func is_climbable(cell: Vector2i) -> bool:
-	return in_bounds(cell) and (_flags[_index(cell)] & FLAG_CLIMBABLE) != 0
+## Solid cells (trees, walls, roofs, water, fences) can never be entered.
+func is_solid(cell: Vector2i) -> bool:
+	return in_bounds(cell) and (_flags[_index(cell)] & FLAG_SOLID) != 0
 
 
-func set_climbable(cell: Vector2i, climbable: bool) -> void:
-	_set_flag(cell, FLAG_CLIMBABLE, climbable)
+func set_solid(cell: Vector2i, solid: bool) -> void:
+	_set_flag(cell, FLAG_SOLID, solid)
 
 
-## A ramp lets actors walk up or down one level without climbing or dropping.
+## A ramp is stairs: walk up or down one level from or onto it.
 func is_ramp(cell: Vector2i) -> bool:
 	return in_bounds(cell) and (_flags[_index(cell)] & FLAG_RAMP) != 0
 
 
 func set_ramp(cell: Vector2i, ramp: bool) -> void:
 	_set_flag(cell, FLAG_RAMP, ramp)
-
-
-## Interior id entered by diving here, or &"" if this is not a dive point.
-func dive_point(cell: Vector2i) -> StringName:
-	return _dive_points.get(cell, &"")
-
-
-func set_dive_point(cell: Vector2i, interior_id: StringName) -> void:
-	if not in_bounds(cell):
-		return
-	if interior_id == &"":
-		_dive_points.erase(cell)
-	else:
-		_dive_points[cell] = interior_id
 
 
 func _index(cell: Vector2i) -> int:

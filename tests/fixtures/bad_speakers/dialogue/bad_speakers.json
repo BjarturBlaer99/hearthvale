@@ -1,0 +1,6 @@
+{
+  "id": "bad_speakers",
+  "start": "a",
+  "speakers": ["bram"],
+  "nodes": { "a": { "speaker": "bram", "text": "Hello.", "options": [] } }
+}

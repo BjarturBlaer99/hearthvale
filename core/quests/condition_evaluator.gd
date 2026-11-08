@@ -16,15 +16,8 @@ func is_met(condition: Dictionary) -> bool:
 	match str(condition.get("type", "")):
 		"flag":
 			return _same(_section("flags").get(str(condition["flag"]), false), condition["value"])
-		"water_level":
-			return str(_section("water").get(str(condition["district"]), "")) == str(condition["level"])
 		"has_item":
 			return item_count(str(condition["item"])) >= int(condition["count"])
-		"reputation_gte":
-			return int(_section("reputation").get(str(condition["faction"]), 0)) >= int(condition["value"])
-		"attribute_gte":
-			var attributes: Dictionary = _section("player").get("attributes", {})
-			return int(attributes.get(str(condition["attribute"]), 0)) >= int(condition["value"])
 		"quest_stage":
 			return str(_section("quests").get(str(condition["quest"]), "")) == str(condition["stage"])
 		"all":

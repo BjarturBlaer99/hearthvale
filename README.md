@@ -1,41 +1,34 @@
-# Low Tide
+# Hearthvale
 
-2D top-down open-world RPG: Fallout-style factions and choices + Zelda-style exploration and tools, set a century
-after a catastrophic flood. Changing the water level changes the world.
+A 2D top-down action-adventure in the style of *A Link to the Past*: start in a small medieval village, explore
+the countryside, and delve into dungeons full of enemies and puzzles. Find new weapons, and grow from three hearts
+into a hero.
 
 ## Getting started with Claude Code
 1. Install Godot 4.x (latest stable) and make sure `godot` is on your PATH.
-2. `git init` in this folder and commit these docs.
-3. Run `claude` here and say: **"Read CLAUDE.md and the docs, then start milestone M0."**
-4. After each milestone, review `docs/progress/LOG.md`, play the build, commit, then ask for the next one.
+2. Run `claude` here and say: **"Read CLAUDE.md and the docs, then start the next milestone."**
+3. After each milestone, review `docs/progress/LOG.md`, play the build, commit, then ask for the next one.
 
 ## Playing the current build
-Run `godot --path .` to start in the greybox St. Aud district.
+Run `godot --path .` to start in Hearthvale.
 
 | Action | Keyboard | Gamepad |
 |---|---|---|
 | Move (8 directions) | WASD / arrow keys | Left stick / d-pad |
-| Sprint (uses stamina) | Shift | LB or L3 |
-| Use what you're standing on · board the boat · go ashore | E | A |
-| Cycle the water level (debug builds) | F2 | Back / Select |
+| Talk / read / pick up | E | A |
+| Choose an answer | W / S or arrows, then E | d-pad, then A |
 
-Walk into a climbable (ivy) wall to climb it; walking off a ledge drops you.
-
-**The boat:** stand next to it (or swim beside it) and press E to board. It steers toward the direction you
-press. Press E again to go ashore. Sail off the edge of a district to reach the open sea, then sail into a
-marked approach to visit St. Aud, Spire Nine or Greenterrace. If the water's too low for the boat, it waits at
-sea off the district's harbour (the anchor): walk there and press E to board it.
-
-**The Network Key:** St. Aud's pump is on the lookout tower (the red valve wheel), but it's broken. Sail to Spire
-Nine and pick up the Pump Valve on the platform, bring it back, and press E on the pump to fit it. Press E again
-to open the Network Key: **Up/Down** picks Raise or Lower, the mini-map and text show everything that will change
-(red means a district floods), **E** confirms and **Esc** cancels. Draining St. Aud pushes its water into
-Greenterrace: sail there afterwards to see it flooded.
+Read the sign in the square, then walk into a door: Elder Bram lives in the blue-roofed house, Wenna the weaver
+in the house west of the road. Take the stairs up to the chapel on the north rise, or to the meadow in the east;
+hop down a ledge to come back. Combat, enemies, items and dungeons arrive milestone by milestone
+(`docs/ROADMAP.md`).
 
 ## Docs
 - `CLAUDE.md` — rules for Claude Code
 - `docs/GDD.md` — game design
 - `docs/TECH_DESIGN.md` — architecture
-- `docs/ROADMAP.md` — milestones M0–M11 (vertical slice)
+- `docs/ROADMAP.md` — milestones H0–H9 (vertical slice)
 - `docs/data/` — example content files and the condition/effect vocabulary
 - `docs/DECISIONS.md`, `docs/progress/` — running records
+
+The project started as a water-level game called *Low Tide*; that version is kept on the `water-version` branch.

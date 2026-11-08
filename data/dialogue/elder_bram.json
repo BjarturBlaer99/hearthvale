@@ -1,0 +1,45 @@
+{
+  "id": "elder_bram",
+  "start": "greet",
+  "speakers": { "bram": "Elder Bram" },
+  "nodes": {
+    "greet": {
+      "speaker": "bram",
+      "text": "Ah, come in, come in. Have you seen the lights over the old keep at night?",
+      "options": [
+        { "text": "What lights?",
+          "conditions": [{ "type": "flag", "flag": "promised_elder_keep", "value": false }],
+          "next": "lights" },
+        { "text": "I'm keeping watch, as I promised.",
+          "conditions": [{ "type": "flag", "flag": "promised_elder_keep", "value": true }],
+          "next": "kept" },
+        { "text": "Goodbye.", "next": null }
+      ]
+    },
+    "lights": {
+      "speaker": "bram",
+      "text": "Something has stirred in the keep north of here. Someone sharp-eyed ought to keep watch.",
+      "options": [
+        { "text": "I'll keep watch.",
+          "effects": [{ "type": "set_flag", "flag": "promised_elder_keep", "value": true }],
+          "next": "promise" },
+        { "text": "Not me.", "next": "refused" }
+      ]
+    },
+    "promise": {
+      "speaker": "bram",
+      "text": "Bless you. Ask about the square, too. Folk there hear everything.",
+      "options": [{ "text": "Goodbye.", "next": null }]
+    },
+    "refused": {
+      "speaker": "bram",
+      "text": "Hm. Think on it.",
+      "options": [{ "text": "Goodbye.", "next": null }]
+    },
+    "kept": {
+      "speaker": "bram",
+      "text": "Good. I sleep easier for it.",
+      "options": [{ "text": "Goodbye.", "next": null }]
+    }
+  }
+}
