@@ -71,4 +71,5 @@ Warm, cosy medieval: green meadows, timber houses, red and blue roofs; darker, c
 limited palette. The hero is an original green-hooded adventurer (Zelda-style, not Link).
 
 ## 11. Out of scope (for now)
-Multiplayer, procedural generation, 3D, voice acting, swimming and water levels, an open world beyond the slice.
+Multiplayer, procedural generation, 3D, voice acting, swimming and water levels, an open world. Phase 2 (ROADMAP)
+adds one region and a second dungeon, not an open world.

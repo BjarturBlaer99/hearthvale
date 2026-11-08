@@ -9,7 +9,8 @@ You are building **Hearthvale**, a **2D top-down action-adventure** (A Link to t
 4. `docs/data/` — example data files showing the schemas content must follow
 
 ## Current goal
-Build the **vertical slice** in `docs/ROADMAP.md`: Hearthvale, the countryside and the first dungeon. Do not
+**Phase 2** in `docs/ROADMAP.md` (H10–H16): grow the finished vertical slice (H0–H9) into a small game of about
+two hours: feel and sound, more to find, quests, a new region, a second dungeon, pixel art, a light story. Do not
 build anything outside the current milestone. Scope creep is the main risk on this project.
 
 History: the project began as "Low Tide", a water-level game (milestones M0–M4 in `docs/progress/LOG.md`). It

@@ -65,5 +65,90 @@ the boss door needs the big key.
 
 ---
 
-## After the slice (not now)
-More dungeons and items, heart pieces everywhere, a bigger world, real pixel art and audio, a story.
+# Phase 2 — From slice to small game (approved 2026-11-08)
+
+Goal: grow the slice into a small, complete game of about **2 hours**:
+- it feels and sounds good
+- the world has more to find
+- villagers give small quests
+- a second dungeon is built around a new item
+- a light story leads to an ending
+
+Same rules as the slice:
+- Work milestone by milestone, H10 onwards; stop after each and report.
+- No external assets. Sound, music and art are made in code, the way the hero's sprite and the tiles already are.
+- Change the GDD before adding a mechanic it doesn't describe.
+
+## H10 — Feel & sound
+- **Sound effects**, made in code (a small synth in `tools/`, baked to WAV files the way the tiles are baked to a
+  PNG):
+  - swings and hits; enemies hurt and beaten
+  - pickups; doors, chests and keys
+  - arrows, bombs, crystals and blocks
+  - the Warden's stomp, clink, gaze and fall
+- **Music:** a short looping tune each for the village, the countryside, dungeons and the boss, from a code
+  sequencer.
+- **Juice:**
+  - a brief freeze when a hit lands
+  - screen shake for bombs and the Warden
+  - dust and sparkle particles
+- **Settings:** music and effects volume, kept with the other settings.
+
+**Done when**: every action above makes its sound, each area plays its tune and the boss fight its own, volume
+settings work and persist, and a playtest says the game feels better, not noisier.
+
+## H11 — Grass, pots & heart pieces
+- Cuttable grass and breakable pots, with data-driven drop tables (hearts, coins, arrows, bombs), as GDD §5 and §8
+  promise.
+- Three more heart pieces, hidden around the world (four in all make a heart), each behind a small secret.
+- A heart-piece counter on the HUD.
+
+**Done when**: grass and pots drop what their data says and come back on the next visit, and all four heart
+pieces can be found and together add a heart.
+
+## H12 — Quests
+- `QuestRunner` (TECH_DESIGN §7): quests as JSON stages with objectives, using the existing conditions and
+  effects. Adding a quest needs no new code.
+- Two or three small villager quests with rewards, for example a lost item found in the countryside, or a
+  delivery. A heart piece or a bigger quiver are possible rewards.
+- A quest log in the pause menu. Quest progress is saved.
+
+**Done when**: each quest starts, advances and finishes from data alone; the log shows where each stands; progress
+survives a save; and a new quest can be added by writing only a JSON file.
+
+## H13 — A new region
+- A third area of countryside off the village (the GDD's map grows: hills or a lakeside), with its enemies,
+  secrets and a road to the second dungeon.
+- One new enemy type, data-driven like the others.
+- **Pits** (deferred since H6): falling costs half a heart and puts the hero back at the edge. Blocks can fill
+  them.
+
+**Done when**: the region is reachable from the village and back, has an optional secret, the new enemy patrols,
+notices, attacks and can be beaten, and pits work for the hero, enemies and blocks.
+
+## H14 — The second dungeon & boss
+- A second dungeon of 10–14 rooms built around a **new item**, chosen in this milestone's plan (candidates: a
+  boomerang that stuns and fetches, or a lantern for dark rooms and torches).
+- A second boss whose weak point needs the new item. The **Iron Sword** (GDD §5) is a reward.
+
+**Done when**: the dungeon can be finished start to end, its puzzles need the new item, the boss can only be
+beaten with it, and the Iron Sword does more than the wooden one.
+
+## H15 — Pixel art for everyone
+- Pixel-art sprites, painted in code like the hero, for every villager, enemy, item, puzzle piece and both bosses,
+  replacing the placeholder shapes.
+- Raised floors in dungeons get their own tile (no more dirt-path ledges).
+
+**Done when**: no placeholder shapes are left, screenshots of every area read clearly, and tests stay green.
+
+## H16 — Story, ending & playtest
+- A light story that ties the two dungeons together (still short: GDD §9), told through villagers and signs, and
+  a real ending after the second boss.
+- Fixes from a full playtest with new players.
+
+**Done when**: a new player finishes the game in about 2 hours with no developer help.
+
+---
+
+## Later (not in phase 2)
+More dungeons and items, a bigger world, key rebinding, several save slots.

@@ -249,3 +249,9 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   - The welcome sign names the road to the keep.
   - The controls hint mentions Esc.
 - 2026-11-08 — **H9's last criterion needs a person:** a new player finishing in 30–60 minutes without help. The build, the clock and the ending are ready for it. The ROADMAP marked H9 built but not done until that playtest. It went well (2026-11-08), so H9 is done.
+
+## Phase 2
+- 2026-11-08 — **Phase 2 approved: from slice to small game** (ROADMAP H10–H16), aiming at about two hours of play. The order is feel and sound, then grass, pots and heart pieces, quests, a new region with pits, the second dungeon around a new item, pixel art for everyone, and story with an ending.
+  - Sound first, because the game is silent and sound improves everything after it.
+  - Art last, because it's costly and easiest to get right once content stops changing.
+  - Still no external assets: sound, music and art are made in code.
