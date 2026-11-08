@@ -10,7 +10,9 @@ into a hero.
 3. After each milestone, review `docs/progress/LOG.md`, play the build, commit, then ask for the next one.
 
 ## Playing the current build
-Run `godot --path .` to start in Hearthvale.
+Run `godot --path .` to reach the title screen. Choose **New game** to start in Hearthvale, or **Continue** to pick
+up a save. Press **Esc** (gamepad Start) to pause: from there you can save, change the settings (fullscreen, window
+size, the controls hint), or quit to the title. The pause menu also shows your play time.
 
 | Action | Keyboard | Gamepad |
 |---|---|---|
@@ -21,6 +23,7 @@ Run `godot --path .` to start in Hearthvale.
 | Swing the sword (once you have it) | Space / J | X |
 | Use the equipped item (bow, bombs) | Q / K | Y |
 | Item menu (choose what's equipped) | Tab / I | Back |
+| Pause menu (save, settings, quit) | Esc / P | Start |
 
 Read the sign in the square, then walk into a door: Elder Bram lives in the blue-roofed house, Wenna the weaver
 in the house west of the road. The Wooden Sword lies in the fenced training yard south-west of the square, next
@@ -57,7 +60,7 @@ Beaten enemies sometimes drop hearts or coins.
     it, then use your sword while it's stunned.
   - Beat it for a heart container, and the way out opens behind it.
 
-Next: a title screen, saving from a menu, and playtesting (`docs/ROADMAP.md`).
+That's the whole vertical slice. Beating the Iron Warden ends it, and the pause menu shows how long it took.
 
 ## Docs
 - `CLAUDE.md` — rules for Claude Code

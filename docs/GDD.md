@@ -27,7 +27,7 @@ item, the boss) → heart container and a new item that opens new paths → back
 
 ## 5. The hero
 - Moves in 8 directions and faces 4. **E / A** interacts. Hold **Shift / B** to sprint (no stamina: it never
-  runs out). No climbing or stamina.
+  runs out). No climbing or stamina. **Esc / Start** pauses: save, settings, quit to the title.
 - **Life: hearts.** Start with **3**. Most hits cost **half a heart**. A **heart container** (from a boss) adds a
   heart and refills you; four **heart pieces** make a container (one is hidden in the slice; more after it). Hearts drop from enemies,
   grass and pots. At zero hearts you return to the area's entrance with full hearts.

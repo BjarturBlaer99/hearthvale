@@ -8,7 +8,8 @@ extends SceneTree
 ## "talk" (to what is in front), "swing" (the sword, caught mid-swing), and with the bow, arrows
 ## and bombs in hand: "menu" (the item menu open), "shoot" (an arrow in flight), "bomb" (lit);
 ## "flag:<name>" sets that flag first (a door already opened); "gaze" waits for a boss's eye to
-## open.
+## open; "pause" opens the pause menu and "settings" the settings from it. The area id "title"
+## shows the title screen instead of an area.
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -57,6 +58,10 @@ const SHOTS: Array = [
 	["45_wood_keep_gate", &"old_wood", Vector2i(19, 8), Vector2.UP, 0, ""],
 	["46_wood_shrine", &"old_wood", Vector2i(27, 13), Vector2.RIGHT, 0, ""],
 	["47_wood_shrine_opened", &"old_wood", Vector2i(31, 13), Vector2.RIGHT, 0, "flag:dungeon/old_wood/door/shrine_wall"],
+	["48_title_screen", &"title", Vector2i.ZERO, Vector2.DOWN, 0, ""],
+	["49_pause_menu", &"keep", Vector2i(22, 30), Vector2.UP, 1, "pause"],
+	["50_settings", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "settings"],
+	["51_the_end", &"keep", Vector2i(22, 14), Vector2.UP, 0, "flag:keep_warden_beaten"],
 ]
 
 
@@ -75,6 +80,14 @@ func _capture() -> void:
 		game_state.call(&"damage", shot[4])
 		if str(shot[5]).begins_with("flag:"):
 			game_state.call(&"set_flag", StringName(str(shot[5]).trim_prefix("flag:")), true)
+		if shot[1] == &"title":
+			var title: Node = (load("res://ui/title_screen.tscn") as PackedScene).instantiate()
+			root.add_child(title)
+			await _frames(30)
+			_save(out_dir, shot[0])
+			title.queue_free()
+			await _frames(2)
+			continue
 		var scene: Node = (load(WorldPaths.scene_for(shot[1])) as PackedScene).instantiate()
 		root.add_child(scene)
 		var player: Node = scene.get(&"player")
@@ -104,17 +117,27 @@ func _capture() -> void:
 			await _frames(18)
 		elif shot[5] == "gaze":
 			await _frames(170)
+		elif shot[5] in ["pause", "settings"]:
+			scene.call(&"open_pause_menu")
+			if shot[5] == "settings":
+				scene.get(&"hud").get(&"pause_menu").call(&"choose", &"settings")
+			await _frames(2)
 		elif shot[5] == "bomb":
 			scene.call(&"use_item")
 			player.get(&"motor").call(&"place", shot[2] + Vector2i(0, 2))
 			player.call(&"sync_from_motor")
 			await _frames(40)
-		var path: String = out_dir.path_join("%s.png" % shot[0])
-		var error: Error = root.get_texture().get_image().save_png(path)
-		print("tools/capture: %s (%s)" % [path, error_string(error)])
+		_save(out_dir, shot[0])
+		paused = false
 		scene.queue_free()
 		await _frames(2)
 	quit()
+
+
+func _save(out_dir: String, shot_name: String) -> void:
+	var path: String = out_dir.path_join("%s.png" % shot_name)
+	var error: Error = root.get_texture().get_image().save_png(path)
+	print("tools/capture: %s (%s)" % [path, error_string(error)])
 
 
 func _frames(count: int) -> void:

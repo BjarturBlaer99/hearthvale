@@ -2,7 +2,8 @@ class_name HeartContainer
 extends Node2D
 ## A heart container (docs/TECH_DESIGN.md §4): it appears once `appears_flag` is set (its boss
 ## beaten), and touching it adds a heart and fills them all. `taken_flag` remembers it's gone,
-## for good. The area collects it like a recovery heart. Position = the cell's top-left corner.
+## for good. The area collects it like a recovery heart, then opens the conversation
+## `dialogue_id` if it has one (the end of the slice). Position = the cell's top-left corner.
 
 const RADIUS: float = 6.0
 const CENTER: Vector2 = Vector2(8.0, 8.0)
@@ -12,6 +13,8 @@ const GOLD: Color = Color(0.98, 0.80, 0.30)
 
 @export var appears_flag: StringName
 @export var taken_flag: StringName
+## A conversation (data/dialogue) to open once it's taken; empty: just a message.
+@export var dialogue_id: StringName
 
 var _clock: float = 0.0
 

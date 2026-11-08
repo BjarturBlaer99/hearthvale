@@ -7,6 +7,7 @@ const TEST_SLOT: int = 990
 
 func after_test() -> void:
 	GameState.clear()
+	SaveSystem.current_slot = SaveSystem.GAME_SLOT
 	if SaveSystem.has_slot(TEST_SLOT):
 		DirAccess.remove_absolute(SaveSystem.slot_path(TEST_SLOT))
 
@@ -46,3 +47,21 @@ func test_saves_carry_a_version() -> void:
 	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveSystem.slot_path(TEST_SLOT)))
 	assert_int(int(data["version"])).is_equal(GameState.SAVE_VERSION)
+
+
+func test_the_menus_slot_saves_loads_and_sums_up_without_loading() -> void:
+	SaveSystem.current_slot = TEST_SLOT
+	assert_bool(SaveSystem.has_save()).is_false()
+	assert_dict(SaveSystem.summary()).override_failure_message("no save, nothing to sum up").is_empty()
+	GameState.new_game()
+	GameState.add_heart_container()
+	GameState.add_play_time(754.0)
+	GameState.update_player(&"old_wood", Vector2i(18, 10))
+	assert_int(SaveSystem.save_game()).is_equal(OK)
+	assert_bool(SaveSystem.has_slot(TEST_SLOT)).is_true()
+	GameState.new_game()
+	assert_dict(SaveSystem.summary()).is_equal({"area": "old_wood", "play_time": 754.0, "hearts_max": 4})
+	assert_int(GameState.hearts_max).override_failure_message("summing up doesn't load").is_equal(3)
+	assert_int(SaveSystem.load_game()).is_equal(OK)
+	assert_int(GameState.hearts_max).is_equal(4)
+	assert_float(GameState.play_time).is_equal(754.0)

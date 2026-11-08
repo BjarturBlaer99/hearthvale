@@ -26,6 +26,8 @@ var quests: Dictionary[StringName, StringName] = {}
 var inventory: Array[Dictionary] = []
 ## The item on the item button (bow, bombs), or empty.
 var equipped: StringName = &""
+## Seconds played, counted while an area runs unpaused (add_play_time).
+var play_time: float = 0.0
 ## Where the hero is: { "area", "cell": [x, y] }, or { "area", "entry" } on the way into an
 ## area through one of its entry points (go_to), until the area places them.
 var player: Dictionary = {}
@@ -72,6 +74,23 @@ func add_heart_piece() -> int:
 		add_heart_container()
 	EventBus.heart_piece_found.emit(heart_pieces)
 	return heart_pieces
+
+
+## Counts `seconds` of play. It changes every frame, so it announces nothing.
+func add_play_time(seconds: float) -> void:
+	play_time += maxf(seconds, 0.0)
+
+
+## "4:07" or "1:02:09".
+static func format_play_time(seconds: float) -> String:
+	var total: int = floori(maxf(seconds, 0.0))
+	@warning_ignore("integer_division")
+	var hours: int = total / 3600
+	@warning_ignore("integer_division")
+	var minutes: int = (total / 60) % 60
+	if hours > 0:
+		return "%d:%02d:%02d" % [hours, minutes, total % 60]
+	return "%d:%02d" % [minutes, total % 60]
 
 
 func set_health(value: int) -> void:
@@ -182,6 +201,7 @@ func clear() -> void:
 	hearts_max = 0
 	health = 0
 	heart_pieces = 0
+	play_time = 0.0
 	flags.clear()
 	quests.clear()
 	inventory.clear()
@@ -199,6 +219,7 @@ func to_dict() -> Dictionary:
 		"hearts_max": hearts_max,
 		"health": health,
 		"heart_pieces": heart_pieces,
+		"play_time": snappedf(play_time, 0.01),
 		"flags": _json_safe(flags),
 		"quests": _json_safe(quests),
 		"inventory": stacks,
@@ -214,6 +235,7 @@ func from_dict(data: Dictionary) -> void:
 	hearts_max = clampi(int(data.get("hearts_max", 0)), 0, MAX_HEARTS)
 	health = clampi(int(data.get("health", 0)), 0, max_health())
 	heart_pieces = clampi(int(data.get("heart_pieces", 0)), 0, PIECES_PER_HEART - 1)
+	play_time = maxf(float(data.get("play_time", 0.0)), 0.0)
 	var src_flags: Dictionary = data.get("flags", {})
 	for key: Variant in src_flags:
 		flags[StringName(str(key))] = src_flags[key]

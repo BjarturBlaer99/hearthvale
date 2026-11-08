@@ -230,3 +230,22 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   - A cracked wall gains a `stone` colour so it matches the light ruin stone outdoors.
 - 2026-11-08 — **Every dungeon door must stand on walkable ground** (`doors_test`). The shrine's first bake left solid stone under its cracked wall, so it opened onto nothing. The secret's test found it, and the new check keeps it from happening again.
 - 2026-11-08 — The welcome sign now points north to the road to the keep and south to the South Field. A new sign in the fields points the way.
+
+## H9 — Save, menus & playtest
+- 2026-11-08 — **One save slot for the slice.** Save from the pause menu; Continue on the title loads it and puts you on the saved cell, even mid-dungeon. Classic Zelda restarts at a dungeon's entrance, but resuming where you stood is simpler and kinder to a playtest.
+  - `SaveSystem.current_slot` lets tests save elsewhere.
+  - Quitting to the title loses unsaved progress, and the pause menu says so. There's no autosave.
+- 2026-11-08 — **Pause really pauses:** the pause menu sets `get_tree().paused`, and the menus run with `PROCESS_MODE_ALWAYS`. Earlier menus (dialogue, items) only stop the hero, and still do. Pausing can't happen while the hero is busy (talking, item menu, travelling, down).
+- 2026-11-08 — **Play time is GameState state** (`play_time`, saved as an additive key; the version stays 1). It counts in the area's `_process`, so it stops behind the pause menu, and announces nothing because it changes every frame. It's what we'll read to check the 30–60 minute goal.
+- 2026-11-08 — **Settings are a new `Settings` autoload over a pure `SettingsData`, kept in `user://settings.cfg`.** They belong to the machine, not the save, so GameState doesn't own them.
+  - The settings: fullscreen, window size (2x, 3x or 4x), and showing the controls hint.
+  - No volume until there's audio, and no key rebinding in the slice.
+  - Applying is skipped headless.
+- 2026-11-08 — **Menus share a pure `MenuCursor` and `MenuInput`.** Movement keys move the cursor, E / Enter / A picks, and Esc / Start / Tab backs out. Options that can't be chosen show in brackets and are skipped. The test for the settings menu found that a multi-step move went only one step; fixed.
+- 2026-11-08 — **The slice ends with a closing conversation from data** (`ending_keep`), opened when the Warden's heart container is taken (`HeartContainer.dialogue_id`). It replaces the pickup message, points to the play time, and hints at secrets. The game goes on afterwards.
+- 2026-11-08 — **Fixes for new players:**
+  - Closed doors seal their cells (`TerrainQuery.set_sealed`), so arrows and bats stop at them (H7's known issue).
+  - Elder Bram now points to the training yard's sword and the road north.
+  - The welcome sign names the road to the keep.
+  - The controls hint mentions Esc.
+- 2026-11-08 — **H9's last criterion needs a person:** a new player finishing in 30–60 minutes without help. The build, the clock and the ending are ready for it. The ROADMAP marked H9 built but not done until that playtest. It went well (2026-11-08), so H9 is done.

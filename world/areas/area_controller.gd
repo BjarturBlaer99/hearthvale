@@ -26,6 +26,8 @@ const RESPAWN_DELAY: float = 1.0
 const ROOM_FLASH: float = 0.2
 ## How long the hero must push against a block before it slides.
 const PUSH_TIME: float = 0.35
+## Where "Quit to title" goes.
+const TITLE_SCENE: String = "res://ui/title_screen.tscn"
 
 @export var area_id: StringName = &"village"
 @export var area_name: String = "Hearthvale"
@@ -96,6 +98,7 @@ func _ready() -> void:
 	hud.dialogue.closed.connect(_on_dialogue_closed)
 	hud.item_menu.chosen.connect(_on_item_chosen)
 	hud.item_menu.closed.connect(_on_item_menu_closed)
+	hud.pause_menu.quit_to_title.connect(_on_quit_to_title)
 	EventBus.health_changed.connect(_on_health_changed)
 	EventBus.flag_set.connect(_on_flag_set)
 	hud.set_area(area_name)
@@ -109,6 +112,8 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if _travelling:
 		return
+	# Runs only while the game isn't paused, so the clock stops behind the pause menu.
+	GameState.add_play_time(delta)
 	if _dying:
 		_respawn_left -= delta
 		if _respawn_left <= 0.0:
@@ -161,6 +166,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		used = use_item()
 	elif event.is_action_pressed(&"item_menu"):
 		used = open_item_menu()
+	elif event.is_action_pressed(&"pause"):
+		used = open_pause_menu()
 	if used:
 		get_viewport().set_input_as_handled()
 
@@ -276,14 +283,46 @@ func pick_up(pickup: ItemPickup) -> bool:
 
 ## Opens `talkable`'s conversation in the dialogue box; the hero stands still until it ends.
 func talk_to(talkable: Talkable) -> bool:
-	var data: Dictionary = talkable.dialogue()
+	return open_dialogue(talkable.dialogue_id)
+
+
+## Opens conversation `dialogue_id` (data/dialogue) in the dialogue box; the hero stands still
+## until it ends. Returns false if there's no such conversation.
+func open_dialogue(dialogue_id: StringName) -> bool:
+	var data: Dictionary = DataRegistry.get_dialogue(dialogue_id)
 	if data.is_empty():
-		push_warning("%s: no dialogue '%s' in data/dialogue." % [talkable.name, talkable.dialogue_id])
+		push_warning("%s: no dialogue '%s' in data/dialogue." % [area_id, dialogue_id])
 		return false
 	player.controls_enabled = false
 	hud.set_prompt("")
 	hud.dialogue.open(DialogueRunner.new(data, GameState))
 	return true
+
+
+## Pauses the game behind the pause menu (Esc / Start). Returns whether it opened.
+func open_pause_menu() -> bool:
+	if _busy():
+		return false
+	hud.set_prompt("")
+	hud.pause_menu.open(pause_status())
+	return true
+
+
+func is_paused() -> bool:
+	return hud.pause_menu.is_open()
+
+
+## The pause menu's summary: hearts and heart pieces, keys in a dungeon, and the play time.
+func pause_status() -> String:
+	var lines: PackedStringArray = ["Hearts %d   Heart pieces %d of %d" % [GameState.hearts_max, GameState.heart_pieces, GameState.PIECES_PER_HEART]]
+	if dungeon_id != &"":
+		var keys: int = int(GameState.get_flag(DungeonState.keys_flag(dungeon_id), 0))
+		var big_key: bool = GameState.get_flag(DungeonState.big_key_flag(dungeon_id)) == true
+		lines.append("%s   Small keys %d%s" % [area_name, keys, "   Big key" if big_key else ""])
+	else:
+		lines.append(area_name)
+	lines.append("Time played %s" % GameState.format_play_time(GameState.play_time))
+	return "\n".join(lines)
 
 
 func is_talking() -> bool:
@@ -366,7 +405,7 @@ func _set_bomb(item: Dictionary) -> bool:
 
 ## Talking, in the item menu, going through a door or down: no interacting or items.
 func _busy() -> bool:
-	return _travelling or _dying or is_talking() or is_in_menu()
+	return _travelling or _dying or is_talking() or is_in_menu() or is_paused()
 
 
 ## Lets every active HitBox in this area hit the HurtBoxes it touches (TECH_DESIGN §4).
@@ -398,6 +437,9 @@ func collect_pickups() -> int:
 		if child.has_method(&"touches") and child.has_method(&"collect") \
 				and child.call(&"touches", at, player.hurt_box.radius) and child.call(&"collect"):
 			collected += 1
+			var follow: Variant = child.get(&"dialogue_id")
+			if typeof(follow) == TYPE_STRING_NAME and follow != &"" and open_dialogue(follow):
+				continue
 			if child.has_method(&"pickup_message"):
 				hud.show_message(str(child.call(&"pickup_message")))
 	return collected
@@ -511,6 +553,12 @@ func _on_dialogue_closed() -> void:
 	player.controls_enabled = true
 
 
+func _on_quit_to_title() -> void:
+	_travelling = true
+	player.controls_enabled = false
+	travel.call(TITLE_SCENE)
+
+
 func _on_item_chosen(item_id: StringName) -> void:
 	GameState.equip(item_id)
 
@@ -540,12 +588,14 @@ func _on_flag_set(_flag: StringName, _value: Variant) -> void:
 	_refresh_doors()
 
 
-## Closed doors fill their cells; open ones don't. Shutters that stay open remember opening.
+## Closed doors fill and seal their cells (nothing passes, not even arrows); open ones don't.
+## Shutters that stay open remember opening.
 func _refresh_doors() -> void:
 	for door: DungeonDoor in doors():
 		door.latch()
 		for cell: Vector2i in door.cells():
 			terrain.set_occupied(cell, not door.is_open())
+			terrain.set_sealed(cell, not door.is_open())
 
 
 ## When the last enemy sharing a clear flag falls, the flag is set (a shutter may open).

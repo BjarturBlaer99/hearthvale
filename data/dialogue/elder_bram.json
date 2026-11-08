@@ -28,7 +28,7 @@
     },
     "promise": {
       "speaker": "bram",
-      "text": "Bless you. Ask about the square, too. Folk there hear everything.",
+      "text": "Bless you. Take the old wooden sword from the training yard first. Then follow the road north past the chapel, through the fields and the Old Wood, to the keep.",
       "options": [{ "text": "Goodbye.", "next": null }]
     },
     "refused": {
@@ -38,7 +38,7 @@
     },
     "kept": {
       "speaker": "bram",
-      "text": "Good. I sleep easier for it.",
+      "text": "Good. I sleep easier for it. The road north past the chapel leads through the fields and the Old Wood to the keep.",
       "options": [{ "text": "Goodbye.", "next": null }]
     }
   }

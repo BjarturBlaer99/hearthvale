@@ -59,3 +59,13 @@ func test_occupied_cells_are_blocked_until_freed() -> void:
 func _step(row: String) -> MoveResult:
 	var query: TerrainQuery = TerrainQuery.new(HeightGrid.from_rows(PackedStringArray([row])))
 	return query.check_move(Vector2i(0, 0), Vector2i(1, 0))
+
+
+func test_sealed_cells_stop_flying_things_too() -> void:
+	var query: TerrainQuery = TerrainQuery.new(HeightGrid.from_rows(PackedStringArray(["0 0 0"])))
+	assert_bool(query.check_flight(Vector2i(0, 0), Vector2i(1, 0)).is_allowed()).is_true()
+	query.set_sealed(Vector2i(1, 0))
+	assert_bool(query.is_sealed(Vector2i(1, 0))).is_true()
+	assert_bool(query.check_flight(Vector2i(0, 0), Vector2i(1, 0)).is_allowed()).override_failure_message("a closed door stops a bat").is_false()
+	query.set_sealed(Vector2i(1, 0), false)
+	assert_bool(query.check_flight(Vector2i(0, 0), Vector2i(1, 0)).is_allowed()).is_true()

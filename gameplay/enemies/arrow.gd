@@ -2,7 +2,7 @@ class_name Arrow
 extends Node2D
 ## An arrow: flies straight and hurts what it touches on the other team (an enemy's arrow
 ## hits the hero; the hero's bow hits enemies and the dummy), then stops. It also stops at a
-## solid tile, the map edge, or after LIFETIME, and flies over heights and ledges. A `bolt`
+## solid tile, a closed door (a sealed cell), the map edge, or after LIFETIME, and flies over heights and ledges. A `bolt`
 ## (a boss's) is the same thing drawn as a glowing orb. Position = its point, at ground level.
 
 const LIFETIME: float = 3.0
@@ -51,7 +51,7 @@ func fly(delta: float) -> bool:
 	position += direction * speed * delta
 	_age += delta
 	var cell: Vector2i = GridBody.cell_of(position)
-	if _age > LIFETIME or not terrain.grid.in_bounds(cell) or terrain.grid.is_solid(cell):
+	if _age > LIFETIME or not terrain.grid.in_bounds(cell) or terrain.grid.is_solid(cell) or terrain.is_sealed(cell):
 		_stop()
 		return false
 	return true

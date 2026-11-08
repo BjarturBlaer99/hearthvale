@@ -20,6 +20,7 @@ func _initialize() -> void:
 	_action("sprint", [_key(KEY_SHIFT), _button(JOY_BUTTON_B)])
 	_action("use_item", [_key(KEY_Q), _key(KEY_K), _button(JOY_BUTTON_Y)])
 	_action("item_menu", [_key(KEY_TAB), _key(KEY_I), _button(JOY_BUTTON_BACK)])
+	_action("pause", [_key(KEY_ESCAPE), _key(KEY_P), _button(JOY_BUTTON_START)])
 	for action_name: String in RETIRED:
 		if ProjectSettings.has_setting("input/" + action_name):
 			ProjectSettings.clear("input/" + action_name)

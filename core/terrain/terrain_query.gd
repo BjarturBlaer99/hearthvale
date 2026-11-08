@@ -13,6 +13,8 @@ var grid: HeightGrid
 
 ## Cells something stands in, which nothing else may enter.
 var _occupied: Dictionary[Vector2i, bool] = {}
+## Cells closed to everything, flying things and arrows too: closed doors.
+var _sealed: Dictionary[Vector2i, bool] = {}
 
 
 func _init(height_grid: HeightGrid) -> void:
@@ -30,19 +32,34 @@ func is_occupied(cell: Vector2i) -> bool:
 	return _occupied.has(cell)
 
 
+## Seals or unseals `cell`: a closed door stops bats and arrows as well as walkers.
+func set_sealed(cell: Vector2i, sealed: bool = true) -> void:
+	if sealed:
+		_sealed[cell] = true
+	else:
+		_sealed.erase(cell)
+
+
+func is_sealed(cell: Vector2i) -> bool:
+	return _sealed.has(cell)
+
+
 ## The level something stands at on `cell`: its terrain height.
 func standing_level(cell: Vector2i) -> int:
 	return grid.height_at(cell)
 
 
 ## For things that fly (bats): heights, stairs and ledges don't matter; solid cells and the
-## map edge still block. Occupied cells don't (they fly over villagers and dummies).
+## map edge still block, and so do sealed cells (closed doors). Occupied cells don't (they fly
+## over villagers and dummies).
 func check_flight(from_cell: Vector2i, to_cell: Vector2i) -> MoveResult:
 	var result: MoveResult = MoveResult.new()
 	if not grid.in_bounds(from_cell) or not grid.in_bounds(to_cell):
 		result.reason = "out of bounds"
 	elif grid.is_solid(to_cell):
 		result.reason = "solid"
+	elif is_sealed(to_cell):
+		result.reason = "sealed"
 	else:
 		result.kind = MoveResult.Kind.WALK
 		result.to_level = grid.height_at(to_cell)

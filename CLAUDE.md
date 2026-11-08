@@ -29,7 +29,7 @@ in `docs/DECISIONS.md` are superseded.
 
 ## Commands
 ```bash
-# Run the game
+# Run the game (the title screen; Esc pauses)
 godot --path .
 # Run all tests headless (gdUnit4; exit code 0 = green; --continue reports every failure)
 godot --headless --path . -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add res://tests --ignoreHeadlessMode --continue

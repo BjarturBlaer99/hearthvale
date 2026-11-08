@@ -18,11 +18,13 @@ res://
     combat/          # CombatRules (hit geometry, knockback, weapon choice), Hit
     inventory/       # Inventory (stack limits, the item button, ammo)
     dialogue/        # DialogueRunner
+    menus/           # MenuCursor (a menu's options and cursor)
+    settings/        # SettingsData (the player's settings and their rules)
   gameplay/          # Node scripts: player, enemies, weapons, interactables, puzzle pieces
   world/
     areas/<id>/      # one scene per area: <id>.tscn (village, houses, countryside, dungeon rooms)
     tiles/           # greybox TileSet and atlas
-  ui/                # HUD, menus, text box
+  ui/                # HUD, text box, item and pause menus, settings menu, title screen
   data/              # JSON content (see docs/data for schemas + examples)
   tests/             # gdUnit4 tests, mirroring the code
   tools/             # dev-only scripts (greybox generation, captures, input map); not game code
@@ -35,7 +37,8 @@ res://
 | `EventBus` | Global signals only, no state: `health_changed`, `item_added`, `flag_set`, `quest_updated`, … |
 | `DataRegistry` | Loads and validates all JSON in `res://data` at startup (directory = kind of content); read-only lookups by id. Fails loudly on invalid data. |
 | `GameState` | Owns all persistent state: hearts and health, flags, quests, inventory, where the hero is. `to_dict()` / `from_dict()`. Mutates only through methods that emit `EventBus` signals. |
-| `SaveSystem` | Writes `GameState.to_dict()` as JSON to `user://saves/slot_<n>.json` with a `version`; loads and migrates. |
+| `SaveSystem` | Writes `GameState.to_dict()` as JSON to `user://saves/slot_<n>.json` with a `version`; loads and migrates. The menus use one slot (`current_slot`, `save_game()`, `load_game()`, `summary()`). |
+| `Settings` | The player's settings (`SettingsData`), apart from any save: loaded from `user://settings.cfg` at start, applied to the window, saved on every change, announced by `EventBus.settings_changed`. |
 
 ## 3. Terrain & areas
 - Each area scene has a `TileMapLayer` named **`Height`** whose tiles carry custom data **`height`** (0–7),
@@ -48,6 +51,7 @@ res://
   - The hero may hop down ledges; enemies may not (`allow_drops`), so they keep to their level.
   - Flying bodies use `check_flight`: only solid cells and the map edge block them.
   - Cells occupied by villagers and the dummy block walkers.
+  - Sealed cells (closed doors) block everything: walkers, fliers and arrows.
 - `HeightShading` draws from the grid: earthy cliff faces with a dark lip below drops, soft shadows below
   solid things, and thin edges beside lower neighbours.
 - **Tiles** are pixel art painted in code by `tools/greybox/make_tile_texture.gd`; `GreyboxTiles` has the atlas
@@ -206,7 +210,7 @@ DataRegistry validates required fields and resolves every cross-reference at loa
 
 ## 9. Save format
 ```json
-{ "version": 1, "hearts_max": 3, "health": 5, "heart_pieces": 0,
+{ "version": 1, "hearts_max": 3, "health": 5, "heart_pieces": 0, "play_time": 754.25,
   "flags": {}, "quests": {}, "inventory": [{"id": "small_key", "count": 1}],
   "equipped": "bow", "player": {"area": "village", "cell": [23, 20]} }
 ```
@@ -221,3 +225,31 @@ run headless; see CLAUDE.md for the command and gotchas.
 
 ## 11. Performance budget (slice)
 60 fps on integrated graphics. Area loads under 200 ms. No world streaming in the slice.
+
+## 12. Menus, saving & settings
+- **The title screen** (`ui/title_screen.tscn`) is the main scene. It offers:
+  - **Continue**, which can be chosen only when there's a save, and names where and how long (`SaveSystem.summary()`)
+  - **New game**, **Settings** and **Quit**
+
+  Continue loads the save and opens the area it names, with the hero on the saved cell.
+- **Menus** share a pure `MenuCursor`: options with ids, labels and whether they can be chosen. Moving wraps and
+  skips the ones that can't. `MenuInput` names the keys:
+  - the movement keys move the cursor
+  - E, Enter or A picks
+  - Esc, Start or Tab backs out
+- **Pause:** the `pause` action (Esc / P / Start) makes the area open the HUD's `PauseMenu`, unless the hero is
+  busy (talking, in the item menu, travelling, down).
+  - The menu pauses the scene tree and runs anyway (`PROCESS_MODE_ALWAYS`), so enemies, arrows and the play clock
+    stop.
+  - It shows hearts, heart pieces, keys in a dungeon and the play time.
+  - It offers Resume, Save (the menus' slot), Settings, and Quit to title. Anything not saved is lost on quitting,
+    and the menu says so.
+- **Play time:** `GameState.play_time` counts in the area's `_process`, which a paused tree skips. It's saved.
+- **Settings** (`SettingsMenu` over the `Settings` autoload):
+  - fullscreen
+  - window size (2x, 3x or 4x the 480x270 picture)
+  - whether the HUD shows the controls hint
+
+  Changes apply and are saved at once. There's no audio yet, so no volume.
+- **The end of the slice:** the Warden's `HeartContainer` names a conversation (`dialogue_id`). The area opens it
+  once the heart is taken, in place of the pickup message.

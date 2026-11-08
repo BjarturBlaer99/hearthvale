@@ -20,5 +20,8 @@ signal health_changed(current: int, maximum: int)
 ## A piece of heart was found; `pieces` are now held toward the next heart (0: one was just made).
 signal heart_piece_found(pieces: int)
 
+## The player changed a setting (Settings has the new values).
+signal settings_changed
+
 ## The item on the item button changed (empty: nothing equipped).
 signal equipped_changed(item_id: StringName)

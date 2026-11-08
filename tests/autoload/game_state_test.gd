@@ -51,6 +51,18 @@ func test_four_pieces_of_heart_make_a_heart() -> void:
 	assert_int(_state.health).override_failure_message("and fills them all").is_equal(8)
 
 
+func test_play_time_counts_up_and_reads_as_a_clock() -> void:
+	_state.new_game()
+	_state.add_play_time(61.5)
+	_state.add_play_time(-5.0)
+	assert_float(_state.play_time).override_failure_message("never backwards").is_equal(61.5)
+	assert_str(GameStateScript.format_play_time(0.0)).is_equal("0:00")
+	assert_str(GameStateScript.format_play_time(61.9)).is_equal("1:01")
+	assert_str(GameStateScript.format_play_time(3725.0)).is_equal("1:02:05")
+	_state.new_game()
+	assert_float(_state.play_time).override_failure_message("a new game starts the clock again").is_equal(0.0)
+
+
 func test_health_changes_are_announced_once() -> void:
 	_state.new_game()
 	var announced: Array = []
@@ -136,6 +148,7 @@ func test_state_survives_a_json_round_trip() -> void:
 	_state.set_quest_stage(&"lost_key", &"find_key")
 	_state.add_item(&"coin", 20)
 	_state.add_heart_piece()
+	_state.add_play_time(83.257)
 	_state.update_player(&"village", Vector2i(12, 8))
 
 	var first_save: String = JSON.stringify(_state.to_dict(), "", true)
@@ -149,4 +162,5 @@ func test_state_survives_a_json_round_trip() -> void:
 	assert_that(restored.get_quest_stage(&"lost_key")).is_equal(&"find_key")
 	assert_int(restored.item_count(&"coin")).is_equal(20)
 	assert_int(restored.heart_pieces).is_equal(1)
+	assert_float(restored.play_time).is_equal_approx(83.26, 0.001)
 	assert_array(restored.player["cell"]).is_equal([12, 8])

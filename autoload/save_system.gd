@@ -5,6 +5,11 @@ extends Node
 ## the save shape and add a step to `migrate()` so older saves still load.
 
 const SAVE_DIR: String = "user://saves"
+## The slot the title screen and the pause menu use (the slice has one).
+const GAME_SLOT: int = 1
+
+## The slot save_game() and load_game() use. Tests point it elsewhere.
+var current_slot: int = GAME_SLOT
 
 
 func slot_path(slot: int) -> String:
@@ -13,6 +18,36 @@ func slot_path(slot: int) -> String:
 
 func has_slot(slot: int) -> bool:
 	return FileAccess.file_exists(slot_path(slot))
+
+
+func has_save() -> bool:
+	return has_slot(current_slot)
+
+
+func save_game() -> Error:
+	return save_to_slot(current_slot)
+
+
+func load_game() -> Error:
+	return load_from_slot(current_slot)
+
+
+## A save's key facts without loading it: { "area", "play_time", "hearts_max" }, or empty if
+## there's no readable save in `from_slot` (default: the current slot).
+func summary(from_slot: int = -1) -> Dictionary:
+	var path: String = slot_path(current_slot if from_slot < 0 else from_slot)
+	if not FileAccess.file_exists(path):
+		return {}
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return {}
+	var data: Dictionary = parsed
+	var where: Dictionary = data.get("player", {}) if typeof(data.get("player")) == TYPE_DICTIONARY else {}
+	return {
+		"area": str(where.get("area", "")),
+		"play_time": float(data.get("play_time", 0.0)),
+		"hearts_max": int(data.get("hearts_max", 0)),
+	}
 
 
 func save_to_slot(slot: int) -> Error:

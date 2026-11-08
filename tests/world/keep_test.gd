@@ -202,7 +202,10 @@ func test_the_keep_can_be_finished_start_to_end() -> void:
 	assert_int(keep.collect_pickups()).is_equal(1)
 	assert_int(GameState.hearts_max).override_failure_message("beating the boss adds a heart").is_equal(4)
 	assert_int(GameState.health).override_failure_message("and fills them all").is_equal(8)
-	assert_str((keep.hud.get_node(^"Message") as Label).text).contains("Heart Container")
+	assert_bool(keep.is_talking()).override_failure_message("the closing conversation opens").is_true()
+	assert_str(keep.hud.dialogue.shown_text()).contains("Heart Container")
+	keep.hud.dialogue.confirm()
+	keep.hud.dialogue.confirm()
 	_face(keep, Vector2i(22, 12), Vector2.UP)
 	assert_str(Steps.walk_until_travel(keep, Vector2.UP)).override_failure_message("out to the Old Wood").is_equal(WOOD)
 

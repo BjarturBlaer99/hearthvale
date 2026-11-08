@@ -1,0 +1,26 @@
+{
+  "id": "ending_keep",
+  "start": "quiet",
+  "nodes": {
+    "quiet": {
+      "speaker": "",
+      "text": "You got a Heart Container! Your hearts grow, and fill.\nThe Iron Warden lies still, and the Old Keep falls quiet at last.",
+      "options": [
+        {
+          "text": "Go on.",
+          "next": "thanks"
+        }
+      ]
+    },
+    "thanks": {
+      "speaker": "",
+      "text": "That's the end of the Hearthvale slice. Thank you for playing!\nYour play time is in the pause menu (Esc). A secret or two may still be out there.",
+      "options": [
+        {
+          "text": "Keep exploring.",
+          "next": null
+        }
+      ]
+    }
+  }
+}

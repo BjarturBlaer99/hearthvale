@@ -546,6 +546,56 @@ At the user's request, the environment moves from flat greybox to pixel art. It'
 **Known issues / notes**
 - No HUD counter for heart pieces; only the message when one is found.
 - The keep's front is a plain stone wall with two towers.
-- Not played by hand yet.
+- Played by hand on 2026-11-08: the road north, the secrets and the enemies feel right.
 
 **Next:** H9, save, menus and playtest.
+
+## 2026-11-08 — H9 Save, menus & playtest — done
+
+**Built**
+- **Title screen** (`ui/title_screen.tscn`, now the main scene): a painted dusk with the keep on the skyline, and Continue (with where and how long), New game, Settings and Quit.
+- **Pause menu** (Esc / P / Start; new `pause` action):
+  - It pauses the game tree.
+  - It shows hearts, heart pieces, keys and the play time.
+  - It offers Resume, Save, Settings, and Quit to title (warning that unsaved progress is lost).
+- **Saving:** one slot (`SaveSystem.current_slot`, `save_game`, `load_game`, `summary`). Continue resumes on the saved cell.
+- **Settings:** a `Settings` autoload over a pure `SettingsData` (fullscreen, window size 2x/3x/4x, controls hint), kept in `user://settings.cfg`.
+- **Menus:** a shared `MenuCursor` (pure) and `MenuInput`.
+- **Play time:** `GameState.play_time` (saved) and `format_play_time`.
+- **The end:** taking the Warden's heart opens a closing conversation (`ending_keep`).
+- **Fixes:**
+  - Closed doors seal their cells, so arrows and bats stop at them.
+  - Elder Bram points to the sword and the road north.
+  - The welcome sign names the road to the keep.
+  - The controls hint mentions Esc.
+- 197 tests in 31 suites (+21). New: `menu_cursor_test`, `settings_data_test`, and `menus_test` (the title, pause, saving and continuing, settings, the clock, the ending, arrows at doors, Bram's hint). GameState, SaveSystem, TerrainQuery and the input map suites grew; the keep walkthrough now ends in the closing conversation.
+
+**Acceptance criteria**
+- [x] A new player finishes the slice in 30–60 minutes with no developer help. The new-player playtest went well, as reported on 2026-11-08 (no play time was given). Everything it relies on is built and tested:
+  - The title starts a fresh game, or continues a save to the exact cell.
+  - The pause menu stops the game (the area can't process, the menu can) and saves.
+  - Settings apply at once and survive a reload.
+  - The clock stops while paused.
+  - The Warden's heart ends the slice.
+- Mutation checks: eight deliberate bugs, each caught, files restored byte for byte:
+  - the cursor landing on options that can't be chosen
+  - the pause menu not pausing
+  - Continue without a save
+  - play time not saved
+  - the clock never running
+  - arrows ignoring closed doors
+  - settings not kept
+  - no closing conversation
+- One real bug, found by the settings test: `MenuCursor.move(2)` moved only one step.
+- Visual check (`tools/capture.gd`, 51 shots): the title screen, the pause menu, the settings menu, and the closing conversation. Two layout fixes came out of it: "Quit" spilled out of the title's menu panel, and the pause note crowded the last option (the pause panel now steps aside for the settings).
+
+**Known issues / notes**
+- One save slot, no autosave.
+- No audio, so no volume setting.
+- The window settings are applied but can't be checked headless.
+- **First run by hand (2026-11-08):** saving and a settings change worked (both files written). The log showed a script error each time a menu choice changed the scene (New game, Continue, Quit to title): the menu asked for its viewport after the scene change had taken it out of the tree.
+  - Fixed: the menus take the viewport first.
+  - A test now leaves the tree mid-choice the same way. Putting the bug back in either menu fails it.
+- Played again by hand on 2026-11-08: the title, the pause menu and the settings feel right.
+
+**Next:** the vertical slice (H0–H9) is done. What comes after it is in ROADMAP's "After the slice".

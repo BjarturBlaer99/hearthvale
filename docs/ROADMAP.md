@@ -59,7 +59,7 @@ the boss door needs the big key.
 - Fields and forest between Hearthvale and the keep, enemies, a secret or two, a heart piece.
 **Done when**: you can walk from the village to the keep and back, with at least one optional secret.
 
-## H9 — Save, menus & playtest
+## H9 — Save, menus & playtest ✅
 - Title screen, save/load from a menu, pause, settings; fixes from playtesting.
 **Done when**: a new player finishes the slice in 30–60 minutes with no developer help.
 

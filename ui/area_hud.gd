@@ -1,7 +1,8 @@
 class_name AreaHud
 extends CanvasLayer
 ## The HUD: hearts, where you are, what you're carrying, the prompt for whatever the hero
-## can use, short messages, the dialogue box, and a screen flash for scene changes.
+## can use, short messages, the dialogue box, the item and pause menus, and a screen flash for
+## scene changes. The controls hint shows or hides with the player's setting.
 
 const MESSAGE_TIME: float = 3.0
 const FLASH_TIME: float = 0.35
@@ -13,6 +14,8 @@ var _flash_time: float = FLASH_TIME
 @onready var hearts: HeartsBar = $Panel/Hearts
 @onready var dialogue: DialogueBox = $DialogueBox
 @onready var item_menu: ItemMenu = $ItemMenu
+@onready var pause_menu: PauseMenu = $PauseMenu
+@onready var _hint: Label = $Hint
 @onready var _equipped: Label = $Panel/Equipped
 @onready var _area: Label = $Panel/Area
 @onready var _items: Label = $Panel/Items
@@ -24,6 +27,20 @@ var _flash_time: float = FLASH_TIME
 func _ready() -> void:
 	_prompt.text = ""
 	_message.text = ""
+	_show_settings()
+	EventBus.settings_changed.connect(_show_settings)
+
+
+func message_text() -> String:
+	return _message.text
+
+
+func hint_shown() -> bool:
+	return _hint.visible
+
+
+func _show_settings() -> void:
+	_hint.visible = Settings.data.show_controls
 
 
 func set_health(current: int, maximum: int) -> void:

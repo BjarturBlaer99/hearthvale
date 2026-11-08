@@ -281,6 +281,7 @@ position = Vector2(352, 224)
 script = ExtResource("14_heart")
 appears_flag = &"keep_warden_beaten"
 taken_flag = &"keep_heart_container"
+dialogue_id = &"ending_keep"
 
 [node name="Entries" type="Node2D" parent="." unique_id=348423467]
 
