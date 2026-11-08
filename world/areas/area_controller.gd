@@ -77,7 +77,7 @@ func _ready() -> void:
 	terrain = TerrainQuery.new(grid)
 	for child: Node in interactables.get_children():
 		if child.has_method(&"set_dungeon"):
-			child.call(&"set_dungeon", dungeon_id)
+			child.call(&"set_dungeon", flag_scope())
 		if child.has_method(&"occupies") and child.call(&"occupies"):
 			terrain.set_occupied(child.call(&"cell"))
 	_refresh_doors()
@@ -217,6 +217,24 @@ func update_room(first: bool = false) -> void:
 		room_mask.show_room(Rect2(rect))
 	if not first:
 		hud.flash(ROOM_FLASH)
+		reset_blocks()
+
+
+## Puts back every push block outside the hero's room (one jammed in a corner is back in place
+## on the way back in). Returns how many moved.
+func reset_blocks() -> int:
+	var moved: int = 0
+	for child: Node in interactables.get_children():
+		if child is PushBlock and RoomGrid.room_of((child as PushBlock).cell(), room_size) != current_room:
+			if (child as PushBlock).reset(terrain):
+				moved += 1
+	return moved
+
+
+## What doors and chests name their flags by: the dungeon, or outside dungeons the area (a
+## cracked wall in the countryside).
+func flag_scope() -> StringName:
+	return dungeon_id if dungeon_id != &"" else area_id
 
 
 ## "Ruin Cellar   Keys: 1   Big key" in a dungeon; just the name elsewhere.
@@ -380,6 +398,8 @@ func collect_pickups() -> int:
 		if child.has_method(&"touches") and child.has_method(&"collect") \
 				and child.call(&"touches", at, player.hurt_box.radius) and child.call(&"collect"):
 			collected += 1
+			if child.has_method(&"pickup_message"):
+				hud.show_message(str(child.call(&"pickup_message")))
 	return collected
 
 
@@ -520,9 +540,10 @@ func _on_flag_set(_flag: StringName, _value: Variant) -> void:
 	_refresh_doors()
 
 
-## Closed doors fill their cells; open ones don't.
+## Closed doors fill their cells; open ones don't. Shutters that stay open remember opening.
 func _refresh_doors() -> void:
 	for door: DungeonDoor in doors():
+		door.latch()
 		for cell: Vector2i in door.cells():
 			terrain.set_occupied(cell, not door.is_open())
 

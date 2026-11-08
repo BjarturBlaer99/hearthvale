@@ -7,7 +7,8 @@ extends SceneTree
 ## [file name, area id, hero cell, facing, damage in half hearts, action]. Actions: "" (none),
 ## "talk" (to what is in front), "swing" (the sword, caught mid-swing), and with the bow, arrows
 ## and bombs in hand: "menu" (the item menu open), "shoot" (an arrow in flight), "bomb" (lit);
-## "flag:<name>" sets that flag first (a door already opened).
+## "flag:<name>" sets that flag first (a door already opened); "gaze" waits for a boss's eye to
+## open.
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -35,6 +36,27 @@ const SHOTS: Array = [
 	["24_cistern_switch_room", &"cistern", Vector2i(22, 17), Vector2.UP, 0, ""],
 	["25_cistern_cracked_wall", &"cistern", Vector2i(17, 5), Vector2.LEFT, 0, ""],
 	["26_cistern_combined_room", &"cistern", Vector2i(7, 8), Vector2.LEFT, 0, ""],
+	["27_village_keep_road", &"village", Vector2i(36, 4), Vector2.UP, 0, ""],
+	["28_keep_entrance", &"keep", Vector2i(22, 41), Vector2.UP, 0, ""],
+	["29_keep_guard_room", &"keep", Vector2i(12, 38), Vector2.LEFT, 0, ""],
+	["30_keep_great_hall", &"keep", Vector2i(22, 30), Vector2.UP, 0, ""],
+	["31_keep_plate_room", &"keep", Vector2i(12, 27), Vector2.LEFT, 0, ""],
+	["32_keep_armoury", &"keep", Vector2i(7, 19), Vector2.UP, 0, ""],
+	["33_keep_gallery", &"keep", Vector2i(7, 8), Vector2.UP, 0, ""],
+	["34_keep_twin_crystals", &"keep", Vector2i(32, 27), Vector2.RIGHT, 0, ""],
+	["35_keep_big_key_room", &"keep", Vector2i(37, 20), Vector2.UP, 0, ""],
+	["36_keep_old_store", &"keep", Vector2i(32, 38), Vector2.RIGHT, 0, ""],
+	["37_the_warden_wakes", &"keep", Vector2i(22, 20), Vector2.UP, 0, ""],
+	["38_the_wardens_eye_opens", &"keep", Vector2i(22, 20), Vector2.UP, 0, "gaze"],
+	["39_the_warden_beaten", &"keep", Vector2i(22, 18), Vector2.UP, 0, "flag:keep_warden_beaten"],
+	["40_fields_road_in", &"north_fields", Vector2i(20, 25), Vector2.UP, 0, ""],
+	["41_fields_bridge", &"north_fields", Vector2i(15, 12), Vector2.UP, 0, ""],
+	["42_fields_plateau", &"north_fields", Vector2i(24, 18), Vector2.RIGHT, 0, ""],
+	["43_fields_hidden_meadow", &"north_fields", Vector2i(6, 5), Vector2.LEFT, 0, ""],
+	["44_wood_road", &"old_wood", Vector2i(11, 19), Vector2.UP, 0, ""],
+	["45_wood_keep_gate", &"old_wood", Vector2i(19, 8), Vector2.UP, 0, ""],
+	["46_wood_shrine", &"old_wood", Vector2i(27, 13), Vector2.RIGHT, 0, ""],
+	["47_wood_shrine_opened", &"old_wood", Vector2i(31, 13), Vector2.RIGHT, 0, "flag:dungeon/old_wood/door/shrine_wall"],
 ]
 
 
@@ -80,6 +102,8 @@ func _capture() -> void:
 		elif shot[5] == "shoot":
 			scene.call(&"use_item")
 			await _frames(18)
+		elif shot[5] == "gaze":
+			await _frames(170)
 		elif shot[5] == "bomb":
 			scene.call(&"use_item")
 			player.get(&"motor").call(&"place", shot[2] + Vector2i(0, 2))

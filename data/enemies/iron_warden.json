@@ -1,0 +1,15 @@
+{
+  "id": "iron_warden",
+  "name": "Iron Warden",
+  "behaviour": "warden",
+  "health": 12,
+  "speed": 18,
+  "sight": 96,
+  "contact_damage": 1,
+  "knockback": 32,
+  "shot": { "damage": 1, "speed": 90 },
+  "boss": { "guard_time": 2.5, "gaze_time": 2.2, "stun_time": 3.0, "rage_at": 6, "rage_speed": 1.3, "weak_point": "arrow" },
+  "drops": [
+    { "type": "nothing", "weight": 1 }
+  ]
+}

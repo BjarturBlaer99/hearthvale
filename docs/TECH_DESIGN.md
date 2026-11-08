@@ -11,7 +11,7 @@ res://
   core/              # pure logic, RefCounted, unit-tested (no Node dependencies)
     terrain/         # HeightGrid, TerrainQuery, MoveResult, GridBody (grid-checked movement)
     player/          # PlayerMotor + one script per state (states/)
-    enemies/         # EnemyBrain + one subclass per behaviour, EnemyBrains, DropTable
+    enemies/         # EnemyBrain + one subclass per behaviour (WardenBrain: the keep's boss), EnemyBrains, DropTable
     dungeons/        # RoomGrid (rooms for the camera), DungeonState (dungeon flags, door rules)
     puzzles/         # PuzzleRules (pushing blocks, pressing plates, multi-flag shutters)
     quests/          # ConditionEvaluator, EffectApplier, later QuestRunner
@@ -59,7 +59,7 @@ res://
   crops, and a deterministic scatter of tufts, flowers, pebbles and mushrooms over open ground (never on what
   the hero uses or arrives at). Movement never reads the Decor layer.
 - **Areas** live at `world/areas/<id>/<id>.tscn` (`WorldPaths`): the village, house interiors, the shop, the
-  South Field, the Ruin Cellar and the Cistern so far. An
+  South Field and its Ruin Cellar and Cistern, and on the road north the North Fields, the Old Wood and the Old Keep. An
   `AreaController` builds the grid, places the hero, drives the HUD, and handles interact: pick up the
   `ItemPickup` underfoot, else talk to the `Talkable` in the cell the hero faces. `Interactables` children expose
   `covers(cell)`; Talkables also occupy their cell (`TerrainQuery.set_occupied`), and the area is y-sorted so
@@ -95,6 +95,10 @@ res://
   - At zero hearts the area waits `RESPAWN_DELAY`, then puts the hero back at its **entrance** (where they
     arrived) with full hearts.
   - Recovery hearts (`HeartPickup`) heal on touch and come back on the next visit.
+  - A `HeartContainer` appears once its flag is set (its boss beaten). Touching it adds a heart and fills them
+    all, once and for good (`taken_flag`).
+  - **Heart pieces:** `GameState.heart_pieces` (0–3, saved) and `add_heart_piece()`. Every fourth piece becomes a
+    heart container. A `HeartPiece` lies in the world, is taken by touch, and is gone for good.
 - **Items:** the inventory lives in GameState. `Inventory` (pure) sets the rules:
   - stack capacity (`max_stack`, or 1), so `GameState.add_item` adds only what fits
   - which items go on the item button (`weapon_ranged`, `bomb`)
@@ -118,16 +122,31 @@ res://
     - `hopper` (slime): hops, lunges when close
     - `archer` (goblin): keeps its distance, lines up, draws (the tell), shoots
     - `flier` (bat): rests, zigzags at the hero, swoops; flies over heights
+    - `warden` (the Iron Warden, the keep's boss):
+      - It guards: stomps after the hero, and every blow clinks off.
+      - Then it gazes: stands still and opens its eye (the tell). Only a `weak_point` hit (arrows) during the gaze
+        stuns it.
+      - Only a stunned warden takes damage, with a flinch between blows. An unanswered gaze ends in a bolt.
+      - At `rage_at` health it stomps faster and fires three bolts. Its timings are the data's `boss` object.
   - Wandering stays within `LEASH` of home; it notices the hero within `sight` and gives up beyond
     `sight × LOSE_FACTOR`.
-  - A hit costs health, knocks it back and stuns it briefly (no further hits). At zero it dies.
+  - A hit costs health, knocks it back and stuns it briefly (no further hits). At zero it dies. A brain is told
+    the hit's kind, which only the warden cares about.
   - Random numbers come from the area's seeded `RandomNumberGenerator`.
 - **Nodes:**
   - `Enemy` (`gameplay/enemies/`) follows its brain and draws a placeholder. It has a HurtBox (the sword hits it)
     and a contact HitBox (touching it hurts the hero).
   - Beaten, it rolls `DropTable` and leaves a `HeartPickup` or an `ItemDrop` (coins, collected by touch).
-  - `Arrow` is a flying HitBox that stops at solid tiles.
-  - The area sets enemies up on load. They're back on every visit, and nothing about them is saved.
+  - `Arrow` is a flying HitBox that stops at solid tiles. A boss's `bolt` is one drawn as a glowing orb.
+  - A drop from an enemy on raised ground falls to the foot of the ledge, where the hero can reach it.
+    Goblin archers can drop arrows.
+  - `Boss` (an Enemy with a WardenBrain, drawn big):
+    - It keeps to its `arena` (its room's floor) and starts over (full health, back home) when the hero leaves.
+    - If the hero has no arrows when its eye opens, five arrows fall into a far corner of the room.
+    - With `stays_beaten`, it never comes back once its `clear_flag` is set. The heart container and the way out
+      wait on that flag.
+  - The area sets enemies up on load. They're back on every visit, and nothing about them is saved (except
+    that a boss stays beaten).
 
 ## 6. Dungeons & puzzles
 - **Rooms:** a dungeon is one area (`dungeon_id` set on its AreaController) cut into equal rooms of `room_size`
@@ -139,9 +158,12 @@ res://
   saving never reset progress:
   - `dungeon/<id>/keys` (small keys held: keys belong to their dungeon) and `dungeon/<id>/big_key`
   - `dungeon/<id>/door/<door>` and `dungeon/<id>/chest/<chest>`
+  - Outside dungeons the area's id stands in (`AreaController.flag_scope()`), so a cracked wall or a chest works
+    in the countryside too. A cracked wall's `stone` colour can match a ruin.
 - **Doors** (`DungeonDoor`): `open`, `locked`, `boss`, `shutter`.
   - E opens a locked door with a small key (spent), or the boss door with the big key (kept).
   - A shutter lifts when its `open_flag` is set. Enemies sharing a `clear_flag` set it when the last one falls.
+    With `stays_open` it records itself open for good once lifted (`latch()`), so a solved puzzle stays solved.
   - A closed door fills its cells; the area re-checks doors whenever a flag changes. A door through a two-cell
     wall shows half in each room, so each half draws its own lock.
 - **Chests** (`Chest`) stand in their cell. E opens one: keys go to the dungeon's count, anything else to the
@@ -149,8 +171,8 @@ res://
 - **Interaction:** E uses whatever in front of the hero has `use()` and `prompt()`, after pickups and people.
 - **Puzzles** (`gameplay/puzzles/` nodes over `PuzzleRules`, pure):
   - **Push block:** stands in its cell. Holding straight against it for `PUSH_TIME` slides it one cell onto open
-    floor at its level, never onto a room's border (doorways), and the slide is drawn. It returns to where it
-    started on the next visit.
+    floor at its level, never onto a room's border (doorways), and the slide is drawn. It goes back to where it
+    started when the hero leaves its room (`reset_blocks`), and on the next visit.
   - **Pressure plate:** the hero or a block on it sets its flag, and stepping off clears it unless it `latches`.
   - **Crystal switch:** a sword, arrow or bomb hit sets (or toggles) its flag, with a short lockout; red when
     off, blue when on.
@@ -184,7 +206,7 @@ DataRegistry validates required fields and resolves every cross-reference at loa
 
 ## 9. Save format
 ```json
-{ "version": 1, "hearts_max": 3, "health": 5,
+{ "version": 1, "hearts_max": 3, "health": 5, "heart_pieces": 0,
   "flags": {}, "quests": {}, "inventory": [{"id": "small_key", "count": 1}],
   "equipped": "bow", "player": {"area": "village", "cell": [23, 20]} }
 ```

@@ -45,8 +45,19 @@ Beaten enemies sometimes drop hearts or coins.
   - Push the sandstone block (walk into it and keep pushing), stand on the plate, and hit the crystal.
   - Bomb the cracked wall.
   - The treasure room has two ways in: a block on the plate, or an arrow into the crystal up on the platform.
+- **The road north:** from the top of the north rise, through the woods.
+  - **The North Fields:** a stream with a bridge, a farm plot, slimes, and a goblin archer on a plateau. Keep an eye
+    on the tree line beside the road.
+  - **The Old Wood:** a road winding between clearings, up to the keep's gate. There's an old walled shrine with
+    something inside, and one stretch of its wall looks cracked.
+- **The Old Keep:** the first real dungeon, at the top of the Old Wood.
+  - Ten rooms: small keys, a room with two plates (stand on one, push the block onto the other), and crystals.
+  - **The Bow** is in its armoury; goblin archers on a walkway have to be shot down.
+  - The big key opens the Iron Warden's hall. Blows clink off its iron: wait for its eye to open, put an arrow in
+    it, then use your sword while it's stunned.
+  - Beat it for a heart container, and the way out opens behind it.
 
-Dungeons arrive milestone by milestone (`docs/ROADMAP.md`).
+Next: a title screen, saving from a menu, and playtesting (`docs/ROADMAP.md`).
 
 ## Docs
 - `CLAUDE.md` — rules for Claude Code

@@ -3,8 +3,8 @@ extends Node2D
 ## A heavy stone block (docs/TECH_DESIGN.md §6). It stands in its cell; hold a direction
 ## against it for a moment and it slides one cell that way, if PuzzleRules.can_push allows
 ## (open floor at the same level, not a room's border). It also presses plates. It's back
-## where it started on the next visit. Position = its cell's top-left corner (the slide is
-## drawn; the cell changes at once).
+## where it started when the hero leaves its room (reset()) and on the next visit. Position =
+## its cell's top-left corner (the slide is drawn; the cell changes at once).
 
 const SLIDE_TIME: float = 0.18
 const OUTLINE: Color = Color(0.10, 0.08, 0.12)
@@ -14,10 +14,13 @@ const STONE: Color = Color(0.74, 0.60, 0.40)
 var _slide_left: float = 0.0
 var _slide_from: Vector2 = Vector2.ZERO
 var _home: Vector2 = Vector2.ZERO
+## Where it started (its cell's top-left corner).
+var _start: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
 	_home = position
+	_start = position
 	set_process(false)
 
 
@@ -45,6 +48,21 @@ func try_push(direction: Vector2i, terrain: TerrainQuery, room_size: Vector2i) -
 	terrain.set_occupied(cell(), true)
 	_slide_left = SLIDE_TIME
 	set_process(true)
+	return true
+
+
+## Puts it back where it started, if it has moved and that cell is free, keeping `terrain`'s
+## occupied cells up to date. Returns whether it moved.
+func reset(terrain: TerrainQuery) -> bool:
+	var start_cell: Vector2i = PlayerMotor.cell_of(_start + Vector2(0.5, 0.5))
+	if start_cell == cell() or terrain.is_occupied(start_cell):
+		return false
+	terrain.set_occupied(cell(), false)
+	_home = _start
+	position = _start
+	_slide_left = 0.0
+	set_process(false)
+	terrain.set_occupied(cell(), true)
 	return true
 
 

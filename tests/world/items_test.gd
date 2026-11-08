@@ -1,11 +1,12 @@
 extends GdUnitTestSuite
-## Items & weapons (H4): the Bow lies in the South Field ruin and goes on the item button when
-## picked up; arrows and bombs hurt enemies and run out; Tilda's shop sells them for coins
+## Items & weapons (H4): the Bow (in a chest in the keep's armoury, H7) goes on the item button
+## when picked up; arrows and bombs hurt enemies and run out; Tilda's shop sells them for coins
 ## (only what you can afford and carry); the item menu equips, and the choice survives a save.
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
 const FIELD: String = "res://world/areas/south_field/south_field.tscn"
+const KEEP: String = "res://world/areas/keep/keep.tscn"
 const SHOP: String = "res://world/areas/shop/shop.tscn"
 const VILLAGE: String = "res://world/areas/village/village.tscn"
 const FRAME: float = 1.0 / 60.0
@@ -28,14 +29,15 @@ func after_test() -> void:
 		DirAccess.remove_absolute(SaveSystem.slot_path(TEST_SLOT))
 
 
-func test_the_bow_lies_in_the_ruin_and_goes_on_the_item_button() -> void:
-	var field: AreaController = _load(FIELD)
-	for pickup_name: String in ["Bow", "RuinArrows"]:
-		var pickup: ItemPickup = field.interactables.get_node(NodePath(pickup_name))
-		field.player.motor.place(pickup.cell())
-		assert_bool(field.interact()).override_failure_message("pick up %s" % pickup_name).is_true()
+func test_the_bow_waits_in_the_keep_and_goes_on_the_item_button() -> void:
+	var keep: AreaController = _load(KEEP)
+	for chest_name: String in ["BowChest", "QuiverChest"]:
+		var chest: Chest = keep.interactables.get_node(NodePath(chest_name))
+		keep.player.motor.place(chest.cell() + Vector2i.DOWN)
+		keep.player.face(Vector2.UP)
+		assert_bool(keep.interact()).override_failure_message("open %s" % chest_name).is_true()
 	assert_that(GameState.equipped).override_failure_message("the first item for the button is equipped").is_equal(&"bow")
-	assert_str(AreaController.equipped_text()).is_equal("Item: Bow (Arrows x10)")
+	assert_str(AreaController.equipped_text()).is_equal("Item: Bow (Arrows x15)")
 
 
 func test_arrows_hurt_enemies_and_run_out() -> void:

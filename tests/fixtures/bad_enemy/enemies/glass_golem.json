@@ -1,0 +1,12 @@
+{
+  "id": "glass_golem",
+  "name": "Glass Golem",
+  "behaviour": "warden",
+  "health": 8,
+  "speed": 20,
+  "contact_damage": 2,
+  "boss": { "weak_point": "song" },
+  "drops": [
+    { "type": "nothing", "weight": 1 }
+  ]
+}

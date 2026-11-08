@@ -10,6 +10,7 @@
   "shot": { "damage": 1, "speed": 120, "cooldown": 1.6 },
   "drops": [
     { "type": "item", "item": "coin", "count": 3, "weight": 2 },
+    { "type": "item", "item": "arrow", "count": 3, "weight": 2 },
     { "type": "heart", "weight": 1 },
     { "type": "nothing", "weight": 1 }
   ]

@@ -23,6 +23,12 @@ extends SceneTree
 ## The Cistern (H6's puzzle rooms, tests/world/puzzle_test.gd): five 15x11 rooms on a 2x3 grid,
 ## (0,2) push block -> (0,1) pressure plate -> (1,1) switch -> (1,0) cracked wall -> (0,0)
 ## the combined room; the sixth room, (1,2), is solid rock.
+## The Old Keep (H7's dungeon, tests/world/keep_test.gd): ten 15x11 rooms on a 3x4 grid; the
+## gate is in the south wall, the way out behind the boss in the north wall of (1,1).
+## The countryside (H8, tests/world/countryside_test.gd): the village's north road leads to the
+## North Fields (a stream and its bridge, a plateau, a farm plot, a hidden meadow behind a gap in
+## the tree line), then the Old Wood (clearings off a winding road, the keep's front and gate,
+## and a walled shrine with a cracked wall and a heart piece).
 
 ## Each area: scene, size in cells, blocks, and optionally the base kind (default grass).
 ## Block = [x, y, width, height, terrain height, kind]; kind is "ground", "stairs", "path" (at
@@ -47,6 +53,9 @@ const MAPS: Dictionary = {
 			[18, 2, 12, 3, 3, "roof_blue"],
 			[18, 5, 12, 1, 3, "wall"],
 			[22, 8, 4, 1, 1, "stairs"],
+			# The road north to the fields: along the chapel front, then up through a gap in the woods.
+			[22, 6, 16, 2, 2, "path"],
+			[36, 0, 2, 6, 2, "path"],
 			# The east meadow: a long ledge down to the road, stairs at its south end.
 			[38, 12, 9, 18, 1, "ground"],
 			[40, 30, 3, 1, 1, "stairs"],
@@ -232,6 +241,162 @@ const MAPS: Dictionary = {
 			# The way back up.
 			[7, 32, 1, 1, 0, "stairway"],
 		],
+	},
+	"keep": {
+		"scene": "res://world/areas/keep/keep.tscn",
+		"size": Vector2i(45, 44),
+		"base": "dungeon_wall",
+		"blocks": [
+			# Floors of the ten rooms (the top middle and top right are solid rock).
+			[16, 34, 13, 9, 0, "dungeon_floor"],
+			[1, 34, 13, 9, 0, "dungeon_floor"],
+			[31, 34, 13, 9, 0, "dungeon_floor"],
+			[16, 23, 13, 9, 0, "dungeon_floor"],
+			[1, 23, 13, 9, 0, "dungeon_floor"],
+			[31, 23, 13, 9, 0, "dungeon_floor"],
+			[1, 12, 13, 9, 0, "dungeon_floor"],
+			[16, 12, 13, 9, 0, "dungeon_floor"],
+			[31, 12, 13, 9, 0, "dungeon_floor"],
+			[1, 1, 13, 9, 0, "dungeon_floor"],
+			# Doorways through the walls between rooms (their doors are in the scene).
+			[14, 38, 2, 1, 0, "dungeon_floor"],
+			[29, 38, 2, 1, 0, "dungeon_floor"],
+			[22, 32, 1, 2, 0, "dungeon_floor"],
+			[14, 27, 2, 1, 0, "dungeon_floor"],
+			[29, 27, 2, 1, 0, "dungeon_floor"],
+			[22, 21, 1, 2, 0, "dungeon_floor"],
+			[7, 21, 1, 2, 0, "dungeon_floor"],
+			[7, 10, 1, 2, 0, "dungeon_floor"],
+			[37, 21, 1, 2, 0, "dungeon_floor"],
+			# Entrance and great hall: pillars.
+			[18, 36, 1, 1, 0, "pillar"],
+			[26, 36, 1, 1, 0, "pillar"],
+			[18, 40, 1, 1, 0, "pillar"],
+			[26, 40, 1, 1, 0, "pillar"],
+			[18, 25, 1, 1, 0, "pillar"],
+			[26, 25, 1, 1, 0, "pillar"],
+			[18, 29, 1, 1, 0, "pillar"],
+			[26, 29, 1, 1, 0, "pillar"],
+			[33, 35, 1, 1, 0, "pillar"],
+			[41, 35, 1, 1, 0, "pillar"],
+			# Guard room: the small key's alcove, behind a shutter.
+			[4, 34, 1, 4, 0, "dungeon_wall"],
+			[1, 37, 4, 1, 0, "dungeon_wall"],
+			[2, 37, 1, 1, 0, "dungeon_floor"],
+			# Armoury: a ledge (no stairs) with a crystal on it, out of sword reach; two pillars.
+			[9, 12, 4, 3, 1, "path"],
+			[3, 18, 1, 1, 0, "pillar"],
+			[11, 18, 1, 1, 0, "pillar"],
+			# Gallery: a walkway along the north wall for the archers (no stairs), and the second
+			# small key's alcove behind a shutter.
+			[1, 1, 13, 3, 1, "path"],
+			[10, 6, 1, 4, 0, "dungeon_wall"],
+			[10, 6, 4, 1, 0, "dungeon_wall"],
+			[10, 8, 1, 1, 0, "dungeon_floor"],
+			# Twin crystals: a ledge in the north-east corner for the high one.
+			[39, 23, 5, 3, 1, "path"],
+			# Big key room: the big key's alcove, behind a shutter.
+			[35, 12, 1, 3, 0, "dungeon_wall"],
+			[39, 12, 1, 3, 0, "dungeon_wall"],
+			[35, 15, 5, 1, 0, "dungeon_wall"],
+			[37, 15, 1, 1, 0, "dungeon_floor"],
+			# The gate (south) and the way out behind the Warden's hall (north).
+			[22, 43, 1, 1, 0, "stairway"],
+			[22, 11, 1, 1, 0, "stairway"],
+		],
+	},
+	"north_fields": {
+		"scene": "res://world/areas/north_fields/north_fields.tscn",
+		"size": Vector2i(40, 30),
+		"blocks": [
+			# Woods round the edges; the road comes in at the bottom and leaves at the top.
+			[0, 0, 40, 2, 0, "tree"],
+			[0, 28, 40, 2, 0, "tree"],
+			[0, 2, 2, 26, 0, "tree"],
+			[38, 2, 2, 26, 0, "tree"],
+			# A thicket in the north-west hiding a meadow, reached by a narrow path from a gap
+			# in the tree line beside the road (the first secret).
+			[2, 2, 11, 7, 0, "tree"],
+			[3, 3, 5, 4, 0, "ground"],
+			[8, 5, 5, 1, 0, "ground"],
+			# The stream across the fields; the road crosses it (laid later, so a bridge).
+			[2, 10, 36, 2, 0, "water"],
+			# The road, winding north.
+			[20, 16, 2, 14, 0, "path"],
+			[14, 14, 8, 2, 0, "path"],
+			[14, 4, 2, 12, 0, "path"],
+			[14, 4, 6, 2, 0, "path"],
+			[18, 0, 2, 6, 0, "path"],
+			# The plateau in the east: stairs on its west side, a ledge all round, an archer.
+			[27, 14, 10, 8, 1, "ground"],
+			[26, 17, 1, 2, 1, "stairs"],
+			[33, 15, 2, 2, 1, "tree"],
+			[29, 19, 1, 1, 1, "rock"],
+			# A fenced farm plot with a gate.
+			[4, 18, 9, 1, 0, "fence"],
+			[4, 25, 9, 1, 0, "fence"],
+			[4, 18, 1, 8, 0, "fence"],
+			[12, 18, 1, 8, 0, "fence"],
+			[8, 18, 1, 1, 0, "ground"],
+			# Trees and rocks about the fields.
+			[24, 4, 2, 2, 0, "tree"],
+			[30, 5, 2, 2, 0, "tree"],
+			[8, 13, 1, 1, 0, "rock"],
+			[25, 24, 2, 2, 0, "tree"],
+			[32, 25, 1, 1, 0, "rock"],
+			[16, 22, 2, 2, 0, "tree"],
+		],
+		"decor": [
+			[5, 19, 7, 6, "crops"],
+			[6, 10, 1, 1, "lily"],
+			[25, 11, 1, 1, "lily"],
+			[33, 10, 1, 1, "lily"],
+			[3, 3, 1, 1, "flowers_red"],
+			[7, 3, 1, 1, "flowers_yellow"],
+			[3, 6, 2, 1, "flowers_blue"],
+			[6, 6, 2, 1, "flowers_red"],
+		],
+		"scatter": {"seed": 13, "kinds": [["tuft", 8], ["flowers_red", 1], ["flowers_yellow", 2], ["flowers_blue", 1], ["pebbles", 1]]},
+	},
+	"old_wood": {
+		"scene": "res://world/areas/old_wood/old_wood.tscn",
+		"size": Vector2i(40, 30),
+		"blocks": [
+			# Trees everywhere; clearings and the road are cut out of them below.
+			[0, 0, 40, 30, 0, "tree"],
+			# The keep's stone front along the top, its gate in the middle.
+			[10, 0, 20, 4, 0, "stone"],
+			[18, 3, 2, 1, 0, "stairway"],
+			# The forecourt before the keep.
+			[8, 4, 24, 6, 0, "ground"],
+			[14, 6, 1, 1, 0, "rock"],
+			[26, 7, 1, 1, 0, "rock"],
+			# Corner towers standing out from the keep's front.
+			[10, 0, 3, 5, 0, "stone"],
+			[27, 0, 3, 5, 0, "stone"],
+			# The road, winding south from the gate to the fields.
+			[18, 4, 2, 10, 0, "path"],
+			[10, 12, 10, 2, 0, "path"],
+			[10, 14, 2, 10, 0, "path"],
+			[10, 22, 10, 2, 0, "path"],
+			[18, 24, 2, 6, 0, "path"],
+			# Clearings off the road: bats in the west, slimes and an archer in the south-east.
+			[2, 14, 8, 8, 0, "ground"],
+			[20, 18, 12, 8, 0, "ground"],
+			# The old shrine east of the forecourt (the second secret): stone walls round a
+			# heart piece, one stretch cracked (its door is in the scene), and a nook before it.
+			[24, 10, 6, 6, 0, "ground"],
+			[30, 10, 8, 7, 0, "stone"],
+			[31, 11, 6, 5, 0, "ground"],
+			[30, 13, 1, 1, 0, "ground"],
+		],
+		"decor": [
+			[32, 11, 1, 1, "flowers_blue"],
+			[35, 11, 1, 1, "flowers_red"],
+			[32, 15, 1, 1, "flowers_yellow"],
+			[35, 15, 1, 1, "flowers_blue"],
+		],
+		"scatter": {"seed": 17, "kinds": [["tuft", 10], ["mushroom", 4], ["pebbles", 2], ["flowers_blue", 1]]},
 	},
 	"south_field": {
 		"scene": "res://world/areas/south_field/south_field.tscn",

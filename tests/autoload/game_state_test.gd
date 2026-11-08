@@ -40,6 +40,17 @@ func test_a_heart_container_adds_a_heart_and_refills() -> void:
 	assert_int(_state.health).is_equal(8)
 
 
+func test_four_pieces_of_heart_make_a_heart() -> void:
+	_state.new_game()
+	_state.damage(3)
+	for expected: int in [1, 2, 3]:
+		assert_int(_state.add_heart_piece()).is_equal(expected)
+		assert_int(_state.hearts_max).override_failure_message("%d pieces aren't a heart yet" % expected).is_equal(3)
+	assert_int(_state.add_heart_piece()).override_failure_message("the fourth makes a heart").is_equal(0)
+	assert_int(_state.hearts_max).is_equal(4)
+	assert_int(_state.health).override_failure_message("and fills them all").is_equal(8)
+
+
 func test_health_changes_are_announced_once() -> void:
 	_state.new_game()
 	var announced: Array = []
@@ -124,6 +135,7 @@ func test_state_survives_a_json_round_trip() -> void:
 	_state.set_flag(&"talked_to_elder", true)
 	_state.set_quest_stage(&"lost_key", &"find_key")
 	_state.add_item(&"coin", 20)
+	_state.add_heart_piece()
 	_state.update_player(&"village", Vector2i(12, 8))
 
 	var first_save: String = JSON.stringify(_state.to_dict(), "", true)
@@ -136,4 +148,5 @@ func test_state_survives_a_json_round_trip() -> void:
 	assert_int(restored.hearts_max).is_equal(3)
 	assert_that(restored.get_quest_stage(&"lost_key")).is_equal(&"find_key")
 	assert_int(restored.item_count(&"coin")).is_equal(20)
+	assert_int(restored.heart_pieces).is_equal(1)
 	assert_array(restored.player["cell"]).is_equal([12, 8])

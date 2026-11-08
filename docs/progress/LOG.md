@@ -446,3 +446,106 @@ At the user's request, the environment moves from flat greybox to pixel art. It'
 - Not played by hand yet.
 
 **Next:** H7, the first dungeon and its boss.
+
+## 2026-11-08 — H7 The first dungeon & boss — done
+
+**Built**
+- **The Old Keep** (`world/areas/keep/`): ten rooms using the H5 and H6 pieces, up a new road through the woods at the top of the village's north rise.
+  - Small keys from a cleared guard room and from the archer gallery; a two-plate room; the armoury with **the Bow**.
+  - Crystals on ledges out of sword reach, the big key room, and the boss.
+  - An optional store behind a cracked wall.
+- **The Iron Warden:** a `WardenBrain` (pure; behaviour `warden`, data in `iron_warden.json`) and a `Boss` node.
+  - It guards (blows clink off), then gazes. An arrow in its eye stuns it, and only then does the sword hurt it.
+  - Unanswered gazes end in bolts. It rages at half health.
+  - It keeps to its room and starts over when the hero leaves, and drops arrows for an empty quiver.
+- **Heart container** (`HeartContainer`): appears when the boss falls, and adds a heart and fills them all. The way out opens on the same flag.
+- **Engine pieces:**
+  - shutters that `stays_open`
+  - blocks that reset when the hero leaves their room
+  - bosses that stay beaten
+  - drops that fall off ledges
+  - arrow drops (goblin archers, and the boss's help) drawn as a bundle; glowing boss bolts
+  - pickup messages
+- The Bow and its arrows left the South Field ruin.
+- 170 tests in 27 suites (+13). New: `warden_brain_test` and `keep_test`; the doors, decor, items and data suites cover the keep and the boss data.
+
+**Acceptance criteria**
+- [x] The dungeon can be finished start to end. `keep_test` walks it gate by gate and checks each one shuts the way until it's solved:
+  - the locked hall door, then small key 1 from the guard room's alcove (opened by beating its guards)
+  - the two-plate shutter: one plate does nothing; the block on one plate and the hero on the other open it, and it stays open, even after the block goes back
+  - the Bow and 15 arrows
+  - the armoury crystal: the sword can't reach it, an arrow can
+  - the gallery archers: no way up the walkway; they're shot down, and their drops land on the floor; small key 2
+  - the east door, then the twin crystals (sword and arrow, both needed)
+  - the big key, then the boss door
+- [x] Beating the boss adds a heart.
+  - Sword blows clink off until an arrow finds its eye. It took two stuns to beat.
+  - The heart container appeared; touching it took the hero from 3 to 4 hearts and filled them.
+  - The way out led back to the village.
+  - Reloaded, the Warden is gone and the heart is taken for good.
+- Also:
+  - The road from the village leads to the keep and back.
+  - All ten rooms are joined once every door is open.
+  - The Warden starts over when the hero leaves its room.
+  - An empty quiver gets five arrows.
+  - An unanswered gaze fires a glowing bolt.
+- Mutation checks: eight deliberate bugs, each caught, files restored byte for byte:
+  - the eye taking any blow
+  - the boss never starting over
+  - bosses coming back
+  - shutters never latching
+  - blocks never resetting
+  - drops staying on the ledge
+  - no arrows for an empty quiver
+  - no flinch
+- One test mistake: the pickup tests moved the hero's grid position without moving its node, so nothing was touched. The game was right.
+- Visual check (`tools/capture.gd`, 39 shots): the north road, every keep room, the Warden waking and opening its eye (with arrows fallen for an empty quiver), and the heart container after it falls.
+
+**Known issues / notes**
+- Arrows fly through closed doors and shutters (they only stop at solid tiles). It's harmless so far.
+- Ledges in dungeons use the dirt-path tile.
+- The Warden has no health bar or music.
+- Played by hand on 2026-11-08: the boss was too hard. It was eased on every front:
+  - its touch and bolts cost half a heart
+  - it moves slower, its eye stays open longer, and stuns last longer
+  - it has less health
+
+  A dev shortcut, `tools/playtest.gd -- warden`, starts at its door for retrying (details in DECISIONS).
+- Played again on 2026-11-08: the eased Warden feels right.
+
+**Next:** H8, the countryside between the village and the keep.
+
+## 2026-11-08 — H8 The countryside — done
+
+**Built**
+- **The North Fields** (`world/areas/north_fields/`): a winding road and a bridge over a stream, a fenced farm plot, a plateau with a goblin archer, five slimes, and a signpost. A gap in the tree line hides a meadow with a chest of five bombs (secret 1).
+- **The Old Wood** (`world/areas/old_wood/`): dense trees, the road winding between clearings with bats, slimes and an archer, and the keep's stone front with corner towers and its gate. A walled shrine with a cracked wall holds a heart piece (secret 2).
+- **The roads are rewired:** village → fields → wood → keep, and back. The keep's way out behind the boss leads to the wood.
+- **Heart pieces:**
+  - `GameState.heart_pieces` (saved) and `add_heart_piece()`, where four make a heart
+  - `EventBus.heart_piece_found`
+  - the `HeartPiece` node, a quarter heart taken by touch
+- **Outdoor doors and chests:** their flags are named by the area (`flag_scope()`), and cracked walls get a `stone` colour.
+- 176 tests in 28 suites (+6). New: `countryside_test`; GameState covers heart pieces and saves them; `doors_test` checks every door stands on walkable ground; the doors, decor and keep suites cover the new roads.
+
+**Acceptance criteria**
+- [x] You can walk from the village to the keep and back. `countryside_test` takes every exit in turn and checks each can be reached on foot: village to fields to wood to keep, then back the same way, arriving where the north road comes in.
+- [x] At least one optional secret. There are two, and neither is on the way to the keep:
+  - The hidden meadow: a path one tree wide off the road leads to a chest of five bombs, opened for good.
+  - The shrine: the heart piece is walled in. A sword doesn't break the crack, but a bomb does (sparing the hero). The piece counts "1 of 4", doesn't add a heart on its own, and stays taken after a reload.
+- Also: both areas have five or more enemies of more than one kind, all set up and on open ground.
+- Mutation checks: five deliberate bugs, each caught, files restored byte for byte:
+  - pieces never making a heart
+  - pieces not saved
+  - a piece never taken for good
+  - outdoor flags left unnamed
+  - the village road skipping the countryside
+- One real bug, found by the shrine's test: the cracked wall stood on solid stone, so opening it led nowhere. The map now has floor under it, and a new check in `doors_test` makes sure every door in every area stands on walkable ground.
+- Visual check (`tools/capture.gd`, 47 shots): the fields' road, bridge, plateau and hidden meadow, and the wood's road, the keep's gate, and the shrine closed and opened.
+
+**Known issues / notes**
+- No HUD counter for heart pieces; only the message when one is found.
+- The keep's front is a plain stone wall with two towers.
+- Not played by hand yet.
+
+**Next:** H9, save, menus and playtest.

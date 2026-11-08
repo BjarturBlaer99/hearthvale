@@ -5,7 +5,7 @@ extends GdUnitTestSuite
 ## stand only on solid ground; nothing on the Decor layer blocks. Houses get windows, ridges and
 ## eaves, and stay exactly as solid as before.
 
-const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"south_field", &"shop", &"ruin_cellar", &"cistern"]
+const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"south_field", &"shop", &"ruin_cellar", &"cistern", &"keep", &"north_fields", &"old_wood"]
 
 
 func test_every_area_has_a_decor_layer_just_above_its_height_layer() -> void:

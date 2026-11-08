@@ -38,8 +38,10 @@ const REQUIRED_FIELDS: Dictionary = {
 }
 
 ## Enemy behaviour ids (EnemyBrains makes one brain per id) and drop-table entry types.
-const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier"]
+const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden"]
 const DROP_TYPES: Array[String] = ["heart", "item", "nothing"]
+## What a boss's weak point can take (Hit kinds dealt by the hero's weapons).
+const WEAK_POINTS: Array[String] = ["sword", "arrow", "bomb"]
 
 ## Condition type -> required fields (docs/data/CONDITIONS_AND_EFFECTS.md).
 const CONDITION_FIELDS: Dictionary = {
@@ -299,6 +301,12 @@ func _check_enemy(enemy: Dictionary) -> void:
 		var value: Variant = enemy[field]
 		if (typeof(value) != TYPE_INT and typeof(value) != TYPE_FLOAT) or float(value) < 0.0:
 			errors.append("%s: %s '%s' must be a number of 0 or more." % [path, label, field])
+	if enemy.has("boss"):
+		var boss: Variant = enemy["boss"]
+		if typeof(boss) != TYPE_DICTIONARY:
+			errors.append("%s: %s 'boss' must be an object." % [path, label])
+		elif not WEAK_POINTS.has(str((boss as Dictionary).get("weak_point", "arrow"))):
+			errors.append("%s: %s has unknown weak_point '%s'. Known: %s." % [path, label, boss["weak_point"], ", ".join(WEAK_POINTS)])
 	var drops: Array = _array_field(path, label, enemy, "drops")
 	for i: int in drops.size():
 		var where: String = "%s drop %d" % [label, i]

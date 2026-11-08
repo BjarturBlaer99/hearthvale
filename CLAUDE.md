@@ -39,6 +39,8 @@ godot --headless --path . --import
 godot --headless --path . --quit-after 30
 # Screenshots for review (needs a window, not --headless)
 godot --path . -s res://tools/capture.gd -- <output_dir>
+# Start partway through to try one part by hand (scenarios in the script, e.g. warden)
+godot --path . -s res://tools/playtest.gd -- warden
 # Repaint the hero's sprite sheet after editing its ASCII art (optional 8x preview), then re-import
 godot --headless --path . -s res://tools/art/make_player_sprite.gd -- <preview.png>
 godot --headless --path . --import

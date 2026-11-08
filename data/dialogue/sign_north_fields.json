@@ -1,0 +1,11 @@
+{
+  "id": "sign_north_fields",
+  "start": "read",
+  "nodes": {
+    "read": {
+      "speaker": "",
+      "text": "THE NORTH FIELDS\nNorth: the Old Wood and the keep.   South: Hearthvale.",
+      "options": []
+    }
+  }
+}

@@ -166,3 +166,67 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
 - 2026-11-08 — **Shutters can wait on several flags** (`open_flags`, any of them; `needs_all` for all), so the Cistern's treasure room has two solutions: a block held on its plate, or an arrow into a crystal on a raised platform. The platform has no stairs, and the crystal is three cells in, beyond the sword's 20 px reach; arrows fly over heights.
 - 2026-11-08 — **The H6 puzzle rooms are the Cistern**, down a stairway in the Ruin Cellar's inner room. It has five 15x11 rooms on a 2x3 grid: push block, then latching plate, then crystal switch, then cracked wall, then the combined room (30 coins in a chest); the sixth room is solid rock. Gating it behind the cellar keeps a natural order (keys, then puzzles), and H7's keep is still the real dungeon.
 - 2026-11-08 — Push blocks are carved sandstone with a diamond mark, so they never pass for the grey pillars around them. The first screenshot made that confusion plain.
+
+## H7 — The first dungeon & boss
+- 2026-11-08 — **The Old Keep is ten 15x11 rooms on a 3x4 grid** (the top middle and top right are solid rock), in the H5/H6 style. The order is forced:
+  1. guard room (small key 1, from a cleared room)
+  2. the hall door
+  3. the two-plate room
+  4. the armoury (the Bow, and a crystal on a ledge to try it on)
+  5. the gallery (archers on a walkway, small key 2)
+  6. the east door and the twin crystals
+  7. the big key room
+  8. the Warden
+
+  The old store behind the entrance's cracked wall (50 coins) is optional.
+- 2026-11-08 — **Until H8, the road to the keep is a gap in the woods at the top of the village's north rise.** H8 puts the countryside in between by retargeting the village's `KeepRoad` exit and the keep's two exits.
+- 2026-11-08 — **The boss is the Iron Warden**, an enemy with a new behaviour, `warden` (data in `data/enemies/iron_warden.json`, timings in a `boss` object):
+  - It guards, then gazes. Only an arrow during the gaze stuns it (its `weak_point`), and only stunned does it take damage. That makes the bow necessary and the sword still useful.
+  - It has 12 health and stays stunned for 3 s, with a 0.4 s flinch between blows, so one stun is worth about five sword hits: two or three stuns in all (eased after the first playtest, below).
+  - At half health it stomps faster, guards for less long, and fires three bolts.
+  - Brains now get the hit's kind (`take_hit(..., kind)`); other enemies ignore it.
+- 2026-11-08 — **Bosses don't trap or strand the hero.** The boss door doesn't shut behind them.
+  - The Warden keeps to its room and starts over whenever the hero leaves it, the classic reset.
+  - If the hero has no arrows when its eye opens, five fall into the room's far corner, so the fight can't strand anyone.
+  - Beaten, it stays beaten: the Enemy's new `stays_beaten` with its saved `clear_flag`.
+- 2026-11-08 — **A heart container is a `HeartContainer` node**, not an item. It appears when its flag is set, is taken by touch, and calls `GameState.add_heart_container()`. Its taken flag keeps it gone. The way out is a shutter on a stairway behind the boss, on the same flag.
+- 2026-11-08 — **Shutters can `stays_open`:** once their flags are met, they latch open for good (a door flag set by `latch()`, which the area calls whenever flags change).
+  - This lets puzzles use plates that don't latch. In the two-plate room the hero stands on one plate and a block holds the other, and once solved it stays solved.
+  - Crystal shutters latch too, for consistency.
+- 2026-11-08 — **Blocks go back to their start when the hero leaves their room** (H6's known issue): one jammed in a corner is back in place on the return. Safe now that solved shutters stay open.
+- 2026-11-08 — **What an enemy drops falls off a ledge** to the first lower open cell below it (up to four cells), so archers shot off the gallery leave their drops where the hero can walk. Goblin archers can now drop three arrows (weight 2 of 6), which keeps the bow fed in the keep.
+- 2026-11-08 — **The Bow moved from the South Field ruin into the keep's armoury**, with a chest of 15 arrows beside it, as H4 planned. The shop still sells arrows. The Cistern's arrow solution now needs the keep first; its block solution doesn't.
+- 2026-11-08 — **The Warden was too hard in the first playtest, so it was eased on every front:**
+
+  | | Before | After |
+  |---|---|---|
+  | Touch | a heart | half a heart |
+  | Bolts | a heart, at 110 px/s | half a heart, at 90 px/s |
+  | Speed | 22 | 18 |
+  | Rage | half health, x1.5 | half health, x1.3 |
+  | Eye open | 1.6 s | 2.2 s |
+  | Stun | 2.2 s | 3 s |
+  | Guard (before each gaze) | 3 s | 2.5 s (more chances) |
+  | Health | 16 | 12 |
+  | Flinch | 0.5 s | 0.4 s |
+
+  `tools/playtest.gd -- warden` starts at its door with the sword, the bow and 20 arrows, for retrying it.
+- 2026-11-08 — Raised ledges in dungeons reuse the dirt-path tile at height 1, as the Cistern did. A proper raised-flagstone tile can come with the art later.
+
+## H8 — The countryside
+- 2026-11-08 — **The road north is two areas**, each 40x30, both outdoor greybox like the South Field:
+  - **The North Fields:** a stream with a bridge, a farm plot, a plateau with an archer.
+  - **The Old Wood:** dense trees cut by a winding road and clearings, ending at the keep's stone front with its gate.
+
+  They replace H7's stand-in road from the village straight into the keep: the village's `NorthRoad` now leads to the fields, and the keep's gate and its way out both lead to the wood.
+- 2026-11-08 — **Two secrets, both optional and both seen before they're reached** (curiosity pays, no blind searching):
+  - **Hidden meadow:** a one-tree-wide gap in the fields' thicket beside the road leads to a meadow with a chest of five bombs. That's enough for the second secret even without visiting the shop.
+  - **Old shrine:** the wood's shrine shows its heart piece through the open-air ruin. One stretch of its wall is cracked: bomb it.
+- 2026-11-08 — **Heart pieces are GameState state, not items:**
+  - `heart_pieces` (0–3), saved as an additive key, so the save version stays 1.
+  - `add_heart_piece()` turns every fourth piece into a heart container, and `EventBus.heart_piece_found` announces each one.
+  - The slice has one piece; finding it says "1 of 4". There's no HUD counter yet, only the message.
+- 2026-11-08 — **Doors and chests outside dungeons keep their flags under the area's id** (`flag_scope()`): `dungeon/old_wood/door/shrine_wall`. The flag prefix is a little off for a field, but it reuses DungeonState unchanged.
+  - A cracked wall gains a `stone` colour so it matches the light ruin stone outdoors.
+- 2026-11-08 — **Every dungeon door must stand on walkable ground** (`doors_test`). The shrine's first bake left solid stone under its cracked wall, so it opened onto nothing. The secret's test found it, and the new check keeps it from happening again.
+- 2026-11-08 — The welcome sign now points north to the road to the keep and south to the South Field. A new sign in the fields points the way.

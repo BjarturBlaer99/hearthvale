@@ -29,7 +29,7 @@ item, the boss) → heart container and a new item that opens new paths → back
 - Moves in 8 directions and faces 4. **E / A** interacts. Hold **Shift / B** to sprint (no stamina: it never
   runs out). No climbing or stamina.
 - **Life: hearts.** Start with **3**. Most hits cost **half a heart**. A **heart container** (from a boss) adds a
-  heart and refills you; four **heart pieces** make a container (after the slice). Hearts drop from enemies,
+  heart and refills you; four **heart pieces** make a container (one is hidden in the slice; more after it). Hearts drop from enemies,
   grass and pots. At zero hearts you return to the area's entrance with full hearts.
 - **Weapons and items (slice):**
 
@@ -48,7 +48,7 @@ item, the boss) → heart container and a new item that opens new paths → back
 | **Slime** | Countryside, dungeon | Hops toward you; weak |
 | **Goblin archer** | Countryside | Keeps its distance and shoots arrows |
 | **Bat** | Dungeon | Erratic flight |
-| **Keep boss** (TBD) | Dungeon | Attack patterns; its weak point needs the dungeon item |
+| **Iron Warden** (keep boss) | The keep | Stomps after you; blows clink off its iron. It opens its eye (the tell): an arrow there stuns it, then the sword hurts it. Rages at half health |
 
 Enemies sometimes drop hearts or coins.
 

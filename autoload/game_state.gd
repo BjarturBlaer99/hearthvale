@@ -9,11 +9,15 @@ const SAVE_VERSION: int = 1
 const HALVES_PER_HEART: int = 2
 const START_HEARTS: int = 3
 const MAX_HEARTS: int = 20
+## Pieces of heart that make one heart container.
+const PIECES_PER_HEART: int = 4
 
 ## Heart containers the hero has (0 until a game starts).
 var hearts_max: int = 0
 ## Health in half hearts, 0..max_health().
 var health: int = 0
+## Pieces of heart found toward the next heart container, 0..PIECES_PER_HEART - 1.
+var heart_pieces: int = 0
 ## flag -> value. A missing flag reads as false.
 var flags: Dictionary[StringName, Variant] = {}
 ## quest id -> current stage id
@@ -57,6 +61,17 @@ func add_heart_container() -> void:
 	hearts_max = mini(hearts_max + 1, MAX_HEARTS)
 	health = max_health()
 	EventBus.health_changed.emit(health, max_health())
+
+
+## A piece of heart: every PIECES_PER_HEART of them make a heart container. Returns the
+## pieces now held toward the next one (0 when they just made a heart).
+func add_heart_piece() -> int:
+	heart_pieces += 1
+	if heart_pieces >= PIECES_PER_HEART:
+		heart_pieces = 0
+		add_heart_container()
+	EventBus.heart_piece_found.emit(heart_pieces)
+	return heart_pieces
 
 
 func set_health(value: int) -> void:
@@ -166,6 +181,7 @@ func _find_stack(item_id: StringName) -> int:
 func clear() -> void:
 	hearts_max = 0
 	health = 0
+	heart_pieces = 0
 	flags.clear()
 	quests.clear()
 	inventory.clear()
@@ -182,6 +198,7 @@ func to_dict() -> Dictionary:
 		"version": SAVE_VERSION,
 		"hearts_max": hearts_max,
 		"health": health,
+		"heart_pieces": heart_pieces,
 		"flags": _json_safe(flags),
 		"quests": _json_safe(quests),
 		"inventory": stacks,
@@ -196,6 +213,7 @@ func from_dict(data: Dictionary) -> void:
 	clear()
 	hearts_max = clampi(int(data.get("hearts_max", 0)), 0, MAX_HEARTS)
 	health = clampi(int(data.get("health", 0)), 0, max_health())
+	heart_pieces = clampi(int(data.get("heart_pieces", 0)), 0, PIECES_PER_HEART - 1)
 	var src_flags: Dictionary = data.get("flags", {})
 	for key: Variant in src_flags:
 		flags[StringName(str(key))] = src_flags[key]

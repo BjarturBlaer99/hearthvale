@@ -51,11 +51,11 @@ the boss door needs the big key.
 - Push blocks, pressure plates, switches (sword or arrow), cracked walls (bombs).
 **Done when**: one room per mechanic works, and one room combines two mechanics with more than one solution.
 
-## H7 — The first dungeon & boss
+## H7 — The first dungeon & boss ✅
 - The keep: 8–12 rooms using H5/H6, the bow as its item, a boss whose weak point needs the bow, a heart container.
 **Done when**: the dungeon can be finished start to end; beating the boss adds a heart.
 
-## H8 — The countryside
+## H8 — The countryside ✅
 - Fields and forest between Hearthvale and the keep, enemies, a secret or two, a heart piece.
 **Done when**: you can walk from the village to the keep and back, with at least one optional secret.
 

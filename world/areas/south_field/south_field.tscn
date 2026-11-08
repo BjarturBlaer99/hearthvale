@@ -7,7 +7,6 @@
 [ext_resource type="PackedScene" path="res://ui/area_hud.tscn" id="5_hud"]
 [ext_resource type="Script" path="res://gameplay/interactables/area_exit.gd" id="6_exit"]
 [ext_resource type="PackedScene" path="res://gameplay/enemies/enemy.tscn" id="7_enemy"]
-[ext_resource type="Script" path="res://gameplay/interactables/item_pickup.gd" id="8_pickup"]
 
 [node name="SouthField" type="Node2D" unique_id=1148323330]
 script = ExtResource("1_area")
@@ -63,19 +62,6 @@ position = Vector2(496, 304)
 script = ExtResource("6_exit")
 target_area = &"ruin_cellar"
 target_entry = &"entrance"
-
-[node name="Bow" type="Node2D" parent="Interactables" unique_id=1027286455]
-position = Vector2(480, 352)
-script = ExtResource("8_pickup")
-item_id = &"bow"
-taken_flag = &"took_ruin_bow"
-
-[node name="RuinArrows" type="Node2D" parent="Interactables" unique_id=1175327487]
-position = Vector2(512, 352)
-script = ExtResource("8_pickup")
-item_id = &"arrow"
-count = 10
-taken_flag = &"took_ruin_arrows"
 
 [node name="Entries" type="Node2D" parent="." unique_id=1821153580]
 

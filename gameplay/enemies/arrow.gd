@@ -2,13 +2,15 @@ class_name Arrow
 extends Node2D
 ## An arrow: flies straight and hurts what it touches on the other team (an enemy's arrow
 ## hits the hero; the hero's bow hits enemies and the dummy), then stops. It also stops at a
-## solid tile, the map edge, or after LIFETIME, and flies over heights and ledges. Position =
-## its point, at ground level.
+## solid tile, the map edge, or after LIFETIME, and flies over heights and ledges. A `bolt`
+## (a boss's) is the same thing drawn as a glowing orb. Position = its point, at ground level.
 
 const LIFETIME: float = 3.0
 const SHAFT: Color = Color(0.85, 0.78, 0.62)
 const TIP: Color = Color(0.75, 0.78, 0.82)
 const FLETCH: Color = Color(0.85, 0.30, 0.25)
+
+const BOLT: Color = Color(1.0, 0.62, 0.22)
 
 var direction: Vector2 = Vector2.RIGHT
 var speed: float = 120.0
@@ -16,6 +18,8 @@ var terrain: TerrainQuery
 var hit_box: HitBox
 ## Set once it has hit something or stopped; it frees itself.
 var stopped: bool = false
+## Drawn as a glowing bolt instead of an arrow.
+var bolt: bool = false
 
 var _age: float = 0.0
 
@@ -64,6 +68,14 @@ func _stop() -> void:
 
 
 func _draw() -> void:
+	if bolt:
+		var at: Vector2 = Vector2(0, -6)
+		draw_circle(Vector2(0, 0), 2.5, Color(0, 0, 0, 0.25))
+		draw_circle(at - direction * 4.0, 2.5, Color(BOLT, 0.35))
+		draw_circle(at, 4.0, Color(BOLT, 0.45))
+		draw_circle(at, 2.5, BOLT)
+		draw_circle(at, 1.2, Color(1.0, 0.95, 0.75))
+		return
 	var lift: Vector2 = Vector2(0, -4)
 	var tail: Vector2 = lift - direction * 9.0
 	draw_line(tail, lift, SHAFT, 1.0)

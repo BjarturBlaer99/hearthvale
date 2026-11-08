@@ -6,7 +6,8 @@ extends Node2D
 ## - locked: E with a small key spends the key and opens it for good
 ## - boss: E with the big key opens it for good (the key isn't spent)
 ## - shutter: bars that lift once `open_flag` is set (a room cleared), or any of `open_flags`
-##   (all of them with `needs_all`): a plate, a switch...
+##   (all of them with `needs_all`): a plate, a switch... With `stays_open`, once lifted they
+##   stay lifted for good (a solved puzzle stays solved).
 ## - cracked: a cracked wall; a bomb's blast opens it for good (nothing else does)
 ## A closed door fills its cells; the area keeps them occupied. Opened locked, boss and cracked
 ## doors are flags in GameState (DungeonState.door_flag). Position = the top-left corner of its
@@ -26,6 +27,10 @@ const BOSS_RED: Color = Color(0.45, 0.12, 0.14)
 ## ...or several (any of them lifts the bars, all of them with `needs_all`).
 @export var open_flags: Array[StringName] = []
 @export var needs_all: bool = false
+## Shutters only: once its flags have lifted the bars, they stay up for good (a door flag).
+@export var stays_open: bool = false
+## Cracked walls only: the stone they're made of (dungeon walls; a ruin's lighter stone outdoors).
+@export var stone: Color = Color(0.22, 0.22, 0.28)
 
 var dungeon_id: StringName
 
@@ -81,8 +86,22 @@ func is_open() -> bool:
 		DungeonState.OPEN:
 			return true
 		DungeonState.SHUTTER:
+			if stays_open and GameState.get_flag(DungeonState.door_flag(dungeon_id, door_id)) == true:
+				return true
 			return PuzzleRules.shutter_open(_shutter_values(), needs_all)
 	return GameState.get_flag(DungeonState.door_flag(dungeon_id, door_id)) == true
+
+
+## A shutter that `stays_open` and whose flags are met records itself open for good. The area
+## calls this whenever flags change. Returns whether it just did.
+func latch() -> bool:
+	if kind != DungeonState.SHUTTER or not stays_open:
+		return false
+	var flag: StringName = DungeonState.door_flag(dungeon_id, door_id)
+	if GameState.get_flag(flag) == true or not PuzzleRules.shutter_open(_shutter_values(), needs_all):
+		return false
+	GameState.set_flag(flag, true)
+	return true
 
 
 func _shutter_values() -> Array:
@@ -171,9 +190,9 @@ func _draw() -> void:
 
 ## A crack-riddled stretch of dungeon wall.
 func _draw_cracked(area: Rect2) -> void:
-	draw_rect(area, Color(0.22, 0.22, 0.28))
+	draw_rect(area, stone)
 	for y: float in range(3, int(area.size.y), 4):
-		draw_line(Vector2(0, y + 0.5), Vector2(area.size.x, y + 0.5), Color(0.11, 0.11, 0.14), 1.0)
+		draw_line(Vector2(0, y + 0.5), Vector2(area.size.x, y + 0.5), stone.darkened(0.5), 1.0)
 	var crack: Color = Color(0.06, 0.05, 0.07)
 	for center: Vector2 in _cell_centers():
 		var points: PackedVector2Array = [center + Vector2(-5, -6), center + Vector2(-1, -2), center + Vector2(-3, 1), center + Vector2(1, 4), center + Vector2(4, 7)]
@@ -184,11 +203,11 @@ func _draw_cracked(area: Rect2) -> void:
 
 ## What's left of a cracked wall once blown open: rubble at the sides.
 func _draw_rubble() -> void:
-	var stone: Color = Color(0.40, 0.40, 0.46)
+	var rubble: Color = stone.lightened(0.3)
 	for center: Vector2 in _cell_centers():
 		for bit: Vector3 in [Vector3(-6, 5, 2.0), Vector3(5, 6, 1.5), Vector3(-4, -5, 1.5), Vector3(6, -4, 2.0)]:
 			draw_circle(center + Vector2(bit.x, bit.y), bit.z + 0.8, OUTLINE)
-			draw_circle(center + Vector2(bit.x, bit.y), bit.z, stone)
+			draw_circle(center + Vector2(bit.x, bit.y), bit.z, rubble)
 
 
 func _cell_centers() -> Array[Vector2]:

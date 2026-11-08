@@ -6,7 +6,7 @@ extends GdUnitTestSuite
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
 const VILLAGE: String = "res://world/areas/village/village.tscn"
-const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"south_field", &"shop", &"ruin_cellar", &"cistern"]
+const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"south_field", &"shop", &"ruin_cellar", &"cistern", &"keep", &"north_fields", &"old_wood"]
 ## [house, the cell just outside its door]
 const HOUSES: Array = [
 	[&"elder_house", Vector2i(30, 15)],
@@ -69,6 +69,19 @@ func test_a_house_smaller_than_the_screen_sits_in_the_middle_of_it() -> void:
 	assert_int((camera.limit_top + camera.limit_bottom) / 2).is_equal(room.y / 2)
 
 
+func test_every_dungeon_door_stands_on_ground_that_opens_when_it_does() -> void:
+	var doors: int = 0
+	for area_id: StringName in AREAS:
+		var scene: Node = auto_free((load(WorldPaths.scene_for(area_id)) as PackedScene).instantiate())
+		var grid: HeightGrid = HeightGridBuilder.from_layer(scene.get_node(^"Height"))
+		for child: Node in scene.get_node(^"Interactables").get_children():
+			if child is DungeonDoor:
+				doors += 1
+				for cell: Vector2i in (child as DungeonDoor).cells():
+					assert_bool(grid.is_solid(cell)).override_failure_message("%s/%s: %s is solid under the door" % [area_id, child.name, cell]).is_false()
+	assert_int(doors).is_greater(0)
+
+
 func test_every_exit_leads_to_an_entry_point_and_every_talker_has_a_conversation() -> void:
 	var exits: int = 0
 	for area_id: StringName in AREAS:
@@ -102,4 +115,4 @@ func test_every_exit_leads_to_an_entry_point_and_every_talker_has_a_conversation
 			for other: Node in target.get_node(^"Interactables").get_children():
 				if other is AreaExit:
 					assert_bool((other as AreaExit).covers(entry_cell)).override_failure_message(where + ": arrives on another exit").is_false()
-	assert_int(exits).override_failure_message("three doors and three doormats, the south road, the cellar stairs and the cistern stairs both ways").is_equal(12)
+	assert_int(exits).override_failure_message("three doors and three doormats, the south road, the cellar stairs and the cistern stairs both ways, the north road, the fields' and the wood's roads, the keep's gate both ways, and the way out behind the boss").is_equal(19)

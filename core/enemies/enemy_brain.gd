@@ -4,7 +4,7 @@ extends RefCounted
 ## attack, hurt, dead) moving a GridBody, set up from the enemy's data (health, speed, sight).
 ## Pure: call step() every frame with the hero's position, and take_hit() when a blow lands.
 ## Randomness comes from the RandomNumberGenerator given, so tests can seed it. One subclass
-## per behaviour id (EnemyBrains): HopperBrain, ArcherBrain, FlierBrain. Subclasses fill in
+## per behaviour id (EnemyBrains): HopperBrain, ArcherBrain, FlierBrain, WardenBrain (the keep's boss). Subclasses fill in
 ## _enter_state() and _think(); hurt and dead work the same for every enemy.
 
 signal state_changed(state: StringName)
@@ -89,8 +89,9 @@ func step(hero: Vector2, delta: float) -> void:
 
 
 ## A blow lands: `damage` off its health, knocked back by `push` (direction times px).
+## `kind` says what dealt it (Hit.kind); most enemies don't care, a boss's weak point does.
 ## Ignored while already stunned or dead. Returns whether the blow landed.
-func take_hit(damage: int, push: Vector2) -> bool:
+func take_hit(damage: int, push: Vector2, _kind: StringName = &"contact") -> bool:
 	if state == HURT or state == DEAD:
 		return false
 	health = maxi(health - damage, 0)

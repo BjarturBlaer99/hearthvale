@@ -4,8 +4,9 @@ extends Node2D
 ## an EnemyBrain moves a GridBody, and this node follows it and draws a placeholder for its
 ## behaviour. Its HurtBox takes the sword's hits; its HitBox (contact damage) hurts the hero
 ## on touch. Archers shoot Arrows. Beaten, it rolls its drop table, leaves the drop where it
-## fell and vanishes; it's back on the next visit (nothing is saved). Position = its feet:
-## place it at a cell's centre. The area calls setup().
+## fell (at the foot of the ledge, if it stood on raised ground) and vanishes; it's back on the
+## next visit (nothing is saved), unless it `stays_beaten` (a boss). Position = its feet: place
+## it at a cell's centre. The area calls setup(). Bosses are the Boss subclass.
 
 signal died(enemy: Enemy)
 
@@ -18,6 +19,8 @@ const SHADOW: Color = Color(0, 0, 0, 0.3)
 ## Set once every enemy in the area with this same flag is beaten (a room cleared: a shutter
 ## waiting on the flag opens). Empty: none.
 @export var clear_flag: StringName
+## A boss: once its `clear_flag` is set (saved), it never comes back.
+@export var stays_beaten: bool = false
 
 var data: Dictionary = {}
 var brain: EnemyBrain
@@ -40,8 +43,13 @@ var _clock: float = 0.0
 @onready var hit_box: HitBox = $HitBox
 
 
-## Reads its data and starts its brain. Returns false (and stays inert) for an unknown id.
+## Reads its data and starts its brain. Returns false (and stays inert) for an unknown id, or
+## for a boss already beaten (it leaves).
 func setup(terrain_query: TerrainQuery, hero: Node2D, rng: RandomNumberGenerator) -> bool:
+	if stays_beaten and clear_flag != &"" and GameState.get_flag(clear_flag) == true:
+		visible = false
+		queue_free()
+		return false
 	data = DataRegistry.get_enemy(enemy_id)
 	if data.is_empty():
 		push_warning("%s: no enemy '%s' in data/enemies." % [name, enemy_id])
@@ -93,7 +101,7 @@ func step(delta: float) -> void:
 
 
 func _on_hit_taken(hit: Hit) -> void:
-	if not brain.take_hit(hit.damage, hit.push):
+	if not brain.take_hit(hit.damage, hit.push, hit.kind):
 		return
 	_flash_left = FLASH_TIME
 	if brain.is_dead():
@@ -122,9 +130,24 @@ func _drop() -> Node2D:
 			item.count = int(drop.get("count", 1))
 			node = item
 	if node != null:
-		node.position = Vector2(body.cell) * GridBody.TILE
+		node.position = Vector2(drop_cell()) * GridBody.TILE
 		get_parent().add_child(node)
 	return node
+
+
+## Where its drop lands: its cell, or, when it stands on raised ground (an archer on a
+## walkway), the first lower open cell straight below it on screen: the drop falls off the
+## ledge to where the hero can reach it.
+func drop_cell() -> Vector2i:
+	var at: Vector2i = body.cell
+	var level: int = terrain.standing_level(at)
+	for i: int in range(1, 5):
+		var below: Vector2i = at + Vector2i(0, i)
+		if not terrain.grid.in_bounds(below) or terrain.grid.is_solid(below):
+			break
+		if terrain.standing_level(below) < level:
+			return below
+	return at
 
 
 func _on_shot(direction: Vector2) -> void:

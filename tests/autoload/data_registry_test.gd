@@ -53,8 +53,9 @@ func test_villagers_and_signs_have_their_conversations() -> void:
 
 func test_enemies_are_registered() -> void:
 	_registry.load_all()
-	assert_array(Array(_registry.ids(&"enemies")).map(func(id: StringName) -> String: return String(id))).is_equal(["bat", "goblin_archer", "slime"])
+	assert_array(Array(_registry.ids(&"enemies")).map(func(id: StringName) -> String: return String(id))).is_equal(["bat", "goblin_archer", "iron_warden", "slime"])
 	assert_str(str(_registry.get_enemy(&"slime").get("behaviour", ""))).is_equal("hopper")
+	assert_str(str(_registry.get_enemy(&"iron_warden")["boss"]["weak_point"])).override_failure_message("the keep's boss needs the bow").is_equal("arrow")
 
 
 func test_a_ranged_weapons_ammo_must_be_an_item() -> void:
@@ -68,6 +69,7 @@ func test_bad_enemies_are_reported() -> void:
 	_assert_reported(errors, "unknown item id 'ruby'")
 	_assert_reported(errors, "unknown type 'treasure'")
 	_assert_reported(errors, "needs a 'weight' above 0")
+	_assert_reported(errors, "unknown weak_point 'song'")
 
 
 func test_dialogue_speakers_must_be_a_map() -> void:
