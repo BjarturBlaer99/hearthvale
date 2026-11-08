@@ -18,8 +18,10 @@ var health: int = 0
 var flags: Dictionary[StringName, Variant] = {}
 ## quest id -> current stage id
 var quests: Dictionary[StringName, StringName] = {}
-## Stacks of { "id": StringName, "count": int }, in pickup order.
+## Stacks of { "id": StringName, "count": int }, in pickup order. Capped by Inventory rules.
 var inventory: Array[Dictionary] = []
+## The item on the item button (bow, bombs), or empty.
+var equipped: StringName = &""
 ## Where the hero is: { "area", "cell": [x, y] }, or { "area", "entry" } on the way into an
 ## area through one of its entry points (go_to), until the area places them.
 var player: Dictionary = {}
@@ -109,19 +111,25 @@ func get_quest_stage(quest_id: StringName) -> StringName:
 
 
 # --- Inventory -------------------------------------------------------------
-# Stack limits and item rules arrive with core/inventory; this only keeps counts.
 
-## Adds `count` of an item; a negative count removes, never going below zero.
-func add_item(item_id: StringName, count: int = 1) -> void:
+## Adds `count` of an item, as many as fit (Inventory.capacity, from the item's data); a
+## negative count removes, never going below zero. The first item for the item button that
+## comes in is equipped. Returns how many were actually added (negative when removing).
+func add_item(item_id: StringName, count: int = 1) -> int:
+	var item: Dictionary = DataRegistry.get_item(item_id)
+	if count > 0:
+		count = mini(count, Inventory.room_for(item_count(item_id), item))
 	if count == 0:
-		return
+		return 0
+	if count > 0 and equipped == &"" and Inventory.is_equippable(item):
+		equip(item_id)
 	var index: int = _find_stack(item_id)
 	if index == -1:
 		if count < 0:
-			return
+			return 0
 		inventory.append({"id": item_id, "count": count})
 		EventBus.item_added.emit(item_id, count)
-		return
+		return count
 	var held: int = inventory[index]["count"]
 	var applied: int = maxi(count, -held)
 	if held + applied == 0:
@@ -129,6 +137,15 @@ func add_item(item_id: StringName, count: int = 1) -> void:
 	else:
 		inventory[index]["count"] = held + applied
 	EventBus.item_added.emit(item_id, applied)
+	return applied
+
+
+## Puts `item_id` on the item button (empty to clear it).
+func equip(item_id: StringName) -> void:
+	if equipped == item_id:
+		return
+	equipped = item_id
+	EventBus.equipped_changed.emit(item_id)
 
 
 func item_count(item_id: StringName) -> int:
@@ -152,6 +169,7 @@ func clear() -> void:
 	flags.clear()
 	quests.clear()
 	inventory.clear()
+	equipped = &""
 	player.clear()
 
 
@@ -167,6 +185,7 @@ func to_dict() -> Dictionary:
 		"flags": _json_safe(flags),
 		"quests": _json_safe(quests),
 		"inventory": stacks,
+		"equipped": String(equipped),
 		"player": _json_safe(player),
 	}
 
@@ -187,6 +206,7 @@ func from_dict(data: Dictionary) -> void:
 	for stack: Variant in src_inventory:
 		var entry: Dictionary = stack
 		inventory.append({"id": StringName(str(entry["id"])), "count": int(entry["count"])})
+	equipped = StringName(str(data.get("equipped", "")))
 	player = _whole_numbers_as_int(data.get("player", {}))
 
 

@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://ui/area_hud.gd" id="1_hud"]
 [ext_resource type="Script" path="res://ui/hearts_bar.gd" id="2_hearts"]
 [ext_resource type="PackedScene" path="res://ui/dialogue_box.tscn" id="3_dialogue"]
+[ext_resource type="PackedScene" path="res://ui/item_menu.tscn" id="4_menu"]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_hud")
@@ -11,7 +12,7 @@ script = ExtResource("1_hud")
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 160.0
-offset_bottom = 40.0
+offset_bottom = 51.0
 mouse_filter = 2
 color = Color(0.04, 0.06, 0.08, 0.55)
 
@@ -42,16 +43,25 @@ theme_override_colors/font_color = Color(0.85, 0.8, 0.62, 1)
 theme_override_font_sizes/font_size = 8
 text = "Carrying: nothing"
 
+[node name="Equipped" type="Label" parent="Panel"]
+offset_left = 4.0
+offset_top = 35.0
+offset_right = 152.0
+offset_bottom = 46.0
+theme_override_colors/font_color = Color(0.72, 0.86, 1, 1)
+theme_override_font_sizes/font_size = 8
+text = "Item: none"
+
 [node name="Hint" type="Label" parent="."]
 offset_left = 164.0
 offset_top = 4.0
 offset_right = 476.0
-offset_bottom = 15.0
+offset_bottom = 26.0
 theme_override_colors/font_color = Color(0.95, 0.95, 0.9, 0.85)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 8
-text = "WASD: move   Shift: sprint   E: talk / use   Space: sword"
+text = "WASD: move   Shift: sprint   E: talk / use\nSpace: sword   Q: item   Tab: items"
 horizontal_alignment = 2
 
 [node name="Message" type="Label" parent="."]
@@ -74,6 +84,8 @@ theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 
 [node name="DialogueBox" parent="." instance=ExtResource("3_dialogue")]
+
+[node name="ItemMenu" parent="." instance=ExtResource("4_menu")]
 
 [node name="Fade" type="ColorRect" parent="."]
 anchors_preset = 15

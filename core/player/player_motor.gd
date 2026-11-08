@@ -24,6 +24,8 @@ const DEAD: StringName = &"dead"
 var facing: Vector2 = Vector2.DOWN
 ## Whether sprint is held (the controller sets it every frame). Only walking goes faster.
 var sprinting: bool = false
+## The direction input held on the last step (snapped to 8 ways; zero when none).
+var held: Vector2 = Vector2.ZERO
 var state: PlayerState
 var state_name: StringName = &""
 ## Seconds of invincibility left after a hit.
@@ -59,6 +61,7 @@ func place(at_cell: Vector2i) -> void:
 func step(input: Vector2, delta: float) -> void:
 	invincible_left = maxf(0.0, invincible_left - delta)
 	var direction: Vector2 = snap_to_8(input)
+	held = direction
 	# Only on foot does input turn the hero; a swing or a knockback keeps their facing.
 	if direction != Vector2.ZERO and state_name == GROUND:
 		facing = direction

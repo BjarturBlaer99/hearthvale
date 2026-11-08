@@ -1,0 +1,52 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://world/areas/area_controller.gd" id="1_area"]
+[ext_resource type="TileSet" path="res://world/tiles/greybox_tiles.tres" id="2_tiles"]
+[ext_resource type="Script" path="res://world/areas/height_shading.gd" id="3_shading"]
+[ext_resource type="PackedScene" path="res://gameplay/player/player.tscn" id="4_player"]
+[ext_resource type="PackedScene" path="res://ui/area_hud.tscn" id="5_hud"]
+[ext_resource type="Script" path="res://gameplay/interactables/area_exit.gd" id="6_exit"]
+[ext_resource type="Script" path="res://gameplay/interactables/villager.gd" id="7_villager"]
+
+[node name="Shop" type="Node2D" unique_id=1446911742]
+script = ExtResource("1_area")
+area_id = &"shop"
+area_name = "Tilda's shop"
+
+[node name="Height" type="TileMapLayer" parent="." unique_id=873019545]
+tile_map_data = PackedByteArray("AAAAAAAAAAAAAAUAAAABAAAAAAAAAAUAAAACAAAAAAAAAAUAAAADAAAAAAAAAAUAAAAEAAAAAAAAAAUAAAAFAAAAAAAAAAUAAAAGAAAAAAAAAAUAAAAHAAAAAAAAAAUAAAAIAAAAAAAAAAUAAAAJAAAAAAAAAAUAAAAKAAAAAAAAAAUAAAAAAAEAAAAAAAUAAAABAAEAAAAAAAUAAAACAAEAAAAAAAUAAAADAAEAAAAAAAUAAAAEAAEAAAAAAAUAAAAFAAEAAAAAAAUAAAAGAAEAAAAAAAUAAAAHAAEAAAAAAAUAAAAIAAEAAAAAAAUAAAAJAAEAAAAAAAUAAAAKAAEAAAAAAAUAAAAAAAIAAAAAAAUAAAABAAIAAAADAAUAAAACAAIAAAADAAUAAAADAAIAAAADAAUAAAAEAAIAAAADAAUAAAAFAAIAAAADAAUAAAAGAAIAAAADAAUAAAAHAAIAAAADAAUAAAAIAAIAAAADAAUAAAAJAAIAAAADAAUAAAAKAAIAAAAAAAUAAAAAAAMAAAAAAAUAAAABAAMAAAABAAQAAAACAAMAAAABAAQAAAADAAMAAAABAAQAAAAEAAMAAAABAAQAAAAFAAMAAAABAAQAAAAGAAMAAAABAAQAAAAHAAMAAAABAAQAAAAIAAMAAAABAAQAAAAJAAMAAAABAAQAAAAKAAMAAAAAAAUAAAAAAAQAAAAAAAUAAAABAAQAAAABAAQAAAACAAQAAAABAAUAAAADAAQAAAABAAUAAAAEAAQAAAABAAUAAAAFAAQAAAABAAQAAAAGAAQAAAABAAUAAAAHAAQAAAABAAUAAAAIAAQAAAABAAUAAAAJAAQAAAABAAQAAAAKAAQAAAAAAAUAAAAAAAUAAAAAAAUAAAABAAUAAAABAAQAAAACAAUAAAABAAQAAAADAAUAAAABAAQAAAAEAAUAAAABAAQAAAAFAAUAAAABAAQAAAAGAAUAAAABAAQAAAAHAAUAAAABAAQAAAAIAAUAAAABAAQAAAAJAAUAAAABAAQAAAAKAAUAAAAAAAUAAAAAAAYAAAAAAAUAAAABAAYAAAAEAAUAAAACAAYAAAABAAQAAAADAAYAAAABAAQAAAAEAAYAAAACAAQAAAAFAAYAAAACAAQAAAAGAAYAAAACAAQAAAAHAAYAAAABAAQAAAAIAAYAAAABAAQAAAAJAAYAAAAEAAUAAAAKAAYAAAAAAAUAAAAAAAcAAAAAAAUAAAABAAcAAAAEAAUAAAACAAcAAAABAAQAAAADAAcAAAABAAQAAAAEAAcAAAABAAQAAAAFAAcAAAABAAQAAAAGAAcAAAABAAQAAAAHAAcAAAABAAQAAAAIAAcAAAABAAQAAAAJAAcAAAAEAAUAAAAKAAcAAAAAAAUAAAAAAAgAAAAAAAUAAAABAAgAAAAAAAUAAAACAAgAAAAAAAUAAAADAAgAAAAAAAUAAAAEAAgAAAAAAAUAAAAFAAgAAAADAAQAAAAGAAgAAAAAAAUAAAAHAAgAAAAAAAUAAAAIAAgAAAAAAAUAAAAJAAgAAAAAAAUAAAAKAAgAAAAAAAUAAAA=")
+tile_set = ExtResource("2_tiles")
+
+[node name="Decor" type="TileMapLayer" parent="." unique_id=1312965158]
+tile_set = ExtResource("2_tiles")
+
+[node name="HeightShading" type="Node2D" parent="." unique_id=700976883]
+script = ExtResource("3_shading")
+
+[node name="Interactables" type="Node2D" parent="." unique_id=579257859]
+
+[node name="Doormat" type="Node2D" parent="Interactables" unique_id=1831515786]
+position = Vector2(80, 128)
+script = ExtResource("6_exit")
+target_area = &"village"
+target_entry = &"shop_door"
+
+[node name="Tilda" type="Node2D" parent="Interactables" unique_id=1837310993]
+position = Vector2(80, 48)
+script = ExtResource("7_villager")
+robe_color = Color(0.25, 0.5, 0.42, 1)
+hair_color = Color(0.82, 0.62, 0.3, 1)
+dialogue_id = &"shop_tilda"
+
+[node name="Entries" type="Node2D" parent="." unique_id=548187738]
+
+[node name="door" type="Marker2D" parent="Entries" unique_id=449472988]
+position = Vector2(88, 120)
+rotation = -1.5707964
+
+[node name="PlayerSpawn" type="Marker2D" parent="." unique_id=1045622780]
+position = Vector2(88, 120)
+
+[node name="Player" parent="." unique_id=1850848050 instance=ExtResource("4_player")]
+
+[node name="HUD" parent="." unique_id=884442582 instance=ExtResource("5_hud")]

@@ -9,9 +9,12 @@ var damage: int = 0
 var push: Vector2 = Vector2.ZERO
 ## Where the blow came from, in area pixels.
 var source: Vector2 = Vector2.ZERO
+## What dealt it: &"sword", &"arrow", &"bomb" or &"contact" (switches and cracked walls care).
+var kind: StringName = &"contact"
 
 
-func _init(hit_damage: int = 0, hit_push: Vector2 = Vector2.ZERO, hit_source: Vector2 = Vector2.ZERO) -> void:
+func _init(hit_damage: int = 0, hit_push: Vector2 = Vector2.ZERO, hit_source: Vector2 = Vector2.ZERO, hit_kind: StringName = &"contact") -> void:
 	damage = hit_damage
 	push = hit_push
 	source = hit_source
+	kind = hit_kind

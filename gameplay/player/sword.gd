@@ -18,6 +18,7 @@ var progress: float = 0.0
 
 func _init() -> void:
 	team = &"hero"
+	kind = &"sword"
 	radius = CombatRules.SWORD_REACH
 	arc_degrees = CombatRules.SWORD_ARC_DEGREES
 	once_per_activation = true

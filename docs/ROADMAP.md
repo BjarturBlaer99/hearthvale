@@ -34,20 +34,20 @@ knockback and invincibility frames; at zero hearts the hero respawns at the area
 **Done when**: each enemy patrols, notices, attacks and can be beaten; drops follow data; enemies respect cliffs,
 ledges and solid tiles.
 
-## H4 — Items & weapons
+## H4 — Items & weapons ✅
 - Inventory and equipment: one item on the item button, an item menu.
 - Bow and arrows (ammo), bombs (fuse, blast); coins and the village shop.
 **Done when**: arrows and bombs hurt enemies and run out; the shop sells them for coins; the equipped item survives
 a save.
 
-## H5 — Dungeon framework
+## H5 — Dungeon framework ✅
 - Rooms with a camera per room and doors between them; small keys and locked doors; the big key and boss door;
   shutter doors.
 - Dungeon state (opened doors, keys held, chests opened) in GameState.
 **Done when**: a three-room test dungeon needs a small key to progress, remembers opened doors after leaving, and
 the boss door needs the big key.
 
-## H6 — Puzzles
+## H6 — Puzzles ✅
 - Push blocks, pressure plates, switches (sword or arrow), cracked walls (bombs).
 **Done when**: one room per mechanic works, and one room combines two mechanics with more than one solution.
 

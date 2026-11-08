@@ -21,6 +21,8 @@ const GROUP: StringName = &"hit_boxes"
 @export var arc_degrees: float = 360.0
 @export var active: bool = true
 @export var once_per_activation: bool = false
+## What its hits are: &"sword", &"arrow", &"bomb" or &"contact".
+@export var kind: StringName = &"contact"
 
 ## The way an arc points.
 var facing: Vector2 = Vector2.DOWN
@@ -60,6 +62,6 @@ func try_hit(hurt_box: HurtBox) -> bool:
 			return false
 		_already_hit[id] = true
 	var push: Vector2 = CombatRules.push(global_position, hurt_box.global_position, knockback, facing)
-	hurt_box.receive(Hit.new(damage, push, global_position))
+	hurt_box.receive(Hit.new(damage, push, global_position, kind))
 	landed.emit(hurt_box)
 	return true

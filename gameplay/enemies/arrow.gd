@@ -1,8 +1,9 @@
 class_name Arrow
 extends Node2D
-## An enemy's arrow: flies straight, hurts the hero on touching them (a HitBox on the enemy
-## team), and stops at a solid tile, the map edge, or after LIFETIME. It flies over heights and
-## ledges. Position = its point, at ground level.
+## An arrow: flies straight and hurts what it touches on the other team (an enemy's arrow
+## hits the hero; the hero's bow hits enemies and the dummy), then stops. It also stops at a
+## solid tile, the map edge, or after LIFETIME, and flies over heights and ledges. Position =
+## its point, at ground level.
 
 const LIFETIME: float = 3.0
 const SHAFT: Color = Color(0.85, 0.78, 0.62)
@@ -19,15 +20,17 @@ var stopped: bool = false
 var _age: float = 0.0
 
 
-func setup(terrain_query: TerrainQuery, flight: Vector2, damage: int, flight_speed: float) -> void:
+func setup(terrain_query: TerrainQuery, flight: Vector2, damage: int, flight_speed: float,
+		team: StringName = &"enemy", knockback: float = 20.0) -> void:
 	terrain = terrain_query
 	direction = flight.normalized()
 	speed = flight_speed
 	hit_box = HitBox.new()
-	hit_box.team = &"enemy"
+	hit_box.team = team
+	hit_box.kind = &"arrow"
 	hit_box.radius = 3.0
 	hit_box.damage = damage
-	hit_box.knockback = 20.0
+	hit_box.knockback = knockback
 	hit_box.facing = direction
 	add_child(hit_box)
 	hit_box.landed.connect(_on_landed)

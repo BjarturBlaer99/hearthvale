@@ -1,0 +1,1 @@
+{ "items": [ { "id": "sling", "name": "Sling", "type": "weapon_ranged", "stats": { "damage": 1, "ammo": "pebble" } } ] }

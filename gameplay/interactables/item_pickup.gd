@@ -43,8 +43,34 @@ func _draw() -> void:
 	match str(DataRegistry.get_item(item_id).get("type", "")):
 		"weapon_melee":
 			_draw_sword()
+		"weapon_ranged":
+			_draw_bow()
+		"ammo":
+			_draw_arrows()
+		"bomb":
+			_draw_bomb()
 		_:
 			_draw_token()
+
+
+func _draw_bow() -> void:
+	draw_arc(Vector2(6, 9), 6.0, -PI / 2.0, PI / 2.0, 10, Color(0.10, 0.08, 0.12), 3.0)
+	draw_arc(Vector2(6, 9), 6.0, -PI / 2.0, PI / 2.0, 10, Color(0.62, 0.40, 0.20), 1.0)
+	draw_line(Vector2(6, 3), Vector2(6, 15), Color(0.92, 0.90, 0.84), 1.0)
+
+
+func _draw_arrows() -> void:
+	for i: int in 3:
+		var x: float = 5.0 + i * 3.0
+		draw_line(Vector2(x, 14), Vector2(x, 4), Color(0.85, 0.78, 0.62), 1.0)
+		draw_line(Vector2(x, 4), Vector2(x, 3), Color(0.75, 0.78, 0.82), 2.0)
+		draw_line(Vector2(x - 1, 14), Vector2(x + 1, 14), Color(0.85, 0.30, 0.25), 1.0)
+
+
+func _draw_bomb() -> void:
+	draw_circle(Vector2(8, 10), 5.0, Color(0.10, 0.08, 0.12))
+	draw_circle(Vector2(8, 10), 4.0, Color(0.20, 0.24, 0.40))
+	draw_line(Vector2(10, 6), Vector2(12, 3), Color(0.85, 0.75, 0.55), 1.0)
 
 
 ## A short sword lying on the ground, point up and to the right.

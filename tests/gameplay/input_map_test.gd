@@ -2,7 +2,7 @@ extends GdUnitTestSuite
 ## The input map in project.godot: every action works from the keyboard (physical keys,
 ## so any layout) and from a gamepad, and actions from the old design are gone.
 
-const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down", &"interact", &"attack", &"sprint"]
+const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down", &"interact", &"attack", &"sprint", &"use_item", &"item_menu"]
 const RETIRED: Array[StringName] = [&"debug_cycle_water"]
 
 

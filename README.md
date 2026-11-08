@@ -19,6 +19,8 @@ Run `godot --path .` to start in Hearthvale.
 | Talk / read / pick up | E | A |
 | Choose an answer | W / S or arrows, then E | d-pad, then A |
 | Swing the sword (once you have it) | Space / J | X |
+| Use the equipped item (bow, bombs) | Q / K | Y |
+| Item menu (choose what's equipped) | Tab / I | Back |
 
 Read the sign in the square, then walk into a door: Elder Bram lives in the blue-roofed house, Wenna the weaver
 in the house west of the road. The Wooden Sword lies in the fenced training yard south-west of the square, next
@@ -31,8 +33,20 @@ Follow the road south out of the village to the **South Field**:
 - a goblin archer guards the plateau (take its stairs, and watch for it drawing its bow)
 - bats roost in the old ruin
 
-Beaten enemies sometimes drop hearts or coins. Items and dungeons arrive milestone by milestone
-(`docs/ROADMAP.md`).
+Beaten enemies sometimes drop hearts or coins.
+- **Bow:** for now it lies in the South Field's ruin, with ten arrows. It moves into the first dungeon later.
+- **Tilda's shop:** the red house beside the training yard. She sells ten arrows for 5 coins and three bombs for 8.
+- **Bombs:** set one down, step back, and it blows up enemies nearby.
+- **The Ruin Cellar:** a three-room test dungeon down the stairway in the ruin.
+  - A chest in the entry hall holds the small key for the locked door.
+  - Beat the hall's slimes to lift the bars on the big key's alcove.
+  - The big key opens the boss door. Doors and chests you open stay open.
+- **The Cistern:** five puzzle rooms down a stairway in the cellar's inner room.
+  - Push the sandstone block (walk into it and keep pushing), stand on the plate, and hit the crystal.
+  - Bomb the cracked wall.
+  - The treasure room has two ways in: a block on the plate, or an arrow into the crystal up on the platform.
+
+Dungeons arrive milestone by milestone (`docs/ROADMAP.md`).
 
 ## Docs
 - `CLAUDE.md` — rules for Claude Code

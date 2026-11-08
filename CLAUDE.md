@@ -23,6 +23,9 @@ in `docs/DECISIONS.md` are superseded.
 - Use placeholder art: flat-colored 16×16 tiles generated in code or as tiny PNGs you create, `ColorRect`/`Polygon2D` for actors. No external art, audio or asset-store dependencies until the roadmap says so.
   **Exception (user's request, 2026-11-07):** the hero is a Zelda-style pixel-art sprite, painted from ASCII art by
   `tools/art/make_player_sprite.gd`. Keep it; edit the art in that tool, never the PNG. Other actors stay placeholders.
+  **Exception (user's request, 2026-11-08):** the environment tiles are proper pixel art (grass, trees, roofs with
+  ridges and eaves, windows, water...) plus a Decor layer of flowers, tufts and the like, all still painted in code by
+  `tools/greybox/make_tile_texture.gd` and placed by `build_maps.gd`. No external assets; edit the art in the tool.
 
 ## Commands
 ```bash
@@ -74,6 +77,8 @@ removes the shim, so recreate it after upgrading.
   inherited property of instanced children (Player, HUD) as an override.
 - Windows PowerShell 5.1's `Set-Content -Encoding utf8` writes a byte-order mark. Edit text files with the Edit
   tool or `sed`, not PowerShell.
+- On this machine a file just written can be locked for a moment (`OSError: [Errno 22] Invalid argument` on the
+  next write). Scripts that write the same file twice in a row should retry briefly.
 
 ## Code conventions
 - **Typed GDScript everywhere**: `var hp: int = 10`, typed function signatures, `class_name` on reusable scripts.

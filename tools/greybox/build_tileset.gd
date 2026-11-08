@@ -39,6 +39,16 @@ func _initialize() -> void:
 		_fixed(source, Vector2i(index, GreyboxTiles.ROW_FLOOR), 0, false)
 	for index: int in GreyboxTiles.FURNITURE_KINDS.size():
 		_fixed(source, Vector2i(index, GreyboxTiles.ROW_FURNITURE), GreyboxTiles.FURNITURE_HEIGHTS[index], true)
+	# Decorations live on the Decor layer, which movement never reads; they're open ground anyway.
+	for index: int in GreyboxTiles.DECOR_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_DECOR), 0, false)
+	for index: int in GreyboxTiles.DETAIL_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_DETAIL), GreyboxTiles.DETAIL_HEIGHTS[index], true)
+	# Solid ground: grass of each height that can't be entered (trees, rocks, fences stand on it).
+	for height: int in GreyboxTiles.COLUMNS:
+		_fixed(source, Vector2i(height, GreyboxTiles.ROW_SOLID_GROUND), height, true)
+	for index: int in GreyboxTiles.PROP_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_PROPS), 0, false)
 
 	var error: Error = ResourceSaver.save(tile_set, GreyboxTiles.TILESET_PATH)
 	print("tools/greybox: wrote %s (%s)" % [GreyboxTiles.TILESET_PATH, error_string(error)])

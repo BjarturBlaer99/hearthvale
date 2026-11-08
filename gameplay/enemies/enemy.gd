@@ -15,6 +15,9 @@ const OUTLINE: Color = Color(0.10, 0.08, 0.12)
 const SHADOW: Color = Color(0, 0, 0, 0.3)
 
 @export var enemy_id: StringName
+## Set once every enemy in the area with this same flag is beaten (a room cleared: a shutter
+## waiting on the flag opens). Empty: none.
+@export var clear_flag: StringName
 
 var data: Dictionary = {}
 var brain: EnemyBrain

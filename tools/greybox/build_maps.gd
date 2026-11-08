@@ -15,12 +15,27 @@ extends SceneTree
 ## bottom wall at (5, 8).
 ## The South Field (H3's enemy ground, tests/world/south_field_test.gd): the road from the
 ## village comes in at the top; slimes in the western meadow; a goblin archer on the eastern
-## plateau, reached by its stairs, with a one-way ledge all round; bats in the stone ruin.
+## plateau, reached by its stairs, with a one-way ledge all round; bats in the stone ruin,
+## where a stairway leads down to the Ruin Cellar.
+## The Ruin Cellar (H5's test dungeon, tests/world/dungeon_test.gd): three 15x11 rooms stacked
+## north to south inside thick walls, joined by doorways at x = 7 that its doors close; a
+## stairway in the inner room leads down to the Cistern.
+## The Cistern (H6's puzzle rooms, tests/world/puzzle_test.gd): five 15x11 rooms on a 2x3 grid,
+## (0,2) push block -> (0,1) pressure plate -> (1,1) switch -> (1,0) cracked wall -> (0,0)
+## the combined room; the sixth room, (1,2), is solid rock.
 
 ## Each area: scene, size in cells, blocks, and optionally the base kind (default grass).
 ## Block = [x, y, width, height, terrain height, kind]; kind is "ground", "stairs", "path" (at
 ## that height) or a fixed-height kind from GreyboxTiles (solid, floor or furniture; the
 ## height is then ignored). Everything else is the base at height 0. Later blocks win.
+## Details come by themselves: a roof block's top row gets a ridge and its bottom row eaves,
+## and walls get a window every third cell (doors, laid later, replace them). Trees, rocks,
+## fences and the 2x2 "well" become solid ground at the block's height (so they sit on grass of
+## any height) with their picture on the Decor layer.
+## Optional looks, on the Decor layer (never read for movement):
+## - "decor": blocks [x, y, width, height, kind] of GreyboxTiles.DECOR_KINDS;
+## - "scatter": { "seed", "kinds": [[kind, percent], ...] } sprinkled over open ground,
+##   never on paths, solids, doors, exits, people, items or arrival spots.
 const MAPS: Dictionary = {
 	"village": {
 		"scene": "res://world/areas/village/village.tscn",
@@ -47,19 +62,20 @@ const MAPS: Dictionary = {
 			[28, 14, 6, 1, 3, "wall"],
 			[6, 21, 6, 3, 3, "roof"],
 			[6, 24, 6, 1, 3, "wall"],
-			# Doors: the weaver's and the elder's.
+			# Doors: the weaver's, the elder's and the shop's.
 			[16, 14, 1, 1, 0, "door"],
 			[30, 14, 1, 1, 0, "door"],
+			[8, 24, 1, 1, 0, "door"],
 			# Roads: north-south from the stairs out through the woods; east-west across.
 			[22, 9, 4, 27, 0, "path"],
 			[3, 16, 35, 2, 0, "path"],
 			# The well.
-			[18, 19, 2, 2, 2, "stone"],
+			[18, 19, 2, 2, 0, "well"],
 			# A fenced field with a gate.
-			[4, 27, 10, 1, 1, "fence"],
-			[4, 33, 10, 1, 1, "fence"],
-			[4, 27, 1, 7, 1, "fence"],
-			[13, 27, 1, 7, 1, "fence"],
+			[4, 27, 10, 1, 0, "fence"],
+			[4, 33, 10, 1, 0, "fence"],
+			[4, 27, 1, 7, 0, "fence"],
+			[13, 27, 1, 7, 0, "fence"],
 			[8, 27, 2, 1, 0, "ground"],
 			# The pond.
 			[28, 26, 6, 4, 0, "water"],
@@ -76,6 +92,24 @@ const MAPS: Dictionary = {
 			[0, 34, 22, 2, 0, "tree"],
 			[26, 34, 22, 2, 0, "tree"],
 		],
+		"decor": [
+			# Flower beds along the house fronts, leaving the doorsteps clear.
+			[6, 15, 2, 1, "flowers_red"],
+			[10, 15, 2, 1, "flowers_yellow"],
+			[14, 15, 2, 1, "flowers_blue"],
+			[18, 15, 2, 1, "flowers_red"],
+			[28, 15, 2, 1, "flowers_yellow"],
+			[32, 15, 2, 1, "flowers_blue"],
+			[6, 25, 1, 1, "flowers_red"],
+			[10, 25, 2, 1, "flowers_yellow"],
+			# Lily pads on the pond.
+			[29, 27, 1, 1, "lily"],
+			[32, 28, 1, 1, "lily"],
+			[30, 29, 1, 1, "lily"],
+			# A vegetable patch on the east meadow.
+			[43, 26, 3, 3, "crops"],
+		],
+		"scatter": {"seed": 7, "kinds": [["tuft", 6], ["flowers_red", 1], ["flowers_yellow", 1], ["flowers_blue", 1], ["pebbles", 1]]},
 	},
 	"elder_house": {
 		"scene": "res://world/areas/elder_house/elder_house.tscn",
@@ -114,6 +148,91 @@ const MAPS: Dictionary = {
 			[8, 5, 1, 2, 0, "barrel"],
 		],
 	},
+	"shop": {
+		"scene": "res://world/areas/shop/shop.tscn",
+		"size": Vector2i(11, 9),
+		"base": "floor",
+		"blocks": [
+			[0, 0, 11, 2, 0, "inner_wall"],
+			[0, 0, 1, 9, 0, "inner_wall"],
+			[10, 0, 1, 9, 0, "inner_wall"],
+			[0, 8, 11, 1, 0, "inner_wall"],
+			[5, 8, 1, 1, 0, "doormat"],
+			# Shelves of wares along the back wall; the counter, open in the middle.
+			[1, 2, 9, 1, 0, "shelf"],
+			[2, 4, 3, 1, 0, "table"],
+			[6, 4, 3, 1, 0, "table"],
+			[1, 6, 1, 2, 0, "barrel"],
+			[9, 6, 1, 2, 0, "barrel"],
+			[4, 6, 3, 1, 0, "rug"],
+		],
+	},
+	"ruin_cellar": {
+		"scene": "res://world/areas/ruin_cellar/ruin_cellar.tscn",
+		"size": Vector2i(15, 33),
+		"base": "dungeon_wall",
+		"blocks": [
+			# Floors: the inner room (north), the hall, the entry hall (south).
+			[1, 1, 13, 9, 0, "dungeon_floor"],
+			[1, 12, 13, 9, 0, "dungeon_floor"],
+			[1, 23, 13, 9, 0, "dungeon_floor"],
+			# Doorways through the walls between rooms: entry hall to hall, hall to inner room.
+			[7, 21, 1, 2, 0, "dungeon_floor"],
+			[7, 10, 1, 2, 0, "dungeon_floor"],
+			# The hall's side alcove, behind a shutter.
+			[4, 12, 1, 9, 0, "dungeon_wall"],
+			[4, 16, 1, 1, 0, "dungeon_floor"],
+			# Pillars.
+			[3, 25, 1, 1, 0, "pillar"],
+			[11, 25, 1, 1, 0, "pillar"],
+			[3, 29, 1, 1, 0, "pillar"],
+			[11, 29, 1, 1, 0, "pillar"],
+			[10, 14, 1, 1, 0, "pillar"],
+			[10, 18, 1, 1, 0, "pillar"],
+			[4, 3, 1, 1, 0, "pillar"],
+			[10, 3, 1, 1, 0, "pillar"],
+			# The way back up, in the entry hall's south wall; the way down, in the inner room's north wall.
+			[7, 32, 1, 1, 0, "stairway"],
+			[12, 0, 1, 1, 0, "stairway"],
+		],
+	},
+	"cistern": {
+		"scene": "res://world/areas/cistern/cistern.tscn",
+		"size": Vector2i(30, 33),
+		"base": "dungeon_wall",
+		"blocks": [
+			# Floors of the five rooms.
+			[1, 1, 13, 9, 0, "dungeon_floor"],
+			[16, 1, 13, 9, 0, "dungeon_floor"],
+			[1, 12, 13, 9, 0, "dungeon_floor"],
+			[16, 12, 13, 9, 0, "dungeon_floor"],
+			[1, 23, 13, 9, 0, "dungeon_floor"],
+			# Doorways: push room to plate room, plate room to switch room, switch room to the
+			# cracked wall's room, and the cracked wall itself into the combined room.
+			[7, 21, 1, 2, 0, "dungeon_floor"],
+			[14, 16, 2, 1, 0, "dungeon_floor"],
+			[22, 10, 1, 2, 0, "dungeon_floor"],
+			[14, 5, 2, 1, 0, "dungeon_floor"],
+			# Push room: a row of pillars across it; a block fills the only gap, away from the
+			# doorway, so pushing it north can't park it in front of the way out.
+			[1, 26, 3, 1, 0, "pillar"],
+			[5, 26, 9, 1, 0, "pillar"],
+			# Plate room and switch room: a few pillars; the switch sits in a nook open to the south.
+			[4, 18, 1, 1, 0, "pillar"],
+			[10, 14, 1, 1, 0, "pillar"],
+			[21, 14, 3, 1, 0, "pillar"],
+			[21, 15, 1, 1, 0, "pillar"],
+			[23, 15, 1, 1, 0, "pillar"],
+			# Combined room: the treasure alcove behind a shutter, and a raised platform (no
+			# stairs) with a crystal out of sword reach.
+			[4, 1, 1, 4, 0, "dungeon_wall"],
+			[1, 4, 4, 1, 0, "dungeon_wall"],
+			[2, 4, 1, 1, 0, "dungeon_floor"],
+			[9, 1, 4, 4, 1, "path"],
+			# The way back up.
+			[7, 32, 1, 1, 0, "stairway"],
+		],
+	},
 	"south_field": {
 		"scene": "res://world/areas/south_field/south_field.tscn",
 		"size": Vector2i(40, 28),
@@ -132,7 +251,8 @@ const MAPS: Dictionary = {
 			[10, 11, 1, 1, 0, "rock"],
 			[14, 21, 1, 1, 0, "rock"],
 			[12, 24, 2, 2, 0, "tree"],
-			# The old ruin, open to the south.
+			# The old ruin, open to the south, with a stairway down to the cellar.
+			[31, 19, 1, 1, 0, "stairway"],
 			[27, 18, 9, 1, 0, "stone"],
 			[27, 18, 1, 6, 0, "stone"],
 			[35, 18, 1, 6, 0, "stone"],
@@ -143,6 +263,11 @@ const MAPS: Dictionary = {
 			[38, 2, 2, 26, 0, "tree"],
 			[0, 26, 40, 2, 0, "tree"],
 		],
+		"decor": [
+			[6, 18, 1, 1, "lily"],
+			[9, 19, 1, 1, "lily"],
+		],
+		"scatter": {"seed": 11, "kinds": [["tuft", 9], ["flowers_red", 1], ["flowers_yellow", 1], ["flowers_blue", 1], ["mushroom", 1], ["pebbles", 2]]},
 	},
 }
 
@@ -174,6 +299,7 @@ func _bake(map: Dictionary) -> Error:
 	var layer: TileMapLayer = root.get_node("Height")
 	var size: Vector2i = map["size"]
 	var base: Vector2i = GreyboxTiles.coords(str(map.get("base", "ground")), 0)
+	var props: Dictionary = {}
 	layer.clear()
 	for y: int in size.y:
 		for x: int in size.x:
@@ -184,10 +310,20 @@ func _bake(map: Dictionary) -> Error:
 			push_error("tools/greybox: unknown tile kind '%s' in %s" % [kind, block])
 			root.free()
 			return ERR_INVALID_DATA
-		var coords: Vector2i = GreyboxTiles.coords(kind, block[4])
 		for y: int in range(block[1], block[1] + block[3]):
 			for x: int in range(block[0], block[0] + block[2]):
-				layer.set_cell(Vector2i(x, y), GreyboxTiles.SOURCE_ID, coords)
+				var cell: Vector2i = Vector2i(x, y)
+				props.erase(cell)
+				if GreyboxTiles.PROP_BLOCKS.has(kind):
+					layer.set_cell(cell, GreyboxTiles.SOURCE_ID, GreyboxTiles.coords("solid_ground", block[4]))
+					props[cell] = _prop(kind, x - int(block[0]), y - int(block[1]))
+					continue
+				var detail: String = _detail(kind, x - int(block[0]), y - int(block[1]), block[2], block[3])
+				layer.set_cell(cell, GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(detail, block[4]))
+	var decor_error: Error = _decorate(root, layer, map, props)
+	if decor_error != OK:
+		root.free()
+		return decor_error
 	var out: PackedScene = PackedScene.new()
 	var error: Error = out.pack(root)
 	if error == OK:
@@ -195,3 +331,100 @@ func _bake(map: Dictionary) -> Error:
 	root.free()
 	print("tools/greybox: baked %d blocks into %s (%s)" % [(map["blocks"] as Array).size(), path, error_string(error)])
 	return error
+
+
+## The prop for cell (dx, dy) of a prop block: the tree, rock or fence, or a well quarter.
+func _prop(kind: String, dx: int, dy: int) -> String:
+	if kind == "well":
+		return "well_%s%s" % ["n" if dy % 2 == 0 else "s", "w" if dx % 2 == 0 else "e"]
+	return GreyboxTiles.PROP_BLOCKS[kind]
+
+
+## The tile for cell (dx, dy) of a block of `kind`, `width` x `height`: a roof's top row gets
+## its ridge and its bottom row its eaves; walls get a window every third cell.
+func _detail(kind: String, dx: int, dy: int, width: int, height: int) -> String:
+	match kind:
+		"roof", "roof_blue":
+			if height >= 2 and dy == 0:
+				return kind + "_top"
+			if height >= 2 and dy == height - 1:
+				return kind + "_eave"
+		"wall":
+			if width >= 4 and dx % 3 == 1 and dx < width - 1:
+				return "wall_window"
+	return kind
+
+
+## Fills the Decor layer (adding it after Height if the scene has none): the map's decor
+## blocks, then its scatter over open ground away from anything the hero uses or arrives at.
+func _decorate(root: Node, height_layer: TileMapLayer, map: Dictionary, props: Dictionary) -> Error:
+	var decor: TileMapLayer = root.get_node_or_null(^"Decor")
+	if decor == null:
+		decor = TileMapLayer.new()
+		decor.name = "Decor"
+		root.add_child(decor)
+		root.move_child(decor, height_layer.get_index() + 1)
+		decor.owner = root
+	decor.tile_set = height_layer.tile_set
+	decor.clear()
+	for cell: Vector2i in props:
+		decor.set_cell(cell, GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(str(props[cell])))
+	for block: Array in map.get("decor", []):
+		var kind: String = block[4]
+		if not GreyboxTiles.is_decor(kind):
+			push_error("tools/greybox: '%s' is not a decoration (%s)" % [kind, block])
+			return ERR_INVALID_DATA
+		for y: int in range(block[1], block[1] + block[3]):
+			for x: int in range(block[0], block[0] + block[2]):
+				decor.set_cell(Vector2i(x, y), GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(kind))
+	var scatter: Dictionary = map.get("scatter", {})
+	if scatter.is_empty():
+		return OK
+	var avoid: Dictionary = _busy_cells(root)
+	var seed_value: int = int(scatter.get("seed", 1))
+	for cell: Vector2i in height_layer.get_used_cells():
+		if height_layer.get_cell_atlas_coords(cell).y != GreyboxTiles.ROW_GROUND or avoid.has(cell):
+			continue
+		if decor.get_cell_source_id(cell) != -1:
+			continue
+		var roll: int = _cell_hash(cell, seed_value) % 100
+		for entry: Array in scatter["kinds"]:
+			if roll < int(entry[1]):
+				decor.set_cell(cell, GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(str(entry[0])))
+				break
+			roll -= int(entry[1])
+	return OK
+
+
+## Cells the hero uses or arrives at: every Interactables child (with its size, if it has
+## one), every entry point and the spawn. Scatter keeps off them.
+func _busy_cells(root: Node) -> Dictionary:
+	var cells: Dictionary = {}
+	var interactables: Node = root.get_node_or_null(^"Interactables")
+	if interactables != null:
+		for child: Node in interactables.get_children():
+			var at: Vector2i = _cell_at((child as Node2D).position)
+			var size: Variant = child.get(&"size")
+			var span: Vector2i = size if typeof(size) == TYPE_VECTOR2I else Vector2i.ONE
+			for y: int in span.y:
+				for x: int in span.x:
+					cells[at + Vector2i(x, y)] = true
+	var entries: Node = root.get_node_or_null(^"Entries")
+	if entries != null:
+		for marker: Node in entries.get_children():
+			cells[_cell_at((marker as Node2D).position)] = true
+	var spawn: Node2D = root.get_node_or_null(^"PlayerSpawn")
+	if spawn != null:
+		cells[_cell_at(spawn.position)] = true
+	return cells
+
+
+func _cell_at(point: Vector2) -> Vector2i:
+	return Vector2i(floori(point.x / GreyboxTiles.TILE_SIZE), floori(point.y / GreyboxTiles.TILE_SIZE))
+
+
+## The same number for the same cell and seed, every bake.
+func _cell_hash(cell: Vector2i, seed_value: int) -> int:
+	var h: int = (cell.x * 73856093) ^ (cell.y * 19349663) ^ (seed_value * 83492791)
+	h = (h ^ (h >> 13)) * 1274126177
+	return absi(h ^ (h >> 16))

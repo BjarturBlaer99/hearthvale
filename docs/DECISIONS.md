@@ -112,3 +112,57 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
 
 ## Sprint
 - 2026-11-08 — **The hero can sprint** (hold Shift / gamepad B): 120 px/s instead of 72, at the user's request. This reverses the pivot's "no sprint" for sprint only; there's still **no stamina**, so it never runs out, and still no climbing or swimming. GDD §5 and CLAUDE.md were updated first. Sprint speeds up walking only: a swing still roots the hero, and knockback keeps its own speed. The `sprint` action left `setup_input_map.gd`'s retired list.
+
+## H4 — Items & weapons
+- 2026-11-08 — **The Bow lies in the South Field ruin for now**, with a bundle of ten arrows. GDD §5 makes it the first dungeon's item, but the keep is H7 and H4 needs arrows in the game. When H7 builds the keep, it moves the pickup there; the bow itself is all data and code that stays.
+- 2026-11-08 — **Stack limits are enforced in `GameState.add_item`** through `Inventory.capacity` (the item's `max_stack`, or 1 for single items; no limit for ids with no data). It returns how many were added. Gifts and pickups beyond the limit are simply not taken.
+- 2026-11-08 — **One item on the item button: `GameState.equipped`**, saved with the game as an additive key, so the save version stays 1. The first equippable item picked up (bow or bombs) goes on the button by itself. Equipping announces `EventBus.equipped_changed`.
+- 2026-11-08 — **The item button** (Q or K, gamepad Y; next to E and Space on the keyboard) is handled by the area, which has the terrain and can place arrows and bombs.
+  - The bow roots the hero for its cooldown (the sword's attack state) and fires the H3 `Arrow`, now on either team, the way the hero faces.
+  - Bombs go down at the hero's feet. They burn a 2 s fuse whose spark blinks faster as it runs down, then blast a 24 px radius once.
+  - With nothing equipped, or no ammo, a message says so.
+- 2026-11-08 — **The hero's own bombs don't hurt them** (the blast is on the hero team), for now. One HitBox damage number can't be half hearts for the hero and health points for enemies at once. If self-damage is wanted, the blast needs a second, hero-scaled hit.
+- 2026-11-08 — **The item menu** (Tab or I, gamepad Back) lists the equippable items held in pickup order, with their ammo (`Bow (Arrows x10)`, `Bombs x3`). E equips and closes; Tab just closes; the hero stands still meanwhile. The HUD gained an "Item:" line, and its hint is two lines.
+- 2026-11-08 — **The shop is a conversation in data** (`data/dialogue/shop_tilda.json`), built from existing effects (`take_item`, `give_item`) and conditions (`has_item`, `not`, `all`).
+  - Each buy option shows only when you can afford it and have room for the whole lot. Otherwise a same-named option leads to Tilda's "come back when…".
+  - A `can_carry` condition type would make the room check read better; add it if more shops appear.
+  - Prices: ten arrows for 5 coins, three bombs for 8.
+- 2026-11-08 — **Tilda's shop** is the red house beside the training yard (door at (8, 24)), the same 11×9 room as the other houses, with shelves and an open counter.
+
+## H5 — Dungeon framework
+- 2026-11-08 — **A dungeon is one area cut into equal rooms** (`room_size` on its AreaController; `RoomGrid`), rather than one scene per room. Doors are then just nodes in walls; enemies, arrows and bombs need no hand-off between scenes; and the whole dungeon's state is in one place.
+  - The camera shows only the hero's room, centred when smaller than the screen.
+  - A `RoomMask` shades everything else. Without it, a 15x11 room centred on a 30x17-cell screen showed the rooms above and below.
+  - A room change dims the screen for 0.2 s; there's no scroll animation yet.
+- 2026-11-08 — **Dungeon state is flags, named by `DungeonState`:** `dungeon/<id>/keys` (an int), `dungeon/<id>/big_key`, `dungeon/<id>/door/<door>`, `dungeon/<id>/chest/<chest>`. Keys belong to their dungeon, as TECH_DESIGN §6 says, so they're counts in flags rather than inventory items. Chests turn `small_key` and `big_key` contents into those flags. The items stay in data (with a new `big_key`) for their names.
+- 2026-11-08 — **Doors open with E while facing them** (as chests and people do), not by walking into them. A locked door spends a small key; the boss door needs the big key and keeps it. A closed door fills its cells (TerrainQuery occupied cells), refreshed whenever any flag changes.
+- 2026-11-08 — **Shutters open on a flag**, and a room is "cleared" when every enemy sharing an Enemy's `clear_flag` is beaten (the area sets the flag). Enemies come back on the next visit, but the flag, and so the open shutter, stays.
+- 2026-11-08 — Doors between rooms go through a two-cell wall (each room owns its walls), so a door shows half in each room. Each cell of a locked or boss door draws its own lock, so both halves read as a door.
+- 2026-11-08 — **E uses anything with `use()` and `prompt()`** in front of the hero, after pickups underfoot and people: doors and chests now, puzzle pieces later. `use()` returns the message for the HUD.
+- 2026-11-08 — **The H5 test dungeon is the Ruin Cellar**, down a stairway in the South Field ruin. It has three 15x11 rooms stacked north to south: an entry hall (small key chest, locked door), a hall (two slimes, a shuttered alcove with the big key, the boss door), and an inner room (20 coins, where a boss room would go). H7's keep is the real dungeon; the cellar can stay as a side dungeon or go then. The ruin's roosting bat moved one cell aside, off the stairway.
+- 2026-11-08 — New tiles: `dungeon_floor` and `stairway` (walkable; a stairway leads down into a dungeon or back up), and `dungeon_wall` and `pillar` (solid).
+
+## Art pass
+- 2026-11-08 — **The environment gets proper pixel art now**, at the user's request ("make the village more pretty and the environment and graphics better"). This is a second exception to "placeholder art until the roadmap says so", after the hero sprite. Everything is still painted in code by `tools/greybox/make_tile_texture.gd`, with no external assets; CLAUDE.md records the exception.
+  - Tiles: grass with blades and speckles, pebbled paths, stone steps, leafy trees with trunks and shadows, mossy boulders, timber-framed walls on stone footings, clay and slate roofs, rippled water, capped fences, cut stone.
+  - Seamless patterns come from a small coordinate hash.
+- 2026-11-08 — **Details come from the map baker**, not hand-placed tiles: a roof block's top row gets a ridge and its bottom row eaves, and walls get a window (with a flower box) every third cell, which doors replace. The map data didn't change, apart from fences and the well now giving their ground height.
+- 2026-11-08 — **Trees, rocks, fences and the well are props over solid ground.** The Height layer gets a new "solid ground" tile at the block's height (grass that can't be entered), and the picture goes on the Decor layer. Before, those tiles carried lowland grass, which showed as dark squares on raised ground. Their shading height is now their ground height: the art draws its own shadow. The well is one 2x2 picture cut into quarters.
+- 2026-11-08 — **A Decor layer** (TileMapLayer "Decor", just above Height, added by the baker) holds props and decorations: flowers in three colours, grass tufts, pebbles, mushrooms, a vegetable patch, lily pads.
+  - Each map can place decor blocks and scatter decorations over open ground with a seed. The scatter is deterministic: re-baking gives identical scenes.
+  - The scatter never touches paths, solids, doors, exits, people, items, entry points or the spawn.
+  - Movement only reads the Height layer, so the Decor layer can't change the way; a test checks the rules.
+- 2026-11-08 — **Cliffs read as cliffs:** below a drop, HeightShading draws an earthy face (4 px per level, up to 12) with a dark lip, strata lines, a crack and a soft shadow at its foot. Below solid things (houses, walls) it draws just a soft shadow.
+
+## H6 — Puzzles
+- 2026-11-08 — **Puzzle pieces are Interactables children over pure `PuzzleRules`.** The area pushes blocks and presses plates every physics frame; switches and cracked walls take hits through HurtBoxes like enemies do.
+- 2026-11-08 — **Pushing: hold straight against a block for 0.35 s** and it slides one cell; a tap doesn't move it. It moves only onto open floor at its own level (no stairs, ledges, solids or anything standing there).
+  - **Never onto its room's border:** the wall ring, where doorways are. A block can't jam a doorway, and the Cistern's push room keeps its gap away from the doorway so pushing straight on can't park the block in front of the way out.
+  - Blocks go back to their start on the next visit (not saved), the classic reset if a player gets stuck. What a puzzle opened stays open, because plates, switches and walls are flags.
+- 2026-11-08 — **Plates set a flag while the hero or a block stands on them.** A latching plate stays pressed for good. A non-latching plate also counts the hero, which is why a block is needed when the plate and the door are far apart.
+- 2026-11-08 — **A `Hit` now carries its kind** (sword, arrow, bomb, contact; HitBox `kind`).
+  - Crystal switches react to sword, arrow and bomb hits, set or toggle their flag, and ignore further hits for 0.4 s (one swing, one change). They show red when off and blue when on.
+  - Cracked walls are a `DungeonDoor` kind, `cracked`, opened only by a bomb, through a HurtBox the door makes for itself.
+- 2026-11-08 — **Shutters can wait on several flags** (`open_flags`, any of them; `needs_all` for all), so the Cistern's treasure room has two solutions: a block held on its plate, or an arrow into a crystal on a raised platform. The platform has no stairs, and the crystal is three cells in, beyond the sword's 20 px reach; arrows fly over heights.
+- 2026-11-08 — **The H6 puzzle rooms are the Cistern**, down a stairway in the Ruin Cellar's inner room. It has five 15x11 rooms on a 2x3 grid: push block, then latching plate, then crystal switch, then cracked wall, then the combined room (30 coins in a chest); the sixth room is solid rock. Gating it behind the cellar keeps a natural order (keys, then puzzles), and H7's keep is still the real dungeon.
+- 2026-11-08 — Push blocks are carved sandstone with a diamond mark, so they never pass for the grey pillars around them. The first screenshot made that confusion plain.

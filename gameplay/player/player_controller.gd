@@ -36,7 +36,7 @@ func setup(terrain: TerrainQuery, start_cell: Vector2i, bounds: Rect2i) -> void:
 	motor = PlayerMotor.new(terrain)
 	motor.place(start_cell)
 	motor.dropped.connect(_on_dropped)
-	_set_camera_limits(bounds)
+	set_camera_bounds(bounds)
 	_last_position = motor.position
 	sync_from_motor()
 
@@ -60,6 +60,17 @@ func facing_direction() -> Vector2i:
 ## The cell in front of the hero: who they talk to.
 func front_cell() -> Vector2i:
 	return motor.cell + facing_direction()
+
+
+## The way the hero is pushing: the held direction when it's straight (not diagonal), they're
+## on foot and facing it; zero otherwise.
+func pushing_toward() -> Vector2i:
+	if motor == null or motor.state_name != PlayerMotor.GROUND:
+		return Vector2i.ZERO
+	var held: Vector2i = Vector2i(roundi(motor.held.x), roundi(motor.held.y))
+	if absi(held.x) + absi(held.y) != 1 or held != facing_direction():
+		return Vector2i.ZERO
+	return held
 
 
 ## The strongest sword the hero holds (an item entry from data), or empty.
@@ -148,9 +159,9 @@ func _update_visuals() -> void:
 	_sprite.visible = not blinking or fmod(motor.invincible_left, BLINK_PERIOD) < BLINK_PERIOD / 2.0
 
 
-## Keeps the camera inside the area. An area smaller than the screen (a house) sits in the
-## middle of it, on the clear colour.
-func _set_camera_limits(bounds: Rect2i) -> void:
+## Keeps the camera inside `bounds` (area pixels: the whole area, or a dungeon room). Bounds
+## smaller than the screen (a house, a room) sit in the middle of it, on the clear colour.
+func set_camera_bounds(bounds: Rect2i) -> void:
 	var view: Vector2i = Vector2i(get_viewport_rect().size)
 	var limits: Rect2i = bounds
 	for axis: int in 2:
@@ -162,6 +173,11 @@ func _set_camera_limits(bounds: Rect2i) -> void:
 	_camera.limit_top = limits.position.y
 	_camera.limit_right = limits.end.x
 	_camera.limit_bottom = limits.end.y
+
+
+## Where the camera may look (for tests): its limits as a rectangle.
+func camera_limits() -> Rect2i:
+	return Rect2i(_camera.limit_left, _camera.limit_top, _camera.limit_right - _camera.limit_left, _camera.limit_bottom - _camera.limit_top)
 
 
 func _on_dropped(_levels: int) -> void:

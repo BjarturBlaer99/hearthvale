@@ -302,4 +302,147 @@ hearts. The finished water version (M4 included) is committed on the **`water-ve
 ## 2026-11-08 — Sprint (user request)
 - Hold **Shift** (gamepad **B**) to sprint at 120 px/s (walking is 72); no stamina. GDD §5 and CLAUDE.md now allow it. The HUD hint lists it.
 - Tests: sprinting covers 120 px/s in all eight directions while walking stays at 72, a swing still roots a sprinting hero, and Shift is bound. 118 tests, all green. A deliberate bug (sprint not faster) was caught.
+- Played by hand on 2026-11-08: the sprint speed feels right.
+
+## 2026-11-08 — H4 Items & weapons — done
+
+**Built**
+- **Items in data:** Bow (ranged: damage 2, cooldown 0.45 s, ammo `arrow`, speed 180), Arrows (up to 30), Bombs (up to 10: damage 4, fuse 2 s, radius 24). DataRegistry checks a ranged weapon's ammo is an item.
+- **Inventory rules** (`core/inventory/Inventory`, pure): stack capacity, room left, which items go on the item button, ammo per item, and the equippable items held. `GameState.add_item` respects capacity and returns what it added.
+- **Equipment:** `GameState.equipped` is saved, and the first item for the button is equipped automatically. `EventBus.equipped_changed`.
+- **The item button** (Q / K / Y): the bow shoots hero-team arrows (they hurt enemies and the dummy, and stop at solid tiles); bombs go down, burn a blinking fuse, and blast enemies in range once. A message shows when out of ammo or with nothing equipped.
+- **The item menu** (Tab / I / Back), and an "Item:" line on the HUD.
+- **Tilda's shop:** a new door and interior in the village, with the shop as a conversation in data. The Bow and ten arrows lie in the South Field ruin.
+- 132 tests in 20 suites (+14). New: `inventory_test` and `items_test`; additions to the GameState, save, registry, input-map and doors suites.
+
+**Acceptance criteria**
+- [x] Arrows and bombs hurt enemies and run out.
+  - With two arrows, the first beats a slime in its path and the second leaves the quiver empty; a third shot does nothing.
+  - One bomb: the goblin is untouched while the fuse burns, beaten by the blast, and the hero beside it is unhurt. Then there are no bombs left to set.
+- [x] The shop sells them for coins. With 20 coins: ten arrows (→ 15 coins), three bombs (→ 7). With 7 coins the bombs only get an explanation, and nothing changes. A full quiver (capped at 30) can't buy arrows, and no coins are taken.
+- [x] The equipped item survives a save. The menu lists "Bow (Arrows x5)" then "Bombs x2"; choosing Bombs equips them. It survives a save slot round trip and a fresh game being loaded over it, and the HUD shows "Item: Bombs x2" after. Also checked in the GameState JSON round trip and SaveSystem suites.
+- Mutation checks: six deliberate bugs, each caught by the expected test, files restored byte for byte:
+  - arrows never used up
+  - no stack limits
+  - the equipped item not saved
+  - bombs that never blast
+  - coins always "enough"
+  - the hero's arrows on the enemy team
+- One real fix found by the tests: the item menu listed items alphabetically by id ("Bombs" before "Bow"). It now uses pickup order.
+- Visual check (`tools/capture.gd`, 18 shots): Tilda's shop with her offer, the item menu, an arrow in flight, and a lit bomb.
+
+**Known issues / notes**
+- An arrow shot upward starts behind the hero and is mostly hidden for its first few frames (y-sorting); sideways and downward shots read clearly.
+- The hero's own bombs can't hurt them, and bombs don't break anything yet (cracked walls are H6).
+- Shop options repeat their conditions in data (buy vs "can't"); a `can_carry` condition would tidy that.
+- Played by hand on 2026-11-08: the bow, bombs, item menu and shop all feel right.
+
+**Next:** H5, the dungeon framework.
+
+## 2026-11-08 — H5 Dungeon framework — done
+
+**Built**
+- **Rooms** (`RoomGrid`, pure): a dungeon area is cut into equal rooms. The camera shows only the hero's room, centred, with a `RoomMask` shading the rest, and the screen dims briefly on a room change.
+- **Dungeon state** (`DungeonState`, pure): per-dungeon flags for small keys, the big key, opened doors and opened chests, and the door rules (a small key for locked doors, spent; the big key for the boss door, kept).
+- **`DungeonDoor`** (open, locked, boss, shutter): closed doors fill their cells, and shutters lift on a flag.
+  - **`Chest`**: keys go to the dungeon's count, anything else to the inventory.
+  - Enemies can share a `clear_flag` that's set when the last of them falls.
+  - E now uses doors and chests in front, with HUD prompts. The HUD shows a dungeon's keys.
+- **The Ruin Cellar:** a three-room test dungeon down a new stairway in the South Field ruin. New tiles: dungeon floor, stairway, dungeon wall, pillar.
+- 142 tests in 22 suites (+10). New: `dungeon_rules_test` and `dungeon_test`; the doors suite covers the cellar's stairs.
+
+**Acceptance criteria**
+- [x] A three-room test dungeon needs a small key to progress. Facing the hall door with no key, it holds (and says so), and walking north stays in the entry hall. The entry hall's chest gives a key (HUD "Keys: 1"); the door then opens, the key is spent, and the hero walks through into the hall.
+- [x] It remembers opened doors after leaving. After opening the chest and the door, the hero goes up the stairs, through a JSON save and load, and back down: the door is open and its cells walkable, and the chest is open with nothing more to give.
+- [x] The boss door needs the big key. Three small keys don't open it. The big key from the alcove chest does, and neither key count goes down. The inner room's chest gives 20 coins.
+- Also: the camera centres on one room at a time and the mask covers the rest. Beating one hall slime leaves the shutter shut; beating both lifts it.
+- Mutation checks: six deliberate bugs, each caught, files restored byte for byte:
+  - locked doors opening without a key
+  - closed doors not blocking
+  - flags not restored from a save
+  - small keys opening the boss door
+  - the shutter opening after the first slime
+  - the camera ignoring rooms
+- Visual check (`tools/capture.gd`, 21 shots): the stairway in the ruin, the entry hall, and the hall with its shutter and boss door. The first shots showed the neighbouring rooms above and below a room, so `RoomMask` was added. Doors were drawn with one lock across both halves, so each room saw half a keyhole; now each cell has its own.
+
+**Known issues / notes**
+- Room changes snap (with a short dim) rather than scroll.
+- Doors don't lock behind you, and there's no map or compass.
+- The cellar's slimes could notice the hero through a closed door when close, but can't pass it.
+- Played by hand on 2026-11-08: the cellar, its keys, doors, shutter and room camera all feel right.
+
+**Next:** H6, puzzles.
+
+## 2026-11-08 — Art pass (user request)
+
+At the user's request, the environment moves from flat greybox to pixel art. It's still all painted in code, and every map plays exactly as before.
+
+**Built**
+- **Repainted tiles** (`make_tile_texture.gd`): grass, paths, stairs, trees, rocks, timber walls, clay and slate roofs, water, fences, stone.
+- **New atlas rows:**
+  - decorations: flowers in three colours, tufts, pebbles, mushrooms, crops, lily pads
+  - details: roof ridges and eaves, a wall with a flower-box window
+  - solid ground by height
+  - props: tree, rock, fence, the well's four quarters
+- **Map baker** (`build_maps.gd`):
+  - ridges, eaves and windows by itself
+  - trees, rocks, fences and the well as props over solid ground
+  - a Decor layer in every area, with placed decorations (flower beds along the house fronts, lily pads, a vegetable patch on the east meadow) and a seeded scatter over open grass
+- **HeightShading:** earthy cliff faces with a lip and a shadow at the foot; soft shadows under houses.
+- 146 tests in 23 suites (+4, `decor_test`). All earlier tests pass unchanged, so layouts, combat, enemies, items and dungeons behave as before.
+
+**Checks**
+- `decor_test`: every area has a Decor layer just above Height. Decorations sit only on open ground (lily pads only on water) and never on anything the hero uses or arrives at. Props stand only on solid ground, nothing on the Decor layer blocks, and the village and the field each have 60+ decorations. House roofs and walls show ridges, eaves and windows and stay solid at height 3; the well's quarters stand on solid ground.
+- Mutation check: scatter allowed on busy cells, caught by `decor_test`. Restoring the tool and re-baking gave byte-identical scenes, so the baker is deterministic.
+- Visual check: before/after screenshots of the village square, the field and pond, and the South Field. The first pass showed dark squares behind trees and rocks on raised ground, the well as a plain block, and cliffs as a thin band. Props over solid ground, a 2x2 well and cliff faces fixed all three.
+
+**Known issues / notes**
+- Interiors and the dungeon keep their earlier tiles (they were already detailed); their Decor layers are empty.
+- No autotiled shorelines or path edges yet: water and paths meet grass with a straight edge.
+- Trees in long rows still read as a line of round trees rather than a forest canopy.
+- Seen in the game on 2026-11-08: the new look is approved ("looks good").
+
+## 2026-11-08 — H6 Puzzles — done
+
+**Built**
+- **`PuzzleRules`** (`core/puzzles/`, pure): pushable cells (open floor at the same level, never a room's border), plates pressed by the hero or a block, shutters on any or all of several flags.
+- **Pieces** (`gameplay/puzzles/`):
+  - `PushBlock`: slides a cell after 0.35 s of pushing, drawn sliding; back at its start each visit.
+  - `PressurePlate`: sets its flag while pressed, or for good with `latches`.
+  - `CrystalSwitch`: hit by sword, arrow or bomb, it sets or toggles its flag; red or blue.
+- **Doors and hits:** a `cracked` `DungeonDoor` kind that only a bomb opens; shutters with `open_flags` / `needs_all`; `Hit.kind` and `HitBox.kind` on the sword, arrows and bombs.
+- **The hero** remembers the held direction (`PlayerMotor.held`), and the area pushes blocks the hero leans on (`update_pushing`) and updates plates (`update_plates`).
+- **The Cistern:** five puzzle rooms, down a new stairway in the Ruin Cellar's inner room.
+- 157 tests in 25 suites (+11). New: `puzzle_rules_test` and `puzzle_test`; the doors and decor suites cover the Cistern.
+
+**Acceptance criteria**
+- [x] One room per mechanic works.
+  - **Push block:** a tap doesn't move it. Holding north slides it cell by cell until the room's edge stops it, and the way north opens (a flood fill reaches the next room).
+  - **Pressure plate:** standing on it lifts the east shutter, and it stays lifted after stepping off (latching).
+  - **Crystal switch:** the sword turns it blue and lifts the north shutter. With the flag reset (the shutter drops again), an arrow does the same.
+  - **Cracked wall:** a sword hit does nothing; a bomb blows it open, its cells come free, the hero is unhurt, and it's still open after reloading.
+- [x] One room combines two mechanics with more than one solution. In the treasure room:
+  - Pushing the block west onto the plate lifts the shutter. Pushing it off (and stepping away) drops it again.
+  - Separately, the platform can't be climbed and the sword can't reach its crystal from below, but an arrow can. That lifts the shutter too, and the chest behind it holds 30 coins.
+- Also: the Cistern's stairs lead from the cellar's inner room and back.
+- Mutation checks: six deliberate bugs, each caught, files restored byte for byte:
+  - no room borders for blocks
+  - pushing without holding
+  - anything breaking cracked walls
+  - shutters needing all flags
+  - plates always latching
+  - crystals ignoring arrows
+- Two test mistakes found and fixed along the way:
+  - A crystal's 0.4 s lockout runs on real frames, so a test must let it pass before a second hit.
+  - The hero following a pushed block steps onto the plate and keeps it down; the game is right.
+- Two layout fixes found while building:
+  - The push room's gap sat in line with the doorway, so pushing straight on would park the block in front of the way out. The gap moved to column 4.
+  - Blocks looked like pillars; they're sandstone now.
+- Visual check (`tools/capture.gd`, 26 shots): the five Cistern rooms.
+
+**Known issues / notes**
+- There are no pits for blocks to fall into, and no ice, torches or timed switches (not in the slice).
+- Blocks reset only when the area reloads, not when you leave a room within it.
 - Not played by hand yet.
+
+**Next:** H7, the first dungeon and its boss.

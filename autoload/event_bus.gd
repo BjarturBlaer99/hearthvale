@@ -16,3 +16,6 @@ signal flag_set(flag: StringName, value: Variant)
 
 ## The hero's health changed. Both values are in half hearts.
 signal health_changed(current: int, maximum: int)
+
+## The item on the item button changed (empty: nothing equipped).
+signal equipped_changed(item_id: StringName)

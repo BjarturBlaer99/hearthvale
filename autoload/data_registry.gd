@@ -221,6 +221,10 @@ func _validate_references() -> void:
 		_check_dialogue(dialogue)
 	for enemy: Dictionary in _collections[&"enemies"].values():
 		_check_enemy(enemy)
+	for item: Dictionary in _collections[&"items"].values():
+		var stats: Variant = item.get("stats", {})
+		if typeof(stats) == TYPE_DICTIONARY and (stats as Dictionary).has("ammo"):
+			_check_id(item["_source"], "item '%s' ammo" % item["id"], &"items", str(stats["ammo"]))
 
 
 func _check_quest(quest: Dictionary) -> void:

@@ -26,6 +26,18 @@ func test_slot_round_trip_keeps_hearts_items_and_place() -> void:
 	assert_int(GameState.health).is_equal(4)
 
 
+func test_the_equipped_item_survives_a_save_slot() -> void:
+	GameState.new_game()
+	GameState.add_item(&"bow")
+	GameState.add_item(&"bomb", 2)
+	GameState.equip(&"bomb")
+	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
+	GameState.new_game()
+	assert_int(SaveSystem.load_from_slot(TEST_SLOT)).is_equal(OK)
+	assert_that(GameState.equipped).is_equal(&"bomb")
+	assert_int(GameState.item_count(&"bomb")).is_equal(2)
+
+
 func test_missing_slot_is_not_found() -> void:
 	assert_int(SaveSystem.load_from_slot(TEST_SLOT)).is_equal(ERR_FILE_NOT_FOUND)
 

@@ -8,9 +8,12 @@ const FLASH_TIME: float = 0.35
 
 var _message_left: float = 0.0
 var _flash_left: float = 0.0
+var _flash_time: float = FLASH_TIME
 
 @onready var hearts: HeartsBar = $Panel/Hearts
 @onready var dialogue: DialogueBox = $DialogueBox
+@onready var item_menu: ItemMenu = $ItemMenu
+@onready var _equipped: Label = $Panel/Equipped
 @onready var _area: Label = $Panel/Area
 @onready var _items: Label = $Panel/Items
 @onready var _prompt: Label = $Prompt
@@ -35,6 +38,10 @@ func set_items(text: String) -> void:
 	_items.text = text
 
 
+func set_equipped(text: String) -> void:
+	_equipped.text = text
+
+
 func set_prompt(text: String) -> void:
 	_prompt.text = text
 
@@ -44,9 +51,10 @@ func show_message(text: String) -> void:
 	_message_left = MESSAGE_TIME
 
 
-## Briefly darkens the screen so a scene change doesn't pop.
-func flash() -> void:
-	_flash_left = FLASH_TIME
+## Briefly darkens the screen so a scene change (or a new room) doesn't pop.
+func flash(duration: float = FLASH_TIME) -> void:
+	_flash_time = maxf(duration, 0.01)
+	_flash_left = _flash_time
 
 
 func _process(delta: float) -> void:
@@ -54,4 +62,4 @@ func _process(delta: float) -> void:
 		_message_left -= delta
 		_message.modulate.a = clampf(_message_left, 0.0, 1.0)
 	_flash_left = maxf(0.0, _flash_left - delta)
-	_fade.color.a = (_flash_left / FLASH_TIME) * 0.85
+	_fade.color.a = (_flash_left / _flash_time) * 0.85

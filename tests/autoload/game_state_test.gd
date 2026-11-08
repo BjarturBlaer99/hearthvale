@@ -76,6 +76,32 @@ func test_removing_more_than_held_empties_the_stack() -> void:
 	assert_array(_state.inventory).is_empty()
 
 
+func test_stacks_stop_at_their_limit() -> void:
+	assert_int(_state.add_item(&"arrow", 25)).is_equal(25)
+	assert_int(_state.add_item(&"arrow", 10)).override_failure_message("only 5 more fit").is_equal(5)
+	assert_int(_state.item_count(&"arrow")).is_equal(30)
+	assert_int(_state.add_item(&"arrow", 1)).is_equal(0)
+	_state.add_item(&"wooden_sword", 2)
+	assert_int(_state.item_count(&"wooden_sword")).override_failure_message("one of a single item").is_equal(1)
+	_state.add_item(&"not_in_data", 5000)
+	assert_int(_state.item_count(&"not_in_data")).override_failure_message("no data, no limit").is_equal(5000)
+
+
+func test_the_first_item_for_the_item_button_is_equipped() -> void:
+	_state.add_item(&"wooden_sword")
+	assert_that(_state.equipped).override_failure_message("a sword isn't for the item button").is_equal(&"")
+	_state.add_item(&"bow")
+	assert_that(_state.equipped).is_equal(&"bow")
+	_state.add_item(&"bomb", 3)
+	assert_that(_state.equipped).override_failure_message("still the first").is_equal(&"bow")
+	_state.equip(&"bomb")
+	var restored: Node = auto_free(GameStateScript.new())
+	restored.from_dict(JSON.parse_string(JSON.stringify(_state.to_dict())))
+	assert_that(restored.equipped).override_failure_message("saved with the game").is_equal(&"bomb")
+	_state.clear()
+	assert_that(_state.equipped).is_equal(&"")
+
+
 func test_the_heros_position_is_recorded_for_saving() -> void:
 	_state.update_player(&"village", Vector2i(8, 9))
 	assert_dict(_state.to_dict()["player"]).is_equal({"area": "village", "cell": [8, 9]})

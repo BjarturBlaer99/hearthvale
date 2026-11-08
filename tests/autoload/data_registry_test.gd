@@ -20,12 +20,12 @@ func test_project_data_loads_without_errors() -> void:
 
 func test_starting_items_are_registered_in_id_order() -> void:
 	_registry.load_all()
-	assert_array(_registry.ids(&"items")).is_equal([&"coin", &"small_key", &"wooden_sword"])
+	assert_array(_registry.ids(&"items")).is_equal([&"arrow", &"big_key", &"bomb", &"bow", &"coin", &"small_key", &"wooden_sword"])
 	assert_str(_registry.get_item(&"wooden_sword").get("name", "")).is_equal("Wooden Sword")
 	var found: Array = []
 	for entry: Dictionary in _registry.entries(&"items"):
 		found.append(entry["id"])
-	assert_array(found).is_equal(["coin", "small_key", "wooden_sword"])
+	assert_array(found).is_equal(["arrow", "big_key", "bomb", "bow", "coin", "small_key", "wooden_sword"])
 
 
 func test_missing_required_field_is_reported_and_not_loaded() -> void:
@@ -55,6 +55,11 @@ func test_enemies_are_registered() -> void:
 	_registry.load_all()
 	assert_array(Array(_registry.ids(&"enemies")).map(func(id: StringName) -> String: return String(id))).is_equal(["bat", "goblin_archer", "slime"])
 	assert_str(str(_registry.get_enemy(&"slime").get("behaviour", ""))).is_equal("hopper")
+
+
+func test_a_ranged_weapons_ammo_must_be_an_item() -> void:
+	var errors: PackedStringArray = _registry.load_all(FIXTURES.path_join("bad_ammo"))
+	_assert_reported(errors, "unknown item id 'pebble'")
 
 
 func test_bad_enemies_are_reported() -> void:

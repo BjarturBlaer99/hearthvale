@@ -3,12 +3,16 @@ extends Node2D
 ## Runs one area scene: the village, house interiors, later the countryside and dungeon rooms
 ## (docs/TECH_DESIGN.md §3). Builds the HeightGrid from the `Height` layer, places the hero,
 ## shows hearts and prompts on the HUD, and handles interacting: picking up what's underfoot,
-## talking to whoever the hero faces, and leaving through exits. Every physics frame it lets
+## talking to whoever the hero faces, using the equipped item (bow shots, bombs), opening the
+## item menu, and leaving through exits. Every physics frame it lets
 ## HitBoxes hit HurtBoxes and the hero collect hearts; at zero hearts the hero falls and comes
 ## back at the area's entrance (where they arrived) with full hearts.
 ##
 ## Expects children: Height, HeightShading, Interactables, PlayerSpawn, Player, HUD, and
-## optionally Entries. Interactables holds ItemPickups, Talkables (villagers, signs),
+## optionally Entries. Puzzle pieces (push blocks, pressure plates, crystal switches) live in
+## Interactables too: the area pushes blocks and presses plates. In a dungeon (`dungeon_id` set) the map is cut into rooms of
+## `room_size` cells and the camera shows the hero's room. Interactables holds ItemPickups,
+## Talkables (villagers, signs), dungeon doors and chests (E uses whatever has use()),
 ## AreaExits, combat pieces (training dummy, brambles, hearts) and Enemies, which the area
 ## sets up with its terrain, the hero and its random numbers. Any child whose occupies() is
 ## true stands in its cell; any with touches() and collect() (hearts, coins) is picked up by
@@ -18,9 +22,17 @@ extends Node2D
 
 ## Seconds the hero lies still after falling, before coming back at the entrance.
 const RESPAWN_DELAY: float = 1.0
+## How long the screen dims when the hero walks into another room.
+const ROOM_FLASH: float = 0.2
+## How long the hero must push against a block before it slides.
+const PUSH_TIME: float = 0.35
 
 @export var area_id: StringName = &"village"
 @export var area_name: String = "Hearthvale"
+## Set for dungeons: names its flags (DungeonState) for doors, chests and keys.
+@export var dungeon_id: StringName
+## Room size in cells for dungeons (the camera shows one room); zero: the whole area at once.
+@export var room_size: Vector2i = Vector2i.ZERO
 
 var grid: HeightGrid
 var terrain: TerrainQuery
@@ -28,8 +40,15 @@ var terrain: TerrainQuery
 var travel: Callable
 ## Random numbers for enemies (wandering, drops). Randomised on load; tests can seed it.
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+## The last arrow or bomb the hero let loose (for tests), or null.
+var last_projectile: Node2D
+## The room the camera shows (RoomGrid coordinates).
+var current_room: Vector2i = Vector2i.ZERO
+## Shades everything outside the current room (dungeons only), or null.
+var room_mask: RoomMask
 
 var _travelling: bool = false
+var _push_time: float = 0.0
 var _dying: bool = false
 var _respawn_left: float = 0.0
 ## Where the hero arrived in this area, facing which way: where they come back after falling.
@@ -57,8 +76,11 @@ func _ready() -> void:
 	grid = HeightGridBuilder.from_layer(height_layer)
 	terrain = TerrainQuery.new(grid)
 	for child: Node in interactables.get_children():
+		if child.has_method(&"set_dungeon"):
+			child.call(&"set_dungeon", dungeon_id)
 		if child.has_method(&"occupies") and child.call(&"occupies"):
 			terrain.set_occupied(child.call(&"cell"))
+	_refresh_doors()
 	_shading.show_grid(grid)
 	var arrival: Dictionary = _arrival()
 	_entrance_cell = arrival["cell"]
@@ -69,7 +91,11 @@ func _ready() -> void:
 	rng.randomize()
 	for enemy: Enemy in enemies():
 		enemy.setup(terrain, player, rng)
+		enemy.died.connect(_on_enemy_died)
+	update_room(true)
 	hud.dialogue.closed.connect(_on_dialogue_closed)
+	hud.item_menu.chosen.connect(_on_item_chosen)
+	hud.item_menu.closed.connect(_on_item_menu_closed)
 	EventBus.health_changed.connect(_on_health_changed)
 	EventBus.flag_set.connect(_on_flag_set)
 	hud.set_area(area_name)
@@ -91,22 +117,58 @@ func _process(delta: float) -> void:
 	_update_hud()
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if _travelling:
 		return
+	update_pushing(delta)
+	update_plates()
 	resolve_combat()
 	collect_pickups()
 
 
+## Pushing a block: holding straight against one for PUSH_TIME slides it a cell. Returns
+## whether a block moved this time.
+func update_pushing(delta: float) -> bool:
+	var direction: Vector2i = player.pushing_toward() if player.controls_enabled else Vector2i.ZERO
+	var block: PushBlock = _find(PushBlock, player.motor.cell + direction) as PushBlock if direction != Vector2i.ZERO else null
+	if block == null:
+		_push_time = 0.0
+		return false
+	_push_time += delta
+	if _push_time < PUSH_TIME:
+		return false
+	_push_time = 0.0
+	return block.try_push(direction, terrain, room_size)
+
+
+## Presses or releases every plate for whether the hero or a block stands on it.
+func update_plates() -> void:
+	var block_cells: Array = []
+	for child: Node in interactables.get_children():
+		if child is PushBlock:
+			block_cells.append((child as PushBlock).cell())
+	for child: Node in interactables.get_children():
+		if child is PressurePlate:
+			var plate: PressurePlate = child
+			plate.set_pressed(not _dying and PuzzleRules.plate_pressed(plate.cell(), player.motor.cell, block_cells))
+
+
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"interact") and interact():
+	var used: bool = false
+	if event.is_action_pressed(&"interact"):
+		used = interact()
+	elif event.is_action_pressed(&"use_item"):
+		used = use_item()
+	elif event.is_action_pressed(&"item_menu"):
+		used = open_item_menu()
+	if used:
 		get_viewport().set_input_as_handled()
 
 
 ## Picks up what's underfoot, else talks to whoever the hero faces. Returns true if
 ## something happened.
 func interact() -> bool:
-	if _travelling or _dying or is_talking():
+	if _busy():
 		return false
 	var pickup: ItemPickup = pickup_under_player()
 	if pickup != null:
@@ -114,7 +176,56 @@ func interact() -> bool:
 	var talkable: Talkable = talkable_in_front()
 	if talkable != null:
 		return talk_to(talkable)
+	var usable: Node2D = usable_in_front()
+	if usable != null:
+		var message: String = usable.call(&"use")
+		if not message.is_empty():
+			hud.show_message(message)
+			return true
 	return false
+
+
+## The door or chest in the cell the hero faces (anything with use() and prompt()), or null.
+func usable_in_front() -> Node2D:
+	var front: Vector2i = player.front_cell()
+	for child: Node in interactables.get_children():
+		if child.has_method(&"use") and child.has_method(&"prompt") and child.call(&"covers", front):
+			return child as Node2D
+	return null
+
+
+func doors() -> Array[DungeonDoor]:
+	var out: Array[DungeonDoor] = []
+	for child: Node in interactables.get_children():
+		if child is DungeonDoor:
+			out.append(child as DungeonDoor)
+	return out
+
+
+## Points the camera at the hero's room (dungeons) and dims the screen briefly when it changed.
+func update_room(first: bool = false) -> void:
+	var room: Vector2i = RoomGrid.room_of(player.motor.cell, room_size)
+	if room == current_room and not first:
+		return
+	current_room = room
+	var rect: Rect2i = RoomGrid.camera_rect(player.motor.cell, room_size, grid.size, GreyboxTiles.TILE_SIZE)
+	player.set_camera_bounds(rect)
+	if room_size != Vector2i.ZERO:
+		if room_mask == null:
+			room_mask = RoomMask.new()
+			add_child(room_mask)
+		room_mask.show_room(Rect2(rect))
+	if not first:
+		hud.flash(ROOM_FLASH)
+
+
+## "Ruin Cellar   Keys: 1   Big key" in a dungeon; just the name elsewhere.
+func area_text() -> String:
+	if dungeon_id == &"":
+		return area_name
+	var keys: int = int(GameState.get_flag(DungeonState.keys_flag(dungeon_id), 0))
+	var big_key: bool = GameState.get_flag(DungeonState.big_key_flag(dungeon_id)) == true
+	return "%s   Keys: %d%s" % [area_name, keys, "   Big key" if big_key else ""]
 
 
 func pickup_under_player() -> ItemPickup:
@@ -159,6 +270,85 @@ func talk_to(talkable: Talkable) -> bool:
 
 func is_talking() -> bool:
 	return hud.dialogue.is_open()
+
+
+## Uses the item on the item button: the bow shoots an arrow the way the hero faces (one ammo,
+## and the hero stands still for its cooldown); bombs are set down at the hero's feet. Says so
+## and does nothing with nothing equipped or no ammo left. Returns whether it was used.
+func use_item() -> bool:
+	if _busy() or not player.controls_enabled:
+		return false
+	var item: Dictionary = DataRegistry.get_item(GameState.equipped)
+	if item.is_empty():
+		hud.show_message("Nothing on the item button yet.")
+		return false
+	var ammo: String = Inventory.ammo_for(item)
+	if not ammo.is_empty() and GameState.item_count(StringName(ammo)) <= 0:
+		hud.show_message("Out of %s." % str(DataRegistry.get_item(StringName(ammo)).get("name", ammo)).to_lower())
+		return false
+	match str(item.get("type", "")):
+		"weapon_ranged":
+			return _shoot(item, StringName(ammo))
+		"bomb":
+			return _set_bomb(item)
+	return false
+
+
+## Opens the item menu with the equippable items held. Returns whether it opened.
+func open_item_menu() -> bool:
+	if _busy() or not player.controls_enabled:
+		return false
+	var held: Array[Dictionary] = Inventory.equippable_held(GameState.inventory, DataRegistry.entries(&"items"))
+	if held.is_empty():
+		hud.show_message("No items yet.")
+		return false
+	player.controls_enabled = false
+	hud.set_prompt("")
+	hud.item_menu.open(held, GameState.equipped)
+	return true
+
+
+func is_in_menu() -> bool:
+	return hud.item_menu.is_open()
+
+
+## "Item: Bow (Arrows x10)" for the HUD.
+static func equipped_text() -> String:
+	var item: Dictionary = DataRegistry.get_item(GameState.equipped)
+	return "Item: %s" % (ItemMenu.describe(item) if not item.is_empty() else "none")
+
+
+func _shoot(bow: Dictionary, ammo: StringName) -> bool:
+	var stats: Dictionary = bow.get("stats", {})
+	var direction: Vector2i = player.facing_direction()
+	if not player.motor.attack(direction, float(stats.get("cooldown", 0.45))):
+		return false
+	GameState.add_item(ammo, -1)
+	var arrow: Arrow = Arrow.new()
+	arrow.setup(terrain, Vector2(direction), int(stats.get("damage", 2)), float(stats.get("speed", 180.0)),
+		&"hero", float(stats.get("knockback", 20.0)))
+	arrow.position = player.motor.position + Vector2(direction) * 8.0
+	interactables.add_child(arrow)
+	last_projectile = arrow
+	player.sync_from_motor()
+	return true
+
+
+func _set_bomb(item: Dictionary) -> bool:
+	if player.motor.state_name != PlayerMotor.GROUND:
+		return false
+	GameState.add_item(StringName(str(item["id"])), -1)
+	var bomb: Bomb = Bomb.new()
+	bomb.setup(item.get("stats", {}))
+	bomb.position = player.motor.position
+	interactables.add_child(bomb)
+	last_projectile = bomb
+	return true
+
+
+## Talking, in the item menu, going through a door or down: no interacting or items.
+func _busy() -> bool:
+	return _travelling or _dying or is_talking() or is_in_menu()
 
 
 ## Lets every active HitBox in this area hit the HurtBoxes it touches (TECH_DESIGN §4).
@@ -212,6 +402,7 @@ func respawn() -> void:
 	GameState.set_health(GameState.max_health())
 	player.motor.place(_entrance_cell)
 	player.face(_entrance_facing)
+	update_room()
 	player.controls_enabled = not is_talking()
 	hud.flash()
 	hud.show_message("You wake up back at the entrance.")
@@ -290,6 +481,7 @@ func _change_scene(path: String) -> void:
 
 
 func _on_cell_changed(cell: Vector2i) -> void:
+	update_room()
 	var exit: AreaExit = exit_at(cell)
 	if exit != null:
 		take_exit(exit)
@@ -297,6 +489,14 @@ func _on_cell_changed(cell: Vector2i) -> void:
 
 func _on_dialogue_closed() -> void:
 	player.controls_enabled = true
+
+
+func _on_item_chosen(item_id: StringName) -> void:
+	GameState.equip(item_id)
+
+
+func _on_item_menu_closed() -> void:
+	player.controls_enabled = not (_dying or _travelling or is_talking())
 
 
 func _on_health_changed(current: int, maximum: int) -> void:
@@ -317,11 +517,31 @@ func _fall() -> void:
 func _on_flag_set(_flag: StringName, _value: Variant) -> void:
 	for child: Node in interactables.get_children():
 		(child as Node2D).queue_redraw()
+	_refresh_doors()
+
+
+## Closed doors fill their cells; open ones don't.
+func _refresh_doors() -> void:
+	for door: DungeonDoor in doors():
+		for cell: Vector2i in door.cells():
+			terrain.set_occupied(cell, not door.is_open())
+
+
+## When the last enemy sharing a clear flag falls, the flag is set (a shutter may open).
+func _on_enemy_died(enemy: Enemy) -> void:
+	if enemy.clear_flag == &"":
+		return
+	for other: Enemy in enemies():
+		if other.clear_flag == enemy.clear_flag and not other.is_dead():
+			return
+	GameState.set_flag(enemy.clear_flag, true)
 
 
 func _update_hud() -> void:
+	hud.set_area(area_text())
 	hud.set_items(carrying_text())
-	if is_talking():
+	hud.set_equipped(equipped_text())
+	if is_talking() or is_in_menu():
 		hud.set_prompt("")
 		return
 	var pickup: ItemPickup = pickup_under_player()
@@ -329,4 +549,9 @@ func _update_hud() -> void:
 		hud.set_prompt("[E] Pick up the %s" % pickup.item_name())
 		return
 	var talkable: Talkable = talkable_in_front()
-	hud.set_prompt("[E] %s" % talkable.prompt() if talkable != null else "")
+	if talkable != null:
+		hud.set_prompt("[E] %s" % talkable.prompt())
+		return
+	var usable: Node2D = usable_in_front()
+	var text: String = str(usable.call(&"prompt")) if usable != null else ""
+	hud.set_prompt("[E] %s" % text if not text.is_empty() else "")

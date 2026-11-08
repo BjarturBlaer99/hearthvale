@@ -1,0 +1,66 @@
+{
+  "id": "shop_tilda",
+  "start": "greet",
+  "speakers": { "tilda": "Tilda" },
+  "nodes": {
+    "greet": {
+      "speaker": "tilda",
+      "text": "Arrows and bombs, the best in Hearthvale. Well, the only ones. What'll it be?",
+      "options": [
+        { "text": "Ten arrows (5 coins)",
+          "conditions": [
+            { "type": "has_item", "item": "coin", "count": 5 },
+            { "type": "not", "condition": { "type": "has_item", "item": "arrow", "count": 21 } }
+          ],
+          "effects": [
+            { "type": "take_item", "item": "coin", "count": 5 },
+            { "type": "give_item", "item": "arrow", "count": 10 }
+          ],
+          "next": "sold" },
+        { "text": "Ten arrows (5 coins)",
+          "conditions": [
+            { "type": "not", "condition": { "type": "all", "of": [
+              { "type": "has_item", "item": "coin", "count": 5 },
+              { "type": "not", "condition": { "type": "has_item", "item": "arrow", "count": 21 } }
+            ] } }
+          ],
+          "next": "cannot" },
+        { "text": "Three bombs (8 coins)",
+          "conditions": [
+            { "type": "has_item", "item": "coin", "count": 8 },
+            { "type": "not", "condition": { "type": "has_item", "item": "bomb", "count": 8 } }
+          ],
+          "effects": [
+            { "type": "take_item", "item": "coin", "count": 8 },
+            { "type": "give_item", "item": "bomb", "count": 3 }
+          ],
+          "next": "sold" },
+        { "text": "Three bombs (8 coins)",
+          "conditions": [
+            { "type": "not", "condition": { "type": "all", "of": [
+              { "type": "has_item", "item": "coin", "count": 8 },
+              { "type": "not", "condition": { "type": "has_item", "item": "bomb", "count": 8 } }
+            ] } }
+          ],
+          "next": "cannot" },
+        { "text": "Just looking.", "next": null }
+      ]
+    },
+    "sold": {
+      "speaker": "tilda",
+      "text": "There you go. Mind where you point them.",
+      "options": [
+        { "text": "Something else.", "next": "greet" },
+        { "text": "Goodbye.", "next": null }
+      ]
+    },
+    "cannot": {
+      "speaker": "tilda",
+      "text": "Come back when you've the coin for it, and room to carry it.",
+      "options": [
+        { "text": "Something else.", "next": "greet" },
+        { "text": "Goodbye.", "next": null }
+      ]
+    }
+  }
+}
