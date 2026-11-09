@@ -10,8 +10,49 @@
         { "text": "Bram asked me to keep watch.",
           "conditions": [{ "type": "flag", "flag": "promised_elder_keep", "value": true }],
           "next": "watch" },
+        { "text": "You look troubled.",
+          "conditions": [{ "type": "quest_status", "quest": "lost_shuttle", "status": "not_started" }],
+          "next": "shuttle" },
+        { "text": "About your shuttle...",
+          "conditions": [{ "type": "quest_stage", "quest": "lost_shuttle", "stage": "find" }],
+          "next": "shuttle_hint" },
+        { "text": "I found your shuttle.",
+          "conditions": [{ "type": "quest_stage", "quest": "lost_shuttle", "stage": "return" }],
+          "effects": [{ "type": "set_flag", "flag": "returned_shuttle", "value": true }],
+          "next": "shuttle_done" },
         { "text": "Goodbye.", "next": null }
       ]
+    },
+    "shuttle": {
+      "speaker": "wenna",
+      "text": "My best shuttle is gone. I was washing wool at the stream in the North Fields, on the far bank, and it must have slipped from my apron.",
+      "options": [
+        { "text": "I'll look for it.",
+          "effects": [{ "type": "set_quest_stage", "quest": "lost_shuttle", "stage": "find" }],
+          "next": "shuttle_go" },
+        { "text": "Not now.", "next": null }
+      ]
+    },
+    "shuttle_go": {
+      "speaker": "wenna",
+      "text": "Would you? It's boxwood, about so long. Over the bridge, then east along the bank.",
+      "options": [
+        { "text": "Is this it?",
+          "conditions": [{ "type": "quest_stage", "quest": "lost_shuttle", "stage": "return" }],
+          "effects": [{ "type": "set_flag", "flag": "returned_shuttle", "value": true }],
+          "next": "shuttle_done" },
+        { "text": "Goodbye.", "next": null }
+      ]
+    },
+    "shuttle_hint": {
+      "speaker": "wenna",
+      "text": "The far bank of the stream in the North Fields. Over the bridge, then east.",
+      "options": [{ "text": "Goodbye.", "next": null }]
+    },
+    "shuttle_done": {
+      "speaker": "wenna",
+      "text": "That's it! Oh, bless you. Here, for your trouble.",
+      "options": [{ "text": "Goodbye.", "next": null }]
     },
     "watch": {
       "speaker": "wenna",

@@ -13,7 +13,7 @@ const MUSIC_DIR: String = "res://audio/music"
 const SFX: Array[String] = [
 	"sword", "hit", "enemy_die", "hurt", "heart", "coin", "item_get", "heart_get", "door", "solved",
 	"secret", "arrow", "bomb_set", "bomb", "crystal", "push", "plate", "clink", "stomp", "gaze", "stun",
-	"boss_die", "menu_move", "menu_select", "pause", "nope", "cut", "pot",
+	"boss_die", "menu_move", "menu_select", "pause", "nope", "cut", "pot", "quest",
 ]
 
 ## Each song: tempo, bars (4/4; every track must last bars x 8 eighths), and its tracks.
@@ -153,6 +153,8 @@ static func effect(id: String) -> PackedFloat32Array:
 		"pot":
 			var crack: PackedFloat32Array = Synth.mix(Synth.tone(&"noise", 4500, 900, 0.16, 0.4, 0.001, 0.1, 0.5, 24), Synth.tone(&"square", 640, 220, 0.06, 0.18, 0.001, 0.04, 0.25))
 			return Synth.mix(crack, Synth.tone(&"noise", 7000, 5000, 0.05, 0.2, 0.001, 0.04, 0.5, 25), 0.09)
+		"quest":
+			return Synth.join([_note("E5", 0.08), _note("A5", 0.08), _note("C#6", 0.22, 0.16)])
 		"nope":
 			return Synth.join([Synth.tone(&"square", 185, 185, 0.08, 0.25, 0.002, 0.02), Synth.tone(&"square", 147, 147, 0.13, 0.25, 0.002, 0.08)])
 	push_error("tools/audio: no recipe for sound '%s'" % id)

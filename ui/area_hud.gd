@@ -5,9 +5,12 @@ extends CanvasLayer
 ## scene changes. The controls hint shows or hides with the player's setting.
 
 const MESSAGE_TIME: float = 3.0
+## How long a notice (quest news) stays at the top of the screen.
+const NOTICE_TIME: float = 3.5
 const FLASH_TIME: float = 0.35
 
 var _message_left: float = 0.0
+var _notice_left: float = 0.0
 var _flash_left: float = 0.0
 var _flash_time: float = FLASH_TIME
 
@@ -21,12 +24,14 @@ var _flash_time: float = FLASH_TIME
 @onready var _items: Label = $Panel/Items
 @onready var _prompt: Label = $Prompt
 @onready var _message: Label = $Message
+@onready var _notice: Label = $Notice
 @onready var _fade: ColorRect = $Fade
 
 
 func _ready() -> void:
 	_prompt.text = ""
 	_message.text = ""
+	_notice.text = ""
 	_show_settings()
 	EventBus.settings_changed.connect(_show_settings)
 
@@ -73,6 +78,17 @@ func show_message(text: String) -> void:
 	_message_left = MESSAGE_TIME
 
 
+## News at the top of the screen (a quest started, moved on or finished): it stays clear of
+## the dialogue box, which covers the message line.
+func show_notice(text: String) -> void:
+	_notice.text = text
+	_notice_left = NOTICE_TIME
+
+
+func notice_text() -> String:
+	return _notice.text if _notice_left > 0.0 else ""
+
+
 ## Briefly darkens the screen so a scene change (or a new room) doesn't pop.
 func flash(duration: float = FLASH_TIME) -> void:
 	_flash_time = maxf(duration, 0.01)
@@ -83,5 +99,8 @@ func _process(delta: float) -> void:
 	if _message_left > 0.0:
 		_message_left -= delta
 		_message.modulate.a = clampf(_message_left, 0.0, 1.0)
+	if _notice_left > 0.0:
+		_notice_left -= delta
+		_notice.modulate.a = clampf(_notice_left, 0.0, 1.0)
 	_flash_left = maxf(0.0, _flash_left - delta)
 	_fade.color.a = (_flash_left / _flash_time) * 0.85

@@ -59,6 +59,19 @@ func _initialize() -> void:
 		_fixed(source, Vector2i(index, GreyboxTiles.ROW_PROPS_C), 0, false)
 	for index: int in GreyboxTiles.FURNITURE_B_KINDS.size():
 		_fixed(source, Vector2i(index, GreyboxTiles.ROW_FURNITURE_B), GreyboxTiles.FURNITURE_B_HEIGHTS[index], true)
+	# House fronts: solid, as tall as any roof or wall. Their overlays and the smoke are Decor.
+	for kind: String in GreyboxTiles.HOUSE_KINDS:
+		_fixed(source, GreyboxTiles.coords(kind), 3, true)
+	for kind: String in GreyboxTiles.HOUSE_DECOR_KINDS:
+		_fixed(source, GreyboxTiles.coords(kind), 0, false)
+	var smoke: Vector2i = GreyboxTiles.coords("smoke")
+	_fixed(source, smoke, 0, false)
+	source.set_tile_animation_columns(smoke, GreyboxTiles.SMOKE_FRAMES)
+	source.set_tile_animation_frames_count(smoke, GreyboxTiles.SMOKE_FRAMES)
+	for frame: int in GreyboxTiles.SMOKE_FRAMES:
+		source.set_tile_animation_frame_duration(smoke, frame, GreyboxTiles.SMOKE_FRAME_TIME)
+	for kind: String in GreyboxTiles.TREE_KINDS:
+		_fixed(source, GreyboxTiles.coords(kind), 0, false)
 	# Spawn markers: never walked on (the area clears them), open ground in the editor.
 	for index: int in GreyboxTiles.MARKER_KINDS.size():
 		_fixed(source, Vector2i(index, GreyboxTiles.ROW_MARKERS), 0, false)

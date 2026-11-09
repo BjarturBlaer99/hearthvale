@@ -1,0 +1,25 @@
+{
+  "id": "herb_run",
+  "title": "Herbs for the Chapel",
+  "start_stage": "gather",
+  "stages": {
+    "gather": {
+      "journal": "The chapel keeper needs three healing herbs.",
+      "objectives": [
+        { "id": "herbs", "text": "Gather three healing herbs",
+          "complete_when": { "type": "has_item", "item": "healing_herb", "count": 3 } }
+      ],
+      "transitions": [
+        { "when": { "type": "has_item", "item": "healing_herb", "count": 3 }, "to": "done" }
+      ]
+    },
+    "done": {
+      "journal": "The herbs are in the chapel's store.",
+      "on_enter": [
+        { "type": "take_item", "item": "healing_herb", "count": 3 },
+        { "type": "give_item", "item": "coin", "count": 12 },
+        { "type": "complete_quest" }
+      ]
+    }
+  }
+}

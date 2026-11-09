@@ -1,19 +1,26 @@
 extends SceneTree
-## Paints the player's sprite sheet from the ASCII pixel art below, then:
+## Paints the hero's sprite sheet from the ASCII pixel art below, then:
 ##   godot --headless --path . -s res://tools/art/make_player_sprite.gd [-- <preview.png>]
 ##   godot --headless --path . --import
-## The optional preview is the sheet at 8x on a grey background, for reviewing the art.
+## The optional preview is the sheet at 6x on a green background, for reviewing the art.
 ##
 ## An original Zelda-style adventurer (GDD §10): a blue hood and tunic with a gold-trimmed hem,
-## a brown belt with a gold buckle, cream trousers and brown boots. In side view an arm swings
-## with the walk.
-## Sheet: 3 columns (idle, step A, step B) x 3 rows (down, up, side facing left; the game
-## flips the side row for right). Frames are 16x24 with the soles on the bottom row.
+## a red scarf, a brown belt with a gold buckle, cream trousers and brown boots.
+## Sheet: one row per facing (ROWS: down, up, side facing left; the game flips the side row for
+## right) and one column per frame (COLUMNS; PlayerAnimator names the same columns, and a test
+## checks they agree). Frames are 16x24 with the soles on the bottom row.
+## - idle, blink: standing; the eyes close for a moment now and then
+## - walk_a, pass_a, walk_b, pass_b: the walk cycle (hands swing, the scarf's tail flutters)
+## - attack: lunging behind the sword's swing
+## - hold: arms up, holding something overhead (the same front view in every row)
+## - fallen: out of hearts (the same in every row)
 ## Edit the art here, never the PNG.
 
 const OUT_PATH: String = "res://gameplay/player/player_sheet.png"
 const W: int = 16
 const H: int = 24
+const ROWS: Array[String] = ["down", "up", "side"]
+const COLUMNS: Array[String] = ["idle", "blink", "walk_a", "pass_a", "walk_b", "pass_b", "attack", "hold", "fallen"]
 
 const PALETTE: Dictionary = {
 	".": Color(0, 0, 0, 0),
@@ -24,7 +31,7 @@ const PALETTE: Dictionary = {
 	"t": Color(0.96, 0.78, 0.30),  # gold trim on the hem
 	"y": Color(1.00, 0.88, 0.40),  # belt buckle
 	"h": Color(0.45, 0.27, 0.13),  # hair
-	"H": Color(0.30, 0.17, 0.08),  # hair, shade
+	"H": Color(0.30, 0.17, 0.08),  # hair, shade (and closed eyes)
 	"s": Color(0.97, 0.80, 0.64),  # skin
 	"S": Color(0.83, 0.61, 0.47),  # skin, shade
 	"e": Color(0.10, 0.10, 0.20),  # eyes
@@ -33,155 +40,761 @@ const PALETTE: Dictionary = {
 	"P": Color(0.74, 0.70, 0.60),  # trousers, shade
 	"B": Color(0.33, 0.20, 0.10),  # boots
 	"c": Color(0.52, 0.33, 0.17),  # boots, highlight
+	"r": Color(0.86, 0.20, 0.20),  # scarf
+	"R": Color(0.60, 0.11, 0.14),  # scarf, shade
 }
 
-# Front and back views are symmetric: only the left half (8 px) is drawn, then mirrored.
-const DOWN_UPPER_HALF: Array[String] = [
-	"........",
-	".....ooo",
-	"....oLmm",
-	"...oLmmm",
-	"...oLmmm",
-	"..oLmmhh",
-	"..oDmhhh",
-	"..oDhsss",
-	"..oDsess",
-	"..oDsess",
-	"..oDSsss",
-	"...oDSSs",
-	"..oDDmmm",
-	".oDmmLmm",
-	".oDmmmmm",
-	".osDmmmm",
-	".oSbbbby",
-	"..oDmmmm",
-	"..oDtttt",
-]
-
-const UP_UPPER_HALF: Array[String] = [
-	"........",
-	".....ooo",
-	"....oLmm",
-	"...oLmmm",
-	"...oLmmm",
-	"..oLmmmm",
-	"..oDmmmm",
-	"..oDmmmm",
-	"..oDmmmD",
-	"..oDDmmD",
-	"...oDDDD",
-	"...oHhhh",
-	"..oDDmmm",
-	".oDmmmmm",
-	".oDmmmmm",
-	".osDmmmm",
-	".oSbbbbb",
-	"..oDmmmm",
-	"..oDtttt",
-]
-
-const LEGS_IDLE_HALF: Array[String] = [
-	"...oPppo",
-	"...oPppo",
-	"...oBcBo",
-	"...oBBBo",
-	"...ooooo",
-]
-
-## Front/back step A (left foot down, right foot lifted). Step B is its mirror image.
-const LEGS_STEP: Array[String] = [
-	"...oPppooPppo...",
-	"...oPppooBcBo...",
-	"...oBcBooBBBo...",
-	"...oBBBo.oooo...",
-	"...ooooo........",
-]
-
-## Side view (facing left), head to chest. Each walk frame adds its arm, the hem and its legs.
-const SIDE_HEAD: Array[String] = [
-	"................",
-	"......ooooo.....",
-	".....oLLmmmo....",
-	"....oLmmmmmmo...",
-	"....oLmmmmmmmo..",
-	"...ohhhhmmmmmmo.",
-	"...ohhhhhmmmmmDo",
-	"..osshhhhmmmmDo.",
-	"..oseshhhmmmDo..",
-	".osssshhhmmmDo..",
-	"..osssssmmmDo...",
-	"...oSSSSDDo.....",
-	"....oDmmmmDo....",
-	"...oDmmLmmmDo...",
-]
-
-const SIDE_ARMS_IDLE: Array[String] = [
-	"...oDmDmmmmDo...",
-	"...oDmDmmmmDo...",
-	"...obsbbbbbbo...",
-]
-
-const SIDE_ARMS_FORWARD: Array[String] = [
-	"..oDDmmmmmmDo...",
-	"..osDmmmmmmDo...",
-	"...obbbbbbbbo...",
-]
-
-const SIDE_ARMS_BACK: Array[String] = [
-	"...oDmmmmmDDo...",
-	"...oDmmmmmmDso..",
-	"...obbbbbbbbo...",
-]
-
-const SIDE_HEM: Array[String] = [
-	"....oDmmmmDo....",
-	"....otttttto....",
-]
-
-const SIDE_LEGS_IDLE: Array[String] = [
-	".....oPpppo.....",
-	".....oPpppo.....",
-	".....oBBcBo.....",
-	"....oBBBBBo.....",
-	"....ooooooo.....",
-]
-
-const SIDE_LEGS_A: Array[String] = [
-	"....oPpooPppo...",
-	"...oPpo..oPpo...",
-	"...oBco..oBco...",
-	"..oBBBo..oBBBo..",
-	"..ooooo..ooooo..",
-]
-
-const SIDE_LEGS_B: Array[String] = [
-	".....oPpppo.....",
-	".....oPppBo.....",
-	"....oBcBoBo.....",
-	"....oBBBBoo.....",
-	"....ooooo.......",
-]
+## FRAMES[row] is that facing's frames, in COLUMNS order.
+const FRAMES: Dictionary = {
+	"down": [
+		# idle
+		[
+			"................",
+			".....oooooo.....",
+			"....oLmmmmLo....",
+			"...oLmmmmmmLo...",
+			"...oLmmmmmmLo...",
+			"..oLmmhhhhmmLo..",
+			"..oDmhhhhhhmDo..",
+			"..oDhsssssshDo..",
+			"..oDsessssesDo..",
+			"..oDsessssesDo..",
+			"..oDSssssssSDo..",
+			"...oDSSssSSDo...",
+			"..oDrrrrrrrrDo..",
+			".oDmmRrmmmLmmDo.",
+			".oDmmmRmmmmmmDo.",
+			".oDDmmmmmmmmDDo.",
+			".osbbbbyybbbbso.",
+			"..oDmmmmmmmmDo..",
+			"..oDttttttttDo..",
+			"...oPppooppPo...",
+			"...oPppooppPo...",
+			"...oBcBooBcBo...",
+			"...oBBBooBBBo...",
+			"...oooooooooo...",
+		],
+		# blink
+		[
+			"................",
+			".....oooooo.....",
+			"....oLmmmmLo....",
+			"...oLmmmmmmLo...",
+			"...oLmmmmmmLo...",
+			"..oLmmhhhhmmLo..",
+			"..oDmhhhhhhmDo..",
+			"..oDhsssssshDo..",
+			"..oDssssssssDo..",
+			"..oDsHssssHsDo..",
+			"..oDSssssssSDo..",
+			"...oDSSssSSDo...",
+			"..oDrrrrrrrrDo..",
+			".oDmmRrmmmLmmDo.",
+			".oDmmmRmmmmmmDo.",
+			".oDDmmmmmmmmDDo.",
+			".osbbbbyybbbbso.",
+			"..oDmmmmmmmmDo..",
+			"..oDttttttttDo..",
+			"...oPppooppPo...",
+			"...oPppooppPo...",
+			"...oBcBooBcBo...",
+			"...oBBBooBBBo...",
+			"...oooooooooo...",
+		],
+		# walk_a
+		[
+			"................",
+			".....oooooo.....",
+			"....oLmmmmLo....",
+			"...oLmmmmmmLo...",
+			"...oLmmmmmmLo...",
+			"..oLmmhhhhmmLo..",
+			"..oDmhhhhhhmDo..",
+			"..oDhsssssshDo..",
+			"..oDsessssesDo..",
+			"..oDsessssesDo..",
+			"..oDSssssssSDo..",
+			"...oDSSssSSDo...",
+			"..oDrrrrrrrrDo..",
+			".oDmmRrmmmLmmDo.",
+			".oDmmmRmmmmmmDo.",
+			".oDDmmmmmmmmDso.",
+			".oDbbbbyybbbbo..",
+			".osDmmmmmmmmDo..",
+			"..oDttttttttDo..",
+			"...oPppooPppo...",
+			"...oPppooBcBo...",
+			"...oBcBooBBBo...",
+			"...oBBBo.oooo...",
+			"...ooooo........",
+		],
+		# pass_a
+		[
+			"................",
+			".....oooooo.....",
+			"....oLmmmmLo....",
+			"...oLmmmmmmLo...",
+			"...oLmmmmmmLo...",
+			"..oLmmhhhhmmLo..",
+			"..oDmhhhhhhmDo..",
+			"..oDhsssssshDo..",
+			"..oDsessssesDo..",
+			"..oDsessssesDo..",
+			"..oDSssssssSDo..",
+			"...oDSSssSSDo...",
+			"..oDrrrrrrrrDo..",
+			".oDmmRrmmmLmmDo.",
+			".oDmmmRmmmmmmDo.",
+			".oDDmmmmmmmmDDo.",
+			".osbbbbyybbbbso.",
+			"..oDmmmmmmmmDo..",
+			"..oDttttttttDo..",
+			"...oPppooppPo...",
+			"...oPppooppPo...",
+			"...oBcBooBcBo...",
+			"...oBBBooBBBo...",
+			"...oooooooooo...",
+		],
+		# walk_b
+		[
+			"................",
+			".....oooooo.....",
+			"....oLmmmmLo....",
+			"...oLmmmmmmLo...",
+			"...oLmmmmmmLo...",
+			"..oLmmhhhhmmLo..",
+			"..oDmhhhhhhmDo..",
+			"..oDhsssssshDo..",
+			"..oDsessssesDo..",
+			"..oDsessssesDo..",
+			"..oDSssssssSDo..",
+			"...oDSSssSSDo...",
+			"..oDrrrrrrrrDo..",
+			".oDmmRrmmmLmmDo.",
+			".oDmmmRmmmmmmDo.",
+			".osDmmmmmmmmDDo.",
+			"..obbbbyybbbbDo.",
+			"..oDmmmmmmmmDso.",
+			"..oDttttttttDo..",
+			"...oppPooppPo...",
+			"...oBcBooppPo...",
+			"...oBBBooBcBo...",
+			"...oooo.oBBBo...",
+			"........ooooo...",
+		],
+		# pass_b
+		[
+			"................",
+			".....oooooo.....",
+			"....oLmmmmLo....",
+			"...oLmmmmmmLo...",
+			"...oLmmmmmmLo...",
+			"..oLmmhhhhmmLo..",
+			"..oDmhhhhhhmDo..",
+			"..oDhsssssshDo..",
+			"..oDsessssesDo..",
+			"..oDsessssesDo..",
+			"..oDSssssssSDo..",
+			"...oDSSssSSDo...",
+			"..oDrrrrrrrrDo..",
+			".oDmmRrmmmLmmDo.",
+			".oDmmmRmmmmmmDo.",
+			".oDDmmmmmmmmDDo.",
+			".osbbbbyybbbbso.",
+			"..oDmmmmmmmmDo..",
+			"..oDttttttttDo..",
+			"...oPppooppPo...",
+			"...oPppooppPo...",
+			"...oBcBooBcBo...",
+			"...oBBBooBBBo...",
+			"...oooooooooo...",
+		],
+		# attack
+		[
+			"................",
+			".....oooooo.....",
+			"....oLmmmmLo....",
+			"...oLmmmmmmLo...",
+			"...oLmmmmmmLo...",
+			"..oLmmhhhhmmLo..",
+			"..oDmhhhhhhmDo..",
+			"..oDhsssssshDo..",
+			"..oDsessssesDo..",
+			"..oDsessssesDo..",
+			"..oDSssssssSDo..",
+			"...oDSSssSSDo...",
+			"..oDrrrrrrrrDo..",
+			".oDmmRrmmmLmmDo.",
+			".oDmmmRmmmmmmDo.",
+			".oDDmmmmmmmmDDo.",
+			"..oDbbbyybbbDo..",
+			"..oDmmDssDmmDo..",
+			"..oDttttttttDo..",
+			"..oPppo..oppPo..",
+			"..oPppo..oppPo..",
+			"..oBcBo..oBcBo..",
+			"..oBBBo..oBBBo..",
+			"..ooooo..ooooo..",
+		],
+		# hold
+		[
+			"................",
+			".o...oooooo...o.",
+			"oso.oLmmmmLo.oso",
+			"osooLmmmmmmLooso",
+			"omooLmmmmmmLoomo",
+			"omoLmmhhhhmmLomo",
+			"omoDmhhhhhhmDomo",
+			"omoDhsssssshDomo",
+			"omoDsessssesDomo",
+			"omoDsessssesDomo",
+			"omoDSssssssSDomo",
+			"omooDSSssSSDoomo",
+			"ommDrrrrrrrrDmmo",
+			"..oDmRrmmmLmDo..",
+			"..oDmmRmmmmmDo..",
+			"..oDmmmmmmmmDo..",
+			"..obbbbyybbbbo..",
+			"..oDmmmmmmmmDo..",
+			"..oDttttttttDo..",
+			"...oPppooppPo...",
+			"...oPppooppPo...",
+			"...oBcBooBcBo...",
+			"...oBBBooBBBo...",
+			"...oooooooooo...",
+		],
+		# fallen
+		[
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"...oooo.........",
+			"..oLmmmoooooo...",
+			".oLmhhsoDmmmtooo",
+			".oDmhHsrmmmmtpBo",
+			".oDmmhsrDmmmtpBo",
+			"..oDDmmoDbbmtooo",
+			"...oooo.ooooo...",
+		],
+	],
+	"up": [
+		# idle
+		[
+			"................",
+			".....oooooo.....",
+			"....oLmmmmLo....",
+			"...oLmmmmmmLo...",
+			"...oLmmmmmmLo...",
+			"..oLmmmmmmmmLo..",
+			"..oDmmmmmmmmDo..",
+			"..oDmmmmmmmmDo..",
+			"..oDmmmDDmmmDo..",
+			"..oDDmmDDmmDDo..",
+			"...oDDDDDDDDo...",
+			"...oHhhhhhhHo...",
+			"..oDrrrrrrrrDo..",
+			".oDmmmmRrmmmmDo.",
+			".oDmmmmrrmmmmDo.",
+			".oDDmmmRrmmmDDo.",
+			".osbbbbbbbbbbso.",
+			"..oDmmmmmmmmDo..",
+			"..oDttttttttDo..",
+			"...oPppooppPo...",
+			"...oPppooppPo...",
+			"...oBcBooBcBo...",
+			"...oBBBooBBBo...",
+			"...oooooooooo...",
+		],
+		# blink
+		[
+			"................",
+			".....oooooo.....",
+			"....oLmmmmLo....",
+			"...oLmmmmmmLo...",
+			"...oLmmmmmmLo...",
+			"..oLmmmmmmmmLo..",
+			"..oDmmmmmmmmDo..",
+			"..oDmmmmmmmmDo..",
+			"..oDmmmDDmmmDo..",
+			"..oDDmmDDmmDDo..",
+			"...oDDDDDDDDo...",
+			"...oHhhhhhhHo...",
+			"..oDrrrrrrrrDo..",
+			".oDmmmmRrmmmmDo.",
+			".oDmmmmrrmmmmDo.",
+			".oDDmmmRrmmmDDo.",
+			".osbbbbbbbbbbso.",
+			"..oDmmmmmmmmDo..",
+			"..oDttttttttDo..",
+			"...oPppooppPo...",
+			"...oPppooppPo...",
+			"...oBcBooBcBo...",
+			"...oBBBooBBBo...",
+			"...oooooooooo...",
+		],
+		# walk_a
+		[
+			"................",
+			".....oooooo.....",
+			"....oLmmmmLo....",
+			"...oLmmmmmmLo...",
+			"...oLmmmmmmLo...",
+			"..oLmmmmmmmmLo..",
+			"..oDmmmmmmmmDo..",
+			"..oDmmmmmmmmDo..",
+			"..oDmmmDDmmmDo..",
+			"..oDDmmDDmmDDo..",
+			"...oDDDDDDDDo...",
+			"...oHhhhhhhHo...",
+			"..oDrrrrrrrrDo..",
+			".oDmmmmRrmmmmDo.",
+			".oDmmmrrmmmmmDo.",
+			".oDDmrRmmmmmDso.",
+			".oDbbbbbbbbbbo..",
+			".osDmmmmmmmmDo..",
+			"..oDttttttttDo..",
+			"...oPppooPppo...",
+			"...oPppooBcBo...",
+			"...oBcBooBBBo...",
+			"...oBBBo.oooo...",
+			"...ooooo........",
+		],
+		# pass_a
+		[
+			"................",
+			".....oooooo.....",
+			"....oLmmmmLo....",
+			"...oLmmmmmmLo...",
+			"...oLmmmmmmLo...",
+			"..oLmmmmmmmmLo..",
+			"..oDmmmmmmmmDo..",
+			"..oDmmmmmmmmDo..",
+			"..oDmmmDDmmmDo..",
+			"..oDDmmDDmmDDo..",
+			"...oDDDDDDDDo...",
+			"...oHhhhhhhHo...",
+			"..oDrrrrrrrrDo..",
+			".oDmmmmRrmmmmDo.",
+			".oDmmmmrrmmmmDo.",
+			".oDDmmmRrmmmDDo.",
+			".osbbbbbbbbbbso.",
+			"..oDmmmmmmmmDo..",
+			"..oDttttttttDo..",
+			"...oPppooppPo...",
+			"...oPppooppPo...",
+			"...oBcBooBcBo...",
+			"...oBBBooBBBo...",
+			"...oooooooooo...",
+		],
+		# walk_b
+		[
+			"................",
+			".....oooooo.....",
+			"....oLmmmmLo....",
+			"...oLmmmmmmLo...",
+			"...oLmmmmmmLo...",
+			"..oLmmmmmmmmLo..",
+			"..oDmmmmmmmmDo..",
+			"..oDmmmmmmmmDo..",
+			"..oDmmmDDmmmDo..",
+			"..oDDmmDDmmDDo..",
+			"...oDDDDDDDDo...",
+			"...oHhhhhhhHo...",
+			"..oDrrrrrrrrDo..",
+			".oDmmmmRrmmmmDo.",
+			".oDmmmmmrrmmmDo.",
+			".osDmmmmmRrmDDo.",
+			"..obbbbbbbbbbDo.",
+			"..oDmmmmmmmmDso.",
+			"..oDttttttttDo..",
+			"...oppPooppPo...",
+			"...oBcBooppPo...",
+			"...oBBBooBcBo...",
+			"...oooo.oBBBo...",
+			"........ooooo...",
+		],
+		# pass_b
+		[
+			"................",
+			".....oooooo.....",
+			"....oLmmmmLo....",
+			"...oLmmmmmmLo...",
+			"...oLmmmmmmLo...",
+			"..oLmmmmmmmmLo..",
+			"..oDmmmmmmmmDo..",
+			"..oDmmmmmmmmDo..",
+			"..oDmmmDDmmmDo..",
+			"..oDDmmDDmmDDo..",
+			"...oDDDDDDDDo...",
+			"...oHhhhhhhHo...",
+			"..oDrrrrrrrrDo..",
+			".oDmmmmRrmmmmDo.",
+			".oDmmmmrrmmmmDo.",
+			".oDDmmmRrmmmDDo.",
+			".osbbbbbbbbbbso.",
+			"..oDmmmmmmmmDo..",
+			"..oDttttttttDo..",
+			"...oPppooppPo...",
+			"...oPppooppPo...",
+			"...oBcBooBcBo...",
+			"...oBBBooBBBo...",
+			"...oooooooooo...",
+		],
+		# attack
+		[
+			"................",
+			".....oooooo.....",
+			"....oLmmmmLo....",
+			"...oLmmmmmmLo...",
+			"...oLmmmmmmLo...",
+			"..oLmmmmmmmmLo..",
+			"..oDmmmmmmmmDo..",
+			"..oDmmmmmmmmDo..",
+			"..oDmmmDDmmmDo..",
+			"..oDDmmDDmmDDo..",
+			"...oDDDDDDDDo...",
+			"...oHhhhhhhHo...",
+			".ooDrrrrrrrrDoo.",
+			".osmmmmRrmmmmso.",
+			".oDmmmmrrmmmmDo.",
+			".oDDmmmRrmmmDDo.",
+			"..oDbbbbbbbbDo..",
+			"..oDmmmmmmmmDo..",
+			"..oDttttttttDo..",
+			"..oPppo..oppPo..",
+			"..oPppo..oppPo..",
+			"..oBcBo..oBcBo..",
+			"..oBBBo..oBBBo..",
+			"..ooooo..ooooo..",
+		],
+		# hold
+		[
+			"................",
+			".o...oooooo...o.",
+			"oso.oLmmmmLo.oso",
+			"osooLmmmmmmLooso",
+			"omooLmmmmmmLoomo",
+			"omoLmmhhhhmmLomo",
+			"omoDmhhhhhhmDomo",
+			"omoDhsssssshDomo",
+			"omoDsessssesDomo",
+			"omoDsessssesDomo",
+			"omoDSssssssSDomo",
+			"omooDSSssSSDoomo",
+			"ommDrrrrrrrrDmmo",
+			"..oDmRrmmmLmDo..",
+			"..oDmmRmmmmmDo..",
+			"..oDmmmmmmmmDo..",
+			"..obbbbyybbbbo..",
+			"..oDmmmmmmmmDo..",
+			"..oDttttttttDo..",
+			"...oPppooppPo...",
+			"...oPppooppPo...",
+			"...oBcBooBcBo...",
+			"...oBBBooBBBo...",
+			"...oooooooooo...",
+		],
+		# fallen
+		[
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"...oooo.........",
+			"..oLmmmoooooo...",
+			".oLmhhsoDmmmtooo",
+			".oDmhHsrmmmmtpBo",
+			".oDmmhsrDmmmtpBo",
+			"..oDDmmoDbbmtooo",
+			"...oooo.ooooo...",
+		],
+	],
+	"side": [
+		# idle
+		[
+			"................",
+			"......ooooo.....",
+			".....oLLmmmo....",
+			"....oLmmmmmmo...",
+			"....oLmmmmmmmo..",
+			"...ohhhhmmmmmmo.",
+			"...ohhhhhmmmmmDo",
+			"..osshhhhmmmmDo.",
+			"..oseshhhmmmDo..",
+			".osssshhhmmmDo..",
+			"..osssssmmmDo...",
+			"...oSSSSDDo.....",
+			"....orrrrrRR....",
+			"...oDmmLmmmDr...",
+			"...oDmDmmmmDR...",
+			"...oDmDmmmmDo...",
+			"...obsbbbbbbo...",
+			"....oDmmmmDo....",
+			"....otttttto....",
+			".....oPpppo.....",
+			".....oPpppo.....",
+			".....oBBcBo.....",
+			"....oBBBBBo.....",
+			"....ooooooo.....",
+		],
+		# blink
+		[
+			"................",
+			"......ooooo.....",
+			".....oLLmmmo....",
+			"....oLmmmmmmo...",
+			"....oLmmmmmmmo..",
+			"...ohhhhmmmmmmo.",
+			"...ohhhhhmmmmmDo",
+			"..osshhhhmmmmDo.",
+			"..osHshhhmmmDo..",
+			".osssshhhmmmDo..",
+			"..osssssmmmDo...",
+			"...oSSSSDDo.....",
+			"....orrrrrRR....",
+			"...oDmmLmmmDr...",
+			"...oDmDmmmmDR...",
+			"...oDmDmmmmDo...",
+			"...obsbbbbbbo...",
+			"....oDmmmmDo....",
+			"....otttttto....",
+			".....oPpppo.....",
+			".....oPpppo.....",
+			".....oBBcBo.....",
+			"....oBBBBBo.....",
+			"....ooooooo.....",
+		],
+		# walk_a
+		[
+			"................",
+			"......ooooo.....",
+			".....oLLmmmo....",
+			"....oLmmmmmmo...",
+			"....oLmmmmmmmo..",
+			"...ohhhhmmmmmmo.",
+			"...ohhhhhmmmmmDo",
+			"..osshhhhmmmmDo.",
+			"..oseshhhmmmDo..",
+			".osssshhhmmmDo..",
+			"..osssssmmmDo.R.",
+			"...oSSSSDDo.rr..",
+			"....orrrrrRR....",
+			"...oDmmLmmmDo...",
+			"..oDDmmmmmmDo...",
+			"..osDmmmmmmDo...",
+			"...obbbbbbbbo...",
+			"....oDmmmmDo....",
+			"....otttttto....",
+			"....oppooPPPo...",
+			"...oppo..oPPo...",
+			"...oBco..oBBo...",
+			"..oBBBo..oBBBo..",
+			"..ooooo..ooooo..",
+		],
+		# pass_a
+		[
+			"................",
+			"......ooooo.....",
+			".....oLLmmmo....",
+			"....oLmmmmmmo...",
+			"....oLmmmmmmmo..",
+			"...ohhhhmmmmmmo.",
+			"...ohhhhhmmmmmDo",
+			"..osshhhhmmmmDo.",
+			"..oseshhhmmmDo..",
+			".osssshhhmmmDo..",
+			"..osssssmmmDo...",
+			"...oSSSSDDo.....",
+			"....orrrrrRRrr..",
+			"...oDmmLmmmDo.R.",
+			"...oDmDmmmmDo...",
+			"...oDmDmmmmDo...",
+			"...obsbbbbbbo...",
+			"....oDmmmmDo....",
+			"....otttttto....",
+			".....oPpppo.....",
+			".....oPppBo.....",
+			"....oBcBoBo.....",
+			"....oBBBBoo.....",
+			"....ooooo.......",
+		],
+		# walk_b
+		[
+			"................",
+			"......ooooo.....",
+			".....oLLmmmo....",
+			"....oLmmmmmmo...",
+			"....oLmmmmmmmo..",
+			"...ohhhhmmmmmmo.",
+			"...ohhhhhmmmmmDo",
+			"..osshhhhmmmmDo.",
+			"..oseshhhmmmDo..",
+			".osssshhhmmmDo..",
+			"..osssssmmmDo...",
+			"...oSSSSDDo.....",
+			"....orrrrrRR....",
+			"...oDmmLmmmDrr..",
+			"...oDmmmmmDDoR..",
+			"...oDmmmmmmDso..",
+			"...obbbbbbbbo...",
+			"....oDmmmmDo....",
+			"....otttttto....",
+			"....oPPoopppo...",
+			"...oPPo..oppo...",
+			"...oBBo..oBco...",
+			"..oBBBo..oBBBo..",
+			"..ooooo..ooooo..",
+		],
+		# pass_b
+		[
+			"................",
+			"......ooooo.....",
+			".....oLLmmmo....",
+			"....oLmmmmmmo...",
+			"....oLmmmmmmmo..",
+			"...ohhhhmmmmmmo.",
+			"...ohhhhhmmmmmDo",
+			"..osshhhhmmmmDo.",
+			"..oseshhhmmmDo..",
+			".osssshhhmmmDo..",
+			"..osssssmmmDo...",
+			"...oSSSSDDo.....",
+			"....orrrrrRRrr..",
+			"...oDmmLmmmDo.R.",
+			"...oDmDmmmmDo...",
+			"...oDmDmmmmDo...",
+			"...obsbbbbbbo...",
+			"....oDmmmmDo....",
+			"....otttttto....",
+			".....opppPo.....",
+			".....opppBo.....",
+			"....oBBBoBo.....",
+			"....oBBBBoo.....",
+			"....ooooo.......",
+		],
+		# attack
+		[
+			"................",
+			"......ooooo.....",
+			".....oLLmmmo....",
+			"....oLmmmmmmo...",
+			"....oLmmmmmmmo..",
+			"...ohhhhmmmmmmo.",
+			"...ohhhhhmmmmmDo",
+			"..osshhhhmmmmDo.",
+			"..oseshhhmmmDo..",
+			".osssshhhmmmDo..",
+			"..osssssmmmDo.R.",
+			"...oSSSSDDo.rr..",
+			"....orrrrrRR....",
+			".oooDmmLmmmDo...",
+			".osDDmmmmmmDo...",
+			".oooDmmmmmmDo...",
+			"...obbbbbbbbo...",
+			"....oDmmmmDo....",
+			"....otttttto....",
+			"....oppooPPPo...",
+			"...oppo..oPPo...",
+			"...oBco..oBBo...",
+			"..oBBBo..oBBBo..",
+			"..ooooo..ooooo..",
+		],
+		# hold
+		[
+			"................",
+			".o...oooooo...o.",
+			"oso.oLmmmmLo.oso",
+			"osooLmmmmmmLooso",
+			"omooLmmmmmmLoomo",
+			"omoLmmhhhhmmLomo",
+			"omoDmhhhhhhmDomo",
+			"omoDhsssssshDomo",
+			"omoDsessssesDomo",
+			"omoDsessssesDomo",
+			"omoDSssssssSDomo",
+			"omooDSSssSSDoomo",
+			"ommDrrrrrrrrDmmo",
+			"..oDmRrmmmLmDo..",
+			"..oDmmRmmmmmDo..",
+			"..oDmmmmmmmmDo..",
+			"..obbbbyybbbbo..",
+			"..oDmmmmmmmmDo..",
+			"..oDttttttttDo..",
+			"...oPppooppPo...",
+			"...oPppooppPo...",
+			"...oBcBooBcBo...",
+			"...oBBBooBBBo...",
+			"...oooooooooo...",
+		],
+		# fallen
+		[
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"...oooo.........",
+			"..oLmmmoooooo...",
+			".oLmhhsoDmmmtooo",
+			".oDmhHsrmmmmtpBo",
+			".oDmmhsrDmmmtpBo",
+			"..oDDmmoDbbmtooo",
+			"...oooo.ooooo...",
+		],
+	],
+}
 
 
 func _initialize() -> void:
-	var down: Array[String] = _mirror_halves(DOWN_UPPER_HALF)
-	var up: Array[String] = _mirror_halves(UP_UPPER_HALF)
-	var legs_idle: Array[String] = _mirror_halves(LEGS_IDLE_HALF)
-	var legs_b: Array[String] = _flip_rows(LEGS_STEP)
-	var side_idle: Array[String] = SIDE_HEAD + SIDE_ARMS_IDLE + SIDE_HEM + SIDE_LEGS_IDLE
-	var side_a: Array[String] = SIDE_HEAD + SIDE_ARMS_FORWARD + SIDE_HEM + SIDE_LEGS_A
-	var side_b: Array[String] = SIDE_HEAD + SIDE_ARMS_BACK + SIDE_HEM + SIDE_LEGS_B
-	var sheet: Array = [
-		[down + legs_idle, down + LEGS_STEP, down + legs_b],
-		[up + legs_idle, up + LEGS_STEP, up + legs_b],
-		[side_idle, side_a, side_b],
-	]
-	var image: Image = Image.create(W * 3, H * 3, false, Image.FORMAT_RGBA8)
+	var image: Image = Image.create(W * COLUMNS.size(), H * ROWS.size(), false, Image.FORMAT_RGBA8)
 	image.fill(Color(0, 0, 0, 0))
-	for row: int in sheet.size():
-		for column: int in (sheet[row] as Array).size():
-			var frame: Array = sheet[row][column]
-			if not _paint(image, frame, Vector2i(column * W, row * H), "row %d column %d" % [row, column]):
+	for row: int in ROWS.size():
+		var frames: Array = FRAMES[ROWS[row]]
+		if frames.size() != COLUMNS.size():
+			push_error("tools/art: row '%s' has %d frames, expected %d" % [ROWS[row], frames.size(), COLUMNS.size()])
+			quit(1)
+			return
+		for column: int in frames.size():
+			if not _paint(image, frames[column], Vector2i(column * W, row * H), "%s/%s" % [ROWS[row], COLUMNS[column]]):
 				quit(1)
 				return
 	DirAccess.make_dir_recursive_absolute(OUT_PATH.get_base_dir())
@@ -211,24 +824,10 @@ func _paint(image: Image, rows: Array, origin: Vector2i, label: String) -> bool:
 	return true
 
 
-func _mirror_halves(halves: Array[String]) -> Array[String]:
-	var out: Array[String] = []
-	for half: String in halves:
-		out.append(half + half.reverse())
-	return out
-
-
-func _flip_rows(rows: Array[String]) -> Array[String]:
-	var out: Array[String] = []
-	for line: String in rows:
-		out.append(line.reverse())
-	return out
-
-
 func _save_preview(sheet: Image, path: String) -> void:
-	var scale: int = 8
+	var scale: int = 6
 	var preview: Image = Image.create(sheet.get_width() * scale, sheet.get_height() * scale, false, Image.FORMAT_RGBA8)
-	preview.fill(Color(0.45, 0.47, 0.5))
+	preview.fill(Color(0.42, 0.58, 0.36))
 	var big: Image = sheet.duplicate()
 	big.resize(sheet.get_width() * scale, sheet.get_height() * scale, Image.INTERPOLATE_NEAREST)
 	preview.blend_rect(big, Rect2i(Vector2i.ZERO, big.get_size()), Vector2i.ZERO)

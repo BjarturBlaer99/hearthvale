@@ -10,6 +10,46 @@
       "text": "My chickens won't keep to the field, and the tall grass by the woods grows back faster than I can cut it.",
       "options": [
         {
+          "text": "Need a hand with anything?",
+          "conditions": [
+            {
+              "type": "quest_status",
+              "quest": "eggs_for_tilda",
+              "status": "not_started"
+            }
+          ],
+          "next": "eggs"
+        },
+        {
+          "text": "About those eggs...",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "eggs_for_tilda",
+              "stage": "deliver"
+            }
+          ],
+          "next": "eggs_hint"
+        },
+        {
+          "text": "Tilda has her eggs.",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "eggs_for_tilda",
+              "stage": "tell_oda"
+            }
+          ],
+          "effects": [
+            {
+              "type": "set_flag",
+              "flag": "told_oda_eggs",
+              "value": true
+            }
+          ],
+          "next": "eggs_done"
+        },
+        {
           "text": "Anything else?",
           "next": "more"
         },
@@ -22,6 +62,57 @@
     "more": {
       "speaker": "oda",
       "text": "Something glints in there, too, where the trees come down to the field. A sword would make short work of that grass.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "eggs": {
+      "speaker": "oda",
+      "text": "Tilda's waiting on a basket of eggs, and I can't leave the hens. Would you carry it to her shop?",
+      "options": [
+        {
+          "text": "I'll take it.",
+          "effects": [
+            {
+              "type": "set_quest_stage",
+              "quest": "eggs_for_tilda",
+              "stage": "deliver"
+            }
+          ],
+          "next": "eggs_go"
+        },
+        {
+          "text": "Not now.",
+          "next": null
+        }
+      ]
+    },
+    "eggs_go": {
+      "speaker": "oda",
+      "text": "Careful with them! Her shop's the red house by the training yard.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "eggs_hint": {
+      "speaker": "oda",
+      "text": "Tilda's shop, the red house by the training yard. Mind the eggs!",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "eggs_done": {
+      "speaker": "oda",
+      "text": "Good, good. Here: I keep these for tree stumps, but you'll find better use for them. Mind the fuse.",
       "options": [
         {
           "text": "Goodbye.",

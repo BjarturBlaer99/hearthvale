@@ -9,6 +9,11 @@ const T: int = GreyboxTiles.TILE_SIZE
 const OUTLINE: Color = Color(0.10, 0.08, 0.12)
 const ROOF_RED: Color = Color(0.74, 0.30, 0.22)
 const ROOF_BLUE: Color = Color(0.30, 0.40, 0.62)
+const PLASTER: Color = Color(0.92, 0.87, 0.74)
+const TIMBER: Color = Color(0.30, 0.19, 0.11)
+const THATCH: Color = Color(0.80, 0.66, 0.34)
+## The shadow under eaves and under an upper floor that juts out.
+const EAVE_SHADOW: Color = Color(0.16, 0.10, 0.09)
 ## Shadows on see-through props darken whatever grass they're drawn over.
 const SHADOW: Color = Color(0, 0, 0, 0.28)
 
@@ -523,6 +528,17 @@ func _initialize() -> void:
 		_water_frame(Vector2i(frame, GreyboxTiles.ROW_WATER), frame)
 	for index: int in GreyboxTiles.MARKER_KINDS.size():
 		_marker(Vector2i(index, GreyboxTiles.ROW_MARKERS), index)
+	for kind: String in GreyboxTiles.HOUSE_KINDS:
+		_house(GreyboxTiles.coords(kind), kind)
+	_pine_art(GreyboxTiles.coords("prop_tree_b"))
+	_oak_art(GreyboxTiles.coords("prop_tree_c"))
+	_canopy(GreyboxTiles.coords("prop_canopy"))
+	_chimney(GreyboxTiles.coords("chimney"))
+	_cross(GreyboxTiles.coords("cross_l"), true)
+	_cross(GreyboxTiles.coords("cross_r"), false)
+	_shop_sign(GreyboxTiles.coords("shop_sign"))
+	for frame: int in GreyboxTiles.SMOKE_FRAMES:
+		_smoke(Vector2i(frame, GreyboxTiles.ROW_SMOKE), frame)
 	for index: int in GreyboxTiles.PROPS_B_KINDS.size():
 		_ascii(Vector2i(index, GreyboxTiles.ROW_PROPS_B), GreyboxTiles.PROPS_B_KINDS[index])
 	for index: int in GreyboxTiles.PROPS_C_KINDS.size():
@@ -671,19 +687,23 @@ func _rock_art(tile: Vector2i) -> void:
 		_px(tile, p.x, p.y, Color(0.36, 0.55, 0.28))
 
 
-## A timber-framed wall: plaster between beams, on a stone footing.
-func _wall(tile: Vector2i) -> void:
-	var plaster: Color = Color(0.91, 0.85, 0.71)
-	var timber: Color = Color(0.40, 0.25, 0.13)
-	_fill(tile, plaster)
+## Plaster between two posts: what a house's timber framing is drawn on.
+func _plaster(tile: Vector2i) -> void:
+	_fill(tile, PLASTER)
 	for y: int in T:
 		for x: int in T:
 			if _hash(x, y, 31) % 11 == 0:
-				_px(tile, x, y, plaster.darkened(0.06))
-	_rect(tile, Rect2i(0, 0, T, 2), timber)
-	_rect(tile, Rect2i(0, 1, T, 1), timber.darkened(0.25))
-	_rect(tile, Rect2i(0, 0, 1, 13), timber)
-	_rect(tile, Rect2i(T - 1, 0, 1, 13), timber.darkened(0.2))
+				_px(tile, x, y, PLASTER.darkened(0.06))
+	_rect(tile, Rect2i(0, 0, 1, T), TIMBER)
+	_rect(tile, Rect2i(T - 1, 0, 1, T), TIMBER.darkened(0.2))
+
+
+## A house's ground floor: plaster and posts on a stone footing, in the shadow of the upper
+## floor that juts out above it.
+func _wall(tile: Vector2i) -> void:
+	_plaster(tile)
+	_rect(tile, Rect2i(0, 0, T, 2), EAVE_SHADOW)
+	_rect(tile, Rect2i(0, 2, T, 1), PLASTER.darkened(0.2))
 	var footing: Color = Color(0.52, 0.50, 0.52)
 	_rect(tile, Rect2i(0, 12, T, 4), footing.darkened(0.35))
 	for x: int in range(0, T, 4):
@@ -692,22 +712,59 @@ func _wall(tile: Vector2i) -> void:
 		_px(tile, x, 12 + offset, footing.lightened(0.2))
 
 
-## A wall with a window: a dark frame, panes of sky with a glint, and a box of flowers.
+## A ground-floor window: small leaded panes in a dark frame, over a box of flowers.
 func _wall_window(tile: Vector2i) -> void:
 	_wall(tile)
-	var timber: Color = Color(0.36, 0.22, 0.12)
-	_rect(tile, Rect2i(4, 3, 8, 7), timber)
-	_rect(tile, Rect2i(5, 4, 6, 5), Color(0.46, 0.64, 0.82))
-	_rect(tile, Rect2i(5, 4, 6, 1), Color(0.62, 0.78, 0.92))
-	_rect(tile, Rect2i(7, 4, 1, 5), timber)
-	_rect(tile, Rect2i(5, 6, 6, 1), timber)
-	_px(tile, 5, 5, Color(0.95, 0.97, 1.0))
+	_rect(tile, Rect2i(4, 4, 8, 6), TIMBER)
+	_leaded_glass(tile, Rect2i(5, 5, 6, 4))
 	_rect(tile, Rect2i(3, 10, 10, 2), Color(0.48, 0.30, 0.16))
 	_rect(tile, Rect2i(3, 11, 10, 1), Color(0.34, 0.20, 0.10))
 	for p: Vector2i in [Vector2i(4, 9), Vector2i(6, 9), Vector2i(9, 9), Vector2i(11, 9)]:
 		_px(tile, p.x, p.y, Color(0.90, 0.30, 0.38) if p.x % 3 != 0 else Color(0.98, 0.85, 0.35))
 	for p: Vector2i in [Vector2i(5, 9), Vector2i(8, 9), Vector2i(10, 9)]:
 		_px(tile, p.x, p.y, Color(0.30, 0.55, 0.25))
+
+
+## Leaded glass over `area`: small panes in a diamond lattice of lead, with a glint.
+func _leaded_glass(tile: Vector2i, area: Rect2i) -> void:
+	var glass: Color = Color(0.52, 0.70, 0.86)
+	var lead: Color = Color(0.24, 0.30, 0.40)
+	for y: int in range(area.position.y, area.end.y):
+		for x: int in range(area.position.x, area.end.x):
+			var on_lead: bool = (x + y) % 4 == 0 or posmod(x - y, 4) == 0
+			_px(tile, x, y, lead if on_lead else glass)
+	_px(tile, area.position.x + 1, area.position.y, Color(0.92, 0.96, 1.0))
+
+
+## A half-timbered upper floor: a rail along the top, posts at the sides, a diagonal brace
+## ("a" rises to the right, "b" to the left, "" none) and, along the bottom, the beam it rests
+## on, with the ends of its joists.
+func _timber(tile: Vector2i, brace: String) -> void:
+	_plaster(tile)
+	_rect(tile, Rect2i(0, 0, T, 2), TIMBER)
+	_rect(tile, Rect2i(0, 2, T, 1), PLASTER.darkened(0.14))
+	if brace != "":
+		for i: int in 10:
+			var x: int = 2 + i if brace == "a" else 12 - i
+			_px(tile, x, 12 - i, TIMBER)
+			_px(tile, x + 1, 12 - i, TIMBER.lightened(0.1))
+	_rect(tile, Rect2i(0, 13, T, 3), TIMBER)
+	_rect(tile, Rect2i(0, 13, T, 1), TIMBER.lightened(0.2))
+	for x: int in range(2, T, 4):
+		_px(tile, x, 15, TIMBER.darkened(0.4))
+
+
+## An upper-floor window: leaded panes between open shutters.
+func _timber_window(tile: Vector2i) -> void:
+	_timber(tile, "")
+	var shutter: Color = Color(0.50, 0.31, 0.16)
+	_rect(tile, Rect2i(2, 3, 12, 9), OUTLINE)
+	for x: int in [3, 11]:
+		_rect(tile, Rect2i(x, 4, 2, 7), shutter)
+		_rect(tile, Rect2i(x, 4, 2, 1), shutter.lightened(0.2))
+		_rect(tile, Rect2i(x, 7, 2, 1), shutter.darkened(0.3))
+	_leaded_glass(tile, Rect2i(5, 4, 6, 7))
+	_rect(tile, Rect2i(2, 11, 12, 1), TIMBER.lightened(0.25))
 
 
 ## Clay roof tiles in staggered rows, each row lit along its top and shadowed below.
@@ -964,16 +1021,25 @@ func _rect(tile: Vector2i, rect: Rect2i, color: Color) -> void:
 			_px(tile, x, y, color)
 
 
-## A plank door in the timber wall, under a dark lintel.
+## An arched plank door in the ground floor's wall: iron bands, studs and a ring.
 func _door(tile: Vector2i) -> void:
 	_wall(tile)
-	var wood: Color = Color(0.40, 0.24, 0.12)
-	_rect(tile, Rect2i(3, 2, 10, 14), OUTLINE)
-	_rect(tile, Rect2i(4, 3, 8, 13), wood)
-	for x: int in [6, 9]:
-		_rect(tile, Rect2i(x, 3, 1, 13), wood.darkened(0.3))
-	_rect(tile, Rect2i(4, 3, 8, 1), wood.lightened(0.15))
-	_px(tile, 10, 9, Color(0.85, 0.75, 0.35))
+	var wood: Color = Color(0.44, 0.27, 0.13)
+	var iron: Color = Color(0.24, 0.25, 0.29)
+	_rect(tile, Rect2i(2, 4, 12, 12), OUTLINE)
+	_rect(tile, Rect2i(3, 3, 10, 1), OUTLINE)
+	_rect(tile, Rect2i(5, 2, 6, 1), OUTLINE)
+	_rect(tile, Rect2i(3, 5, 10, 11), wood)
+	_rect(tile, Rect2i(4, 4, 8, 1), wood)
+	_rect(tile, Rect2i(5, 3, 6, 1), wood.lightened(0.12))
+	for x: int in [5, 8, 10]:
+		_rect(tile, Rect2i(x, 4, 1, 12), wood.darkened(0.28))
+	for y: int in [7, 13]:
+		_rect(tile, Rect2i(3, y, 10, 1), iron)
+		_px(tile, 4, y, iron.lightened(0.45))
+		_px(tile, 11, y, iron.lightened(0.45))
+	_px(tile, 10, 10, Color(0.92, 0.80, 0.36))
+	_px(tile, 10, 11, Color(0.66, 0.52, 0.20))
 
 
 ## Wooden planks running east-west, with staggered seams.
@@ -1172,3 +1238,311 @@ func _well(quarters: Array[Vector2i]) -> void:
 	var origins: Array[Vector2i] = [Vector2i(0, 0), Vector2i(T, 0), Vector2i(0, T), Vector2i(T, T)]
 	for i: int in 4:
 		_image.blit_rect(art, Rect2i(origins[i], Vector2i(T, T)), quarters[i] * T)
+
+
+# --- House fronts (art pass 2) ----------------------------------------------------------------
+
+## Paints house tile `kind` (GreyboxTiles.HOUSE_KINDS): a roof named by its style, part and
+## gable end, a timber-framed upper wall, or a piece of the chapel.
+func _house(tile: Vector2i, kind: String) -> void:
+	if kind.begins_with("roof"):
+		var part: String = "top" if kind.contains("_top") else ("eave" if kind.contains("_eave") else "")
+		var edge: String = "l" if kind.ends_with("_l") else ("r" if kind.ends_with("_r") else "")
+		if kind.begins_with("roof_thatch"):
+			_thatch(tile, part)
+		else:
+			var slate: bool = kind.begins_with("roof_blue")
+			var color: Color = ROOF_BLUE if slate else ROOF_RED
+			if part == "top":
+				_roof_ridge(tile, color, slate)
+			elif part == "eave":
+				_roof_eave(tile, color, slate)
+			elif slate:
+				_slate(tile, color)
+			else:
+				_roof(tile, color)
+		if edge != "":
+			_barge_board(tile, edge == "l", part)
+		return
+	match kind:
+		"wall_upper":
+			_timber(tile, "a")
+		"wall_upper_b":
+			_timber(tile, "b")
+		"wall_upper_window":
+			_timber_window(tile)
+		"chapel_wall":
+			_stone(tile)
+		"chapel_window":
+			_chapel_window(tile)
+		"chapel_door_l":
+			_chapel_door(tile, true)
+		"chapel_door_r":
+			_chapel_door(tile, false)
+
+
+## Thatch: straw laid in layers, each ending in a ragged fringe. `part` "top" adds the ridge's
+## stitched cap, "eave" the overhanging ends above their shadow.
+func _thatch(tile: Vector2i, part: String) -> void:
+	for y: int in T:
+		for x: int in T:
+			var shade: Color = THATCH
+			var tone: int = _hash(x, 0, 71) % 6
+			if tone == 0:
+				shade = THATCH.lightened(0.14)
+			elif tone == 1:
+				shade = THATCH.darkened(0.12)
+			if y % 5 == 4 and _hash(x, y, 73) % 3 != 0:
+				shade = THATCH.darkened(0.34)
+			elif y % 5 == 0 and _hash(x, y, 75) % 4 == 0:
+				shade = THATCH.darkened(0.2)
+			_px(tile, x, y, shade)
+	if part == "top":
+		var cap: Color = THATCH.lightened(0.22)
+		_rect(tile, Rect2i(0, 0, T, 5), cap)
+		_rect(tile, Rect2i(0, 0, T, 1), THATCH.darkened(0.5))
+		_rect(tile, Rect2i(0, 5, T, 1), THATCH.darkened(0.42))
+		for x: int in range(1, T, 5):
+			for stitch: Vector2i in [Vector2i(0, 1), Vector2i(2, 1), Vector2i(1, 2), Vector2i(0, 3), Vector2i(2, 3)]:
+				_px(tile, x + stitch.x, stitch.y, THATCH.darkened(0.45))
+	elif part == "eave":
+		for x: int in T:
+			var ends: int = 11 + _hash(x, 3, 77) % 3
+			_px(tile, x, ends - 1, THATCH.lightened(0.2))
+			for y: int in range(ends, T):
+				_px(tile, x, y, EAVE_SHADOW)
+
+
+## A gable's barge board down a roof tile's outer edge (`left`: its left edge). Over the
+## eaves it stops where the roof does.
+func _barge_board(tile: Vector2i, left: bool, part: String) -> void:
+	var rows: int = 13 if part == "eave" else T
+	var shades: Array[Color] = [OUTLINE, TIMBER.lightened(0.3), TIMBER]
+	for i: int in shades.size():
+		_rect(tile, Rect2i(i if left else T - 1 - i, 0, 1, rows), shades[i])
+	if part == "top":
+		_rect(tile, Rect2i(0 if left else T - 3, 0, 3, 1), OUTLINE)
+
+
+## A lancet window of stained glass in the chapel's stone.
+func _chapel_window(tile: Vector2i) -> void:
+	_stone(tile)
+	for y: int in range(1, 15):
+		# A pointed arch: narrow at the top, three pixels either side of the middle below.
+		var half: int = clampi(y - 1, 0, 3)
+		for x: int in range(8 - half - 1, 8 + half + 1):
+			var frame: bool = y == 1 or y == 14 or x == 8 - half - 1 or x == 8 + half
+			if frame:
+				_px(tile, x, y, OUTLINE)
+			elif y % 4 == 1:
+				_px(tile, x, y, Color(0.20, 0.22, 0.30))
+			elif y < 5:
+				_px(tile, x, y, Color(0.95, 0.80, 0.35))
+			else:
+				@warning_ignore("integer_division")
+				var red: bool = ((x - 5) / 3 + y / 4) % 2 == 0
+				_px(tile, x, y, Color(0.80, 0.24, 0.26) if red else Color(0.28, 0.46, 0.82))
+	_px(tile, 7, 6, Color(1.0, 0.86, 0.86))
+
+
+## One leaf of the chapel's arched double door (`left`: the left leaf): planks, long iron
+## hinges and a ring, set into the stone.
+func _chapel_door(tile: Vector2i, left: bool) -> void:
+	_stone(tile)
+	var wood: Color = Color(0.40, 0.24, 0.12)
+	var iron: Color = Color(0.24, 0.25, 0.29)
+	# How far in from the leaf's outer edge the door starts on each row: the arch.
+	var arch: Array[int] = [16, 8, 6, 4, 3, 2, 2]
+	for y: int in T:
+		var starts: int = arch[y] if y < arch.size() else 2
+		for from_outer: int in T:
+			var x: int = from_outer if left else T - 1 - from_outer
+			if from_outer < starts:
+				var above_door: bool = y + 1 < T and from_outer >= (arch[y + 1] if y + 1 < arch.size() else 2)
+				if from_outer == starts - 1 or above_door:
+					_px(tile, x, y, OUTLINE)
+				continue
+			var shade: Color = wood
+			if from_outer == T - 1:
+				shade = wood.darkened(0.5)
+			elif from_outer % 4 == 1:
+				shade = wood.darkened(0.28)
+			elif (y == 8 or y == 13) and from_outer < 11:
+				shade = iron
+			_px(tile, x, y, shade)
+	var ring: int = T - 3 if left else 2
+	_px(tile, ring, 10, Color(0.92, 0.80, 0.36))
+	_px(tile, ring, 11, Color(0.66, 0.52, 0.20))
+
+
+## A stone chimney, see-through around it, to stand on a roof (the Decor layer).
+func _chimney(tile: Vector2i) -> void:
+	var stone: Color = Color(0.60, 0.58, 0.57)
+	_rect(tile, Rect2i(13, 6, 2, 9), SHADOW)
+	_rect(tile, Rect2i(4, 4, 9, 11), OUTLINE)
+	_rect(tile, Rect2i(5, 5, 7, 9), stone)
+	_rect(tile, Rect2i(10, 5, 2, 9), stone.darkened(0.2))
+	for y: int in [7, 10]:
+		_rect(tile, Rect2i(5, y, 7, 1), stone.darkened(0.32))
+	for joint: Vector2i in [Vector2i(8, 5), Vector2i(8, 6), Vector2i(6, 8), Vector2i(6, 9), Vector2i(9, 11), Vector2i(9, 12)]:
+		_px(tile, joint.x, joint.y, stone.darkened(0.32))
+	_rect(tile, Rect2i(3, 1, 11, 4), OUTLINE)
+	_rect(tile, Rect2i(4, 2, 9, 2), stone.lightened(0.18))
+	_rect(tile, Rect2i(6, 2, 5, 1), Color(0.08, 0.06, 0.06))
+
+
+## Half of the stone cross on the chapel's ridge (`left`: the half left of the seam between
+## the two tiles it stands across), for the Decor layer.
+func _cross(tile: Vector2i, left: bool) -> void:
+	var stone: Color = Color(0.84, 0.82, 0.78)
+	for y: int in T:
+		for from_seam: int in 6:
+			var x: int = T - 1 - from_seam if left else from_seam
+			if _in_cross(from_seam, y):
+				_px(tile, x, y, stone if left else stone.darkened(0.14))
+			elif _in_cross(from_seam - 1, y) or _in_cross(from_seam, y - 1) or _in_cross(from_seam, y + 1) or _in_cross(from_seam + 1, y):
+				_px(tile, x, y, OUTLINE)
+
+
+## Whether the cross covers the pixel `from_seam` in from the middle seam, on row `y`.
+func _in_cross(from_seam: int, y: int) -> bool:
+	# One pixel past the seam is the other half's first pixel: the cross is the same both sides.
+	var d: int = maxi(from_seam, 0)
+	return (d == 0 and y >= 2 and y <= 13) or (d <= 3 and y >= 5 and y <= 6) or (d <= 1 and y >= 12 and y <= 13)
+
+
+## A shop's hanging sign for the Decor layer: an iron bracket, two chains and a board with a
+## bomb painted on it.
+func _shop_sign(tile: Vector2i) -> void:
+	var iron: Color = Color(0.20, 0.20, 0.24)
+	var wood: Color = Color(0.66, 0.46, 0.24)
+	_rect(tile, Rect2i(2, 1, 12, 1), iron)
+	_px(tile, 2, 2, iron)
+	_rect(tile, Rect2i(4, 2, 1, 2), iron)
+	_rect(tile, Rect2i(11, 2, 1, 2), iron)
+	_rect(tile, Rect2i(2, 4, 12, 9), OUTLINE)
+	_rect(tile, Rect2i(3, 5, 10, 7), wood)
+	_rect(tile, Rect2i(3, 5, 10, 1), wood.lightened(0.22))
+	_ellipse(tile, Vector2(7.5, 9.0), Vector2(2.6, 2.4), Color(0.12, 0.12, 0.16))
+	_px(tile, 6, 8, Color(0.55, 0.56, 0.66))
+	_px(tile, 9, 6, Color(0.86, 0.76, 0.52))
+	_px(tile, 10, 5, Color(1.0, 0.86, 0.30))
+
+
+## One frame of chimney smoke for the Decor layer: puffs four pixels apart that each rise a
+## pixel a frame, growing and thinning as they go, so SMOKE_FRAMES frames loop without a jump.
+func _smoke(tile: Vector2i, frame: int) -> void:
+	for puff: int in 4:
+		var y: float = 14.0 - 4.0 * puff - frame
+		var rise: float = (14.0 - y) / 15.0
+		var alpha: float = 0.55 * (1.0 - rise)
+		if alpha <= 0.03:
+			continue
+		var center: Vector2 = Vector2(7.5 + rise * 3.0 + sin(y * 0.9) * rise * 1.5, y + 0.5)
+		var radius: float = 1.4 + rise * 2.2
+		for py: int in T:
+			for px: int in T:
+				if Vector2(px + 0.5, py + 0.5).distance_to(center) <= radius:
+					_px(tile, px, py, Color(0.93, 0.93, 0.96, alpha))
+
+
+# --- More trees (art pass 2) --------------------------------------------------------------------
+
+## A pine, see-through around it: three tiers of dark needles, lit from the left, on a short
+## trunk.
+func _pine_art(tile: Vector2i) -> void:
+	var dark: Color = Color(0.07, 0.22, 0.16)
+	var mid: Color = Color(0.13, 0.35, 0.22)
+	var light: Color = Color(0.26, 0.52, 0.30)
+	_ellipse(tile, Vector2(8.5, 14.2), Vector2(5.5, 1.8), SHADOW)
+	_rect(tile, Rect2i(6, 11, 4, 4), OUTLINE)
+	_rect(tile, Rect2i(7, 11, 2, 3), Color(0.40, 0.25, 0.14))
+	# Each tier: its top row, its bottom row and its half width at the bottom.
+	for tier: Vector3 in [Vector3(8, 13, 6.5), Vector3(4, 10, 5.2), Vector3(0, 6, 3.8)]:
+		var top: int = int(tier.x)
+		var bottom: int = int(tier.y)
+		for y: int in range(top, bottom + 2):
+			for x: int in T:
+				var half: float = tier.z * (y - top + 1) / (bottom - top + 1)
+				var off: float = absf(x + 0.5 - 8.0)
+				if y <= bottom and off <= half:
+					var shade: Color = mid
+					if y == bottom:
+						shade = dark
+					elif x + 0.5 < 8.0 - half * 0.25:
+						shade = light
+					elif x + 0.5 > 8.0 + half * 0.4:
+						shade = dark
+					_px(tile, x, y, shade)
+				elif off <= half + 1.0 and y <= bottom + 1 and (y > bottom or off > half):
+					_px(tile, x, y, OUTLINE)
+
+
+## A broad oak, see-through around it: a wide, warm green crown that nearly fills its tile.
+func _oak_art(tile: Vector2i) -> void:
+	var dark: Color = Color(0.15, 0.32, 0.11)
+	var mid: Color = Color(0.26, 0.47, 0.16)
+	var light: Color = Color(0.46, 0.66, 0.26)
+	_ellipse(tile, Vector2(8.5, 14.2), Vector2(7.0, 2.0), SHADOW)
+	_rect(tile, Rect2i(6, 11, 4, 4), OUTLINE)
+	_rect(tile, Rect2i(7, 11, 2, 3), Color(0.44, 0.28, 0.15))
+	var lobes: Array[Vector3] = [
+		Vector3(4.2, 6.6, 3.8), Vector3(11.8, 6.6, 3.8), Vector3(8.0, 3.8, 4.4), Vector3(8.0, 8.8, 4.8),
+		Vector3(4.6, 9.8, 3.0), Vector3(11.4, 9.8, 3.0),
+	]
+	for y: int in T:
+		for x: int in T:
+			var at: Vector2 = Vector2(x + 0.5, y + 0.5)
+			var inside: bool = false
+			var edge: bool = false
+			for lobe: Vector3 in lobes:
+				var d: float = at.distance_to(Vector2(lobe.x, lobe.y))
+				inside = inside or d <= lobe.z
+				edge = edge or d <= lobe.z + 1.0
+			if inside:
+				var shade: Color = mid
+				if x + y < 12:
+					shade = light
+				elif x - y > 5 or y > 10:
+					shade = dark
+				var n: int = _hash(x, y, 81) % 8
+				if n == 0:
+					shade = shade.darkened(0.22)
+				elif n == 1:
+					shade = shade.lightened(0.16)
+				_px(tile, x, y, shade)
+			elif edge:
+				_px(tile, x, y, OUTLINE)
+
+
+## The closed canopy of a thick wood, seen from above: crowns crowding together, each lit from
+## the top left, with dark gaps between. It fills its tile and tiles seamlessly.
+func _canopy(tile: Vector2i) -> void:
+	var gap: Color = Color(0.05, 0.14, 0.08)
+	var dark: Color = Color(0.10, 0.26, 0.14)
+	var mid: Color = Color(0.16, 0.37, 0.18)
+	var light: Color = Color(0.30, 0.53, 0.25)
+	var crowns: Array[Vector3] = [Vector3(3, 3, 4.4), Vector3(11, 4, 4.6), Vector3(7, 10, 4.8), Vector3(14.5, 11.5, 4.2), Vector3(1.5, 12.5, 3.6)]
+	for y: int in T:
+		for x: int in T:
+			var shade: Color = gap
+			var best: float = 2.0
+			for crown: Vector3 in crowns:
+				# Distances wrap round the tile, so crowns run on into the next tile.
+				var dx: float = fposmod(x + 0.5 - crown.x + 8.0, 16.0) - 8.0
+				var dy: float = fposmod(y + 0.5 - crown.y + 8.0, 16.0) - 8.0
+				var d: float = Vector2(dx, dy).length() / crown.z
+				if d < best and d <= 1.0:
+					best = d
+					shade = mid
+					if dx + dy < -crown.z * 0.5:
+						shade = light
+					elif dx + dy > crown.z * 0.7 or d > 0.86:
+						shade = dark
+			if best <= 1.0:
+				var n: int = _hash(x, y, 83) % 9
+				if n == 0:
+					shade = shade.darkened(0.2)
+				elif n == 1:
+					shade = shade.lightened(0.14)
+			_px(tile, x, y, shade)

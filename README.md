@@ -57,6 +57,12 @@ Beaten enemies sometimes drop hearts or coins.
 - **Tall grass and pots** everywhere: cut and smash them with the sword (or a bomb) for hearts, coins, arrows and
   bombs.
 - **Four heart pieces** are hidden around the world; four make a new heart. The villagers drop a hint or two.
+- **Quests:** three villagers have work for you. Ask Wenna the weaver, Farmer Oda and Guard Rolf. A notice tells
+  you when a quest starts, moves on or is done, and the pause menu's **Quests** entry shows where each stands.
+- **A new look** (art pass 2):
+  - the hero walks with a four-frame stride, blinks, lunges with the sword and holds up what they find
+  - Hearthvale's houses are half-timbered, under thatch, clay tiles or slate, with smoking chimneys
+  - grass frays over the paths, the pond has a bank, and the woods mix three kinds of tree under a closed canopy
 - **The road north:** from the top of the north rise, through the woods.
   - **The North Fields:** a stream with a bridge, a farm plot, slimes, and a goblin archer on a plateau. Keep an eye
     on the tree line beside the road.

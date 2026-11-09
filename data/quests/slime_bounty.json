@@ -1,0 +1,74 @@
+{
+  "id": "slime_bounty",
+  "title": "Slimes in the South Field",
+  "giver": "guard_rolf",
+  "start_stage": "hunt",
+  "stages": {
+    "hunt": {
+      "journal": "Guard Rolf wants the three slimes in the South Field beaten, all in one visit.",
+      "objectives": [
+        {
+          "id": "beat_slimes",
+          "text": "Beat all three slimes in the South Field",
+          "complete_when": {
+            "type": "flag",
+            "flag": "south_field_slimes_beaten",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "south_field_slimes_beaten",
+            "value": true
+          },
+          "to": "report"
+        }
+      ]
+    },
+    "report": {
+      "journal": "The slimes are beaten. Guard Rolf stands on the north rise in Hearthvale, by the road to the fields.",
+      "objectives": [
+        {
+          "id": "tell_rolf",
+          "text": "Report to Guard Rolf",
+          "complete_when": {
+            "type": "flag",
+            "flag": "reported_slimes",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "reported_slimes",
+            "value": true
+          },
+          "to": "done"
+        }
+      ]
+    },
+    "done": {
+      "journal": "Rolf paid the bounty: 40 coins and a bundle of arrows.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "coin",
+          "count": 40
+        },
+        {
+          "type": "give_item",
+          "item": "arrow",
+          "count": 10
+        },
+        {
+          "type": "complete_quest"
+        }
+      ]
+    }
+  }
+}

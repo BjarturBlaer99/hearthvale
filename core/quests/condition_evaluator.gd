@@ -20,6 +20,8 @@ func is_met(condition: Dictionary) -> bool:
 			return item_count(str(condition["item"])) >= int(condition["count"])
 		"quest_stage":
 			return str(_section("quests").get(str(condition["quest"]), "")) == str(condition["stage"])
+		"quest_status":
+			return String(QuestState.status_in(_section("quests"), _section("flags"), str(condition["quest"]))) == str(condition["status"])
 		"all":
 			return all_met(condition["of"])
 		"any":

@@ -1,0 +1,76 @@
+{
+  "id": "eggs_for_tilda",
+  "title": "Eggs for Tilda",
+  "giver": "farmer_oda",
+  "start_stage": "deliver",
+  "stages": {
+    "deliver": {
+      "journal": "Farmer Oda gave you a basket of eggs for Tilda. Her shop is the red house by the training yard.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "egg_basket",
+          "count": 1
+        }
+      ],
+      "objectives": [
+        {
+          "id": "deliver_eggs",
+          "text": "Bring the eggs to Tilda's shop",
+          "complete_when": {
+            "type": "flag",
+            "flag": "eggs_delivered",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "eggs_delivered",
+            "value": true
+          },
+          "to": "tell_oda"
+        }
+      ]
+    },
+    "tell_oda": {
+      "journal": "Tilda has her eggs. Let Farmer Oda know, by his field in Hearthvale.",
+      "objectives": [
+        {
+          "id": "tell_oda",
+          "text": "Tell Farmer Oda",
+          "complete_when": {
+            "type": "flag",
+            "flag": "told_oda_eggs",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "told_oda_eggs",
+            "value": true
+          },
+          "to": "done"
+        }
+      ]
+    },
+    "done": {
+      "journal": "Oda was pleased, and gave you five of the bombs he keeps for tree stumps.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "bomb",
+          "count": 5
+        },
+        {
+          "type": "complete_quest"
+        }
+      ]
+    }
+  }
+}

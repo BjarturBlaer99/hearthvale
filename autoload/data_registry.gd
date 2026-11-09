@@ -54,6 +54,7 @@ const CONDITION_FIELDS: Dictionary = {
 	"flag": ["flag", "value"],
 	"has_item": ["item", "count"],
 	"quest_stage": ["quest", "stage"],
+	"quest_status": ["quest", "status"],
 	"all": ["of"],
 	"any": ["of"],
 	"not": ["condition"],
@@ -250,6 +251,7 @@ func _check_quest(quest: Dictionary) -> void:
 		errors.append("%s: %s needs a non-empty 'stages' object." % [path, label])
 		return
 	var stages: Dictionary = quest["stages"]
+	var completes: bool = false
 	if not stages.has(str(quest["start_stage"])):
 		errors.append("%s: %s start_stage '%s' is not a stage." % [path, label, quest["start_stage"]])
 	for stage_id: Variant in stages:
@@ -273,6 +275,13 @@ func _check_quest(quest: Dictionary) -> void:
 			if not stages.has(str(transition["to"])):
 				errors.append("%s: %s goes to unknown stage '%s'." % [path, t_where, transition["to"]])
 		_check_effect_list(path, where + " on_enter", stage.get("on_enter", []))
+		var on_enter: Variant = stage.get("on_enter", [])
+		if typeof(on_enter) == TYPE_ARRAY:
+			for effect: Variant in on_enter:
+				if typeof(effect) == TYPE_DICTIONARY and str((effect as Dictionary).get("type", "")) == "complete_quest":
+					completes = true
+	if not completes:
+		errors.append("%s: %s can never finish: no stage's on_enter has a 'complete_quest' effect." % [path, label])
 
 
 func _check_dialogue(dialogue: Dictionary) -> void:
@@ -388,6 +397,9 @@ func _check_condition(path: String, where: String, raw: Variant) -> void:
 			_check_condition(path, where + " not", condition["condition"])
 		"quest_stage":
 			_check_stage(path, where, str(condition["quest"]), str(condition["stage"]))
+		"quest_status":
+			if not QuestState.STATUSES.has(StringName(str(condition["status"]))):
+				errors.append("%s: %s: unknown quest status '%s'. Known: %s." % [path, where, condition["status"], ", ".join(QuestState.STATUSES)])
 
 
 func _check_effect_list(path: String, where: String, list: Variant) -> void:

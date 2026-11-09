@@ -82,3 +82,12 @@ func test_dungeon_ledges_are_flagstones_you_can_stand_on_and_water_is_animated()
 
 func _tool_sprites() -> Dictionary:
 	return (load(TOOL) as GDScript).get_script_constant_map()["SPRITES"]
+
+
+func test_items_take_the_picture_their_data_names() -> void:
+	assert_that(ItemIcons.name_for(&"weavers_shuttle")).override_failure_message("the shuttle names its own picture").is_equal(&"shuttle")
+	assert_that(ItemIcons.name_for(&"egg_basket")).override_failure_message("no picture named: by type, a gem").is_equal(&"gem")
+	assert_that(ItemIcons.name_for(&"wooden_sword")).is_equal(&"sword")
+	for item: Dictionary in DataRegistry.entries(&"items"):
+		if item.has("icon"):
+			assert_bool(ItemIcons.FRAMES.has(StringName(str(item["icon"])))).override_failure_message("%s names a picture that exists" % item["id"]).is_true()

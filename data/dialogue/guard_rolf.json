@@ -10,6 +10,46 @@
       "text": "The road runs north through the fields and the Old Wood, all the way to the keep.",
       "options": [
         {
+          "text": "Any work for a sword?",
+          "conditions": [
+            {
+              "type": "quest_status",
+              "quest": "slime_bounty",
+              "status": "not_started"
+            }
+          ],
+          "next": "bounty"
+        },
+        {
+          "text": "About those slimes...",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "slime_bounty",
+              "stage": "hunt"
+            }
+          ],
+          "next": "bounty_hint"
+        },
+        {
+          "text": "The slimes are dealt with.",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "slime_bounty",
+              "stage": "report"
+            }
+          ],
+          "effects": [
+            {
+              "type": "set_flag",
+              "flag": "reported_slimes",
+              "value": true
+            }
+          ],
+          "next": "bounty_done"
+        },
+        {
           "text": "Anything else?",
           "next": "more"
         },
@@ -22,6 +62,75 @@
     "more": {
       "speaker": "rolf",
       "text": "Mind the goblins on the high ground. And if you find pieces of a heart out there, they say four make a whole one.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "bounty": {
+      "speaker": "rolf",
+      "text": "There is. Slimes have got into the South Field again, three of them. Beat all three and I'll pay a fair bounty.",
+      "options": [
+        {
+          "text": "I'll do it.",
+          "effects": [
+            {
+              "type": "set_quest_stage",
+              "quest": "slime_bounty",
+              "stage": "hunt"
+            }
+          ],
+          "next": "bounty_go"
+        },
+        {
+          "text": "Not now.",
+          "next": null
+        }
+      ]
+    },
+    "bounty_go": {
+      "speaker": "rolf",
+      "text": "Good. Take the south road out of the village. All three in one visit, mind: leave one and the rest come back.",
+      "options": [
+        {
+          "text": "They're beaten already.",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "slime_bounty",
+              "stage": "report"
+            }
+          ],
+          "effects": [
+            {
+              "type": "set_flag",
+              "flag": "reported_slimes",
+              "value": true
+            }
+          ],
+          "next": "bounty_done"
+        },
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "bounty_hint": {
+      "speaker": "rolf",
+      "text": "The South Field, down the south road. All three in one visit, or they're back.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "bounty_done": {
+      "speaker": "rolf",
+      "text": "Ha! Knew you had it in you. Forty coins, and arrows from the guard store.",
       "options": [
         {
           "text": "Goodbye.",

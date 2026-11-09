@@ -31,6 +31,16 @@ func test_quest_stages() -> void:
 	assert_bool(_check.is_met({"type": "quest_stage", "quest": "lost_key", "stage": "done"})).is_false()
 
 
+func test_quest_status_is_not_started_active_or_complete() -> void:
+	var check: ConditionEvaluator = ConditionEvaluator.new({
+		"flags": {"quest/done_one/complete": true, "quest/lost_key/entered": "find_key"},
+		"quests": {"lost_key": "find_key", "done_one": "end"},
+	})
+	for case: Array in [["never_heard_of", "not_started"], ["lost_key", "active"], ["done_one", "complete"]]:
+		for status: String in ["not_started", "active", "complete"]:
+			assert_bool(check.is_met({"type": "quest_status", "quest": case[0], "status": status})) 				.override_failure_message("%s is %s, asked %s" % [case[0], case[1], status]).is_equal(status == case[1])
+
+
 func test_all_any_and_not() -> void:
 	var key: Dictionary = {"type": "has_item", "item": "small_key", "count": 1}
 	var rich: Dictionary = {"type": "has_item", "item": "coin", "count": 100}

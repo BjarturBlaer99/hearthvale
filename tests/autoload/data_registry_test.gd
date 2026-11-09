@@ -20,12 +20,12 @@ func test_project_data_loads_without_errors() -> void:
 
 func test_starting_items_are_registered_in_id_order() -> void:
 	_registry.load_all()
-	assert_array(_registry.ids(&"items")).is_equal([&"arrow", &"big_key", &"bomb", &"bow", &"coin", &"small_key", &"wooden_sword"])
+	assert_array(_registry.ids(&"items")).is_equal([&"arrow", &"big_key", &"bomb", &"bow", &"coin", &"egg_basket", &"small_key", &"weavers_shuttle", &"wooden_sword"])
 	assert_str(_registry.get_item(&"wooden_sword").get("name", "")).is_equal("Wooden Sword")
 	var found: Array = []
 	for entry: Dictionary in _registry.entries(&"items"):
 		found.append(entry["id"])
-	assert_array(found).is_equal(["arrow", "big_key", "bomb", "bow", "coin", "small_key", "wooden_sword"])
+	assert_array(found).is_equal(["arrow", "big_key", "bomb", "bow", "coin", "egg_basket", "small_key", "weavers_shuttle", "wooden_sword"])
 
 
 func test_missing_required_field_is_reported_and_not_loaded() -> void:
@@ -43,6 +43,8 @@ func test_unresolved_references_are_reported() -> void:
 	var errors: PackedStringArray = _registry.load_all(FIXTURES.path_join("bad_reference"))
 	_assert_reported(errors, "unknown item id 'unobtainium'")
 	_assert_reported(errors, "unknown stage 'nowhere'")
+	_assert_reported(errors, "unknown quest status 'abandoned'")
+	_assert_reported(errors, "can never finish")
 
 
 func test_villagers_and_signs_have_their_conversations() -> void:

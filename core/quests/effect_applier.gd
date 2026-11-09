@@ -13,7 +13,7 @@ func _init(state: Object) -> void:
 
 
 ## Applies one effect. Returns false for anything it can't apply here: unknown types, and
-## complete_quest, which needs a running quest (QuestRunner, later).
+## complete_quest, which only means something inside a quest's stage (QuestRunner applies it).
 func apply(effect: Dictionary) -> bool:
 	match str(effect.get("type", "")):
 		"set_flag":

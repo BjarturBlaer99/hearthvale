@@ -260,6 +260,7 @@ func test_beaten_the_warden_stays_beaten_and_its_heart_is_taken_once() -> void:
 	keep.player.motor.place(heart.cell())
 	keep.player.sync_from_motor()
 	assert_int(keep.collect_pickups()).is_equal(1)
+	assert_bool(keep.player.is_holding_up()).override_failure_message("the heart is held up").is_true()
 	assert_int(keep.collect_pickups()).is_equal(0)
 	keep = _load(KEEP)
 	assert_bool((keep.interactables.get_node(^"HeartContainer") as HeartContainer).is_there()).override_failure_message("taken for good").is_false()

@@ -3,14 +3,20 @@ extends CharacterBody2D
 ## The hero in an area: reads input, steps the grid-checked PlayerMotor, swings the sword and
 ## takes hits, and draws the sprite (docs/TECH_DESIGN.md §4). Position comes from the motor,
 ## not from physics. The HurtBox child is where the hero can be hit; the Sword child is the
-## swing's HitBox.
+## swing's HitBox. PlayerAnimator picks the sprite's frame: walking, blinking, lunging with the
+## sword, holding up an item just taken (hold_up), or fallen.
 
 const HOP_TIME: float = 0.22
 const HOP_HEIGHT: float = 4.0
 ## Invincibility blinks: visible for half of each period.
 const BLINK_PERIOD: float = 0.12
 const HURT_TINT: Color = Color(1.0, 0.55, 0.55)
-const DEAD_TINT: Color = Color(1.0, 0.35, 0.35, 0.8)
+## Seconds between puffs of dust while sprinting.
+const DUST_EVERY: float = 0.16
+## How long an item just taken is held overhead (moving or swinging ends it sooner).
+const HOLD_TIME: float = 1.1
+## Where a held item's picture is drawn, from the hero's feet: just above the raised hands.
+const HOLD_OFFSET: Vector2 = Vector2(-8.0, -39.0)
 
 var motor: PlayerMotor
 ## Whether input moves the hero (off while talking, going through a door, or down).
@@ -20,19 +26,17 @@ var _animator: PlayerAnimator = PlayerAnimator.new()
 var _last_position: Vector2 = Vector2.ZERO
 var _hop_left: float = 0.0
 var _attack_was_held: bool = false
-
-@onready var hurt_box: HurtBox = $HurtBox
-@onready var sword: Sword = $Sword
-@onready var _sprite: Sprite2D = $Sprite
 var _shake_left: float = 0.0
 var _shake_time: float = 0.0
 var _shake_strength: float = 0.0
 var _dust_left: float = 0.0
+var _hold_left: float = 0.0
+var _hold_icon: StringName = &""
 
+@onready var hurt_box: HurtBox = $HurtBox
+@onready var sword: Sword = $Sword
+@onready var _sprite: Sprite2D = $Sprite
 @onready var _camera: Camera2D = $Camera2D
-
-## Seconds between puffs of dust while sprinting.
-const DUST_EVERY: float = 0.16
 
 
 func _ready() -> void:
@@ -127,7 +131,41 @@ func _physics_process(delta: float) -> void:
 	motor.step(input, delta)
 	_kick_up_dust(motor.position != before, delta)
 	_hop_left = maxf(0.0, _hop_left - delta)
+	_animator.tick(delta)
+	if _hold_left > 0.0:
+		_hold_left -= delta
+		if _hold_left <= 0.0:
+			_end_hold()
 	sync_from_motor()
+
+
+## Shows the hero holding picture `icon` (ItemIcons) overhead for a moment: an item just taken.
+## For show only: moving or swinging ends it.
+func hold_up(icon: StringName) -> void:
+	_hold_icon = icon
+	_hold_left = HOLD_TIME
+	queue_redraw()
+	if motor != null:
+		sync_from_motor()
+
+
+func is_holding_up() -> bool:
+	return _hold_left > 0.0
+
+
+## The frame the sprite shows (for tests): its region of the sheet.
+func shown_region() -> Rect2:
+	return _sprite.region_rect
+
+
+func _end_hold() -> void:
+	_hold_left = 0.0
+	queue_redraw()
+
+
+func _draw() -> void:
+	if _hold_left > 0.0:
+		ItemIcons.draw(self, _hold_icon, HOLD_OFFSET)
 
 
 ## A HitBox of the other team touched the hero: knockback and invincibility from the motor,
@@ -179,18 +217,22 @@ func _update_sword() -> void:
 func _update_visuals() -> void:
 	var moved: float = motor.position.distance_to(_last_position)
 	_last_position = motor.position
+	if _hold_left > 0.0 and (moved > 0.0 or motor.is_attacking()):
+		_end_hold()
 	_animator.update(motor.facing, moved)
+	if motor.state_name == PlayerMotor.DEAD:
+		_animator.pose = PlayerAnimator.Pose.FALLEN
+	elif motor.is_attacking():
+		_animator.pose = PlayerAnimator.Pose.ATTACK
+	elif _hold_left > 0.0:
+		_animator.pose = PlayerAnimator.Pose.HOLD
+	else:
+		_animator.pose = PlayerAnimator.Pose.NONE
 	_sprite.region_rect = _animator.region()
 	var lift: float = sin(_hop_left / HOP_TIME * PI) * HOP_HEIGHT if _hop_left > 0.0 else 0.0
 	_sprite.position = Vector2(-PlayerAnimator.FRAME_SIZE.x / 2.0, -PlayerAnimator.FRAME_SIZE.y + _animator.bob() - roundi(lift))
-	_sprite.flip_h = _animator.flip_h
-	match motor.state_name:
-		PlayerMotor.DEAD:
-			_sprite.modulate = DEAD_TINT
-		PlayerMotor.HURT:
-			_sprite.modulate = HURT_TINT
-		_:
-			_sprite.modulate = Color.WHITE
+	_sprite.flip_h = _animator.shows_flipped()
+	_sprite.modulate = HURT_TINT if motor.state_name == PlayerMotor.HURT else Color.WHITE
 	var blinking: bool = motor.is_invincible() and motor.state_name != PlayerMotor.DEAD
 	_sprite.visible = not blinking or fmod(motor.invincible_left, BLINK_PERIOD) < BLINK_PERIOD / 2.0
 

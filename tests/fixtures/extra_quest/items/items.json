@@ -1,0 +1,6 @@
+{
+  "items": [
+    { "id": "coin", "name": "Coin", "type": "currency", "stackable": true, "max_stack": 999 },
+    { "id": "healing_herb", "name": "Healing Herb", "type": "quest", "stackable": true, "max_stack": 9 }
+  ]
+}

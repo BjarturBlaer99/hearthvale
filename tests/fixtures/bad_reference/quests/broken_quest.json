@@ -6,7 +6,25 @@
     "begin": {
       "journal": "Needs an item nobody defined and leads to a stage that is not there.",
       "transitions": [
-        { "when": { "type": "has_item", "item": "unobtainium", "count": 1 }, "to": "nowhere" }
+        {
+          "when": {
+            "type": "has_item",
+            "item": "unobtainium",
+            "count": 1
+          },
+          "to": "nowhere"
+        }
+      ],
+      "objectives": [
+        {
+          "id": "wait",
+          "text": "Wait for a status nobody defined",
+          "complete_when": {
+            "type": "quest_status",
+            "quest": "broken_quest",
+            "status": "abandoned"
+          }
+        }
       ]
     }
   }

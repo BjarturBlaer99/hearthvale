@@ -313,3 +313,42 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   Each is visible before it's reachable. Farmer Oda, Pip, Guard Rolf and Shepherd Edda each hint at one, or at how pieces add up.
 - 2026-11-09 — **New props and furniture are drawn as ASCII art in the tile tool** (`PROP_ART`, painted by `_ascii`), the way the sprites are. The market stall is a 3x2 prop like the 2x2 well. The washing line and the bucket are decorations you can walk past or under.
 - 2026-11-09 — The HUD shows heart pieces as a gold heart after the hearts, filling a quarter at a time. It's hidden at zero.
+
+## H13 — Quests
+- 2026-11-09 — **Quest progress is all in GameState, in what was already saved.** The stage is in `quests`; two flags per quest (`quest/<id>/entered`, `quest/<id>/complete`) record whether a stage's `on_enter` effects were applied and whether the quest is finished.
+  - `QuestRunner` keeps nothing of its own, so it needs no sync after a load, and a reward can't be paid twice.
+  - No save-format change: the version stays 1.
+- 2026-11-09 — **Quests advance on change, not on a timer.** A new `Quests` autoload runs the runner whenever EventBus reports a flag, an item or a stage change, and when an area loads. Changes the runner makes come straight back as signals; the update already running picks them up.
+- 2026-11-09 — **One new condition type, `quest_status`** (`not_started`, `active`, `complete`), so a giver's conversation can offer a quest once without knowing flag names. No new effect types: quests start with the existing `set_quest_stage`, and `complete_quest` is now applied (by the runner, in a stage's `on_enter`).
+- 2026-11-09 — **DataRegistry rejects a quest that can never finish** (no stage's `on_enter` has `complete_quest`). With quests written as data only, the check has to catch what a script's author would have noticed.
+- 2026-11-09 — **Three small quests, three shapes**, to prove the format: a fetch (The Lost Shuttle), a delivery with a report back (Eggs for Tilda), and a bounty (Slimes in the South Field, on the slimes' shared `clear_flag`).
+  - Rewards are things the game already has: 30 coins; 5 bombs; 40 coins and 10 arrows.
+  - The roadmap's "bigger quiver or heart piece" rewards wait. A quiver needs carrying-capacity upgrades, and the shop's stock rules are written against today's limits. A fifth heart piece would leave a heart that can never be completed.
+  - An item or deed done before asking still counts: the quest moves straight on when taken, and the giver's reply offers to settle it on the spot.
+- 2026-11-09 — **Items can name their picture** (`icon` in item data). The shuttle has its own; without one an item's type decides, so new quest items need no code.
+- 2026-11-09 — **Quest news is a notice at the top of the screen**, not the message line, which the dialogue box covers: quests mostly start and finish mid-conversation.
+- 2026-11-09 — **The quest log lists started quests only**, active first and then finished, each group by title. Unstarted quests stay hidden. With three quests it needs no scrolling; a longer list will.
+
+## Art pass 2 — hero, houses and the land
+- 2026-11-09 — **An art pass between H13 and H14, at the user's request**: better graphics, a better-looking hero
+  with better animation, more medieval houses. It adds no mechanics, areas or content, and everything is still
+  painted in code.
+- 2026-11-09 — **The hero keeps the blue hood and tunic and gains a red scarf.** The scarf is my choice, not the
+  user's: a warm accent on a blue figure, and its tail shows movement in the side view. It's two palette entries
+  in `make_player_sprite.gd`, easy to recolour or remove.
+- 2026-11-09 — **Holding up an item is for show only.** The hero raises it for about a second but can move or
+  swing at once, which ends the pose. Freezing the hero would need a new motor state and would get in the way
+  when picking things up mid-fight.
+- 2026-11-09 — **A fallen pose replaces the red tint at zero hearts.** The hurt tint stays.
+- 2026-11-09 — **Houses keep their footprints, doors and solidity.** What was three roof rows over one wall row is
+  now two roof rows, a half-timbered upper floor and the ground floor. Roofs tell the houses apart: thatch on the
+  cottages, clay tiles on the shop (still "the red house"), slate on Elder Bram's (still "the blue-roofed house").
+- 2026-11-09 — **Soft edges are drawn, not tiled.** `HeightShading` reads the Height layer at load and draws grass
+  over path edges and a bank round water. The alternative, a transition tile for every combination of
+  neighbours, would mean dozens of new tiles and a baker that picks among them; this way hand-painted maps get
+  the edges too.
+- 2026-11-09 — **The baker picks each tree.** Maps still say only "tree". A tree hemmed in by trees (or the map's
+  edge) on all four sides becomes closed canopy; the rest are a round tree, a pine or an oak by a hash of the
+  cell, so the same map always bakes the same wood.
+- 2026-11-09 — **Smoke is an animated tile on the Decor layer**, like water on the Height layer: no node, no
+  script.

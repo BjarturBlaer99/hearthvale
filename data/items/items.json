@@ -6,6 +6,8 @@
     { "id": "bomb", "name": "Bombs", "type": "bomb", "stackable": true, "max_stack": 10, "stats": { "damage": 4, "knockback": 32, "fuse": 2.0, "radius": 24 } },
     { "id": "small_key", "name": "Small Key", "type": "key", "stackable": true, "max_stack": 9 },
     { "id": "big_key", "name": "Big Key", "type": "key" },
-    { "id": "coin", "name": "Coin", "type": "currency", "stackable": true, "max_stack": 999 }
+    { "id": "coin", "name": "Coin", "type": "currency", "stackable": true, "max_stack": 999 },
+    { "id": "weavers_shuttle", "name": "Weaver's Shuttle", "type": "quest", "icon": "shuttle" },
+    { "id": "egg_basket", "name": "Basket of Eggs", "type": "quest" }
   ]
 }

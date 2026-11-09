@@ -8,6 +8,10 @@ extends Node
 ## A quest moved to a new stage.
 signal quest_updated(quest_id: StringName)
 
+## News of a quest for the player (Quests announces it): `what` is &"started", &"updated" or
+## &"completed".
+signal quest_announced(quest_id: StringName, what: StringName)
+
 ## Items entered the inventory. A negative `count` means items were removed.
 signal item_added(item_id: StringName, count: int)
 

@@ -103,7 +103,7 @@ func test_the_flag_survives_leaving_the_area() -> void:
 	var weaver: AreaController = _area
 	Steps.stand_before(weaver, "Wenna")
 	weaver.interact()
-	assert_array(Array(weaver.hud.dialogue.shown_options())).is_equal(["Bram asked me to keep watch.", "Goodbye."])
+	assert_array(Array(weaver.hud.dialogue.shown_options())).is_equal(["Bram asked me to keep watch.", "You look troubled.", "Goodbye."])
 	weaver.hud.dialogue.confirm()
 	weaver.hud.dialogue.confirm()
 

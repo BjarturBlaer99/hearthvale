@@ -67,8 +67,9 @@ Enemies sometimes drop hearts or coins.
 Something has stirred in the old keep north of Hearthvale. The story stays thin until the slice plays well.
 
 ## 10. Tone & look
-Warm, cosy medieval: green meadows, timber houses, red and blue roofs; darker, colder dungeons. 16×16 pixel art,
-limited palette. The hero is an original adventurer in a blue hooded tunic with gold trim (Zelda-style, not Link).
+Warm, cosy medieval: green meadows, half-timbered houses under thatch, red clay tiles or blue slate, with
+smoking chimneys, and a stone chapel; darker, colder dungeons. 16×16 pixel art, limited palette. The hero is an
+original adventurer in a blue hooded tunic with gold trim and a red scarf (Zelda-style, not Link).
 
 ## 11. Out of scope (for now)
 Multiplayer, procedural generation, 3D, voice acting, swimming and water levels, an open world. Phase 2 (ROADMAP)

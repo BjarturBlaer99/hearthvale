@@ -443,7 +443,7 @@ At the user's request, the environment moves from flat greybox to pixel art. It'
 **Known issues / notes**
 - There are no pits for blocks to fall into, and no ice, torches or timed switches (not in the slice).
 - Blocks reset only when the area reloads, not when you leave a room within it.
-- Not played by hand yet.
+- Played by hand on 2026-11-09: the new look feels right.
 
 **Next:** H7, the first dungeon and its boss.
 
@@ -719,7 +719,7 @@ Re-planned first at the user's request: phase 2 now puts detail and graphics ahe
   - The dungeons get pots.
 - **Heart pieces:** three more (village nook, fields plateau, Cistern secret room) join the Old Wood's, plus a HUD counter.
 - **Villagers:** Farmer Oda, Pip and Guard Rolf in Hearthvale, Shepherd Edda in the North Fields, each with a short conversation from data.
-- 230 tests in 38 suites (+12). New: `critter_motion_test` and `detail_test`; the data, sprite and decor suites grew.
+- 230 tests in 36 suites (+12). New: `critter_motion_test` and `detail_test`; the data, sprite and decor suites grew.
 
 **Acceptance criteria**
 - [x] Every outdoor area and interior has new detail in its screenshots: 57 shots, including new views of the market, the field and chickens, the washing line and nook, the shepherd and plateau, the Cistern's secret room, and the Old Wood's fireflies.
@@ -748,6 +748,91 @@ Re-planned first at the user's request: phase 2 now puts detail and graphics ahe
 - The washing line's rope runs a little past its outer posts.
 - No lifting or throwing pots; critters don't react to the hero.
 - Fireflies glow in daylight.
-- Not played by hand yet.
+- Played by hand on 2026-11-09: the new look feels right.
 
 **Next:** H13, quests.
+
+## 2026-11-09 — H13 Quests — done
+
+**Built**
+- **`QuestRunner`** and **`QuestState`** (`core/quests/`, pure):
+  - Quests run from data: `on_enter` effects once per stage, the first met transition wins, and `complete_quest` finishes a quest.
+  - All progress is in GameState's quests and flags.
+- **`Quests` autoload:** runs the runner on every flag, item and stage change and on area load, and announces quest news with a sound (`quest`, or the item fanfare on completion).
+- **`quest_status` condition**, validated by DataRegistry, which now also rejects quests that can never finish.
+- **Three quests as data** (`data/quests/`), with quest options added to four conversations:
+  - The Lost Shuttle: Wenna, to the far bank of the stream in the North Fields, and back.
+  - Eggs for Tilda: Oda, to the shop, and back.
+  - Slimes in the South Field: Rolf, the three slimes, and back.
+- **Quest items:** the Weaver's Shuttle (with its own picture, lying by the stream) and the Basket of Eggs. Items can name their picture in data.
+- **Quest log:** a "Quests" entry in the pause menu.
+- **Notice:** quest news at the top of the screen.
+- 249 tests in 38 suites (+19). New: `quest_runner_test` and `quests_test`; the condition, data, sprite, menu and village suites grew.
+
+**Acceptance criteria**
+- [x] Each quest starts, advances and finishes from data alone.
+  - A generic test starts every quest in `data/quests` and walks it to the end by satisfying each stage's first transition.
+  - Three scene tests play each quest through its real conversations: accept, do the thing, report back, get the reward. Each checks the notice at every step.
+- [x] The log shows where each stands: empty at first, then active quests before finished ones, with the journal line and unticked objectives for the highlighted quest.
+- [x] Progress survives a save. Saved mid-quest and loaded: the same quests at the same stages, Oda's basket not handed over twice, and the shuttle's 30 coins paid once, also after a second save and load.
+- [x] A new quest can be added by writing only a JSON file. A fixture quest that exists only as JSON loads without errors and runs start to finish. The game runs exactly the files in `data/quests`.
+- Mutation checks: nine deliberate bugs, each caught, files restored byte for byte:
+  - stage effects not recorded as applied
+  - `complete_quest` ignored
+  - quests deaf to item changes
+  - started quests reading as not started
+  - quests that can't finish accepted
+  - every objective ticked
+  - no notice
+  - the Quests entry opening nothing
+  - item pictures ignoring data
+- Four existing tests listed exact menu entries, dialogue options and item ids; they were updated for the new entries.
+- Visual check (`tools/capture.gd`, 61 shots): Wenna's offer, the "New quest" notice over the conversation, the shuttle by the stream, the quest log, and the pause menu with its fifth entry.
+
+**Known issues / notes**
+- The quest log has no scrolling: fine for three quests, not for many.
+- Rewards are coins, bombs and arrows only (see DECISIONS).
+- The HUD's "Carrying" line grows with every item, quest items included.
+- Played by hand on 2026-11-09: the quests feel right.
+
+**Next:** H14, the second dungeon and its boss.
+
+## 2026-11-09 — Art pass 2: hero, houses and the land — done
+
+Asked for by the user between H13 and H14: better graphics, a better-looking hero with better animation, and
+houses that look more medieval. Plan: `docs/progress/art-pass-2-plan.md`. No new mechanics, areas or content.
+
+**Built**
+- **The hero:** a red scarf, clearer arms and hands, more shading. The sheet grew from 3 to 9 frames a row.
+  - a four-frame walk cycle, with hands swinging and the scarf's tail fluttering in side view
+  - a blink while standing
+  - a lunge behind the sword, one for each facing
+  - an item held overhead when picking one up, opening a chest or taking a heart container (for show: moving ends it)
+  - a fallen pose at zero hearts, in place of the red tint
+- **Houses:** two-storey fronts, with a half-timbered upper floor over a ground floor on a stone footing.
+  - roofs with gable boards: thatch on the cottages, clay tiles on the shop, slate on Elder Bram's
+  - stone chimneys with drifting smoke, and a hanging sign on the shop
+  - the chapel in stone, with arched stained-glass windows, a double door and a cross on its ridge
+  - footprints, doors and what's solid are unchanged
+- **The land:**
+  - grass frays over the edges of paths, and water has a bank and foam (`HeightShading.find_ground_edges`)
+  - three kinds of tree mixed by position (round, pine, oak), and a closed canopy where a wood is thick
+- 264 tests in 40 suites (+15). New: `hero_test` and `ground_edges_test`; the animator suite was rewritten for the new sheet, and the decor and keep suites grew.
+
+**Done when**
+- [x] The hero has the new look and all five animations, and the animator's tests cover them: facing, the four-frame cycle, the blink, each pose, and that its columns are the ones the tool paints.
+- [x] Every village house and the chapel show the new fronts and roofs, with doors still working. A test pins the tile at 21 cells (ridge, eaves, gable ends, both floors, the chapel) and that all but the door stay solid at height 3; the village's door tests still pass unchanged.
+- [x] Paths, water and woods show the new edges and trees in every outdoor area: a test checks that canopy sits exactly where trees stand on every side, in all four outdoor areas, and that each has every kind of tree.
+- [x] All tests pass, and before and after screenshots were reviewed (`tools/capture.gd`, now 64 shots: three new ones for the held item, a stride and the fallen pose).
+- Mutation checks: 22 deliberate bugs, each caught, files restored byte for byte:
+  - the hero: a walk that starts on a full step, no blink, no bob, an item held up sideways or mirrored, no lunge, never fallen, arms down while holding, a hold that moving doesn't end or that never ends, and no hold for a picked-up item, a chest's treasure or a heart container
+  - the land: grass fraying down a cliff, no fringe beside trees, fringes on grass instead of paths, no banks, banks at the map's edge, areas not asking for edges, edges never stored, and every tree kind sharing one tile
+
+**Known issues / notes**
+- The baker's choices (which tree, which roof tile) are tested through the baked scenes, so a baker bug shows only after a re-bake.
+- The fallen pose is one picture for every facing, and small: it has to fit the 16-pixel-wide frame.
+- Villagers and enemies kept their H11 sprites and animations (deliberately not in this pass).
+- The red scarf was my choice (DECISIONS). It's two palette entries in the tool if it should change.
+- Played by hand on 2026-11-09: the new look feels right.
+
+**Next:** H14, the second dungeon and its boss.

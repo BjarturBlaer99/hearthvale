@@ -125,7 +125,7 @@ More to see and do in the areas we have, instead of new ones:
 **Done when**: every outdoor area and interior has new detail in its screenshots; grass and pots drop what their
 data says; all four heart pieces can be found; and the map is no bigger than before.
 
-## H13 — Quests
+## H13 — Quests ✅
 - `QuestRunner` (TECH_DESIGN §7): quests as JSON stages with objectives, using the existing conditions and
   effects. Adding a quest needs no new code.
 - Two or three small villager quests with rewards, for example a lost item found in the countryside, or a
@@ -134,6 +134,10 @@ data says; all four heart pieces can be found; and the map is no bigger than bef
 
 **Done when**: each quest starts, advances and finishes from data alone; the log shows where each stands; progress
 survives a save; and a new quest can be added by writing only a JSON file.
+
+## Art pass 2 ✅ (user's request, between H13 and H14)
+Better graphics, a better-looking hero with better animation, and houses that look more medieval. No new
+mechanics, areas or content. Plan and checklist: `docs/progress/art-pass-2-plan.md`.
 
 ## H14 — The second dungeon & boss
 - A second dungeon of 10–14 rooms, entered from somewhere in the existing world (no new region), built around a

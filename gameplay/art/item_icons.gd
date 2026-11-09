@@ -8,14 +8,18 @@ const SIZE: Vector2i = Vector2i(16, 16)
 ## Frames in the order the tool paints them (a test checks).
 const FRAMES: Dictionary = {
 	&"sword": 0, &"bow": 1, &"arrows": 2, &"bomb": 3, &"bomb_dim": 4, &"key": 5, &"coin": 6,
-	&"heart": 7, &"heart_container": 8, &"heart_piece": 9, &"gem": 10,
+	&"heart": 7, &"heart_container": 8, &"heart_piece": 9, &"gem": 10, &"shuttle": 11,
 }
 
 
-## The picture for an item, by its type in data: a sword, a bow, arrows, a bomb, a key, a coin,
-## or a gem for anything else.
+## The picture for an item: the one its data names ("icon"), else by its type: a sword, a bow,
+## arrows, a bomb, a key, a coin, or a gem for anything else.
 static func name_for(item_id: StringName) -> StringName:
-	match str(DataRegistry.get_item(item_id).get("type", "")):
+	var item: Dictionary = DataRegistry.get_item(item_id)
+	var named: StringName = StringName(str(item.get("icon", "")))
+	if FRAMES.has(named):
+		return named
+	match str(item.get("type", "")):
 		"weapon_melee":
 			return &"sword"
 		"weapon_ranged":

@@ -14,7 +14,7 @@ res://
     enemies/         # EnemyBrain + one subclass per behaviour (WardenBrain: the keep's boss), EnemyBrains, DropTable
     dungeons/        # RoomGrid (rooms for the camera), DungeonState (dungeon flags, door rules)
     puzzles/         # PuzzleRules (pushing blocks, pressing plates, multi-flag shutters)
-    quests/          # ConditionEvaluator, EffectApplier, later QuestRunner
+    quests/          # ConditionEvaluator, EffectApplier, QuestRunner, QuestState
     combat/          # CombatRules (hit geometry, knockback, weapon choice), Hit
     inventory/       # Inventory (stack limits, the item button, ammo)
     dialogue/        # DialogueRunner
@@ -44,6 +44,7 @@ res://
 | `GameState` | Owns all persistent state: hearts and health, flags, quests, inventory, where the hero is. `to_dict()` / `from_dict()`. Mutates only through methods that emit `EventBus` signals. |
 | `SaveSystem` | Writes `GameState.to_dict()` as JSON to `user://saves/slot_<n>.json` with a `version`; loads and migrates. The menus use one slot (`current_slot`, `save_game()`, `load_game()`, `summary()`). |
 | `Settings` | The player's settings (`SettingsData`), apart from any save: loaded from `user://settings.cfg` at start, applied to the window, saved on every change, announced by `EventBus.settings_changed`. |
+| `Quests` | Runs every quest in `data/quests` (a `QuestRunner` over GameState) whenever a flag, an item or a quest's stage changes, and announces quest news (`EventBus.quest_announced`). Holds no state. |
 | `Audio` | Plays sound effects (`EventBus.sound`) on a pool of players on the `SFX` bus, and loops music (`EventBus.music_requested`) on the `Music` bus; volumes from Settings. |
 
 ## 3. Terrain & areas
@@ -58,12 +59,28 @@ res://
   - Flying bodies use `check_flight`: only solid cells and the map edge block them.
   - Cells occupied by villagers and the dummy block walkers.
   - Sealed cells (closed doors) block everything: walkers, fliers and arrows.
-- `HeightShading` draws from the grid: cliff faces with a dark lip below drops (earthy outdoors, cut stone in
-  dungeons), soft shadows below solid things, and thin edges beside lower neighbours.
+- `HeightShading` draws what square tiles can't show, once, at load:
+  - from the grid: cliff faces with a dark lip below drops (earthy outdoors, cut stone in dungeons), soft shadows
+    below solid things, and thin edges beside lower neighbours
+  - from the Height layer (`find_ground_edges`, tested), **soft edges**: grass frays over the edge of a path
+    where the two meet on the same level, and water gets a dark line under its bank and foam beside it. No
+    transition tiles: any map gets them.
 - **Tiles** are pixel art painted in code by `tools/greybox/make_tile_texture.gd`; `GreyboxTiles` has the atlas
   layout. `build_maps.gd` lays out each area's `Height` layer and adds some details by itself:
-  - roof ridges and eaves, and windows in walls
-  - trees, rocks, fences and the well become solid ground at the right height, with their picture on top
+  - **house fronts** (`GreyboxTiles.HOUSE_KINDS`, all solid at height 3). A map gives a house as three blocks: a
+    roof two rows deep (`roof` clay tiles, `roof_blue` slate or `roof_thatch`), a `wall_upper` row and a `wall`
+    row. The baker picks each cell's tile:
+    - a ridge on the roof's first row, eaves on its last, and a barge board at each gable end
+    - beams and braces alternating along the half-timbered upper floor, with a window every third cell
+    - windows in the ground floor, beside the door
+
+    The chapel is built the same way from `chapel_window`, `chapel_wall` and a two-leaf `chapel_door_l`.
+  - trees, rocks, fences and the well become solid ground at the right height, with their picture on top. A tree
+    is one of three kinds picked by its cell (round, pine, oak), or a closed canopy where trees stand on all four
+    sides of it (`GreyboxTiles.TREE_KINDS`).
+
+  Chimneys, the chapel's cross and the shop's sign are overlays (`HOUSE_DECOR_KINDS`) that a map's `decor` blocks
+  put on house tiles; `smoke` above a chimney is an animated tile (`SMOKE_FRAMES`).
 
   Raised dungeon floor is its own layered kind, `ledge` (flagstones at any height). Water is one animated tile
   (`WATER_FRAMES` frames). H12 added a second set of props:
@@ -94,8 +111,19 @@ res://
 - An area smaller than the screen (a house) is centred on it, on the dark clear colour.
 
 ## 4. Hero, items & combat
-- `PlayerController` (CharacterBody2D) reads input, steps `PlayerMotor` and draws the sprite (`PlayerAnimator`:
-  4-way facing, walk cycle by distance). The motor's state machine has one script per state:
+- `PlayerController` (CharacterBody2D) reads input, steps `PlayerMotor` and draws the sprite. `PlayerAnimator`
+  (pure, tested) picks the frame:
+  - 4-way facing, and a four-frame walk cycle that advances by distance travelled (so it keeps pace with
+    sprinting), with a one-pixel bob on each step
+  - a blink every few seconds while standing
+  - a pose that overrides both: lunging behind the sword, lying fallen at zero hearts, or holding an item
+    overhead (always seen from the front)
+
+  `hold_up(icon)` shows that last pose, with the item's picture above the hands, for `HOLD_TIME`. The area calls
+  it when the hero picks up an item, opens a chest or takes a heart container. It's for show only: moving or
+  swinging ends it at once.
+
+  The motor's state machine has one script per state:
   - `ground`: walks at `WALK_SPEED`, or `SPRINT_SPEED` while sprint is held (no stamina)
   - `attack`: stands still for the weapon's cooldown
   - `hurt`: pushed along the hit at `KNOCKBACK_SPEED` through the terrain rules
@@ -215,6 +243,28 @@ res://
 - Quests are JSON (`docs/data/quest.example.json`): stages with objectives and transitions. Conditions and
   effects use the shared vocabulary (`docs/data/CONDITIONS_AND_EFFECTS.md`); `ConditionEvaluator` evaluates
   conditions against a GameState snapshot. New condition or effect *types* are the only reason to add code.
+- **`QuestRunner`** (`core/quests/`, pure) runs the quests. A new quest is a new file in `data/quests/`, and
+  nothing else.
+  - A quest's stage is in `GameState.quests`. Two flags per quest (`QuestState`) record the rest:
+    `quest/<id>/entered` is the stage whose `on_enter` effects were applied, and `quest/<id>/complete` is set by
+    the `complete_quest` effect. The runner keeps nothing itself, so quests save with the game, and a load never
+    repeats a reward.
+  - `update()` applies the `on_enter` effects of any stage just reached, then moves each active quest on by the
+    first of its stage's transitions whose condition is met. It repeats until nothing changes, with a cap in
+    case quest data goes round in a loop.
+  - Quests start when anything sets their stage: a dialogue option's `set_quest_stage` effect, or `start()`.
+  - The `quest_status` condition (`not_started`, `active`, `complete`) lets a giver's conversation offer a quest
+    only once.
+  - The `Quests` autoload calls `update()` when EventBus reports a flag, item or stage change, and when an area
+    loads. It announces "New quest", "Quest updated" and "Quest complete" with a sound. The area shows the
+    announcement as a notice at the top of the screen, clear of the dialogue box.
+  - DataRegistry rejects a quest no stage of which completes it.
+- **The quests so far** (each a different shape):
+  - The Lost Shuttle: fetch an item lying in the world.
+  - Eggs for Tilda: carry an item from one villager to another, then report back.
+  - Slimes in the South Field: a bounty. The slimes share a `clear_flag` that the quest waits on.
+- **Quest items** are items of type `quest`. An item's `icon` names its picture (`ItemIcons`); without one, its
+  type decides.
 - Dialogue is a JSON node graph (`docs/data/dialogue.example.json`): nodes with speaker, text and options;
   options have conditions, effects and `next` (null ends); an optional `speakers` map gives display names.
 - `DialogueRunner` (`core/dialogue/`, pure) plays one conversation against a game state (GameState, or a
@@ -269,7 +319,8 @@ run headless; see CLAUDE.md for the command and gotchas.
   - The menu pauses the scene tree and runs anyway (`PROCESS_MODE_ALWAYS`), so enemies, arrows and the play clock
     stop.
   - It shows hearts, heart pieces, keys in a dungeon and the play time.
-  - It offers Resume, Save (the menus' slot), Settings, and Quit to title. Anything not saved is lost on quitting,
+  - It offers Resume, Save (the menus' slot), Quests, Settings, and Quit to title. Quests opens the
+    `QuestLog`: started quests, active first, each with its journal line and objectives ticked when done. Anything not saved is lost on quitting,
     and the menu says so.
 - **Play time:** `GameState.play_time` counts in the area's `_process`, which a paused tree skips. It's saved.
 - **Settings** (`SettingsMenu` over the `Settings` autoload):
@@ -321,7 +372,9 @@ run headless; see CLAUDE.md for the command and gotchas.
 
 ## 14. Sprites
 - **Every actor is pixel art painted in code**, like the hero. The art lives as ASCII in `tools/art/`:
-  - `make_player_sprite.gd`: the hero, a blue hood and tunic with a gold hem
+  - `make_player_sprite.gd`: the hero, a blue hood and tunic with a gold hem and a red scarf. Three rows (down,
+    up, side; right is the side row mirrored) of nine 16x24 frames: idle, blink, four walk frames, attack, item
+    held up, fallen. A test checks `PlayerAnimator`'s columns against the tool's.
   - `make_sprites.gd`: everything else, namely slime, bat, goblin archer, the Iron Warden, villagers, items and
     pickups, the crystal switch, the training dummy and brambles
 

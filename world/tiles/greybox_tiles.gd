@@ -27,13 +27,18 @@ extends RefCounted
 ##  14 the market stall's six quarters, a washing line (decoration) and its post
 ##  15 more furniture, on a wooden floor: chair, cupboard, loom, plant, candle stand, shop counter,
 ##     stool, bookcase
+##  16-19 house fronts (HOUSE_KINDS): roofs with a gable's barge board on their left or right edge,
+##     thatch, the half-timbered upper floor, and the stone chapel
+##  20 overlays for the Decor layer on houses: chimney, the chapel's cross (two halves), shop sign
+##  21 chimney smoke, animated: SMOKE_FRAMES frames side by side
+##  22 more trees for the Decor layer: a pine, a broad oak, and a closed canopy for thick woods
 
 const TEXTURE_PATH: String = "res://world/tiles/greybox_tiles.png"
 const TILESET_PATH: String = "res://world/tiles/greybox_tiles.tres"
 const SOURCE_ID: int = 0
 const TILE_SIZE: int = 16
 const COLUMNS: int = 8
-const ROWS: int = 16
+const ROWS: int = 23
 
 const ROW_GROUND: int = 0
 const ROW_STAIRS: int = 1
@@ -51,6 +56,30 @@ const ROW_MARKERS: int = 12
 const ROW_PROPS_B: int = 13
 const ROW_PROPS_C: int = 14
 const ROW_FURNITURE_B: int = 15
+const ROW_HOUSE: int = 16
+const ROW_HOUSE_DECOR: int = 20
+const ROW_SMOKE: int = 21
+const ROW_TREES: int = 22
+## More trees, all props like "prop_tree". The baker mixes the three kinds by cell and uses
+## the canopy where trees stand on all four sides.
+const TREE_KINDS: Array[String] = ["prop_tree_b", "prop_tree_c", "prop_canopy"]
+## House fronts, in atlas order from ROW_HOUSE (eight to a row), all solid at height 3.
+## A roof kind is its style ("roof" clay tiles, "roof_blue" slate, "roof_thatch"), then "_top"
+## (ridge) or "_eave" for its first and last rows, then "_l" or "_r" for a gable end; the baker
+## builds the name for each cell of a roof block.
+const HOUSE_KINDS: Array[String] = [
+	"roof_l", "roof_r", "roof_top_l", "roof_top_r", "roof_eave_l", "roof_eave_r",
+	"roof_blue_l", "roof_blue_r", "roof_blue_top_l", "roof_blue_top_r", "roof_blue_eave_l", "roof_blue_eave_r",
+	"roof_thatch", "roof_thatch_l", "roof_thatch_r", "roof_thatch_top", "roof_thatch_top_l", "roof_thatch_top_r",
+	"roof_thatch_eave", "roof_thatch_eave_l", "roof_thatch_eave_r",
+	"wall_upper", "wall_upper_b", "wall_upper_window",
+	"chapel_wall", "chapel_window", "chapel_door_l", "chapel_door_r",
+]
+## Overlays that sit on house tiles, on the Decor layer.
+const HOUSE_DECOR_KINDS: Array[String] = ["chimney", "cross_l", "cross_r", "shop_sign"]
+## Chimney smoke's animation: frames, and how long each shows (seconds).
+const SMOKE_FRAMES: int = 4
+const SMOKE_FRAME_TIME: float = 0.35
 const PROPS_B_KINDS: Array[String] = ["prop_crate", "prop_keg", "prop_hay", "prop_logs", "prop_stump", "prop_lamp", "prop_stone", "bucket"]
 const PROPS_C_KINDS: Array[String] = ["stall_nw", "stall_n", "stall_ne", "stall_sw", "stall_s", "stall_se", "laundry", "prop_post"]
 ## More solid indoor furniture, with shading heights like FURNITURE_HEIGHTS.
@@ -145,6 +174,16 @@ static func coords(kind: String, height: int = 0) -> Vector2i:
 		return Vector2i(PROPS_C_KINDS.find(kind), ROW_PROPS_C)
 	if FURNITURE_B_KINDS.has(kind):
 		return Vector2i(FURNITURE_B_KINDS.find(kind), ROW_FURNITURE_B)
+	if HOUSE_KINDS.has(kind):
+		var index: int = HOUSE_KINDS.find(kind)
+		@warning_ignore("integer_division")
+		return Vector2i(index % COLUMNS, ROW_HOUSE + index / COLUMNS)
+	if HOUSE_DECOR_KINDS.has(kind):
+		return Vector2i(HOUSE_DECOR_KINDS.find(kind), ROW_HOUSE_DECOR)
+	if kind == "smoke":
+		return Vector2i(0, ROW_SMOKE)
+	if TREE_KINDS.has(kind):
+		return Vector2i(TREE_KINDS.find(kind), ROW_TREES)
 	return Vector2i(0, ROW_GROUND)
 
 
@@ -163,12 +202,14 @@ static func marker_kind(coords: Vector2i) -> String:
 static func is_known_kind(kind: String) -> bool:
 	return LAYERED_KINDS.has(kind) or SOLID_KINDS.has(kind) or FLOOR_KINDS.has(kind) or FURNITURE_KINDS.has(kind) \
 		or DECOR_KINDS.has(kind) or DETAIL_KINDS.has(kind) or PROP_KINDS.has(kind) or PROP_BLOCKS.has(kind) \
-		or PROPS_B_KINDS.has(kind) or PROPS_C_KINDS.has(kind) or FURNITURE_B_KINDS.has(kind)
+		or PROPS_B_KINDS.has(kind) or PROPS_C_KINDS.has(kind) or FURNITURE_B_KINDS.has(kind) \
+		or HOUSE_KINDS.has(kind) or HOUSE_DECOR_KINDS.has(kind) or kind == "smoke" or TREE_KINDS.has(kind)
 
 
 static func is_decor(kind: String) -> bool:
-	return DECOR_KINDS.has(kind) or PROP_DECOR_KINDS.has(kind)
+	return DECOR_KINDS.has(kind) or PROP_DECOR_KINDS.has(kind) or HOUSE_DECOR_KINDS.has(kind) or kind == "smoke"
 
 
 static func is_prop(kind: String) -> bool:
-	return PROP_KINDS.has(kind) or (PROPS_B_KINDS.has(kind) or PROPS_C_KINDS.has(kind)) and not PROP_DECOR_KINDS.has(kind)
+	return PROP_KINDS.has(kind) or TREE_KINDS.has(kind) \
+		or (PROPS_B_KINDS.has(kind) or PROPS_C_KINDS.has(kind)) and not PROP_DECOR_KINDS.has(kind)

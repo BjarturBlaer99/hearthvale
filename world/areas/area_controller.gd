@@ -95,7 +95,7 @@ func _ready() -> void:
 			terrain.set_occupied(child.call(&"cell"))
 	_refresh_doors()
 	_shading.stone_faces = dungeon_id != &""
-	_shading.show_grid(grid)
+	_shading.show_grid(grid, height_layer)
 	var arrival: Dictionary = _arrival()
 	_entrance_cell = arrival["cell"]
 	_entrance_facing = arrival["facing"]
@@ -112,6 +112,7 @@ func _ready() -> void:
 	hud.item_menu.closed.connect(_on_item_menu_closed)
 	hud.pause_menu.quit_to_title.connect(_on_quit_to_title)
 	EventBus.hit_stop.connect(hit_stop)
+	EventBus.quest_announced.connect(_on_quest_announced)
 	for boss: Enemy in enemies():
 		if boss is Boss:
 			(boss as Boss).calm_music = music
@@ -127,6 +128,8 @@ func _ready() -> void:
 		hud.flash()
 	GameState.update_player(area_id, player.motor.cell)
 	_update_hud()
+	# A loaded game, or anything changed outside an area: let the quests catch up.
+	Quests.refresh()
 
 
 func _process(delta: float) -> void:
@@ -244,6 +247,8 @@ func interact() -> bool:
 		var message: String = usable.call(&"use")
 		if not message.is_empty():
 			hud.show_message(message)
+			if usable is Chest:
+				player.hold_up(ItemIcons.name_for((usable as Chest).item_id))
 			return true
 	return false
 
@@ -334,6 +339,7 @@ func pick_up(pickup: ItemPickup) -> bool:
 	if not pickup.take():
 		return false
 	hud.show_message("You pick up the %s." % pickup.item_name())
+	player.hold_up(ItemIcons.name_for(pickup.item_id))
 	return true
 
 
@@ -497,6 +503,8 @@ func collect_pickups() -> int:
 		if child.has_method(&"touches") and child.has_method(&"collect") \
 				and child.call(&"touches", at, player.hurt_box.radius) and child.call(&"collect"):
 			collected += 1
+			if child is HeartContainer:
+				player.hold_up(&"heart_container")
 			var follow: Variant = child.get(&"dialogue_id")
 			if typeof(follow) == TYPE_STRING_NAME and follow != &"" and open_dialogue(follow):
 				continue
@@ -633,6 +641,10 @@ func _end_hit_stop() -> void:
 
 func _exit_tree() -> void:
 	_end_hit_stop()
+
+
+func _on_quest_announced(quest_id: StringName, what: StringName) -> void:
+	hud.show_notice(Quests.announcement(quest_id, what))
 
 
 func _on_quit_to_title() -> void:

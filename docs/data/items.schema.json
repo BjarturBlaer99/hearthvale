@@ -14,6 +14,7 @@
           "id": { "type": "string", "minLength": 1 },
           "name": { "type": "string" },
           "type": { "enum": ["weapon_melee", "weapon_ranged", "ammo", "bomb", "key", "currency", "consumable", "quest", "heart"] },
+          "icon": { "type": "string", "description": "The item's picture (a frame of gameplay/art/items.png, ItemIcons.FRAMES). Without one, its type decides." },
           "stackable": { "type": "boolean", "default": false },
           "max_stack": { "type": "integer", "minimum": 1 },
           "stats": {

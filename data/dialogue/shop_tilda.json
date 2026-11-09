@@ -7,6 +7,16 @@
       "speaker": "tilda",
       "text": "Arrows and bombs, the best in Hearthvale. Well, the only ones. What'll it be?",
       "options": [
+        { "text": "Eggs from Farmer Oda.",
+          "conditions": [
+            { "type": "quest_stage", "quest": "eggs_for_tilda", "stage": "deliver" },
+            { "type": "has_item", "item": "egg_basket", "count": 1 }
+          ],
+          "effects": [
+            { "type": "take_item", "item": "egg_basket", "count": 1 },
+            { "type": "set_flag", "flag": "eggs_delivered", "value": true }
+          ],
+          "next": "eggs" },
         { "text": "Ten arrows (5 coins)",
           "conditions": [
             { "type": "has_item", "item": "coin", "count": 5 },
@@ -44,6 +54,14 @@
           ],
           "next": "cannot" },
         { "text": "Just looking.", "next": null }
+      ]
+    },
+    "eggs": {
+      "speaker": "tilda",
+      "text": "Oh, lovely, and not one cracked! Tell Oda I'll settle up on market day.",
+      "options": [
+        { "text": "Something else.", "next": "greet" },
+        { "text": "Goodbye.", "next": null }
       ]
     },
     "sold": {

@@ -1,0 +1,74 @@
+{
+  "id": "lost_shuttle",
+  "title": "The Lost Shuttle",
+  "giver": "wenna_weaver",
+  "start_stage": "find",
+  "stages": {
+    "find": {
+      "journal": "Wenna the weaver lost her shuttle at the stream in the North Fields, on the far bank.",
+      "objectives": [
+        {
+          "id": "find_shuttle",
+          "text": "Find the weaver's shuttle",
+          "complete_when": {
+            "type": "has_item",
+            "item": "weavers_shuttle",
+            "count": 1
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "has_item",
+            "item": "weavers_shuttle",
+            "count": 1
+          },
+          "to": "return"
+        }
+      ]
+    },
+    "return": {
+      "journal": "You have the shuttle. Wenna is at her loom, in the house west of the road in Hearthvale.",
+      "objectives": [
+        {
+          "id": "give_shuttle",
+          "text": "Bring the shuttle to Wenna",
+          "complete_when": {
+            "type": "flag",
+            "flag": "returned_shuttle",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "returned_shuttle",
+            "value": true
+          },
+          "to": "done"
+        }
+      ]
+    },
+    "done": {
+      "journal": "Wenna has her shuttle back, and paid you 30 coins.",
+      "on_enter": [
+        {
+          "type": "take_item",
+          "item": "weavers_shuttle",
+          "count": 1
+        },
+        {
+          "type": "give_item",
+          "item": "coin",
+          "count": 30
+        },
+        {
+          "type": "complete_quest"
+        }
+      ]
+    }
+  }
+}

@@ -8,7 +8,10 @@ extends SceneTree
 ## "talk" (to what is in front), "swing" (the sword, caught mid-swing), and with the bow, arrows
 ## and bombs in hand: "menu" (the item menu open), "shoot" (an arrow in flight), "bomb" (lit);
 ## "flag:<name>" sets that flag first (a door already opened); "gaze" waits for a boss's eye to
-## open; "pause" opens the pause menu and "settings" the settings from it. The area id "title"
+## open; "pause" opens the pause menu and "settings" the settings from it; "accept" talks and
+## takes the first answer twice (accepting a quest); "questlog" starts the quests, moves them on
+## a little and opens the quest log; "take" picks up what lies underfoot (the hero holds it up);
+## "walk" catches the hero mid-stride; "fall" takes every heart. The area id "title"
 ## shows the title screen instead of an area.
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
@@ -68,6 +71,13 @@ const SHOTS: Array = [
 	["55_fields_shepherd_and_plateau", &"north_fields", Vector2i(25, 23), Vector2.UP, 0, ""],
 	["56_cistern_secret_room", &"cistern", Vector2i(22, 29), Vector2.UP, 0, "flag:dungeon/cistern/door/secret_wall"],
 	["57_old_wood_fireflies", &"old_wood", Vector2i(6, 18), Vector2.UP, 0, ""],
+	["58_wenna_has_a_problem", &"weaver_house", Vector2i(7, 4), Vector2.UP, 0, "talk"],
+	["59_a_new_quest", &"weaver_house", Vector2i(7, 4), Vector2.UP, 0, "accept"],
+	["60_the_shuttle_by_the_stream", &"north_fields", Vector2i(32, 8), Vector2.RIGHT, 0, ""],
+	["61_quest_log", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "questlog"],
+	["62_holding_up_the_sword", &"village", Vector2i(6, 29), Vector2.RIGHT, 0, "take"],
+	["63_walking", &"village", Vector2i(23, 17), Vector2.LEFT, 0, "walk"],
+	["64_fallen", &"south_field", Vector2i(12, 12), Vector2.LEFT, 0, "fall"],
 ]
 
 
@@ -109,12 +119,27 @@ func _capture() -> void:
 			for item: Array in [[&"bow", 1], [&"arrow", 10], [&"bomb", 3]]:
 				game_state.call(&"add_item", item[0], item[1])
 			game_state.call(&"equip", &"bomb" if shot[5] == "bomb" else &"bow")
-		if shot[5] == "talk":
+		if shot[5] == "talk" or shot[5] == "accept":
 			scene.call(&"interact")
+		if shot[5] == "accept":
+			for i: int in 2:
+				scene.get(&"hud").get(&"dialogue").call(&"confirm")
 		await _frames(30)
 		if shot[5] == "swing":
 			player.call(&"swing")
 			await _frames(9)
+		elif shot[5] == "take":
+			scene.call(&"interact")
+			await _frames(4)
+		elif shot[5] == "walk":
+			# By the clock, like "gaze": a third of a second of walking, whatever the frame rate.
+			Input.action_press(&"move_left")
+			await create_timer(0.34).timeout
+			_save(out_dir, shot[0])
+			Input.action_release(&"move_left")
+		elif shot[5] == "fall":
+			game_state.call(&"damage", 99)
+			await _frames(6)
 		elif shot[5] == "menu":
 			scene.call(&"open_item_menu")
 			await _frames(2)
@@ -124,6 +149,17 @@ func _capture() -> void:
 		elif shot[5] == "gaze":
 			# By the clock, not frames: a fast screen draws many more frames a second.
 			await create_timer(3.2).timeout
+		elif shot[5] == "questlog":
+			var runner: RefCounted = root.get_node("Quests").get(&"runner")
+			for quest_id: StringName in [&"lost_shuttle", &"slime_bounty", &"eggs_for_tilda"]:
+				runner.call(&"start", quest_id)
+			for flag: StringName in [&"eggs_delivered", &"told_oda_eggs"]:
+				game_state.call(&"set_flag", flag, true)
+			game_state.call(&"add_item", &"weavers_shuttle", 1)
+			scene.call(&"open_pause_menu")
+			scene.get(&"hud").get(&"pause_menu").call(&"choose", &"quests")
+			scene.get(&"hud").get(&"pause_menu").get(&"quest_log").call(&"move_cursor", 1)
+			await _frames(2)
 		elif shot[5] in ["pause", "settings"]:
 			scene.call(&"open_pause_menu")
 			if shot[5] == "settings":
@@ -134,7 +170,8 @@ func _capture() -> void:
 			player.get(&"motor").call(&"place", shot[2] + Vector2i(0, 2))
 			player.call(&"sync_from_motor")
 			await _frames(40)
-		_save(out_dir, shot[0])
+		if shot[5] != "walk":
+			_save(out_dir, shot[0])
 		paused = false
 		scene.queue_free()
 		await _frames(2)

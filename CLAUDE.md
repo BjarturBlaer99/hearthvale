@@ -26,6 +26,9 @@ in `docs/DECISIONS.md` are superseded.
   The slice started with placeholder shapes; phase 2 replaced them with pixel art, as below.
   **Exception (user's request, 2026-11-07; blue suit 2026-11-08):** the hero is a Zelda-style pixel-art sprite in a blue suit, painted from ASCII art by
   `tools/art/make_player_sprite.gd`. Keep it; edit the art in that tool, never the PNG.
+  **Art pass 2 (user's request, 2026-11-09, between H13 and H14):** the hero has a red scarf and nine frames a row
+  (walk cycle, blink, attack, item held up, fallen); houses are half-timbered with thatch, tile and slate roofs;
+  paths and water have soft edges drawn by `HeightShading`. See `docs/progress/art-pass-2-plan.md`.
   **Exception (user's request, 2026-11-08):** the environment tiles are proper pixel art (grass, trees, roofs with
   ridges and eaves, windows, water...) plus a Decor layer of flowers, tufts and the like, all still painted in code by
   `tools/greybox/make_tile_texture.gd` and placed by `build_maps.gd`. No external assets; edit the art in the tool.

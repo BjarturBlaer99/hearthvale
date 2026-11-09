@@ -52,8 +52,11 @@ const MAPS: Dictionary = {
 			# The north rise, wooded along the top, with the old chapel on it.
 			[0, 0, 48, 8, 2, "ground"],
 			[0, 0, 48, 2, 2, "tree"],
-			[18, 2, 12, 3, 3, "roof_blue"],
-			[18, 5, 12, 1, 3, "wall"],
+			# The chapel: slate over stone, with lancet windows and an arched double door.
+			[18, 2, 12, 2, 3, "roof_blue"],
+			[18, 4, 12, 1, 3, "chapel_window"],
+			[18, 5, 12, 1, 3, "chapel_wall"],
+			[23, 5, 2, 1, 3, "chapel_door_l"],
 			[22, 8, 4, 1, 1, "stairs"],
 			# The road north to the fields: along the chapel front, then up through a gap in the woods.
 			[22, 6, 16, 2, 2, "path"],
@@ -64,14 +67,19 @@ const MAPS: Dictionary = {
 			[42, 15, 2, 2, 1, "tree"],
 			[44, 22, 2, 2, 1, "tree"],
 			[40, 25, 1, 1, 1, "rock"],
-			# Houses: a roof over a timber front wall.
-			[6, 11, 6, 3, 3, "roof"],
+			# Houses: a roof over a half-timbered upper floor and a ground floor. Two thatched
+			# cottages, Elder Bram's under blue slate, and the shop under red tiles.
+			[6, 11, 6, 2, 3, "roof_thatch"],
+			[6, 13, 6, 1, 3, "wall_upper"],
 			[6, 14, 6, 1, 3, "wall"],
-			[14, 11, 6, 3, 3, "roof"],
+			[14, 11, 6, 2, 3, "roof_thatch"],
+			[14, 13, 6, 1, 3, "wall_upper"],
 			[14, 14, 6, 1, 3, "wall"],
-			[28, 11, 6, 3, 3, "roof_blue"],
+			[28, 11, 6, 2, 3, "roof_blue"],
+			[28, 13, 6, 1, 3, "wall_upper"],
 			[28, 14, 6, 1, 3, "wall"],
-			[6, 21, 6, 3, 3, "roof"],
+			[6, 21, 6, 2, 3, "roof"],
+			[6, 23, 6, 1, 3, "wall_upper"],
 			[6, 24, 6, 1, 3, "wall"],
 			# Doors: the weaver's, the elder's and the shop's.
 			[16, 14, 1, 1, 0, "door"],
@@ -155,6 +163,13 @@ const MAPS: Dictionary = {
 			[30, 29, 1, 1, "lily"],
 			# A vegetable patch on the east meadow.
 			[43, 26, 3, 3, "crops"],
+			# Chimneys with their smoke, the shop's sign and the chapel's cross.
+			[10, 11, 1, 1, "chimney"], [10, 10, 1, 1, "smoke"],
+			[18, 11, 1, 1, "chimney"], [18, 10, 1, 1, "smoke"],
+			[32, 11, 1, 1, "chimney"], [32, 10, 1, 1, "smoke"],
+			[10, 21, 1, 1, "chimney"], [10, 20, 1, 1, "smoke"],
+			[9, 23, 1, 1, "shop_sign"],
+			[23, 2, 1, 1, "cross_l"], [24, 2, 1, 1, "cross_r"],
 			[20, 20, 1, 1, "bucket"],
 			[3, 19, 2, 1, "laundry"],
 		],
@@ -648,18 +663,36 @@ func _prop(kind: String, dx: int, dy: int) -> String:
 	return GreyboxTiles.PROP_BLOCKS[kind]
 
 
-## The tile for cell (dx, dy) of a block of `kind`, `width` x `height`: a roof's top row gets
-## its ridge and its bottom row its eaves; walls get a window every third cell.
+## The tile for cell (dx, dy) of a block of `kind`, `width` x `height`:
+## - a roof ("roof", "roof_blue", "roof_thatch"): its top row gets the ridge, its bottom row the
+##   eaves, and its first and last columns a gable's barge board
+## - walls get a window every third cell; an upper floor's other cells alternate their braces
+## - "chapel_window" alternates stone and lancet windows; "chapel_door_l" is a pair of leaves
 func _detail(kind: String, dx: int, dy: int, width: int, height: int) -> String:
 	match kind:
-		"roof", "roof_blue":
+		"roof", "roof_blue", "roof_thatch":
+			var part: String = ""
 			if height >= 2 and dy == 0:
-				return kind + "_top"
-			if height >= 2 and dy == height - 1:
-				return kind + "_eave"
+				part = "_top"
+			elif height >= 2 and dy == height - 1:
+				part = "_eave"
+			var edge: String = ""
+			if width >= 2 and dx == 0:
+				edge = "_l"
+			elif width >= 2 and dx == width - 1:
+				edge = "_r"
+			return kind + part + edge
 		"wall":
 			if width >= 4 and dx % 3 == 1 and dx < width - 1:
 				return "wall_window"
+		"wall_upper":
+			if width >= 4 and dx % 3 == 1 and dx < width - 1:
+				return "wall_upper_window"
+			return "wall_upper" if dx % 2 == 0 else "wall_upper_b"
+		"chapel_window":
+			return "chapel_window" if dx % 2 == 1 else "chapel_wall"
+		"chapel_door_l":
+			return "chapel_door_l" if dx % 2 == 0 else "chapel_door_r"
 	return kind
 
 
@@ -676,7 +709,10 @@ func _decorate(root: Node, height_layer: TileMapLayer, map: Dictionary, props: D
 	decor.tile_set = height_layer.tile_set
 	decor.clear()
 	for cell: Vector2i in props:
-		decor.set_cell(cell, GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(str(props[cell])))
+		var prop: String = str(props[cell])
+		if prop == "prop_tree":
+			prop = _tree_kind(cell, props, map["size"])
+		decor.set_cell(cell, GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(prop))
 	for block: Array in map.get("decor", []):
 		var kind: String = block[4]
 		if not GreyboxTiles.is_decor(kind):
@@ -729,6 +765,21 @@ func _spawns(root: Node, map: Dictionary) -> Error:
 			for x: int in range(block[0], block[0] + block[2]):
 				layer.set_cell(Vector2i(x, y), GreyboxTiles.SOURCE_ID, GreyboxTiles.marker_coords(kind))
 	return OK
+
+
+## Which tree stands at `cell`: a closed canopy where trees (or the map's edge) stand on all
+## four sides of it, else one of three kinds, picked by the cell so a wood is never a grid of
+## one tree.
+func _tree_kind(cell: Vector2i, props: Dictionary, size: Vector2i) -> String:
+	var hemmed_in: bool = true
+	for side: Vector2i in [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
+		var neighbour: Vector2i = cell + side
+		if Rect2i(Vector2i.ZERO, size).has_point(neighbour) and str(props.get(neighbour, "")) != "prop_tree":
+			hemmed_in = false
+	if hemmed_in:
+		return "prop_canopy"
+	var roll: int = _cell_hash(cell, 29) % 6
+	return "prop_tree" if roll < 3 else ("prop_tree_b" if roll < 5 else "prop_tree_c")
 
 
 ## Cells the hero uses or arrives at: every Interactables child (with its size, if it has
