@@ -49,6 +49,26 @@ func _initialize() -> void:
 		_fixed(source, Vector2i(height, GreyboxTiles.ROW_SOLID_GROUND), height, true)
 	for index: int in GreyboxTiles.PROP_KINDS.size():
 		_fixed(source, Vector2i(index, GreyboxTiles.ROW_PROPS), 0, false)
+	# Raised dungeon floor: walkable, its height by column.
+	for height: int in GreyboxTiles.COLUMNS:
+		_fixed(source, Vector2i(height, GreyboxTiles.ROW_LEDGE), height, false)
+	# H12 props and decorations (Decor layer, never read for movement) and furniture.
+	for index: int in GreyboxTiles.PROPS_B_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_PROPS_B), 0, false)
+	for index: int in GreyboxTiles.PROPS_C_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_PROPS_C), 0, false)
+	for index: int in GreyboxTiles.FURNITURE_B_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_FURNITURE_B), GreyboxTiles.FURNITURE_B_HEIGHTS[index], true)
+	# Spawn markers: never walked on (the area clears them), open ground in the editor.
+	for index: int in GreyboxTiles.MARKER_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_MARKERS), 0, false)
+	# Water: one tile that plays its frames (which lie to its right) in a loop.
+	var water: Vector2i = Vector2i(0, GreyboxTiles.ROW_WATER)
+	_fixed(source, water, 0, true)
+	source.set_tile_animation_columns(water, GreyboxTiles.WATER_FRAMES)
+	source.set_tile_animation_frames_count(water, GreyboxTiles.WATER_FRAMES)
+	for frame: int in GreyboxTiles.WATER_FRAMES:
+		source.set_tile_animation_frame_duration(water, frame, GreyboxTiles.WATER_FRAME_TIME)
 
 	var error: Error = ResourceSaver.save(tile_set, GreyboxTiles.TILESET_PATH)
 	print("tools/greybox: wrote %s (%s)" % [GreyboxTiles.TILESET_PATH, error_string(error)])

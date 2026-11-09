@@ -1,0 +1,33 @@
+{
+  "id": "guard_rolf",
+  "start": "hello",
+  "speakers": {
+    "rolf": "Guard Rolf"
+  },
+  "nodes": {
+    "hello": {
+      "speaker": "rolf",
+      "text": "The road runs north through the fields and the Old Wood, all the way to the keep.",
+      "options": [
+        {
+          "text": "Anything else?",
+          "next": "more"
+        },
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "more": {
+      "speaker": "rolf",
+      "text": "Mind the goblins on the high ground. And if you find pieces of a heart out there, they say four make a whole one.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    }
+  }
+}

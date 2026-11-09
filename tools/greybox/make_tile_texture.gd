@@ -12,6 +12,452 @@ const ROOF_BLUE: Color = Color(0.30, 0.40, 0.62)
 ## Shadows on see-through props darken whatever grass they're drawn over.
 const SHADOW: Color = Color(0, 0, 0, 0.28)
 
+## The pixel art of the props and furniture added in H12: each a palette name and 16 rows.
+const PROP_PALETTES: Dictionary = {
+	"wood": {"L": Color(0.62, 0.42, 0.22), "w": Color(0.78, 0.58, 0.34), "W": Color(0.50, 0.32, 0.16), "s": Color(0.00, 0.00, 0.00, 0.25), "i": Color(0.42, 0.42, 0.48), "b": Color(0.40, 0.25, 0.12)},
+	"hay": {"y": Color(0.92, 0.80, 0.42), "Y": Color(0.76, 0.62, 0.28), "b": Color(0.58, 0.40, 0.20), "s": Color(0.00, 0.00, 0.00, 0.25)},
+	"log": {"r": Color(0.84, 0.68, 0.44), "R": Color(0.62, 0.46, 0.26), "b": Color(0.48, 0.32, 0.16), "B": Color(0.34, 0.22, 0.10), "s": Color(0.00, 0.00, 0.00, 0.25)},
+	"lamp": {"y": Color(1.00, 0.88, 0.45), "Y": Color(1.00, 0.97, 0.75), "i": Color(0.30, 0.30, 0.36), "s": Color(0.00, 0.00, 0.00, 0.25)},
+	"stone": {"g": Color(0.58, 0.58, 0.62), "G": Color(0.40, 0.40, 0.46), "l": Color(0.74, 0.74, 0.78), "m": Color(0.40, 0.56, 0.30), "s": Color(0.00, 0.00, 0.00, 0.25)},
+	"stall": {"r": Color(0.80, 0.22, 0.22), "R": Color(0.60, 0.14, 0.14), "w": Color(0.96, 0.94, 0.88), "W": Color(0.80, 0.78, 0.72), "L": Color(0.62, 0.42, 0.22), "p": Color(0.78, 0.58, 0.34), "P": Color(0.50, 0.32, 0.16), "a": Color(0.88, 0.18, 0.20), "A": Color(0.98, 0.50, 0.40), "c": Color(0.42, 0.70, 0.30), "C": Color(0.26, 0.48, 0.18), "t": Color(0.86, 0.66, 0.36), "s": Color(0.00, 0.00, 0.00, 0.25)},
+	"laundry": {"r": Color(0.80, 0.74, 0.58), "b": Color(0.40, 0.56, 0.86), "B": Color(0.28, 0.40, 0.68), "w": Color(0.96, 0.95, 0.90), "W": Color(0.80, 0.80, 0.78), "L": Color(0.62, 0.42, 0.22), "s": Color(0.00, 0.00, 0.00, 0.25)},
+	"furniture": {"L": Color(0.58, 0.38, 0.20), "w": Color(0.74, 0.54, 0.32), "W": Color(0.46, 0.30, 0.14), "i": Color(0.42, 0.42, 0.48), "g": Color(0.36, 0.62, 0.26), "G": Color(0.22, 0.44, 0.16), "c": Color(0.80, 0.50, 0.30), "C": Color(0.58, 0.32, 0.18), "y": Color(1.00, 0.88, 0.45), "Y": Color(1.00, 0.97, 0.75), "e": Color(0.94, 0.90, 0.80), "r": Color(0.70, 0.20, 0.22), "u": Color(0.30, 0.42, 0.72), "t": Color(0.86, 0.66, 0.36), "v": Color(0.56, 0.30, 0.56), "s": Color(0.00, 0.00, 0.00, 0.22)},
+}
+const PROP_ART: Dictionary = {
+	"prop_crate": ["wood", [
+		"................",
+		".oooooooooooooo.",
+		".oLLLLLLLLLLLLo.",
+		".oLWwwwwwwwwWLo.",
+		".oLwWwwwwwwWwLo.",
+		".oLwwWwwwwWwwLo.",
+		".oLwwwWwwWwwwLo.",
+		".oLwwwwWWwwwwLo.",
+		".oLwwwwWWwwwwLo.",
+		".oLwwwWwwWwwwLo.",
+		".oLwwWwwwwWwwLo.",
+		".oLwWwwwwwwWwLo.",
+		".oLWwwwwwwwwWLo.",
+		".oLLLLLLLLLLLLo.",
+		".oooooooooooooo.",
+		"..ssssssssssss..",
+	]],
+	"prop_keg": ["wood", [
+		"................",
+		"....oooooooo....",
+		"...owwwwwwwwo...",
+		"..owWwwwwwwWwo..",
+		"..oiiiiiiiiiio..",
+		"..owwwwwwwwwwo..",
+		".owwwwwwwwwwwwo.",
+		".owWwwwwwwwwWwo.",
+		".oiiiiiiiiiiiio.",
+		".owwwwwwwwwwwwo.",
+		".owWwwwwwwwwWwo.",
+		"..owwwwwwwwwwo..",
+		"..oiiiiiiiiiio..",
+		"...owwwwwwwwo...",
+		"....oooooooo....",
+		"...ssssssssss...",
+	]],
+	"prop_hay": ["hay", [
+		"................",
+		"................",
+		"................",
+		"................",
+		".oooooooooooooo.",
+		".oyyYyyyyYyyyyo.",
+		".oyYyyyYyyyYyyo.",
+		".obbbbbbbbbbbbo.",
+		".oyyyYyyyyYyyyo.",
+		".oYyyyyYyyyyYyo.",
+		".oyyYyyyyYyyyyo.",
+		".obbbbbbbbbbbbo.",
+		".oYyyyyyYyyyYyo.",
+		".oyyYyyyyyYyyyo.",
+		".oooooooooooooo.",
+		"..ssssssssssss..",
+	]],
+	"prop_logs": ["log", [
+		"................",
+		"................",
+		"................",
+		"................",
+		"......oooo......",
+		".....orrrro.....",
+		".....orRRro.....",
+		".....orrrro.....",
+		"..ooooooooooo...",
+		".orrrroorrrro...",
+		".orRRroorRRro...",
+		".orrrroorrrro...",
+		".obbbbbbbbbbbo..",
+		".obBbbBbbBbbbo..",
+		".ooooooooooooo..",
+		"..sssssssssss...",
+	]],
+	"prop_stump": ["log", [
+		"................",
+		"................",
+		"................",
+		"................",
+		"................",
+		"................",
+		"................",
+		"....oooooooo....",
+		"...orrrrrrrro...",
+		"...orRrRRrRro...",
+		"...orrrRRrrro...",
+		"...obrrrrrrbo...",
+		"..obbbbbbbbbbo..",
+		"..obBbbBbbBbbo..",
+		"..oooooooooooo..",
+		"...ssssssssss...",
+	]],
+	"prop_lamp": ["lamp", [
+		"......oooo......",
+		".....oyyyyo.....",
+		".....oyYYyo.....",
+		".....oyyyyo.....",
+		"......oiio......",
+		"......oiio......",
+		"......oiio......",
+		"......oiio......",
+		"......oiio......",
+		"......oiio......",
+		"......oiio......",
+		"......oiio......",
+		"......oiio......",
+		".....oiiiio.....",
+		".....oooooo.....",
+		"......ssss......",
+	]],
+	"prop_stone": ["stone", [
+		"................",
+		"......oooo......",
+		".....ogggGo.....",
+		".....olggGo.....",
+		"....olgggGGo....",
+		"....olggggGo....",
+		"....olgmggGo....",
+		"....olggmgGo....",
+		"....olgggGGo....",
+		"...olgggggGGo...",
+		"...olggmmggGo...",
+		"...olgggggGGo...",
+		"...olgggggGGo...",
+		"...oooooooooo...",
+		"....ssssssss....",
+		"................",
+	]],
+	"bucket": ["wood", [
+		"................",
+		"................",
+		"................",
+		"................",
+		"................",
+		"................",
+		"......oo........",
+		".....o..o.......",
+		"....o....o......",
+		"...oooooooo.....",
+		"...owwwwwwo.....",
+		"...oiiiiiio.....",
+		"....owwwwo......",
+		"....owwwwo......",
+		".....oooo.......",
+		"....ssssss......",
+	]],
+	"stall_nw": ["stall", [
+		"................",
+		".ooooooooooooooo",
+		".orrwwwwrrrrwwww",
+		".orrwwwwrrrrwwww",
+		".orrwwwwrrrrwwww",
+		".orrwwwwrrrrwwww",
+		".orrwwwwrrrrwwww",
+		".orrwwwwrrrrwwww",
+		".orrwwwwrrrrwwww",
+		".oRRWWWWRRRRWWWW",
+		".orrowwworrrowww",
+		".o...o...o...o..",
+		"...oLo..........",
+		"...oLo..........",
+		"...oLo..........",
+		"...oLo..........",
+	]],
+	"stall_n": ["stall", [
+		"................",
+		"oooooooooooooooo",
+		"rrrrwwwwrrrrwwww",
+		"rrrrwwwwrrrrwwww",
+		"rrrrwwwwrrrrwwww",
+		"rrrrwwwwrrrrwwww",
+		"rrrrwwwwrrrrwwww",
+		"rrrrwwwwrrrrwwww",
+		"rrrrwwwwrrrrwwww",
+		"RRRRWWWWRRRRWWWW",
+		"orrrowwworrrowww",
+		".o...o...o...o..",
+		"................",
+		"................",
+		"................",
+		"................",
+	]],
+	"stall_ne": ["stall", [
+		"................",
+		"ooooooooooooooo.",
+		"rrrrwwwwrrrrwwo.",
+		"rrrrwwwwrrrrwwo.",
+		"rrrrwwwwrrrrwwo.",
+		"rrrrwwwwrrrrwwo.",
+		"rrrrwwwwrrrrwwo.",
+		"rrrrwwwwrrrrwwo.",
+		"rrrrwwwwrrrrwwo.",
+		"RRRRWWWWRRRRWWo.",
+		"orrrowwworrrowo.",
+		".o...o...o...o..",
+		"..........oLo...",
+		"..........oLo...",
+		"..........oLo...",
+		"..........oLo...",
+	]],
+	"stall_sw": ["stall", [
+		"...oLo..........",
+		"...oLo..........",
+		"...oLo..oaao..oc",
+		"...oLo.oaAaao.oc",
+		"...oLo.oaaaao.oc",
+		"..oooooooooooooo",
+		".oLLLLLLLLLLLLLL",
+		".opppppppppppppp",
+		".oPpppppPpppppPp",
+		".oPpppppPpppppPp",
+		".oPpppppPpppppPp",
+		".oPpppppPpppppPp",
+		".oPpppppPpppppPp",
+		".oPpppppPpppppPp",
+		".ooooooooooooooo",
+		"..ssssssssssssss",
+	]],
+	"stall_s": ["stall", [
+		"................",
+		"................",
+		"co..ottto...oaao",
+		"Cco.otttto..oaAa",
+		"cco.otttto..oaaa",
+		"oooooooooooooooo",
+		"LLLLLLLLLLLLLLLL",
+		"pppppppppppppppp",
+		"ppppPpppppPppppp",
+		"ppppPpppppPppppp",
+		"ppppPpppppPppppp",
+		"ppppPpppppPppppp",
+		"ppppPpppppPppppp",
+		"ppppPpppppPppppp",
+		"oooooooooooooooo",
+		"ssssssssssssssss",
+	]],
+	"stall_se": ["stall", [
+		"..........oLo...",
+		"..........oLo...",
+		"..occo...oAAo...",
+		"o.ocCco..oaaao..",
+		"o.occco..oaaao..",
+		"oooooooooooooo..",
+		"LLLLLLLLLLLLLLo.",
+		"ppppppppppppppo.",
+		"PpppppPpppppPpo.",
+		"PpppppPpppppPpo.",
+		"PpppppPpppppPpo.",
+		"PpppppPpppppPpo.",
+		"PpppppPpppppPpo.",
+		"PpppppPpppppPpo.",
+		"ooooooooooooooo.",
+		"ssssssssssssss..",
+	]],
+	"laundry": ["laundry", [
+		"................",
+		"................",
+		"................",
+		"................",
+		"rrrrrrrrrrrrrrrr",
+		"..obbbbo.owwwwo.",
+		".obbbbbbo.wwwww.",
+		".obBbbBbo.wWwww.",
+		"..obbbbo..wwwWw.",
+		"..obbbbo..wwwww.",
+		"..obbbbo..wWwww.",
+		"..oooooo..wwwww.",
+		"..........ooooo.",
+		"................",
+		"................",
+		"................",
+	]],
+	"prop_post": ["laundry", [
+		"................",
+		"................",
+		".......oo.......",
+		"......oLLo......",
+		"rrrrrroLLorrrrrr",
+		"......oLLo......",
+		"......oLLo......",
+		"......oLLo......",
+		"......oLLo......",
+		"......oLLo......",
+		"......oLLo......",
+		"......oLLo......",
+		"......oLLo......",
+		".....oLLLLo.....",
+		".....oooooo.....",
+		"......ssss......",
+	]],
+	"chair": ["furniture", [
+		"................",
+		"................",
+		"................",
+		"....oooooooo....",
+		"....owwwwwwo....",
+		"....oWWWWWWo....",
+		"....owwwwwwo....",
+		"....oooooooo....",
+		"...owwwwwwwwo...",
+		"...oLLLLLLLLo...",
+		"...oooooooooo...",
+		"...ow......wo...",
+		"...ow......wo...",
+		"...oo......oo...",
+		"....ssssssss....",
+		"................",
+	]],
+	"cupboard": ["furniture", [
+		".oooooooooooooo.",
+		".oLLLLLLLLLLLLo.",
+		".owwwwwwwwwwwwo.",
+		".owWWWWWoWWWWWo.",
+		".owWwwwWoWwwwWo.",
+		".owWwwwWoWwwwWo.",
+		".owWwwywoywwwWo.",
+		".owWwwwWoWwwwWo.",
+		".owWwwwWoWwwwWo.",
+		".owWWWWWoWWWWWo.",
+		".owwwwwwwwwwwwo.",
+		".owWWWWWWWWWWWo.",
+		".owwwwwwwwwwwwo.",
+		".oooooooooooooo.",
+		".ow..........wo.",
+		"..ssssssssssss..",
+	]],
+	"loom": ["furniture", [
+		"................",
+		".oooooooooooooo.",
+		".oLLLLLLLLLLLLo.",
+		".owrurvrurvrurwo",
+		".owrurvrurvruwo.",
+		".owrurvrurvruwo.",
+		".owrurvrurvruwo.",
+		".owrrrrrrrrrrwo.",
+		".owvvvvvvvvvvwo.",
+		".owuuuuuuuuuuwo.",
+		".owrurvrurvruwo.",
+		".oLLLLLLLLLLLLo.",
+		".oooooooooooooo.",
+		".ow..........wo.",
+		".oo..........oo.",
+		"..ssssssssssss..",
+	]],
+	"plant": ["furniture", [
+		"................",
+		"......oo........",
+		".....oggo.oo....",
+		"..oo.oggooggo...",
+		".oggooGggoGgo...",
+		".ogGgoGgggggo...",
+		"..ogggGggGgo....",
+		"...oggggGgo.....",
+		"....oooooo......",
+		"....occcco......",
+		"...occcccco.....",
+		"...occcCcco.....",
+		"....oCCCCo......",
+		"....oooooo......",
+		"...ssssssss.....",
+		"................",
+	]],
+	"candle": ["furniture", [
+		"................",
+		"......oyo.......",
+		".....oyYyo......",
+		"......oyo.......",
+		"......oeo.......",
+		"......oeo.......",
+		"......oeo.......",
+		".....oiiio......",
+		"......oio.......",
+		"......oio.......",
+		"......oio.......",
+		"......oio.......",
+		".....oiiio......",
+		"....oiiiiio.....",
+		"....ooooooo.....",
+		".....sssss......",
+	]],
+	"counter": ["furniture", [
+		"................",
+		"................",
+		"..oooo....oooo..",
+		".ocCcco..ottto..",
+		".occcco..ottto..",
+		"oooooooooooooooo",
+		"oLLLLLLLLLLLLLLo",
+		"owwwwwwwwwwwwwwo",
+		"owWwwwwwWwwwwwWo",
+		"owWwwwwwWwwwwwWo",
+		"owWwwwwwWwwwwwWo",
+		"owWwwwwwWwwwwwWo",
+		"owwwwwwwwwwwwwwo",
+		"oooooooooooooooo",
+		".ssssssssssssss.",
+		"................",
+	]],
+	"stool": ["furniture", [
+		"................",
+		"................",
+		"................",
+		"................",
+		"................",
+		"................",
+		".....oooooo.....",
+		"....owwwwwwo....",
+		"....oLLLLLLo....",
+		"....oooooooo....",
+		".....ow..wo.....",
+		".....ow..wo.....",
+		".....ow..wo.....",
+		".....oo..oo.....",
+		"....ssssssss....",
+		"................",
+	]],
+	"bookcase": ["furniture", [
+		".oooooooooooooo.",
+		".oLLLLLLLLLLLLo.",
+		".oruvruvtruvruo.",
+		".oruvruvtruvruo.",
+		".oruvruvtruvruo.",
+		".oLLLLLLLLLLLLo.",
+		".otruvrtuvrtruo.",
+		".otruvrtuvrtruo.",
+		".otruvrtuvrtruo.",
+		".oLLLLLLLLLLLLo.",
+		".ouvrtruvtruvro.",
+		".ouvrtruvtruvro.",
+		".oLLLLLLLLLLLLo.",
+		".oooooooooooooo.",
+		"..ssssssssssss..",
+		"................",
+	]],
+}
+
 var _image: Image
 
 
@@ -71,6 +517,19 @@ func _initialize() -> void:
 	_rock_art(Vector2i(1, row))
 	_fence_art(Vector2i(2, row))
 	_well([Vector2i(3, row), Vector2i(4, row), Vector2i(5, row), Vector2i(6, row)])
+	for height: int in GreyboxTiles.COLUMNS:
+		_ledge(Vector2i(height, GreyboxTiles.ROW_LEDGE), height)
+	for frame: int in GreyboxTiles.WATER_FRAMES:
+		_water_frame(Vector2i(frame, GreyboxTiles.ROW_WATER), frame)
+	for index: int in GreyboxTiles.MARKER_KINDS.size():
+		_marker(Vector2i(index, GreyboxTiles.ROW_MARKERS), index)
+	for index: int in GreyboxTiles.PROPS_B_KINDS.size():
+		_ascii(Vector2i(index, GreyboxTiles.ROW_PROPS_B), GreyboxTiles.PROPS_B_KINDS[index])
+	for index: int in GreyboxTiles.PROPS_C_KINDS.size():
+		_ascii(Vector2i(index, GreyboxTiles.ROW_PROPS_C), GreyboxTiles.PROPS_C_KINDS[index])
+	for index: int in GreyboxTiles.FURNITURE_B_KINDS.size():
+		_floor(Vector2i(index, GreyboxTiles.ROW_FURNITURE_B))
+		_ascii(Vector2i(index, GreyboxTiles.ROW_FURNITURE_B), GreyboxTiles.FURNITURE_B_KINDS[index])
 	DirAccess.make_dir_recursive_absolute(GreyboxTiles.TEXTURE_PATH.get_base_dir())
 	var error: Error = _image.save_png(GreyboxTiles.TEXTURE_PATH)
 	print("tools/greybox: wrote %s (%s)" % [GreyboxTiles.TEXTURE_PATH, error_string(error)])
@@ -325,6 +784,69 @@ func _water(tile: Vector2i) -> void:
 		_px(tile, rx - 1, ry + 1, deep.lightened(0.15))
 		_px(tile, rx + 3, ry + 1, deep.lightened(0.15))
 	_px(tile, _hash(9, 9, 59) % T, _hash(4, 4, 61) % T, Color(0.95, 0.98, 1.0))
+
+
+## One frame of animated water: the ripples drift right and bob, and the glint moves, frame by
+## frame (frames wrap, so the loop is seamless).
+func _water_frame(tile: Vector2i, frame: int) -> void:
+	var deep: Color = Color(0.20, 0.42, 0.68)
+	_fill(tile, deep)
+	for y: int in T:
+		for x: int in T:
+			if _hash(x, y, 51) % 7 == 0:
+				_px(tile, x, y, deep.lightened(0.06))
+	var ripple: Color = Color(0.55, 0.74, 0.92)
+	for i: int in 3:
+		var rx: int = (_hash(i, 5, 53) + frame * 2) % T
+		var ry: int = 2 + _hash(i, 7, 57) % (T - 4) + (1 if (frame + i) % 2 == 0 else 0)
+		for dx: int in 3:
+			_px(tile, (rx + dx) % T, ry, ripple)
+		_px(tile, (rx + T - 1) % T, ry + 1, deep.lightened(0.15))
+		_px(tile, (rx + 3) % T, ry + 1, deep.lightened(0.15))
+	if frame % 2 == 0:
+		_px(tile, (_hash(9, 9, 59) + frame * 3) % T, _hash(4, 4, 61) % T, Color(0.95, 0.98, 1.0))
+
+
+## Paints PROP_ART[`art`] onto `tile` ("." clear, "o" outline, the rest from its palette),
+## blending see-through colours (shadows) over what's there.
+func _ascii(tile: Vector2i, art: String) -> void:
+	var entry: Array = PROP_ART[art]
+	var palette: Dictionary = PROP_PALETTES[entry[0]]
+	var rows: Array = entry[1]
+	for y: int in T:
+		for x: int in T:
+			var key: String = (rows[y] as String)[x]
+			if key == ".":
+				continue
+			var color: Color = OUTLINE if key == "o" else palette[key]
+			var at: Vector2i = Vector2i(tile.x * T + x, tile.y * T + y)
+			_image.set_pixelv(at, _image.get_pixelv(at).blend(color) if color.a < 1.0 else color)
+
+
+## A spawn marker (only ever seen in the editor): a bright square with a dot per index, so
+## the kinds tell apart.
+func _marker(tile: Vector2i, index: int) -> void:
+	var color: Color = [Color(0.3, 0.9, 0.3), Color(0.85, 0.5, 0.25), Color(1, 1, 1), Color(1, 0.85, 0.2), Color(0.9, 1, 0.4)][index]
+	_rect(tile, Rect2i(2, 2, T - 4, T - 4), Color(color, 0.55))
+	_rect(tile, Rect2i(2, 2, T - 4, 1), OUTLINE)
+	for dot: int in index + 1:
+		_px(tile, 4 + dot * 2, 8, OUTLINE)
+
+
+## A raised dungeon floor: big flagstones, lighter the higher they stand, each lit on its top
+## edge, in dark mortar.
+func _ledge(tile: Vector2i, height: int) -> void:
+	var stone: Color = Color(0.44, 0.44, 0.50).lightened(height * 0.04)
+	_fill(tile, stone.darkened(0.45))
+	for flag: Rect2i in [Rect2i(0, 0, 9, 7), Rect2i(10, 0, 6, 7), Rect2i(0, 8, 5, 8), Rect2i(6, 8, 10, 8)]:
+		var inner: Rect2i = Rect2i(flag.position, flag.size - Vector2i(1, 1))
+		_rect(tile, inner, stone)
+		_rect(tile, Rect2i(inner.position, Vector2i(inner.size.x, 1)), stone.lightened(0.15))
+		_rect(tile, Rect2i(inner.position + Vector2i(0, inner.size.y - 1), Vector2i(inner.size.x, 1)), stone.darkened(0.12))
+	for y: int in T:
+		for x: int in T:
+			if _hash(x, y, 67) % 23 == 0:
+				_px(tile, x, y, stone.darkened(0.2))
 
 
 func _fence(tile: Vector2i, grass: Color) -> void:

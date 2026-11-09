@@ -17,6 +17,7 @@ const KIND_ITEMS: StringName = &"items"
 const KIND_QUEST: StringName = &"quest"
 const KIND_DIALOGUE: StringName = &"dialogue"
 const KIND_ENEMY: StringName = &"enemy"
+const KIND_BREAKABLE: StringName = &"breakable"
 
 ## Directory under DATA_ROOT -> the kind of file it holds.
 const DIRECTORY_KINDS: Dictionary = {
@@ -24,6 +25,7 @@ const DIRECTORY_KINDS: Dictionary = {
 	"quests": KIND_QUEST,
 	"dialogue": KIND_DIALOGUE,
 	"enemies": KIND_ENEMY,
+	"breakables": KIND_BREAKABLE,
 }
 
 const REQUIRED_FIELDS: Dictionary = {
@@ -35,13 +37,17 @@ const REQUIRED_FIELDS: Dictionary = {
 	&"dialogue": ["id", "start", "nodes"],
 	&"dialogue_node": ["speaker", "text", "options"],
 	&"enemy": ["id", "name", "behaviour", "health", "speed", "contact_damage"],
+	&"breakable": ["id", "name", "breaks_on", "drops"],
 }
 
 ## Enemy behaviour ids (EnemyBrains makes one brain per id) and drop-table entry types.
 const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden"]
 const DROP_TYPES: Array[String] = ["heart", "item", "nothing"]
-## What a boss's weak point can take (Hit kinds dealt by the hero's weapons).
+## What a boss's weak point can take (Hit kinds dealt by the hero's weapons). Also what can
+## cut or break a breakable.
 const WEAK_POINTS: Array[String] = ["sword", "arrow", "bomb"]
+## The bursts a breakable can throw up (Burst kinds).
+const BREAK_BURSTS: Array[String] = ["leaves", "shards", "dust", "spark", "sparkle"]
 
 ## Condition type -> required fields (docs/data/CONDITIONS_AND_EFFECTS.md).
 const CONDITION_FIELDS: Dictionary = {
@@ -129,13 +135,17 @@ func get_enemy(id: StringName) -> Dictionary:
 	return get_entry(&"enemies", id)
 
 
+func get_breakable(id: StringName) -> Dictionary:
+	return get_entry(&"breakables", id)
+
+
 # --- Loading ---------------------------------------------------------------
 
 ## Clears everything and loads all JSON under `root`. Returns the problems found;
 ## an empty result means every file is valid and every reference resolves.
 func load_all(root: String = DATA_ROOT) -> PackedStringArray:
 	errors = []
-	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}}
+	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}}
 	if not DirAccess.dir_exists_absolute(root):
 		errors.append("%s: data directory does not exist." % root)
 		return errors
@@ -176,6 +186,8 @@ func _load_file(path: String, kind: StringName) -> void:
 			_register(path, data, &"dialogue", &"dialogues")
 		KIND_ENEMY:
 			_register(path, data, &"enemy", &"enemies")
+		KIND_BREAKABLE:
+			_register(path, data, &"breakable", &"breakables")
 
 
 ## Registers every object in the array `data[key]`.
@@ -223,6 +235,8 @@ func _validate_references() -> void:
 		_check_dialogue(dialogue)
 	for enemy: Dictionary in _collections[&"enemies"].values():
 		_check_enemy(enemy)
+	for breakable: Dictionary in _collections[&"breakables"].values():
+		_check_breakable(breakable)
 	for item: Dictionary in _collections[&"items"].values():
 		var stats: Variant = item.get("stats", {})
 		if typeof(stats) == TYPE_DICTIONARY and (stats as Dictionary).has("ammo"):
@@ -307,7 +321,26 @@ func _check_enemy(enemy: Dictionary) -> void:
 			errors.append("%s: %s 'boss' must be an object." % [path, label])
 		elif not WEAK_POINTS.has(str((boss as Dictionary).get("weak_point", "arrow"))):
 			errors.append("%s: %s has unknown weak_point '%s'. Known: %s." % [path, label, boss["weak_point"], ", ".join(WEAK_POINTS)])
-	var drops: Array = _array_field(path, label, enemy, "drops")
+	_check_drops(path, label, enemy)
+
+
+func _check_breakable(breakable: Dictionary) -> void:
+	var path: String = breakable["_source"]
+	var label: String = "breakable '%s'" % breakable["id"]
+	var breaks_on: Array = _array_field(path, label, breakable, "breaks_on")
+	if breaks_on.is_empty():
+		errors.append("%s: %s needs something in 'breaks_on' that can break it." % [path, label])
+	for kind: Variant in breaks_on:
+		if not WEAK_POINTS.has(str(kind)):
+			errors.append("%s: %s 'breaks_on' has unknown '%s'. Known: %s." % [path, label, kind, ", ".join(WEAK_POINTS)])
+	if breakable.has("burst") and not BREAK_BURSTS.has(str(breakable["burst"])):
+		errors.append("%s: %s has unknown burst '%s'. Known: %s." % [path, label, breakable["burst"], ", ".join(BREAK_BURSTS)])
+	_check_drops(path, label, breakable)
+
+
+## A weighted drop table (enemies, breakables): known types, weights above 0, real items.
+func _check_drops(path: String, label: String, entry: Dictionary) -> void:
+	var drops: Array = _array_field(path, label, entry, "drops")
 	for i: int in drops.size():
 		var where: String = "%s drop %d" % [label, i]
 		if typeof(drops[i]) != TYPE_DICTIONARY:

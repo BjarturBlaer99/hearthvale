@@ -1,0 +1,33 @@
+{
+  "id": "pip",
+  "start": "hello",
+  "speakers": {
+    "pip": "Pip"
+  },
+  "nodes": {
+    "hello": {
+      "speaker": "pip",
+      "text": "You can smash pots, you know. Mum says not to. Tilda's always got coins in hers, though.",
+      "options": [
+        {
+          "text": "Anything else?",
+          "next": "more"
+        },
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "more": {
+      "speaker": "pip",
+      "text": "My brother went all the way down under the old ruin in the South Field. He says one wall down there sounds hollow.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    }
+  }
+}

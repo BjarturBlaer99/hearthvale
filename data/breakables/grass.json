@@ -1,0 +1,13 @@
+{
+  "id": "grass",
+  "name": "Tall grass",
+  "breaks_on": ["sword", "bomb"],
+  "sound": "cut",
+  "burst": "leaves",
+  "frames": { "whole": "grass", "broken": "grass_cut" },
+  "drops": [
+    { "type": "nothing", "weight": 6 },
+    { "type": "heart", "weight": 2 },
+    { "type": "item", "item": "coin", "count": 1, "weight": 2 }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "pot",
+  "name": "Clay pot",
+  "breaks_on": ["sword", "bomb"],
+  "sound": "pot",
+  "burst": "shards",
+  "frames": { "whole": "pot", "broken": "" },
+  "drops": [
+    { "type": "nothing", "weight": 3 },
+    { "type": "heart", "weight": 2 },
+    { "type": "item", "item": "coin", "count": 3, "weight": 2 },
+    { "type": "item", "item": "arrow", "count": 5, "weight": 1 },
+    { "type": "item", "item": "bomb", "count": 2, "weight": 1 }
+  ]
+}

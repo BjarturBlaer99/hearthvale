@@ -47,6 +47,11 @@ func set_health(current: int, maximum: int) -> void:
 	hearts.set_health(current, maximum)
 
 
+## Pieces of heart toward the next heart, shown after the hearts.
+func set_pieces(pieces: int) -> void:
+	hearts.set_pieces(pieces)
+
+
 func set_area(text: String) -> void:
 	_area.text = text
 

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "breakable.schema.json",
+  "title": "Breakable file (data/breakables/<id>.json, one kind per file)",
+  "description": "Something in the world a blow cuts or breaks: tall grass, a clay pot (TECH_DESIGN §6). Placed by the map baker's spawn markers; back on every visit.",
+  "type": "object",
+  "required": ["id", "name", "breaks_on", "drops"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1, "description": "Also the spawn marker's kind (GreyboxTiles.MARKER_KINDS)." },
+    "name": { "type": "string" },
+    "breaks_on": {
+      "type": "array", "minItems": 1,
+      "items": { "enum": ["sword", "arrow", "bomb"] },
+      "description": "The kinds of blow (Hit.kind) that break it; anything else does nothing."
+    },
+    "sound": { "type": "string", "description": "A sound id (audio/sfx) played when it breaks." },
+    "burst": { "enum": ["leaves", "shards", "dust", "spark", "sparkle"], "description": "The Burst it throws up." },
+    "frames": {
+      "type": "object",
+      "description": "Frames of gameplay/art/breakables.png (Breakable.FRAMES): 'whole', and 'broken' (empty: nothing is left).",
+      "properties": { "whole": { "type": "string" }, "broken": { "type": "string" } }
+    },
+    "drops": {
+      "type": "array",
+      "description": "Weighted table, like an enemy's: one entry is picked when it breaks.",
+      "items": {
+        "type": "object",
+        "required": ["type", "weight"],
+        "properties": {
+          "type": { "enum": ["heart", "item", "nothing"] },
+          "item": { "type": "string" },
+          "count": { "type": "integer", "minimum": 1, "default": 1 },
+          "weight": { "type": "number", "exclusiveMinimum": 0 }
+        }
+      }
+    }
+  }
+}

@@ -11,8 +11,9 @@ extends Node2D
 signal died(enemy: Enemy)
 
 const POOF_TIME: float = 0.35
+## How long the game freezes when a blow lands on it.
+const HIT_STOP: float = 0.05
 const FLASH_TIME: float = 0.15
-const OUTLINE: Color = Color(0.10, 0.08, 0.12)
 const SHADOW: Color = Color(0, 0, 0, 0.3)
 
 @export var enemy_id: StringName
@@ -104,12 +105,22 @@ func _on_hit_taken(hit: Hit) -> void:
 	if not brain.take_hit(hit.damage, hit.push, hit.kind):
 		return
 	_flash_left = FLASH_TIME
+	Burst.spawn(get_parent(), position + Vector2(0, -6), &"spark")
+	EventBus.hit_stop.emit(HIT_STOP)
 	if brain.is_dead():
 		_die()
+	else:
+		EventBus.sound.emit(&"hit")
 	queue_redraw()
 
 
+## The sound it makes when beaten.
+func death_sound() -> StringName:
+	return &"enemy_die"
+
+
 func _die() -> void:
+	EventBus.sound.emit(death_sound())
 	hit_box.deactivate()
 	hurt_box.enabled = false
 	_poof_left = POOF_TIME
@@ -157,9 +168,22 @@ func _on_shot(direction: Vector2) -> void:
 	arrow.position = body.position + direction * 6.0
 	get_parent().add_child(arrow)
 	last_arrow = arrow
+	EventBus.sound.emit(&"arrow")
 
 
-# --- Drawing (placeholder art) ----------------------------------------------
+# --- Drawing (pixel art painted by tools/art/make_sprites.gd) ------------------
+
+const SLIME_SHEET: Texture2D = preload("res://gameplay/art/slime.png")
+const BAT_SHEET: Texture2D = preload("res://gameplay/art/bat.png")
+const GOBLIN_SHEET: Texture2D = preload("res://gameplay/art/goblin.png")
+## Frames in each sheet, in the order the tool paints them (a test checks).
+const SLIME_FRAMES: Dictionary = {&"rest": 0, &"wide": 1, &"hop": 2}
+const BAT_FRAMES: Dictionary = {&"rest": 0, &"up": 1, &"down": 2}
+const GOBLIN_FRAMES: Dictionary = {&"front": 0, &"front_draw": 1, &"back": 2, &"side": 3, &"side_draw": 4}
+const SMALL: Vector2i = Vector2i(16, 16)
+const TALL: Vector2i = Vector2i(16, 24)
+const TELL: Color = Color(1.0, 0.85, 0.2)
+
 
 func _draw() -> void:
 	if brain == null:
@@ -177,8 +201,9 @@ func _draw() -> void:
 			_draw_bat()
 
 
-func _tint(color: Color) -> Color:
-	return Color.WHITE if _flash_left > 0.0 else color
+## White while a blow's flash lasts.
+func _flashing() -> bool:
+	return _flash_left > 0.0
 
 
 func _ellipse(center: Vector2, radius: Vector2, color: Color) -> void:
@@ -191,65 +216,32 @@ func _ellipse(center: Vector2, radius: Vector2, color: Color) -> void:
 
 func _draw_slime() -> void:
 	var phase: float = (brain as HopperBrain).hop_phase()
-	var lift: float = sin(phase * PI) * 5.0 if phase >= 0.0 else 0.0
-	var squash: float = 1.0 if phase >= 0.0 else 1.0 + 0.12 * sin(_clock * 6.0)
+	var lift: float = roundf(sin(phase * PI) * 5.0) if phase >= 0.0 else 0.0
 	_ellipse(Vector2(0, 0), Vector2(5, 2), SHADOW)
-	var center: Vector2 = Vector2(0, -4.0 - lift)
-	var size: Vector2 = Vector2(6.5 * squash, 5.0 / squash) if phase < 0.0 else Vector2(5.5, 6.0)
-	_ellipse(center, size + Vector2(1, 1), OUTLINE)
-	_ellipse(center, size, _tint(Color(0.36, 0.72, 0.30)))
-	_ellipse(center + Vector2(-2, -2), size * 0.3, _tint(Color(0.62, 0.90, 0.52)))
-	var look: Vector2 = brain.facing * 1.5
-	draw_rect(Rect2(center + look + Vector2(-2.5, -1), Vector2(1, 2)), OUTLINE)
-	draw_rect(Rect2(center + look + Vector2(1.5, -1), Vector2(1, 2)), OUTLINE)
+	var frame: StringName = &"hop" if phase >= 0.0 else (&"wide" if sin(_clock * 6.0) > 0.3 else &"rest")
+	SpriteSheet.draw(self, SLIME_SHEET, SLIME_FRAMES[frame], SMALL, Vector2(-8, -15 - lift), false, _flashing())
 
 
 func _draw_goblin() -> void:
-	var archer: ArcherBrain = brain as ArcherBrain
-	var skin: Color = _tint(Color(0.46, 0.60, 0.26))
-	var tunic: Color = _tint(Color(0.50, 0.32, 0.18))
+	var drawing: bool = (brain as ArcherBrain).is_drawing()
 	_ellipse(Vector2(0, 0), Vector2(5, 2), SHADOW)
-	draw_rect(Rect2(-3, -4, 2, 4), OUTLINE)
-	draw_rect(Rect2(1, -4, 2, 4), OUTLINE)
-	draw_colored_polygon(PackedVector2Array([Vector2(-5, -3), Vector2(5, -3), Vector2(4, -11), Vector2(-4, -11)]), OUTLINE)
-	draw_colored_polygon(PackedVector2Array([Vector2(-4, -4), Vector2(4, -4), Vector2(3, -10), Vector2(-3, -10)]), tunic)
-	draw_circle(Vector2(0, -14), 5.0, OUTLINE)
-	draw_circle(Vector2(0, -14), 4.0, skin)
-	draw_colored_polygon(PackedVector2Array([Vector2(-4, -15), Vector2(-8, -17), Vector2(-4, -13)]), skin)
-	draw_colored_polygon(PackedVector2Array([Vector2(4, -15), Vector2(8, -17), Vector2(4, -13)]), skin)
-	var eyes: Vector2 = brain.facing * 1.5
-	draw_rect(Rect2(Vector2(-2, -15) + eyes, Vector2(1, 1)), Color(0.9, 0.2, 0.1))
-	draw_rect(Rect2(Vector2(1, -15) + eyes, Vector2(1, 1)), Color(0.9, 0.2, 0.1))
-	# The bow, held out the way it faces; drawn back with an arrow nocked while it aims (the tell).
-	var hand: Vector2 = Vector2(0, -8) + brain.facing * 6.0
-	var across: Vector2 = brain.facing.orthogonal() * 5.0
-	var wood: Color = Color(0.55, 0.36, 0.18)
-	draw_line(hand - across, hand + brain.facing * 2.0, wood, 1.5)
-	draw_line(hand + brain.facing * 2.0, hand + across, wood, 1.5)
-	var pull: float = 3.0 if archer.is_drawing() else 0.0
-	draw_line(hand - across, hand - brain.facing * pull, Color(0.9, 0.9, 0.85), 1.0)
-	draw_line(hand - brain.facing * pull, hand + across, Color(0.9, 0.9, 0.85), 1.0)
-	if archer.is_drawing():
-		draw_line(hand - brain.facing * pull, hand + brain.facing * 6.0, Color(0.85, 0.80, 0.70), 1.0)
-		draw_rect(Rect2(-0.5, -25, 1.5, 4), Color(1.0, 0.85, 0.2))
-		draw_rect(Rect2(-0.5, -20, 1.5, 1.5), Color(1.0, 0.85, 0.2))
+	var side: bool = absf(brain.facing.x) > absf(brain.facing.y)
+	var frame: StringName = &"front_draw" if drawing else &"front"
+	if side:
+		frame = &"side_draw" if drawing else &"side"
+	elif brain.facing.y < 0.0:
+		frame = &"back"
+	# The side frames face left; facing right is the mirror image.
+	SpriteSheet.draw(self, GOBLIN_SHEET, GOBLIN_FRAMES[frame], TALL, Vector2(-8, -23), side and brain.facing.x > 0.0, _flashing())
+	if drawing:
+		# The tell: a "!" over its head while it draws its bow.
+		draw_rect(Rect2(-1, -27, 2, 4), TELL)
+		draw_rect(Rect2(-1, -22, 2, 2), TELL)
 
 
 func _draw_bat() -> void:
-	var flier: FlierBrain = brain as FlierBrain
-	var resting: bool = flier.is_resting()
-	var height: float = 4.0 if resting else 10.0 + sin(_clock * 5.0) * 1.5
-	var wing_color: Color = _tint(Color(0.30, 0.18, 0.36))
+	var resting: bool = (brain as FlierBrain).is_resting()
+	var height: float = 4.0 if resting else roundf(10.0 + sin(_clock * 5.0) * 1.5)
 	_ellipse(Vector2(0, 0), Vector2(3.5, 1.5), SHADOW)
-	var center: Vector2 = Vector2(0, -height)
-	if resting:
-		draw_colored_polygon(PackedVector2Array([center + Vector2(-5, 1), center + Vector2(0, -3), center + Vector2(5, 1), center + Vector2(0, 3)]), wing_color)
-	else:
-		var flap: float = sin(_clock * 22.0) * 4.0
-		for side: float in [-1.0, 1.0]:
-			var wing: PackedVector2Array = [center + Vector2(side * 2, -1), center + Vector2(side * 9, -2 - flap), center + Vector2(side * 7, 2), center + Vector2(side * 4, 1)]
-			draw_colored_polygon(wing, wing_color)
-	draw_circle(center, 3.5, OUTLINE)
-	draw_circle(center, 2.5, _tint(Color(0.42, 0.26, 0.48)))
-	draw_rect(Rect2(center + Vector2(-1.5, -1), Vector2(1, 1)), Color(1.0, 0.3, 0.3))
-	draw_rect(Rect2(center + Vector2(0.5, -1), Vector2(1, 1)), Color(1.0, 0.3, 0.3))
+	var frame: StringName = &"rest" if resting else (&"up" if sin(_clock * 22.0) > 0.0 else &"down")
+	SpriteSheet.draw(self, BAT_SHEET, BAT_FRAMES[frame], SMALL, Vector2(-8, -8 - height), false, _flashing())

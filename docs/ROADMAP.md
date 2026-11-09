@@ -69,7 +69,8 @@ the boss door needs the big key.
 
 Goal: grow the slice into a small, complete game of about **2 hours**:
 - it feels and sounds good
-- the world has more to find
+- it looks good: a blue-suited hero and pixel art everywhere
+- the world we have is richer and more detailed, rather than bigger
 - villagers give small quests
 - a second dungeon is built around a new item
 - a light story leads to an ending
@@ -79,7 +80,7 @@ Same rules as the slice:
 - No external assets. Sound, music and art are made in code, the way the hero's sprite and the tiles already are.
 - Change the GDD before adding a mechanic it doesn't describe.
 
-## H10 — Feel & sound
+## H10 — Feel & sound ✅
 - **Sound effects**, made in code (a small synth in `tools/`, baked to WAV files the way the tiles are baked to a
   PNG):
   - swings and hits; enemies hurt and beaten
@@ -97,51 +98,55 @@ Same rules as the slice:
 **Done when**: every action above makes its sound, each area plays its tune and the boss fight its own, volume
 settings work and persist, and a playtest says the game feels better, not noisier.
 
-## H11 — Grass, pots & heart pieces
-- Cuttable grass and breakable pots, with data-driven drop tables (hearts, coins, arrows, bombs), as GDD §5 and §8
-  promise.
-- Three more heart pieces, hidden around the world (four in all make a heart), each behind a small secret.
-- A heart-piece counter on the HUD.
+## H11 — Hero & graphics ✅
+- **A new hero sprite** with a **blue suit** (hood and tunic, gold trim, belt and buckle), more detail and shading,
+  and arms that swing on the walk. Still painted in code from ASCII art. The leftover "Network Key" from the old
+  design goes.
+- **Pixel art for every actor**, painted in code like the hero, replacing the placeholder shapes: villagers,
+  slimes, goblin archers, bats, the Iron Warden, items and pickups, chests, doors and puzzle pieces.
+- **Better tiles:** a raised-floor dungeon tile (no more dirt-path ledges), richer walls and floors, and gently
+  animated water.
 
-**Done when**: grass and pots drop what their data says and come back on the next visit, and all four heart
-pieces can be found and together add a heart.
+**Done when**: no placeholder shapes are left, screenshots of every area read clearly, the hero wears blue, and
+tests stay green.
 
-## H12 — Quests
+## H12 — A more detailed world ✅
+More to see and do in the areas we have, instead of new ones:
+- **Denser, livelier places:**
+  - Hearthvale gets a market stall, crates and barrels, a washing line, a well bucket, more fences and paths.
+  - Interiors get furnished.
+  - The fields and the wood get more props and decoration.
+- **Ambient life:** butterflies over flowers, chickens in the village, fireflies in the wood, drawn in code.
+- **Grass and pots** to cut and break, with data-driven drop tables (hearts, coins, arrows, bombs), as GDD §5 and
+  §8 promise.
+- **More villagers** with something to say, and three more heart pieces hidden in the existing areas (four make a
+  heart), with a HUD counter.
+
+**Done when**: every outdoor area and interior has new detail in its screenshots; grass and pots drop what their
+data says; all four heart pieces can be found; and the map is no bigger than before.
+
+## H13 — Quests
 - `QuestRunner` (TECH_DESIGN §7): quests as JSON stages with objectives, using the existing conditions and
   effects. Adding a quest needs no new code.
 - Two or three small villager quests with rewards, for example a lost item found in the countryside, or a
-  delivery. A heart piece or a bigger quiver are possible rewards.
+  delivery. A bigger quiver or a heart piece are possible rewards.
 - A quest log in the pause menu. Quest progress is saved.
 
 **Done when**: each quest starts, advances and finishes from data alone; the log shows where each stands; progress
 survives a save; and a new quest can be added by writing only a JSON file.
 
-## H13 — A new region
-- A third area of countryside off the village (the GDD's map grows: hills or a lakeside), with its enemies,
-  secrets and a road to the second dungeon.
-- One new enemy type, data-driven like the others.
+## H14 — The second dungeon & boss
+- A second dungeon of 10–14 rooms, entered from somewhere in the existing world (no new region), built around a
+  **new item** chosen in this milestone's plan: a boomerang that stuns and fetches, or a lantern for dark rooms
+  and torches.
 - **Pits** (deferred since H6): falling costs half a heart and puts the hero back at the edge. Blocks can fill
   them.
-
-**Done when**: the region is reachable from the village and back, has an optional secret, the new enemy patrols,
-notices, attacks and can be beaten, and pits work for the hero, enemies and blocks.
-
-## H14 — The second dungeon & boss
-- A second dungeon of 10–14 rooms built around a **new item**, chosen in this milestone's plan (candidates: a
-  boomerang that stuns and fetches, or a lantern for dark rooms and torches).
 - A second boss whose weak point needs the new item. The **Iron Sword** (GDD §5) is a reward.
 
 **Done when**: the dungeon can be finished start to end, its puzzles need the new item, the boss can only be
-beaten with it, and the Iron Sword does more than the wooden one.
+beaten with it, pits work, and the Iron Sword does more than the wooden one.
 
-## H15 — Pixel art for everyone
-- Pixel-art sprites, painted in code like the hero, for every villager, enemy, item, puzzle piece and both bosses,
-  replacing the placeholder shapes.
-- Raised floors in dungeons get their own tile (no more dirt-path ledges).
-
-**Done when**: no placeholder shapes are left, screenshots of every area read clearly, and tests stay green.
-
-## H16 — Story, ending & playtest
+## H15 — Story, ending & playtest
 - A light story that ties the two dungeons together (still short: GDD §9), told through villagers and signs, and
   a real ending after the second boss.
 - Fixes from a full playtest with new players.
@@ -151,4 +156,5 @@ beaten with it, and the Iron Sword does more than the wooden one.
 ---
 
 ## Later (not in phase 2)
-More dungeons and items, a bigger world, key rebinding, several save slots.
+A new region and a bigger world (moved out of phase 2 on 2026-11-08: detail first), more dungeons and items, key
+rebinding, several save slots.

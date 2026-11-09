@@ -23,6 +23,7 @@ DataRegistry="*res://autoload/data_registry.gd"
 GameState="*res://autoload/game_state.gd"
 SaveSystem="*res://autoload/save_system.gd"
 Settings="*res://autoload/settings.gd"
+Audio="*res://autoload/audio.gd"
 
 [debug]
 

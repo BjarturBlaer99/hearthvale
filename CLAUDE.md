@@ -5,12 +5,13 @@ You are building **Hearthvale**, a **2D top-down action-adventure** (A Link to t
 
 1. `docs/GDD.md` — what the game is (design source of truth)
 2. `docs/TECH_DESIGN.md` — how it is built (architecture source of truth)
-3. `docs/ROADMAP.md` — what to build next, milestone by milestone (H0–H9)
+3. `docs/ROADMAP.md` — what to build next, milestone by milestone (the slice H0–H9, phase 2 H10–H15)
 4. `docs/data/` — example data files showing the schemas content must follow
 
 ## Current goal
-**Phase 2** in `docs/ROADMAP.md` (H10–H16): grow the finished vertical slice (H0–H9) into a small game of about
-two hours: feel and sound, more to find, quests, a new region, a second dungeon, pixel art, a light story. Do not
+**Phase 2** in `docs/ROADMAP.md` (H10–H15): grow the finished vertical slice (H0–H9) into a small game of about
+two hours: feel and sound, a blue-suited hero and pixel art everywhere, a more detailed world (not a bigger one),
+quests, a second dungeon, a light story. Do not
 build anything outside the current milestone. Scope creep is the main risk on this project.
 
 History: the project began as "Low Tide", a water-level game (milestones M0–M4 in `docs/progress/LOG.md`). It
@@ -21,12 +22,17 @@ in `docs/DECISIONS.md` are superseded.
 - Work one milestone at a time, in order. Each milestone has acceptance criteria — meet them, then stop and summarize.
 - Before a milestone, write a short plan in `docs/progress/H<n>-plan.md`. After it, append results and known issues to `docs/progress/LOG.md`.
 - If a design question isn't answered in the docs, pick the simplest option that keeps systems data-driven, note it in `docs/DECISIONS.md`, and continue.
-- Use placeholder art: flat-colored 16×16 tiles generated in code or as tiny PNGs you create, `ColorRect`/`Polygon2D` for actors. No external art, audio or asset-store dependencies until the roadmap says so.
-  **Exception (user's request, 2026-11-07):** the hero is a Zelda-style pixel-art sprite, painted from ASCII art by
-  `tools/art/make_player_sprite.gd`. Keep it; edit the art in that tool, never the PNG. Other actors stay placeholders.
+- Art and sound are made in code (no external art, audio or asset-store dependencies until the roadmap says so).
+  The slice started with placeholder shapes; phase 2 replaced them with pixel art, as below.
+  **Exception (user's request, 2026-11-07; blue suit 2026-11-08):** the hero is a Zelda-style pixel-art sprite in a blue suit, painted from ASCII art by
+  `tools/art/make_player_sprite.gd`. Keep it; edit the art in that tool, never the PNG.
   **Exception (user's request, 2026-11-08):** the environment tiles are proper pixel art (grass, trees, roofs with
   ridges and eaves, windows, water...) plus a Decor layer of flowers, tufts and the like, all still painted in code by
   `tools/greybox/make_tile_texture.gd` and placed by `build_maps.gd`. No external assets; edit the art in the tool.
+  **Every other actor (H11)** is pixel art painted from ASCII by `tools/art/make_sprites.gd` into `gameplay/art/`
+  (no placeholder shapes left; effects like shadows and sparks stay drawn in code). Edit the art in the tool.
+  **Sound (H10):** all sound effects and music are made in code by `tools/audio/make_audio.gd` (Synth) and baked to
+  `audio/`. No external audio; edit the sounds in the tool, never the WAVs.
 
 ## Commands
 ```bash
@@ -44,6 +50,12 @@ godot --path . -s res://tools/capture.gd -- <output_dir>
 godot --path . -s res://tools/playtest.gd -- warden
 # Repaint the hero's sprite sheet after editing its ASCII art (optional 8x preview), then re-import
 godot --headless --path . -s res://tools/art/make_player_sprite.gd -- <preview.png>
+godot --headless --path . --import
+# Repaint the other actors' sprites after editing tools/art/make_sprites.gd, then re-import
+godot --headless --path . -s res://tools/art/make_sprites.gd
+godot --headless --path . --import
+# Re-bake sound effects and music after editing tools/audio/make_audio.gd (or just some: -- sword boss), then re-import
+godot --headless --path . -s res://tools/audio/make_audio.gd
 godot --headless --path . --import
 # Rewrite the input map after editing tools/setup_input_map.gd
 godot --headless --path . -s res://tools/setup_input_map.gd

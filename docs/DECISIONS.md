@@ -255,3 +255,61 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   - Sound first, because the game is silent and sound improves everything after it.
   - Art last, because it's costly and easiest to get right once content stops changing.
   - Still no external assets: sound, music and art are made in code.
+
+## H10 — Feel & sound
+- 2026-11-08 — **Sound is made in code and baked to WAVs**, like the tile art: a pure `Synth` plus `tools/audio/make_audio.gd`, written to `audio/sfx` and `audio/music`.
+  - Baking keeps start-up instant; synthesising seconds of music in GDScript at load would take seconds.
+  - The four songs come to about 3 MB of WAV in the repository. Fine for now; compress or shorten later if it grows.
+- 2026-11-08 — **The songs are short original loops** (13–23 s):
+  - village: warm, F major
+  - countryside: brisk, G major, with drums
+  - dungeon: sparse, A minor
+  - boss: driving, E minor
+
+  The jingles (item, solved, secret) are plain arpeggios of their own, kept clear of any famous tune.
+- 2026-11-08 — **Sounds are asked for with `EventBus.sound(id)`** at the node where the action happens, and an `Audio` autoload plays them. That keeps systems talking through signals, and lets tests listen for every sound without audio. Music is asked for the same way (`music_requested`). Each area names its tune, and a boss swaps in its own while awake.
+- 2026-11-08 — **Headless, `Audio` plays nothing but still records** what it would play. A tune still playing at quit raced the dummy mixer and leaked at exit; nobody hears headless audio anyway.
+- 2026-11-08 — **Hit-stop uses `Engine.time_scale`**, ended on real time by the area, and always reset when an area leaves the tree, so tests and scene changes can't be left in slow motion. Shake is the camera's offset. Particles are small drawn `Burst` nodes, keeping to placeholder art.
+- 2026-11-08 — **Volumes are settings, not save data:** music and sound, 0–10, default 7. Zero mutes the bus. The settings menu lists them first.
+- 2026-11-08 — **Phase 2 re-planned at the user's request:** more detail in the world we have instead of a bigger map, a new hero sprite with a blue suit, and better graphics, sooner. The new order:
+  - H11 hero and graphics (was H15)
+  - H12 a more detailed world (replaces the new region, and takes in grass, pots and heart pieces)
+  - H13 quests
+  - H14 the second dungeon, entered from the existing world, with pits
+  - H15 story
+
+  The new region moves to "later".
+
+## H11 — Hero & graphics
+- 2026-11-08 — **The hero wears blue** (user's request): a blue hood and tunic with a gold-trimmed hem, a brown belt with a gold buckle, cream trousers and brown boots.
+  - More shading, two eyes, a hair fringe, and an arm that swings in side view.
+  - The leftover "Network Key" glow from the water design is gone.
+  - Same 3x3 sheet of 16x24 frames, so nothing else changed.
+- 2026-11-08 — **One art tool for every other actor:** `tools/art/make_sprites.gd` holds ASCII art with a small palette per sprite (sharing `.` and `o`) and paints a strip per sprite into `gameplay/art/`. The art is written and width-checked in a generator first, but lives in the tool afterwards.
+  - Each strip carries a white silhouette row, so hit flashes stay a simple frame swap (no shader).
+  - Nodes draw frames with `SpriteSheet`. A test pins the frame names to the tool's order.
+- 2026-11-08 — **Villagers are one sprite in marker colours**, recoloured per villager at run time (cached). New villagers stay a matter of picking colours in the scene.
+- 2026-11-08 — **What "no placeholder shapes" means here:** every body, item and piece is a sprite. Shadows, glows, sparks, poofs, the sword's swing arc, flying arrows and bolts stay drawn in code as effects. Rectangle-built pieces already sit on the pixel grid (chests, doors, plates, blocks, signs) and look the part, so they stay.
+- 2026-11-08 — **Tiles:**
+  - A raised flagstone `ledge` kind replaces the dirt-path ledges in dungeons, with cut-stone cliff faces under it (`HeightShading.stone_faces`, set for dungeons).
+  - Water is one animated tile of four frames in its own atlas row. The old still water tile stays in the atlas, unused.
+  - Dungeon walls and floors were already detailed and stay as they are.
+- 2026-11-08 — **The screenshot tool waits by the clock for the Warden's gaze.** A fast screen draws far more than 60 frames a second, so frame counts lie.
+
+## H12 — A more detailed world
+- 2026-11-09 — **Grass, pots and critters are placed by spawn markers.** The map baker paints a hidden `Spawns` tile layer, and the area turns markers into nodes on load. Placement stays in `build_maps.gd` with the rest of each layout, and no tool attaches scripts to scenes (a `-s` tool compiles before the autoloads exist, so it can't load scripts that use them).
+- 2026-11-09 — **Breakables are a new kind of data** (`data/breakables/`), validated like enemies. The enemy drop-table check is now shared (`_check_drops`).
+  - Grass and pots break on the sword and bombs, not arrows (an arrow just stops).
+  - Grass drops a heart or a coin now and then. Pots drop more often: hearts, coins, arrows or bombs.
+  - Pots in the keep give arrows and bombs before the Warden.
+- 2026-11-09 — **No lifting or throwing pots**: the sword breaks them. It's the simplest version, and it keeps the hero's moves unchanged (GDD §5).
+- 2026-11-09 — **Critters are pure decoration with honest movement.** Chickens use a GridBody by the terrain rules, so they never walk through a fence. Butterflies and fireflies fly over anything. None blocks the hero, fights or is saved. Fireflies glow all day: there's no night yet.
+- 2026-11-09 — **The heart pieces:**
+  1. the village: a nook carved into the woods by the field, behind a tuft of grass
+  2. the North Fields: the plateau's far corner, ringed by grass
+  3. the Cistern: a secret room behind a new cracked wall in the push room (the sixth room was solid rock)
+  4. the Old Wood's shrine
+
+  Each is visible before it's reachable. Farmer Oda, Pip, Guard Rolf and Shepherd Edda each hint at one, or at how pieces add up.
+- 2026-11-09 — **New props and furniture are drawn as ASCII art in the tile tool** (`PROP_ART`, painted by `_ascii`), the way the sprites are. The market stall is a 3x2 prop like the 2x2 well. The washing line and the bucket are decorations you can walk past or under.
+- 2026-11-09 — The HUD shows heart pieces as a gold heart after the hearts, filling a quarter at a time. It's hidden at zero.

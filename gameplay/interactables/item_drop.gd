@@ -25,6 +25,8 @@ func collect() -> bool:
 		return false
 	taken = true
 	GameState.add_item(item_id, count)
+	EventBus.sound.emit(&"coin")
+	Burst.spawn(get_parent(), position + CENTER, &"sparkle")
 	queue_redraw()
 	return true
 
@@ -33,23 +35,10 @@ func _draw() -> void:
 	if taken:
 		return
 	draw_circle(CENTER + Vector2(0, 4), 3.0, Color(0, 0, 0, 0.25))
-	if str(DataRegistry.get_item(item_id).get("type", "")) == "ammo":
-		_draw_arrows()
+	if ItemIcons.name_for(item_id) != &"coin":
+		ItemIcons.draw(self, ItemIcons.name_for(item_id), Vector2(0, -1))
 		return
+	# A little pile: up to three coins.
 	var coins: int = clampi(count, 1, 3)
 	for i: int in coins:
-		var at: Vector2 = CENTER + Vector2((i - (coins - 1) / 2.0) * 3.0, -i)
-		draw_circle(at, 3.5, OUTLINE)
-		draw_circle(at, 2.5, GOLD)
-		draw_rect(Rect2(at + Vector2(-1, -1), Vector2(1, 1)), Color(1, 0.95, 0.7))
-
-
-## A bundle of arrows, tied in the middle.
-func _draw_arrows() -> void:
-	for i: int in 3:
-		var x: float = CENTER.x - 3.0 + i * 3.0
-		draw_line(Vector2(x, CENTER.y - 6.0), Vector2(x, CENTER.y + 4.0), OUTLINE, 3.0)
-		draw_line(Vector2(x, CENTER.y - 6.0), Vector2(x, CENTER.y + 4.0), Color(0.85, 0.78, 0.62), 1.0)
-		draw_rect(Rect2(x - 0.5, CENTER.y - 7.0, 1.0, 2.0), Color(0.75, 0.78, 0.82))
-		draw_rect(Rect2(x - 1.0, CENTER.y + 3.0, 2.0, 2.0), Color(0.85, 0.30, 0.25))
-	draw_rect(Rect2(CENTER.x - 4.0, CENTER.y - 1.0, 8.0, 2.0), Color(0.55, 0.36, 0.18))
+		ItemIcons.draw(self, &"coin", Vector2(roundf((i - (coins - 1) / 2.0) * 3.0), -i))

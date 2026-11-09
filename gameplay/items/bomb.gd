@@ -7,8 +7,6 @@ extends Node2D
 ## sits, at ground level.
 
 const BLAST_TIME: float = 0.3
-const OUTLINE: Color = Color(0.10, 0.08, 0.12)
-const BODY: Color = Color(0.20, 0.24, 0.40)
 
 var fuse: float = 2.0
 var fuse_left: float = 2.0
@@ -56,6 +54,10 @@ func explode() -> void:
 	exploded = true
 	_blast_left = BLAST_TIME
 	blast.activate(Vector2.DOWN)
+	EventBus.sound.emit(&"bomb")
+	EventBus.shake.emit(3.0, 0.35)
+	if get_parent() != null:
+		Burst.spawn(get_parent(), position, &"dust", 2.0)
 	queue_redraw()
 
 
@@ -67,11 +69,6 @@ func _draw() -> void:
 		draw_circle(Vector2(0, -2), size * 0.6, Color(1.0, 0.85, 0.35, 0.8 * (1.0 - spread)))
 		return
 	draw_circle(Vector2(0, 1), 4.0, Color(0, 0, 0, 0.3))
-	draw_circle(Vector2(0, -4), 5.5, OUTLINE)
-	draw_circle(Vector2(0, -4), 4.5, BODY)
-	draw_rect(Rect2(-2, -7, 1, 1), BODY.lightened(0.5))
-	draw_line(Vector2(2, -8), Vector2(4, -11), Color(0.85, 0.75, 0.55), 1.0)
 	# The spark blinks faster as the fuse runs down: the tell for "move away".
 	var period: float = lerpf(0.3, 0.06, 1.0 - fuse_left / fuse)
-	if fmod(fuse_left, period) < period / 2.0:
-		draw_circle(Vector2(4, -12), 1.5, Color(1.0, 0.85, 0.3))
+	ItemIcons.draw(self, &"bomb" if fmod(fuse_left, period) < period / 2.0 else &"bomb_dim", Vector2(-8, -14))

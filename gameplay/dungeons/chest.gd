@@ -47,6 +47,8 @@ func use() -> String:
 	if opened():
 		return ""
 	GameState.set_flag(DungeonState.chest_flag(dungeon_id, chest_id), true)
+	EventBus.sound.emit(&"item_get")
+	Burst.spawn(get_parent(), position + Vector2(8, 4), &"sparkle", 1.3)
 	match item_id:
 		&"small_key":
 			var keys: StringName = DungeonState.keys_flag(dungeon_id)

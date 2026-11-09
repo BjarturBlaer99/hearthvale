@@ -1,7 +1,8 @@
 class_name HeartsBar
 extends Control
 ## The hero's life as a row of hearts (GDD: Zelda-style). Each heart is two halves: full,
-## half or empty. Ten to a row; more wrap onto a second row.
+## half or empty. Ten to a row; more wrap onto a second row. Pieces of heart found toward the
+## next heart show after the row as a gold heart filling a quarter at a time.
 
 const HEART: Array[String] = [
 	".oo.oo.",
@@ -17,9 +18,12 @@ const PER_ROW: int = 10
 const FULL: Color = Color(0.89, 0.18, 0.20)
 const EMPTY: Color = Color(0.22, 0.12, 0.14)
 const OUTLINE: Color = Color(0.08, 0.05, 0.07)
+const PIECE: Color = Color(0.98, 0.78, 0.30)
+const PIECE_EMPTY: Color = Color(0.30, 0.24, 0.12)
 
 var _halves: int = 0
 var _max_halves: int = 0
+var _pieces: int = 0
 
 
 ## Both values in half hearts.
@@ -29,6 +33,18 @@ func set_health(halves: int, max_halves: int) -> void:
 	_halves = halves
 	_max_halves = max_halves
 	queue_redraw()
+
+
+## Pieces of heart toward the next heart (0 hides the piece heart).
+func set_pieces(pieces: int) -> void:
+	if pieces == _pieces:
+		return
+	_pieces = pieces
+	queue_redraw()
+
+
+func pieces_shown() -> int:
+	return _pieces
 
 
 ## Full hearts, whether the next one is half full, and empty hearts: what the bar shows.
@@ -55,3 +71,19 @@ func _draw() -> void:
 					var lit: bool = filled == 2 or (filled == 1 and x <= 3)
 					color = FULL if lit else EMPTY
 				draw_rect(Rect2(origin + Vector2(x, y), Vector2.ONE), color)
+	if _pieces > 0:
+		_draw_pieces(Vector2(hearts % PER_ROW, hearts / PER_ROW) * SPACING)
+
+
+## The piece heart: quarters fill in order (top left, top right, bottom left, bottom right).
+func _draw_pieces(origin: Vector2) -> void:
+	for y: int in HEART.size():
+		for x: int in HEART[y].length():
+			var pixel: String = HEART[y][x]
+			if pixel == ".":
+				continue
+			var color: Color = OUTLINE
+			if pixel == "r":
+				var quarter: int = (0 if x <= 3 else 1) + (0 if y <= 2 else 2)
+				color = PIECE if quarter < _pieces else PIECE_EMPTY
+			draw_rect(Rect2(origin + Vector2(x, y), Vector2.ONE), color)

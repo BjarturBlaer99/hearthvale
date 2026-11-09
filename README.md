@@ -11,8 +11,9 @@ into a hero.
 
 ## Playing the current build
 Run `godot --path .` to reach the title screen. Choose **New game** to start in Hearthvale, or **Continue** to pick
-up a save. Press **Esc** (gamepad Start) to pause: from there you can save, change the settings (fullscreen, window
-size, the controls hint), or quit to the title. The pause menu also shows your play time.
+up a save. Press **Esc** (gamepad Start) to pause: from there you can save, change the settings (music and sound
+volume, fullscreen, window size, the controls hint), or quit to the title. The game has sound effects and music
+(made in code). The pause menu also shows your play time.
 
 | Action | Keyboard | Gamepad |
 |---|---|---|
@@ -48,6 +49,14 @@ Beaten enemies sometimes drop hearts or coins.
   - Push the sandstone block (walk into it and keep pushing), stand on the plate, and hit the crystal.
   - Bomb the cracked wall.
   - The treasure room has two ways in: a block on the plate, or an arrow into the crystal up on the platform.
+- **A livelier Hearthvale:**
+  - a market stall in the square, crates, kegs and lamp posts
+  - a washing line, chickens in the field, butterflies over the flowers
+  - furnished houses
+  - more folk to talk to: Farmer Oda, Pip and Guard Rolf (and Shepherd Edda in the North Fields)
+- **Tall grass and pots** everywhere: cut and smash them with the sword (or a bomb) for hearts, coins, arrows and
+  bombs.
+- **Four heart pieces** are hidden around the world; four make a new heart. The villagers drop a hint or two.
 - **The road north:** from the top of the north rise, through the woods.
   - **The North Fields:** a stream with a bridge, a farm plot, slimes, and a goblin archer on a plateau. Keep an eye
     on the tree line beside the road.

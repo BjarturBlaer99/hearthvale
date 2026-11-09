@@ -40,6 +40,7 @@ func open(status: String) -> void:
 	])
 	_refresh()
 	show()
+	EventBus.sound.emit(&"pause")
 	get_tree().paused = true
 
 
@@ -56,6 +57,7 @@ func shown_lines() -> PackedStringArray:
 
 
 func move_cursor(step: int) -> void:
+	EventBus.sound.emit(&"menu_move")
 	cursor.move(step)
 	_refresh()
 
@@ -64,6 +66,7 @@ func move_cursor(step: int) -> void:
 func choose(id: StringName = &"") -> void:
 	if id == &"":
 		id = cursor.selected_id()
+	EventBus.sound.emit(&"menu_select")
 	match id:
 		RESUME:
 			resume()

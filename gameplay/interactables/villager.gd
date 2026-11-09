@@ -1,13 +1,24 @@
 class_name Villager
 extends Talkable
 ## A villager who stands in one spot and talks. Their name comes from their conversation (the
-## start node's speaker, through the dialogue's "speakers" map). Placeholder art: a robed
-## figure drawn in code, feet in the middle of the cell like the hero's, head above the cell.
+## start node's speaker, through the dialogue's "speakers" map). Pixel art painted by
+## tools/art/make_sprites.gd in marker colours, swapped for this villager's robe and hair; feet
+## in the middle of the cell like the hero's, head above the cell.
 
-const OUTLINE: Color = Color(0.10, 0.08, 0.12)
-const SKIN: Color = Color(0.93, 0.76, 0.60)
-## How far the figure is drawn up from the bottom of its cell, so its feet are mid-cell.
+const SHEET: Texture2D = preload("res://gameplay/art/villager.png")
+## Frames in the order the tool paints them (a test checks).
+const FRAMES: Dictionary = {&"plain": 0, &"bearded": 1}
+const SIZE: Vector2i = Vector2i(16, 24)
+## The marker colours the sheet is painted in, swapped for each villager's own.
+const ROBE_MARK: Color = Color(1.0, 0.0, 1.0)
+const ROBE_SHADE_MARK: Color = Color(0.5, 0.0, 0.5)
+const HAIR_MARK: Color = Color(0.0, 1.0, 1.0)
+const HAIR_SHADE_MARK: Color = Color(0.0, 0.5, 0.5)
+## How far the figure is drawn up from the bottom of its cell, so its feet are mid-cell (signs
+## stand the same way).
 const LIFT: float = 5.0
+## Where the feet are, down from the top of the cell.
+const FEET_Y: float = 14.0 - LIFT
 
 @export var robe_color: Color = Color(0.45, 0.35, 0.60)
 @export var hair_color: Color = Color(0.35, 0.22, 0.12)
@@ -28,23 +39,16 @@ func prompt() -> String:
 
 
 func _draw() -> void:
-	draw_set_transform(Vector2(0.0, -LIFT))
-	_ellipse(Vector2(8, 13), Vector2(6, 2.5), Color(0, 0, 0, 0.35))
-	# Robe, belt and sleeves.
-	var robe: PackedVector2Array = [Vector2(2, 14), Vector2(14, 14), Vector2(12, 1), Vector2(4, 1)]
-	draw_colored_polygon(robe, OUTLINE)
-	draw_colored_polygon(PackedVector2Array([Vector2(3, 13), Vector2(13, 13), Vector2(11, 2), Vector2(5, 2)]), robe_color)
-	draw_rect(Rect2(4, 7, 8, 1), robe_color.darkened(0.35))
-	draw_rect(Rect2(2, 4, 2, 5), robe_color.darkened(0.15))
-	draw_rect(Rect2(12, 4, 2, 5), robe_color.darkened(0.15))
-	# Head: outline, hair, face, eyes.
-	draw_circle(Vector2(8, -3), 5.0, OUTLINE)
-	draw_circle(Vector2(8, -3), 4.0, hair_color)
-	draw_rect(Rect2(5, -3, 6, 4), SKIN)
-	draw_rect(Rect2(6, -2, 1, 1), OUTLINE)
-	draw_rect(Rect2(9, -2, 1, 1), OUTLINE)
-	if beard:
-		draw_colored_polygon(PackedVector2Array([Vector2(5, 0), Vector2(11, 0), Vector2(8, 5)]), hair_color)
+	_ellipse(Vector2(8, FEET_Y - 1.0), Vector2(6, 2.5), Color(0, 0, 0, 0.35))
+	SpriteSheet.draw(self, _sheet(), FRAMES[&"bearded" if beard else &"plain"], SIZE, Vector2(0, FEET_Y - SIZE.y + 1))
+
+
+## The villager sheet in this villager's robe and hair (made once per look).
+func _sheet() -> Texture2D:
+	return SpriteSheet.recoloured(SHEET, {
+		ROBE_MARK: robe_color, ROBE_SHADE_MARK: robe_color.darkened(0.3),
+		HAIR_MARK: hair_color, HAIR_SHADE_MARK: hair_color.darkened(0.3),
+	}, "villager:%s:%s" % [robe_color.to_html(), hair_color.to_html()])
 
 
 func _ellipse(center: Vector2, radius: Vector2, color: Color) -> void:

@@ -61,6 +61,7 @@ func _on_blasted(hit: Hit) -> void:
 	if hit.kind != &"bomb" or is_open():
 		return
 	GameState.set_flag(DungeonState.door_flag(dungeon_id, door_id), true)
+	EventBus.sound.emit(&"secret")
 	_blast_box.enabled = false
 	queue_redraw()
 
@@ -133,12 +134,14 @@ func use() -> String:
 	match kind:
 		DungeonState.LOCKED, DungeonState.BOSS:
 			if not _can_unlock():
+				EventBus.sound.emit(&"nope")
 				return "It's locked. A small key would open it." if kind == DungeonState.LOCKED \
 					else "The boss door. Only the big key opens it."
 			var cost: int = DungeonState.key_cost(kind)
 			if cost > 0:
 				GameState.set_flag(DungeonState.keys_flag(dungeon_id), _keys() - cost)
 			GameState.set_flag(DungeonState.door_flag(dungeon_id, door_id), true)
+			EventBus.sound.emit(&"door")
 			queue_redraw()
 			return "The door opens."
 		DungeonState.SHUTTER:

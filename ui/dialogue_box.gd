@@ -47,6 +47,7 @@ func move_cursor(step: int) -> void:
 	if count == 0:
 		return
 	selected = wrapi(selected + step, 0, count)
+	EventBus.sound.emit(&"menu_move")
 	_refresh()
 
 

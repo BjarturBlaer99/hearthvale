@@ -48,6 +48,8 @@ func try_push(direction: Vector2i, terrain: TerrainQuery, room_size: Vector2i) -
 	terrain.set_occupied(cell(), true)
 	_slide_left = SLIDE_TIME
 	set_process(true)
+	EventBus.sound.emit(&"push")
+	Burst.spawn(get_parent(), _slide_from + Vector2(8, 14), &"dust")
 	return true
 
 

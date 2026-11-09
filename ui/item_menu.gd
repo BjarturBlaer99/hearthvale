@@ -58,6 +58,7 @@ func move_cursor(step: int) -> void:
 	if items.is_empty():
 		return
 	selected = wrapi(selected + step, 0, items.size())
+	EventBus.sound.emit(&"menu_move")
 	_refresh()
 
 
@@ -65,6 +66,7 @@ func move_cursor(step: int) -> void:
 func confirm() -> StringName:
 	var id: StringName = selected_id()
 	if id != &"":
+		EventBus.sound.emit(&"menu_select")
 		chosen.emit(id)
 	close()
 	return id

@@ -1,0 +1,33 @@
+{
+  "id": "shepherd_edda",
+  "start": "hello",
+  "speakers": {
+    "edda": "Shepherd Edda"
+  },
+  "nodes": {
+    "hello": {
+      "speaker": "edda",
+      "text": "Lost a lamb up on that plateau once. Found it in the long grass in the far corner, by a bright red something.",
+      "options": [
+        {
+          "text": "Anything else?",
+          "next": "more"
+        },
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "more": {
+      "speaker": "edda",
+      "text": "I'd have taken it, but my knees don't do stairs any more.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    }
+  }
+}

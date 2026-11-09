@@ -599,3 +599,155 @@ At the user's request, the environment moves from flat greybox to pixel art. It'
 - Played again by hand on 2026-11-08: the title, the pause menu and the settings feel right.
 
 **Next:** the vertical slice (H0–H9) is done. What comes after it is in ROADMAP's "After the slice".
+
+## 2026-11-08 — H10 Feel & sound — done
+
+**Built**
+- **`Synth`** (`core/audio/`, pure): oscillators, noise, envelopes, pitch sweeps, mixing, a note sequencer with drums, PCM16.
+- **`tools/audio/make_audio.gd`:** 26 sound effects and 4 original songs, baked in about 5 s to `audio/sfx` (0.5 MB) and `audio/music` (3 MB).
+  - The effects cover swings, hits, hurt, pickups, fanfares, doors, jingles, arrows, bombs, crystals, pushes, plates, the Warden, and menus.
+- **`Audio` autoload:** sound and music buses, eight effect voices, looping music, volumes.
+- **Hooked into the game:** every action asks for its sound through `EventBus.sound`.
+  - Each area plays its tune; the Warden plays the boss tune while awake.
+  - Hit-stop on landed blows, hurts, stuns and the Warden's fall.
+  - Screen shake for bombs, the Warden's stomps and fall, and the hero being hurt.
+  - Sparks, dust and sparkle bursts.
+- **Settings:** music and sound volume.
+- 214 tests in 33 suites (+17). New: `synth_test` and `sound_test`; the settings and menu suites cover volume.
+
+**Acceptance criteria**
+- [x] Every action makes its sound. `sound_test` listens while doing each one:
+  - fighting: swing, hit, beat, hurt
+  - items: arrow, out of arrows, bomb set and blast
+  - pickups and treasure: an item, a heart, a coin, a chest, the heart container
+  - doors and puzzles: locked, unlocked, a plate (one click, not one a frame), a pushed block, a crystal and the shutter it lifts, a cracked wall
+  - the Warden: stomp, gaze, clink, stun, fall
+  - the pause menu
+- [x] Each area plays its tune and the boss fight its own. All ten areas and the title are checked. The Warden switches to the boss tune when it wakes, and back to the dungeon's when the hero leaves or it falls.
+- [x] Volume settings work and persist: each sets its bus, 0 mutes, and they survive a reload.
+- [x] A playtest says the game feels better, not noisier: played by hand on 2026-11-08, and the sound feels right.
+- Also checked:
+  - Every sound and tune the game uses is baked by the tool, and the tool bakes nothing unused.
+  - A landed blow freezes the game a moment and sends sparks.
+  - Getting hurt and blasts shake the view.
+  - Leaving an area always ends a freeze.
+- Mutation checks: eight deliberate bugs, each caught, files restored byte for byte:
+  - silent blows
+  - no hit-stop
+  - no boss tune
+  - silent solved puzzles
+  - zero volume still playing
+  - music volume forgotten
+  - areas playing no tune
+  - a baked sound left unlisted
+- Found along the way:
+  - The boot leaked the village tune at exit (fixed: headless plays nothing).
+  - A dialogue-box hook landed under the wrong function's comment (fixed).
+- Visual check: the settings menu fits its six lines.
+
+**Known issues / notes**
+- Mono only; no footsteps or text blips.
+- The tunes loop with a hard cut.
+- Heard and approved by hand on 2026-11-08.
+
+**Next:** the playtest, then H11 (grass, pots and heart pieces).
+
+## 2026-11-08 — H11 Hero & graphics — done
+
+Re-planned first at the user's request: phase 2 now puts detail and graphics ahead of a bigger map (ROADMAP H11–H15; the new region moved to "later").
+
+**Built**
+- **The hero repainted in blue:** hood and tunic with a gold hem, belt and buckle, more shading, a face with two eyes, and an arm that swings in side view. The old Network Key glow is gone.
+- **`tools/art/make_sprites.gd`:** 9 sprites, 33 frames, painted into `gameplay/art/` with white flash rows:
+  - slime (rest, wobble, hop)
+  - bat (roosting, wings up, wings down)
+  - goblin archer (front, back and side, drawing its bow in front and side views)
+  - the Iron Warden (stand, step, gaze, stunned)
+  - villagers (plain and bearded)
+  - 11 item icons (sword, bow, arrows, bomb lit and dim, key, coin, heart, heart container, heart piece, gem)
+  - the crystal switch (red, blue, white)
+  - the training dummy and brambles
+- **`SpriteSheet`** (frames, mirroring, flashes, tint, villager recolouring) and **`ItemIcons`**. Every enemy, the Warden, villagers, pickups, items, bombs, the crystal, the dummy and the brambles now draw sprites.
+- **Tiles:** a raised flagstone `ledge` kind for dungeon platforms and walkways, stone cliff faces in dungeons, and animated water (four frames).
+- 218 tests in 34 suites (+4). New: `sprites_test`.
+
+**Acceptance criteria**
+- [x] The hero wears blue.
+- [x] No placeholder shapes are left. Every body, item and puzzle piece is a sprite; only effects stay drawn (shadows, glows, sparks, poofs, the swing arc, arrows in flight).
+- [x] Screenshots of every area read clearly: all 51 shots reviewed, with close-ups of the training yard, the goblin, Bram, the Warden, the keep's walkway and the Cistern's platform.
+- [x] Tests stay green. `sprites_test` checks:
+  - the frame names match the tool
+  - every sheet has its white flash row
+  - villagers are recoloured with no marker colour left
+  - ledges are walkable at every height
+  - water animates
+  - the keep's walkway is a ledge
+- Mutation checks: four deliberate bugs, each caught, files restored byte for byte:
+  - goblin frames out of order
+  - villagers keeping marker colours
+  - water not animated
+  - beards on the wrong villagers
+- Found along the way:
+  - The Warden's first step frame lifted half its body. The generator shifted the wrong rows; fixed.
+  - The bomb and hearts borrowed the wrong palette keys (a blue cap, a red fuse, grey highlights); fixed.
+  - The signpost relied on the villager's old `LIFT` constant; kept.
+  - The screenshot tool counted frames, not seconds, for the Warden's gaze; fixed.
+
+**Known issues / notes**
+- Sprites are a first pass: one idle frame for villagers, no walk cycle for goblins (they glide), no attack poses.
+- Flying arrows and the sword arc are still thin drawn lines.
+- Played by hand on 2026-11-08: the new art feels right.
+
+**Next:** H12, a more detailed world.
+
+## 2026-11-09 — H12 A more detailed world — done
+
+**Built**
+- **Grass and pots** (`Breakable`, data in `data/breakables/` with a schema):
+  - Cut or smashed by the sword or a bomb, each with its own sound (`cut`, `pot`) and a burst (leaves, shards).
+  - Drops come from data tables; the cell is freed; grass leaves stubble.
+  - DataRegistry validates the new kind, sharing the enemies' drop-table check.
+- **Spawn markers:** a hidden `Spawns` layer painted by the baker becomes grass, pots, chickens, butterflies and fireflies on load.
+- **Ambient life** (`Critter` over a pure `CritterMotion`): chickens wander and peck by the terrain rules, butterflies flutter over the flowers, fireflies blink in the Old Wood. New sprites: tall grass, stubble, a pot, a chicken (three frames), butterflies in two colours.
+- **24 new props and furniture tiles**, painted from ASCII in the tile tool:
+  - outdoors: crate, keg, hay, logs, stump, lamp post, standing stone, the washing line and its posts, a well bucket, a 3x2 market stall with wares
+  - indoors: chair, cupboard, loom, plant, candle stand, counter, stool, bookcase
+- **Dressing:**
+  - Hearthvale: market stall, lamp posts, crates, a washing line, hay and logs, a standing stone on the rise, chickens, butterflies, grass and pots.
+  - All three interiors are furnished.
+  - The South Field, the North Fields and the Old Wood get props, grass, pots and critters.
+  - The dungeons get pots.
+- **Heart pieces:** three more (village nook, fields plateau, Cistern secret room) join the Old Wood's, plus a HUD counter.
+- **Villagers:** Farmer Oda, Pip and Guard Rolf in Hearthvale, Shepherd Edda in the North Fields, each with a short conversation from data.
+- 230 tests in 38 suites (+12). New: `critter_motion_test` and `detail_test`; the data, sprite and decor suites grew.
+
+**Acceptance criteria**
+- [x] Every outdoor area and interior has new detail in its screenshots: 57 shots, including new views of the market, the field and chickens, the washing line and nook, the shepherd and plateau, the Cistern's secret room, and the Old Wood's fireflies.
+- [x] Grass and pots drop what their data says. Rolls across each table produce exactly the drop `DropTable` picks. Arrows don't cut grass, the sword does, and bombs break pots. Cells come free, and everything's back next visit.
+- [x] All four heart pieces can be found. One test walks to each:
+  - the village nook (cut the grass)
+  - the plateau corner (stairs, then cut the grass)
+  - the Cistern's secret room (bomb the wall)
+  - the shrine (bomb)
+
+  Each is unreachable first. Four pieces make the fourth heart, and the HUD counts 1, then back to 0.
+- [x] The map is no bigger: every area's size is unchanged, and there are no new areas.
+- Mutation checks: six deliberate bugs, each caught, files restored byte for byte:
+  - anything cutting grass
+  - broken things still blocking
+  - markers left behind
+  - the HUD not counting pieces
+  - chickens walking through walls
+  - any breaks_on accepted
+- Found along the way:
+  - The standing stone first stood where a village test expects open ground on the rise; moved.
+  - The layout script's map lookup dropped a newline and stopped before writing; fixed and rerun.
+  - The decor test only knew the old prop rows; it now checks the new props stand on solid ground and the bucket and washing line sit on open ground.
+
+**Known issues / notes**
+- The washing line's rope runs a little past its outer posts.
+- No lifting or throwing pots; critters don't react to the hero.
+- Fireflies glow in daylight.
+- Not played by hand yet.
+
+**Next:** H13, quests.

@@ -29,7 +29,20 @@ func test_decorations_never_hide_the_way() -> void:
 			var tile: Vector2i = decor.get_cell_atlas_coords(cell)
 			var under: Vector2i = height.get_cell_atlas_coords(cell)
 			var where: String = "%s %s" % [area_id, cell]
+			var kind: String = ""
+			if tile.y == GreyboxTiles.ROW_PROPS_B:
+				kind = GreyboxTiles.PROPS_B_KINDS[tile.x]
+			elif tile.y == GreyboxTiles.ROW_PROPS_C:
+				kind = GreyboxTiles.PROPS_C_KINDS[tile.x]
+			if GreyboxTiles.PROP_DECOR_KINDS.has(kind):
+				# A bucket or the washing line: decoration on open ground, walked under or past.
+				assert_int(under.y).override_failure_message(where + ": %s sits on open ground" % kind).is_equal(GreyboxTiles.ROW_GROUND)
+				assert_bool(busy.has(cell)).override_failure_message(where + ": nothing on what the hero uses or arrives at").is_false()
+			elif kind != "":
+				assert_int(under.y).override_failure_message(where + ": %s stands on solid ground" % kind).is_equal(GreyboxTiles.ROW_SOLID_GROUND)
 			match tile.y:
+				GreyboxTiles.ROW_PROPS_B, GreyboxTiles.ROW_PROPS_C:
+					pass
 				GreyboxTiles.ROW_PROPS:
 					assert_int(under.y).override_failure_message(where + ": props stand on solid ground").is_equal(GreyboxTiles.ROW_SOLID_GROUND)
 				GreyboxTiles.ROW_DECOR:

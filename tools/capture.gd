@@ -62,6 +62,12 @@ const SHOTS: Array = [
 	["49_pause_menu", &"keep", Vector2i(22, 30), Vector2.UP, 1, "pause"],
 	["50_settings", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "settings"],
 	["51_the_end", &"keep", Vector2i(22, 14), Vector2.UP, 0, "flag:keep_warden_beaten"],
+	["52_village_market", &"village", Vector2i(28, 23), Vector2.UP, 0, ""],
+	["53_village_field_and_chickens", &"village", Vector2i(16, 30), Vector2.LEFT, 0, ""],
+	["54_village_washing_line_and_nook", &"village", Vector2i(3, 25), Vector2.UP, 0, ""],
+	["55_fields_shepherd_and_plateau", &"north_fields", Vector2i(25, 23), Vector2.UP, 0, ""],
+	["56_cistern_secret_room", &"cistern", Vector2i(22, 29), Vector2.UP, 0, "flag:dungeon/cistern/door/secret_wall"],
+	["57_old_wood_fireflies", &"old_wood", Vector2i(6, 18), Vector2.UP, 0, ""],
 ]
 
 
@@ -116,7 +122,8 @@ func _capture() -> void:
 			scene.call(&"use_item")
 			await _frames(18)
 		elif shot[5] == "gaze":
-			await _frames(170)
+			# By the clock, not frames: a fast screen draws many more frames a second.
+			await create_timer(3.2).timeout
 		elif shot[5] in ["pause", "settings"]:
 			scene.call(&"open_pause_menu")
 			if shot[5] == "settings":

@@ -113,10 +113,10 @@ func test_settings_apply_at_once_are_kept_and_can_hide_the_controls_hint() -> vo
 	menu.choose(PauseMenu.SETTINGS)
 	var settings: SettingsMenu = menu.settings_menu
 	assert_bool(settings.is_open()).is_true()
-	assert_array(Array(settings.shown_lines())).is_equal(["> Fullscreen: Off", "  Window size: 3x", "  Controls hint: On", "  Back"])
-	settings.move_cursor(2)
+	assert_array(Array(settings.shown_lines())).is_equal(["> Music volume: 70%", "  Sound volume: 70%", "  Fullscreen: Off", "  Window size: 3x", "  Controls hint: On", "  Back"])
+	settings.move_cursor(4)
 	settings.change(1)
-	assert_str(settings.shown_lines()[2]).is_equal("> Controls hint: Off")
+	assert_str(settings.shown_lines()[4]).is_equal("> Controls hint: Off")
 	assert_bool(village.hud.hint_shown()).override_failure_message("hidden at once").is_false()
 	var config: ConfigFile = ConfigFile.new()
 	assert_int(config.load(TEST_SETTINGS)).override_failure_message("kept on disk").is_equal(OK)

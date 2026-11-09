@@ -29,6 +29,8 @@ func set_pressed(down: bool) -> void:
 		down = true
 	if down == pressed and GameState.get_flag(flag) == down:
 		return
+	if down and GameState.get_flag(flag) != true:
+		EventBus.sound.emit(&"plate")
 	pressed = down
 	GameState.set_flag(flag, down)
 	queue_redraw()

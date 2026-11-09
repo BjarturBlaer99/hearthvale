@@ -4,8 +4,9 @@ extends SceneTree
 ##   godot --headless --path . --import
 ## The optional preview is the sheet at 8x on a grey background, for reviewing the art.
 ##
-## An original Zelda-style adventurer: green hooded salvager's coat, tan trousers, boots,
-## and the glowing Network Key on the belt (GDD §5).
+## An original Zelda-style adventurer (GDD §10): a blue hood and tunic with a gold-trimmed hem,
+## a brown belt with a gold buckle, cream trousers and brown boots. In side view an arm swings
+## with the walk.
 ## Sheet: 3 columns (idle, step A, step B) x 3 rows (down, up, side facing left; the game
 ## flips the side row for right). Frames are 16x24 with the soles on the bottom row.
 ## Edit the art here, never the PNG.
@@ -16,124 +17,147 @@ const H: int = 24
 
 const PALETTE: Dictionary = {
 	".": Color(0, 0, 0, 0),
-	"o": Color(0.10, 0.08, 0.12),  # outline
-	"d": Color(0.20, 0.45, 0.13),  # coat, shade
-	"g": Color(0.38, 0.70, 0.18),  # coat
-	"l": Color(0.62, 0.86, 0.33),  # coat, highlight
-	"h": Color(0.40, 0.24, 0.13),  # hair
+	"o": Color(0.10, 0.08, 0.14),  # outline
+	"D": Color(0.13, 0.22, 0.50),  # tunic, shade
+	"m": Color(0.22, 0.42, 0.84),  # tunic
+	"L": Color(0.50, 0.70, 1.00),  # tunic, highlight
+	"t": Color(0.96, 0.78, 0.30),  # gold trim on the hem
+	"y": Color(1.00, 0.88, 0.40),  # belt buckle
+	"h": Color(0.45, 0.27, 0.13),  # hair
+	"H": Color(0.30, 0.17, 0.08),  # hair, shade
 	"s": Color(0.97, 0.80, 0.64),  # skin
-	"S": Color(0.82, 0.60, 0.46),  # skin, shade
-	"e": Color(0.12, 0.12, 0.20),  # eyes
-	"b": Color(0.52, 0.32, 0.16),  # belt
-	"B": Color(0.32, 0.19, 0.10),  # boots
-	"p": Color(0.86, 0.80, 0.62),  # trousers
-	"k": Color(0.40, 0.96, 0.86),  # Network Key glow
+	"S": Color(0.83, 0.61, 0.47),  # skin, shade
+	"e": Color(0.10, 0.10, 0.20),  # eyes
+	"b": Color(0.42, 0.25, 0.12),  # belt
+	"p": Color(0.92, 0.88, 0.76),  # trousers
+	"P": Color(0.74, 0.70, 0.60),  # trousers, shade
+	"B": Color(0.33, 0.20, 0.10),  # boots
+	"c": Color(0.52, 0.33, 0.17),  # boots, highlight
 }
 
 # Front and back views are symmetric: only the left half (8 px) is drawn, then mirrored.
 const DOWN_UPPER_HALF: Array[String] = [
 	"........",
 	".....ooo",
-	"....oddg",
-	"...odggl",
-	"...oggll",
-	"..odghhh",
-	"..oghhhh",
-	"..oghsss",
-	"..ogsess",
-	"..odssss",
-	"...odsss",
-	"...oddSS",
-	"..oddggg",
-	".odglggg",
-	".odggdgg",
-	".osgdggg",
-	".osdbbbk",
-	"..odgggg",
-	"..odgggd",
+	"....oLmm",
+	"...oLmmm",
+	"...oLmmm",
+	"..oLmmhh",
+	"..oDmhhh",
+	"..oDhsss",
+	"..oDsess",
+	"..oDsess",
+	"..oDSsss",
+	"...oDSSs",
+	"..oDDmmm",
+	".oDmmLmm",
+	".oDmmmmm",
+	".osDmmmm",
+	".oSbbbby",
+	"..oDmmmm",
+	"..oDtttt",
 ]
 
 const UP_UPPER_HALF: Array[String] = [
 	"........",
 	".....ooo",
-	"....oddg",
-	"...odggg",
-	"...ogggg",
-	"..odgggg",
-	"..oggggg",
-	"..ogdggg",
-	"..ogdggg",
-	"..odgggg",
-	"...odhhh",
-	"...odddd",
-	"..oddggg",
-	".odggggg",
-	".odggdgg",
-	".osgdggg",
-	".osdbbbb",
-	"..odgggg",
-	"..odgggd",
+	"....oLmm",
+	"...oLmmm",
+	"...oLmmm",
+	"..oLmmmm",
+	"..oDmmmm",
+	"..oDmmmm",
+	"..oDmmmD",
+	"..oDDmmD",
+	"...oDDDD",
+	"...oHhhh",
+	"..oDDmmm",
+	".oDmmmmm",
+	".oDmmmmm",
+	".osDmmmm",
+	".oSbbbbb",
+	"..oDmmmm",
+	"..oDtttt",
 ]
 
 const LEGS_IDLE_HALF: Array[String] = [
-	"...opppo",
-	"...opppo",
-	"...oBBbo",
+	"...oPppo",
+	"...oPppo",
+	"...oBcBo",
 	"...oBBBo",
 	"...ooooo",
 ]
 
 ## Front/back step A (left foot down, right foot lifted). Step B is its mirror image.
 const LEGS_STEP: Array[String] = [
-	"...opppoopppo...",
-	"...opppooBBbo...",
-	"...oBBbooBBBo...",
+	"...oPppooPppo...",
+	"...oPppooBcBo...",
+	"...oBcBooBBBo...",
 	"...oBBBo.oooo...",
 	"...ooooo........",
 ]
 
-const SIDE_UPPER: Array[String] = [
+## Side view (facing left), head to chest. Each walk frame adds its arm, the hem and its legs.
+const SIDE_HEAD: Array[String] = [
 	"................",
 	"......ooooo.....",
-	".....oddgggo....",
-	"....odgglgggo...",
-	"....oggllggggo..",
-	"...ohhhhggggggo.",
-	"...ohhhhhgggggdo",
-	"..ossshhhggggdo.",
-	"..osesshhgggdo..",
-	".ossssshggggdo..",
-	"..osssssgggdo...",
-	"...oSSSSddo.....",
-	"....oddggggdo...",
-	"...odggggggdo...",
-	"...ogggggdggo...",
-	"...ogggggdggo...",
-	"...obbbbbsbbo...",
-	"....odggggdo....",
-	"....odgggddo....",
+	".....oLLmmmo....",
+	"....oLmmmmmmo...",
+	"....oLmmmmmmmo..",
+	"...ohhhhmmmmmmo.",
+	"...ohhhhhmmmmmDo",
+	"..osshhhhmmmmDo.",
+	"..oseshhhmmmDo..",
+	".osssshhhmmmDo..",
+	"..osssssmmmDo...",
+	"...oSSSSDDo.....",
+	"....oDmmmmDo....",
+	"...oDmmLmmmDo...",
+]
+
+const SIDE_ARMS_IDLE: Array[String] = [
+	"...oDmDmmmmDo...",
+	"...oDmDmmmmDo...",
+	"...obsbbbbbbo...",
+]
+
+const SIDE_ARMS_FORWARD: Array[String] = [
+	"..oDDmmmmmmDo...",
+	"..osDmmmmmmDo...",
+	"...obbbbbbbbo...",
+]
+
+const SIDE_ARMS_BACK: Array[String] = [
+	"...oDmmmmmDDo...",
+	"...oDmmmmmmDso..",
+	"...obbbbbbbbo...",
+]
+
+const SIDE_HEM: Array[String] = [
+	"....oDmmmmDo....",
+	"....otttttto....",
 ]
 
 const SIDE_LEGS_IDLE: Array[String] = [
-	".....oppppo.....",
-	".....oppppo.....",
-	".....oBBBbo.....",
+	".....oPpppo.....",
+	".....oPpppo.....",
+	".....oBBcBo.....",
 	"....oBBBBBo.....",
 	"....ooooooo.....",
 ]
 
 const SIDE_LEGS_A: Array[String] = [
-	"....oppoopppo...",
-	"...oppo..oppo...",
-	"...oBbo..oBBo...",
+	"....oPpooPppo...",
+	"...oPpo..oPpo...",
+	"...oBco..oBco...",
 	"..oBBBo..oBBBo..",
 	"..ooooo..ooooo..",
 ]
 
 const SIDE_LEGS_B: Array[String] = [
-	".....oppppo.....",
-	".....opppBo.....",
-	"....oBBBoBo.....",
+	".....oPpppo.....",
+	".....oPppBo.....",
+	"....oBcBoBo.....",
 	"....oBBBBoo.....",
 	"....ooooo.......",
 ]
@@ -144,10 +168,13 @@ func _initialize() -> void:
 	var up: Array[String] = _mirror_halves(UP_UPPER_HALF)
 	var legs_idle: Array[String] = _mirror_halves(LEGS_IDLE_HALF)
 	var legs_b: Array[String] = _flip_rows(LEGS_STEP)
+	var side_idle: Array[String] = SIDE_HEAD + SIDE_ARMS_IDLE + SIDE_HEM + SIDE_LEGS_IDLE
+	var side_a: Array[String] = SIDE_HEAD + SIDE_ARMS_FORWARD + SIDE_HEM + SIDE_LEGS_A
+	var side_b: Array[String] = SIDE_HEAD + SIDE_ARMS_BACK + SIDE_HEM + SIDE_LEGS_B
 	var sheet: Array = [
 		[down + legs_idle, down + LEGS_STEP, down + legs_b],
 		[up + legs_idle, up + LEGS_STEP, up + legs_b],
-		[SIDE_UPPER + SIDE_LEGS_IDLE, SIDE_UPPER + SIDE_LEGS_A, SIDE_UPPER + SIDE_LEGS_B],
+		[side_idle, side_a, side_b],
 	]
 	var image: Image = Image.create(W * 3, H * 3, false, Image.FORMAT_RGBA8)
 	image.fill(Color(0, 0, 0, 0))

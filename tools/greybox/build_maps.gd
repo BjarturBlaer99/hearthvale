@@ -22,7 +22,7 @@ extends SceneTree
 ## stairway in the inner room leads down to the Cistern.
 ## The Cistern (H6's puzzle rooms, tests/world/puzzle_test.gd): five 15x11 rooms on a 2x3 grid,
 ## (0,2) push block -> (0,1) pressure plate -> (1,1) switch -> (1,0) cracked wall -> (0,0)
-## the combined room; the sixth room, (1,2), is solid rock.
+## the combined room; the sixth room, (1,2), is a secret behind a cracked wall (H12).
 ## The Old Keep (H7's dungeon, tests/world/keep_test.gd): ten 15x11 rooms on a 3x4 grid; the
 ## gate is in the south wall, the way out behind the boss in the north wall of (1,1).
 ## The countryside (H8, tests/world/countryside_test.gd): the village's north road leads to the
@@ -38,6 +38,8 @@ extends SceneTree
 ## and walls get a window every third cell (doors, laid later, replace them). Trees, rocks,
 ## fences and the 2x2 "well" become solid ground at the block's height (so they sit on grass of
 ## any height) with their picture on the Decor layer.
+## Grass, pots and critters: "spawns" blocks [x, y, width, height, kind] paint markers on a hidden
+## Spawns layer, and the area turns each into its node on load (GreyboxTiles.MARKER_KINDS).
 ## Optional looks, on the Decor layer (never read for movement):
 ## - "decor": blocks [x, y, width, height, kind] of GreyboxTiles.DECOR_KINDS;
 ## - "scatter": { "seed", "kinds": [[kind, percent], ...] } sprinkled over open ground,
@@ -100,6 +102,42 @@ const MAPS: Dictionary = {
 			[44, 30, 4, 4, 0, "tree"],
 			[0, 34, 22, 2, 0, "tree"],
 			[26, 34, 22, 2, 0, "tree"],
+			# H12: a market stall in the square with a keg and a crate, lamp posts along the road.
+			[29, 19, 3, 2, 0, "stall"],
+			[32, 19, 1, 1, 0, "keg"],
+			[32, 20, 1, 1, 0, "crate"],
+			[21, 12, 1, 1, 0, "lamp"],
+			[26, 12, 1, 1, 0, "lamp"],
+			[21, 21, 1, 1, 0, "lamp"],
+			# Crates by the shop, hay and logs by the field, a washing line west of the square.
+			[12, 23, 1, 1, 0, "crate"],
+			[12, 24, 1, 1, 0, "keg"],
+			[15, 28, 1, 2, 0, "hay"],
+			[16, 32, 1, 1, 0, "logs"],
+			[2, 19, 1, 1, 0, "post"],
+			[5, 19, 1, 1, 0, "post"],
+			# A standing stone and a stump on the north rise.
+			[12, 4, 1, 1, 2, "standing_stone"],
+			[33, 3, 1, 1, 2, "stump"],
+			# A nook in the woods by the field, behind tall grass, with a heart piece.
+			[0, 30, 2, 1, 0, "ground"],
+		],
+		"spawns": [
+			# Tall grass (one tuft hides the heart piece's nook), pots, chickens in and by the field, butterflies over flowers.
+			[1, 30, 1, 1, "grass"],
+			[2, 12, 2, 1, "grass"],
+			[44, 13, 2, 1, "grass"],
+			[34, 30, 2, 1, "grass"],
+			[27, 30, 1, 1, "grass"],
+			[13, 21, 1, 1, "pot"],
+			[34, 14, 1, 2, "pot"],
+			[6, 29, 1, 1, "chicken"],
+			[10, 31, 1, 1, "chicken"],
+			[14, 26, 1, 1, "chicken"],
+			[11, 15, 1, 1, "butterfly"],
+			[30, 15, 1, 1, "butterfly"],
+			[44, 26, 1, 1, "butterfly"],
+			[7, 15, 1, 1, "butterfly"],
 		],
 		"decor": [
 			# Flower beds along the house fronts, leaving the doorsteps clear.
@@ -117,6 +155,8 @@ const MAPS: Dictionary = {
 			[30, 29, 1, 1, "lily"],
 			# A vegetable patch on the east meadow.
 			[43, 26, 3, 3, "crops"],
+			[20, 20, 1, 1, "bucket"],
+			[3, 19, 2, 1, "laundry"],
 		],
 		"scatter": {"seed": 7, "kinds": [["tuft", 6], ["flowers_red", 1], ["flowers_yellow", 1], ["flowers_blue", 1], ["pebbles", 1]]},
 	},
@@ -137,6 +177,14 @@ const MAPS: Dictionary = {
 			[1, 5, 2, 1, 0, "table"],
 			[1, 7, 1, 1, 0, "barrel"],
 			[9, 7, 1, 1, 0, "barrel"],
+			# H12: a chair at the table, a cupboard, a candle stand, a bookcase.
+			[3, 5, 1, 1, 0, "chair"],
+			[6, 2, 1, 1, 0, "cupboard"],
+			[7, 2, 1, 1, 0, "candle"],
+			[9, 4, 1, 1, 0, "bookcase"],
+		],
+		"spawns": [
+			[8, 7, 1, 1, "pot"],
 		],
 	},
 	"weaver_house": {
@@ -155,6 +203,14 @@ const MAPS: Dictionary = {
 			[1, 5, 1, 1, 0, "bed"],
 			[3, 4, 3, 2, 0, "rug"],
 			[8, 5, 1, 2, 0, "barrel"],
+			# H12: the weaver's loom, a cupboard, a stool and a plant.
+			[3, 2, 1, 1, 0, "loom"],
+			[5, 2, 1, 1, 0, "cupboard"],
+			[2, 7, 1, 1, 0, "stool"],
+			[9, 7, 1, 1, 0, "plant"],
+		],
+		"spawns": [
+			[1, 7, 1, 1, "pot"],
 		],
 	},
 	"shop": {
@@ -174,6 +230,15 @@ const MAPS: Dictionary = {
 			[1, 6, 1, 2, 0, "barrel"],
 			[9, 6, 1, 2, 0, "barrel"],
 			[4, 6, 3, 1, 0, "rug"],
+			# H12: proper counters with wares, a plant and a stool.
+			[2, 4, 3, 1, 0, "counter"],
+			[6, 4, 3, 1, 0, "counter"],
+			[2, 6, 1, 1, 0, "plant"],
+			[8, 6, 1, 1, 0, "stool"],
+		],
+		"spawns": [
+			[2, 7, 1, 1, "pot"],
+			[8, 7, 1, 1, "pot"],
 		],
 	},
 	"ruin_cellar": {
@@ -203,6 +268,10 @@ const MAPS: Dictionary = {
 			# The way back up, in the entry hall's south wall; the way down, in the inner room's north wall.
 			[7, 32, 1, 1, 0, "stairway"],
 			[12, 0, 1, 1, 0, "stairway"],
+		],
+		"spawns": [
+			[1, 30, 1, 1, "pot"],
+			[13, 30, 1, 1, "pot"],
 		],
 	},
 	"cistern": {
@@ -237,9 +306,23 @@ const MAPS: Dictionary = {
 			[4, 1, 1, 4, 0, "dungeon_wall"],
 			[1, 4, 4, 1, 0, "dungeon_wall"],
 			[2, 4, 1, 1, 0, "dungeon_floor"],
-			[9, 1, 4, 4, 1, "path"],
+			[9, 1, 4, 4, 1, "ledge"],
 			# The way back up.
 			[7, 32, 1, 1, 0, "stairway"],
+			# H12: the sixth room is no longer rock: a secret room behind a cracked wall in the push
+			# room's east wall (its door is in the scene), with a heart piece and pots.
+			[16, 23, 13, 9, 0, "dungeon_floor"],
+			[14, 27, 2, 1, 0, "dungeon_floor"],
+			[18, 25, 1, 1, 0, "pillar"],
+			[26, 25, 1, 1, 0, "pillar"],
+			[18, 29, 1, 1, 0, "pillar"],
+			[26, 29, 1, 1, 0, "pillar"],
+		],
+		"spawns": [
+			[17, 24, 1, 1, "pot"],
+			[27, 24, 1, 1, "pot"],
+			[17, 30, 1, 1, "pot"],
+			[27, 30, 1, 1, "pot"],
 		],
 	},
 	"keep": {
@@ -284,17 +367,17 @@ const MAPS: Dictionary = {
 			[1, 37, 4, 1, 0, "dungeon_wall"],
 			[2, 37, 1, 1, 0, "dungeon_floor"],
 			# Armoury: a ledge (no stairs) with a crystal on it, out of sword reach; two pillars.
-			[9, 12, 4, 3, 1, "path"],
+			[9, 12, 4, 3, 1, "ledge"],
 			[3, 18, 1, 1, 0, "pillar"],
 			[11, 18, 1, 1, 0, "pillar"],
 			# Gallery: a walkway along the north wall for the archers (no stairs), and the second
 			# small key's alcove behind a shutter.
-			[1, 1, 13, 3, 1, "path"],
+			[1, 1, 13, 3, 1, "ledge"],
 			[10, 6, 1, 4, 0, "dungeon_wall"],
 			[10, 6, 4, 1, 0, "dungeon_wall"],
 			[10, 8, 1, 1, 0, "dungeon_floor"],
 			# Twin crystals: a ledge in the north-east corner for the high one.
-			[39, 23, 5, 3, 1, "path"],
+			[39, 23, 5, 3, 1, "ledge"],
 			# Big key room: the big key's alcove, behind a shutter.
 			[35, 12, 1, 3, 0, "dungeon_wall"],
 			[39, 12, 1, 3, 0, "dungeon_wall"],
@@ -303,6 +386,14 @@ const MAPS: Dictionary = {
 			# The gate (south) and the way out behind the Warden's hall (north).
 			[22, 43, 1, 1, 0, "stairway"],
 			[22, 11, 1, 1, 0, "stairway"],
+		],
+		"spawns": [
+			[17, 35, 1, 1, "pot"],
+			[27, 35, 1, 1, "pot"],
+			[17, 23, 1, 1, "pot"],
+			[27, 23, 1, 1, "pot"],
+			[17, 13, 1, 1, "pot"],
+			[27, 13, 1, 1, "pot"],
 		],
 	},
 	"north_fields": {
@@ -345,6 +436,21 @@ const MAPS: Dictionary = {
 			[25, 24, 2, 2, 0, "tree"],
 			[32, 25, 1, 1, 0, "rock"],
 			[16, 22, 2, 2, 0, "tree"],
+			# H12: hay by the farm, logs, a standing stone by the stream, a stump below the plateau.
+			[13, 19, 1, 2, 0, "hay"],
+			[3, 26, 1, 1, 0, "logs"],
+			[24, 9, 1, 1, 0, "standing_stone"],
+			[30, 23, 1, 1, 0, "stump"],
+		],
+		"spawns": [
+			# Tall grass round the plateau's far corner hides a heart piece.
+			[35, 21, 1, 1, "grass"],
+			[36, 20, 1, 1, "grass"],
+			[3, 13, 2, 1, "grass"],
+			[10, 9, 1, 1, "grass"],
+			[22, 24, 1, 1, "grass"],
+			[8, 21, 1, 1, "butterfly"],
+			[30, 7, 1, 1, "butterfly"],
 		],
 		"decor": [
 			[5, 19, 7, 6, "crops"],
@@ -389,6 +495,23 @@ const MAPS: Dictionary = {
 			[30, 10, 8, 7, 0, "stone"],
 			[31, 11, 6, 5, 0, "ground"],
 			[30, 13, 1, 1, 0, "ground"],
+			# H12: logs and stumps in the clearings, a standing stone by the shrine.
+			[3, 15, 1, 1, 0, "logs"],
+			[8, 20, 1, 1, 0, "stump"],
+			[22, 24, 1, 1, 0, "stump"],
+			[30, 24, 1, 1, 0, "logs"],
+			[26, 11, 1, 1, 0, "standing_stone"],
+		],
+		"spawns": [
+			[4, 16, 1, 1, "firefly"],
+			[7, 19, 1, 1, "firefly"],
+			[23, 21, 1, 1, "firefly"],
+			[28, 20, 1, 1, "firefly"],
+			[12, 8, 1, 1, "firefly"],
+			[21, 19, 2, 1, "grass"],
+			[9, 15, 1, 1, "grass"],
+			[16, 4, 1, 1, "pot"],
+			[21, 4, 1, 1, "pot"],
 		],
 		"decor": [
 			[32, 11, 1, 1, "flowers_blue"],
@@ -427,6 +550,21 @@ const MAPS: Dictionary = {
 			[0, 2, 2, 26, 0, "tree"],
 			[38, 2, 2, 26, 0, "tree"],
 			[0, 26, 40, 2, 0, "tree"],
+			# H12: logs, a stump and a pair of standing stones.
+			[4, 22, 1, 1, 0, "logs"],
+			[36, 24, 1, 1, 0, "stump"],
+			[16, 8, 1, 1, 0, "standing_stone"],
+			[12, 13, 1, 1, 0, "standing_stone"],
+		],
+		"spawns": [
+			[2, 10, 2, 1, "grass"],
+			[3, 14, 1, 1, "grass"],
+			[13, 23, 2, 1, "grass"],
+			[24, 24, 2, 1, "grass"],
+			[28, 22, 1, 1, "pot"],
+			[34, 22, 1, 1, "pot"],
+			[8, 13, 1, 1, "butterfly"],
+			[14, 20, 1, 1, "butterfly"],
 		],
 		"decor": [
 			[6, 18, 1, 1, "lily"],
@@ -486,6 +624,8 @@ func _bake(map: Dictionary) -> Error:
 				var detail: String = _detail(kind, x - int(block[0]), y - int(block[1]), block[2], block[3])
 				layer.set_cell(cell, GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(detail, block[4]))
 	var decor_error: Error = _decorate(root, layer, map, props)
+	if decor_error == OK:
+		decor_error = _spawns(root, map)
 	if decor_error != OK:
 		root.free()
 		return decor_error
@@ -498,10 +638,13 @@ func _bake(map: Dictionary) -> Error:
 	return error
 
 
-## The prop for cell (dx, dy) of a prop block: the tree, rock or fence, or a well quarter.
+## The prop for cell (dx, dy) of a prop block: the tree, rock, fence, crate and so on, a well
+## quarter (2x2), or a part of the market stall (3x2: awning above, counter below).
 func _prop(kind: String, dx: int, dy: int) -> String:
 	if kind == "well":
 		return "well_%s%s" % ["n" if dy % 2 == 0 else "s", "w" if dx % 2 == 0 else "e"]
+	if kind == "stall":
+		return "stall_%s%s" % ["n" if dy % 2 == 0 else "s", ["w", "", "e"][dx % 3]]
 	return GreyboxTiles.PROP_BLOCKS[kind]
 
 
@@ -558,6 +701,33 @@ func _decorate(root: Node, height_layer: TileMapLayer, map: Dictionary, props: D
 				decor.set_cell(cell, GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(str(entry[0])))
 				break
 			roll -= int(entry[1])
+	return OK
+
+
+## Paints the hidden Spawns layer (adding it after Decor if the scene has none): grass, pots and
+## critters, from the map's "spawns" blocks [x, y, width, height, kind]. The area turns each
+## marker into its node on load.
+func _spawns(root: Node, map: Dictionary) -> Error:
+	var layer: TileMapLayer = root.get_node_or_null(^"Spawns")
+	var blocks: Array = map.get("spawns", [])
+	if layer == null and blocks.is_empty():
+		return OK
+	if layer == null:
+		layer = TileMapLayer.new()
+		layer.name = "Spawns"
+		root.add_child(layer)
+		root.move_child(layer, root.get_node(^"Decor").get_index() + 1)
+		layer.owner = root
+	layer.tile_set = (root.get_node(^"Height") as TileMapLayer).tile_set
+	layer.clear()
+	for block: Array in blocks:
+		var kind: String = block[4]
+		if not GreyboxTiles.MARKER_KINDS.has(kind):
+			push_error("tools/greybox: '%s' is not a spawn marker (%s)" % [kind, block])
+			return ERR_INVALID_DATA
+		for y: int in range(block[1], block[1] + block[3]):
+			for x: int in range(block[0], block[0] + block[2]):
+				layer.set_cell(Vector2i(x, y), GreyboxTiles.SOURCE_ID, GreyboxTiles.marker_coords(kind))
 	return OK
 
 

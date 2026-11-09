@@ -72,6 +72,19 @@ func test_bad_enemies_are_reported() -> void:
 	_assert_reported(errors, "unknown weak_point 'song'")
 
 
+func test_breakables_are_registered() -> void:
+	_registry.load_all()
+	assert_array(Array(_registry.ids(&"breakables")).map(func(id: StringName) -> String: return String(id))).contains_exactly_in_any_order(["grass", "pot"])
+	assert_array(_registry.get_breakable(&"pot")["breaks_on"]).contains(["sword", "bomb"])
+
+
+func test_bad_breakables_are_reported() -> void:
+	var errors: PackedStringArray = _registry.load_all(FIXTURES.path_join("bad_breakable"))
+	_assert_reported(errors, "'breaks_on' has unknown 'song'")
+	_assert_reported(errors, "unknown burst 'confetti'")
+	_assert_reported(errors, "unknown item id 'gold_bar'")
+
+
 func test_dialogue_speakers_must_be_a_map() -> void:
 	var errors: PackedStringArray = _registry.load_all(FIXTURES.path_join("bad_speakers"))
 	_assert_reported(errors, "'speakers' must be an object")

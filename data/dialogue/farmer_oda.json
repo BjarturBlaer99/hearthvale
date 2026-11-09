@@ -1,0 +1,33 @@
+{
+  "id": "farmer_oda",
+  "start": "hello",
+  "speakers": {
+    "oda": "Farmer Oda"
+  },
+  "nodes": {
+    "hello": {
+      "speaker": "oda",
+      "text": "My chickens won't keep to the field, and the tall grass by the woods grows back faster than I can cut it.",
+      "options": [
+        {
+          "text": "Anything else?",
+          "next": "more"
+        },
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "more": {
+      "speaker": "oda",
+      "text": "Something glints in there, too, where the trees come down to the field. A sword would make short work of that grass.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    }
+  }
+}

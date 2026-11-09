@@ -1,0 +1,7 @@
+{
+  "id": "vase",
+  "name": "Vase",
+  "breaks_on": ["song"],
+  "burst": "confetti",
+  "drops": [ { "type": "item", "item": "gold_bar", "weight": 1 } ]
+}

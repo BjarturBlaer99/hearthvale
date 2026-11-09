@@ -7,6 +7,9 @@ extends Node2D
 
 ## After a hit, more hits are ignored this long (one swing, one change).
 const LOCKOUT: float = 0.4
+const SHEET: Texture2D = preload("res://gameplay/art/crystal.png")
+## Frames in the order tools/art/make_sprites.gd paints them (a test checks).
+const FRAMES: Dictionary = {&"red": 0, &"blue": 1, &"white": 2}
 const OUTLINE: Color = Color(0.10, 0.08, 0.12)
 const RED: Color = Color(0.92, 0.28, 0.30)
 const BLUE: Color = Color(0.35, 0.62, 0.98)
@@ -53,6 +56,8 @@ func _on_hit(hit: Hit) -> void:
 	if _lockout > 0.0 or not KINDS.has(hit.kind):
 		return
 	GameState.set_flag(flag, not is_on() if toggles else true)
+	EventBus.sound.emit(&"crystal")
+	Burst.spawn(get_parent(), position + Vector2(8, 4), &"sparkle")
 	_lockout = LOCKOUT
 	_flash = 0.15
 	set_process(true)
@@ -69,11 +74,5 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	draw_rect(Rect2(2, 12, 12, 3), Color(0, 0, 0, 0.3))
-	draw_rect(Rect2(3, 9, 10, 6), OUTLINE)
-	draw_rect(Rect2(4, 10, 8, 4), STONE)
-	draw_rect(Rect2(4, 10, 8, 1), STONE.lightened(0.2))
-	var gem: Color = Color.WHITE if _flash > 0.0 else (BLUE if is_on() else RED)
-	var crystal: PackedVector2Array = [Vector2(8, 0), Vector2(13, 5), Vector2(8, 11), Vector2(3, 5)]
-	draw_colored_polygon(PackedVector2Array([Vector2(8, -1), Vector2(14, 5), Vector2(8, 12), Vector2(2, 5)]), OUTLINE)
-	draw_colored_polygon(crystal, gem)
-	draw_colored_polygon(PackedVector2Array([Vector2(8, 1), Vector2(11, 5), Vector2(8, 5), Vector2(5, 4)]), gem.lightened(0.35))
+	var frame: StringName = &"white" if _flash > 0.0 else (&"blue" if is_on() else &"red")
+	SpriteSheet.draw(self, SHEET, FRAMES[frame], Vector2i(16, 16), Vector2(0, -1))

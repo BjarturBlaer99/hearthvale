@@ -42,10 +42,12 @@ func change(step: int = 1) -> void:
 		close()
 		return
 	Settings.change(id, step)
+	EventBus.sound.emit(&"menu_select")
 	_rebuild(id)
 
 
 func move_cursor(step: int) -> void:
+	EventBus.sound.emit(&"menu_move")
 	cursor.move(step)
 	_list.text = "\n".join(cursor.lines())
 

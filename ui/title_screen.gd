@@ -26,6 +26,7 @@ func _init() -> void:
 
 func _ready() -> void:
 	get_tree().paused = false
+	EventBus.music_requested.emit(&"village")
 	refresh()
 
 
@@ -54,6 +55,7 @@ func shown_lines() -> PackedStringArray:
 
 
 func move_cursor(step: int) -> void:
+	EventBus.sound.emit(&"menu_move")
 	cursor.move(step)
 	_list.text = "\n".join(cursor.lines())
 
@@ -62,6 +64,7 @@ func move_cursor(step: int) -> void:
 func choose(id: StringName = &"") -> void:
 	if id == &"":
 		id = cursor.selected_id()
+	EventBus.sound.emit(&"menu_select")
 	match id:
 		CONTINUE:
 			if SaveSystem.load_game() == OK:

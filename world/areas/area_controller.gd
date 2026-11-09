@@ -28,6 +28,8 @@ const ROOM_FLASH: float = 0.2
 const PUSH_TIME: float = 0.35
 ## Where "Quit to title" goes.
 const TITLE_SCENE: String = "res://ui/title_screen.tscn"
+## How slow the game runs during a hit-stop.
+const HIT_STOP_SCALE: float = 0.05
 
 @export var area_id: StringName = &"village"
 @export var area_name: String = "Hearthvale"
@@ -35,6 +37,8 @@ const TITLE_SCENE: String = "res://ui/title_screen.tscn"
 @export var dungeon_id: StringName
 ## Room size in cells for dungeons (the camera shows one room); zero: the whole area at once.
 @export var room_size: Vector2i = Vector2i.ZERO
+## The tune this area plays (audio/music); empty: whatever is playing carries on.
+@export var music: StringName = &""
 
 var grid: HeightGrid
 var terrain: TerrainQuery
@@ -50,6 +54,10 @@ var current_room: Vector2i = Vector2i.ZERO
 var room_mask: RoomMask
 
 var _travelling: bool = false
+## When the current hit-stop ends (real milliseconds; 0: none).
+var _hit_stop_until: int = 0
+## Whether each door was open, to hear shutters lift.
+var _door_open: Dictionary = {}
 var _push_time: float = 0.0
 var _dying: bool = false
 var _respawn_left: float = 0.0
@@ -77,12 +85,16 @@ func _ready() -> void:
 	interactables.y_sort_enabled = true
 	grid = HeightGridBuilder.from_layer(height_layer)
 	terrain = TerrainQuery.new(grid)
+	spawn_markers()
 	for child: Node in interactables.get_children():
 		if child.has_method(&"set_dungeon"):
 			child.call(&"set_dungeon", flag_scope())
+		if child.has_method(&"set_terrain"):
+			child.call(&"set_terrain", terrain, rng)
 		if child.has_method(&"occupies") and child.call(&"occupies"):
 			terrain.set_occupied(child.call(&"cell"))
 	_refresh_doors()
+	_shading.stone_faces = dungeon_id != &""
 	_shading.show_grid(grid)
 	var arrival: Dictionary = _arrival()
 	_entrance_cell = arrival["cell"]
@@ -99,10 +111,18 @@ func _ready() -> void:
 	hud.item_menu.chosen.connect(_on_item_chosen)
 	hud.item_menu.closed.connect(_on_item_menu_closed)
 	hud.pause_menu.quit_to_title.connect(_on_quit_to_title)
+	EventBus.hit_stop.connect(hit_stop)
+	for boss: Enemy in enemies():
+		if boss is Boss:
+			(boss as Boss).calm_music = music
+	if music != &"":
+		EventBus.music_requested.emit(music)
 	EventBus.health_changed.connect(_on_health_changed)
 	EventBus.flag_set.connect(_on_flag_set)
 	hud.set_area(area_name)
 	hud.set_health(GameState.health, GameState.max_health())
+	hud.set_pieces(GameState.heart_pieces)
+	EventBus.heart_piece_found.connect(hud.set_pieces)
 	if arrival["through_entry"]:
 		hud.flash()
 	GameState.update_player(area_id, player.motor.cell)
@@ -110,6 +130,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if _hit_stop_until > 0 and Time.get_ticks_msec() >= _hit_stop_until:
+		_end_hit_stop()
 	if _travelling:
 		return
 	# Runs only while the game isn't paused, so the clock stops behind the pause menu.
@@ -129,6 +151,40 @@ func _physics_process(delta: float) -> void:
 	update_plates()
 	resolve_combat()
 	collect_pickups()
+
+
+## Turns the markers the map baker painted on the hidden Spawns layer into their nodes: grass
+## and pots (Breakable), chickens, butterflies and fireflies (Critter). Returns how many.
+func spawn_markers() -> int:
+	var layer: TileMapLayer = get_node_or_null(^"Spawns") as TileMapLayer
+	if layer == null:
+		return 0
+	layer.visible = false
+	var made: int = 0
+	for cell: Vector2i in layer.get_used_cells():
+		var kind: String = GreyboxTiles.marker_kind(layer.get_cell_atlas_coords(cell))
+		var node: Node2D = _spawned(kind)
+		if node == null:
+			push_warning("%s: no spawn marker '%s' at %s." % [area_id, kind, cell])
+			continue
+		node.name = "%s_%d_%d" % [kind.capitalize(), cell.x, cell.y]
+		node.position = Vector2(cell * GreyboxTiles.TILE_SIZE)
+		interactables.add_child(node)
+		made += 1
+	layer.clear()
+	return made
+
+
+func _spawned(kind: String) -> Node2D:
+	if GreyboxTiles.BREAKABLE_MARKERS.has(kind):
+		var breakable: Breakable = Breakable.new()
+		breakable.breakable_id = StringName(kind)
+		return breakable
+	if Critter.KINDS.has(StringName(kind)):
+		var critter: Critter = Critter.new()
+		critter.kind = StringName(kind)
+		return critter
+	return null
 
 
 ## Pushing a block: holding straight against one for PUSH_TIME slides it a cell. Returns
@@ -337,10 +393,12 @@ func use_item() -> bool:
 		return false
 	var item: Dictionary = DataRegistry.get_item(GameState.equipped)
 	if item.is_empty():
+		EventBus.sound.emit(&"nope")
 		hud.show_message("Nothing on the item button yet.")
 		return false
 	var ammo: String = Inventory.ammo_for(item)
 	if not ammo.is_empty() and GameState.item_count(StringName(ammo)) <= 0:
+		EventBus.sound.emit(&"nope")
 		hud.show_message("Out of %s." % str(DataRegistry.get_item(StringName(ammo)).get("name", ammo)).to_lower())
 		return false
 	match str(item.get("type", "")):
@@ -381,6 +439,7 @@ func _shoot(bow: Dictionary, ammo: StringName) -> bool:
 	if not player.motor.attack(direction, float(stats.get("cooldown", 0.45))):
 		return false
 	GameState.add_item(ammo, -1)
+	EventBus.sound.emit(&"arrow")
 	var arrow: Arrow = Arrow.new()
 	arrow.setup(terrain, Vector2(direction), int(stats.get("damage", 2)), float(stats.get("speed", 180.0)),
 		&"hero", float(stats.get("knockback", 20.0)))
@@ -395,6 +454,7 @@ func _set_bomb(item: Dictionary) -> bool:
 	if player.motor.state_name != PlayerMotor.GROUND:
 		return false
 	GameState.add_item(StringName(str(item["id"])), -1)
+	EventBus.sound.emit(&"bomb_set")
 	var bomb: Bomb = Bomb.new()
 	bomb.setup(item.get("stats", {}))
 	bomb.position = player.motor.position
@@ -553,6 +613,28 @@ func _on_dialogue_closed() -> void:
 	player.controls_enabled = true
 
 
+## A moment's near-freeze for weight (EventBus.hit_stop): the game runs at HIT_STOP_SCALE for
+## `seconds` of real time. Overlapping stops last until the latest ends.
+func hit_stop(seconds: float) -> void:
+	if seconds <= 0.0:
+		return
+	_hit_stop_until = maxi(_hit_stop_until, Time.get_ticks_msec() + int(seconds * 1000.0))
+	Engine.time_scale = HIT_STOP_SCALE
+
+
+func is_hit_stopped() -> bool:
+	return _hit_stop_until > 0
+
+
+func _end_hit_stop() -> void:
+	_hit_stop_until = 0
+	Engine.time_scale = 1.0
+
+
+func _exit_tree() -> void:
+	_end_hit_stop()
+
+
 func _on_quit_to_title() -> void:
 	_travelling = true
 	player.controls_enabled = false
@@ -593,9 +675,13 @@ func _on_flag_set(_flag: StringName, _value: Variant) -> void:
 func _refresh_doors() -> void:
 	for door: DungeonDoor in doors():
 		door.latch()
+		var open: bool = door.is_open()
+		if open and _door_open.has(door) and not _door_open[door] and door.kind == DungeonState.SHUTTER:
+			EventBus.sound.emit(&"solved")
+		_door_open[door] = open
 		for cell: Vector2i in door.cells():
-			terrain.set_occupied(cell, not door.is_open())
-			terrain.set_sealed(cell, not door.is_open())
+			terrain.set_occupied(cell, not open)
+			terrain.set_sealed(cell, not open)
 
 
 ## When the last enemy sharing a clear flag falls, the flag is set (a shutter may open).

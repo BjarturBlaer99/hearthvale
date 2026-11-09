@@ -24,11 +24,20 @@ var _attack_was_held: bool = false
 @onready var hurt_box: HurtBox = $HurtBox
 @onready var sword: Sword = $Sword
 @onready var _sprite: Sprite2D = $Sprite
+var _shake_left: float = 0.0
+var _shake_time: float = 0.0
+var _shake_strength: float = 0.0
+var _dust_left: float = 0.0
+
 @onready var _camera: Camera2D = $Camera2D
+
+## Seconds between puffs of dust while sprinting.
+const DUST_EVERY: float = 0.16
 
 
 func _ready() -> void:
 	hurt_box.hit_taken.connect(_on_hit_taken)
+	EventBus.shake.connect(shake)
 
 
 ## Called by the area once its terrain is known.
@@ -91,6 +100,7 @@ func swing() -> bool:
 	if not motor.attack(direction, stats["cooldown"]):
 		return false
 	sword.swing(Vector2(direction), stats)
+	EventBus.sound.emit(&"sword")
 	sync_from_motor()
 	return true
 
@@ -113,7 +123,9 @@ func _physics_process(delta: float) -> void:
 	_attack_was_held = attack_held
 	var input: Vector2 = Input.get_vector(&"move_left", &"move_right", &"move_up", &"move_down") if controls_enabled else Vector2.ZERO
 	motor.sprinting = controls_enabled and Input.is_action_pressed(&"sprint")
+	var before: Vector2 = motor.position
 	motor.step(input, delta)
+	_kick_up_dust(motor.position != before, delta)
 	_hop_left = maxf(0.0, _hop_left - delta)
 	sync_from_motor()
 
@@ -123,7 +135,31 @@ func _physics_process(delta: float) -> void:
 func _on_hit_taken(hit: Hit) -> void:
 	if motor != null and motor.take_hit(hit.push):
 		GameState.damage(hit.damage)
+		EventBus.sound.emit(&"hurt")
+		EventBus.hit_stop.emit(0.08)
+		EventBus.shake.emit(2.0, 0.18)
 		sync_from_motor()
+
+
+## Shakes the camera up to `strength` px for `seconds` (the strongest shake wins).
+func shake(strength: float, seconds: float) -> void:
+	if seconds <= 0.0:
+		return
+	_shake_strength = maxf(strength, _shake_strength if _shake_left > 0.0 else 0.0)
+	_shake_left = maxf(seconds, _shake_left)
+	_shake_time = _shake_left
+
+
+func is_shaking() -> bool:
+	return _shake_left > 0.0
+
+
+func _process(delta: float) -> void:
+	if _shake_left <= 0.0:
+		return
+	_shake_left = maxf(0.0, _shake_left - delta)
+	var amount: float = _shake_strength * (_shake_left / maxf(_shake_time, 0.001))
+	_camera.offset = Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * amount if _shake_left > 0.0 else Vector2.ZERO
 
 
 ## The sword's arc is live only while the motor is swinging; it draws behind the hero when
@@ -182,3 +218,14 @@ func camera_limits() -> Rect2i:
 
 func _on_dropped(_levels: int) -> void:
 	_hop_left = HOP_TIME
+
+
+## Running feet kick up a little dust every DUST_EVERY seconds.
+func _kick_up_dust(moved: bool, delta: float) -> void:
+	if not (moved and motor.sprinting and motor.state_name == PlayerMotor.GROUND):
+		_dust_left = 0.0
+		return
+	_dust_left -= delta
+	if _dust_left <= 0.0 and get_parent() != null:
+		_dust_left = DUST_EVERY
+		Burst.spawn(get_parent(), position, &"dust", 0.6)

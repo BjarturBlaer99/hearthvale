@@ -23,5 +23,18 @@ signal heart_piece_found(pieces: int)
 ## The player changed a setting (Settings has the new values).
 signal settings_changed
 
+## A sound effect should play: `id` names audio/sfx/<id>.wav (Audio plays it).
+signal sound(id: StringName)
+
+## The music should become `id` (audio/music/<id>.wav), or stop for empty. Asking for the tune
+## already playing doesn't restart it.
+signal music_requested(id: StringName)
+
+## A moment's freeze, for weight: `seconds` of near-stillness (the area applies it).
+signal hit_stop(seconds: float)
+
+## The camera shakes up to `strength` pixels for `seconds`.
+signal shake(strength: float, seconds: float)
+
 ## The item on the item button changed (empty: nothing equipped).
 signal equipped_changed(item_id: StringName)
