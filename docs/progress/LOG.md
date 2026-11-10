@@ -877,7 +877,7 @@ Plan: `docs/progress/H14-plan.md`. The roadmap left the dungeon's item open; the
 - Visual check (`tools/capture.gd`, now 80 shots, 16 new): the chapel door barred and open, every room of the crypt, the trench bridged, the hero falling, the Dark Path with and without the Lantern, and the Shade haunting and bound. Three things were changed after looking: braziers moved so room centres and the trench are lit, light kept from leaking between rooms, and the Shade's hall lit fully when all four braziers burn.
 
 **Known issues / notes**
-- Not played by hand yet. The Shade's difficulty, the brief torches' 6.5 seconds and how dark the dark is are guesses until someone plays; all three are single numbers (in `data/enemies/crypt_shade.json`, the crypt's scene and `Darkness`).
+- Played by hand on 2026-11-10: the crypt and the Shade feel right. The Shade's difficulty, the brief torches' 6.5 seconds and how dark the dark is were guesses, and stay as they are; all three are single numbers (in `data/enemies/crypt_shade.json`, the crypt's scene and `Darkness`).
 - What the Reliquary's archers drop stays on the far side of the pit.
 - The crypt uses the keep's tiles and the dungeon tune. It has no look or music of its own beyond the dark.
 - The hero's safe cell is tracked as they walk, so a test that places the hero beside a pit has to walk them a step first.
@@ -908,7 +908,7 @@ Plan: `docs/progress/H15-plan.md`. Playtest guide: `docs/progress/H15-playtest.m
 - Mutation checks: eight deliberate bugs, each caught, files restored byte for byte: the ending flag ignored, the ending screen never coming, the closing words setting the wrong flag, the hero's place not kept, keep exploring going to the village, save and quit not saving, every quest counting as finished, and the quests line left out.
 
 **Known issues / notes**
-- H14 and H15 have not been played by hand.
+- Played by hand on 2026-11-10: the crypt, the story and the ending feel right. The new-player playtest is still to run.
 - Length: my guess is that a first run takes 45 to 75 minutes, well under the roadmap's two hours. The ending screen will give the real number. If it matters, the fix is more game, which is the "Later" list, not this milestone.
 - The ending screen shows the keep's window dark, but the title screen still shows it lit after the game is finished.
 - The inscriptions are drawn as the village's wooden signpost, in the dungeons too.
