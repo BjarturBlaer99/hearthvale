@@ -9,6 +9,7 @@ const SIZE: Vector2i = Vector2i(16, 16)
 const FRAMES: Dictionary = {
 	&"sword": 0, &"bow": 1, &"arrows": 2, &"bomb": 3, &"bomb_dim": 4, &"key": 5, &"coin": 6,
 	&"heart": 7, &"heart_container": 8, &"heart_piece": 9, &"gem": 10, &"shuttle": 11,
+	&"lantern": 12, &"iron_sword": 13,
 }
 
 

@@ -1,0 +1,33 @@
+{
+  "id": "ending_crypt",
+  "start": "still",
+  "nodes": {
+    "still": {
+      "speaker": "",
+      "text": "You got a Heart Container! Your hearts grow, and fill.\nThe Shade is gone, and the crypt under the chapel lies still.",
+      "options": [
+        {
+          "text": "Go on.",
+          "next": "thanks"
+        }
+      ]
+    },
+    "thanks": {
+      "speaker": "",
+      "text": "What Sir Aldric could only bind, you have ended.\nThe lights over the old keep go out, and Hearthvale sleeps.",
+      "options": [
+        {
+          "text": "The end.",
+          "effects": [
+            {
+              "type": "set_flag",
+              "flag": "game_finished",
+              "value": true
+            }
+          ],
+          "next": null
+        }
+      ]
+    }
+  }
+}

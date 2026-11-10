@@ -20,12 +20,12 @@ func test_project_data_loads_without_errors() -> void:
 
 func test_starting_items_are_registered_in_id_order() -> void:
 	_registry.load_all()
-	assert_array(_registry.ids(&"items")).is_equal([&"arrow", &"big_key", &"bomb", &"bow", &"coin", &"egg_basket", &"small_key", &"weavers_shuttle", &"wooden_sword"])
+	assert_array(_registry.ids(&"items")).is_equal([&"arrow", &"big_key", &"bomb", &"bow", &"coin", &"egg_basket", &"iron_sword", &"lantern", &"small_key", &"weavers_shuttle", &"wooden_sword"])
 	assert_str(_registry.get_item(&"wooden_sword").get("name", "")).is_equal("Wooden Sword")
 	var found: Array = []
 	for entry: Dictionary in _registry.entries(&"items"):
 		found.append(entry["id"])
-	assert_array(found).is_equal(["arrow", "big_key", "bomb", "bow", "coin", "egg_basket", "small_key", "weavers_shuttle", "wooden_sword"])
+	assert_array(found).is_equal(["arrow", "big_key", "bomb", "bow", "coin", "egg_basket", "iron_sword", "lantern", "small_key", "weavers_shuttle", "wooden_sword"])
 
 
 func test_missing_required_field_is_reported_and_not_loaded() -> void:
@@ -55,7 +55,7 @@ func test_villagers_and_signs_have_their_conversations() -> void:
 
 func test_enemies_are_registered() -> void:
 	_registry.load_all()
-	assert_array(Array(_registry.ids(&"enemies")).map(func(id: StringName) -> String: return String(id))).is_equal(["bat", "goblin_archer", "iron_warden", "slime"])
+	assert_array(Array(_registry.ids(&"enemies")).map(func(id: StringName) -> String: return String(id))).is_equal(["bat", "crypt_shade", "goblin_archer", "iron_warden", "slime"])
 	assert_str(str(_registry.get_enemy(&"slime").get("behaviour", ""))).is_equal("hopper")
 	assert_str(str(_registry.get_enemy(&"iron_warden")["boss"]["weak_point"])).override_failure_message("the keep's boss needs the bow").is_equal("arrow")
 

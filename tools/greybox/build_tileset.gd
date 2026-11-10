@@ -61,7 +61,10 @@ func _initialize() -> void:
 		_fixed(source, Vector2i(index, GreyboxTiles.ROW_FURNITURE_B), GreyboxTiles.FURNITURE_B_HEIGHTS[index], true)
 	# House fronts: solid, as tall as any roof or wall. Their overlays and the smoke are Decor.
 	for kind: String in GreyboxTiles.HOUSE_KINDS:
-		_fixed(source, GreyboxTiles.coords(kind), 3, true)
+		if GreyboxTiles.HOUSE_DOOR_KINDS.has(kind):
+			_fixed(source, GreyboxTiles.coords(kind), GreyboxTiles.HOUSE_DOOR_HEIGHT, false)
+		else:
+			_fixed(source, GreyboxTiles.coords(kind), 3, true)
 	for kind: String in GreyboxTiles.HOUSE_DECOR_KINDS:
 		_fixed(source, GreyboxTiles.coords(kind), 0, false)
 	var smoke: Vector2i = GreyboxTiles.coords("smoke")

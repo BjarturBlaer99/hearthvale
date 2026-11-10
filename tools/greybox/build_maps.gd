@@ -25,6 +25,9 @@ extends SceneTree
 ## the combined room; the sixth room, (1,2), is a secret behind a cracked wall (H12).
 ## The Old Keep (H7's dungeon, tests/world/keep_test.gd): ten 15x11 rooms on a 3x4 grid; the
 ## gate is in the south wall, the way out behind the boss in the north wall of (1,1).
+## The Chapel Crypt (H14's dungeon, tests/world/crypt_test.gd): ten 15x11 rooms on a 3x4 grid,
+## the keep's shape mirrored; the stairs up to the chapel are in the south wall. Its pits are
+## "pit" blocks (the top row of each shows the far wall).
 ## The countryside (H8, tests/world/countryside_test.gd): the village's north road leads to the
 ## North Fields (a stream and its bridge, a plateau, a farm plot, a hidden meadow behind a gap in
 ## the tree line), then the Old Wood (clearings off a winding road, the keep's front and gate,
@@ -411,6 +414,71 @@ const MAPS: Dictionary = {
 			[27, 13, 1, 1, "pot"],
 		],
 	},
+	"crypt": {
+		"scene": "res://world/areas/crypt/crypt.tscn",
+		"size": Vector2i(45, 44),
+		"base": "dungeon_wall",
+		"blocks": [
+			# Floors of the ten rooms (the top left and top middle are solid rock).
+			[16, 34, 13, 9, 0, "dungeon_floor"],
+			[31, 34, 13, 9, 0, "dungeon_floor"],
+			[1, 34, 13, 9, 0, "dungeon_floor"],
+			[16, 23, 13, 9, 0, "dungeon_floor"],
+			[31, 23, 13, 9, 0, "dungeon_floor"],
+			[1, 23, 13, 9, 0, "dungeon_floor"],
+			[31, 12, 13, 9, 0, "dungeon_floor"],
+			[16, 12, 13, 9, 0, "dungeon_floor"],
+			[1, 12, 13, 9, 0, "dungeon_floor"],
+			[31, 1, 13, 9, 0, "dungeon_floor"],
+			# Doorways through the walls between rooms (their doors are in the scene).
+			[29, 38, 2, 1, 0, "dungeon_floor"],
+			[14, 38, 2, 1, 0, "dungeon_floor"],
+			[22, 32, 1, 2, 0, "dungeon_floor"],
+			[29, 27, 2, 1, 0, "dungeon_floor"],
+			[14, 27, 2, 1, 0, "dungeon_floor"],
+			[22, 21, 1, 2, 0, "dungeon_floor"],
+			[37, 21, 1, 2, 0, "dungeon_floor"],
+			[37, 10, 1, 2, 0, "dungeon_floor"],
+			[7, 21, 1, 2, 0, "dungeon_floor"],
+			# The Trench: a pit right across the room.
+			[37, 34, 1, 9, 0, "pit"],
+			# The Dark Path: two walls of pit, each with a gap at one end.
+			[34, 17, 10, 1, 0, "pit"],
+			[31, 14, 10, 1, 0, "pit"],
+			# The Knight's Tomb: the Iron Sword's alcove, behind bars.
+			[39, 1, 1, 3, 0, "dungeon_wall"],
+			[35, 1, 1, 3, 0, "dungeon_wall"],
+			[35, 4, 5, 1, 0, "dungeon_wall"],
+			[37, 4, 1, 1, 0, "dungeon_floor"],
+			# The Ossuary: the small key's alcove, behind bars.
+			[4, 34, 1, 4, 0, "dungeon_wall"],
+			[1, 37, 4, 1, 0, "dungeon_wall"],
+			[2, 37, 1, 1, 0, "dungeon_floor"],
+			[8, 38, 1, 1, 0, "pillar"],
+			# The Broken Floor: a trench between the way in and the way on.
+			[1, 26, 13, 1, 0, "pit"],
+			# The Reliquary: a pit between the hero and the far wall, and the big key's alcove.
+			[1, 14, 13, 2, 0, "pit"],
+			[1, 17, 4, 1, 0, "dungeon_wall"],
+			[4, 17, 1, 4, 0, "dungeon_wall"],
+			[4, 19, 1, 1, 0, "dungeon_floor"],
+			# The stairs up to the chapel.
+			[22, 43, 1, 1, 0, "stairway"],
+		],
+		"spawns": [
+			[28, 34, 1, 1, "pot"],
+			[16, 34, 1, 1, "pot"],
+			[28, 42, 1, 1, "pot"],
+			[16, 42, 1, 1, "pot"],
+			[28, 23, 1, 1, "pot"],
+			[16, 23, 1, 1, "pot"],
+			[11, 31, 1, 1, "pot"],
+			[9, 31, 1, 1, "pot"],
+			[13, 20, 1, 1, "pot"],
+			[11, 20, 1, 1, "pot"],
+			[1, 42, 1, 1, "pot"],
+		],
+	},
 	"north_fields": {
 		"scene": "res://world/areas/north_fields/north_fields.tscn",
 		"size": Vector2i(40, 30),
@@ -668,6 +736,7 @@ func _prop(kind: String, dx: int, dy: int) -> String:
 ##   eaves, and its first and last columns a gable's barge board
 ## - walls get a window every third cell; an upper floor's other cells alternate their braces
 ## - "chapel_window" alternates stone and lancet windows; "chapel_door_l" is a pair of leaves
+## - a "pit" shows its far wall along its top row
 func _detail(kind: String, dx: int, dy: int, width: int, height: int) -> String:
 	match kind:
 		"roof", "roof_blue", "roof_thatch":
@@ -693,6 +762,8 @@ func _detail(kind: String, dx: int, dy: int, width: int, height: int) -> String:
 			return "chapel_window" if dx % 2 == 1 else "chapel_wall"
 		"chapel_door_l":
 			return "chapel_door_l" if dx % 2 == 0 else "chapel_door_r"
+		"pit":
+			return "pit_top" if dy == 0 else "pit"
 	return kind
 
 

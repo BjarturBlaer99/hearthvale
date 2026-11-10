@@ -1,0 +1,15 @@
+{
+  "id": "crypt_shade",
+  "name": "Crypt Shade",
+  "behaviour": "shade",
+  "health": 16,
+  "speed": 24,
+  "sight": 96,
+  "contact_damage": 1,
+  "knockback": 32,
+  "shot": { "damage": 1, "speed": 80 },
+  "boss": { "bound_time": 3.0, "rage_at": 8, "rage_speed": 1.4, "bolt_every": 2.8 },
+  "drops": [
+    { "type": "nothing", "weight": 1 }
+  ]
+}

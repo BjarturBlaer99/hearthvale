@@ -14,6 +14,7 @@ const SFX: Array[String] = [
 	"sword", "hit", "enemy_die", "hurt", "heart", "coin", "item_get", "heart_get", "door", "solved",
 	"secret", "arrow", "bomb_set", "bomb", "crystal", "push", "plate", "clink", "stomp", "gaze", "stun",
 	"boss_die", "menu_move", "menu_select", "pause", "nope", "cut", "pot", "quest",
+	"torch", "snuff", "fall", "sink", "whiff",
 ]
 
 ## Each song: tempo, bars (4/4; every track must last bars x 8 eighths), and its tracks.
@@ -148,6 +149,21 @@ static func effect(id: String) -> PackedFloat32Array:
 			return Synth.join([Synth.tone(&"square", 880, 880, 0.04, 0.2, 0.001, 0.01, 0.25), Synth.tone(&"square", 1320, 1320, 0.07, 0.2, 0.001, 0.05, 0.25)])
 		"pause":
 			return Synth.join([Synth.tone(&"sine", 660, 660, 0.05, 0.3, 0.002, 0.02), Synth.tone(&"sine", 990, 990, 0.09, 0.3, 0.002, 0.07)])
+		"torch":
+			# A torch catching: a rising rush of air and a soft bloom.
+			return Synth.mix(Synth.tone(&"noise", 2200, 7500, 0.24, 0.3, 0.02, 0.14, 0.5, 31), Synth.tone(&"triangle", 330, 660, 0.14, 0.2, 0.01, 0.08))
+		"snuff":
+			# A flame going out: a falling puff.
+			return Synth.tone(&"noise", 6000, 400, 0.32, 0.3, 0.005, 0.24, 0.5, 32)
+		"fall":
+			# Down a pit: a long falling whistle.
+			return Synth.tone(&"square", 900, 110, 0.5, 0.26, 0.005, 0.22, 0.25)
+		"sink":
+			# A block dropping into a pit: a deep thud.
+			return Synth.mix(Synth.tone(&"square", 150, 45, 0.32, 0.42, 0.002, 0.22, 0.5), Synth.tone(&"noise", 1600, 250, 0.26, 0.3, 0.002, 0.2, 0.5, 34))
+		"whiff":
+			# A blow passing through the Shade: thin air.
+			return Synth.tone(&"noise", 9000, 2500, 0.12, 0.16, 0.02, 0.08, 0.5, 33)
 		"cut":
 			return Synth.mix(Synth.tone(&"noise", 11000, 3500, 0.09, 0.3, 0.003, 0.06, 0.5, 22), Synth.tone(&"noise", 16000, 16000, 0.03, 0.15, 0.001, 0.02, 0.5, 23), 0.02)
 		"pot":

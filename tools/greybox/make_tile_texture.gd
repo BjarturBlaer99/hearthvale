@@ -491,6 +491,8 @@ func _initialize() -> void:
 	_doormat(Vector2i(3, row))
 	_dungeon_floor(Vector2i(4, row))
 	_stairs_down(Vector2i(5, row))
+	_pit(Vector2i(6, row), false)
+	_pit(Vector2i(7, row), true)
 	row = GreyboxTiles.ROW_FURNITURE
 	_inner_wall(Vector2i(0, row))
 	_table(Vector2i(1, row))
@@ -1546,3 +1548,24 @@ func _canopy(tile: Vector2i) -> void:
 				elif n == 1:
 					shade = shade.lightened(0.14)
 			_px(tile, x, y, shade)
+
+
+# --- Pits (H14) -----------------------------------------------------------------------------------
+
+## A pit: blackness. With `top`, its far wall shows along the top edge, running down into the
+## dark (the baker uses that one for the top row of a pit).
+func _pit(tile: Vector2i, top: bool) -> void:
+	var dark: Color = Color(0.03, 0.02, 0.05)
+	_fill(tile, dark)
+	for y: int in T:
+		for x: int in T:
+			if _hash(x, y, 91) % 29 == 0:
+				_px(tile, x, y, dark.lightened(0.05))
+	if not top:
+		return
+	var stone: Color = Color(0.30, 0.31, 0.36)
+	for y: int in 8:
+		for x: int in T:
+			var joint: bool = y == 3 or (x + (4 if y > 3 else 0)) % 8 == 7
+			_px(tile, x, y, stone.darkened(minf(0.30 + y * 0.085 + (0.14 if joint else 0.0), 0.97)))
+	_rect(tile, Rect2i(0, 0, T, 1), OUTLINE)

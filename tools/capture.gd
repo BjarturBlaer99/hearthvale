@@ -11,8 +11,11 @@ extends SceneTree
 ## open; "pause" opens the pause menu and "settings" the settings from it; "accept" talks and
 ## takes the first answer twice (accepting a quest); "questlog" starts the quests, moves them on
 ## a little and opens the quest log; "take" picks up what lies underfoot (the hero holds it up);
-## "walk" catches the hero mid-stride; "fall" takes every heart. The area id "title"
-## shows the title screen instead of an area.
+## "walk" catches the hero mid-stride; "fall" takes every heart; in the crypt, "lantern" gives
+## the Lantern, "sunk" shows the Trench with its block already in, "pit" walks the hero into a
+## pit, "haunt" lets the Shade come, and "braziers" lights its hall. The area id "title"
+## shows the title screen instead of an area, and "ending" the ending screen (after two quests
+## and an hour and a bit of play).
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -78,6 +81,28 @@ const SHOTS: Array = [
 	["62_holding_up_the_sword", &"village", Vector2i(6, 29), Vector2.RIGHT, 0, "take"],
 	["63_walking", &"village", Vector2i(23, 17), Vector2.LEFT, 0, "walk"],
 	["64_fallen", &"south_field", Vector2i(12, 12), Vector2.LEFT, 0, "fall"],
+	["65_chapel_door_barred", &"village", Vector2i(23, 7), Vector2.UP, 0, ""],
+	["66_chapel_door_open", &"village", Vector2i(23, 7), Vector2.UP, 0, "flag:keep_warden_beaten"],
+	["67_crypt_narthex", &"crypt", Vector2i(22, 41), Vector2.UP, 0, ""],
+	["68_crypt_trench", &"crypt", Vector2i(33, 38), Vector2.RIGHT, 0, ""],
+	["69_crypt_trench_bridged", &"crypt", Vector2i(36, 37), Vector2.RIGHT, 0, "sunk"],
+	["70_crypt_falling", &"crypt", Vector2i(35, 38), Vector2.RIGHT, 0, "pit"],
+	["71_crypt_hall", &"crypt", Vector2i(22, 30), Vector2.UP, 0, ""],
+	["72_crypt_lanterns_tomb", &"crypt", Vector2i(38, 27), Vector2.RIGHT, 0, ""],
+	["73_crypt_dark_path_no_lantern", &"crypt", Vector2i(37, 19), Vector2.UP, 0, ""],
+	["74_crypt_dark_path", &"crypt", Vector2i(37, 19), Vector2.UP, 0, "lantern"],
+	["75_crypt_knights_tomb", &"crypt", Vector2i(37, 7), Vector2.UP, 0, "lantern"],
+	["76_crypt_ossuary", &"crypt", Vector2i(11, 38), Vector2.LEFT, 0, "lantern"],
+	["77_crypt_broken_floor", &"crypt", Vector2i(10, 28), Vector2.LEFT, 0, "lantern"],
+	["78_crypt_reliquary", &"crypt", Vector2i(7, 16), Vector2.UP, 0, "lantern"],
+	["79_the_shade_haunts", &"crypt", Vector2i(22, 19), Vector2.UP, 0, "haunt"],
+	["80_the_shade_bound", &"crypt", Vector2i(22, 19), Vector2.UP, 0, "braziers"],
+	["81_bram_tells_the_tale", &"elder_house", Vector2i(5, 4), Vector2.UP, 0, "tale"],
+	["82_the_chapel_plaque", &"village", Vector2i(21, 7), Vector2.UP, 0, "talk"],
+	["83_the_wardens_plaque", &"keep", Vector2i(20, 42), Vector2.UP, 0, "talk"],
+	["84_the_narthex_inscription", &"crypt", Vector2i(24, 41), Vector2.DOWN, 0, "talk"],
+	["85_aldrics_epitaph", &"crypt", Vector2i(36, 6), Vector2.UP, 0, "lantern_talk"],
+	["86_the_ending", &"ending", Vector2i.ZERO, Vector2.DOWN, 0, ""],
 ]
 
 
@@ -96,6 +121,25 @@ func _capture() -> void:
 		game_state.call(&"damage", shot[4])
 		if str(shot[5]).begins_with("flag:"):
 			game_state.call(&"set_flag", StringName(str(shot[5]).trim_prefix("flag:")), true)
+		if shot[5] == "sunk":
+			game_state.call(&"set_flag", &"dungeon/crypt/block/trench", "37,36")
+		if shot[5] in ["lantern", "haunt", "braziers", "lantern_talk"]:
+			game_state.call(&"add_item", &"lantern", 1)
+		if shot[5] == "tale":
+			game_state.call(&"set_flag", &"keep_warden_beaten", true)
+		if shot[1] == &"ending":
+			game_state.call(&"add_play_time", 4031.0)
+			game_state.call(&"add_heart_container")
+			game_state.call(&"add_heart_container")
+			for quest: StringName in [&"lost_shuttle", &"slime_bounty"]:
+				game_state.call(&"set_flag", StringName("quest/%s/complete" % quest), true)
+			var ending: Node = (load("res://ui/ending_screen.tscn") as PackedScene).instantiate()
+			root.add_child(ending)
+			await _frames(30)
+			_save(out_dir, shot[0])
+			ending.queue_free()
+			await _frames(2)
+			continue
 		if shot[1] == &"title":
 			var title: Node = (load("res://ui/title_screen.tscn") as PackedScene).instantiate()
 			root.add_child(title)
@@ -119,8 +163,10 @@ func _capture() -> void:
 			for item: Array in [[&"bow", 1], [&"arrow", 10], [&"bomb", 3]]:
 				game_state.call(&"add_item", item[0], item[1])
 			game_state.call(&"equip", &"bomb" if shot[5] == "bomb" else &"bow")
-		if shot[5] == "talk" or shot[5] == "accept":
+		if shot[5] in ["talk", "accept", "tale", "lantern_talk"]:
 			scene.call(&"interact")
+		if shot[5] == "tale":
+			scene.get(&"hud").get(&"dialogue").call(&"confirm")
 		if shot[5] == "accept":
 			for i: int in 2:
 				scene.get(&"hud").get(&"dialogue").call(&"confirm")
@@ -140,6 +186,17 @@ func _capture() -> void:
 		elif shot[5] == "fall":
 			game_state.call(&"damage", 99)
 			await _frames(6)
+		elif shot[5] == "pit":
+			Input.action_press(&"move_right")
+			await create_timer(0.5).timeout
+			Input.action_release(&"move_right")
+		elif shot[5] == "haunt":
+			await create_timer(1.6).timeout
+		elif shot[5] == "braziers":
+			for child: Node in scene.get(&"interactables").get_children():
+				if String(child.name).begins_with("ShadeBrazier"):
+					child.call(&"light")
+			await create_timer(0.5).timeout
 		elif shot[5] == "menu":
 			scene.call(&"open_item_menu")
 			await _frames(2)

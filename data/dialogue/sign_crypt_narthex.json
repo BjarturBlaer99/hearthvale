@@ -1,0 +1,11 @@
+{
+  "id": "sign_crypt_narthex",
+  "start": "read",
+  "nodes": {
+    "read": {
+      "speaker": "",
+      "text": "BELOW LIES WHAT I COULD ONLY BIND.\nFour flames hold it fast. No blade bites it in the dark. - Aldric",
+      "options": []
+    }
+  }
+}

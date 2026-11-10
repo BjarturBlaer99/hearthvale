@@ -1,15 +1,11 @@
 class_name Boss
-extends Enemy
-## A dungeon boss (docs/TECH_DESIGN.md §5): an Enemy whose brain is a WardenBrain (the Iron
-## Warden), drawn big from its pixel art. It keeps to `arena`, its room's floor in cells, and starts the fight over
-## (full health, back home) whenever the hero leaves it. If the hero has no arrows when its eye
-## opens, ARROW_HELP arrows fall into a far corner of the room, so the fight never strands
-## anyone. Blows it shrugs off throw a spark. Give it a `clear_flag` and `stays_beaten`: the
-## flag records it beaten (a heart container and the way out wait on it), and it never returns.
+extends ArenaBoss
+## The Iron Warden, the keep's boss (docs/TECH_DESIGN.md §5): an ArenaBoss whose brain is a
+## WardenBrain, drawn big from its pixel art. If the hero has no arrows when its eye opens,
+## ARROW_HELP arrows fall into a far corner of the room, so the fight never strands anyone.
+## Blows it shrugs off throw a spark.
 
 const ARROW_HELP: int = 5
-## Kept clear of the arena's edges (px), for its bulk.
-const ARENA_MARGIN: float = 14.0
 const SPARK_TIME: float = 0.15
 ## While guarding it stomps (a thud and a small shake) this often.
 const STOMP_EVERY: float = 0.5
@@ -18,18 +14,11 @@ const IRON_DARK: Color = Color(0.28, 0.30, 0.36)
 const EYE: Color = Color(1.0, 0.78, 0.25)
 const RAGE: Color = Color(0.95, 0.30, 0.20)
 
-## Its room's floor, in cells: where it may go and where the hero must be for it to fight.
-@export var arena: Rect2i
-## The tune for its fight, and the one to go back to when it calms or falls (the area sets it).
-@export var fight_music: StringName = &"boss"
-var calm_music: StringName = &""
-
 var warden: WardenBrain
 ## The arrows it last let fall (null if none).
 var arrow_help: ItemDrop
 
 var _spark_left: float = 0.0
-var _awake: bool = false
 var _stomp_left: float = 0.0
 
 
@@ -47,47 +36,17 @@ func setup(terrain_query: TerrainQuery, hero: Node2D, rng: RandomNumberGenerator
 	return true
 
 
-## The arena in area pixels, less its bulk.
-func arena_pixels() -> Rect2:
-	return Rect2(Vector2(arena.position) * GridBody.TILE, Vector2(arena.size) * GridBody.TILE).grow(-ARENA_MARGIN)
-
-
-func hero_in_arena() -> bool:
-	return target != null and arena.has_point(GridBody.cell_of(target.position))
-
-
 func _physics_process(delta: float) -> void:
 	_spark_left = maxf(0.0, _spark_left - delta)
 	super(delta)
 
 
-## Fights while the hero is in its room; the moment they leave, it starts over.
-func step(delta: float) -> void:
-	if brain == null or brain.is_dead():
-		return
-	if hero_in_arena():
-		super(delta)
-		_stomp(delta)
-		return
-	if brain.state != EnemyBrain.IDLE or brain.health < brain.max_health or body.position != brain.home:
-		warden.reset()
-		position = body.position
-		queue_redraw()
-	if _awake:
-		_awake = false
-		EventBus.music_requested.emit(calm_music)
+func _fight(delta: float) -> void:
+	_stomp(delta)
 
 
-func death_sound() -> StringName:
-	return &"boss_die"
-
-
-func _die() -> void:
-	super()
-	EventBus.hit_stop.emit(0.3)
-	EventBus.shake.emit(4.0, 0.8)
-	_awake = false
-	EventBus.music_requested.emit(calm_music)
+func _start_over() -> void:
+	warden.reset()
 
 
 ## A thud and a little shake every STOMP_EVERY seconds while it guards.
@@ -112,9 +71,7 @@ func _on_clinked() -> void:
 func _on_state_changed(state: StringName) -> void:
 	match state:
 		WardenBrain.GUARD:
-			if not _awake:
-				_awake = true
-				EventBus.music_requested.emit(fight_music)
+			wake()
 		WardenBrain.GAZE:
 			EventBus.sound.emit(&"gaze")
 		WardenBrain.STUNNED:
@@ -139,17 +96,6 @@ func _let_arrows_fall() -> void:
 	arrow_help.count = ARROW_HELP
 	arrow_help.position = Vector2(best) * GridBody.TILE
 	get_parent().add_child(arrow_help)
-
-
-## Its bolts come from the eye and glow.
-func _on_shot(direction: Vector2) -> void:
-	var shot: Dictionary = data.get("shot", {})
-	var bolt: Arrow = Arrow.new()
-	bolt.setup(terrain, direction, int(shot.get("damage", 2)), float(shot.get("speed", 110.0)))
-	bolt.bolt = true
-	bolt.position = body.position + direction * 10.0
-	get_parent().add_child(bolt)
-	last_arrow = bolt
 
 
 # --- Drawing (pixel art painted by tools/art/make_sprites.gd) ------------------

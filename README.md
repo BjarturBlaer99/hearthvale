@@ -75,13 +75,33 @@ Beaten enemies sometimes drop hearts or coins.
     it, then use your sword while it's stunned.
   - Beat it for a heart container, and the way out opens behind it.
 
-That's the whole vertical slice. Beating the Iron Warden ends it, and the pause menu shows how long it took.
+- **The Chapel Crypt:** the second dungeon, under the chapel on Hearthvale's north rise. Bars hold its door
+  until the Iron Warden is beaten (ask Guard Rolf).
+  - It's dark. The first rooms are lit by braziers; further in you see only what your own light reaches.
+  - **Pits:** stepping into one costs half a heart and puts you back at its edge. Push a block in to bridge one.
+  - **The Lantern** is in a tomb behind the first locked door. Carry it and you see further, and E lights torches.
+    Lit torches open barred doors; in the Knight's Tomb three of them burn only for a few seconds.
+  - **The Iron Sword** is in the Knight's Tomb, and hits harder than the wooden one.
+  - **The Crypt Shade** waits behind the boss door. Blows pass through it: light all four braziers in its hall
+    and strike while the light holds it. It puts them out again, so be ready to relight them.
+
+- **The story:** talk to Elder Bram again once the keep is quiet, and read the inscriptions in the keep, by the
+  chapel door and in the crypt. They say what the Warden was for, and how the Shade is beaten.
+
+Beating the Crypt Shade ends the game: after the closing words comes an ending screen with your time, hearts and
+quests finished. From there you can keep exploring or save and go back to the title.
+
+To try one part without playing up to it: `godot --path . -s res://tools/playtest.gd -- crypt` (the top of the
+crypt's stairs, equipped as after the keep), `-- shade` (outside the Shade's hall), `-- ending` (one step from
+the ending) or `-- warden`.
+
+Running a playtest with someone new? `docs/progress/H15-playtest.md` says how, and what to write down.
 
 ## Docs
 - `CLAUDE.md` — rules for Claude Code
 - `docs/GDD.md` — game design
 - `docs/TECH_DESIGN.md` — architecture
-- `docs/ROADMAP.md` — milestones H0–H9 (vertical slice)
+- `docs/ROADMAP.md` — milestones H0–H9 (the vertical slice) and H10–H15 (phase 2)
 - `docs/data/` — example content files and the condition/effect vocabulary
 - `docs/DECISIONS.md`, `docs/progress/` — running records
 

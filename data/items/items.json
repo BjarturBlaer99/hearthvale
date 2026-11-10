@@ -1,9 +1,11 @@
 {
   "items": [
     { "id": "wooden_sword", "name": "Wooden Sword", "type": "weapon_melee", "stats": { "damage": 2, "knockback": 40, "cooldown": 0.3 } },
+    { "id": "iron_sword", "name": "Iron Sword", "type": "weapon_melee", "icon": "iron_sword", "stats": { "damage": 3, "knockback": 44, "cooldown": 0.3 } },
     { "id": "bow", "name": "Bow", "type": "weapon_ranged", "stats": { "damage": 2, "knockback": 24, "cooldown": 0.45, "ammo": "arrow", "speed": 180 } },
     { "id": "arrow", "name": "Arrows", "type": "ammo", "stackable": true, "max_stack": 30 },
     { "id": "bomb", "name": "Bombs", "type": "bomb", "stackable": true, "max_stack": 10, "stats": { "damage": 4, "knockback": 32, "fuse": 2.0, "radius": 24 } },
+    { "id": "lantern", "name": "Lantern", "type": "lantern", "icon": "lantern", "stats": { "radius": 56 } },
     { "id": "small_key", "name": "Small Key", "type": "key", "stackable": true, "max_stack": 9 },
     { "id": "big_key", "name": "Big Key", "type": "key" },
     { "id": "coin", "name": "Coin", "type": "currency", "stackable": true, "max_stack": 999 },

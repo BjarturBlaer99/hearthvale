@@ -1,0 +1,11 @@
+{
+  "id": "sign_chapel",
+  "start": "read",
+  "nodes": {
+    "read": {
+      "speaker": "",
+      "text": "HERE SIR ALDRIC BOUND THE SHADE WITH LIGHT.\nWhile the Warden keeps its watch, let no one go below.",
+      "options": []
+    }
+  }
+}

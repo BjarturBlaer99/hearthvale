@@ -137,7 +137,7 @@ func test_the_play_clock_runs_only_while_the_game_does() -> void:
 	assert_bool(village.can_process()).override_failure_message("paused: no _process, no clock").is_false()
 
 
-func test_taking_the_wardens_heart_ends_the_slice() -> void:
+func test_taking_the_wardens_heart_points_on_to_the_crypt() -> void:
 	GameState.set_flag(&"keep_warden_beaten", true)
 	var keep: AreaController = _load(KEEP)
 	var heart: HeartContainer = keep.interactables.get_node(^"HeartContainer")
@@ -148,7 +148,7 @@ func test_taking_the_wardens_heart_ends_the_slice() -> void:
 	assert_bool(keep.is_talking()).override_failure_message("a closing conversation").is_true()
 	assert_str(keep.hud.dialogue.shown_text()).contains("Heart Container")
 	keep.hud.dialogue.confirm()
-	assert_str(keep.hud.dialogue.shown_text()).contains("end of the Hearthvale slice")
+	assert_str(keep.hud.dialogue.shown_text()).contains("chapel").contains("Elder Bram")
 	keep.hud.dialogue.confirm()
 	assert_bool(keep.is_talking()).is_false()
 

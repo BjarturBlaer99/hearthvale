@@ -2,9 +2,12 @@ class_name Sword
 extends HitBox
 ## The hero's sword: an arc-shaped HitBox in front of the hero, switched on for one swing.
 ## Its damage and knockback come from the weapon's data. Draws the swing in code: a blade
-## sweeping across the arc, with a faint trail.
+## sweeping across the arc, with a faint trail. The blade takes the colour of the weapon's
+## picture (ItemIcons): wood for the Wooden Sword, steel for the Iron Sword.
 
-const BLADE: Color = Color(0.86, 0.88, 0.92)
+## Blade colours by the weapon's picture; anything else swings WOOD.
+const BLADES: Dictionary = {&"sword": Color(0.84, 0.66, 0.42), &"iron_sword": Color(0.86, 0.88, 0.92)}
+const WOOD: Color = Color(0.84, 0.66, 0.42)
 const EDGE: Color = Color(0.10, 0.08, 0.12)
 const HILT: Color = Color(0.55, 0.36, 0.18)
 const TRAIL: Color = Color(1.0, 1.0, 1.0, 0.35)
@@ -14,6 +17,8 @@ const BLADE_LENGTH: float = 13.0
 
 ## How far through the swing, 0 to 1 (the hero's controller sets it every frame).
 var progress: float = 0.0
+## The colour of the blade being swung.
+var blade: Color = WOOD
 
 
 func _init() -> void:
@@ -25,8 +30,10 @@ func _init() -> void:
 	active = false
 
 
-## Starts a swing toward `direction` with the weapon's stats.
-func swing(direction: Vector2, stats: Dictionary) -> void:
+## Starts a swing toward `direction` with the weapon's stats; `picture` is the weapon's
+## picture (ItemIcons), which decides the blade's colour.
+func swing(direction: Vector2, stats: Dictionary, picture: StringName = &"sword") -> void:
+	blade = BLADES.get(picture, WOOD)
 	damage = int(stats.get("damage", 1))
 	knockback = float(stats.get("knockback", 0.0))
 	progress = 0.0
@@ -51,6 +58,6 @@ func _draw() -> void:
 	var tip: Vector2 = HAND + along * BLADE_LENGTH
 	var guard: Vector2 = HAND + along * 3.0
 	draw_line(guard, tip, EDGE, 3.0)
-	draw_line(guard, tip, BLADE, 1.0)
+	draw_line(guard, tip, blade, 1.0)
 	var across: Vector2 = along.orthogonal() * 2.5
 	draw_line(guard - across, guard + across, HILT, 2.0)

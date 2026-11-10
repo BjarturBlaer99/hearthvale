@@ -14,6 +14,7 @@
 [ext_resource type="Script" path="res://gameplay/puzzles/crystal_switch.gd" id="12_switch"]
 [ext_resource type="PackedScene" path="res://gameplay/enemies/boss.tscn" id="13_boss"]
 [ext_resource type="Script" path="res://gameplay/interactables/heart_container.gd" id="14_heart"]
+[ext_resource type="Script" path="res://gameplay/interactables/signpost.gd" id="h15_sign"]
 
 [node name="Keep" type="Node2D" unique_id=1738571638]
 script = ExtResource("1_area")
@@ -287,6 +288,11 @@ script = ExtResource("14_heart")
 appears_flag = &"keep_warden_beaten"
 taken_flag = &"keep_heart_container"
 dialogue_id = &"ending_keep"
+
+[node name="WardenPlaque" type="Node2D" parent="Interactables" unique_id=593097492]
+position = Vector2(320, 656)
+script = ExtResource("h15_sign")
+dialogue_id = &"sign_keep_warden"
 
 [node name="Entries" type="Node2D" parent="." unique_id=348423467]
 

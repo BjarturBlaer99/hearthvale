@@ -1,0 +1,11 @@
+{
+  "id": "sign_crypt_trench",
+  "start": "read",
+  "nodes": {
+    "read": {
+      "speaker": "",
+      "text": "THE FLOOR HAS FALLEN IN.\nA good stone will mend it.",
+      "options": []
+    }
+  }
+}

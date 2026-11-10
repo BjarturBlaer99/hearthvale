@@ -4,8 +4,9 @@ extends RefCounted
 ## attack, hurt, dead) moving a GridBody, set up from the enemy's data (health, speed, sight).
 ## Pure: call step() every frame with the hero's position, and take_hit() when a blow lands.
 ## Randomness comes from the RandomNumberGenerator given, so tests can seed it. One subclass
-## per behaviour id (EnemyBrains): HopperBrain, ArcherBrain, FlierBrain, WardenBrain (the keep's boss). Subclasses fill in
-## _enter_state() and _think(); hurt and dead work the same for every enemy.
+## per behaviour id (EnemyBrains): HopperBrain, ArcherBrain, FlierBrain, and the bosses,
+## WardenBrain (the keep) and ShadeBrain (the crypt). Subclasses fill in _enter_state() and
+## _think(); hurt and dead work the same for every enemy.
 
 signal state_changed(state: StringName)
 ## An archer looses an arrow along `direction`.
@@ -118,6 +119,22 @@ func move(direction: Vector2, delta: float, speed_factor: float = 1.0) -> float:
 		return 0.0
 	facing = direction.normalized()
 	return body.walk(facing, speed * speed_factor * delta)
+
+
+## move(), but never out of `arena` (area pixels; empty: anywhere): how a boss keeps to its
+## hall.
+func move_inside(arena: Rect2, direction: Vector2, delta: float, speed_factor: float = 1.0) -> float:
+	if direction.is_zero_approx():
+		return 0.0
+	facing = direction.normalized()
+	var distance: float = speed * speed_factor * delta
+	if not arena.has_area():
+		return body.walk(facing, distance)
+	var goal: Vector2 = (body.position + facing * distance).clamp(arena.position, arena.end)
+	var motion: Vector2 = goal - body.position
+	if motion.length() < 0.001:
+		return 0.0
+	return body.walk(motion.normalized(), motion.length())
 
 
 func toward(point: Vector2) -> Vector2:

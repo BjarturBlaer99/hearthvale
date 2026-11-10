@@ -103,17 +103,7 @@ func take_hit(damage: int, _push: Vector2, kind: StringName = &"contact") -> boo
 
 ## Walks like any enemy, but never out of its arena.
 func move(direction: Vector2, delta: float, speed_factor: float = 1.0) -> float:
-	if direction.is_zero_approx():
-		return 0.0
-	facing = direction.normalized()
-	var distance: float = speed * speed_factor * delta
-	if not arena.has_area():
-		return body.walk(facing, distance)
-	var goal: Vector2 = (body.position + facing * distance).clamp(arena.position, arena.end)
-	var motion: Vector2 = goal - body.position
-	if motion.length() < 0.001:
-		return 0.0
-	return body.walk(motion.normalized(), motion.length())
+	return move_inside(arena, direction, delta, speed_factor)
 
 
 func _enter_state(next: StringName) -> void:

@@ -38,3 +38,18 @@ func test_the_equippable_items_held_in_pickup_order() -> void:
 	held[0]["count"] = 0
 	ids = Inventory.equippable_held(held, items).map(func(item: Dictionary) -> String: return str(item["id"]))
 	assert_array(ids).override_failure_message("none left: not listed").is_equal(["bow"])
+
+
+func test_a_lantern_is_carried_not_put_on_the_item_button_and_lights_the_dark() -> void:
+	var lantern: Dictionary = {"id": "lantern", "type": "lantern", "stats": {"radius": 56}}
+	var big: Dictionary = {"id": "great_lantern", "type": "lantern", "stats": {"radius": 80}}
+	var items: Array = [BOW, ARROW, lantern, big]
+	assert_bool(Inventory.is_equippable(lantern)).is_false()
+	assert_float(Inventory.light_radius([], items, 20.0)).override_failure_message("no lantern: the hero's own glow").is_equal(20.0)
+	assert_float(Inventory.light_radius([{"id": "bow", "count": 1}], items, 20.0)).is_equal(20.0)
+	assert_float(Inventory.light_radius([{"id": "lantern", "count": 1}], items, 20.0)).is_equal(56.0)
+	assert_float(Inventory.light_radius([{"id": "lantern", "count": 0}], items, 20.0)).override_failure_message("none left: none held").is_equal(20.0)
+	assert_float(Inventory.light_radius([{"id": "lantern", "count": 1}, {"id": "great_lantern", "count": 1}], items, 20.0)).override_failure_message("the widest counts").is_equal(80.0)
+	var held: Array[Dictionary] = Inventory.held_of_type([{"id": "arrow", "count": 5}, {"id": "lantern", "count": 1}], items, "lantern")
+	assert_int(held.size()).is_equal(1)
+	assert_str(str(held[0]["id"])).is_equal("lantern")

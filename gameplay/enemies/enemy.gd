@@ -148,9 +148,17 @@ func _drop() -> Node2D:
 
 ## Where its drop lands: its cell, or, when it stands on raised ground (an archer on a
 ## walkway), the first lower open cell straight below it on screen: the drop falls off the
-## ledge to where the hero can reach it.
+## ledge to where the hero can reach it. Over a pit (a bat), the nearest floor beside it.
 func drop_cell() -> Vector2i:
 	var at: Vector2i = body.cell
+	if terrain.is_pit(at):
+		for reach: int in range(1, 4):
+			for side: Vector2i in [Vector2i.DOWN, Vector2i.UP, Vector2i.LEFT, Vector2i.RIGHT]:
+				var beside: Vector2i = at + side * reach
+				if terrain.grid.in_bounds(beside) and not terrain.grid.is_solid(beside) \
+						and not terrain.is_pit(beside) and not terrain.is_occupied(beside):
+					return beside
+		return at
 	var level: int = terrain.standing_level(at)
 	for i: int in range(1, 5):
 		var below: Vector2i = at + Vector2i(0, i)

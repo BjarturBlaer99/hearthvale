@@ -1,7 +1,8 @@
 class_name PuzzleRules
 extends RefCounted
-## Pure rules for puzzle pieces (docs/TECH_DESIGN.md §6): pushing blocks, pressing plates, and
-## shutters that wait on several flags.
+## Pure rules for puzzle pieces (docs/TECH_DESIGN.md §6): pushing blocks (onto floor, or into a
+## pit), pressing plates, torches that burn for a while, and shutters that wait on several
+## flags.
 
 
 ## Whether a block in `from` can be pushed one cell along `direction`. The next cell must be
@@ -16,6 +17,23 @@ static func can_push(terrain: TerrainQuery, from: Vector2i, direction: Vector2i,
 	if move.kind != MoveResult.Kind.WALK or terrain.grid.is_ramp(to) or terrain.grid.height_at(to) != terrain.grid.height_at(from):
 		return false
 	return not on_room_border(to, room_size)
+
+
+## Whether a block in `from` pushed along `direction` drops into a pit and fills it: the next
+## cell is an open pit at the block's level with nothing in it, and not on its room's border.
+static func can_sink(terrain: TerrainQuery, from: Vector2i, direction: Vector2i, room_size: Vector2i = Vector2i.ZERO) -> bool:
+	if direction == Vector2i.ZERO or absi(direction.x) + absi(direction.y) != 1:
+		return false
+	var to: Vector2i = from + direction
+	if not terrain.is_pit(to) or terrain.grid.height_at(to) != terrain.grid.height_at(from):
+		return false
+	return terrain.check_move(from, to).kind == MoveResult.Kind.DROP and not on_room_border(to, room_size)
+
+
+## Whether a torch lit `lit_for` seconds ago still burns: for good with no `burn_time`, else
+## for that long.
+static func torch_burning(lit_for: float, burn_time: float) -> bool:
+	return burn_time <= 0.0 or lit_for < burn_time
 
 
 ## Whether `cell` is in the wall ring of its room (the first or last row or column).

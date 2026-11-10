@@ -7,6 +7,8 @@ extends RefCounted
 ## - same level, or one level up or down when either cell is stairs (ramp): WALK
 ## - lower: DROP, a hop down a ledge, from any height, never hurting (one-way)
 ## - higher without stairs: BLOCKED
+## - an open pit: DROP too, so the hero can fall in (the area pulls them out) and walkers that
+##   don't drop (enemies) keep out. Things that fly, and arrows, cross pits.
 ## Pure: works on a HeightGrid.
 
 var grid: HeightGrid
@@ -15,6 +17,8 @@ var grid: HeightGrid
 var _occupied: Dictionary[Vector2i, bool] = {}
 ## Cells closed to everything, flying things and arrows too: closed doors.
 var _sealed: Dictionary[Vector2i, bool] = {}
+## Open pits (a pit a block has filled is floor again, and not here).
+var _pits: Dictionary[Vector2i, bool] = {}
 
 
 func _init(height_grid: HeightGrid) -> void:
@@ -42,6 +46,18 @@ func set_sealed(cell: Vector2i, sealed: bool = true) -> void:
 
 func is_sealed(cell: Vector2i) -> bool:
 	return _sealed.has(cell)
+
+
+## Opens a pit at `cell`, or closes it (a block filled it).
+func set_pit(cell: Vector2i, open: bool = true) -> void:
+	if open:
+		_pits[cell] = true
+	else:
+		_pits.erase(cell)
+
+
+func is_pit(cell: Vector2i) -> bool:
+	return _pits.has(cell)
 
 
 ## The level something stands at on `cell`: its terrain height.
@@ -79,6 +95,10 @@ func check_move(from_cell: Vector2i, to_cell: Vector2i) -> MoveResult:
 		return result
 	var rise: int = grid.height_at(to_cell) - grid.height_at(from_cell)
 	result.to_level = grid.height_at(to_cell)
+	if is_pit(to_cell) and not is_pit(from_cell) and rise <= 0:
+		result.kind = MoveResult.Kind.DROP
+		result.drop = maxi(-rise, 1)
+		return result
 	var stairs: bool = grid.is_ramp(from_cell) or grid.is_ramp(to_cell)
 	if rise == 0 or (absi(rise) == 1 and stairs):
 		result.kind = MoveResult.Kind.WALK

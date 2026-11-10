@@ -23,6 +23,8 @@ const SIZES: Dictionary = {
 	&"shop": Vector2i(11, 9), &"south_field": Vector2i(40, 28), &"ruin_cellar": Vector2i(15, 33),
 	&"cistern": Vector2i(30, 33), &"keep": Vector2i(45, 44), &"north_fields": Vector2i(40, 30),
 	&"old_wood": Vector2i(40, 30),
+	# H14's dungeon, the one area added since: under the chapel, so the map above is no bigger.
+	&"crypt": Vector2i(45, 44),
 }
 
 var _area: Node

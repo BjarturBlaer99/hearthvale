@@ -3,7 +3,7 @@ extends RefCounted
 ## Makes the brain for an enemy's behaviour id (the "behaviour" in data/enemies/*.json).
 ## A new behaviour is a new EnemyBrain subclass listed here and in DataRegistry.ENEMY_BEHAVIOURS.
 
-const BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden"]
+const BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden", "shade"]
 
 
 ## The brain script for `behaviour`, or null if there's none.
@@ -17,6 +17,8 @@ static func script_for(behaviour: String) -> GDScript:
 			return FlierBrain
 		"warden":
 			return WardenBrain
+		"shade":
+			return ShadeBrain
 	return null
 
 

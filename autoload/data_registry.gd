@@ -41,7 +41,7 @@ const REQUIRED_FIELDS: Dictionary = {
 }
 
 ## Enemy behaviour ids (EnemyBrains makes one brain per id) and drop-table entry types.
-const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden"]
+const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden", "shade"]
 const DROP_TYPES: Array[String] = ["heart", "item", "nothing"]
 ## What a boss's weak point can take (Hit kinds dealt by the hero's weapons). Also what can
 ## cut or break a breakable.

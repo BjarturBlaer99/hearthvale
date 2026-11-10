@@ -11,6 +11,9 @@ const HILL_NEAR: Color = Color(0.14, 0.27, 0.17)
 const KEEP: Color = Color(0.12, 0.12, 0.17)
 const LIGHT: Color = Color(1.0, 0.82, 0.40)
 
+## Whether the keep's window is lit (the ending screen shows it dark).
+@export var keep_lit: bool = true
+
 var _clock: float = 0.0
 
 
@@ -38,9 +41,10 @@ func _draw() -> void:
 			draw_rect(Rect2(base + Vector2(tower + notch * 4.0 - 1.0, -48), Vector2(2, 4)), KEEP)
 	for notch: int in 7:
 		draw_rect(Rect2(base + Vector2(-24 + notch * 7.0, -34), Vector2(4, 4)), KEEP)
-	var glow: float = 0.75 + 0.25 * sin(_clock * 3.1)
-	draw_rect(Rect2(base + Vector2(-3, -20), Vector2(4, 6)), Color(LIGHT, glow))
-	draw_circle(base + Vector2(-1, -17), 6.0, Color(LIGHT, 0.12 * glow))
+	if keep_lit:
+		var glow: float = 0.75 + 0.25 * sin(_clock * 3.1)
+		draw_rect(Rect2(base + Vector2(-3, -20), Vector2(4, 6)), Color(LIGHT, glow))
+		draw_circle(base + Vector2(-1, -17), 6.0, Color(LIGHT, 0.12 * glow))
 	# Nearer hills, with trees along the middle one.
 	_hill(size_now.y * 0.70, 18.0, 0.020, 2.3, HILL_MID)
 	for x: int in range(6, int(size_now.x), 23):

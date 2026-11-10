@@ -50,3 +50,30 @@ func _push(row: String, direction: Vector2i) -> bool:
 
 func _terrain(rows: Array) -> TerrainQuery:
 	return TerrainQuery.new(HeightGrid.from_rows(PackedStringArray(rows)))
+
+
+func test_a_block_sinks_into_a_pit_beside_it_but_never_slides_over_one() -> void:
+	var terrain: TerrainQuery = _terrain(["0 0 0 0"])
+	terrain.set_pit(Vector2i(1, 0))
+	assert_bool(PuzzleRules.can_sink(terrain, Vector2i(0, 0), Vector2i.RIGHT)).is_true()
+	assert_bool(PuzzleRules.can_push(terrain, Vector2i(0, 0), Vector2i.RIGHT)).override_failure_message("a pit isn't floor to slide onto").is_false()
+	assert_bool(PuzzleRules.can_sink(terrain, Vector2i(3, 0), Vector2i.LEFT)).override_failure_message("plain floor: nothing to sink into").is_false()
+	assert_bool(PuzzleRules.can_sink(terrain, Vector2i(0, 0), Vector2i(1, 1))).override_failure_message("straight pushes only").is_false()
+	terrain.set_pit(Vector2i(1, 0), false)
+	assert_bool(PuzzleRules.can_sink(terrain, Vector2i(0, 0), Vector2i.RIGHT)).override_failure_message("a filled pit takes no second block").is_false()
+	assert_bool(PuzzleRules.can_push(terrain, Vector2i(0, 0), Vector2i.RIGHT)).override_failure_message("it's floor now").is_true()
+
+
+func test_a_block_never_sinks_on_a_rooms_border_or_off_its_level() -> void:
+	var terrain: TerrainQuery = _terrain(["0 0 0 0 0"])
+	terrain.set_pit(Vector2i(4, 0))
+	assert_bool(PuzzleRules.can_sink(terrain, Vector2i(3, 0), Vector2i.RIGHT, Vector2i(5, 1))).override_failure_message("the pit is in the room's wall ring").is_false()
+	var stepped: TerrainQuery = _terrain(["1 0"])
+	stepped.set_pit(Vector2i(1, 0))
+	assert_bool(PuzzleRules.can_sink(stepped, Vector2i(0, 0), Vector2i.RIGHT)).override_failure_message("a pit below a ledge").is_false()
+
+
+func test_a_torch_burns_for_its_burn_time_or_for_good() -> void:
+	assert_bool(PuzzleRules.torch_burning(1000.0, 0.0)).override_failure_message("no burn time: for good").is_true()
+	assert_bool(PuzzleRules.torch_burning(4.9, 5.0)).is_true()
+	assert_bool(PuzzleRules.torch_burning(5.0, 5.0)).is_false()

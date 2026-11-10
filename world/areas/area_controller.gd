@@ -6,7 +6,9 @@ extends Node2D
 ## talking to whoever the hero faces, using the equipped item (bow shots, bombs), opening the
 ## item menu, and leaving through exits. Every physics frame it lets
 ## HitBoxes hit HurtBoxes and the hero collect hearts; at zero hearts the hero falls and comes
-## back at the area's entrance (where they arrived) with full hearts.
+## back at the area's entrance (where they arrived) with full hearts. A hero who steps into a
+## pit loses half a heart and is put back on the last safe cell. A `dark` area shows only what
+## its lights reach: the hero's own glow (wider with a lantern) and burning torches.
 ##
 ## Expects children: Height, HeightShading, Interactables, PlayerSpawn, Player, HUD, and
 ## optionally Entries. Puzzle pieces (push blocks, pressure plates, crystal switches) live in
@@ -28,8 +30,16 @@ const ROOM_FLASH: float = 0.2
 const PUSH_TIME: float = 0.35
 ## Where "Quit to title" goes.
 const TITLE_SCENE: String = "res://ui/title_screen.tscn"
+## The flag the game's last conversation sets, and the screen that follows once it closes.
+const ENDING_FLAG: StringName = &"game_finished"
+const ENDING_SCENE: String = "res://ui/ending_screen.tscn"
 ## How slow the game runs during a hit-stop.
 const HIT_STOP_SCALE: float = 0.05
+## Falling into a pit: the half hearts it costs, and how long the hero is gone.
+const PIT_DAMAGE: int = 1
+const PIT_TIME: float = 0.5
+## How far the hero's own glow reaches in the dark without a lantern (px).
+const DIM_RADIUS: float = 20.0
 
 @export var area_id: StringName = &"village"
 @export var area_name: String = "Hearthvale"
@@ -39,6 +49,8 @@ const HIT_STOP_SCALE: float = 0.05
 @export var room_size: Vector2i = Vector2i.ZERO
 ## The tune this area plays (audio/music); empty: whatever is playing carries on.
 @export var music: StringName = &""
+## A dark area (the crypt): only what lights reach is seen (Darkness, LightRules).
+@export var dark: bool = false
 
 var grid: HeightGrid
 var terrain: TerrainQuery
@@ -52,8 +64,12 @@ var last_projectile: Node2D
 var current_room: Vector2i = Vector2i.ZERO
 ## Shades everything outside the current room (dungeons only), or null.
 var room_mask: RoomMask
+## The dark over a `dark` area, or null.
+var darkness: Darkness
 
 var _travelling: bool = false
+## The ending flag was just set: the ending screen comes when the conversation closes.
+var _ending_due: bool = false
 ## When the current hit-stop ends (real milliseconds; 0: none).
 var _hit_stop_until: int = 0
 ## Whether each door was open, to hear shutters lift.
@@ -64,6 +80,10 @@ var _respawn_left: float = 0.0
 ## Where the hero arrived in this area, facing which way: where they come back after falling.
 var _entrance_cell: Vector2i = Vector2i.ZERO
 var _entrance_facing: Vector2 = Vector2.DOWN
+## Seconds left of a fall into a pit (0: not falling).
+var _pit_left: float = 0.0
+## The last cell the hero stood on that wasn't a pit: where a fall puts them back.
+var _safe_cell: Vector2i = Vector2i.ZERO
 
 @onready var height_layer: TileMapLayer = $Height
 @onready var player: PlayerController = $Player
@@ -85,6 +105,8 @@ func _ready() -> void:
 	interactables.y_sort_enabled = true
 	grid = HeightGridBuilder.from_layer(height_layer)
 	terrain = TerrainQuery.new(grid)
+	for pit: Vector2i in HeightGridBuilder.pit_cells(height_layer):
+		terrain.set_pit(pit)
 	spawn_markers()
 	for child: Node in interactables.get_children():
 		if child.has_method(&"set_dungeon"):
@@ -93,6 +115,9 @@ func _ready() -> void:
 			child.call(&"set_terrain", terrain, rng)
 		if child.has_method(&"occupies") and child.call(&"occupies"):
 			terrain.set_occupied(child.call(&"cell"))
+		# A block that sank for good: its pit is floor.
+		if child is PushBlock and (child as PushBlock).sunk:
+			terrain.set_pit((child as PushBlock).cell(), false)
 	_refresh_doors()
 	_shading.stone_faces = dungeon_id != &""
 	_shading.show_grid(grid, height_layer)
@@ -101,12 +126,17 @@ func _ready() -> void:
 	_entrance_facing = arrival["facing"]
 	player.setup(terrain, _entrance_cell, Rect2i(Vector2i.ZERO, grid.size * GreyboxTiles.TILE_SIZE))
 	player.face(_entrance_facing)
+	_safe_cell = _entrance_cell
 	player.motor.cell_changed.connect(_on_cell_changed)
 	rng.randomize()
 	for enemy: Enemy in enemies():
 		enemy.setup(terrain, player, rng)
 		enemy.died.connect(_on_enemy_died)
 	update_room(true)
+	if dark:
+		darkness = Darkness.new()
+		add_child(darkness)
+		_update_darkness()
 	hud.dialogue.closed.connect(_on_dialogue_closed)
 	hud.item_menu.chosen.connect(_on_item_chosen)
 	hud.item_menu.closed.connect(_on_item_menu_closed)
@@ -114,8 +144,8 @@ func _ready() -> void:
 	EventBus.hit_stop.connect(hit_stop)
 	EventBus.quest_announced.connect(_on_quest_announced)
 	for boss: Enemy in enemies():
-		if boss is Boss:
-			(boss as Boss).calm_music = music
+		if boss is ArenaBoss:
+			(boss as ArenaBoss).calm_music = music
 	if music != &"":
 		EventBus.music_requested.emit(music)
 	EventBus.health_changed.connect(_on_health_changed)
@@ -143,6 +173,11 @@ func _process(delta: float) -> void:
 		_respawn_left -= delta
 		if _respawn_left <= 0.0:
 			respawn()
+	if _pit_left > 0.0:
+		_pit_left -= delta
+		if _pit_left <= 0.0:
+			_climb_out()
+	_update_darkness()
 	GameState.update_player(area_id, player.motor.cell)
 	_update_hud()
 
@@ -471,7 +506,72 @@ func _set_bomb(item: Dictionary) -> bool:
 
 ## Talking, in the item menu, going through a door or down: no interacting or items.
 func _busy() -> bool:
-	return _travelling or _dying or is_talking() or is_in_menu() or is_paused()
+	return _travelling or _dying or is_in_pit() or is_talking() or is_in_menu() or is_paused()
+
+
+## The lights in this area (LightRules lights): the hero's own, and every torch burning in the
+## room on screen (light doesn't pass a dungeon's walls).
+func lights() -> Array:
+	var out: Array = [LightRules.light(player.position + Vector2(0, -8), hero_light_radius())]
+	for child: Node in interactables.get_children():
+		if child is Torch and (child as Torch).is_lit() 				and RoomGrid.room_of((child as Torch).cell(), room_size) == RoomGrid.room_of(player.motor.cell, room_size):
+			out.append((child as Torch).light_source())
+	return out
+
+
+## How far the hero's light reaches: the widest lantern carried, else a dim glow.
+func hero_light_radius() -> float:
+	return Inventory.light_radius(GameState.inventory, DataRegistry.entries(&"items"), DIM_RADIUS)
+
+
+## How lit `cell` is right now, 0 to 1 (always 1 in an area that isn't dark).
+func brightness_at(cell: Vector2i) -> float:
+	return LightRules.brightness(GridBody.cell_center(cell), lights()) if dark else 1.0
+
+
+func _update_darkness() -> void:
+	if darkness == null:
+		return
+	var rect: Rect2i = RoomGrid.camera_rect(player.motor.cell, room_size, grid.size, GreyboxTiles.TILE_SIZE)
+	darkness.show_lights(lights(), Rect2(rect))
+
+
+## The hero stepped into a pit: PIT_DAMAGE off their hearts and gone for PIT_TIME, then back on
+## the last safe cell they stood on (or, if that was their last heart, at the entrance).
+func fall_into_pit() -> void:
+	if is_in_pit() or _dying:
+		return
+	_pit_left = PIT_TIME
+	player.controls_enabled = false
+	player.hurt_box.enabled = false
+	# Into the middle of the pit, and no sliding on across it.
+	player.motor.place(player.motor.cell)
+	player.fall_in(PIT_TIME)
+	player.sync_from_motor()
+	EventBus.sound.emit(&"fall")
+	GameState.damage(PIT_DAMAGE)
+
+
+## True from the moment the hero drops into a pit until they're back at its edge.
+func is_in_pit() -> bool:
+	return _pit_left > 0.0
+
+
+func _climb_out() -> void:
+	_pit_left = 0.0
+	if _dying:
+		return
+	_end_pit_fall()
+	player.motor.place(_safe_cell)
+	player.motor.invincible_left = PlayerMotor.INVINCIBLE_TIME
+	player.sync_from_motor()
+	player.controls_enabled = not is_talking()
+	update_room()
+
+
+func _end_pit_fall() -> void:
+	player.end_fall()
+	player.hurt_box.enabled = true
 
 
 ## Lets every active HitBox in this area hit the HurtBoxes it touches (TECH_DESIGN §4).
@@ -529,6 +629,9 @@ func is_dying() -> bool:
 ## Brings the hero back at the area's entrance with full hearts.
 func respawn() -> void:
 	_dying = false
+	_pit_left = 0.0
+	_end_pit_fall()
+	_safe_cell = _entrance_cell
 	GameState.set_health(GameState.max_health())
 	player.motor.place(_entrance_cell)
 	player.face(_entrance_facing)
@@ -611,7 +714,13 @@ func _change_scene(path: String) -> void:
 
 
 func _on_cell_changed(cell: Vector2i) -> void:
+	if is_in_pit():
+		return
 	update_room()
+	if terrain.is_pit(cell):
+		fall_into_pit()
+		return
+	_safe_cell = cell
 	var exit: AreaExit = exit_at(cell)
 	if exit != null:
 		take_exit(exit)
@@ -619,6 +728,18 @@ func _on_cell_changed(cell: Vector2i) -> void:
 
 func _on_dialogue_closed() -> void:
 	player.controls_enabled = true
+	if _ending_due:
+		show_ending()
+
+
+## Leaves for the ending screen (the game's last conversation just closed). The hero's place
+## is kept, so "Keep exploring" brings them back here.
+func show_ending() -> void:
+	_ending_due = false
+	_travelling = true
+	player.controls_enabled = false
+	GameState.update_player(area_id, player.motor.cell)
+	travel.call(ENDING_SCENE)
 
 
 ## A moment's near-freeze for weight (EventBus.hit_stop): the game runs at HIT_STOP_SCALE for
@@ -676,7 +797,9 @@ func _fall() -> void:
 	player.sync_from_motor()
 
 
-func _on_flag_set(_flag: StringName, _value: Variant) -> void:
+func _on_flag_set(flag: StringName, value: Variant) -> void:
+	if flag == ENDING_FLAG and value == true:
+		_ending_due = true
 	for child: Node in interactables.get_children():
 		(child as Node2D).queue_redraw()
 	_refresh_doors()

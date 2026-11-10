@@ -69,3 +69,35 @@ func test_sealed_cells_stop_flying_things_too() -> void:
 	assert_bool(query.check_flight(Vector2i(0, 0), Vector2i(1, 0)).is_allowed()).override_failure_message("a closed door stops a bat").is_false()
 	query.set_sealed(Vector2i(1, 0), false)
 	assert_bool(query.check_flight(Vector2i(0, 0), Vector2i(1, 0)).is_allowed()).is_true()
+
+
+func test_a_pit_is_a_drop_for_walkers_and_nothing_to_fliers() -> void:
+	var terrain: TerrainQuery = TerrainQuery.new(HeightGrid.from_rows(PackedStringArray(["0 0 0"])))
+	terrain.set_pit(Vector2i(1, 0))
+	assert_bool(terrain.is_pit(Vector2i(1, 0))).is_true()
+	var into: MoveResult = terrain.check_move(Vector2i(0, 0), Vector2i(1, 0))
+	assert_that(into.kind).override_failure_message("level floor, but a pit: a drop").is_equal(MoveResult.Kind.DROP)
+	assert_int(into.drop).is_equal(1)
+	assert_that(terrain.check_flight(Vector2i(0, 0), Vector2i(1, 0)).kind).override_failure_message("bats cross").is_equal(MoveResult.Kind.WALK)
+	assert_that(terrain.check_move(Vector2i(1, 0), Vector2i(2, 0)).kind).override_failure_message("out of a pit is level ground").is_equal(MoveResult.Kind.WALK)
+	var walker: GridBody = GridBody.new(terrain)
+	walker.allow_drops = false
+	walker.place(Vector2i(0, 0))
+	assert_bool(walker.can_enter(Vector2i(1, 0))).override_failure_message("enemies keep out").is_false()
+	var hero: GridBody = GridBody.new(terrain)
+	hero.place(Vector2i(0, 0))
+	assert_bool(hero.can_enter(Vector2i(1, 0))).override_failure_message("the hero can fall in").is_true()
+
+
+func test_a_filled_pit_is_floor_again() -> void:
+	var terrain: TerrainQuery = TerrainQuery.new(HeightGrid.from_rows(PackedStringArray(["0 0 0"])))
+	terrain.set_pit(Vector2i(1, 0))
+	terrain.set_pit(Vector2i(1, 0), false)
+	assert_bool(terrain.is_pit(Vector2i(1, 0))).is_false()
+	assert_that(terrain.check_move(Vector2i(0, 0), Vector2i(1, 0)).kind).is_equal(MoveResult.Kind.WALK)
+
+
+func test_a_pit_on_higher_ground_is_still_out_of_reach() -> void:
+	var terrain: TerrainQuery = TerrainQuery.new(HeightGrid.from_rows(PackedStringArray(["0 1"])))
+	terrain.set_pit(Vector2i(1, 0))
+	assert_that(terrain.check_move(Vector2i(0, 0), Vector2i(1, 0)).kind).is_equal(MoveResult.Kind.BLOCKED)

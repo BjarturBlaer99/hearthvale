@@ -1,45 +1,159 @@
 {
   "id": "elder_bram",
   "start": "greet",
-  "speakers": { "bram": "Elder Bram" },
+  "speakers": {
+    "bram": "Elder Bram"
+  },
   "nodes": {
     "greet": {
       "speaker": "bram",
       "text": "Ah, come in, come in. Have you seen the lights over the old keep at night?",
       "options": [
-        { "text": "What lights?",
-          "conditions": [{ "type": "flag", "flag": "promised_elder_keep", "value": false }],
-          "next": "lights" },
-        { "text": "I'm keeping watch, as I promised.",
-          "conditions": [{ "type": "flag", "flag": "promised_elder_keep", "value": true }],
-          "next": "kept" },
-        { "text": "Goodbye.", "next": null }
+        {
+          "text": "What lights?",
+          "conditions": [
+            {
+              "type": "flag",
+              "flag": "promised_elder_keep",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "flag": "keep_warden_beaten",
+              "value": false
+            }
+          ],
+          "next": "lights"
+        },
+        {
+          "text": "I'm keeping watch, as I promised.",
+          "conditions": [
+            {
+              "type": "flag",
+              "flag": "promised_elder_keep",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "flag": "keep_warden_beaten",
+              "value": false
+            }
+          ],
+          "next": "kept"
+        },
+        {
+          "text": "The keep is quiet. The Warden fell.",
+          "conditions": [
+            {
+              "type": "flag",
+              "flag": "keep_warden_beaten",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "flag": "crypt_shade_beaten",
+              "value": false
+            }
+          ],
+          "next": "tale"
+        },
+        {
+          "text": "The Shade is gone.",
+          "conditions": [
+            {
+              "type": "flag",
+              "flag": "crypt_shade_beaten",
+              "value": true
+            }
+          ],
+          "next": "ended"
+        },
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
       ]
     },
     "lights": {
       "speaker": "bram",
       "text": "Something has stirred in the keep north of here. Someone sharp-eyed ought to keep watch.",
       "options": [
-        { "text": "I'll keep watch.",
-          "effects": [{ "type": "set_flag", "flag": "promised_elder_keep", "value": true }],
-          "next": "promise" },
-        { "text": "Not me.", "next": "refused" }
+        {
+          "text": "I'll keep watch.",
+          "effects": [
+            {
+              "type": "set_flag",
+              "flag": "promised_elder_keep",
+              "value": true
+            }
+          ],
+          "next": "promise"
+        },
+        {
+          "text": "Not me.",
+          "next": "refused"
+        }
       ]
     },
     "promise": {
       "speaker": "bram",
       "text": "Bless you. Take the old wooden sword from the training yard first. Then follow the road north past the chapel, through the fields and the Old Wood, to the keep.",
-      "options": [{ "text": "Goodbye.", "next": null }]
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
     },
     "refused": {
       "speaker": "bram",
       "text": "Hm. Think on it.",
-      "options": [{ "text": "Goodbye.", "next": null }]
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
     },
     "kept": {
       "speaker": "bram",
       "text": "Good. I sleep easier for it. The road north past the chapel leads through the fields and the Old Wood to the keep.",
-      "options": [{ "text": "Goodbye.", "next": null }]
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "tale": {
+      "speaker": "bram",
+      "text": "Then the old tale is true, and I sent you to break a lock. Long ago Sir Aldric bound a Shade under our chapel, and set the Warden to watch it. With the Warden fallen, the bars are up.",
+      "options": [
+        {
+          "text": "What now?",
+          "next": "tale_next"
+        }
+      ]
+    },
+    "tale_next": {
+      "speaker": "bram",
+      "text": "Finish what Aldric began. It is dark down there, so find a light before you go deep. They say his sword still lies in his tomb.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "ended": {
+      "speaker": "bram",
+      "text": "Gone? Then Hearthvale can sleep, and there will be no more lights over the keep. You have done what Aldric could not. We will not forget it.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
     }
   }
 }

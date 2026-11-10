@@ -836,3 +836,82 @@ houses that look more medieval. Plan: `docs/progress/art-pass-2-plan.md`. No new
 - Played by hand on 2026-11-09: the new look feels right.
 
 **Next:** H14, the second dungeon and its boss.
+
+## 2026-11-10 — H14 The second dungeon & boss — done
+
+Plan: `docs/progress/H14-plan.md`. The roadmap left the dungeon's item open; the plan chose the Lantern.
+
+**Built**
+- **The Chapel Crypt:** ten dark rooms under Hearthvale's chapel, on a 3x4 grid (the keep's shape mirrored).
+  - The chapel's doors are a way in now, behind bars that lift once the Iron Warden is beaten. Guard Rolf says so.
+  - The stairs back up come out at the chapel door.
+- **Pits:** a pit is a drop in `TerrainQuery`, so the hero can step in, enemies keep out, and bats and arrows cross.
+  - Falling costs half a heart; the hero drops out of sight and comes back on the last safe cell, briefly invincible.
+  - A push block pushed in fills the pit. With a `block_id` it stays there for good.
+  - Drops from anything beaten over a pit land beside it.
+- **The dark:** `LightRules` (pure) and a `Darkness` overlay drawn by a small shader, the project's first.
+  - The hero has a dim glow, or the Lantern's wide one. Burning torches light their own room only.
+- **Torches:** E lights one while the Lantern is carried. Lit, a torch sets a flag that shutters can wait on.
+  - Braziers that always burn light the first rooms; three in the Knight's Tomb burn for 6.5 seconds only.
+- **The Lantern** (a new item type, carried rather than equipped) and **the Iron Sword** (damage 3 to the wooden sword's 2, with a steel blade when swung).
+- **The Crypt Shade:** `ShadeBrain` and `ShadeBoss`. Blows pass through it until all four braziers in its hall burn; the light binds it for three seconds, then it puts them out. At half health it's faster and throws bolts.
+  - `ArenaBoss` now holds what both bosses share. The Iron Warden's class and scene are unchanged.
+- **Art and sound, all in code:** the torch and the Shade as sprites, Lantern and Iron Sword icons, pit tiles, and five sounds (torch, snuff, fall, sink, whiff).
+- **The closing words** moved from the keep to the crypt; the keep's now point at the chapel door.
+- **Playtest scenarios:** `crypt` (the top of the stairs, equipped as after the keep) and `shade` (outside its hall).
+- 300 tests in 43 suites (+36). New: `light_rules_test`, `shade_brain_test` and `crypt_test`; the terrain, puzzle, inventory, sprite, decor, door and detail suites grew.
+
+**Acceptance criteria**
+- [x] The dungeon can be finished start to end. A scene test plays it through: the Trench's block and key, the locked door, the Lantern, the torch door, the Dark Path, the three brief torches and the Iron Sword, the Ossuary's fight and key, the Broken Floor's block and locked door, an arrow into the Reliquary's crystal for the big key, the boss door, the Shade, the heart container and the closing words.
+- [x] Its puzzles need the new item. Without the Lantern a torch stays cold (E says why) and its door stays barred; five of the crypt's doors wait on torches.
+- [x] The boss can only be beaten with it. Sword and arrow pass through the Shade until all four braziers burn (checked with none, one, two and three lit), and it takes more than one binding.
+- [x] Pits work. Half a heart and back at the edge; on the last half heart, back at the entrance with full hearts. A block bridges the trench and is still there after leaving and coming back. A walker can't enter a pit; a flier can.
+- [x] The Iron Sword does more than the wooden one: it becomes the sword swung, and a swing does 3.
+- Mutation checks: 29 deliberate bugs, files restored byte for byte. 28 were caught at once. One was not: with the hero's hurt box left on during a fall, every test still passed. The fall test now checks it, and the bug is caught.
+  - pits: plain floor, a free fall, a fall that sends the hero to the entrance, walking over pits, drops landing in pits
+  - blocks: sinking on a room's border, leaving the pit open, a named block lifted out on reset, a sunk block forgotten, its pit open after a load
+  - torches and light: lighting without a lantern, brief torches that never go out, a stale flag surviving a load, light through walls, a lantern that gives no light, lights adding up, every torch burning for good
+  - the Shade: no flinch, never bound, never snuffing, bound with braziers unlit, braziers left lit on starting over, its touch hurting while bound, bosses never starting over
+  - the rest: the dark drawing no lights, a dark area with no darkness, every blade wood, the Iron Sword no stronger
+- Six existing tests listed exact items, enemies, areas, exits or the keep's closing words; they were updated.
+- Visual check (`tools/capture.gd`, now 80 shots, 16 new): the chapel door barred and open, every room of the crypt, the trench bridged, the hero falling, the Dark Path with and without the Lantern, and the Shade haunting and bound. Three things were changed after looking: braziers moved so room centres and the trench are lit, light kept from leaking between rooms, and the Shade's hall lit fully when all four braziers burn.
+
+**Known issues / notes**
+- Not played by hand yet. The Shade's difficulty, the brief torches' 6.5 seconds and how dark the dark is are guesses until someone plays; all three are single numbers (in `data/enemies/crypt_shade.json`, the crypt's scene and `Darkness`).
+- What the Reliquary's archers drop stays on the far side of the pit.
+- The crypt uses the keep's tiles and the dungeon tune. It has no look or music of its own beyond the dark.
+- The hero's safe cell is tracked as they walk, so a test that places the hero beside a pit has to walk them a step first.
+- A heart container is the Shade's only reward; the story and the real ending are H15's.
+
+**Next:** H15, the story, the ending and a full playtest.
+
+## 2026-11-10 — H15 Story, ending & playtest — built; the playtest is still to run
+
+Plan: `docs/progress/H15-plan.md`. Playtest guide: `docs/progress/H15-playtest.md`.
+
+**Built**
+- **The story**, all in data: long ago Sir Aldric bound a Shade under the chapel and set the Iron Warden to bar the crypt when it stirred. Beating the Warden lifts the bars, so the hero has to finish what Aldric began.
+  - Elder Bram tells the tale once the keep is quiet, and gives thanks at the end. His earlier lines go away when they're stale.
+  - Guard Rolf gets a last line.
+  - Five inscriptions: a plaque in the keep's entrance, one by the chapel door, and three in the crypt (the Narthex, the Trench, Aldric's epitaph). The crypt's three are also hints.
+  - The keep's closing words now send the hero to Elder Bram. The crypt's end the game.
+- **The ending:** the crypt's closing conversation sets the flag `game_finished`, and when it closes the area leaves for a new ending screen: "The End", time played, hearts and quests finished, then Keep exploring or Save and go to the title. `EndingSummary` (pure) builds the lines.
+- **For the playtest:** the guide, and an `ending` scenario for `tools/playtest.gd`.
+- 313 tests in 46 suites (+13). New: `ending_summary_test`, `ending_test` and `story_test`.
+
+**Done when**
+- [x] The story is told in each place, from data, at its point in the game. Tests check Elder Bram's options before the keep, after it and at the end, his tale's words, Rolf's lines, and that each inscription stands on open floor with its cell to itself, can be read, and says what it should.
+- [x] The ending screen follows the crypt's closing words, once: not before the last line is read, and not again on a later visit. It shows the right time, hearts and quests.
+- [x] Keep exploring returns the hero to the cell they stood on and saves nothing. Save and go to the title saves, and the save remembers the game was finished.
+- [x] All tests pass. Screenshots checked (`tools/capture.gd`, now 86 shots, 6 new): Bram's tale, four inscriptions being read, and the ending screen with the keep's window dark.
+- [ ] **A new player finishes the game without help, in about two hours.** Not run: it needs people who haven't seen the game.
+- Mutation checks: eight deliberate bugs, each caught, files restored byte for byte: the ending flag ignored, the ending screen never coming, the closing words setting the wrong flag, the hero's place not kept, keep exploring going to the village, save and quit not saving, every quest counting as finished, and the quests line left out.
+
+**Known issues / notes**
+- H14 and H15 have not been played by hand.
+- Length: my guess is that a first run takes 45 to 75 minutes, well under the roadmap's two hours. The ending screen will give the real number. If it matters, the fix is more game, which is the "Later" list, not this milestone.
+- The ending screen shows the keep's window dark, but the title screen still shows it lit after the game is finished.
+- The inscriptions are drawn as the village's wooden signpost, in the dungeons too.
+- The ending counts hearts and quests, not heart pieces found (see DECISIONS).
+
+**Next:** the playtest. Then fixes for what it finds.

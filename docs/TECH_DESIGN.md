@@ -11,14 +11,15 @@ res://
   core/              # pure logic, RefCounted, unit-tested (no Node dependencies)
     terrain/         # HeightGrid, TerrainQuery, MoveResult, GridBody (grid-checked movement)
     player/          # PlayerMotor + one script per state (states/)
-    enemies/         # EnemyBrain + one subclass per behaviour (WardenBrain: the keep's boss), EnemyBrains, DropTable
+    enemies/         # EnemyBrain + one subclass per behaviour (the bosses: WardenBrain, ShadeBrain), EnemyBrains, DropTable
     dungeons/        # RoomGrid (rooms for the camera), DungeonState (dungeon flags, door rules)
-    puzzles/         # PuzzleRules (pushing blocks, pressing plates, multi-flag shutters)
+    puzzles/         # PuzzleRules (pushing blocks, sinking them in pits, plates, torches, multi-flag shutters)
+    light/           # LightRules (how much light reaches a point in a dark area)
     quests/          # ConditionEvaluator, EffectApplier, QuestRunner, QuestState
     combat/          # CombatRules (hit geometry, knockback, weapon choice), Hit
-    inventory/       # Inventory (stack limits, the item button, ammo)
+    inventory/       # Inventory (stack limits, the item button, ammo, a lantern's reach)
     dialogue/        # DialogueRunner
-    menus/           # MenuCursor (a menu's options and cursor)
+    menus/           # MenuCursor (a menu's options and cursor), EndingSummary (the ending screen's lines)
     audio/           # Synth (oscillators, noise, envelopes, a note sequencer, PCM16)
     ambient/         # CritterMotion (how chickens, butterflies and fireflies wander)
     settings/        # SettingsData (the player's settings and their rules)
@@ -28,7 +29,7 @@ res://
   world/
     areas/<id>/      # one scene per area: <id>.tscn (village, houses, countryside, dungeon rooms)
     tiles/           # greybox TileSet and atlas
-  ui/                # HUD, text box, item and pause menus, settings menu, title screen
+  ui/                # HUD, text box, item and pause menus, settings menu, title screen, ending screen
   data/              # JSON content (see docs/data for schemas + examples)
   tests/             # gdUnit4 tests, mirroring the code
   audio/             # baked sound effects (sfx/) and music (music/): WAVs made by tools/audio/make_audio.gd
@@ -59,6 +60,8 @@ res://
   - Flying bodies use `check_flight`: only solid cells and the map edge block them.
   - Cells occupied by villagers and the dummy block walkers.
   - Sealed cells (closed doors) block everything: walkers, fliers and arrows.
+  - **Pits** (`TerrainQuery.set_pit`) are a drop for walkers, whatever the heights: the hero can step in, enemies
+    (who never drop) keep out, and fliers and arrows cross. The area takes it from there (§6).
 - `HeightShading` draws what square tiles can't show, once, at load:
   - from the grid: cliff faces with a dark lip below drops (earthy outdoors, cut stone in dungeons), soft shadows
     below solid things, and thin edges beside lower neighbours
@@ -81,6 +84,10 @@ res://
 
   Chimneys, the chapel's cross and the shop's sign are overlays (`HOUSE_DECOR_KINDS`) that a map's `decor` blocks
   put on house tiles; `smoke` above a chimney is an animated tile (`SMOKE_FRAMES`).
+
+  The chapel's two doors (`HOUSE_DOOR_KINDS`) are the exception among house fronts: open, and level with the rise,
+  because they lead down to the crypt. A `pit` is a floor tile (walkable as far as the tiles go) that the area
+  hands to `TerrainQuery`; the baker shows the far wall in the top row of each pit block.
 
   Raised dungeon floor is its own layered kind, `ledge` (flagstones at any height). Water is one animated tile
   (`WATER_FRAMES` frames). H12 added a second set of props:
@@ -161,6 +168,10 @@ res://
   - Bombs set down a `Bomb`: a fuse, then a blast HitBox that hits each enemy once and spares the hero.
 
   `ItemMenu` (Tab / I / Back) lists the equippable items held, in pickup order, and equips the chosen one.
+- **The Lantern** (type `lantern`) is carried, not put on the item button. Its `radius` is how far the hero's
+  light reaches in a dark area (`Inventory.light_radius`), and carrying one lets E light torches.
+- **The sword's blade** takes the colour of the weapon's picture: wood for the Wooden Sword, steel for the Iron
+  Sword (damage 3 to the wooden one's 2). The strongest sword held is the one swung.
 
 ## 5. Enemies
 - **Data:** `data/enemies/<id>.json`, one per file (`docs/data/enemy.schema.json`), validated by DataRegistry:
@@ -179,6 +190,12 @@ res://
         stuns it.
       - Only a stunned warden takes damage, with a flinch between blows. An unanswered gaze ends in a bolt.
       - At `rage_at` health it stomps faster and fires three bolts. Its timings are the data's `boss` object.
+    - `shade` (the Crypt Shade, the crypt's boss):
+      - It haunts: drifts after the hero over pits and all, and every blow passes through it.
+      - While its hall is lit (`set_lit`, which its node calls every frame) the light binds it for `bound_time`:
+        it stands still, and only now do blows hurt, with a flinch between them.
+      - When the binding ends it emits `snuffed` (its node puts the braziers out) and haunts again.
+      - At `rage_at` health it drifts faster and throws a bolt every `bolt_every` seconds.
   - Wandering stays within `LEASH` of home; it notices the hero within `sight` and gives up beyond
     `sight × LOSE_FACTOR`.
   - A hit costs health, knocks it back and stuns it briefly (no further hits). At zero it dies. A brain is told
@@ -191,11 +208,17 @@ res://
   - `Arrow` is a flying HitBox that stops at solid tiles. A boss's `bolt` is one drawn as a glowing orb.
   - A drop from an enemy on raised ground falls to the foot of the ledge, where the hero can reach it.
     Goblin archers can drop arrows.
-  - `Boss` (an Enemy with a WardenBrain, drawn big):
+  - `ArenaBoss` (an Enemy; what the bosses share):
     - It keeps to its `arena` (its room's floor) and starts over (full health, back home) when the hero leaves.
-    - If the hero has no arrows when its eye opens, five arrows fall into a far corner of the room.
-    - With `stays_beaten`, it never comes back once its `clear_flag` is set. The heart container and the way out
+    - Its fight has its own tune, and its shots are bolts.
+    - With `stays_beaten`, it never comes back once its `clear_flag` is set. The heart container and the way on
       wait on that flag.
+  - `Boss` (the Iron Warden: an ArenaBoss with a WardenBrain, drawn big). If the hero has no arrows when its eye
+    opens, five arrows fall into a far corner of the room.
+  - `ShadeBoss` (the Crypt Shade: an ArenaBoss with a ShadeBrain, drawn half there while it haunts):
+    - Its braziers are the `Torch` nodes standing in its arena. All of them burning is what binds it.
+    - It puts them out when its binding ends and when the fight starts over.
+    - Bound, its touch does no harm, so the hero can close in.
   - The area sets enemies up on load. They're back on every visit, and nothing about them is saved (except
     that a boss stays beaten).
 
@@ -236,6 +259,26 @@ res://
     off, blue when on.
   - **Cracked wall:** a `DungeonDoor` kind opened for good only by a bomb's blast.
   - A `Hit` carries its kind (sword, arrow, bomb, contact) so pieces can tell them apart.
+  - **Pits:**
+    - A hero who steps into one (`AreaController.fall_into_pit`) loses half a heart, drops out of sight for
+      `PIT_TIME`, and is put back on the last safe cell they stood on, with a moment's invincibility. On their
+      last half heart they come back at the entrance like any other fall.
+    - A push block pushed into a pit (`PuzzleRules.can_sink`) fills it: the pit is floor from then on and the
+      block is part of it. With a `block_id` it stays sunk for good (`DungeonState.block_flag` holds the cell);
+      without one it's lifted out when its room resets.
+    - A drop from something beaten over a pit (a bat) lands on the floor beside it.
+  - **Torch** (a standing brazier): E lights it if the hero carries a lantern. Burning, it sets its flag, so
+    shutters wait on torches as they do on plates and crystals.
+    - `always_lit`: burns from the start (the light of the crypt's first rooms).
+    - `burn_time`: goes out by itself after that long, guttering first, and starts every visit unlit.
+    - Otherwise it burns until snuffed, and its flag keeps it lit across visits.
+- **The dark:** an area marked `dark` shows only what its lights reach.
+  - `LightRules` (pure) works it out: each light is full to `CORE` of its radius and fades to nothing at its
+    edge, and the brightest one counts.
+  - The lights are the hero's own (a dim glow, or a lantern's `radius`) and every torch burning in the room on
+    screen (`AreaController.lights()`): light doesn't pass a dungeon's walls.
+  - `Darkness` draws it with a shader, in a few steps of brightness, over the tiles and actors and under the
+    room mask and HUD. `brightness_at(cell)` asks the same rule, for tests.
   - Shutters can wait on several flags (`open_flags`, any of them, or all with `needs_all`), so a room can have
     two solutions.
 
@@ -329,8 +372,17 @@ run headless; see CLAUDE.md for the command and gotchas.
   - whether the HUD shows the controls hint
 
   Changes apply and are saved at once. There's no audio yet, so no volume.
-- **The end of the slice:** the Warden's `HeartContainer` names a conversation (`dialogue_id`). The area opens it
-  once the heart is taken, in place of the pickup message.
+- **Closing words:** a `HeartContainer` can name a conversation (`dialogue_id`). The area opens it once the heart
+  is taken, in place of the pickup message. The Warden's sends the hero to Elder Bram; the Shade's ends the game.
+- **The ending** (`ui/ending_screen.tscn`):
+  - The game's last conversation sets the flag `game_finished` (`AreaController.ENDING_FLAG`) with an ordinary
+    `set_flag` effect. When that conversation closes, the area leaves for the ending screen. The flag is saved,
+    so the ending plays once.
+  - The screen shows "The End" over the title's picture (the keep's window dark), then `EndingSummary`'s lines
+    (pure): time played, hearts, and quests finished out of those in `data/quests`.
+  - **Keep exploring** goes back to the area and cell the hero stood on. **Save and go to the title** saves first.
+- **The story** is data only: conversations whose options are gated on the flags `keep_warden_beaten` and
+  `crypt_shade_beaten`, and `Signpost` inscriptions in the keep, by the chapel and in the crypt.
 
 ## 13. Audio & feel
 - **Made in code, baked to files** (no external assets):
@@ -375,8 +427,8 @@ run headless; see CLAUDE.md for the command and gotchas.
   - `make_player_sprite.gd`: the hero, a blue hood and tunic with a gold hem and a red scarf. Three rows (down,
     up, side; right is the side row mirrored) of nine 16x24 frames: idle, blink, four walk frames, attack, item
     held up, fallen. A test checks `PlayerAnimator`'s columns against the tool's.
-  - `make_sprites.gd`: everything else, namely slime, bat, goblin archer, the Iron Warden, villagers, items and
-    pickups, the crystal switch, the training dummy and brambles
+  - `make_sprites.gd`: everything else, namely slime, bat, goblin archer, the Iron Warden, the Crypt Shade,
+    villagers, items and pickups, the crystal switch, the torch, the training dummy and brambles
 
   Each sprite becomes `gameplay/art/<name>.png`. Its frames sit side by side in the order the tool lists them, and
   below them the same frames as white silhouettes for hit flashes. Edit the art in the tool, never the PNGs.

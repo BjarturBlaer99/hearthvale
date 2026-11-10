@@ -11,7 +11,7 @@ func test_frame_names_match_the_order_the_tool_paints_them() -> void:
 	var sprites: Dictionary = _tool_sprites()
 	var cases: Array = [
 		["slime", Enemy.SLIME_FRAMES], ["bat", Enemy.BAT_FRAMES], ["goblin", Enemy.GOBLIN_FRAMES],
-		["warden", Boss.FRAMES], ["villager", Villager.FRAMES], ["items", ItemIcons.FRAMES],
+		["warden", Boss.FRAMES], ["villager", Villager.FRAMES], ["items", ItemIcons.FRAMES], ["torch", Torch.FRAMES], ["shade", ShadeBoss.FRAMES],
 		["crystal", CrystalSwitch.FRAMES], ["breakables", Breakable.FRAMES], ["critters", Critter.FRAMES],
 	]
 	for case: Array in cases:

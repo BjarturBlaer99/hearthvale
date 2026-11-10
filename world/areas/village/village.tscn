@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" path="res://gameplay/interactables/training_dummy.tscn" id="9_dummy"]
 [ext_resource type="PackedScene" path="res://gameplay/interactables/brambles.tscn" id="10_brambles"]
 [ext_resource type="Script" path="res://gameplay/interactables/heart_pickup.gd" id="11_heart"]
+[ext_resource type="Script" path="res://gameplay/dungeons/dungeon_door.gd" id="h14_door"]
 [ext_resource type="Script" path="res://gameplay/interactables/heart_piece.gd" id="v12_piece"]
 [ext_resource type="Script" path="res://gameplay/interactables/villager.gd" id="v12_villager"]
 
@@ -121,6 +122,31 @@ hair_color = Color(0.2, 0.16, 0.12, 1)
 beard = true
 dialogue_id = &"guard_rolf"
 
+[node name="CryptBars" type="Node2D" parent="Interactables" unique_id=1560067211]
+position = Vector2(368, 80)
+script = ExtResource("h14_door")
+door_id = &"crypt_bars"
+kind = &"shutter"
+size = Vector2i(2, 1)
+open_flag = &"keep_warden_beaten"
+
+[node name="CryptDoorL" type="Node2D" parent="Interactables" unique_id=1054063380]
+position = Vector2(368, 80)
+script = ExtResource("6_exit")
+target_area = &"crypt"
+target_entry = &"entrance"
+
+[node name="CryptDoorR" type="Node2D" parent="Interactables" unique_id=1181703531]
+position = Vector2(384, 80)
+script = ExtResource("6_exit")
+target_area = &"crypt"
+target_entry = &"entrance"
+
+[node name="ChapelPlaque" type="Node2D" parent="Interactables" unique_id=919790723]
+position = Vector2(336, 96)
+script = ExtResource("7_sign")
+dialogue_id = &"sign_chapel"
+
 [node name="Entries" type="Node2D" parent="." unique_id=885840115]
 
 [node name="weaver_door" type="Marker2D" parent="Entries" unique_id=735700195]
@@ -141,6 +167,10 @@ rotation = -1.5707964
 
 [node name="north_road" type="Marker2D" parent="Entries" unique_id=574769179]
 position = Vector2(584, 24)
+rotation = 1.5707964
+
+[node name="crypt_door" type="Marker2D" parent="Entries" unique_id=950649077]
+position = Vector2(376, 104)
 rotation = 1.5707964
 
 [node name="PlayerSpawn" type="Marker2D" parent="." unique_id=573120596]

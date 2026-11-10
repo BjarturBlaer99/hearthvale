@@ -352,3 +352,58 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   cell, so the same map always bakes the same wood.
 - 2026-11-09 — **Smoke is an animated tile on the Decor layer**, like water on the Height layer: no node, no
   script.
+
+## H14 — The second dungeon & boss
+- 2026-11-09 — **The dungeon's item is the Lantern, not the boomerang** (the roadmap left the choice to this
+  milestone). The bow already hits things at range, so a boomerang's puzzles would mostly repeat the keep's, and
+  its stun would have touched every enemy brain. Darkness and torches are new and self-contained.
+- 2026-11-09 — **The Lantern is carried, not put on the item button.** E lights a torch while it's in the pack.
+  The first plan put it on the button, but that meant swapping between it and the bow in the item menu, most of
+  all in the boss fight. Nothing about it needs a button: no fuel, no aiming.
+- 2026-11-09 — **The second dungeon is the Chapel Crypt**, under the chapel already on Hearthvale's north rise, so
+  the world above grows by nothing. Its door is barred (a shutter on the `keep_warden_beaten` flag) until the
+  keep is done, which keeps the dungeons in order without a new key item. Guard Rolf explains, before and after.
+- 2026-11-09 — **A pit is a drop, not a new kind of move.** `TerrainQuery` reports stepping into an open pit as a
+  DROP: the hero already may drop and enemies already may not, so enemies keep out with no new rule, and fliers
+  and arrows were never bound by drops. The area does the falling: half a heart, back on the last safe cell.
+- 2026-11-09 — **A block that fills a pit can stay for good.** Given a `block_id`, the pit cell goes into a
+  dungeon flag, so a bridge built once is there on every later visit and nobody is stranded on the far side.
+  Both of the crypt's trenches cut their room in two right across, so any cell a block sinks into bridges it:
+  there's no wrong place to push it.
+- 2026-11-09 — **Keys can't be spent in the wrong order.** Before the Lantern there is one small key and one
+  locked door in reach. The second key is behind a torch door, and so is the second locked door.
+- 2026-11-09 — **Light stays in its room.** Only torches in the room on screen count, so a lit room never glows
+  through the wall into a dark one. Lights don't add up either: the brightest counts, which keeps the rule simple
+  enough to test and to draw in a shader.
+- 2026-11-09 — **The dark is drawn by a small shader written in code**, the first in the project: a sheet of
+  black with stepped holes. Drawing it in rectangles would have cost thousands of draw calls a frame. The rule
+  it draws lives in `LightRules`, pure and tested; the shader only repeats it.
+- 2026-11-09 — **The Crypt Shade is beaten with light, then the sword.** All four braziers burning bind it for
+  three seconds; then it puts them out. Its touch does no harm while bound. 16 health against the Iron Sword's 3
+  and a flinch of 0.6 s means two bindings at best, three or four more likely.
+- 2026-11-09 — **Bosses share `ArenaBoss`** (the arena, starting over when the hero leaves, the fight's tune,
+  bolts). `Boss` stays the Iron Warden's class so the keep's scene and tests are untouched.
+- 2026-11-09 — **The Iron Sword is in the crypt, before its boss**, not a reward for beating it: a sword won from
+  the last boss would never be swung. It's behind the three brief torches, the crypt's one optional room.
+- 2026-11-09 — **The game's closing words moved to the crypt.** The keep's now point on to the chapel door. The
+  real ending is H15's.
+- 2026-11-09 — **No lantern fuel, fire arrows or burning things**: one new item, used two ways (seeing and
+  lighting), is enough for one dungeon.
+
+## H15 — Story, ending & playtest
+- 2026-11-10 — **The story is one idea: the Warden was a lock.** Sir Aldric bound a Shade under the chapel and set
+  the Iron Warden to bar the crypt when it stirred. Beating the Warden opens the way to what it guarded. It ties
+  the two dungeons together with what the game already had (the lights over the keep, the bars on the chapel door,
+  the Iron Sword in a knight's tomb), and adds no new place, character on screen or mechanic.
+- 2026-11-10 — **It's told in about a dozen lines**: Elder Bram before and after the keep, Guard Rolf, five
+  inscriptions and the two dungeons' closing words. Three of the inscriptions double as hints (the block and the
+  pit, the three brief torches, how the Shade is beaten), so the story is where a stuck player will look.
+- 2026-11-10 — **No new effect type for the ending.** The last conversation sets the flag `game_finished`; the
+  area leaves for the ending screen when that conversation closes. Because it's a saved flag, the ending plays
+  once, and a save remembers the game was finished.
+- 2026-11-10 — **The ending screen lets you keep exploring**, back on the cell you stood on, or save and go to the
+  title. It doesn't save by itself: the game never saves unasked anywhere else.
+- 2026-11-10 — **The ending sums up time, hearts and quests**, the three things the game already counts. It doesn't
+  count heart pieces found: pieces merge into hearts, so the number isn't kept.
+- 2026-11-10 — **The playtest isn't mine to run.** It needs people who haven't seen the game. This milestone
+  ships a guide for it and stops there; nothing is "fixed" ahead of anyone hitting it, beyond the three hints.

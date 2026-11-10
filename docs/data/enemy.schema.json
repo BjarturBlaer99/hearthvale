@@ -8,7 +8,7 @@
   "properties": {
     "id": { "type": "string", "minLength": 1 },
     "name": { "type": "string" },
-    "behaviour": { "enum": ["hopper", "archer", "flier", "warden"], "description": "hopper: hops after you (slime); archer: keeps its distance and shoots (goblin archer); flier: erratic flight over heights (bat); warden: the keep's boss (stomps, gazes, a weak point stuns it)." },
+    "behaviour": { "enum": ["hopper", "archer", "flier", "warden", "shade"], "description": "hopper: hops after you (slime); archer: keeps its distance and shoots (goblin archer); flier: erratic flight over heights (bat); warden: the keep's boss (stomps, gazes, a weak point stuns it); shade: the crypt's boss (blows pass through it until its hall is lit)." },
     "health": { "type": "integer", "minimum": 1, "description": "In weapon damage points; the Wooden Sword does 2." },
     "speed": { "type": "number", "minimum": 0, "description": "px/s" },
     "sight": { "type": "number", "minimum": 0, "default": 64, "description": "How near (px) the hero must come to be noticed." },
@@ -16,7 +16,7 @@
     "knockback": { "type": "number", "minimum": 0, "default": 24, "description": "How far (px) touching it pushes the hero." },
     "shot": {
       "type": "object",
-      "description": "Archers' arrows, or a warden's bolts.",
+      "description": "Archers' arrows, or a boss's bolts.",
       "properties": {
         "damage": { "type": "integer", "minimum": 0 },
         "speed": { "type": "number", "minimum": 1 },
@@ -25,12 +25,14 @@
     },
     "boss": {
       "type": "object",
-      "description": "Wardens only: their timings and weak point.",
+      "description": "Bosses only: their timings. A warden uses guard_time, gaze_time, stun_time and weak_point; a shade uses bound_time and bolt_every; both use rage_at and rage_speed.",
       "properties": {
         "guard_time": { "type": "number", "minimum": 0, "description": "Seconds it stomps after the hero before gazing." },
         "gaze_time": { "type": "number", "minimum": 0, "description": "Seconds its eye stays open: the window to stun it." },
         "stun_time": { "type": "number", "minimum": 0, "description": "Seconds it stays stunned (and can be hurt)." },
-        "rage_at": { "type": "integer", "minimum": 0, "description": "At this health or less it rages: faster, three bolts. Default: half its health." },
+        "bound_time": { "type": "number", "minimum": 0, "description": "Shades: seconds the light holds it (and it can be hurt) once its hall is lit." },
+        "bolt_every": { "type": "number", "minimum": 0, "description": "Shades: seconds between bolts while raging." },
+        "rage_at": { "type": "integer", "minimum": 0, "description": "At this health or less it rages: faster, with bolts. Default: half its health." },
         "rage_speed": { "type": "number", "minimum": 0, "description": "Speed factor while raging." },
         "weak_point": { "enum": ["sword", "arrow", "bomb"], "default": "arrow", "description": "The only kind of hit that stuns it." }
       }

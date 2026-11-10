@@ -9,7 +9,8 @@ extends RefCounted
 ##   2 dirt path by height 0-7
 ##   3 solid things outdoors: tree, rock, wall, red roof, blue roof, water, fence, stone
 ##   4 walkable floors at height 0: door (in a house wall), wooden floor, rug, doormat, dungeon
-##     floor, stairway (down into a dungeon, or up out of it)
+##     floor, stairway (down into a dungeon, or up out of it), and a pit (plain, and with the
+##     far wall showing along its top edge); the area makes pits something to fall into
 ##   5 solid things indoors: inner wall, table, bed, shelf, barrel, hearth, dungeon wall, pillar
 ##   6 decorations (the Decor layer only, see-through, no effect on movement): flowers (red,
 ##     yellow, blue), a grass tuft, pebbles, mushrooms, a vegetable patch, lily pads
@@ -63,7 +64,8 @@ const ROW_TREES: int = 22
 ## More trees, all props like "prop_tree". The baker mixes the three kinds by cell and uses
 ## the canopy where trees stand on all four sides.
 const TREE_KINDS: Array[String] = ["prop_tree_b", "prop_tree_c", "prop_canopy"]
-## House fronts, in atlas order from ROW_HOUSE (eight to a row), all solid at height 3.
+## House fronts, in atlas order from ROW_HOUSE (eight to a row), all solid at height 3 but for
+## HOUSE_DOOR_KINDS.
 ## A roof kind is its style ("roof" clay tiles, "roof_blue" slate, "roof_thatch"), then "_top"
 ## (ridge) or "_eave" for its first and last rows, then "_l" or "_r" for a gable end; the baker
 ## builds the name for each cell of a roof block.
@@ -75,6 +77,10 @@ const HOUSE_KINDS: Array[String] = [
 	"wall_upper", "wall_upper_b", "wall_upper_window",
 	"chapel_wall", "chapel_window", "chapel_door_l", "chapel_door_r",
 ]
+## House fronts that are a way in: the chapel's doors (down to the crypt). Not solid, and level
+## with the rise the chapel stands on.
+const HOUSE_DOOR_KINDS: Array[String] = ["chapel_door_l", "chapel_door_r"]
+const HOUSE_DOOR_HEIGHT: int = 2
 ## Overlays that sit on house tiles, on the Decor layer.
 const HOUSE_DECOR_KINDS: Array[String] = ["chimney", "cross_l", "cross_r", "shop_sign"]
 ## Chimney smoke's animation: frames, and how long each shows (seconds).
@@ -104,7 +110,10 @@ const SOLID_KINDS: Array[String] = ["tree", "rock", "wall", "roof", "roof_blue",
 const SOLID_HEIGHTS: Array[int] = [2, 1, 3, 3, 3, 0, 1, 2]
 
 ## Walkable kinds at height 0, in atlas order. A door sits in a house's front wall.
-const FLOOR_KINDS: Array[String] = ["door", "floor", "rug", "doormat", "dungeon_floor", "stairway"]
+const FLOOR_KINDS: Array[String] = ["door", "floor", "rug", "doormat", "dungeon_floor", "stairway", "pit", "pit_top"]
+## Pits: walkable as far as the tiles go; TerrainQuery makes them a drop (maps say "pit", and
+## the baker shows the far wall in the top row of each).
+const PIT_KINDS: Array[String] = ["pit", "pit_top"]
 
 ## Solid indoor kinds in atlas order, with their shading heights like SOLID_HEIGHTS.
 const FURNITURE_KINDS: Array[String] = ["inner_wall", "table", "bed", "shelf", "barrel", "hearth", "dungeon_wall", "pillar"]
@@ -151,6 +160,11 @@ const PATH_COLOR: Color = Color(0.70, 0.57, 0.38)
 ## Atlas coordinates for a kind of tile: "ground", "stairs" or "path" at `height`, or a
 ## fixed-height kind (SOLID_KINDS, FLOOR_KINDS, FURNITURE_KINDS; height is then ignored).
 ## Unknown kinds give the meadow grass.
+## Whether the tile at atlas `at` is a pit.
+static func is_pit(at: Vector2i) -> bool:
+	return at.y == ROW_FLOOR and at.x >= FLOOR_KINDS.find("pit") and at.x < FLOOR_KINDS.size()
+
+
 static func coords(kind: String, height: int = 0) -> Vector2i:
 	if LAYERED_KINDS.has(kind):
 		return Vector2i(clampi(height, 0, COLUMNS - 1), LAYERED_KINDS[kind])

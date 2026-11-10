@@ -13,13 +13,13 @@
         "properties": {
           "id": { "type": "string", "minLength": 1 },
           "name": { "type": "string" },
-          "type": { "enum": ["weapon_melee", "weapon_ranged", "ammo", "bomb", "key", "currency", "consumable", "quest", "heart"] },
+          "type": { "enum": ["weapon_melee", "weapon_ranged", "ammo", "bomb", "lantern", "key", "currency", "consumable", "quest", "heart"] },
           "icon": { "type": "string", "description": "The item's picture (a frame of gameplay/art/items.png, ItemIcons.FRAMES). Without one, its type decides." },
           "stackable": { "type": "boolean", "default": false },
           "max_stack": { "type": "integer", "minimum": 1 },
           "stats": {
             "type": "object",
-            "description": "Weapon stats. Damage is in enemy health points; ranged weapons name their ammo item id and arrow speed (px/s); bombs have a fuse (s) and blast radius (px).",
+            "description": "Weapon stats. Damage is in enemy health points; ranged weapons name their ammo item id and arrow speed (px/s); bombs have a fuse (s) and blast radius (px); a lantern's radius is how far its light reaches (px).",
             "properties": {
               "damage": { "type": "number", "minimum": 0 },
               "knockback": { "type": "number", "minimum": 0 },

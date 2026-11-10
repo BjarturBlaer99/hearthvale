@@ -139,7 +139,10 @@ survives a save; and a new quest can be added by writing only a JSON file.
 Better graphics, a better-looking hero with better animation, and houses that look more medieval. No new
 mechanics, areas or content. Plan and checklist: `docs/progress/art-pass-2-plan.md`.
 
-## H14 — The second dungeon & boss
+## H14 — The second dungeon & boss ✅
+Built as the **Chapel Crypt**, with the **Lantern** as its item and the **Crypt Shade** as its boss (choices and
+reasons in `docs/progress/H14-plan.md` and DECISIONS).
+
 - A second dungeon of 10–14 rooms, entered from somewhere in the existing world (no new region), built around a
   **new item** chosen in this milestone's plan: a boomerang that stuns and fetches, or a lantern for dark rooms
   and torches.
@@ -150,7 +153,10 @@ mechanics, areas or content. Plan and checklist: `docs/progress/art-pass-2-plan.
 **Done when**: the dungeon can be finished start to end, its puzzles need the new item, the boss can only be
 beaten with it, pits work, and the Iron Sword does more than the wooden one.
 
-## H15 — Story, ending & playtest
+## H15 — Story, ending & playtest (built; the playtest is still to run)
+The story and the ending are in. The "done when" below needs new players: `docs/progress/H15-playtest.md` is the
+guide for running it, and what it finds gets fixed afterwards.
+
 - A light story that ties the two dungeons together (still short: GDD §9), told through villagers and signs, and
   a real ending after the second boss.
 - Fixes from a full playtest with new players.

@@ -32,10 +32,14 @@ var _shake_strength: float = 0.0
 var _dust_left: float = 0.0
 var _hold_left: float = 0.0
 var _hold_icon: StringName = &""
+var _falling: bool = false
+var _fall_left: float = 0.0
+var _fall_time: float = 1.0
 
 @onready var hurt_box: HurtBox = $HurtBox
 @onready var sword: Sword = $Sword
 @onready var _sprite: Sprite2D = $Sprite
+@onready var _shadow: Polygon2D = $Shadow
 @onready var _camera: Camera2D = $Camera2D
 
 
@@ -103,7 +107,7 @@ func swing() -> bool:
 	var direction: Vector2i = facing_direction()
 	if not motor.attack(direction, stats["cooldown"]):
 		return false
-	sword.swing(Vector2(direction), stats)
+	sword.swing(Vector2(direction), stats, ItemIcons.name_for(StringName(str(weapon.get("id", "")))))
 	EventBus.sound.emit(&"sword")
 	sync_from_motor()
 	return true
@@ -132,6 +136,7 @@ func _physics_process(delta: float) -> void:
 	_kick_up_dust(motor.position != before, delta)
 	_hop_left = maxf(0.0, _hop_left - delta)
 	_animator.tick(delta)
+	_fall_left = maxf(0.0, _fall_left - delta)
 	if _hold_left > 0.0:
 		_hold_left -= delta
 		if _hold_left <= 0.0:
@@ -147,6 +152,25 @@ func hold_up(icon: StringName) -> void:
 	queue_redraw()
 	if motor != null:
 		sync_from_motor()
+
+
+## The hero drops out of sight (into a pit) over `seconds`, and stays gone until end_fall().
+## For show only: the area takes the heart and puts the hero back.
+func fall_in(seconds: float) -> void:
+	_falling = true
+	_fall_time = maxf(seconds, 0.01)
+	_fall_left = _fall_time
+	_end_hold()
+
+
+func end_fall() -> void:
+	_falling = false
+	if motor != null:
+		sync_from_motor()
+
+
+func is_falling() -> bool:
+	return _falling
 
 
 func is_holding_up() -> bool:
@@ -230,7 +254,11 @@ func _update_visuals() -> void:
 		_animator.pose = PlayerAnimator.Pose.NONE
 	_sprite.region_rect = _animator.region()
 	var lift: float = sin(_hop_left / HOP_TIME * PI) * HOP_HEIGHT if _hop_left > 0.0 else 0.0
-	_sprite.position = Vector2(-PlayerAnimator.FRAME_SIZE.x / 2.0, -PlayerAnimator.FRAME_SIZE.y + _animator.bob() - roundi(lift))
+	# Falling into a pit, the hero shrinks toward their feet and is gone.
+	var shrink: float = _fall_left / _fall_time if _falling else 1.0
+	_sprite.scale = Vector2(shrink, shrink)
+	_sprite.position = Vector2(-PlayerAnimator.FRAME_SIZE.x / 2.0, -PlayerAnimator.FRAME_SIZE.y + _animator.bob() - roundi(lift)) * shrink
+	_shadow.visible = not _falling
 	_sprite.flip_h = _animator.shows_flipped()
 	_sprite.modulate = HURT_TINT if motor.state_name == PlayerMotor.HURT else Color.WHITE
 	var blinking: bool = motor.is_invincible() and motor.state_name != PlayerMotor.DEAD

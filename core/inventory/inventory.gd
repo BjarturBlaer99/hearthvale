@@ -1,7 +1,7 @@
 class_name Inventory
 extends RefCounted
 ## Inventory rules (docs/TECH_DESIGN.md §4), pure: how many of an item fit, which items go on
-## the item button, and what each one uses up. Works on item entries from data and on stacks
+## the item button, what each one uses up, and how far a carried lantern lights the dark. Works on item entries from data and on stacks
 ## in GameState.inventory's shape ({ "id", "count" }). GameState applies them.
 
 ## Item types that can sit on the item button.
@@ -37,6 +37,34 @@ static func ammo_for(item: Dictionary) -> String:
 		"bomb":
 			return str(item.get("id", ""))
 	return ""
+
+
+## The items of `type` that `stacks` hold, looked up in `items` (data entries), in the order
+## they were picked up.
+static func held_of_type(stacks: Array, items: Array, type: String) -> Array[Dictionary]:
+	var by_id: Dictionary = {}
+	for item: Variant in items:
+		if typeof(item) == TYPE_DICTIONARY:
+			by_id[str((item as Dictionary).get("id", ""))] = item
+	var out: Array[Dictionary] = []
+	for stack: Variant in stacks:
+		if typeof(stack) != TYPE_DICTIONARY or int((stack as Dictionary).get("count", 0)) <= 0:
+			continue
+		var item: Dictionary = by_id.get(str((stack as Dictionary).get("id", "")), {})
+		if str(item.get("type", "")) == type:
+			out.append(item)
+	return out
+
+
+## How far the hero's light reaches in the dark (px): the widest lantern among `stacks`, else
+## `without` (their own dim glow).
+static func light_radius(stacks: Array, items: Array, without: float) -> float:
+	var best: float = without
+	for lantern: Dictionary in held_of_type(stacks, items, "lantern"):
+		var stats: Variant = lantern.get("stats", {})
+		if typeof(stats) == TYPE_DICTIONARY:
+			best = maxf(best, float((stats as Dictionary).get("radius", 0.0)))
+	return best
 
 
 ## The equippable items that `stacks` hold, looked up in `items` (data entries), in the order

@@ -5,7 +5,8 @@ extends RefCounted
 ## Keys belong to their dungeon: small keys are a count, the big key a yes/no.
 ##
 ## Flags: dungeon/<id>/keys (int), dungeon/<id>/big_key (bool),
-##        dungeon/<id>/door/<door> (bool, opened), dungeon/<id>/chest/<chest> (bool, opened).
+##        dungeon/<id>/door/<door> (bool, opened), dungeon/<id>/chest/<chest> (bool, opened),
+##        dungeon/<id>/block/<block> ("x,y": the pit cell a push block sank into, for good).
 
 ## Door kinds (DungeonDoor.kind).
 const OPEN: StringName = &"open"
@@ -31,6 +32,10 @@ static func door_flag(dungeon: StringName, door: StringName) -> StringName:
 
 static func chest_flag(dungeon: StringName, chest: StringName) -> StringName:
 	return StringName("dungeon/%s/chest/%s" % [dungeon, chest])
+
+
+static func block_flag(dungeon: StringName, block: StringName) -> StringName:
+	return StringName("dungeon/%s/block/%s" % [dungeon, block])
 
 
 ## Whether a closed door of `kind` can be opened now, holding `keys` small keys and the big key

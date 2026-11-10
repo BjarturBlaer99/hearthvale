@@ -6,7 +6,7 @@ extends GdUnitTestSuite
 ## roof with gable ends (thatch, clay tiles or slate), carry chimneys that smoke, and stay exactly
 ## as solid as before. Woods mix three kinds of tree and close into a canopy where they are thick.
 
-const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"south_field", &"shop", &"ruin_cellar", &"cistern", &"keep", &"north_fields", &"old_wood"]
+const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"south_field", &"shop", &"ruin_cellar", &"cistern", &"keep", &"north_fields", &"old_wood", &"crypt"]
 
 
 func test_every_area_has_a_decor_layer_just_above_its_height_layer() -> void:
@@ -90,7 +90,11 @@ func test_houses_have_two_storeys_under_a_gabled_roof_and_stay_solid() -> void:
 	for case: Array in cases:
 		var cell: Vector2i = case[0]
 		assert_that(height.get_cell_atlas_coords(cell)).override_failure_message("%s shows %s" % [cell, case[1]]).is_equal(GreyboxTiles.coords(case[1]))
-		if case[1] != "door":
+		if GreyboxTiles.HOUSE_DOOR_KINDS.has(case[1]):
+			# The chapel's doors lead down to the crypt: a way in, level with the rise.
+			assert_bool(grid.is_solid(cell)).override_failure_message("%s is a way in" % cell).is_false()
+			assert_int(grid.height_at(cell)).is_equal(GreyboxTiles.HOUSE_DOOR_HEIGHT)
+		elif case[1] != "door":
 			assert_bool(grid.is_solid(cell)).override_failure_message("%s is solid" % cell).is_true()
 			assert_int(grid.height_at(cell)).is_equal(3)
 

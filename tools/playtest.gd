@@ -14,6 +14,27 @@ const SCENARIOS: Dictionary = {
 		"items": [[&"wooden_sword", 1], [&"bow", 1], [&"arrow", 20]],
 		"flags": [&"took_wooden_sword", &"dungeon/keep/big_key", &"dungeon/keep/door/boss_door"],
 	},
+	# At the top of the crypt's stairs, as after the keep: sword, bow, arrows and bombs.
+	"crypt": {
+		"area": &"crypt",
+		"cell": Vector2i(22, 42),
+		"items": [[&"wooden_sword", 1], [&"bow", 1], [&"arrow", 20], [&"bomb", 5]],
+		"flags": [&"took_wooden_sword", &"keep_warden_beaten"],
+	},
+	# In the Shade's hall with the Shade beaten: step up to the heart container for the ending.
+	"ending": {
+		"area": &"crypt",
+		"cell": Vector2i(22, 16),
+		"items": [[&"wooden_sword", 1], [&"iron_sword", 1], [&"bow", 1], [&"arrow", 20], [&"lantern", 1]],
+		"flags": [&"took_wooden_sword", &"keep_warden_beaten", &"crypt_shade_beaten", &"dungeon/crypt/big_key", &"dungeon/crypt/door/boss_door"],
+	},
+	# Outside the Crypt Shade's hall: the Lantern and the Iron Sword, the boss door already open.
+	"shade": {
+		"area": &"crypt",
+		"cell": Vector2i(22, 24),
+		"items": [[&"wooden_sword", 1], [&"iron_sword", 1], [&"bow", 1], [&"arrow", 20], [&"lantern", 1]],
+		"flags": [&"took_wooden_sword", &"keep_warden_beaten", &"dungeon/crypt/big_key", &"dungeon/crypt/door/boss_door"],
+	},
 }
 
 

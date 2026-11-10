@@ -1,0 +1,11 @@
+{
+  "id": "sign_keep_warden",
+  "start": "read",
+  "nodes": {
+    "read": {
+      "speaker": "",
+      "text": "THE WARDEN WAKES WHEN THE DARK UNDER THE CHAPEL STIRS.\nWhile it stands, the crypt stays barred. So I have made it. - Aldric",
+      "options": []
+    }
+  }
+}

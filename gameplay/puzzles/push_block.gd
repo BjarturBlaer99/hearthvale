@@ -5,11 +5,22 @@ extends Node2D
 ## (open floor at the same level, not a room's border). It also presses plates. It's back
 ## where it started when the hero leaves its room (reset()) and on the next visit. Position =
 ## its cell's top-left corner (the slide is drawn; the cell changes at once).
+## Pushed into a pit (PuzzleRules.can_sink) it drops in and fills it: the pit is floor from then
+## on, and the block is part of it (`sunk`: it stands in nobody's way and moves no more). With a
+## `block_id` it stays sunk for good, a dungeon flag holding the cell; without, reset() lifts it
+## out again. The area calls set_dungeon().
 
 const SLIDE_TIME: float = 0.18
 const OUTLINE: Color = Color(0.10, 0.08, 0.12)
 ## Warm carved sandstone, so a block never passes for one of the grey pillars around it.
 const STONE: Color = Color(0.74, 0.60, 0.40)
+
+## Names its flag (DungeonState.block_flag) so that, once sunk, it stays sunk. Optional.
+@export var block_id: StringName
+
+## Whether it lies in a pit it filled.
+var sunk: bool = false
+var dungeon_id: StringName
 
 var _slide_left: float = 0.0
 var _slide_from: Vector2 = Vector2.ZERO
@@ -24,42 +35,77 @@ func _ready() -> void:
 	set_process(false)
 
 
+## Called by the area on load: a block that sank for good lies where it sank.
+func set_dungeon(id: StringName) -> void:
+	dungeon_id = id
+	if block_id == &"":
+		return
+	var at: PackedStringArray = str(GameState.get_flag(DungeonState.block_flag(dungeon_id, block_id), "")).split(",")
+	if at.size() == 2:
+		_home = Vector2(int(at[0]), int(at[1])) * PlayerMotor.TILE
+		position = _home
+		sunk = true
+		queue_redraw()
+
+
 func cell() -> Vector2i:
 	return PlayerMotor.cell_of(_home + Vector2(0.5, 0.5))
 
 
+## Sunk, it's floor: nothing finds it there.
 func covers(at: Vector2i) -> bool:
-	return at == cell()
+	return not sunk and at == cell()
 
 
-## It stands in its cell: the area marks the cell occupied.
+## It stands in its cell (the area marks the cell occupied), unless it lies in a pit.
 func occupies() -> bool:
-	return true
+	return not sunk
 
 
 ## Slides one cell along `direction` if it can, keeping `terrain`'s occupied cells up to date.
 ## Returns whether it moved.
 func try_push(direction: Vector2i, terrain: TerrainQuery, room_size: Vector2i) -> bool:
-	if not PuzzleRules.can_push(terrain, cell(), direction, room_size):
+	if sunk:
+		return false
+	var sinks: bool = PuzzleRules.can_sink(terrain, cell(), direction, room_size)
+	if not sinks and not PuzzleRules.can_push(terrain, cell(), direction, room_size):
 		return false
 	terrain.set_occupied(cell(), false)
 	_slide_from = position
 	_home += Vector2(direction) * PlayerMotor.TILE
-	terrain.set_occupied(cell(), true)
 	_slide_left = SLIDE_TIME
 	set_process(true)
-	EventBus.sound.emit(&"push")
 	Burst.spawn(get_parent(), _slide_from + Vector2(8, 14), &"dust")
+	if not sinks:
+		terrain.set_occupied(cell(), true)
+		EventBus.sound.emit(&"push")
+		return true
+	# Into the pit: it fills it, and the pit is floor from now on.
+	sunk = true
+	terrain.set_pit(cell(), false)
+	if block_id != &"":
+		GameState.set_flag(DungeonState.block_flag(dungeon_id, block_id), "%d,%d" % [cell().x, cell().y])
+	EventBus.sound.emit(&"sink")
+	EventBus.shake.emit(1.5, 0.12)
+	queue_redraw()
 	return true
 
 
 ## Puts it back where it started, if it has moved and that cell is free, keeping `terrain`'s
 ## occupied cells up to date. Returns whether it moved.
 func reset(terrain: TerrainQuery) -> bool:
+	if sunk and block_id != &"":
+		return false
 	var start_cell: Vector2i = PlayerMotor.cell_of(_start + Vector2(0.5, 0.5))
 	if start_cell == cell() or terrain.is_occupied(start_cell):
 		return false
-	terrain.set_occupied(cell(), false)
+	if sunk:
+		# Lifted out again: the pit is open once more.
+		sunk = false
+		terrain.set_pit(cell(), true)
+		queue_redraw()
+	else:
+		terrain.set_occupied(cell(), false)
 	_home = _start
 	position = _start
 	_slide_left = 0.0
@@ -76,6 +122,14 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
+	if sunk:
+		# Flush with the floor: its top face, a little darker for the depth.
+		draw_rect(Rect2(0, 0, 16, 16), OUTLINE)
+		draw_rect(Rect2(1, 1, 14, 14), STONE.darkened(0.28))
+		draw_rect(Rect2(1, 1, 14, 1), STONE.darkened(0.12))
+		draw_rect(Rect2(3, 3, 10, 10), STONE.darkened(0.45))
+		draw_rect(Rect2(4, 4, 8, 8), STONE.darkened(0.28))
+		return
 	draw_rect(Rect2(1, 13, 14, 3), Color(0, 0, 0, 0.3))
 	draw_rect(Rect2(0, 0, 16, 15), OUTLINE)
 	draw_rect(Rect2(1, 1, 14, 13), STONE)
