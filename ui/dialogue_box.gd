@@ -1,9 +1,9 @@
 class_name DialogueBox
 extends Control
 ## The text box at the bottom of the screen (docs/TECH_DESIGN.md §7): who is speaking, what
-## they say, and the answers to pick from (up/down to move, interact to choose). It shows a
-## DialogueRunner, which holds the conversation; the area keeps the hero still while it's
-## open. On a node with no answers (a sign), interact closes it.
+## they say, and the answers to pick from (up/down to move, interact or Enter to choose). It
+## shows a DialogueRunner, which holds the conversation; the area keeps the hero still while
+## it's open. On a node with no answers (a sign), the same keys close it.
 
 ## The conversation is over and the box has hidden.
 signal closed
@@ -80,7 +80,9 @@ func shown_options() -> PackedStringArray:
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_open():
 		return
-	if event.is_action_pressed(&"interact"):
+	# Held from before: the last answer can end the game's scene, and the box leaves the tree.
+	var viewport: Viewport = get_viewport()
+	if MenuInput.is_answer(event):
 		confirm()
 	elif event.is_action_pressed(&"move_up"):
 		move_cursor(-1)
@@ -88,7 +90,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		move_cursor(1)
 	else:
 		return
-	get_viewport().set_input_as_handled()
+	viewport.set_input_as_handled()
 
 
 func _on_ended() -> void:

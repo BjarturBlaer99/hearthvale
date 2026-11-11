@@ -208,6 +208,29 @@ func test_a_choice_that_changes_the_scene_doesnt_trip_over_the_menu_leaving() ->
 	assert_bool(get_tree().paused).is_false()
 
 
+func test_enter_answers_a_conversation_and_the_attack_key_doesnt() -> void:
+	# Playtest run 3: the game's last words looked stuck, because only E answered them and the
+	# player pressed Enter, which picks in every menu.
+	var village: AreaController = _load(VILLAGE)
+	var left: Array[String] = []
+	village.travel = func(path: String) -> void:
+		left.append(path)
+		village.get_parent().remove_child(village)
+	assert_bool(village.open_dialogue(&"ending_crypt")).is_true()
+	var box: DialogueBox = village.hud.dialogue
+	box._unhandled_input(_key(KEY_SPACE))
+	assert_str(box.shown_text()).override_failure_message("Space swings the sword: it doesn't skip words").contains("Shade is gone")
+	box._unhandled_input(_key(KEY_ENTER))
+	assert_str(box.shown_text()).override_failure_message("Enter answers").contains("Hearthvale sleeps")
+	box._unhandled_input(_key(KEY_SPACE))
+	assert_bool(box.is_open()).is_true()
+	# The last answer ends the game's scene: the box is out of the tree before the press is handled.
+	box._unhandled_input(_key(KEY_KP_ENTER))
+	assert_bool(GameState.get_flag(AreaController.ENDING_FLAG) == true).is_true()
+	assert_int(left.size()).override_failure_message("left for the ending screen, once").is_equal(1)
+	assert_bool(village.is_inside_tree()).is_false()
+
+
 func test_elder_bram_points_new_players_to_the_sword_and_the_road_north() -> void:
 	var nodes: Dictionary = DataRegistry.get_dialogue(&"elder_bram")["nodes"]
 	assert_str(str(nodes["promise"]["text"])).contains("training yard").contains("north")
@@ -217,6 +240,14 @@ func test_elder_bram_points_new_players_to_the_sword_and_the_road_north() -> voi
 func _pressed(action: StringName) -> InputEventAction:
 	var event: InputEventAction = InputEventAction.new()
 	event.action = action
+	event.pressed = true
+	return event
+
+
+func _key(code: Key) -> InputEventKey:
+	var event: InputEventKey = InputEventKey.new()
+	event.keycode = code
+	event.physical_keycode = code
 	event.pressed = true
 	return event
 

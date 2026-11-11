@@ -361,6 +361,8 @@ run headless; see CLAUDE.md for the command and gotchas.
   - the movement keys move the cursor
   - E, Enter or A picks
   - Esc, Start or Tab backs out
+  - a conversation is answered with E, Enter or A, but not Space: Space is also the attack key, and a swing as
+    words open would skip them (`MenuInput.is_answer`)
 - **Pause:** the `pause` action (Esc / P / Start) makes the area open the HUD's `PauseMenu`, unless the hero is
   busy (talking, in the item menu, travelling, down).
   - The menu pauses the scene tree and runs anyway (`PROCESS_MODE_ALWAYS`), so enemies, arrows and the play clock
@@ -386,7 +388,7 @@ run headless; see CLAUDE.md for the command and gotchas.
     (pure): time played, hearts, and quests finished out of those in `data/quests`.
   - **Keep exploring** goes back to the area and cell the hero stood on. **Save and go to the title** saves first.
 - **The story** is data only: conversations whose options are gated on the flags `keep_warden_beaten` and
-  `crypt_shade_beaten`, and `Signpost` inscriptions in the keep, by the chapel and in the crypt. Those five are
+  `crypt_shade_beaten`, and `Signpost` inscriptions in the keep, by the chapel and in the crypt. They are
   `stone`: drawn as a standing stone with carved lines, where a wayside sign is a wooden post.
 
 ## 13. Audio & feel

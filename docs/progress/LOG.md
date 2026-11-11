@@ -964,3 +964,103 @@ Plan: `docs/progress/art-pass-3-plan.md`. Asked for as "very similar to Stardew 
 - This is step 1: colour and line. The shapes are the same art as before. Bigger trees, richer ground, the menus' look and the villagers are later steps in the plan, only if wanted.
 - The title screen's picture and the text box are drawn in code and aren't part of the pass.
 - One screenshot run printed "1 resources still in use at exit" as the tool quit; the game itself boots and runs clean.
+
+## 2026-11-11 — A whole-game playtest run, for H15's playtest
+
+- `tools/playtest.gd -- full [fresh]` opens the title screen on a save slot of its own (901, kept between runs), so the player's game is untouched and the title offers only New game until the playtest has saved.
+- It logs what happens to the console and to `user://playtests/playtest_<date and time>.log`, each line with the time since the run began and the game's own clock: areas entered, items first held, flags, quests and falls.
+- Checked by running it (a clean title, a log with its start and end), then a copy that plays a little by itself (a first item, a flag, a fall and an area all logged; the save landed in slot 901; the player's save stayed byte for byte the same). The tool has no unit tests.
+- The playtest guide, the README and CLAUDE.md say how to run it.
+
+## 2026-11-11 — Playtest run 1 (`-- full`): stopped partway through the crypt
+
+From the tool's log (`playtest_2026-11-11T10-44-45.log`) and the run's save. Played by the user, who knows the game, so this is not the new-player test. What happened at the two spots under "My reading" isn't recorded yet, so everything under "Read from the log" is fact and everything under "My reading" is a guess to check.
+
+**Read from the log** (times are the game's own clock; the run took 18:47 by the wall clock)
+| # | Checkpoint | Time | Notes |
+|---|---|---|---|
+| 2 | Has the Wooden Sword | 0:07 | before talking to anyone |
+| 1 | Talks to Elder Bram | 0:40 | |
+| - | Ruin cellar and cistern (side dungeon) | 2:16 to 4:32 | every chest, the heart piece |
+| 3 | Leaves the village by the north road | 5:40 | |
+| 4 | Enters the Old Keep | 7:07 | |
+| 5 | Has the Bow | 8:24 | |
+| 6 | Beats the Iron Warden | 10:08 | 23 seconds after opening its door |
+| 7 | Back at Elder Bram's | 10:43 | 15 seconds inside |
+| 8 | Enters the crypt | 11:01 | left again after 58 seconds with nothing done; back at 14:43 |
+| 9 | Bridges the Trench | 15:17 | 34 seconds after coming back |
+| 10 | Has the Lantern | 15:49 | |
+| 11 | Has the Iron Sword | 16:39 | the three brief torches: one failed try, then lit in 4 seconds |
+| - | Bridges the Broken Floor | 17:17 | |
+| 12 | Has the crypt's big key | not reached | |
+| 13 | Beats the Crypt Shade | not reached | |
+| 14 | Sees the ending screen | not reached | |
+
+- The run ended at 18:12, saved, with the hero in the Dark Path room (the crypt's east side), holding no key.
+- All three quests finished, four heart pieces found, five hearts, 204 coins. The hero never ran out of hearts.
+- Between the two crypt visits (11:59 to 14:43) the player went to Elder Bram, finished two quests, and visited the shop, the south field and the North Fields.
+- Never done: lighting the Narthex's two torches. They open the Ossuary, which holds the key to the Reliquary door on the far side of the Broken Floor.
+- No errors or warnings in the game's output.
+
+**My reading** (to check with whoever played)
+- This is the pace of someone who knows the game (it was the user): a sword in seven seconds, the keep in three minutes. It says nothing about whether a new player finishes without help.
+- At this pace a whole run is about 25 minutes. That fits the earlier guess of 45 to 75 minutes for a first run, well under the roadmap's two hours.
+- The first crypt visit ended after a minute with nothing done. Either the player chose to finish the quests first, or the dark and the Trench sent them looking for something outside. Elder Bram's tale says to find a light before going deep, and the only light is inside the crypt.
+- The run stopped 55 seconds after the Broken Floor, with the hero back on the east side and no key. That looks like a search for the Reliquary door's key. The way to it (the Narthex torches, passed before the Lantern can light them) may be easy to miss.
+- The three brief torches took two tries, which is about what was hoped for.
+
+**What the player said** (the user, 2026-11-11)
+- The run stopped because they were stuck at the Reliquary's locked door: they couldn't find its key. The reading above was right.
+- The first crypt visit hasn't been explained yet, so Elder Bram's line stays as it is.
+
+**Fixed**
+- **A stone by the Reliquary door** (`ReliquaryInscription`, the crypt's fourth inscription): "THE RELIQUARY IS LOCKED. Its key lies with the bones, west of the first hall. Light the two torches by its west wall." It stands beside the door, on the far side of the trench, where the player is standing when they find the door locked.
+- Why a hint and not a new layout: the key order can't strand anyone, and the way to the key was there. What was missing was anything, at the moment of being stuck, that pointed back to two torches passed before the Lantern could light them. The door itself only says a small key would open it.
+- Tests: the stone is in the inscriptions test (on open floor, readable, its words), and a new test checks it stands within two cells of the locked door and on the door's side of the trench. 327 tests in 47 suites (+1). Screenshot checked (shot 88, the stone being read by lantern light).
+- Mutation checks: three deliberate bugs, each caught, files restored: the hint leaving out the torches, the stone on the wrong side of the trench, and the stone saying the wrong thing.
+
+**Next:** carry on the run from its save with `-- full` to play the Reliquary, the big key and the Shade, which nobody has reached in a whole-game run yet. Then the new-player playtest.
+
+## 2026-11-11 — Playtest runs 2 and 3 (`-- full`, carried on): the Shade beaten, no ending recorded
+
+Played by the user, from run 1's save (the Dark Path room, 18:12 on the game's clock). From the tool's logs; what the player saw isn't recorded yet.
+
+**Run 2** (`playtest_2026-11-11T21-22-23.log`): stopped without a normal end
+- Lit the first hall's two torches at 21:12, cleared the Ossuary in 14 seconds, took its key at 21:31. The stone's hint seems to have worked.
+- Before that, the three brief torches were lit and burnt out four times over (18:55 to 19:19), though they had already given the Iron Sword.
+- The log ends at the key with no "run ended" line; the process exited with code 4 and the engine printed no error. Not known whether the game crashed or was closed from outside. Nothing was saved.
+
+**Run 3** (`playtest_2026-11-11T22-02-04.log`): from the same save again
+| # | Checkpoint | Time | Notes |
+|---|---|---|---|
+| - | Ran out of hearts in the crypt | 19:29 | the first fall in any run |
+| - | (nothing logged) | 19:29 to 28:41 | nine minutes; not known what happened |
+| - | Ossuary key | 32:42 | torches at 31:47, room cleared in 38 seconds |
+| - | Opens the Reliquary door | 33:18 | |
+| 12 | Has the crypt's big key | 33:39 | crystal shot 19 seconds after the door opened |
+| - | Opens the Shade's door | 36:58 | 3:19 after the big key |
+| 13 | Beats the Crypt Shade | 39:39 | 2:41 in its room, without falling |
+| - | Takes the heart container | 39:40 | this opens the closing words |
+| 14 | Sees the ending screen | not recorded | `game_finished` was never set; the run ended at 41:37 |
+
+- The player asked where the big key was (a hint from outside the game) before run 3.
+- The game was closed without saving, so the playtest's save is still run 1's.
+
+**Open**
+- Why the ending wasn't reached in the two minutes after the heart container: the closing words set `game_finished` on their last choice ("The end."). Either they weren't finished or something stopped them. Ask the player what they saw.
+- What ended run 2.
+- The nine quiet minutes after the fall in run 3.
+
+**What the player said** (the user, 2026-11-11): no ending appeared; "the game got stuck on the last message".
+
+**Looked for the cause, not found yet**
+- Read the path from the heart container to the ending screen (the pickup, the closing words, the flag, the area leaving): nothing wrong found.
+- Reproduced it in a window with real key presses (a scratch script): the Shade beaten by a sword swing with the move, sprint and attack keys held, the heart taken, then the interact key twice. Both times the words advanced, `game_finished` was set and the ending screen came up. So the stuck box needs something from the real run that isn't known yet: which words were showing, and which keys were pressed.
+- Found on the way and fixed: the key press that ends the closing words raised a script error (`DialogueBox._unhandled_input` asked for its viewport after the area had already left the tree). It did no harm, and it is not the cause above, since the run's output shows no error. 327 tests pass.
+- The player said the stuck words were the second and last ("What Sir Aldric could only bind..."), so the first answer ("Go on.") worked and the last ("The end.") didn't.
+- Reproduced twice more: with ten seconds between the two key presses, and from a copy of the run's own save (five hearts, every quest done). The ending came up both times. The game was still running while stuck (its clock ran on for two minutes and it closed cleanly), so the box was open and waiting, and the interact key either wasn't reaching it or wasn't what was pressed. Still open.
+- The player tried the ending once more from the `ending` scenario, with every key press printed: Enter did nothing on the first words (only the interact key answers), then E took both answers and the ending screen came up. So the closing words work without the fight before them.
+- One more reproduction, with the item menu open as the Shade fell: the menu took the first press, then the words went through. Five reproductions, none stuck. Still open.
+- **Found** (the player, asked which keys they tried on the stuck box: "Only Enter"). The game wasn't stuck. It was waiting for E, and Enter, which picks in every menu, did nothing in a conversation.
+- **Fixed:** Enter (and the keypad's Enter) now answers a conversation. Space does not, because it is the attack key and would skip words that open mid-swing. One new test (`test_enter_answers_a_conversation_and_the_attack_key_doesnt`), which also covers the last answer taking the box out of the tree. 328 tests in 47 suites (+1). Three deliberate bugs, each caught, files restored: Space answering, Enter not answering, and the old viewport error.
+- So that the next time is not a mystery: the playtest tool takes a `keys` word that prints every key pressed and the words on screen, and a whole-game run (`-- full`) now always logs the keys pressed while words are showing.

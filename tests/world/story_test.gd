@@ -1,8 +1,9 @@
 extends GdUnitTestSuite
 ## The story (H15), all of it data: Elder Bram tells the old tale once the keep is quiet and
-## gives thanks at the end; Guard Rolf has his say; five inscriptions stand where the hero will
+## gives thanks at the end; Guard Rolf has his say; six inscriptions stand where the hero will
 ## pass them, each on open floor, each with its words; and the keep's closing words send the
-## hero to Elder Bram.
+## hero to Elder Bram. The sixth, by the Reliquary's locked door, came from a playtest: it says
+## where the door's key is.
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
@@ -17,6 +18,7 @@ const INSCRIPTIONS: Array = [
 	[CRYPT, "NarthexInscription", &"sign_crypt_narthex", ["Four flames", "No blade"]],
 	[CRYPT, "TrenchInscription", &"sign_crypt_trench", ["FALLEN IN", "stone"]],
 	[CRYPT, "Epitaph", &"sign_crypt_epitaph", ["ALDRIC", "sword", "all three"]],
+	[CRYPT, "ReliquaryInscription", &"sign_crypt_reliquary", ["LOCKED", "key", "bones", "west of the first hall", "two torches"]],
 ]
 
 var _area: Node
@@ -75,7 +77,7 @@ func test_the_keeps_closing_words_send_the_hero_to_elder_bram() -> void:
 	assert_str(str(nodes["thanks"]["text"])).contains("chapel").contains("Elder Bram")
 
 
-func test_five_inscriptions_stand_on_open_floor_and_can_be_read() -> void:
+func test_the_inscriptions_stand_on_open_floor_and_can_be_read() -> void:
 	for case: Array in INSCRIPTIONS:
 		var area: AreaController = _load(case[0])
 		var sign: Signpost = area.interactables.get_node(NodePath(str(case[1])))
@@ -112,6 +114,22 @@ func _options(dialogue_id: StringName) -> PackedStringArray:
 	var runner: DialogueRunner = DialogueRunner.new(DataRegistry.get_dialogue(dialogue_id), GameState)
 	runner.start()
 	return runner.option_texts()
+
+
+func test_the_reliquarys_stone_stands_by_its_locked_door_on_the_far_side_of_the_trench() -> void:
+	var area: AreaController = _load(CRYPT)
+	var stone: Signpost = area.interactables.get_node(^"ReliquaryInscription")
+	var door: DungeonDoor = area.interactables.get_node(^"ReliquaryDoor")
+	assert_that(door.kind).override_failure_message("the door it speaks of is the locked one").is_equal(DungeonState.LOCKED)
+	var gap: Vector2i = (stone.cell() - door.cell()).abs()
+	assert_int(maxi(gap.x, gap.y)).override_failure_message("within two cells of the door").is_less_equal(2)
+	# The trench runs along one row of the room; the stone and the door are on the same side of it.
+	var trench_row: int = -1
+	for y: int in range(door.cell().y, door.cell().y + 11):
+		if area.terrain.is_pit(Vector2i(stone.cell().x, y)):
+			trench_row = y
+			break
+	assert_int(trench_row).override_failure_message("there's a trench below the door").is_greater(stone.cell().y)
 
 
 func test_wayside_signs_stay_wooden() -> void:

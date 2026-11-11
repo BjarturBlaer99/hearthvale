@@ -56,6 +56,9 @@ godot --path . -s res://tools/capture.gd -- <output_dir>
 # Start partway through to try one part by hand (scenarios in the script: warden, crypt, shade, ending).
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
 godot --path . -s res://tools/playtest.gd -- warden
+# The whole game for a playtest: from the title, on its own save slot (901, kept between runs; "fresh" empties
+# it), with a log of what happens in user://playtests
+godot --path . -s res://tools/playtest.gd -- full
 # Repaint the hero's sprite sheet after editing its ASCII art (optional 8x preview), then re-import
 godot --headless --path . -s res://tools/art/make_player_sprite.gd -- <preview.png>
 godot --headless --path . --import

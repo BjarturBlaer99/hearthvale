@@ -1,0 +1,11 @@
+{
+  "id": "sign_crypt_reliquary",
+  "start": "read",
+  "nodes": {
+    "read": {
+      "speaker": "",
+      "text": "THE RELIQUARY IS LOCKED.\nIts key lies with the bones, west of the first hall. Light the two torches by its west wall.",
+      "options": []
+    }
+  }
+}

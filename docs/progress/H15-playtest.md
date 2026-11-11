@@ -5,13 +5,23 @@ is how to run that test and what to bring back from it.
 
 ## Before
 - Find one to three people who have never seen the game. One at a time is best.
-- Start from a clean slate: on the title screen choose **New game**. (A save from your own play is at
-  `%APPDATA%\Godot\app_userdata\Hearthvale\saves`; move it aside if you want to keep it.)
-- Run the game the normal way:
+- Run the playtest version of the game. It opens the title screen on a save slot of its own, so your own game is
+  untouched and the title offers only **New game** until this playtest has saved:
 
 ```bash
-godot --path .
+godot --path . -s res://tools/playtest.gd -- full
 ```
+
+- The slot is kept between runs, so a session can stop and carry on with **Continue**. For the next person, add
+  `fresh` to start with no save:
+
+```bash
+godot --path . -s res://tools/playtest.gd -- full fresh
+```
+
+- It keeps a log of what happens, each line with the time since the run began and the game's own clock: areas
+  entered, items first held, flags (bosses, keys, doors, chests), quests and falls. The logs are in
+  `%APPDATA%\Godot\app_userdata\Hearthvale\playtests`. Most of the checkpoint times below can be read from it.
 
 - Have a clock and something to write on.
 
@@ -19,7 +29,8 @@ godot --path .
 - Say only: "Play it as you would any game. Think out loud if you can." Then say nothing.
 - **Don't help.** If they're stuck for five minutes, write down where and why, and only then give the smallest
   hint that gets them moving. Every hint is a finding.
-- Write down the time when they reach each checkpoint below, and anything they say out loud that sounds like
+- The log has the time of most checkpoints below. Write down the ones it can't see (talking to someone, standing
+  stuck), and anything they say out loud that sounds like
   confusion ("where do I...", "what does this...", "why can't I...").
 
 ## Checkpoints
@@ -49,6 +60,8 @@ These are guesses from building it, not findings. Watch them closely.
 4. **The Trench.** Pushing a block into a pit is new. An inscription hints at it.
 5. **The Broken Floor.** The block is in a far corner, in the dark.
 6. **The Reliquary.** The crystal shows only from the pit's edge, by lantern light, while archers shoot.
+   Its door is locked, and the key is back in the Ossuary, west of the first hall. Run 1 (2026-11-11) got stuck
+   here, so a stone by the door now says where the key is. Watch whether a new player reads it.
 7. **The three brief torches** (the Iron Sword). 6.5 seconds may be too tight, or too easy.
 8. **The Crypt Shade.** Do they read the Narthex inscription? Do they see that lit braziers bind it? Is relighting
    four braziers each round fun or a chore?

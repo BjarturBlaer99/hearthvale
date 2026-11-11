@@ -386,6 +386,12 @@ position = Vector2(112, 336)
 script = ExtResource("7_door")
 door_id = &"reliquary_door"
 
+[node name="ReliquaryInscription" type="Node2D" parent="Interactables" unique_id=1357924680]
+position = Vector2(128, 368)
+script = ExtResource("17_sign")
+dialogue_id = &"sign_crypt_reliquary"
+stone = true
+
 [node name="FloorBatA" parent="Interactables" unique_id=1926808365 instance=ExtResource("9_enemy")]
 position = Vector2(168, 392)
 enemy_id = &"bat"

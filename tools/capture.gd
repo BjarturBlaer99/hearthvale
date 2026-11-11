@@ -105,6 +105,7 @@ const SHOTS: Array = [
 	["85_aldrics_epitaph", &"crypt", Vector2i(36, 6), Vector2.UP, 0, "lantern_talk"],
 	["86_the_ending", &"ending", Vector2i.ZERO, Vector2.DOWN, 0, ""],
 	["87_title_after_the_ending", &"title", Vector2i.ZERO, Vector2.DOWN, 0, "finished"],
+	["88_the_reliquarys_stone", &"crypt", Vector2i(8, 24), Vector2.UP, 0, "lantern_talk"],
 ]
 ## The save slot the "finished" title uses, so the player's own save is left alone.
 const CAPTURE_SLOT: int = 994

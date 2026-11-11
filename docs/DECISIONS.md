@@ -415,6 +415,18 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
 - 2026-11-10 — **Playtest scenarios save into a slot of their own** (900), emptied at each start. Before, saving
   in a scenario (the pause menu, or "Save and go to the title" at the ending) replaced the player's own game.
   The title shown after a scenario reads that slot too, so nothing of the player's is loaded or written.
+- 2026-11-11 — **The new-player playtest runs through the playtest tool** (`-- full`): the whole game from the
+  title, on a slot of its own that is kept between runs, with a log of areas, first items, flags, quests and
+  falls. It listens to `EventBus` and reads `GameState` from outside, so the game itself has no playtest code.
+  Nothing announces a conversation, so who was talked to isn't logged.
+- 2026-11-11 — **A hint goes where the player is stuck.** Playtest run 1 stopped at the Reliquary's locked door
+  with no idea where its key was. The fix is a stone beside that door saying where the key is and how to reach
+  it, in plain words ("the first hall", not "the Narthex", a name the game never shows). The crypt's layout and
+  key order stay as they are: the way was there, only nothing pointed to it.
+- 2026-11-11 — **Enter answers a conversation, Space doesn't.** Playtest run 3 ended at the game's last words:
+  the player pressed Enter, which picks in every menu, and only E answered a conversation. Now Enter does too
+  (`MenuInput.is_answer`). Space also picks in menus but is the attack key, so it is left out: swinging as words
+  open would skip them.
 
 ## Art pass 3 — a warmer, softer look
 - 2026-11-10 — **Hearthvale's look stays its own.** The user asked for graphics "very similar to Stardew Valley".

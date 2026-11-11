@@ -98,6 +98,8 @@ crypt's stairs, equipped as after the keep), `-- shade` (outside the Shade's hal
 the ending) or `-- warden`. Saving in a scenario goes to a slot of its own, so it never replaces your own game.
 
 Running a playtest with someone new? `docs/progress/H15-playtest.md` says how, and what to write down.
+`godot --path . -s res://tools/playtest.gd -- full` runs the whole game for it, on a save slot of its own, and
+logs when things happen.
 
 ## Docs
 - `CLAUDE.md` — rules for Claude Code
