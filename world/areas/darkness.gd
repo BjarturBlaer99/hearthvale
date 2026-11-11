@@ -64,6 +64,15 @@ func _init() -> void:
 	material = _material
 
 
+## A different dark: its colour, how black it gets, the steps from dark to lit, and how much
+## of a light's reach is fully lit. The gloom of houses and dungeons is a soft one.
+func set_look(shade: Color, depth: float, steps: int, core: float) -> void:
+	_material.set_shader_parameter(&"shade", Vector3(shade.r, shade.g, shade.b))
+	_material.set_shader_parameter(&"depth", depth)
+	_material.set_shader_parameter(&"steps", float(steps))
+	_material.set_shader_parameter(&"core", core)
+
+
 ## Covers `area_rect` in darkness, less what `lights` (LightRules lights) reach.
 func show_lights(lights: Array, area_rect: Rect2) -> void:
 	shown = LightRules.reaching(area_rect, lights, MAX_LIGHTS)

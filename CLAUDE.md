@@ -38,6 +38,11 @@ in `docs/DECISIONS.md` are superseded.
   picture through `PixelGrade` (`core/art/`) as it bakes: warmer colour, and outlines in a dark shade of what they
   surround. Tune the look there, not picture by picture. It is Hearthvale's own look: do not copy another game's
   art. See `docs/progress/art-pass-3-plan.md`.
+  **Art pass 4 (user's request, 2026-11-11):** light and lettering. Lamps, hearths, torches and crystals glow
+  (`Glows`, `Ambience`), tall things cast shadows east as well as south (`HeightShading`), houses and dungeons are
+  dim away from their lights (for show only; the crypt's dark is the only light that matters to play), and all
+  text is Hearthvale's own pixel font, painted from ASCII by `tools/art/make_font.gd` with the UI theme. Label
+  sizes are whole multiples of 8; boxes wear `PanelFrame`. See `docs/progress/art-pass-4-plan.md`.
   **Sound (H10):** all sound effects and music are made in code by `tools/audio/make_audio.gd` (Synth) and baked to
   `audio/`. No external audio; edit the sounds in the tool, never the WAVs.
 
@@ -53,6 +58,8 @@ godot --headless --path . --import
 godot --headless --path . --quit-after 30
 # Screenshots for review (needs a window, not --headless)
 godot --path . -s res://tools/capture.gd -- <output_dir>
+# ...or only some shots, by number
+godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
 # Start partway through to try one part by hand (scenarios in the script: warden, crypt, shade, ending).
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
 godot --path . -s res://tools/playtest.gd -- warden
@@ -65,6 +72,8 @@ godot --headless --path . --import
 # Repaint the other actors' sprites after editing tools/art/make_sprites.gd, then re-import
 godot --headless --path . -s res://tools/art/make_sprites.gd
 godot --headless --path . --import
+# Re-bake the pixel font and the UI theme after editing tools/art/make_font.gd (optional preview of the glyphs)
+godot --headless --path . -s res://tools/art/make_font.gd -- <preview.png>
 # Re-bake sound effects and music after editing tools/audio/make_audio.gd (or just some: -- sword boss), then re-import
 godot --headless --path . -s res://tools/audio/make_audio.gd
 godot --headless --path . --import

@@ -1064,3 +1064,33 @@ Played by the user, from run 1's save (the Dark Path room, 18:12 on the game's c
 - **Found** (the player, asked which keys they tried on the stuck box: "Only Enter"). The game wasn't stuck. It was waiting for E, and Enter, which picks in every menu, did nothing in a conversation.
 - **Fixed:** Enter (and the keypad's Enter) now answers a conversation. Space does not, because it is the attack key and would skip words that open mid-swing. One new test (`test_enter_answers_a_conversation_and_the_attack_key_doesnt`), which also covers the last answer taking the box out of the tree. 328 tests in 47 suites (+1). Three deliberate bugs, each caught, files restored: Space answering, Enter not answering, and the old viewport error.
 - So that the next time is not a mystery: the playtest tool takes a `keys` word that prints every key pressed and the words on screen, and a whole-game run (`-- full`) now always logs the keys pressed while words are showing.
+
+## 2026-11-11 — Art pass 4: light and lettering
+
+Asked for by the user: improve the graphics substantially, keeping gameplay, controls and identity. Plan: `docs/progress/art-pass-4-plan.md`.
+
+**What was weakest** (from the 88 review screenshots): flat light, the engine's smooth font and plain boxes over pixel art, and still air. The tiles, sprites and colour were left alone.
+
+**Built**
+- **Cast shadows:** tall solid things shade the ground to their east as well as their south (`HeightShading.cast_on`).
+- **Glows:** lamp posts, hearths, candles, burning torches, crystals and the hero's lantern give a soft round of light (`Glows`, `Ambience`); fires flicker; light is clipped to the map.
+- **Gloom:** houses and dungeons that aren't `dark` are a little dim away from their lights, never around the hero (a second, soft `Darkness`). For show only.
+- **Vignette** on the HUD, and **motes** in the air (pollen outdoors, dust inside).
+- **A pixel font** painted in code (`tools/art/make_font.gd`, 95 glyphs), baked with a UI theme and set for the whole project. Label sizes are whole multiples of 8 (10 became 8, the titles' 36 became 32); outlines became the theme's one-pixel shadow.
+- **Framed boxes** (`PanelFrame`) for the dialogue box, every menu and the HUD; the controls hint has a box of its own; the HUD's corner is wider and cuts long lines with an ellipsis.
+- `tools/capture.gd` takes only the shots named after the folder (`-- <dir> 1 30 71`).
+
+**Checked**
+- 337 tests in 48 suites pass (+9, `tests/world/ambience_test.gd`). Import and boot clean.
+- Mutation checks: five deliberate bugs in runtime code, each caught, files restored: a dungeon taken for the outdoors, a second sheet of dark over the crypt, shade falling from lower things, an unlit torch glowing, a lamp flickering like a fire.
+- Screenshots: all 88 retaken; before and after compared from the same spots for the village square, the elder's house, the keep's great hall, the crypt's hall, the wood road, the title, the pause menu, the item menu, the quest log, a long conversation and the keep's closing words.
+- Frame cost, windowed with vsync off on this machine (Intel graphics): about 2.1 to 2.5 ms a frame with or without the pass, a difference of 0.1 to 0.3 ms and 2 to 4 draw calls, in the village, the wood, the keep and the crypt.
+
+**Known issues and limits**
+- The motes and the flicker only show in motion, so the screenshots couldn't judge them; the play below did.
+- The keep and the cistern have no light sources, so their rooms are lit around the hero only. Wall torches would need map changes.
+- The titles are the 5x7 font at four times its size, which is blocky. A title drawn at its own size would look better.
+- The font is wider than the old one, so text wraps a little sooner. The longest conversations checked fit their box; not every line in the game was looked at.
+- Tiles, sprites and animation are as they were.
+
+**Played** (the user, 2026-11-11): "Feels right". The game ran and closed with no errors or warnings.

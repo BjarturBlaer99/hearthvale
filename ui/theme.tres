@@ -1,0 +1,11 @@
+[gd_resource type="Theme" format=3]
+
+[ext_resource type="FontFile" path="res://ui/font/hearth_font.tres" id="1_rqugq"]
+
+[resource]
+default_font = ExtResource("1_rqugq")
+default_font_size = 8
+Label/colors/font_shadow_color = Color(0.05, 0.03, 0.09, 0.85)
+Label/constants/line_spacing = 0
+Label/constants/shadow_offset_x = 1
+Label/constants/shadow_offset_y = 1

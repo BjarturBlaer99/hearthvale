@@ -9,6 +9,13 @@ const MESSAGE_TIME: float = 3.0
 const NOTICE_TIME: float = 3.5
 const FLASH_TIME: float = 0.35
 
+## The corners of the screen: how dark they get, and how far from the middle it starts (0-1).
+const VIGNETTE_COLOR: Color = Color(0.06, 0.03, 0.12, 0.36)
+const VIGNETTE_START: float = 0.58
+
+## The shading of the screen's corners.
+var vignette: TextureRect
+
 var _message_left: float = 0.0
 var _notice_left: float = 0.0
 var _flash_left: float = 0.0
@@ -19,6 +26,7 @@ var _flash_time: float = FLASH_TIME
 @onready var item_menu: ItemMenu = $ItemMenu
 @onready var pause_menu: PauseMenu = $PauseMenu
 @onready var _hint: Label = $Hint
+@onready var _hint_panel: ColorRect = $HintPanel
 @onready var _equipped: Label = $Panel/Equipped
 @onready var _area: Label = $Panel/Area
 @onready var _items: Label = $Panel/Items
@@ -29,11 +37,35 @@ var _flash_time: float = FLASH_TIME
 
 
 func _ready() -> void:
+	_add_vignette()
 	_prompt.text = ""
 	_message.text = ""
 	_notice.text = ""
 	_show_settings()
 	EventBus.settings_changed.connect(_show_settings)
+
+
+## Darkens the corners of the screen a little, under everything else on the HUD, to draw the
+## eye to the middle (art pass 4). Made in code.
+func _add_vignette() -> void:
+	var fade: Gradient = Gradient.new()
+	fade.offsets = PackedFloat32Array([0.0, VIGNETTE_START, 1.0])
+	fade.colors = PackedColorArray([Color(VIGNETTE_COLOR, 0.0), Color(VIGNETTE_COLOR, 0.0), VIGNETTE_COLOR])
+	var round: GradientTexture2D = GradientTexture2D.new()
+	round.gradient = fade
+	round.width = 240
+	round.height = 135
+	round.fill = GradientTexture2D.FILL_RADIAL
+	round.fill_from = Vector2(0.5, 0.5)
+	round.fill_to = Vector2(1.08, 1.08)
+	vignette = TextureRect.new()
+	vignette.name = "Vignette"
+	vignette.texture = round
+	vignette.stretch_mode = TextureRect.STRETCH_SCALE
+	vignette.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(vignette)
+	move_child(vignette, 0)
 
 
 func message_text() -> String:
@@ -46,6 +78,7 @@ func hint_shown() -> bool:
 
 func _show_settings() -> void:
 	_hint.visible = Settings.data.show_controls
+	_hint_panel.visible = _hint.visible
 
 
 func set_health(current: int, maximum: int) -> void:

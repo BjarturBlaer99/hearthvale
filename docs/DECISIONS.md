@@ -442,3 +442,16 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   floor, the outline of a dark thing (a bomb, a pit's rim) came out as black as before.
 - 2026-11-10 — **The pass changes pixels only**: no map, tile layout, sprite size or frame changed, so no area was
   re-baked.
+- 2026-11-11 — **Art pass 4 is light and lettering, not a repaint.** The review screenshots showed the tiles and
+  sprites in good shape and three things letting them down: flat light, the engine's smooth font over pixel art,
+  and still air. Those change the whole game at once and touch no map, tile or sprite.
+- 2026-11-11 — **The gloom is for show.** Houses and dungeons are dimmed by a second, soft `Darkness`, and the
+  hero always stands in light. The rules that play depends on (`lights()`, `brightness_at()`, the crypt's dark)
+  are untouched, and a dungeon is never dimmed by more than half, so enemies stay easy to see.
+- 2026-11-11 — **What kind of place an area is comes from its tiles**, not a new property on eleven scenes: a
+  `dungeon_id` means a dungeon, inner walls mean a house, anything else is outdoors.
+- 2026-11-11 — **The font is painted in code**, like the rest of the art: 95 glyphs as ASCII in
+  `tools/art/make_font.gd`, baked into a `FontFile` resource. It is set through a project theme, so no label names
+  it. Whole-number scaling only, so a pixel is always a square; label sizes of 10 became 8, and 36 became 32.
+- 2026-11-11 — **The keep and the cistern get no wall torches in this pass.** They would need new decor tiles
+  and a re-bake of their maps. Their rooms are lit around the hero only.

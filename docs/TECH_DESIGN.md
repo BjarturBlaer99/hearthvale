@@ -450,6 +450,26 @@ run headless; see CLAUDE.md for the command and gotchas.
   - A colour painted exactly in the outline colour is treated as outline, so eyes have a colour of their own.
   - Things drawn at runtime match it: code-drawn outlines use `PixelGrade.INK`, and the grass fringe on paths
     uses `HeightShading.fringe_color()`, which warms the ground colour as the tiles are warmed.
+- **Light and air** (art pass 4), all for show: none of it changes movement, combat or what can be seen.
+  - `Ambience` (`world/areas/`) reads what kind of place an area is from its tiles: a dungeon (it has a
+    `dungeon_id`), a house's inside (it has inner walls), else outdoors. It also finds the tiles that give light
+    (lamp posts, hearths, candles).
+  - `Glows` adds a soft round of colour at each light (blend mode add, z 30, clipped to the map so light doesn't
+    spill into the black around a room). The area gives it the tile lights once and, every frame, the ones that
+    come and go: burning torches, crystals in their colour, the hero's lantern. Fires flicker.
+  - **Gloom:** a second `Darkness` with a soft look (`set_look`: violet, shallow, eight steps) over houses and
+    dungeons that aren't `dark`. Its lights are a pool around the hero (`Ambience.HERO_POOL`) and every glow.
+    `brightness_at()` and `lights()`, the rules play depends on, don't know about it.
+  - **Cast shadows:** `HeightShading.cast_on(grid, cell)` says whether a taller solid cell to the west (or
+    north-west) shades an open cell; the sun stands in the north-west.
+  - `Motes` (`gameplay/ambient/`): a few single-pixel specks pinned to the world, by kind of place.
+  - **Vignette:** `AreaHud` shades the screen's corners (a radial gradient, under the rest of the HUD).
+- **Lettering** (art pass 4): `tools/art/make_font.gd` paints a 95-glyph pixel font from ASCII art and bakes
+  `ui/font/hearth_font.tres` (a bitmap `FontFile`, size 8, line height 11, scaled by whole numbers only) and
+  `ui/theme.tres` (that font, and a one-pixel shadow under every label), and sets the project's theme.
+  - Labels ask for size 8, or a whole multiple (the titles are 32). A bitmap font has no outline, so none is set.
+  - `PanelFrame` (`ui/`) is the script on every box's `Panel`: a shadow under the box, an inner line and corner
+    studs over the box's own colour.
 - **Drawing:** `SpriteSheet.draw(canvas, texture, frame, size, origin, flip_h, white, tint)` draws one frame.
   - Origins are rounded so sprites stay on the pixel grid.
   - A negative width mirrors it (side views face left).

@@ -44,6 +44,10 @@ window/stretch/scale_mode="integer"
 
 enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")
 
+[gui]
+
+theme/custom="res://ui/theme.tres"
+
 [input]
 
 move_left={

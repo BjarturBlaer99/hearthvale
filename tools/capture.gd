@@ -121,6 +121,9 @@ func _capture() -> void:
 	DirAccess.make_dir_recursive_absolute(out_dir)
 	var game_state: Node = root.get_node("GameState")
 	for shot: Array in SHOTS:
+		# Shot numbers after the folder take only those shots: -- <output_dir> 1 30 71
+		if args.size() > 1 and not args.slice(1).has(str(shot[0]).get_slice("_", 0)):
+			continue
 		game_state.call(&"clear")
 		game_state.call(&"new_game")
 		game_state.call(&"damage", shot[4])

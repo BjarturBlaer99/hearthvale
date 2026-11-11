@@ -22,6 +22,8 @@ var stone_faces: bool = false
 const LIP_COLOR: Color = Color(0.14, 0.10, 0.08, 0.95)
 const FOOT_SHADOW: Color = Color(0.14, 0.06, 0.24, 0.24)
 const SOLID_SHADOW: Color = Color(0.14, 0.06, 0.24, 0.32)
+## The sun stands in the north-west: tall solid things also shade the ground to their east.
+const CAST: float = 4.0
 const SIDES: Array[Vector2i] = [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP]
 const ALL_SIDES: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT]
 ## Kinds of soft edge: grass fraying over a path, and water against its bank.
@@ -86,6 +88,7 @@ func _draw() -> void:
 			var cell: Vector2i = Vector2i(x, y)
 			var height: int = _grid.height_at(cell)
 			var origin: Vector2 = Vector2(cell) * T
+			_draw_cast(cell)
 			var below: Vector2i = cell + Vector2i.DOWN
 			if _grid.in_bounds(below) and _grid.height_at(below) < height:
 				_draw_drop(cell, origin + Vector2(0.0, T), height - _grid.height_at(below))
@@ -100,6 +103,42 @@ func _draw() -> void:
 						draw_line(origin + Vector2(T - 0.5, 0.0), origin + Vector2(T - 0.5, T), EDGE_COLOR)
 					Vector2i.UP:
 						draw_line(origin + Vector2(0.0, 0.5), origin + Vector2(T, 0.5), EDGE_COLOR)
+
+
+## Kinds of cast shadow on an open cell: down its west side, the same but starting below the
+## shadow from the north, or only its north-west corner.
+const CAST_SIDE: StringName = &"side"
+const CAST_SIDE_BELOW: StringName = &"side_below"
+const CAST_CORNER: StringName = &"corner"
+
+
+## The shadow a taller solid neighbour to the west (or north-west) casts on open `cell`, or
+## empty for none. The shadow from the north is _draw_drop's.
+static func cast_on(grid: HeightGrid, cell: Vector2i) -> StringName:
+	if grid.is_solid(cell):
+		return &""
+	var north: bool = _casts(grid, cell + Vector2i.UP, cell)
+	if _casts(grid, cell + Vector2i.LEFT, cell):
+		return CAST_SIDE_BELOW if north else CAST_SIDE
+	if not north and _casts(grid, cell + Vector2i(-1, -1), cell):
+		return CAST_CORNER
+	return &""
+
+
+func _draw_cast(cell: Vector2i) -> void:
+	var origin: Vector2 = Vector2(cell) * T
+	match cast_on(_grid, cell):
+		CAST_SIDE:
+			draw_rect(Rect2(origin, Vector2(CAST, T)), SOLID_SHADOW)
+		CAST_SIDE_BELOW:
+			draw_rect(Rect2(origin + Vector2(0.0, CAST), Vector2(CAST, T - CAST)), SOLID_SHADOW)
+		CAST_CORNER:
+			draw_rect(Rect2(origin, Vector2(CAST, CAST)), SOLID_SHADOW)
+
+
+## Whether `from` is a solid thing standing taller than `onto`.
+static func _casts(grid: HeightGrid, from: Vector2i, onto: Vector2i) -> bool:
+	return grid.in_bounds(from) and grid.is_solid(from) and grid.height_at(from) > grid.height_at(onto)
 
 
 ## What shows below a cell that's `levels` higher than the one south of it, from `top` down.

@@ -65,6 +65,9 @@ Beaten enemies sometimes drop hearts or coins.
   - grass frays over the paths, the pond has a bank, and the woods mix three kinds of tree under a closed canopy
 - **A warmer look** (art pass 3): sunnier grass, warmer paths, brighter water, and soft coloured outlines in
   place of black ones, on everything.
+- **Light and lettering** (art pass 4): lamps, hearths, torches and crystals glow; houses, trees and walls cast
+  shadows; houses and dungeons are dim away from their lights; specks drift in the air; and all text is the
+  game's own pixel font in framed boxes.
 - **The road north:** from the top of the north rise, through the woods.
   - **The North Fields:** a stream with a bridge, a farm plot, slimes, and a goblin archer on a plateau. Keep an eye
     on the tree line beside the road.
