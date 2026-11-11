@@ -20,8 +20,8 @@ const STONE_FACE_LINE: Color = Color(0.12, 0.12, 0.15, 0.7)
 ## Cut-stone cliff faces (dungeons) instead of earthy ones; the area sets it.
 var stone_faces: bool = false
 const LIP_COLOR: Color = Color(0.14, 0.10, 0.08, 0.95)
-const FOOT_SHADOW: Color = Color(0.0, 0.0, 0.0, 0.22)
-const SOLID_SHADOW: Color = Color(0.0, 0.0, 0.0, 0.30)
+const FOOT_SHADOW: Color = Color(0.14, 0.06, 0.24, 0.24)
+const SOLID_SHADOW: Color = Color(0.14, 0.06, 0.24, 0.32)
 const SIDES: Array[Vector2i] = [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP]
 const ALL_SIDES: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT]
 ## Kinds of soft edge: grass fraying over a path, and water against its bank.
@@ -133,8 +133,14 @@ func _draw_fringe(cell: Vector2i, side: Vector2i) -> void:
 		var depth: float = 1.0 + float((roll / 5) % 3)
 		@warning_ignore("integer_division")
 		var tone: int = (roll / 16) % 3
-		var shade: Color = grass.darkened(0.14) if tone == 0 else (grass.lightened(0.1) if tone == 1 else grass)
-		draw_rect(_strip(origin, side, along, depth), shade)
+		draw_rect(_strip(origin, side, along, depth), fringe_color(grass, tone))
+
+
+## The colour of one blade of fringe on `grass`: darker (tone 0), lighter (1) or plain, and
+## warmed as the baked grass is (PixelGrade), so the fringe matches the tile beside it.
+static func fringe_color(grass: Color, tone: int) -> Color:
+	var shade: Color = grass.darkened(0.14) if tone == 0 else (grass.lightened(0.1) if tone == 1 else grass)
+	return PixelGrade.warm(shade)
 
 
 ## Water meeting the land on `side`: a dark line under the bank, and dashes of foam beside it.

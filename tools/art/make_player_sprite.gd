@@ -797,6 +797,8 @@ func _initialize() -> void:
 			if not _paint(image, frames[column], Vector2i(column * W, row * H), "%s/%s" % [ROWS[row], COLUMNS[column]]):
 				quit(1)
 				return
+	# Art pass 3: warm the colours and soften the outlines.
+	PixelGrade.apply(image, PALETTE["o"])
 	DirAccess.make_dir_recursive_absolute(OUT_PATH.get_base_dir())
 	var error: Error = image.save_png(OUT_PATH)
 	print("tools/art: wrote %s (%s)" % [OUT_PATH, error_string(error)])

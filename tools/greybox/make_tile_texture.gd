@@ -14,8 +14,8 @@ const TIMBER: Color = Color(0.30, 0.19, 0.11)
 const THATCH: Color = Color(0.80, 0.66, 0.34)
 ## The shadow under eaves and under an upper floor that juts out.
 const EAVE_SHADOW: Color = Color(0.16, 0.10, 0.09)
-## Shadows on see-through props darken whatever grass they're drawn over.
-const SHADOW: Color = Color(0, 0, 0, 0.28)
+## Shadows on see-through props darken whatever grass they're drawn over (violet, not black).
+const SHADOW: Color = Color(0.14, 0.06, 0.24, 0.30)
 
 ## The pixel art of the props and furniture added in H12: each a palette name and 16 rows.
 const PROP_PALETTES: Dictionary = {
@@ -548,6 +548,8 @@ func _initialize() -> void:
 	for index: int in GreyboxTiles.FURNITURE_B_KINDS.size():
 		_floor(Vector2i(index, GreyboxTiles.ROW_FURNITURE_B))
 		_ascii(Vector2i(index, GreyboxTiles.ROW_FURNITURE_B), GreyboxTiles.FURNITURE_B_KINDS[index])
+	# Art pass 3: warm every colour and soften every outline, tile by tile.
+	PixelGrade.apply(_image, OUTLINE, Rect2i(), Vector2i(T, T))
 	DirAccess.make_dir_recursive_absolute(GreyboxTiles.TEXTURE_PATH.get_base_dir())
 	var error: Error = _image.save_png(GreyboxTiles.TEXTURE_PATH)
 	print("tools/greybox: wrote %s (%s)" % [GreyboxTiles.TEXTURE_PATH, error_string(error)])
@@ -579,21 +581,26 @@ func _ellipse(tile: Vector2i, center: Vector2, radius: Vector2, color: Color) ->
 				_px(tile, x, y, color)
 
 
-## Grass: speckles of lighter and darker green and a few blades with light tips. Seamless.
+## Grass: flecks and blades in a yellower light and a bluer shade (warm light, cool shadow),
+## some of the blades two wide. Seamless.
 func _ground(tile: Vector2i, color: Color) -> void:
 	_fill(tile, color)
+	var sun: Color = Color(minf(color.r * 1.12 + 0.03, 1.0), minf(color.g * 1.07 + 0.02, 1.0), color.b * 0.90)
+	var shade: Color = Color(color.r * 0.80, color.g * 0.88, minf(color.b * 1.04, 1.0))
 	for y: int in T:
 		for x: int in T:
 			var n: int = _hash(x, y, 1) % 100
 			if n < 9:
-				_px(tile, x, y, color.darkened(0.09))
-			elif n < 13:
-				_px(tile, x, y, color.lightened(0.08))
-	for i: int in 6:
+				_px(tile, x, y, color.lerp(shade, 0.45))
+			elif n < 14:
+				_px(tile, x, y, color.lerp(sun, 0.4))
+	for i: int in 8:
 		var bx: int = _hash(i, 3, 7) % T
 		var by: int = 1 + _hash(i, 9, 5) % (T - 3)
-		_px(tile, bx, by, color.lightened(0.20))
-		_px(tile, bx, by + 1, color.darkened(0.14))
+		_px(tile, bx, by, sun)
+		_px(tile, bx, by + 1, shade)
+		if i % 3 == 0:
+			_px(tile, bx + 1, by + 1, color.lerp(sun, 0.5))
 
 
 ## Stone steps: lit treads over shadowed risers, dark side edges.
@@ -637,9 +644,9 @@ func _tree(tile: Vector2i, grass: Color) -> void:
 ## A leafy tree, see-through around it: a soft shadow, a trunk, and a crown of four lobes lit
 ## from the top left, with leaf speckles.
 func _tree_art(tile: Vector2i) -> void:
-	var dark: Color = Color(0.11, 0.27, 0.14)
-	var mid: Color = Color(0.18, 0.40, 0.19)
-	var light: Color = Color(0.34, 0.58, 0.27)
+	var dark: Color = Color(0.09, 0.30, 0.21)
+	var mid: Color = Color(0.20, 0.47, 0.19)
+	var light: Color = Color(0.47, 0.68, 0.24)
 	_ellipse(tile, Vector2(8.5, 13.8), Vector2(6.5, 2.4), SHADOW)
 	_rect(tile, Rect2i(6, 10, 4, 5), OUTLINE)
 	_rect(tile, Rect2i(7, 10, 2, 4), Color(0.42, 0.26, 0.14))
@@ -828,13 +835,13 @@ func _roof_eave(tile: Vector2i, color: Color, slate: bool) -> void:
 
 ## Deep water: a slightly lighter surface pattern, short ripples and a sparkle. Seamless.
 func _water(tile: Vector2i) -> void:
-	var deep: Color = Color(0.20, 0.42, 0.68)
+	var deep: Color = Color(0.17, 0.48, 0.72)
 	_fill(tile, deep)
 	for y: int in T:
 		for x: int in T:
 			if _hash(x, y, 51) % 7 == 0:
 				_px(tile, x, y, deep.lightened(0.06))
-	var ripple: Color = Color(0.55, 0.74, 0.92)
+	var ripple: Color = Color(0.62, 0.84, 0.95)
 	for i: int in 3:
 		var rx: int = _hash(i, 5, 53) % T
 		var ry: int = 2 + _hash(i, 7, 57) % (T - 4)
@@ -848,13 +855,13 @@ func _water(tile: Vector2i) -> void:
 ## One frame of animated water: the ripples drift right and bob, and the glint moves, frame by
 ## frame (frames wrap, so the loop is seamless).
 func _water_frame(tile: Vector2i, frame: int) -> void:
-	var deep: Color = Color(0.20, 0.42, 0.68)
+	var deep: Color = Color(0.17, 0.48, 0.72)
 	_fill(tile, deep)
 	for y: int in T:
 		for x: int in T:
 			if _hash(x, y, 51) % 7 == 0:
 				_px(tile, x, y, deep.lightened(0.06))
-	var ripple: Color = Color(0.55, 0.74, 0.92)
+	var ripple: Color = Color(0.62, 0.84, 0.95)
 	for i: int in 3:
 		var rx: int = (_hash(i, 5, 53) + frame * 2) % T
 		var ry: int = 2 + _hash(i, 7, 57) % (T - 4) + (1 if (frame + i) % 2 == 0 else 0)
@@ -1010,8 +1017,8 @@ func _lily(tile: Vector2i) -> void:
 	for pad: Vector3 in [Vector3(5, 6, 3.2), Vector3(11, 11, 3.6)]:
 		_ellipse(tile, Vector2(pad.x, pad.y + 0.6), Vector2(pad.z, pad.z * 0.8), Color(0.12, 0.32, 0.20))
 		_ellipse(tile, Vector2(pad.x, pad.y), Vector2(pad.z, pad.z * 0.8), Color(0.30, 0.60, 0.30))
-		_px(tile, int(pad.x), int(pad.y), Color(0.20, 0.42, 0.68))
-		_px(tile, int(pad.x) + 1, int(pad.y) - 1, Color(0.20, 0.42, 0.68))
+		_px(tile, int(pad.x), int(pad.y), Color(0.17, 0.48, 0.72))
+		_px(tile, int(pad.x) + 1, int(pad.y) - 1, Color(0.17, 0.48, 0.72))
 	for p: Vector2i in [Vector2i(10, 10), Vector2i(12, 10), Vector2i(11, 9), Vector2i(11, 11)]:
 		_px(tile, p.x, p.y, Color(0.96, 0.62, 0.78))
 	_px(tile, 11, 10, Color(1.0, 0.90, 0.40))
@@ -1453,9 +1460,9 @@ func _smoke(tile: Vector2i, frame: int) -> void:
 ## A pine, see-through around it: three tiers of dark needles, lit from the left, on a short
 ## trunk.
 func _pine_art(tile: Vector2i) -> void:
-	var dark: Color = Color(0.07, 0.22, 0.16)
-	var mid: Color = Color(0.13, 0.35, 0.22)
-	var light: Color = Color(0.26, 0.52, 0.30)
+	var dark: Color = Color(0.06, 0.24, 0.22)
+	var mid: Color = Color(0.13, 0.39, 0.24)
+	var light: Color = Color(0.32, 0.58, 0.28)
 	_ellipse(tile, Vector2(8.5, 14.2), Vector2(5.5, 1.8), SHADOW)
 	_rect(tile, Rect2i(6, 11, 4, 4), OUTLINE)
 	_rect(tile, Rect2i(7, 11, 2, 3), Color(0.40, 0.25, 0.14))
@@ -1482,9 +1489,9 @@ func _pine_art(tile: Vector2i) -> void:
 
 ## A broad oak, see-through around it: a wide, warm green crown that nearly fills its tile.
 func _oak_art(tile: Vector2i) -> void:
-	var dark: Color = Color(0.15, 0.32, 0.11)
-	var mid: Color = Color(0.26, 0.47, 0.16)
-	var light: Color = Color(0.46, 0.66, 0.26)
+	var dark: Color = Color(0.14, 0.34, 0.16)
+	var mid: Color = Color(0.30, 0.53, 0.16)
+	var light: Color = Color(0.58, 0.74, 0.24)
 	_ellipse(tile, Vector2(8.5, 14.2), Vector2(7.0, 2.0), SHADOW)
 	_rect(tile, Rect2i(6, 11, 4, 4), OUTLINE)
 	_rect(tile, Rect2i(7, 11, 2, 3), Color(0.44, 0.28, 0.15))
@@ -1520,10 +1527,10 @@ func _oak_art(tile: Vector2i) -> void:
 ## The closed canopy of a thick wood, seen from above: crowns crowding together, each lit from
 ## the top left, with dark gaps between. It fills its tile and tiles seamlessly.
 func _canopy(tile: Vector2i) -> void:
-	var gap: Color = Color(0.05, 0.14, 0.08)
-	var dark: Color = Color(0.10, 0.26, 0.14)
-	var mid: Color = Color(0.16, 0.37, 0.18)
-	var light: Color = Color(0.30, 0.53, 0.25)
+	var gap: Color = Color(0.05, 0.15, 0.13)
+	var dark: Color = Color(0.09, 0.29, 0.20)
+	var mid: Color = Color(0.18, 0.43, 0.18)
+	var light: Color = Color(0.42, 0.63, 0.23)
 	var crowns: Array[Vector3] = [Vector3(3, 3, 4.4), Vector3(11, 4, 4.6), Vector3(7, 10, 4.8), Vector3(14.5, 11.5, 4.2), Vector3(1.5, 12.5, 3.6)]
 	for y: int in T:
 		for x: int in T:

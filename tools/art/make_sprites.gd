@@ -10,6 +10,9 @@ extends SceneTree
 
 const OUT_DIR: String = "res://gameplay/art"
 const OUTLINE: Color = Color(0.10, 0.08, 0.12)
+## The villagers' marker colours (Villager.ROBE_MARK and the rest), which the game swaps at
+## runtime: PixelGrade leaves them exactly as painted.
+const MARKERS: Array[Color] = [Color(1.0, 0.0, 1.0), Color(0.5, 0.0, 0.5), Color(0.0, 1.0, 1.0), Color(0.0, 0.5, 0.5)]
 
 const SPRITES: Dictionary = {
 	"slime": {
@@ -444,7 +447,7 @@ const SPRITES: Dictionary = {
 	},
 	"villager": {
 		"size": Vector2i(16, 24),
-		"palette": {"r": Color(1.00, 0.00, 1.00), "R": Color(0.50, 0.00, 0.50), "h": Color(0.00, 1.00, 1.00), "H": Color(0.00, 0.50, 0.50), "s": Color(0.93, 0.76, 0.60), "S": Color(0.80, 0.60, 0.46), "e": Color(0.10, 0.08, 0.12), "b": Color(0.40, 0.25, 0.12), "B": Color(0.30, 0.18, 0.09)},
+		"palette": {"r": Color(1.00, 0.00, 1.00), "R": Color(0.50, 0.00, 0.50), "h": Color(0.00, 1.00, 1.00), "H": Color(0.00, 0.50, 0.50), "s": Color(0.93, 0.76, 0.60), "S": Color(0.80, 0.60, 0.46), "e": Color(0.12, 0.09, 0.18), "b": Color(0.40, 0.25, 0.12), "B": Color(0.30, 0.18, 0.09)},
 		"frames": {
 			"plain": [
 			"................",
@@ -936,7 +939,7 @@ const SPRITES: Dictionary = {
 	},
 	"critters": {
 		"size": Vector2i(16, 16),
-		"palette": {"w": Color(0.97, 0.96, 0.92), "W": Color(0.80, 0.78, 0.74), "r": Color(0.90, 0.20, 0.18), "y": Color(0.98, 0.72, 0.20), "e": Color(0.10, 0.08, 0.12), "a": Color(1.00, 0.86, 0.30), "A": Color(0.92, 0.56, 0.16), "x": Color(0.55, 0.75, 1.00), "X": Color(0.30, 0.48, 0.90), "b": Color(0.25, 0.18, 0.12)},
+		"palette": {"w": Color(0.97, 0.96, 0.92), "W": Color(0.80, 0.78, 0.74), "r": Color(0.90, 0.20, 0.18), "y": Color(0.98, 0.72, 0.20), "e": Color(0.12, 0.09, 0.18), "a": Color(1.00, 0.86, 0.30), "A": Color(0.92, 0.56, 0.16), "x": Color(0.55, 0.75, 1.00), "X": Color(0.30, 0.48, 0.90), "b": Color(0.25, 0.18, 0.12)},
 		"frames": {
 			"chicken": [
 			"................",
@@ -1321,6 +1324,8 @@ func _paint(sprite_name: String, sprite: Dictionary) -> Error:
 				image.set_pixel(column * size.x + x, y, shade)
 				image.set_pixel(column * size.x + x, size.y + y, Color.WHITE)
 		column += 1
+	# Art pass 3: warm the colours and soften the outlines of the painted row (not the flashes).
+	PixelGrade.apply(image, OUTLINE, Rect2i(0, 0, image.get_width(), size.y), Vector2i.ZERO, MARKERS)
 	var path: String = OUT_DIR.path_join(sprite_name + ".png")
 	var error: Error = image.save_png(path)
 	print("tools/art: %s, %d frames (%s)" % [path, frames.size(), error_string(error)])

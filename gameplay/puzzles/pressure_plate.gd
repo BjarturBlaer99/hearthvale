@@ -5,7 +5,7 @@ extends Node2D
 ## again, unless the plate `latches`: then it stays pressed for good. The area checks plates
 ## every physics frame. Position = its cell's top-left corner.
 
-const OUTLINE: Color = Color(0.10, 0.08, 0.12)
+const OUTLINE: Color = PixelGrade.INK
 const PLATE: Color = Color(0.62, 0.58, 0.48)
 const RUNE: Color = Color(0.95, 0.80, 0.35)
 

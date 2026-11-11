@@ -15,6 +15,7 @@ res://
     dungeons/        # RoomGrid (rooms for the camera), DungeonState (dungeon flags, door rules)
     puzzles/         # PuzzleRules (pushing blocks, sinking them in pits, plates, torches, multi-flag shutters)
     light/           # LightRules (how much light reaches a point in a dark area)
+    art/             # PixelGrade (the art tools' colour pass: warm colour, soft outlines)
     quests/          # ConditionEvaluator, EffectApplier, QuestRunner, QuestState
     combat/          # CombatRules (hit geometry, knockback, weapon choice), Hit
     inventory/       # Inventory (stack limits, the item button, ammo, a lantern's reach)
@@ -352,6 +353,9 @@ run headless; see CLAUDE.md for the command and gotchas.
   - **New game**, **Settings** and **Quit**
 
   Continue loads the save and opens the area it names, with the hero on the saved cell.
+
+  The title's picture follows the save: `summary()` also says whether the saved game was finished
+  (`EndingSummary.is_finished`), and then the keep's window is dark.
 - **Menus** share a pure `MenuCursor`: options with ids, labels and whether they can be chosen. Moving wraps and
   skips the ones that can't. `MenuInput` names the keys:
   - the movement keys move the cursor
@@ -375,14 +379,15 @@ run headless; see CLAUDE.md for the command and gotchas.
 - **Closing words:** a `HeartContainer` can name a conversation (`dialogue_id`). The area opens it once the heart
   is taken, in place of the pickup message. The Warden's sends the hero to Elder Bram; the Shade's ends the game.
 - **The ending** (`ui/ending_screen.tscn`):
-  - The game's last conversation sets the flag `game_finished` (`AreaController.ENDING_FLAG`) with an ordinary
+  - The game's last conversation sets the flag `game_finished` (`EndingSummary.FINISHED_FLAG`) with an ordinary
     `set_flag` effect. When that conversation closes, the area leaves for the ending screen. The flag is saved,
     so the ending plays once.
   - The screen shows "The End" over the title's picture (the keep's window dark), then `EndingSummary`'s lines
     (pure): time played, hearts, and quests finished out of those in `data/quests`.
   - **Keep exploring** goes back to the area and cell the hero stood on. **Save and go to the title** saves first.
 - **The story** is data only: conversations whose options are gated on the flags `keep_warden_beaten` and
-  `crypt_shade_beaten`, and `Signpost` inscriptions in the keep, by the chapel and in the crypt.
+  `crypt_shade_beaten`, and `Signpost` inscriptions in the keep, by the chapel and in the crypt. Those five are
+  `stone`: drawn as a standing stone with carved lines, where a wayside sign is a wooden post.
 
 ## 13. Audio & feel
 - **Made in code, baked to files** (no external assets):
@@ -432,6 +437,17 @@ run headless; see CLAUDE.md for the command and gotchas.
 
   Each sprite becomes `gameplay/art/<name>.png`. Its frames sit side by side in the order the tool lists them, and
   below them the same frames as white silhouettes for hit flashes. Edit the art in the tool, never the PNGs.
+- **The colour pass** (art pass 3): all three art tools (the tiles, the hero, the other sprites) hand each picture
+  to `PixelGrade.apply()` (`core/art/`, pure) just before saving it.
+  - **Warm colour:** a little more saturation, lights tinted towards yellow and shadows towards violet.
+  - **Soft outlines:** each pixel of the tools' outline colour takes a dark, rich shade of the colours beside it
+    (never darker than a floor). With nothing coloured beside it, it's a plum-brown `INK`; inside a mass of
+    outline colour (a doorway, a stairwell) it stays `DEEP` dark. In the tile atlas an outline looks no further
+    than its own tile.
+  - **Left alone:** the white flash rows, and the villagers' marker colours.
+  - A colour painted exactly in the outline colour is treated as outline, so eyes have a colour of their own.
+  - Things drawn at runtime match it: code-drawn outlines use `PixelGrade.INK`, and the grass fringe on paths
+    uses `HeightShading.fringe_color()`, which warms the ground colour as the tiles are warmed.
 - **Drawing:** `SpriteSheet.draw(canvas, texture, frame, size, origin, flip_h, white, tint)` draws one frame.
   - Origins are rounded so sprites stay on the pixel grid.
   - A negative width mirrors it (side views face left).

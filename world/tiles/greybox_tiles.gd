@@ -144,9 +144,9 @@ const DATA_SOLID: String = "solid"
 
 ## Meadow grass at the bottom, lighter grass on raised ground, rock on the heights.
 const GROUND_COLORS: Array[Color] = [
-	Color(0.34, 0.56, 0.26),
-	Color(0.39, 0.61, 0.29),
-	Color(0.44, 0.65, 0.32),
+	Color(0.40, 0.64, 0.24),
+	Color(0.45, 0.69, 0.27),
+	Color(0.50, 0.73, 0.30),
 	Color(0.52, 0.56, 0.36),
 	Color(0.56, 0.52, 0.40),
 	Color(0.60, 0.56, 0.47),
@@ -154,7 +154,7 @@ const GROUND_COLORS: Array[Color] = [
 	Color(0.74, 0.72, 0.68),
 ]
 const STAIRS_COLOR: Color = Color(0.63, 0.60, 0.54)
-const PATH_COLOR: Color = Color(0.70, 0.57, 0.38)
+const PATH_COLOR: Color = Color(0.78, 0.61, 0.38)
 
 
 ## Atlas coordinates for a kind of tile: "ground", "stairs" or "path" at `height`, or a

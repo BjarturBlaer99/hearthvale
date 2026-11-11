@@ -910,8 +910,57 @@ Plan: `docs/progress/H15-plan.md`. Playtest guide: `docs/progress/H15-playtest.m
 **Known issues / notes**
 - Played by hand on 2026-11-10: the crypt, the story and the ending feel right. The new-player playtest is still to run.
 - Length: my guess is that a first run takes 45 to 75 minutes, well under the roadmap's two hours. The ending screen will give the real number. If it matters, the fix is more game, which is the "Later" list, not this milestone.
-- The ending screen shows the keep's window dark, but the title screen still shows it lit after the game is finished.
-- The inscriptions are drawn as the village's wooden signpost, in the dungeons too.
+- The ending screen shows the keep's window dark, but the title screen still shows it lit after the game is finished. Fixed the same day (next entry).
+- The inscriptions are drawn as the village's wooden signpost, in the dungeons too. Fixed the same day (next entry).
 - The ending counts hearts and quests, not heart pieces found (see DECISIONS).
 
 **Next:** the playtest. Then fixes for what it finds.
+
+## 2026-11-10 — After H15: three small fixes
+
+The first two were known issues in the H15 entry above; the third turned up while checking them. No plan file:
+each is a few lines.
+
+- **The title follows the save.** `SaveSystem.summary()` now says whether the saved game was finished (`EndingSummary.is_finished`, from the flag `game_finished`), and the title shows the keep's window dark when it was. With no save, or an unfinished one, the window is lit as before.
+- **Inscriptions are stone.** `Signpost` has a `stone` option: a standing stone with carved lines, and the prompt "Read the inscription". The five story inscriptions use it (by the chapel door, in the keep's entrance, three in the crypt). The village's welcome sign and the road sign stay wooden.
+- **Playtest scenarios have their own save slot** (900, emptied at each start). Before, saving in a scenario replaced the player's own game, and seeing the finished title by hand meant doing just that. Checked by running the `ending` scenario with a stale scenario save planted (it was removed), then a copy of the tool that saves right after starting (the save landed in slot 900, and the player's save stayed byte for byte the same).
+- 317 tests in 46 suites (+4). Screenshots checked (`tools/capture.gd`, now 87 shots, 1 new: the title after the ending), and close-ups of the stone in the village, the keep and the crypt.
+- Mutation checks: five deliberate bugs, each caught, files restored: finished games read as unfinished, the summary never saying finished, the title's window always lit, stones prompting like wooden signs, and one inscription turned wooden again.
+
+**Known issues / notes**
+- Not played by hand yet.
+- The title's line "Something has stirred in the old keep north of the village." stays the same after the game is finished.
+- The new-player playtest is still to run.
+
+## 2026-11-10 — Art pass 3, step 1: a warmer, softer look — done
+
+Plan: `docs/progress/art-pass-3-plan.md`. Asked for as "very similar to Stardew Valley"; built as Hearthvale's own look in the manner of cosy village pixel art, without copying that game's art (see DECISIONS).
+
+**Built**
+- **`PixelGrade`** (`core/art/`, pure): all three art tools pass each picture through it as they bake.
+  - Colours are warmed: a little more saturation, lights towards yellow, shadows towards violet.
+  - Outlines take a dark shade of what they surround, never darker than a floor. A lone line is a plum-brown ink, and the inside of a dark mass stays dark.
+  - The white flash rows and the villagers' marker colours are left exactly as painted.
+- **Palette:** sunnier grass on the low ground, warmer paths, brighter water, tree crowns from blue-green shade to yellow-green light, violet-tinted shadows.
+- **Grass:** flecks and blades in a yellower light and a bluer shade.
+- **Drawn at runtime:** code-drawn outlines use the same ink, and the grass fringe on paths is warmed as the tiles are (`HeightShading.fringe_color`).
+- Repainted: the tile atlas, the hero's sheet and 13 sprite sheets. No map, tile layout, sprite size or frame changed.
+- 326 tests in 47 suites (+9, all in `pixel_grade_test`).
+
+**Done when**
+- [x] Every baked picture goes through `PixelGrade`.
+- [x] No old outline ink is left in the tiles, the hero or any sprite (a test reads every picture); flashes are white and villagers still recolour (existing tests).
+- [x] The fringe drawn at runtime is the colour of most of the grass tile (a test, for the three green heights).
+- [x] All tests pass. All 87 screenshots retaken and compared with the ones from before, six of them side by side (the village square, the pond, the Old Wood, a shop, the keep, the crypt's dark path), with close-ups of the hero, the well and a barrel.
+- [x] It looks right in play: played by hand, and on 2026-11-11 the new look was reported to feel right.
+- Mutation checks: six deliberate bugs, each caught, files restored: lights leaning violet, marker colours graded, outlines seeing the tile next door, outlines near black again, the fringe not warmed, and the flashes graded too.
+
+**Found along the way**
+- The first tuning was too strong (an orange cast on skin and paths), so saturation and the light tint were eased.
+- Eyes painted in the outline's own colour were softened with the outlines; they now have a colour of their own.
+- Dark things (a bomb, the pit's rim) got outlines as black as before, which is what the floor fixes.
+
+**Known issues / notes**
+- This is step 1: colour and line. The shapes are the same art as before. Bigger trees, richer ground, the menus' look and the villagers are later steps in the plan, only if wanted.
+- The title screen's picture and the text box are drawn in code and aren't part of the pass.
+- One screenshot run printed "1 resources still in use at exit" as the tool quit; the game itself boots and runs clean.

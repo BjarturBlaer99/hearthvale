@@ -13,7 +13,7 @@ extends Node2D
 ## doors are flags in GameState (DungeonState.door_flag). Position = the top-left corner of its
 ## first cell. The area calls set_dungeon().
 
-const OUTLINE: Color = Color(0.10, 0.08, 0.12)
+const OUTLINE: Color = PixelGrade.INK
 const WOOD: Color = Color(0.45, 0.28, 0.14)
 const IRON: Color = Color(0.40, 0.42, 0.46)
 const GOLD: Color = Color(0.95, 0.78, 0.28)

@@ -6,7 +6,7 @@ extends Node2D
 
 const RADIUS: float = 5.0
 const CENTER: Vector2 = Vector2(8.0, 8.0)
-const OUTLINE: Color = Color(0.10, 0.08, 0.12)
+const OUTLINE: Color = PixelGrade.INK
 const RED: Color = Color(0.86, 0.16, 0.20)
 
 @export var halves: int = 2

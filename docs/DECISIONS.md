@@ -407,3 +407,26 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   count heart pieces found: pieces merge into hearts, so the number isn't kept.
 - 2026-11-10 — **The playtest isn't mine to run.** It needs people who haven't seen the game. This milestone
   ships a guide for it and stops there; nothing is "fixed" ahead of anyone hitting it, beyond the three hints.
+- 2026-11-10 — **The title's picture follows the save.** The keep's window is dark once the save in the menu's
+  slot says the game was finished. It reads the save, not the running game: the title is what you see before
+  anything is loaded.
+- 2026-11-10 — **An inscription is a look of `Signpost`** (`stone`), not a new kind of thing: the same behaviour
+  with a different drawing and prompt. It's drawn in code, as the signpost is.
+- 2026-11-10 — **Playtest scenarios save into a slot of their own** (900), emptied at each start. Before, saving
+  in a scenario (the pause menu, or "Save and go to the title" at the ending) replaced the player's own game.
+  The title shown after a scenario reads that slot too, so nothing of the player's is loaded or written.
+
+## Art pass 3 — a warmer, softer look
+- 2026-11-10 — **Hearthvale's look stays its own.** The user asked for graphics "very similar to Stardew Valley".
+  The pass doesn't copy that game's tiles, characters, palette or interface. It takes the general craft of cosy
+  village pixel art: saturated colour, warm lights and cool shadows, outlines in the colour of the thing.
+- 2026-11-10 — **One colour pass in the tools, not a repaint.** `PixelGrade` runs on every picture as it's baked.
+  That changes the whole game at once, keeps the ASCII art and the palettes as they are, and puts the look in one
+  place to tune. A repaint of specific art (bigger trees, the menus) is a later step, each its own piece of work.
+- 2026-11-10 — **Outlines are found by colour.** Every tool paints outlines in one near-black, so the pass treats
+  any solid pixel of that colour as outline. Eyes were painted in the same colour and came out soft, so they now
+  have a dark violet of their own.
+- 2026-11-10 — **An outline is never darker than a floor**, and the inside of a dark mass stays dark. Without the
+  floor, the outline of a dark thing (a bomb, a pit's rim) came out as black as before.
+- 2026-11-10 — **The pass changes pixels only**: no map, tile layout, sprite size or frame changed, so no area was
+  re-baked.

@@ -4,7 +4,7 @@ extends Talkable
 ## inscription, as in the dungeons and by the chapel door. Its text is a conversation in
 ## data/dialogue (usually one node with no options and no speaker). Drawn in code.
 
-const OUTLINE: Color = Color(0.10, 0.08, 0.12)
+const OUTLINE: Color = PixelGrade.INK
 const WOOD: Color = Color(0.62, 0.43, 0.24)
 const STONE: Color = Color(0.58, 0.60, 0.66)
 

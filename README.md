@@ -63,6 +63,8 @@ Beaten enemies sometimes drop hearts or coins.
   - the hero walks with a four-frame stride, blinks, lunges with the sword and holds up what they find
   - Hearthvale's houses are half-timbered, under thatch, clay tiles or slate, with smoking chimneys
   - grass frays over the paths, the pond has a bank, and the woods mix three kinds of tree under a closed canopy
+- **A warmer look** (art pass 3): sunnier grass, warmer paths, brighter water, and soft coloured outlines in
+  place of black ones, on everything.
 - **The road north:** from the top of the north rise, through the woods.
   - **The North Fields:** a stream with a bridge, a farm plot, slimes, and a goblin archer on a plateau. Keep an eye
     on the tree line beside the road.
@@ -93,7 +95,7 @@ quests finished. From there you can keep exploring or save and go back to the ti
 
 To try one part without playing up to it: `godot --path . -s res://tools/playtest.gd -- crypt` (the top of the
 crypt's stairs, equipped as after the keep), `-- shade` (outside the Shade's hall), `-- ending` (one step from
-the ending) or `-- warden`.
+the ending) or `-- warden`. Saving in a scenario goes to a slot of its own, so it never replaces your own game.
 
 Running a playtest with someone new? `docs/progress/H15-playtest.md` says how, and what to write down.
 

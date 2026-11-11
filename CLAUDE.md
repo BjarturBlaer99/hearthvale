@@ -34,6 +34,10 @@ in `docs/DECISIONS.md` are superseded.
   `tools/greybox/make_tile_texture.gd` and placed by `build_maps.gd`. No external assets; edit the art in the tool.
   **Every other actor (H11)** is pixel art painted from ASCII by `tools/art/make_sprites.gd` into `gameplay/art/`
   (no placeholder shapes left; effects like shadows and sparks stay drawn in code). Edit the art in the tool.
+  **Art pass 3 (user's request, 2026-11-10, after H15):** a warmer, softer look. Every art tool passes its
+  picture through `PixelGrade` (`core/art/`) as it bakes: warmer colour, and outlines in a dark shade of what they
+  surround. Tune the look there, not picture by picture. It is Hearthvale's own look: do not copy another game's
+  art. See `docs/progress/art-pass-3-plan.md`.
   **Sound (H10):** all sound effects and music are made in code by `tools/audio/make_audio.gd` (Synth) and baked to
   `audio/`. No external audio; edit the sounds in the tool, never the WAVs.
 
@@ -49,7 +53,8 @@ godot --headless --path . --import
 godot --headless --path . --quit-after 30
 # Screenshots for review (needs a window, not --headless)
 godot --path . -s res://tools/capture.gd -- <output_dir>
-# Start partway through to try one part by hand (scenarios in the script: warden, crypt, shade, ending)
+# Start partway through to try one part by hand (scenarios in the script: warden, crypt, shade, ending).
+# Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
 godot --path . -s res://tools/playtest.gd -- warden
 # Repaint the hero's sprite sheet after editing its ASCII art (optional 8x preview), then re-import
 godot --headless --path . -s res://tools/art/make_player_sprite.gd -- <preview.png>

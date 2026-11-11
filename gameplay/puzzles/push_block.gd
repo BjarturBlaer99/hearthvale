@@ -11,7 +11,7 @@ extends Node2D
 ## out again. The area calls set_dungeon().
 
 const SLIDE_TIME: float = 0.18
-const OUTLINE: Color = Color(0.10, 0.08, 0.12)
+const OUTLINE: Color = PixelGrade.INK
 ## Warm carved sandstone, so a block never passes for one of the grey pillars around it.
 const STONE: Color = Color(0.74, 0.60, 0.40)
 

@@ -86,7 +86,9 @@ in the crypt, and the closing words of each dungeon. The game ends when the Shad
 
 ## 10. Tone & look
 Warm, cosy medieval: green meadows, half-timbered houses under thatch, red clay tiles or blue slate, with
-smoking chimneys, and a stone chapel; darker, colder dungeons. 16×16 pixel art, limited palette. The hero is an
+smoking chimneys, and a stone chapel; darker, colder dungeons. 16×16 pixel art, limited palette: sunlit and
+saturated, with shadows that lean violet, lights that lean yellow, and outlines in a dark shade of the thing
+itself, not black. The look is Hearthvale's own, in the manner of cosy village pixel art. The hero is an
 original adventurer in a blue hooded tunic with gold trim and a red scarf (Zelda-style, not Link).
 
 ## 11. Out of scope (for now)

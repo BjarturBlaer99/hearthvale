@@ -5,7 +5,7 @@ extends Node2D
 ## inventory. Opened, it stays open (DungeonState.chest_flag). It stands in its cell.
 ## Position = the cell's top-left corner. The area calls set_dungeon().
 
-const OUTLINE: Color = Color(0.10, 0.08, 0.12)
+const OUTLINE: Color = PixelGrade.INK
 const WOOD: Color = Color(0.55, 0.34, 0.16)
 const GOLD: Color = Color(0.95, 0.78, 0.28)
 

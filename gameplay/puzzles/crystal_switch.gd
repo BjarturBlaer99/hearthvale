@@ -10,7 +10,7 @@ const LOCKOUT: float = 0.4
 const SHEET: Texture2D = preload("res://gameplay/art/crystal.png")
 ## Frames in the order tools/art/make_sprites.gd paints them (a test checks).
 const FRAMES: Dictionary = {&"red": 0, &"blue": 1, &"white": 2}
-const OUTLINE: Color = Color(0.10, 0.08, 0.12)
+const OUTLINE: Color = PixelGrade.INK
 const RED: Color = Color(0.92, 0.28, 0.30)
 const BLUE: Color = Color(0.35, 0.62, 0.98)
 const STONE: Color = Color(0.50, 0.50, 0.56)

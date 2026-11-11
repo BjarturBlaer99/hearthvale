@@ -165,6 +165,11 @@ guide for running it, and what it finds gets fixed afterwards.
 
 ---
 
+## Art pass 3 (user's request, after H15): step 1 ✅
+A warmer, softer look, everywhere at once: colour and outlines. No new mechanics, areas or content. Later steps
+(bigger trees, richer ground, the menus' look, the villagers) only if wanted. Plan and checklist:
+`docs/progress/art-pass-3-plan.md`.
+
 ## Later (not in phase 2)
 A new region and a bigger world (moved out of phase 2 on 2026-11-08: detail first), more dungeons and items, key
 rebinding, several save slots.
