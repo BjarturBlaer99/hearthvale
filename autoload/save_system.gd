@@ -32,8 +32,8 @@ func load_game() -> Error:
 	return load_from_slot(current_slot)
 
 
-## A save's key facts without loading it: { "area", "play_time", "hearts_max" }, or empty if
-## there's no readable save in `from_slot` (default: the current slot).
+## A save's key facts without loading it: { "area", "play_time", "hearts_max", "finished" }, or
+## empty if there's no readable save in `from_slot` (default: the current slot).
 func summary(from_slot: int = -1) -> Dictionary:
 	var path: String = slot_path(current_slot if from_slot < 0 else from_slot)
 	if not FileAccess.file_exists(path):
@@ -43,10 +43,12 @@ func summary(from_slot: int = -1) -> Dictionary:
 		return {}
 	var data: Dictionary = parsed
 	var where: Dictionary = data.get("player", {}) if typeof(data.get("player")) == TYPE_DICTIONARY else {}
+	var saved_flags: Dictionary = data.get("flags", {}) if typeof(data.get("flags")) == TYPE_DICTIONARY else {}
 	return {
 		"area": str(where.get("area", "")),
 		"play_time": float(data.get("play_time", 0.0)),
 		"hearts_max": int(data.get("hearts_max", 0)),
+		"finished": EndingSummary.is_finished(saved_flags),
 	}
 
 

@@ -85,6 +85,7 @@ flag = &"crypt_narthex_b"
 position = Vector2(384, 672)
 script = ExtResource("17_sign")
 dialogue_id = &"sign_crypt_narthex"
+stone = true
 
 [node name="OssuaryBars" type="Node2D" parent="Interactables" unique_id=2106919017]
 position = Vector2(224, 608)
@@ -129,6 +130,7 @@ block_id = &"trench"
 position = Vector2(512, 640)
 script = ExtResource("17_sign")
 dialogue_id = &"sign_crypt_trench"
+stone = true
 
 [node name="TrenchKey" type="Node2D" parent="Interactables" unique_id=71329945]
 position = Vector2(656, 608)
@@ -317,6 +319,7 @@ stays_open = true
 position = Vector2(576, 80)
 script = ExtResource("17_sign")
 dialogue_id = &"sign_crypt_epitaph"
+stone = true
 
 [node name="SwordChest" type="Node2D" parent="Interactables" unique_id=1589165046]
 position = Vector2(592, 32)

@@ -146,6 +146,7 @@ target_entry = &"entrance"
 position = Vector2(336, 96)
 script = ExtResource("7_sign")
 dialogue_id = &"sign_chapel"
+stone = true
 
 [node name="Entries" type="Node2D" parent="." unique_id=885840115]
 

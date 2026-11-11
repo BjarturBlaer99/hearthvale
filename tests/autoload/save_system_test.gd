@@ -60,8 +60,19 @@ func test_the_menus_slot_saves_loads_and_sums_up_without_loading() -> void:
 	assert_int(SaveSystem.save_game()).is_equal(OK)
 	assert_bool(SaveSystem.has_slot(TEST_SLOT)).is_true()
 	GameState.new_game()
-	assert_dict(SaveSystem.summary()).is_equal({"area": "old_wood", "play_time": 754.0, "hearts_max": 4})
+	assert_dict(SaveSystem.summary()).is_equal({"area": "old_wood", "play_time": 754.0, "hearts_max": 4, "finished": false})
 	assert_int(GameState.hearts_max).override_failure_message("summing up doesn't load").is_equal(3)
 	assert_int(SaveSystem.load_game()).is_equal(OK)
 	assert_int(GameState.hearts_max).is_equal(4)
 	assert_float(GameState.play_time).is_equal(754.0)
+
+
+func test_the_summary_says_whether_the_game_was_finished() -> void:
+	SaveSystem.current_slot = TEST_SLOT
+	GameState.new_game()
+	assert_int(SaveSystem.save_game()).is_equal(OK)
+	assert_bool(SaveSystem.summary()["finished"]).is_false()
+	GameState.set_flag(EndingSummary.FINISHED_FLAG, true)
+	assert_bool(SaveSystem.summary()["finished"]).override_failure_message("it's the save that counts, and it isn't saved yet").is_false()
+	assert_int(SaveSystem.save_game()).is_equal(OK)
+	assert_bool(SaveSystem.summary()["finished"]).is_true()

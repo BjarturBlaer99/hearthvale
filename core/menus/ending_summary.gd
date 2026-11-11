@@ -4,6 +4,9 @@ extends RefCounted
 ## how long it took, the hearts won and the quests finished. Works on plain values, so it's
 ## tested without the game running.
 
+## The flag the game's last conversation sets (data/dialogue/ending_crypt.json).
+const FINISHED_FLAG: StringName = &"game_finished"
+
 
 ## The summary's lines. `time_text` is the play time already written out ("1:02:33"). The
 ## quests line is left out of a game with no quests.
@@ -21,3 +24,8 @@ static func quests_done(quest_ids: Array, quests: Dictionary, flags: Dictionary)
 		if QuestState.status_in(quests, flags, str(quest_id)) == QuestState.COMPLETE:
 			done += 1
 	return done
+
+
+## Whether `flags` (the game's, or a save's) say the game was finished.
+static func is_finished(flags: Dictionary) -> bool:
+	return flags.get(String(FINISHED_FLAG), false) == true

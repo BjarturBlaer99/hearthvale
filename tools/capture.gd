@@ -14,8 +14,9 @@ extends SceneTree
 ## "walk" catches the hero mid-stride; "fall" takes every heart; in the crypt, "lantern" gives
 ## the Lantern, "sunk" shows the Trench with its block already in, "pit" walks the hero into a
 ## pit, "haunt" lets the Shade come, and "braziers" lights its hall. The area id "title"
-## shows the title screen instead of an area, and "ending" the ending screen (after two quests
-## and an hour and a bit of play).
+## shows the title screen instead of an area ("finished": with a finished game saved, in a
+## slot of its own), and "ending" the ending screen (after two quests and an hour and a bit of
+## play).
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -103,7 +104,10 @@ const SHOTS: Array = [
 	["84_the_narthex_inscription", &"crypt", Vector2i(24, 41), Vector2.DOWN, 0, "talk"],
 	["85_aldrics_epitaph", &"crypt", Vector2i(36, 6), Vector2.UP, 0, "lantern_talk"],
 	["86_the_ending", &"ending", Vector2i.ZERO, Vector2.DOWN, 0, ""],
+	["87_title_after_the_ending", &"title", Vector2i.ZERO, Vector2.DOWN, 0, "finished"],
 ]
+## The save slot the "finished" title uses, so the player's own save is left alone.
+const CAPTURE_SLOT: int = 994
 
 
 func _initialize() -> void:
@@ -141,12 +145,23 @@ func _capture() -> void:
 			await _frames(2)
 			continue
 		if shot[1] == &"title":
+			var saves: Node = root.get_node("SaveSystem")
+			var own_slot: int = saves.get(&"current_slot")
+			if shot[5] == "finished":
+				saves.set(&"current_slot", CAPTURE_SLOT)
+				game_state.call(&"add_play_time", 4031.0)
+				game_state.call(&"update_player", &"village", Vector2i(23, 20))
+				game_state.call(&"set_flag", &"game_finished", true)
+				saves.call(&"save_game")
 			var title: Node = (load("res://ui/title_screen.tscn") as PackedScene).instantiate()
 			root.add_child(title)
 			await _frames(30)
 			_save(out_dir, shot[0])
 			title.queue_free()
 			await _frames(2)
+			if shot[5] == "finished":
+				DirAccess.remove_absolute(str(saves.call(&"slot_path", CAPTURE_SLOT)))
+				saves.set(&"current_slot", own_slot)
 			continue
 		var scene: Node = (load(WorldPaths.scene_for(shot[1])) as PackedScene).instantiate()
 		root.add_child(scene)

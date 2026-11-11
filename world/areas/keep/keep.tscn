@@ -293,6 +293,7 @@ dialogue_id = &"ending_keep"
 position = Vector2(320, 656)
 script = ExtResource("h15_sign")
 dialogue_id = &"sign_keep_warden"
+stone = true
 
 [node name="Entries" type="Node2D" parent="." unique_id=348423467]
 

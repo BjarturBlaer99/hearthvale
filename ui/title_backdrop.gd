@@ -11,7 +11,8 @@ const HILL_NEAR: Color = Color(0.14, 0.27, 0.17)
 const KEEP: Color = Color(0.12, 0.12, 0.17)
 const LIGHT: Color = Color(1.0, 0.82, 0.40)
 
-## Whether the keep's window is lit (the ending screen shows it dark).
+## Whether the keep's window is lit. It's dark on the ending screen, and on the title once
+## the save says the game was finished.
 @export var keep_lit: bool = true
 
 var _clock: float = 0.0

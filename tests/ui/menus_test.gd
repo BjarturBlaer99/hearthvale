@@ -57,6 +57,20 @@ func test_the_title_offers_a_new_game_until_there_is_a_save() -> void:
 	assert_array(quit).is_equal([true])
 
 
+func test_the_keeps_window_goes_dark_on_the_title_once_the_game_is_finished() -> void:
+	var title: TitleScreen = _title()
+	assert_bool(title.backdrop.keep_lit).override_failure_message("no save: the window is lit").is_true()
+	GameState.update_player(&"village", Vector2i(20, 18))
+	assert_int(SaveSystem.save_game()).is_equal(OK)
+	title.refresh()
+	assert_bool(title.backdrop.keep_lit).override_failure_message("an unfinished save: still lit").is_true()
+	GameState.set_flag(AreaController.ENDING_FLAG, true)
+	title.refresh()
+	assert_bool(title.backdrop.keep_lit).override_failure_message("finished but not saved: still lit").is_true()
+	assert_int(SaveSystem.save_game()).is_equal(OK)
+	assert_bool(_title().backdrop.keep_lit).override_failure_message("a finished save: dark").is_false()
+
+
 func test_continue_puts_you_back_where_you_saved() -> void:
 	GameState.add_item(&"wooden_sword")
 	GameState.add_play_time(125.0)

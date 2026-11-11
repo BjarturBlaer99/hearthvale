@@ -9,6 +9,7 @@ const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 const VILLAGE: String = "res://world/areas/village/village.tscn"
 const KEEP: String = "res://world/areas/keep/keep.tscn"
 const CRYPT: String = "res://world/areas/crypt/crypt.tscn"
+const NORTH_FIELDS: String = "res://world/areas/north_fields/north_fields.tscn"
 ## [area scene, the inscription's node, its conversation, words it must hold]
 const INSCRIPTIONS: Array = [
 	[VILLAGE, "ChapelPlaque", &"sign_chapel", ["ALDRIC", "SHADE", "Warden"]],
@@ -80,6 +81,8 @@ func test_five_inscriptions_stand_on_open_floor_and_can_be_read() -> void:
 		var sign: Signpost = area.interactables.get_node(NodePath(str(case[1])))
 		var where: String = "%s in %s" % [case[1], area.area_id]
 		assert_that(sign.dialogue_id).is_equal(case[2])
+		assert_bool(sign.stone).override_failure_message(where + " is cut in stone").is_true()
+		assert_str(sign.prompt()).is_equal("Read the inscription")
 		assert_bool(area.grid.is_solid(sign.cell())).override_failure_message(where + " stands on open floor").is_false()
 		assert_bool(area.terrain.is_pit(sign.cell())).is_false()
 		var others: int = 0
@@ -109,6 +112,14 @@ func _options(dialogue_id: StringName) -> PackedStringArray:
 	var runner: DialogueRunner = DialogueRunner.new(DataRegistry.get_dialogue(dialogue_id), GameState)
 	runner.start()
 	return runner.option_texts()
+
+
+func test_wayside_signs_stay_wooden() -> void:
+	for case: Array in [[VILLAGE, "WelcomeSign"], [NORTH_FIELDS, "RoadSign"]]:
+		var area: AreaController = _load(case[0])
+		var sign: Signpost = area.interactables.get_node(NodePath(str(case[1])))
+		assert_bool(sign.stone).override_failure_message("%s is a wooden signpost" % case[1]).is_false()
+		assert_str(sign.prompt()).is_equal("Read the sign")
 
 
 func _load(path: String) -> AreaController:

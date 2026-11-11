@@ -31,7 +31,7 @@ const PUSH_TIME: float = 0.35
 ## Where "Quit to title" goes.
 const TITLE_SCENE: String = "res://ui/title_screen.tscn"
 ## The flag the game's last conversation sets, and the screen that follows once it closes.
-const ENDING_FLAG: StringName = &"game_finished"
+const ENDING_FLAG: StringName = EndingSummary.FINISHED_FLAG
 const ENDING_SCENE: String = "res://ui/ending_screen.tscn"
 ## How slow the game runs during a hit-stop.
 const HIT_STOP_SCALE: float = 0.05

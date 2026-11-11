@@ -2,7 +2,8 @@ class_name TitleScreen
 extends Control
 ## The title screen, the game's first scene (docs/TECH_DESIGN.md §12): Continue (when there's
 ## a save, saying where and how long), New game, Settings and Quit. Up and down pick, E or
-## Enter chooses.
+## Enter chooses. Its picture follows the save: the keep's window is dark once the game is
+## finished.
 
 const CONTINUE: StringName = &"continue"
 const NEW_GAME: StringName = &"new_game"
@@ -15,6 +16,7 @@ var travel: Callable
 ## Quits the game. Tests replace it.
 var quit: Callable
 
+@onready var backdrop: TitleBackdrop = $Backdrop
 @onready var settings_menu: SettingsMenu = $SettingsMenu
 @onready var _list: Label = $Menu/List
 
@@ -30,9 +32,11 @@ func _ready() -> void:
 	refresh()
 
 
-## Rebuilds the menu: Continue can be chosen only when there's a save.
+## Rebuilds the menu: Continue can be chosen only when there's a save. The keep's window is
+## lit until that save says the game was finished.
 func refresh() -> void:
 	var summary: Dictionary = SaveSystem.summary()
+	backdrop.keep_lit = not bool(summary.get("finished", false))
 	cursor.set_options([
 		MenuCursor.option(CONTINUE, continue_text(summary), not summary.is_empty()),
 		MenuCursor.option(NEW_GAME, "New game"),

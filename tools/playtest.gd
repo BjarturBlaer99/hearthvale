@@ -2,8 +2,12 @@ extends SceneTree
 ## Starts the game partway through, for trying one part by hand without playing up to it.
 ## Needs a window:
 ##   godot --path . -s res://tools/playtest.gd -- <scenario>
-## Scenarios are below. A -s script compiles before the autoloads exist, so GameState is
-## looked up at runtime.
+## Scenarios are below. Saving in a scenario goes to a slot of its own, emptied at each
+## start, so it never overwrites the player's own game. A -s script compiles before the
+## autoloads exist, so GameState and SaveSystem are looked up at runtime.
+
+## The save slot scenarios use (the game's own is SaveSystem.GAME_SLOT; tests use 990 and up).
+const PLAYTEST_SLOT: int = 900
 
 ## Each scenario: the area and cell to start in, items to hold, and flags to set.
 const SCENARIOS: Dictionary = {
@@ -50,6 +54,12 @@ func _start() -> void:
 		quit(1)
 		return
 	var scenario: Dictionary = SCENARIOS[scenario_name]
+	var saves: Node = root.get_node("SaveSystem")
+	saves.set(&"current_slot", PLAYTEST_SLOT)
+	var old_save: String = str(saves.call(&"slot_path", PLAYTEST_SLOT))
+	if FileAccess.file_exists(old_save):
+		DirAccess.remove_absolute(old_save)
+	print("tools/playtest: '%s'. Saving here goes to slot %d, not your own game." % [scenario_name, PLAYTEST_SLOT])
 	var game_state: Node = root.get_node("GameState")
 	game_state.call(&"new_game")
 	for item: Array in scenario["items"]:

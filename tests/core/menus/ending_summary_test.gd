@@ -17,6 +17,14 @@ func test_odd_numbers_are_kept_in_bounds() -> void:
 	assert_str(lines[2]).override_failure_message("never more done than there are").is_equal("Quests finished   3 of 3")
 
 
+func test_a_finished_game_is_known_by_its_flag() -> void:
+	assert_bool(EndingSummary.is_finished({})).is_false()
+	assert_bool(EndingSummary.is_finished({"keep_warden_beaten": true, "crypt_shade_beaten": true})).is_false()
+	assert_bool(EndingSummary.is_finished({"game_finished": false})).is_false()
+	assert_bool(EndingSummary.is_finished({"game_finished": true})).override_failure_message("a save's flags, keyed by text").is_true()
+	assert_bool(EndingSummary.is_finished({&"game_finished": true})).override_failure_message("the game's own flags").is_true()
+
+
 func test_only_finished_quests_count() -> void:
 	var quests: Dictionary = {"fetch": "return", "bounty": "report", "errand": "done"}
 	var flags: Dictionary = {
