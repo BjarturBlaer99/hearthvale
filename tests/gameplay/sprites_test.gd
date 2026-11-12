@@ -15,7 +15,7 @@ func test_frame_names_match_the_order_the_tool_paints_them() -> void:
 		["crystal", CrystalSwitch.FRAMES], ["breakables", Breakable.FRAMES], ["critters", Critter.FRAMES],
 	]
 	for case: Array in cases:
-		var painted: Array = (sprites[case[0]]["frames"] as Dictionary).keys()
+		var painted: Array = _frames_of(sprites[case[0]]).keys()
 		var used: Dictionary = case[1]
 		assert_int(used.size()).override_failure_message("%s: every frame named" % case[0]).is_equal(painted.size())
 		for frame: StringName in used:
@@ -26,7 +26,7 @@ func test_every_sheet_is_painted_with_a_white_flash_row() -> void:
 	var sprites: Dictionary = _tool_sprites()
 	for sprite_name: String in sprites:
 		var size: Vector2i = sprites[sprite_name]["size"]
-		var frames: int = (sprites[sprite_name]["frames"] as Dictionary).size()
+		var frames: int = _frames_of(sprites[sprite_name]).size()
 		var texture: Texture2D = load("res://gameplay/art/%s.png" % sprite_name)
 		assert_object(texture).override_failure_message(sprite_name).is_not_null()
 		assert_that(Vector2i(texture.get_size())).override_failure_message(sprite_name).is_equal(Vector2i(size.x * frames, size.y * 2))
@@ -80,8 +80,44 @@ func test_dungeon_ledges_are_flagstones_you_can_stand_on_and_water_is_animated()
 	assert_that(height_layer.get_cell_atlas_coords(Vector2i(4, 2))).override_failure_message("the gallery's walkway").is_equal(GreyboxTiles.coords("ledge", 1))
 
 
+func test_breathing_and_blinking_frames_are_made_from_the_drawn_ones() -> void:
+	var sprites: Dictionary = _tool_sprites()
+	var villager: Dictionary = _frames_of(sprites["villager"])
+	assert_array(villager.keys()).override_failure_message("the drawn frames first, then the made ones").is_equal(["plain", "bearded", "plain_breathe", "bearded_breathe", "plain_blink", "bearded_blink"])
+	for look: String in ["plain", "bearded"]:
+		var drawn: Array = villager[look]
+		var breathe: Array = villager[look + "_breathe"]
+		var blink: Array = villager[look + "_blink"]
+		assert_int(breathe.size()).is_equal(drawn.size())
+		assert_that(breathe[3]).override_failure_message("%s: the head a pixel lower" % look).is_equal(drawn[2])
+		assert_array(breathe.slice(16)).override_failure_message("%s: below the chest nothing moves" % look).is_equal(drawn.slice(16))
+		var eyes: int = 0
+		for y: int in drawn.size():
+			var open: String = drawn[y]
+			var shut: String = blink[y]
+			assert_bool("e" in shut).override_failure_message("%s: no eye left open (row %d)" % [look, y]).is_false()
+			for x: int in open.length():
+				if open[x] == "e":
+					eyes += 1
+				else:
+					assert_that(shut[x]).override_failure_message("%s: only the eyes change (%d, %d)" % [look, x, y]).is_equal(open[x])
+		assert_int(eyes).override_failure_message("%s: two eyes, two rows tall" % look).is_equal(4)
+	var critters: Dictionary = _frames_of(sprites["critters"])
+	var chicken: Array = critters["chicken"]
+	var resting: Array = critters["chicken_blink"]
+	var changed: int = 0
+	for y: int in chicken.size():
+		changed += 1 if chicken[y] != resting[y] else 0
+	assert_int(changed).override_failure_message("a chicken's blink changes its eye and nothing else").is_equal(1)
+
+
 func _tool_sprites() -> Dictionary:
 	return (load(TOOL) as GDScript).get_script_constant_map()["SPRITES"]
+
+
+## Every frame of a sprite as the tool paints it: the drawn ones, then those made from them.
+func _frames_of(sprite: Dictionary) -> Dictionary:
+	return (load(TOOL) as GDScript).call(&"frames_of", sprite)
 
 
 func test_items_take_the_picture_their_data_names() -> void:

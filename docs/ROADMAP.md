@@ -201,7 +201,8 @@ cherry trees, which are listed and approved before they are baked. Every area is
   **Done when**: the hero is never hidden behind a tree, and reachability is unchanged but for the listed cells.
 - **1d — Buildings, interiors and dungeons** in a taller three-quarter view.
 - **1e — Characters.** The hero taller, hood down, with six-frame walk and run and a drawn three-frame attack;
-  idle animations for villagers and animals; enemies in the new palette.
+  idle animations for villagers and animals (villagers breathe and blink; a chicken standing still blinks);
+  enemies in the new palette (theirs since 1c; not redrawn).
   **Done when**: swing timing, hits, speed and collisions are untouched.
 - **1f — UI polish.** Frames, a second larger letter face for headings, the title screen.
 

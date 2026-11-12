@@ -11,8 +11,11 @@ const SHEET: Texture2D = preload("res://gameplay/art/critters.png")
 ## Frames in the order the tool paints them (a test checks).
 const FRAMES: Dictionary = {
 	&"chicken": 0, &"chicken_peck": 1, &"chicken_walk": 2, &"butterfly_open": 3, &"butterfly_closed": 4,
-	&"bluefly_open": 5, &"bluefly_closed": 6,
+	&"bluefly_open": 5, &"bluefly_closed": 6, &"chicken_blink": 7,
 }
+## A chicken standing still blinks for BLINK_TIME every BLINK_EVERY seconds.
+const BLINK_EVERY: float = 2.9
+const BLINK_TIME: float = 0.16
 ## Each kind: how it moves, how far it wanders (px) and how fast (px/s).
 const KINDS: Dictionary = {
 	&"chicken": {"style": CritterMotion.WALKER, "radius": 40.0, "speed": 18.0},
@@ -59,6 +62,8 @@ func _draw() -> void:
 				frame = &"chicken_peck" if fmod(_clock, 0.5) < 0.25 else &"chicken"
 			elif motion.state == CritterMotion.WALK:
 				frame = &"chicken_walk" if fmod(_clock, 0.3) < 0.15 else &"chicken"
+			elif fmod(_clock, BLINK_EVERY) >= BLINK_EVERY - BLINK_TIME:
+				frame = &"chicken_blink"
 			SpriteSheet.draw(self, SHEET, FRAMES[frame], SIZE, Vector2(-8, -14), motion.facing_x > 0.0)
 		&"butterfly":
 			var hover: float = roundf(8.0 + sin(_clock * 3.0) * 2.0)

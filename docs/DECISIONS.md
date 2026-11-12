@@ -517,6 +517,22 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-12 — **P1e: the hero is put together from parts.** A head, a body pose and a pair of legs per facing,
+  joined by the tool. Thirty-nine frames drawn whole would drift apart; this way one head serves every frame and
+  the second half of the walk is the first on the other foot.
+- 2026-11-12 — **P1e: a walk cycle still covers 28 pixels.** Six frames at 28/6 pixels a step, in place of four
+  at 7, so the legs turn over as fast as they did and only look smoother. The run likewise (36 pixels).
+- 2026-11-12 — **P1e: the sword is drawn from his belt, and hits from his feet as before.** `Sword.HAND` moved up
+  five pixels with the taller body. It is used only in drawing; the arc that hits is the HitBox's, unchanged.
+- 2026-11-12 — **P1e: villagers were redrawn, not stretched.** Stretching the old 16x24 robe left a small head on
+  a long body beside the hero. They have his proportions now (a ten-pixel head), in their marker colours.
+- 2026-11-12 — **P1e: idle frames are made by the tool, not drawn.** A breath is the drawn frame sunk a pixel
+  above the chest, a blink the same frame with the eyes closed, so they can't drift from the picture they come
+  from. `Idling` (pure) keeps each villager's time. A blink never falls mid-breath, since it is drawn with the
+  shoulders up.
+- 2026-11-12 — **P1e: animals got the cheapest idle.** Chickens already walk and peck and butterflies flap; a
+  chicken standing still now blinks (a made frame). No new animal drawings. Enemies and bosses were not redrawn:
+  they took the palette and outline rule in 1c.
 - 2026-11-12 — **P1d: buildings get height the way trees did, over the map and not in it.** Wall faces, tall
   pillars and roof ridges are drawn at load over a Height layer that doesn't change, so no cell's blocking can
   change and no map file is touched.

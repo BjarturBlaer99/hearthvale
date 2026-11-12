@@ -71,6 +71,9 @@ Beaten enemies sometimes drop hearts or coins.
 - **The hero** (hero pass): a leather vest, wrist guards, a belt pouch and tall boots over the blue tunic, the
   sword on his back until he swings it, and a small pack. He breathes when he stands, leans into a sprint,
   winds up before a swing, flinches when hit and bends his knees landing from a ledge.
+- **Taller people** (the pivot, step 1e): the hero stands two cells tall with his hood down, walks and runs in
+  six frames and swings in three; villagers are as tall as he is and breathe and blink; a chicken standing still
+  blinks.
 - **A wider picture** (the pivot, step 1a): the game draws 640x360, so more of the world is in view outdoors;
   houses and dungeon rooms are shown at twice the size. The window is 1920x1080 at the default 3x.
 - **Real light** (the pivot, step 1b): every lamp, hearth, candle, torch and crystal is a light, houses are warm

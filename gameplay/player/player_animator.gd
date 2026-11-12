@@ -7,11 +7,11 @@ extends RefCounted
 ##
 ## Facing follows movement, four ways. A diagonal keeps the current facing when it matches
 ## one of its two directions (as in classic top-down Zeldas), otherwise faces up or down.
-## - Walking: a four-frame cycle (pass, step A, pass, step B) that advances by distance
-##   travelled, so it keeps pace with walking and sprinting alike.
-##   Sprinting uses the leaning run frames and a longer stride.
+## - Walking: a six-frame cycle (legs passing, a step, the weight coming down, then the same on
+##   the other foot) that advances by distance travelled, so it keeps pace with walking and
+##   sprinting alike. Sprinting uses the leaning run frames and a longer stride.
 ## - Standing: idle, breathing out every BREATH_EVERY seconds, with a blink every BLINK_EVERY.
-## - A pose overrides both: ATTACK (a wind-up, the lunge behind the sword, then settling, by
+## - A pose overrides both: ATTACK (a wind-up, the slash, then the follow-through, by
 ##   `attack_progress`), HURT (flinching), HOLD (an item held overhead, always seen from the
 ##   front), LAND (knees bent after a hop) or FALLEN (out of hearts).
 ## It only picks pictures: how fast the hero moves, when a swing hits and how long anything
@@ -21,38 +21,49 @@ extends RefCounted
 enum Facing { DOWN, UP, SIDE }
 enum Pose { NONE, ATTACK, HOLD, FALLEN, HURT, LAND }
 
-const FRAME_SIZE: Vector2i = Vector2i(16, 24)
-## Pixels travelled per animation step; four steps make one walk cycle.
-const STRIDE: float = 7.0
+const FRAME_SIZE: Vector2i = Vector2i(16, 32)
+## Pixels travelled per animation step; six steps make one walk cycle (28 px, as it was when
+## the cycle had four).
+const STRIDE: float = 28.0 / 6.0
 ## Sprinting, each step covers more ground, so the feet don't slide.
-const RUN_STRIDE: float = 9.0
+const RUN_STRIDE: float = 6.0
 ## Sheet columns, in the order the tool paints them (a test checks).
 const IDLE: int = 0
 const BLINK: int = 1
-const WALK_A: int = 2
-const PASS_A: int = 3
-const WALK_B: int = 4
-const PASS_B: int = 5
-const ATTACK: int = 6
-const HOLD: int = 7
-const FALLEN: int = 8
-const BREATHE: int = 9
-const WINDUP: int = 10
-const HURT: int = 11
-const RUN_A: int = 12
-const RUN_PASS_A: int = 13
-const RUN_B: int = 14
-const RUN_PASS_B: int = 15
-const COLUMNS: int = 16
+## The walk: a step, the weight coming down, the legs passing; then the same on the other foot.
+const WALK_1: int = 2
+const WALK_2: int = 3
+const WALK_3: int = 4
+const WALK_4: int = 5
+const WALK_5: int = 6
+const WALK_6: int = 7
+## The swing: gathering, the slash (ATTACK), following through.
+const WINDUP: int = 8
+const ATTACK: int = 9
+const FOLLOW: int = 10
+const HOLD: int = 11
+const FALLEN: int = 12
+const BREATHE: int = 13
+const HURT: int = 14
+const RUN_1: int = 15
+const RUN_2: int = 16
+const RUN_3: int = 17
+const RUN_4: int = 18
+const RUN_5: int = 19
+const RUN_6: int = 20
+const COLUMNS: int = 21
 ## Walk order from standing: legs passing first, then a step, so setting off doesn't jump.
-const CYCLE: Array[int] = [PASS_B, WALK_A, PASS_A, WALK_B]
-const RUN_CYCLE: Array[int] = [RUN_PASS_B, RUN_A, RUN_PASS_A, RUN_B]
+const CYCLE: Array[int] = [WALK_6, WALK_1, WALK_2, WALK_3, WALK_4, WALK_5]
+const RUN_CYCLE: Array[int] = [RUN_6, RUN_1, RUN_2, RUN_3, RUN_4, RUN_5]
+## The frames in which the weight comes down: the body dips a pixel (bob()).
+const LOW: Array[int] = [WALK_2, WALK_5, RUN_2, RUN_5]
 ## Standing, the shoulders drop for BREATH_OUT at the end of every BREATH_EVERY seconds.
 const BREATH_EVERY: float = 2.6
 const BREATH_OUT: float = 0.9
-## A swing's pictures by how far through it is (0-1): the wind-up, the lunge, then settling.
+## A swing's pictures by how far through it is (0-1): the wind-up, the slash, then the
+## follow-through.
 const WINDUP_UNTIL: float = 0.18
-const SETTLE_FROM: float = 0.82
+const FOLLOW_FROM: float = 0.6
 ## Standing, the eyes close for BLINK_TIME every BLINK_EVERY seconds.
 const BLINK_EVERY: float = 3.4
 const BLINK_TIME: float = 0.14
@@ -99,7 +110,7 @@ func frame() -> int:
 		Pose.ATTACK:
 			if attack_progress < WINDUP_UNTIL:
 				return WINDUP
-			return BREATHE if attack_progress >= SETTLE_FROM else ATTACK
+			return FOLLOW if attack_progress >= FOLLOW_FROM else ATTACK
 		Pose.HURT:
 			return HURT
 		Pose.LAND:
@@ -130,9 +141,9 @@ func shows_flipped() -> bool:
 	return flip_h and row() == int(Facing.SIDE)
 
 
-## The classic walking bob: 1 px down on the step frames.
+## The walking bob: 1 px down as the weight comes onto each foot.
 func bob() -> int:
-	return 1 if pose == Pose.NONE and _moving and frame() in [WALK_A, WALK_B, RUN_A, RUN_B] else 0
+	return 1 if pose == Pose.NONE and _moving and frame() in LOW else 0
 
 
 func _face(direction: Vector2) -> void:

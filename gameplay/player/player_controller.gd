@@ -3,7 +3,7 @@ extends CharacterBody2D
 ## The hero in an area: reads input, steps the grid-checked PlayerMotor, swings the sword and
 ## takes hits, and draws the sprite (docs/TECH_DESIGN.md §4). Position comes from the motor,
 ## not from physics. The HurtBox child is where the hero can be hit; the Sword child is the
-## swing's HitBox. PlayerAnimator picks the sprite's frame: walking, blinking, lunging with the
+## swing's HitBox. PlayerAnimator picks the sprite's frame: walking, blinking, swinging the
 ## sword, holding up an item just taken (hold_up), or fallen.
 
 const HOP_TIME: float = 0.22
@@ -18,7 +18,7 @@ const DUST_EVERY: float = 0.16
 ## How long an item just taken is held overhead (moving or swinging ends it sooner).
 const HOLD_TIME: float = 1.1
 ## Where a held item's picture is drawn, from the hero's feet: just above the raised hands.
-const HOLD_OFFSET: Vector2 = Vector2(-8.0, -39.0)
+const HOLD_OFFSET: Vector2 = Vector2(-8.0, -47.0)
 
 var motor: PlayerMotor
 ## Whether input moves the hero (off while talking, going through a door, or down).

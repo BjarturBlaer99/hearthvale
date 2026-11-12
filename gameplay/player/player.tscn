@@ -22,11 +22,11 @@ radii = Vector2(6, 2.6)
 strength = 1.1
 
 [node name="Sprite" type="Sprite2D" parent="."]
-position = Vector2(-8, -24)
+position = Vector2(-8, -32)
 texture = ExtResource("2_sheet")
 centered = false
 region_enabled = true
-region_rect = Rect2(0, 0, 16, 24)
+region_rect = Rect2(0, 0, 16, 32)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 

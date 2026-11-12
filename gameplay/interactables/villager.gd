@@ -3,12 +3,17 @@ extends Talkable
 ## A villager who stands in one spot and talks. Their name comes from their conversation (the
 ## start node's speaker, through the dialogue's "speakers" map). Pixel art painted by
 ## tools/art/make_sprites.gd in marker colours, swapped for this villager's robe and hair; feet
-## in the middle of the cell like the hero's, head above the cell.
+## in the middle of the cell like the hero's, and as tall as he is, two cells (P1e). They
+## breathe and blink in their own time (Idling), for show only.
 
 const SHEET: Texture2D = preload("res://gameplay/art/villager.png")
 ## Frames in the order the tool paints them (a test checks).
-const FRAMES: Dictionary = {&"plain": 0, &"bearded": 1}
-const SIZE: Vector2i = Vector2i(16, 24)
+const FRAMES: Dictionary = {
+	&"plain": 0, &"bearded": 1, &"plain_breathe": 2, &"bearded_breathe": 3, &"plain_blink": 4, &"bearded_blink": 5,
+}
+const SIZE: Vector2i = Vector2i(16, 32)
+## What each look of Idling adds to the frame's name.
+const LOOKS: Dictionary = {Idling.Look.REST: "", Idling.Look.BREATHE: "_breathe", Idling.Look.BLINK: "_blink"}
 ## The marker colours the sheet is painted in, swapped for each villager's own.
 const ROBE_MARK: Color = Color(1.0, 0.0, 1.0)
 const ROBE_SHADE_MARK: Color = Color(0.5, 0.0, 0.5)
@@ -23,6 +28,26 @@ const FEET_Y: float = 14.0 - LIFT
 @export var robe_color: Color = Color(0.45, 0.35, 0.60)
 @export var hair_color: Color = Color(0.35, 0.22, 0.12)
 @export var beard: bool = false
+
+var _idling: Idling
+var _look: Idling.Look = Idling.Look.REST
+
+
+func _ready() -> void:
+	_idling = Idling.new(Idling.phase_of(cell()))
+	_look = _idling.look()
+
+
+func _process(delta: float) -> void:
+	_idling.tick(delta)
+	if _idling.look() != _look:
+		_look = _idling.look()
+		queue_redraw()
+
+
+## The frame of the sheet showing now: this villager's picture, breathing out or blinking.
+func frame() -> StringName:
+	return StringName(("bearded" if beard else "plain") + str(LOOKS[_look]))
 
 
 func display_name() -> String:
@@ -40,7 +65,7 @@ func prompt() -> String:
 
 func _draw() -> void:
 	SoftShadow.draw(self, Vector2(8, FEET_Y - 1.0), Vector2(6, 2.5), 1.1)
-	SpriteSheet.draw(self, _sheet(), FRAMES[&"bearded" if beard else &"plain"], SIZE, Vector2(0, FEET_Y - SIZE.y + 1))
+	SpriteSheet.draw(self, _sheet(), FRAMES[frame()], SIZE, Vector2(0, FEET_Y - SIZE.y + 1))
 
 
 ## The villager sheet in this villager's robe and hair (made once per look).

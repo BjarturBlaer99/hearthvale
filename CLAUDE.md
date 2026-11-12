@@ -53,9 +53,14 @@ in `docs/DECISIONS.md` are superseded.
   text is Hearthvale's own pixel font, painted from ASCII by `tools/art/make_font.gd` with the UI theme. Label
   sizes are whole multiples of 8; boxes wear `PanelFrame`. See `docs/progress/art-pass-4-plan.md`.
   **Hero pass (user's request, 2026-11-11):** over the blue tunic the hero wears a leather vest, wrist guards, a
-  belt pouch, slate trousers and tall boots, with his sword on his back and a small pack. Sixteen frames a row:
-  the nine drawn ones, and seven the tool makes from them (breathing, attack wind-up, flinch, four run frames).
+  belt pouch, slate trousers and tall boots, with his sword on his back and a small pack. (Its sixteen 16x24
+  frames were replaced in P1e, below.)
   The animator only picks pictures; swing timing and hits belong to the motor. See `docs/progress/hero-pass-plan.md`.
+  **Characters (P1e, 2026-11-12):** the hero is two cells tall (16x32) with his hood down, and is put together
+  from parts by the tool (a head, a body pose, a pair of legs per facing), so edit a part and every frame that
+  uses it follows. Twenty-one frames a row: six-frame walk and run, a three-frame swing. Villagers are as tall,
+  and breathe and blink (`Idling`). Feet, collisions and the sword's reach are where they were: `Sword.HAND`
+  only says where the blade is drawn from. See `docs/progress/P1e-plan.md`.
   **Nature (P1c, 2026-11-12):** trees are tall pictures painted by `tools/art/make_scenery.gd` and stood up at
   load by `Scenery` (the hero walks behind them; a crown fades when anything that matters is behind it). A tree
   still blocks exactly its own cell. Cherry trees are `"cherry"` blocks in `build_maps.gd`; the eight new cells

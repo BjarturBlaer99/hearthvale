@@ -1242,3 +1242,37 @@ Plan: `docs/progress/P1d-plan.md`.
 - **Frame times on this machine drift a lot between runs** (the same build read 1.75 ms and 3.77 ms in the same house minutes apart), so only the in-run comparisons above mean anything.
 - **No normal maps.** The pivot plan's promise to try them is dropped: a wall is now a painted lit face and a dark top.
 - House fronts, furniture, floors and doors were not repainted.
+
+## 2026-11-12 — P1e: characters (built; not yet tried in play)
+
+Plan: `docs/progress/P1e-plan.md`.
+
+**Built**
+- **A taller hero, hood down:** 16 by 32 pixels in place of 16 by 24, standing on the same spot. Brown hair, the blue hood hanging behind his neck, and everything he wore before.
+- **Put together from parts** (`tools/art/make_player_sprite.gd`): a head, a body pose and a pair of legs per facing, joined by the tool, so every frame of a facing has the same head and clothes. Twenty-one frames a row (thirteen built, eight made from those).
+- **Six-frame walk and run:** legs passing, a step, the weight coming down, then the same on the other foot, with the arms swinging against the legs. A cycle covers the ground it did with four frames (28 pixels walking, 36 running).
+- **A three-frame swing, drawn for each facing:** wind-up (the hand goes up to the hilt), slash, follow-through, chosen by how far through the swing the motor is.
+- **Villagers two cells tall,** redrawn in the hero's proportions, each breathing out and blinking in their own time (`Idling`, pure). The idle frames are made by the tool from the drawn ones.
+- **A chicken standing still blinks** (a made frame too).
+
+**Checked**
+- 382 tests in 53 suites pass (+8: `tests/core/ambient/idling_test.gd`, `tests/world/characters_test.gd`, and one each in the animator, hero and sprite suites). The tests naming the old frames were rewritten. Import and boot clean.
+- **Play is as it was.** No motor, combat, terrain or map file changed. The one scene touched is `player.tscn` (where the sprite is drawn from, and its size). The feet's collision shape is the same size; a villager still fills exactly its own cell; `Sword.HAND` is used only to draw the blade.
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: the walk's first two steps swapped, slash and follow-through swapped, the taller hero drawn from where the short one was, villagers never breathing or blinking, a blink cutting into a breath out.
+- **Frame cost:** draw calls are what they were at the last commit: the village 324 (325), Elder Bram's house 50 (50), the keep 386 (387), the cistern 235 (235). Times can't be compared on this machine: the same build read 15.6 ms and 2.6 ms in the cistern in two runs.
+- Screenshots: all 88 retaken. Looked at closely: the village square, Elder Bram's house, Tilda's shop, the swing at the dummy, the sword held up, the fall in the South Field.
+
+**Changed from the plan**
+- Villagers were redrawn, not stretched: the old robe lengthened left a small head on a long body.
+- The chicken's blink was added, since the roadmap names animals.
+
+**Known issues and limits**
+- Not tried in play.
+- **The hero's head hides most of whoever he talks to from the south.** Two-cell people on neighbouring cells overlap by half. Elder Bram and Tilda are both talked to this way.
+- **Elder Bram's fire shows above his head like a crown.** He stands in front of his hearth, and his head now reaches the flame. Moving him a cell would change where things stand, so it is left for the user to decide.
+- **The blade is drawn from the middle of his belt,** not from the fist the slash frames hold out. Facing up, it is hidden behind him mid-swing, as it was.
+- **From the front and back, running looks like walking.** Only the side view leans.
+- **The fallen hero is small:** the frame is one cell wide, so he lies curled in it.
+- **The training dummy, the scarecrow and the goblins are still 24 pixels tall,** shorter than the hero. Enemies and bosses were not redrawn.
+- The arms holding an item up are a pixel wide.
+- The HUD still covers the top corners of dungeon rooms (1f).

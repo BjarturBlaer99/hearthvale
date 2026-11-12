@@ -11,8 +11,9 @@ const WOOD: Color = Color(0.84, 0.66, 0.42)
 const EDGE: Color = Color(0.10, 0.08, 0.12)
 const HILT: Color = Color(0.55, 0.36, 0.18)
 const TRAIL: Color = Color(1.0, 1.0, 1.0, 0.35)
-## Where the hand is, relative to the hero's feet.
-const HAND: Vector2 = Vector2(0.0, -6.0)
+## Where the hand is, relative to the hero's feet: at his belt. Only the drawing uses it; the
+## arc that hits is measured from his feet, as it always was.
+const HAND: Vector2 = Vector2(0.0, -11.0)
 const BLADE_LENGTH: float = 13.0
 
 ## How far through the swing, 0 to 1 (the hero's controller sets it every frame).

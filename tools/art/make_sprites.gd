@@ -7,6 +7,9 @@ extends SceneTree
 ## them; frame names map to columns. Edit the art here, never the PNGs. Every sprite shares
 ## "." (clear) and "o" (outline); the rest of the palette is its own. The villager is painted
 ## in marker colours that the game swaps for each villager's robe and hair.
+## A sprite may also list frames "made" from its drawn ones, painted after them (frames_of):
+## "breathe" lowers everything above the sprite's "sink_row" a pixel, "blink" closes the eyes
+## (the "e" pixels: the "lid" colour over an eye's upper row, "shut" on its last).
 
 const OUT_DIR: String = "res://gameplay/art"
 const OUTLINE: Color = Color(0.10, 0.08, 0.12)
@@ -446,60 +449,79 @@ const SPRITES: Dictionary = {
 		},
 	},
 	"villager": {
-		"size": Vector2i(16, 24),
+		"size": Vector2i(16, 32),
 		"palette": {"r": Color(1.00, 0.00, 1.00), "R": Color(0.50, 0.00, 0.50), "h": Color(0.00, 1.00, 1.00), "H": Color(0.00, 0.50, 0.50), "s": Color(0.93, 0.76, 0.60), "S": Color(0.80, 0.60, 0.46), "e": Color(0.12, 0.09, 0.18), "b": Color(0.40, 0.25, 0.12), "B": Color(0.30, 0.18, 0.09)},
+		# Made from the drawn frames (frames_of): each villager breathing out, and blinking.
+		"made": {"plain_breathe": ["plain", "breathe"], "bearded_breathe": ["bearded", "breathe"], "plain_blink": ["plain", "blink"], "bearded_blink": ["bearded", "blink"]},
+		"sink_row": 15, "lid": "s", "shut": "S",
 		"frames": {
 			"plain": [
 			"................",
 			"................",
-			"................",
-			"......oooo......",
-			".....ohhhho.....",
+			".....oooooo.....",
 			"....ohhhhhho....",
-			"....ohhhhhho....",
-			"....ohssssho....",
-			"....osesseso....",
-			"....osssssso....",
-			".....oSssSo.....",
+			"...ohhhhhhhho...",
+			"...ohhhhhhhho...",
+			"...ohhhsshhho...",
+			"...ohssssssho...",
+			"...ohsessesho...",
+			"...oHsessesHo...",
+			"...oHsssssSHo...",
+			"....oSssssSo....",
 			"...oorrrrrroo...",
 			"..orrrrrrrrrro..",
 			"..orRrrrrrrRro..",
+			"..orRrrrrrrRro..",
+			".orrRrrrrrrRrro.",
+			".orrRrrrrrrRrro.",
 			".osrRrrrrrrRrso.",
-			".oSRrrrrrrrrRSo.",
-			"..oRRbbbbbbRRo..",
+			".oSRRbbbbbbRRSo.",
+			"..oorrrrrrrroo..",
 			"..orrrrrrrrrro..",
 			"..orrrrrrrrrro..",
 			"..orRrrrrrrRro..",
+			"..orRrrrrrrRro..",
+			"..orRrrrrrrRro..",
+			"..oRrrrrrrrrRo..",
 			"..oRrrrrrrrrRo..",
 			"..oRRrrrrrrRRo..",
 			"..oRRRRRRRRRRo..",
-			"...oooBooBooo...",
+			"..ooBBBooBBBoo..",
+			"...oooooooooo...",
 			],
 			"bearded": [
 			"................",
 			"................",
-			"................",
-			"......oooo......",
-			".....ohhhho.....",
+			".....oooooo.....",
 			"....ohhhhhho....",
+			"...ohhhhhhhho...",
+			"...ohhhhhhhho...",
+			"...ohssssssho...",
+			"...ohssssssho...",
+			"...ohsessesho...",
+			"...oHsessesHo...",
+			"...oHhhsshhHo...",
 			"....ohhhhhho....",
-			"....ohssssho....",
-			"....osesseso....",
-			"....oshhhhso....",
-			".....ohhhho.....",
-			"...oohhhhhhoo...",
-			"..orrohhhhorro..",
+			"...oorhhhhroo...",
+			"..orrrhhhhrrro..",
+			"..orRrrhhrrRro..",
 			"..orRrrrrrrRro..",
+			".orrRrrrrrrRrro.",
+			".orrRrrrrrrRrro.",
 			".osrRrrrrrrRrso.",
-			".oSRrrrrrrrrRSo.",
-			"..oRRbbbbbbRRo..",
+			".oSRRbbbbbbRRSo.",
+			"..oorrrrrrrroo..",
 			"..orrrrrrrrrro..",
 			"..orrrrrrrrrro..",
 			"..orRrrrrrrRro..",
+			"..orRrrrrrrRro..",
+			"..orRrrrrrrRro..",
+			"..oRrrrrrrrrRo..",
 			"..oRrrrrrrrrRo..",
 			"..oRRrrrrrrRRo..",
 			"..oRRRRRRRRRRo..",
-			"...oooBooBooo...",
+			"..ooBBBooBBBoo..",
+			"...oooooooooo...",
 			],
 		},
 	},
@@ -940,6 +962,9 @@ const SPRITES: Dictionary = {
 	"critters": {
 		"size": Vector2i(16, 16),
 		"palette": {"w": Color(0.97, 0.96, 0.92), "W": Color(0.80, 0.78, 0.74), "r": Color(0.90, 0.20, 0.18), "y": Color(0.98, 0.72, 0.20), "e": Color(0.12, 0.09, 0.18), "a": Color(1.00, 0.86, 0.30), "A": Color(0.92, 0.56, 0.16), "x": Color(0.55, 0.75, 1.00), "X": Color(0.30, 0.48, 0.90), "b": Color(0.25, 0.18, 0.12)},
+		# Made from the drawn frames (frames_of): a chicken at rest blinks.
+		"made": {"chicken_blink": ["chicken", "blink"]},
+		"lid": "w", "shut": "W",
 		"frames": {
 			"chicken": [
 			"................",
@@ -1296,9 +1321,48 @@ func _initialize() -> void:
 	quit(1 if failed else 0)
 
 
+## Every frame of `sprite` by name, in the order they are painted: the drawn ones, then the
+## ones made from them.
+static func frames_of(sprite: Dictionary) -> Dictionary:
+	var frames: Dictionary = (sprite["frames"] as Dictionary).duplicate()
+	var made: Dictionary = sprite.get("made", {})
+	for frame_name: String in made:
+		var from: Array = frames[made[frame_name][0]]
+		if made[frame_name][1] == "breathe":
+			frames[frame_name] = sink(from, int(sprite["sink_row"]))
+		else:
+			frames[frame_name] = blink(from, str(sprite["lid"]), str(sprite["shut"]))
+	return frames
+
+
+## `rows` with everything above `row` a pixel lower, and that row gone: breathing out.
+static func sink(rows: Array, row: int) -> Array:
+	var out: Array = [".".repeat(str(rows[0]).length())]
+	for y: int in rows.size():
+		if y != row:
+			out.append(rows[y])
+	return out
+
+
+## `rows` with the eyes closed: an eye pixel ("e") with more eye below it takes the `lid`
+## colour, and the last row of each eye the `shut` one.
+static func blink(rows: Array, lid: String, shut: String) -> Array:
+	var out: Array = []
+	for y: int in rows.size():
+		var line: String = rows[y]
+		var closed: String = ""
+		for x: int in line.length():
+			if line[x] != "e":
+				closed += line[x]
+			else:
+				closed += lid if y + 1 < rows.size() and str(rows[y + 1])[x] == "e" else shut
+		out.append(closed)
+	return out
+
+
 func _paint(sprite_name: String, sprite: Dictionary) -> Error:
 	var size: Vector2i = sprite["size"]
-	var frames: Dictionary = sprite["frames"]
+	var frames: Dictionary = frames_of(sprite)
 	var palette: Dictionary = sprite["palette"]
 	var image: Image = Image.create(size.x * frames.size(), size.y * 2, false, Image.FORMAT_RGBA8)
 	image.fill(Color(0, 0, 0, 0))

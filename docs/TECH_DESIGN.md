@@ -121,16 +121,20 @@ res://
 ## 4. Hero, items & combat
 - `PlayerController` (CharacterBody2D) reads input, steps `PlayerMotor` and draws the sprite. `PlayerAnimator`
   (pure, tested) picks the frame:
-  - 4-way facing, and a four-frame walk cycle that advances by distance travelled (so it keeps pace with
-    sprinting), with a one-pixel bob on each step
+  - 4-way facing, and a six-frame walk cycle (legs passing, a step, the weight coming down, then the same on
+    the other foot) that advances by distance travelled (so it keeps pace with sprinting), with a one-pixel dip
+    as the weight comes onto each foot. A cycle covers 28 pixels, as it did with four frames
   - a blink every few seconds while standing, and a slow breath (the `BREATHE` frame for `BREATH_OUT` of every
     `BREATH_EVERY` seconds)
   - sprinting (`sprinting`): the leaning run frames, and a longer stride (`RUN_STRIDE`) so the feet keep pace
-  - a swing by `attack_progress` (the motor's): wind-up until `WINDUP_UNTIL`, the lunge, settling from
-    `SETTLE_FROM`. Pictures only: the sword's HitBox is live for the whole swing, as before
+  - a swing by `attack_progress` (the motor's): wind-up until `WINDUP_UNTIL`, the slash, the follow-through
+    from `FOLLOW_FROM`, each drawn for every facing. Pictures only: the sword's HitBox is live for the whole
+    swing, as before, and is measured from his feet. `Sword.HAND` (his belt) is only where the blade is drawn from
   - poses for a hit (`HURT`, a flinch) and for landing from a ledge hop (`LAND`, for `LAND_TIME`)
-  - a pose that overrides both: lunging behind the sword, lying fallen at zero hearts, or holding an item
+  - a pose that overrides both: swinging the sword, lying fallen at zero hearts, or holding an item
     overhead (always seen from the front)
+  - **He is two cells tall** (P1e): frames are 16x32 with the soles on the last row, drawn up from his feet,
+    so he stands on the same spot and collides as he did
 
   `hold_up(icon)` shows that last pose, with the item's picture above the hands, for `HOLD_TIME`. The area calls
   it when the hero picks up an item, opens a chest or takes a heart container. It's for show only: moving or
@@ -445,13 +449,21 @@ run headless; see CLAUDE.md for the command and gotchas.
 
 ## 14. Sprites
 - **Every actor is pixel art painted in code**, like the hero. The art lives as ASCII in `tools/art/`:
-  - `make_player_sprite.gd`: the hero, a blue hood and tunic with a gold hem and a red scarf. Three rows (down,
-    up, side; right is the side row mirrored) of sixteen 16x24 frames. Nine are drawn: idle, blink, four walk
-    frames, attack, item held up, fallen. Seven are made from those by `derived()`: breathe, windup and hurt
-    (`sink()`: the body above the chest a pixel lower) and four run frames (`lean()`: the side view's upper body a
-    pixel forward). A test checks `PlayerAnimator`'s columns against the tool's.
-    Over the tunic he wears a leather vest, wrist guards, a belt pouch, slate trousers and tall boots; the sword's
-    hilt shows over his shoulder (not in the attack frames, when it is in his hand), with a small pack behind.
+  - `make_player_sprite.gd`: the hero, brown-haired with his blue hood down, a blue tunic with a gold hem and a
+    red scarf. Three rows (down, up, side; right is the side row mirrored) of twenty-one 16x32 frames.
+    - **He is put together from parts** (P1e), so every frame of a facing has the same head and clothes:
+      `HEADS` (rows 0-11), `BODIES` (a pose, rows 12-22) and legs (`LEGS_FRONT`, `LEGS_SIDE`, rows 23-31), joined
+      by `frame()` as `RECIPES` says. The second half of the walk is the first on the other foot: the legs
+      mirrored from the front and back, the near and far leg's shades swapped from the side.
+    - Thirteen frames are built that way (`drawn()`): idle, blink, six walk frames, wind-up, slash,
+      follow-through, item held up, fallen (the last two are whole pictures).
+    - Eight are made from those by `derived()`: breathe and hurt (`sink()`: everything above the chest a pixel
+      lower) and six run frames (`lean()`: the side view's upper body a pixel forward).
+    - `HILTS` lays the sword's hilt over his shoulder in every frame but a swing's; `EXTRAS` lays a wind-up's
+      raised hand beside his head.
+    - A test checks `PlayerAnimator`'s columns against the tool's.
+    Over the tunic he wears a leather vest, wrist guards, a belt pouch, slate trousers and tall boots, with a
+    small pack behind.
   - `make_sprites.gd`: everything else, namely slime, bat, goblin archer, the Iron Warden, the Crypt Shade,
     villagers, items and pickups, the crystal switch, the torch, the training dummy and brambles
 
@@ -561,6 +573,13 @@ run headless; see CLAUDE.md for the command and gotchas.
   - Shadows, glows, sparks, poofs, arrows and the sword's swing stay drawn in code: they're effects, not shapes.
 - **Villagers** are painted in marker colours (magenta robe, cyan hair). `SpriteSheet.recoloured()` swaps them for
   each villager's `robe_color` and `hair_color`, once per look.
+  - **As tall as the hero** (P1e): 16x32, feet mid-cell where they were. A villager still fills only its own cell.
+  - **They breathe and blink** (`Idling`, `core/ambient/`, pure): out for `BREATH_OUT` of every `BREATH_EVERY`
+    seconds, eyes shut for `BLINK_TIME` every `BLINK_EVERY`, never mid-breath. Each starts at a moment of their
+    own (`phase_of(cell)`), so they don't move as one. A villager redraws only when its look changes.
+  - **Made frames:** a sprite in `make_sprites.gd` may list frames `"made"` from its drawn ones (`frames_of()`):
+    `"breathe"` lowers everything above its `"sink_row"` a pixel, `"blink"` closes the eyes. The villagers'
+    four idle frames and the chicken's blink (shown when it stands still) are made that way.
 - **The Warden:**
   - frames for standing, stepping (mirrored for the other foot), gazing (the eye open) and stunned (slumped)
   - a red tint while raging
