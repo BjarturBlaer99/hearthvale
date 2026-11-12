@@ -1117,3 +1117,13 @@ Asked for by the user: a better-looking, better-moving hero, keeping controls an
 - From the side the hilt doesn't show (the hood and the scarf's tail are in the way); the pack does.
 - The fallen frame is too small to show the new clothes and is unchanged but for its colours.
 - No jump, dodge or climb: the hero has none, and the pass adds no mechanics.
+
+## 2026-11-12 — The pivot, phase 0: audit and plan (no code)
+
+The user asked for a change of direction: a story-driven RPG with survival and farming, a modern pixel-art look, cherry blossom trees. Phase 0 is a written plan only: `docs/progress/pivot-plan.md`.
+
+- The hero pass was committed first (`ffa36a7`, 345 tests pass); it has still not been tried in play.
+- Audited: `GameState`, `SaveSystem`, the motor, items and the registry, the HUD and screens, the area controller, light, enemies, quests, audio, the art tools, the maps, settings, the tools and the tests.
+- Checked on this machine: the monitors are 2560x1440 (exactly 640x360 four times); real 2D lights work in the project's renderer, and 24 of them over a full screen cost about 0.9 ms a frame.
+- Nine decisions are waiting on the user (resolution and grid, the indoor camera, the hero's hood, a home for the hero, new cherry tree cells, the day's length, the clock in dungeons, saving, six review stops in phase 1).
+- Nothing in the game changed. `CLAUDE.md`, the GDD and the roadmap are rewritten on approval, before any code.
