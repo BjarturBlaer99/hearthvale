@@ -16,6 +16,7 @@ res://
     puzzles/         # PuzzleRules (pushing blocks, sinking them in pits, plates, torches, multi-flag shutters)
     light/           # LightRules (how much light reaches a point in a dark area)
     time/            # DayClock (the day's rules: its length, the light by the hour, lamps, night)
+    energy/          # EnergyRules (what things cost, tiredness, what collapsing costs)
     art/             # PixelGrade (the art tools' colour pass: warm colour, soft outlines)
     quests/          # ConditionEvaluator, EffectApplier, QuestRunner, QuestState
     combat/          # CombatRules (hit geometry, knockback, weapon choice), Hit
@@ -142,7 +143,8 @@ res://
   swinging ends it at once.
 
   The motor's state machine has one script per state:
-  - `ground`: walks at `WALK_SPEED`, or `SPRINT_SPEED` while sprint is held (no stamina)
+  - `ground`: walks at `WALK_SPEED`, or `SPRINT_SPEED` while sprinting, times `speed_scale` (the controller
+    sets both from the energy rules, §17)
   - `attack`: stands still for the weapon's cooldown
   - `hurt`: pushed along the hit at `KNOCKBACK_SPEED` through the terrain rules
   - `dead`: lies still
@@ -345,7 +347,7 @@ res://
 | `data/dialogue/` | one conversation per file |
 | `data/enemies/` | one enemy type per file |
 | `data/breakables/` | one breakable (grass, pot) per file |
-| `data/rules/` | one set of rules per file: the numbers a system runs on (`time.json`: the day's clock) |
+| `data/rules/` | one set of rules per file: the numbers a system runs on (`time.json`: the day's clock; `energy.json`: the hero's energy) |
 
 DataRegistry validates required fields and resolves every cross-reference at load. A set of rules must be one
 the game knows (`RULE_SETS`), and is checked by the class that reads it (`DayClock.problems()`).
@@ -653,3 +655,27 @@ run headless; see CLAUDE.md for the command and gotchas.
   `EventBus.slept`; the area running then saves the game and says so.
 - **Tools:** `tools/capture.gd` takes every shot at noon unless its action is `time:<HH:MM>`;
   `tools/playtest.gd` takes an hour after a scenario's name.
+
+## 17. Energy
+- **The rules are data** (`data/rules/energy.json`, in `docs/data/rules.schema.json`): a full bar (100), what
+  things cost (`sprint_per_second`, `swing`, `shot`), when the hero is tired (`low`: under 25 he moves at 85%
+  and the sword's cooldown is 1.3 times as long), when he can't sprint (`no_sprint_below`: 10), and what
+  collapsing costs (`collapse`: he wakes with half a bar, and loses a tenth of his coins, 30 at most).
+- **`EnergyRules`** (`core/energy/`, pure) reads them and answers `cost()`, `is_low()`, `can_sprint()`,
+  `is_spent()`, `move_factor()`, `cooldown_factor()`, `wake_energy()` and `coins_lost()`. `problems()` checks a
+  set of rules at load.
+- **`GameState`** holds `energy` (saved since version 2). `spend_energy()` and `set_energy()` keep it between
+  nothing and a full bar and emit `EventBus.energy_changed`. `is_exhausted()` is true at zero. `collapse()`
+  is the state's part of collapsing: the next day, half a bar, the coins gone; it returns how many.
+  **Nothing here touches hearts.**
+- **Spending:** `PlayerController` sets `motor.sprinting` (sprint held, and the energy for it) and
+  `motor.speed_scale` every physics frame, and spends the sprint's cost only for frames in which the hero
+  actually moved on foot while sprinting. A swing spends its cost when it starts, with the cooldown stretched
+  if he is tired; the area does the same for a bow's shot. A bomb is free.
+- **Collapsing** (`AreaController`): each frame, an exhausted hero who isn't down, in a pit or talking
+  collapses: `collapse()` lays him down (`PlayerController.lie_down()`, the fallen picture), switches off his
+  hurt box and his controls, and after `COLLAPSE_TIME` `_wake_at_home()` runs: `GameState.collapse()`, the
+  words for the home area to say, the way to his bed, a save, and the change of scene. The day running out
+  (`end_the_day()`) goes the same way, so it costs the same.
+- **The HUD:** the area shows the `EnergyBar` and keeps it to `energy_changed`; a line of words says when he
+  crosses into being tired or too tired to run.

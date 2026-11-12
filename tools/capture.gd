@@ -17,6 +17,8 @@ extends SceneTree
 ## shows the title screen instead of an area ("finished": with a finished game saved, in a
 ## slot of its own), and "ending" the ending screen (after two quests and an hour and a bit of
 ## play). Every shot is taken at noon (NOON), unless its action is "time:<HH:MM>".
+## "energy:<n>" leaves the hero with that much energy; "collapse" takes it all (he is caught
+## lying where he fell, and never gets home: nothing is saved).
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -117,6 +119,8 @@ const SHOTS: Array = [
 	["97_home", &"home", Vector2i(5, 6), Vector2.UP, 0, ""],
 	["98_the_bed_asks", &"home", Vector2i(2, 3), Vector2.LEFT, 0, "talk"],
 	["99_a_new_morning", &"home", Vector2i(2, 3), Vector2.LEFT, 3, "sleep"],
+	["100_tired", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "energy:18"],
+	["101_out_of_energy", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "collapse"],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -213,7 +217,18 @@ func _capture() -> void:
 		if shot[5] == "accept":
 			for i: int in 2:
 				scene.get(&"hud").get(&"dialogue").call(&"confirm")
+		if str(shot[5]).begins_with("energy:"):
+			game_state.call(&"set_energy", float(str(shot[5]).trim_prefix("energy:")))
 		await _frames(30)
+		if shot[5] == "collapse":
+			# Caught as he lies: the way home is stopped before he can take it.
+			scene.set(&"travel", func(_path: String) -> void: pass)
+			game_state.call(&"set_energy", 0.0)
+			await _frames(24)
+			_save(out_dir, shot[0])
+			scene.free()
+			await _frames(2)
+			continue
 		if shot[5] == "swing":
 			player.call(&"swing")
 			await _frames(9)

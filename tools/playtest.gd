@@ -26,7 +26,8 @@ const LOG_DIR: String = "user://playtests"
 const KEYS: String = "keys"
 
 ## Each scenario: the area and cell to start in, items to hold, and flags to set. An hour
-## after the scenario's name starts it at that time of day: -- village 19:30
+## after the scenario's name starts it at that time of day, and energy=<n> with that much
+## energy: -- village 19:30 energy=12
 const SCENARIOS: Dictionary = {
 	# At home, by the door: for trying the bed.
 	"home": {
@@ -116,6 +117,9 @@ func _start() -> void:
 		if DayClock.parse(arg) >= 0:
 			game_state.call(&"set_time", float((game_state.call(&"day_clock") as DayClock).in_day(arg)))
 			print("tools/playtest: starting at %s." % arg)
+		elif arg.begins_with("energy=") and arg.trim_prefix("energy=").is_valid_float():
+			game_state.call(&"set_energy", float(arg.trim_prefix("energy=")))
+			print("tools/playtest: starting with %s energy." % arg.trim_prefix("energy="))
 	game_state.call(&"update_player", scenario["area"], scenario["cell"])
 	change_scene_to_file("res://world/areas/%s/%s.tscn" % [scenario["area"], scenario["area"]])
 

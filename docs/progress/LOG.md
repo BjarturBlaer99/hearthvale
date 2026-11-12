@@ -1366,3 +1366,36 @@ Plan: `docs/progress/P2-plan.md` (the second of P2's five steps).
 - **The bed's question has no name above it,** like a sign's words.
 - **Staying up until 02:00 saves the game,** as sleeping does: the save never holds a day that has ended.
 - The cottage looks like the weaver's from outside but for where it stands.
+
+## 2026-11-12 — P2c: energy (built; not yet tried in play)
+
+Plan: `docs/progress/P2-plan.md` (the third of P2's five steps).
+
+**Built**
+- **The energy rules are data** (`data/rules/energy.json`, read by `EnergyRules` in `core/energy/`, pure): a bar of 100; sprinting 0.25 a second, a swing or a shot 0.5; tired under 25; no sprinting under 10; collapsing leaves half a bar and takes a tenth of his coins, 30 at most.
+- **The bar is on the HUD,** under the hearts: green, then amber, then red where he tires.
+- **Sprint costs energy** for each frame in which he actually runs. Holding the key while standing costs nothing.
+- **A swing and a shot each cost 0.5.** A bomb is free. Walking and talking are free.
+- **Tired (under 25):** he walks and runs at 85% of his speed, and the sword's cooldown is 1.3 times as long. **Worn out (under 10):** he can't sprint. A line of words says so as each happens.
+- **At zero he collapses:** he lies where he fell for a moment (nothing can hurt him), then wakes by his bed the next morning with half his energy and a tenth of his coins gone. It can happen in a dungeon; what he did there stays done.
+- **Staying up until 02:00 costs the same.**
+- **Tools:** the playtest tool takes a starting energy (`-- village energy=12`); two new screenshots (101 in all): the bar when tired, and a collapse.
+
+**Checked**
+- 427 tests in 60 suites pass (+14: `tests/core/energy/energy_rules_test.gd`, `tests/world/energy_test.gd`, two in `tests/autoload/day_test.gd`). They passed on the first run. Import and boot clean.
+- **Hearts are never touched:** every energy test ends by checking them, and a planted bug that made collapsing cost a heart was caught three times over.
+- **Rested, nothing changed:** at 25 energy or more the walk is 72 pixels a second, the run 120, and the sword's cooldown what the weapon's data says.
+- **Older tests updated:** 2b's test of staying up (it now costs a coin of twelve), and the HUD's test that said the bar was hidden.
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: tired already at a quarter, no limit to the coins lost, sprint draining while standing still, being hurt while lying collapsed, collapsing costing a heart.
+- **Frame cost:** draw calls within a few of the last step (the village 327, Elder Bram's house 46, the keep 382, the cistern 231).
+- **The player's own save was not touched** by the tools: the collapse shot stops the way home before anything is saved.
+- Screenshots: all 101 taken. Looked at closely: the bar full, tired and empty; the collapse in the square.
+
+**Known issues and limits**
+- Not tried in play. **The numbers are starting values:** whether sprint still feels free enough, and whether a long fight drains him unfairly, are for a playtest to say. They are one file to change.
+- **Nothing gives energy back but sleep** until food arrives in 2d. For this one step the bar only goes down during a day.
+- **No sound** for tiring or collapsing (2e).
+- **The pause menu doesn't show energy** as a number; the bar is the only place it shows.
+- **A collapse in the middle of a boss fight sends him home:** the fight starts again next time, as after a fall.
+- **Under 10 energy the only way to zero is swinging or shooting** (twenty swings), since he can no longer run.
+- Hoeing and watering costs are in the plan but not in the data yet: they come with the tools, in P3.

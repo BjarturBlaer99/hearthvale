@@ -28,9 +28,18 @@ const RESPAWN_DELAY: float = 1.0
 const ROOM_FLASH: float = 0.2
 ## How long the screen stays dark as one day ends and the next begins.
 const DAY_FLASH: float = 1.4
-## What is said on waking: after a night in bed, and after staying up until the day ran out.
+## What is said on waking: after a night in bed, after staying up until the day ran out, and
+## after collapsing; and what is added when coins were lost on the way.
 const SLEPT_WORDS: String = "You wake rested. The game is saved."
 const WOKE_LATE_WORDS: String = "You stayed up too late, and woke in your own bed."
+const COLLAPSED_WORDS: String = "You collapsed, and woke in your own bed."
+const COINS_LOST_WORDS: String = " You lost %d coins on the way."
+## What is said as the hero tires, and as he drops.
+const TIRED_WORDS: String = "You are getting tired."
+const WORN_OUT_WORDS: String = "You are too tired to run."
+const SPENT_WORDS: String = "You are spent. Everything goes dark."
+## How long the hero lies where he fell, out of energy, before he wakes at home.
+const COLLAPSE_TIME: float = 1.3
 ## How long the hero must push against a block before it slides.
 const PUSH_TIME: float = 0.35
 ## Where "Quit to title" goes.
@@ -106,6 +115,11 @@ var _door_open: Dictionary = {}
 var _push_time: float = 0.0
 var _dying: bool = false
 var _respawn_left: float = 0.0
+## Out of energy: the hero lies where he fell for this long, then wakes at home.
+var _collapsing: bool = false
+var _collapse_left: float = 0.0
+## The hero's energy at the last change, to tell when he crosses into being tired.
+var _energy_was: float = 0.0
 ## Where the hero arrived in this area, facing which way: where they come back after falling.
 var _entrance_cell: Vector2i = Vector2i.ZERO
 var _entrance_facing: Vector2 = Vector2.DOWN
@@ -180,6 +194,10 @@ func _ready() -> void:
 	EventBus.health_changed.connect(_on_health_changed)
 	EventBus.flag_set.connect(_on_flag_set)
 	EventBus.slept.connect(_on_slept)
+	EventBus.energy_changed.connect(_on_energy_changed)
+	hud.show_energy(true)
+	hud.set_energy(GameState.energy, GameState.max_energy())
+	_energy_was = GameState.energy
 	# Arriving with something to be told (he woke here after the day ran out): say it once.
 	if not GameState.arrival_notice.is_empty():
 		hud.flash(DAY_FLASH)
@@ -215,6 +233,13 @@ func _process(delta: float) -> void:
 		_respawn_left -= delta
 		if _respawn_left <= 0.0:
 			respawn()
+	if _collapsing:
+		_collapse_left -= delta
+		if _collapse_left <= 0.0:
+			_wake_at_home(COLLAPSED_WORDS)
+			return
+	elif GameState.is_exhausted() and not (_dying or is_in_pit() or is_talking()):
+		collapse()
 	if _pit_left > 0.0:
 		_pit_left -= delta
 		if _pit_left <= 0.0:
@@ -524,6 +549,7 @@ func _shoot(bow: Dictionary, ammo: StringName) -> bool:
 	var direction: Vector2i = player.facing_direction()
 	if not player.motor.attack(direction, float(stats.get("cooldown", 0.45))):
 		return false
+	GameState.spend_energy(GameState.energy_rules().cost(EnergyRules.SHOT))
 	GameState.add_item(ammo, -1)
 	EventBus.sound.emit(&"arrow")
 	var arrow: Arrow = Arrow.new()
@@ -551,7 +577,7 @@ func _set_bomb(item: Dictionary) -> bool:
 
 ## Talking, in the item menu, going through a door or down: no interacting or items.
 func _busy() -> bool:
-	return _travelling or _dying or is_in_pit() or is_talking() or is_in_menu() or is_paused()
+	return _travelling or _dying or _collapsing or is_in_pit() or is_talking() or is_in_menu() or is_paused()
 
 
 ## The lights in this area (LightRules lights): the hero's own, and every torch burning in the
@@ -578,21 +604,57 @@ func brightness_at(cell: Vector2i) -> float:
 ## day; not in a conversation or the item menu; not while the hero is down or in a pit. (Behind
 ## the pause menu nothing runs at all.)
 func clock_runs() -> bool:
-	return ambience != Ambience.DUNGEON and not (is_talking() or is_in_menu() or _dying or is_in_pit())
+	return ambience != Ambience.DUNGEON and not (is_talking() or is_in_menu() or _dying or _collapsing or is_in_pit())
 
 
-## The day ran out (02:00): the next one begins with the hero by his bed at home, and the game
-## is saved. His hearts are as they were.
+## The day ran out (02:00): he passes out, which costs what collapsing costs (GDD §6), and
+## wakes by his bed.
 func end_the_day() -> void:
+	_wake_at_home(WOKE_LATE_WORDS)
+
+
+## Out of energy (GDD §5): the hero drops where he stands, can't be hurt, and after
+## COLLAPSE_TIME wakes at home. It can happen anywhere, a dungeon too.
+func collapse() -> void:
+	if _collapsing or _travelling:
+		return
+	_collapsing = true
+	_collapse_left = COLLAPSE_TIME
+	player.controls_enabled = false
+	player.hurt_box.enabled = false
+	player.lie_down()
+	hud.set_prompt("")
+	hud.show_message(SPENT_WORDS)
+
+
+func is_collapsing() -> bool:
+	return _collapsing
+
+
+## The next day begins with the hero by his bed: half his energy, some of his coins gone
+## (GameState.collapse), his hearts as they were, and the game saved. The home area says
+## `words` as it loads.
+func _wake_at_home(words: String) -> void:
 	if _travelling:
 		return
 	_travelling = true
 	player.controls_enabled = false
-	GameState.start_next_day()
-	GameState.arrival_notice = WOKE_LATE_WORDS
+	var lost: int = GameState.collapse()
+	GameState.arrival_notice = words + (COINS_LOST_WORDS % lost if lost > 0 else "")
 	GameState.go_to(WorldPaths.HOME_AREA, WorldPaths.HOME_BED)
 	SaveSystem.save_game()
 	travel.call(WorldPaths.scene_for(WorldPaths.HOME_AREA))
+
+
+## The bar follows the hero's energy, and a line says so as he tires.
+func _on_energy_changed(current: float, maximum: float) -> void:
+	hud.set_energy(current, maximum)
+	var rules: EnergyRules = GameState.energy_rules()
+	if rules.can_sprint(_energy_was) and not rules.can_sprint(current) and not rules.is_spent(current):
+		hud.show_message(WORN_OUT_WORDS)
+	elif not rules.is_low(_energy_was) and rules.is_low(current) and not rules.is_spent(current):
+		hud.show_message(TIRED_WORDS)
+	_energy_was = current
 
 
 ## The hero slept in his bed (GameState.sleep, from the bed's conversation): the morning comes

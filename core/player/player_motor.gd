@@ -9,7 +9,8 @@ extends GridBody
 signal state_changed(state_name: StringName)
 
 const WALK_SPEED: float = 72.0
-## Holding sprint (no stamina: it never runs out).
+## Holding sprint. (Whether he may, and what it costs, are the energy rules': the controller
+## sets `sprinting` and `speed_scale`.)
 const SPRINT_SPEED: float = 120.0
 ## How fast a hit pushes the hero back (px/s), and how long they can't be hurt again after.
 const KNOCKBACK_SPEED: float = 160.0
@@ -22,8 +23,11 @@ const DEAD: StringName = &"dead"
 
 ## Last non-zero movement direction.
 var facing: Vector2 = Vector2.DOWN
-## Whether sprint is held (the controller sets it every frame). Only walking goes faster.
+## Whether the hero is sprinting (the controller sets it every frame: sprint held, and the
+## energy for it). Only walking goes faster.
 var sprinting: bool = false
+## The share of his speed he walks and runs at: 1, or less when he is tired (EnergyRules).
+var speed_scale: float = 1.0
 ## The direction input held on the last step (snapped to 8 ways; zero when none).
 var held: Vector2 = Vector2.ZERO
 var state: PlayerState
@@ -47,7 +51,7 @@ func _init(terrain_query: TerrainQuery = null) -> void:
 
 ## How fast the hero walks right now (px/s).
 func walk_speed() -> float:
-	return SPRINT_SPEED if sprinting else WALK_SPEED
+	return (SPRINT_SPEED if sprinting else WALK_SPEED) * speed_scale
 
 
 ## Puts the hero in the middle of `at_cell`, standing.

@@ -517,6 +517,20 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-12 — **P2c: sprint costs energy only for frames in which he ran.** Holding the key against a wall or
+  standing still costs nothing: the cost is for the running, not for the key.
+- 2026-11-12 — **P2c: collapse is checked every frame, not only when energy changes.** A hero who reaches zero
+  while down, in a pit or mid-conversation would otherwise never collapse, and be stuck slow for good.
+- 2026-11-12 — **P2c: he lies where he fell for a moment before waking at home,** and can't be hurt while he
+  does. Going straight to black felt like a crash.
+- 2026-11-12 — **P2c: staying up until 02:00 costs what collapsing costs,** as the pivot plan says ("as at zero
+  energy"): half a bar and a tenth of his coins. Sleeping in bed is how you avoid it.
+- 2026-11-12 — **P2c: "30% slower" is the sword's cooldown, 1.3 times as long.** The swing itself is as long
+  as it was and hits when it did; he is slower to be ready for the next.
+- 2026-11-12 — **P2c: a full bar comes from the rules, not from a constant.** `GameState.ENERGY_MAX` of 2a is
+  gone; `max_energy()` reads `data/rules/energy.json`.
+- 2026-11-12 — **P2c: nothing gives energy back but sleep, until there is food (2d).** For one step the bar
+  only goes down during a day.
 - 2026-11-12 — **P2b: sleeping is an effect a conversation can have.** The bed asks in words from data, and its
   first answer carries `sleep`, as a shop's answer carries `give_item`. No new menu and no new kind of
   interactable beyond a bed that says "Go to bed".

@@ -38,6 +38,7 @@ var _hold_icon: StringName = &""
 var _falling: bool = false
 var _fall_left: float = 0.0
 var _fall_time: float = 1.0
+var _lying: bool = false
 
 @onready var hurt_box: HurtBox = $HurtBox
 @onready var sword: Sword = $Sword
@@ -108,8 +109,11 @@ func swing() -> bool:
 		return false
 	var stats: Dictionary = CombatRules.weapon_stats(weapon)
 	var direction: Vector2i = facing_direction()
-	if not motor.attack(direction, stats["cooldown"]):
+	# Tired, he is slower to be ready again; and every swing costs a little energy.
+	var energy: EnergyRules = GameState.energy_rules()
+	if not motor.attack(direction, float(stats["cooldown"]) * energy.cooldown_factor(GameState.energy)):
 		return false
+	GameState.spend_energy(energy.cost(EnergyRules.SWING))
 	sword.swing(Vector2(direction), stats, ItemIcons.name_for(StringName(str(weapon.get("id", "")))))
 	EventBus.sound.emit(&"sword")
 	sync_from_motor()
@@ -133,9 +137,15 @@ func _physics_process(delta: float) -> void:
 		swing()
 	_attack_was_held = attack_held
 	var input: Vector2 = Input.get_vector(&"move_left", &"move_right", &"move_up", &"move_down") if controls_enabled else Vector2.ZERO
-	motor.sprinting = controls_enabled and Input.is_action_pressed(&"sprint")
+	# The energy rules (GDD §5): sprint needs energy and spends it while he runs; tired, he is
+	# slower.
+	var energy: EnergyRules = GameState.energy_rules()
+	motor.sprinting = controls_enabled and Input.is_action_pressed(&"sprint") and energy.can_sprint(GameState.energy)
+	motor.speed_scale = energy.move_factor(GameState.energy)
 	var before: Vector2 = motor.position
 	motor.step(input, delta)
+	if motor.sprinting and motor.position != before and motor.state_name == PlayerMotor.GROUND:
+		GameState.spend_energy(energy.cost(EnergyRules.SPRINT) * delta)
 	_kick_up_dust(motor.position != before, delta)
 	var was_in_the_air: bool = _hop_left > 0.0
 	_hop_left = maxf(0.0, _hop_left - delta)
@@ -195,6 +205,18 @@ func sheet() -> Texture2D:
 
 func shown_flipped() -> bool:
 	return _sprite.flip_h
+
+
+## The hero drops where he stands, out of energy (the fallen picture; for show). He doesn't
+## get up here: the area takes him home.
+func lie_down() -> void:
+	_lying = true
+	if motor != null:
+		sync_from_motor()
+
+
+func is_lying() -> bool:
+	return _lying
 
 
 func _end_hold() -> void:
@@ -260,7 +282,7 @@ func _update_visuals() -> void:
 		_end_hold()
 	_animator.sprinting = motor.sprinting and moved > 0.0
 	_animator.update(motor.facing, moved)
-	if motor.state_name == PlayerMotor.DEAD:
+	if motor.state_name == PlayerMotor.DEAD or _lying:
 		_animator.pose = PlayerAnimator.Pose.FALLEN
 	elif motor.is_attacking():
 		_animator.pose = PlayerAnimator.Pose.ATTACK

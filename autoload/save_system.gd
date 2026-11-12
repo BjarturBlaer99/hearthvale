@@ -98,5 +98,5 @@ func migrate(data: Dictionary, from_version: int) -> Dictionary:
 func _v1_to_v2(data: Dictionary) -> Dictionary:
 	data["day"] = 1
 	data["minute"] = float(GameState.day_clock().starts)
-	data["energy"] = GameState.ENERGY_MAX
+	data["energy"] = GameState.max_energy()
 	return data

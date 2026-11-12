@@ -102,3 +102,44 @@ Nothing is built ahead of its step. Each later step gets its own "done when" lis
 ### Not in this step
 - Starting a new game at home, in bed.
 - Cooking at the hearth (2d). What collapsing costs (2c). Furniture to buy or move.
+
+---
+
+## 2c — Energy
+
+### What changes
+- **The energy rules are data** (`data/rules/energy.json`, read by a pure `EnergyRules` in `core/energy/`): a
+  bar of 100; sprinting costs 0.25 a second, a sword swing or a bow shot 0.5; walking, talking and bombs cost
+  nothing.
+- **The bar shows on the HUD,** under the hearts (it has been there, hidden, since 1a).
+- **Sprint is no longer free** (the user's rule of 2026-11-12, in place of "no stamina"): it drains energy
+  while the hero is running, and under 10 energy he can't sprint at all.
+- **Low energy slows him:** under 25 he moves at 85% speed and the sword's cooldown is 30% longer. A line of
+  words says so when it happens.
+- **At zero he collapses:** he falls, the screen goes dark, and he wakes by his bed the next morning with half
+  his energy and a tenth of his coins gone (30 at most). Hearts are untouched, and whatever he had done in a
+  dungeon stays done.
+- **Staying up until 02:00 costs the same** as collapsing ("as at zero energy").
+- **Sleeping refills the bar** (since 2b). Nothing else does until there is food (2d).
+- **Tools:** the playtest tool takes a starting energy (`-- village energy=12`); screenshots of the bar when
+  low and of a collapse.
+
+### What does not change
+- Hearts are life in combat only: energy never costs a heart, and losing hearts never costs energy.
+- Walk and sprint speeds at 25 energy or more; the swing's length, its hit and when it lands.
+- Dying (no hearts) works as before, and costs no coins.
+
+### Done when
+- [x] the energy rules are data, checked on load, with a schema, and `EnergyRules` is unit-tested
+- [x] the HUD shows the bar, and it follows the hero's energy
+- [x] sprinting drains energy only while he runs; a swing and a shot each cost their price; a bomb is free
+- [x] under 25 he is slower and the sword's cooldown longer; under 10 he can't sprint
+- [x] at zero he collapses and wakes at home the next day with half energy and a tenth of his coins gone
+- [x] staying up until 02:00 costs the same
+- [x] hearts are never touched by any of it
+- [x] all earlier tests pass
+- [ ] (yours) sprinting still feels free enough, and a long fight doesn't drain him unfairly
+
+### Not in this step
+- Food, and anything else that gives energy back (2d). Hoeing and watering costs (P3).
+- A sound for tiring or collapsing (2e). Night monsters (2e).

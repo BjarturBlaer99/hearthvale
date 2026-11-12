@@ -94,10 +94,10 @@ godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
 # Start partway through to try one part by hand (scenarios in the script: home, village, warden, crypt, shade,
-# ending). An hour after the name starts at that time of day.
+# ending). An hour after the name starts at that time of day, and energy=<n> with that much energy.
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
 godot --path . -s res://tools/playtest.gd -- warden
-godot --path . -s res://tools/playtest.gd -- village 19:30
+godot --path . -s res://tools/playtest.gd -- village 19:30 energy=12
 # The whole game for a playtest: from the title, on its own save slot (901, kept between runs; "fresh" empties
 # it), with a log of what happens in user://playtests
 godot --path . -s res://tools/playtest.gd -- full
@@ -175,8 +175,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
 ## Do not
 - Do not hand-edit `.import` files or anything under `.godot/`.
 - Do not add swimming or climbing: the hero moves on foot (stairs, ledge hops, solid tiles), with a
-  hold-to-sprint. Sprint is free until P2; from P2 it costs **energy**, which the user asked for on 2026-11-12 in
-  place of the old "no stamina" rule. Hearts are life in combat only: energy never costs hearts.
+  hold-to-sprint. Since P2c sprint costs **energy**, which the user asked for on 2026-11-12 in place of the
+  old "no stamina" rule. Hearts are life in combat only: energy never costs hearts.
 - Do not let art or animation change gameplay timing, hit detection or collisions, unless a step says so.
 - Do not add areas beyond the hero's home and plot unless the user asks.
 - Do not add a dependency/addon without noting why in `docs/DECISIONS.md`. Allowed now: gdUnit4.
@@ -193,3 +193,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   conversation (`data/dialogue/bed.json`): `GameState.sleep()` starts the next day rested, and the area saves.
   At 02:00 the hero wakes by his bed. **Anything that ends a day saves the game and changes scene:** a test
   that does it points `SaveSystem.current_slot` at a slot of its own and replaces the area's `travel`.
+- **Energy (P2c):** the numbers are in `data/rules/energy.json`, read by `EnergyRules` (`core/energy/`, pure).
+  `GameState.energy` is spent by sprinting (while he runs), a swing and a shot; under 25 he is slower, under 10
+  he can't sprint, and at zero he collapses and wakes at home with half a bar and a tenth of his coins gone.
+  Staying up until 02:00 costs the same. A hero left at zero energy in an area collapses on its next frame.

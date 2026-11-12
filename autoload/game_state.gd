@@ -11,8 +11,8 @@ const START_HEARTS: int = 3
 const MAX_HEARTS: int = 20
 ## Pieces of heart that make one heart container.
 const PIECES_PER_HEART: int = 4
-## A full bar of energy. Nothing spends it yet (P2c): it is kept, and saved, from P2a.
-const ENERGY_MAX: float = 100.0
+## The item that is money.
+const COIN: StringName = &"coin"
 
 ## Heart containers the hero has (0 until a game starts).
 var hearts_max: int = 0
@@ -35,7 +35,8 @@ var day: int = 1
 ## The time of day, in minutes since the midnight the day began on (DayClock): 360 is 06:00,
 ## and 1560 is 02:00 at the day's end.
 var minute: float = 360.0
-## The hero's energy, 0..ENERGY_MAX (0 until a game starts).
+## The hero's energy, 0..max_energy() (0 until a game starts). Apart from hearts: energy never
+## costs a heart (GDD §5).
 var energy: float = 0.0
 
 ## Words for the area the hero arrives in to say once (he woke at home after staying up too
@@ -43,6 +44,7 @@ var energy: float = 0.0
 var arrival_notice: String = ""
 
 var _day_clock: DayClock
+var _energy_rules: EnergyRules
 ## Where the hero is: { "area", "cell": [x, y] }, or { "area", "entry" } on the way into an
 ## area through one of its entry points (go_to), until the area places them.
 var player: Dictionary = {}
@@ -53,7 +55,7 @@ func new_game() -> void:
 	clear()
 	hearts_max = START_HEARTS
 	health = max_health()
-	energy = ENERGY_MAX
+	energy = max_energy()
 
 
 func is_started() -> bool:
@@ -109,6 +111,51 @@ static func format_play_time(seconds: float) -> String:
 	return "%d:%02d" % [minutes, total % 60]
 
 
+# --- Energy ----------------------------------------------------------------
+
+## The rules of the hero's energy, from data (data/rules/energy.json).
+func energy_rules() -> EnergyRules:
+	if _energy_rules == null:
+		_energy_rules = EnergyRules.new(DataRegistry.get_rules(DataRegistry.RULES_ENERGY))
+	return _energy_rules
+
+
+## A full bar.
+func max_energy() -> float:
+	return energy_rules().maximum
+
+
+func set_energy(value: float) -> void:
+	var clamped: float = clampf(value, 0.0, max_energy())
+	if clamped == energy:
+		return
+	energy = clamped
+	EventBus.energy_changed.emit(energy, max_energy())
+
+
+## Spends `amount` of energy (what a swing costs, or a moment's running). It never goes under
+## nothing.
+func spend_energy(amount: float) -> void:
+	set_energy(energy_rules().after(energy, maxf(amount, 0.0)))
+
+
+## Whether the hero has no energy left: he collapses (the area sees to it).
+func is_exhausted() -> bool:
+	return is_started() and energy_rules().is_spent(energy)
+
+
+## The hero collapsed, or stayed up until the day ran out (GDD §5, §6): the next day begins, he
+## has half his energy, and some of his coins are gone. His hearts are as they were. Returns how
+## many coins he lost.
+func collapse() -> int:
+	start_next_day()
+	set_energy(energy_rules().wake_energy())
+	var lost: int = energy_rules().coins_lost(item_count(COIN))
+	if lost > 0:
+		add_item(COIN, -lost)
+	return lost
+
+
 # --- Time ------------------------------------------------------------------
 
 ## The rules of the day, from data (data/rules/time.json).
@@ -149,7 +196,7 @@ func start_next_day() -> void:
 ## full energy. Whoever runs the area saves the game.
 func sleep() -> void:
 	start_next_day()
-	energy = ENERGY_MAX
+	set_energy(max_energy())
 	set_health(max_health())
 	EventBus.slept.emit(day)
 
@@ -316,7 +363,7 @@ func from_dict(data: Dictionary) -> void:
 	play_time = maxf(float(data.get("play_time", 0.0)), 0.0)
 	day = maxi(int(data.get("day", 1)), 1)
 	minute = clampf(float(data.get("minute", day_clock().starts)), float(day_clock().starts), float(day_clock().ends))
-	energy = clampf(float(data.get("energy", ENERGY_MAX)), 0.0, ENERGY_MAX)
+	energy = clampf(float(data.get("energy", max_energy())), 0.0, max_energy())
 	var src_flags: Dictionary = data.get("flags", {})
 	for key: Variant in src_flags:
 		flags[StringName(str(key))] = src_flags[key]

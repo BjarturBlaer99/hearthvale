@@ -2,11 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "rules.schema.json",
   "title": "Rules file (data/rules/<id>.json, one set of rules per file)",
-  "description": "The numbers a system runs on, so tuning needs no code (GDD §6). The file's id says which rules it holds. Known ids: 'time' (the day's clock, read by DayClock).",
+  "description": "The numbers a system runs on, so tuning needs no code (GDD §6). The file's id says which rules it holds. Known ids: 'time' (the day's clock, read by DayClock) and 'energy' (the hero's energy, read by EnergyRules).",
   "type": "object",
   "required": ["id"],
   "properties": {
-    "id": { "enum": ["time"], "description": "Which rules these are." }
+    "id": { "enum": ["time", "energy"], "description": "Which rules these are." }
   },
   "allOf": [
     {
@@ -37,8 +37,48 @@
           }
         }
       }
+    },
+    {
+      "if": { "properties": { "id": { "const": "energy" } } },
+      "then": {
+        "required": ["maximum", "costs", "low", "no_sprint_below", "collapse"],
+        "properties": {
+          "maximum": { "type": "number", "exclusiveMinimum": 0, "description": "A full bar." },
+          "costs": {
+            "type": "object",
+            "required": ["sprint_per_second", "swing", "shot"],
+            "description": "What things cost. Anything not named here is free.",
+            "properties": {
+              "sprint_per_second": { "type": "number", "minimum": 0, "description": "Each second the hero runs." },
+              "swing": { "type": "number", "minimum": 0, "description": "A swing of the sword." },
+              "shot": { "type": "number", "minimum": 0, "description": "A shot of the bow." }
+            }
+          },
+          "low": {
+            "type": "object",
+            "required": ["below", "move", "cooldown"],
+            "properties": {
+              "below": { "type": "number", "description": "Under this energy the hero is tired." },
+              "move": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "The share of his speed he keeps when tired." },
+              "cooldown": { "type": "number", "minimum": 1, "description": "What the sword's cooldown is multiplied by when tired." }
+            }
+          },
+          "no_sprint_below": { "type": "number", "minimum": 0, "description": "Under this energy he can't sprint." },
+          "collapse": {
+            "type": "object",
+            "required": ["wake_share", "coins_lost_share", "coins_lost_most"],
+            "description": "What running out of energy (or staying up until the day ends) costs.",
+            "properties": {
+              "wake_share": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "The share of a full bar he wakes with." },
+              "coins_lost_share": { "type": "number", "minimum": 0, "maximum": 1, "description": "The share of his coins he loses, rounded down." },
+              "coins_lost_most": { "type": "integer", "minimum": 0, "description": "The most coins he can lose." }
+            }
+          }
+        }
+      }
     }
   ],
+  "$comment": "Energy rules (id 'energy'): see the second entry of allOf.",
   "$defs": {
     "time_of_day": { "type": "string", "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$", "description": "A time on a 24-hour clock, like \"06:00\"." },
     "span": {

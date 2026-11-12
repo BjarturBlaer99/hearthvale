@@ -50,7 +50,7 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 - **Life: hearts**, for combat only. Start with **3**. Most hits cost **half a heart**. A **heart container**
   (from a boss) adds a heart and refills you; four **heart pieces** make a container. Hearts drop from enemies,
   grass and pots. At zero hearts you return to the area's entrance with full hearts.
-- **Energy** *(P2)*: a bar of 100, apart from hearts. It never costs hearts.
+- **Energy**: a bar of 100, apart from hearts. It never costs hearts. Sleep refills it; so will food *(2d)*.
 
 | Action | Energy |
 |---|---|
@@ -63,7 +63,7 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
   - **Low** (under 25): movement at 85%, the sword 30% slower. Under 10, no sprinting.
   - **At zero** the hero collapses, wakes at home the next morning with half energy and loses a tenth of his
     coins (30 at most). Dungeon progress is kept.
-  - Until P2, sprinting is free, as it has been.
+  - Staying up until the day runs out (02:00) costs the same as collapsing.
 - **Weapons and items:**
 
 | Item | Where | Use |
@@ -80,10 +80,10 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 - **Growth** *(P4, to be proposed)*: three skills (combat, farming, cooking) that rise with use.
 
 ## 6. Time, food and sleep *(P2)*
-*(Built so far: the clock, the day and the light in step 2a; the home, the bed and sleeping in 2b. The rest of
-this section is still to come.)*
+*(Built so far: the clock, the day and the light in step 2a; the home, the bed and sleeping in 2b; energy in
+2c. Food, cooking, hours and night monsters are still to come.)*
 - **A day** runs from 06:00 to 02:00 in 14 real minutes. At 02:00 the hero passes out, as at zero energy, and
-  wakes by his bed the next morning *(what it costs him comes with energy, in 2c)*. The clock stops in
+  wakes by his bed the next morning with half his energy and a tenth of his coins gone. The clock stops in
   conversations, in menus and in dungeons.
 - **Light follows the hour:** peach at dawn, clear by day, orange then violet at dusk, blue at night. Lamps
   light at dusk *(windows too, in 2e)*.

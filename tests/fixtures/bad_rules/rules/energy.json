@@ -1,0 +1,12 @@
+{
+	"id": "energy",
+	"maximum": 0,
+	"costs": {
+		"sprint_per_second": 0.25,
+		"swing": 0.5,
+		"shot": 0.5
+	},
+	"low": { "below": 25, "move": 0.85, "cooldown": 1.3 },
+	"no_sprint_below": 10,
+	"collapse": { "wake_share": 0.5, "coins_lost_share": 0.1 }
+}

@@ -40,6 +40,9 @@ signal hit_stop(seconds: float)
 ## The camera shakes up to `strength` pixels for `seconds`.
 signal shake(strength: float, seconds: float)
 
+## The hero's energy changed.
+signal energy_changed(current: float, maximum: float)
+
 ## The day's clock reached a new minute (`minute` counts from the midnight the day began on).
 signal time_changed(day: int, minute: int)
 

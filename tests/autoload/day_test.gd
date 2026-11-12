@@ -35,7 +35,7 @@ func test_a_new_game_starts_on_the_first_morning_rested() -> void:
 	assert_int(GameState.day).is_equal(1)
 	assert_float(GameState.minute).is_equal(360.0)
 	assert_str(GameState.time_text()).is_equal("Day 1  06:00")
-	assert_float(GameState.energy).override_failure_message("a full bar").is_equal(GameState.ENERGY_MAX)
+	assert_float(GameState.energy).override_failure_message("a full bar").is_equal(GameState.max_energy())
 	assert_bool(GameState.is_day_over()).is_false()
 	GameState.clear()
 	assert_float(GameState.energy).override_failure_message("nothing until a game starts").is_equal(0.0)
@@ -70,6 +70,45 @@ func test_time_passes_a_minute_at_a_time_and_stops_when_the_day_is_over() -> voi
 	assert_float(GameState.minute).is_equal(float(clock.starts))
 
 
+func test_energy_is_spent_never_goes_under_nothing_and_is_announced() -> void:
+	var heard: Array = []
+	var note: Callable = func(current: float, maximum: float) -> void: heard.append([current, maximum])
+	EventBus.energy_changed.connect(note)
+	GameState.new_game()
+	var full: float = GameState.max_energy()
+	assert_float(full).override_failure_message("a full bar is the rules'").is_equal(GameState.energy_rules().maximum)
+	GameState.spend_energy(0.5)
+	GameState.spend_energy(-3.0)
+	GameState.spend_energy(0.0)
+	assert_array(heard).override_failure_message("said once for each change").is_equal([[full - 0.5, full]])
+	assert_bool(GameState.is_exhausted()).is_false()
+	GameState.spend_energy(500.0)
+	assert_float(GameState.energy).is_equal(0.0)
+	assert_bool(GameState.is_exhausted()).is_true()
+	GameState.set_energy(full * 3.0)
+	assert_float(GameState.energy).override_failure_message("never over a full bar").is_equal(full)
+	EventBus.energy_changed.disconnect(note)
+	GameState.clear()
+	assert_bool(GameState.is_exhausted()).override_failure_message("no game, nobody to collapse").is_false()
+
+
+func test_collapsing_starts_the_next_day_with_half_his_energy_and_fewer_coins() -> void:
+	GameState.new_game()
+	GameState.add_item(GameState.COIN, 120)
+	GameState.damage(3)
+	var hearts: int = GameState.health
+	GameState.set_energy(0.0)
+	assert_int(GameState.collapse()).override_failure_message("it says what he lost").is_equal(12)
+	assert_int(GameState.day).is_equal(2)
+	assert_float(GameState.minute).is_equal(float(GameState.day_clock().starts))
+	assert_float(GameState.energy).is_equal(GameState.energy_rules().wake_energy())
+	assert_int(GameState.item_count(GameState.COIN)).is_equal(108)
+	assert_int(GameState.health).override_failure_message("hearts are untouched").is_equal(hearts)
+	GameState.add_item(GameState.COIN, -108)
+	assert_int(GameState.collapse()).override_failure_message("with no coins there is nothing to lose").is_equal(0)
+	assert_int(GameState.day).is_equal(3)
+
+
 func test_sleeping_starts_the_next_day_with_full_hearts_and_energy() -> void:
 	var slept: Array = []
 	var note: Callable = func(day: int) -> void: slept.append([day, GameState.day, GameState.health])
@@ -84,7 +123,7 @@ func test_sleeping_starts_the_next_day_with_full_hearts_and_energy() -> void:
 	assert_int(GameState.day).is_equal(2)
 	assert_float(GameState.minute).is_equal(float(GameState.day_clock().starts))
 	assert_int(GameState.health).is_equal(GameState.max_health())
-	assert_float(GameState.energy).is_equal(GameState.ENERGY_MAX)
+	assert_float(GameState.energy).is_equal(GameState.max_energy())
 	assert_array(_days).override_failure_message("a new day is announced").is_equal([2])
 	assert_array(slept).override_failure_message("and then that he slept, once he is rested").is_equal([[2, 2, GameState.max_health()]])
 
@@ -136,7 +175,7 @@ func test_the_day_the_hour_and_the_energy_are_saved() -> void:
 	GameState.from_dict(odd)
 	assert_int(GameState.day).is_equal(1)
 	assert_float(GameState.minute).is_equal(float(GameState.day_clock().starts))
-	assert_float(GameState.energy).is_equal(GameState.ENERGY_MAX)
+	assert_float(GameState.energy).is_equal(GameState.max_energy())
 
 
 func test_a_version_1_save_loads_as_the_first_morning_with_all_else_as_it_was() -> void:
@@ -147,7 +186,7 @@ func test_a_version_1_save_loads_as_the_first_morning_with_all_else_as_it_was() 
 	assert_int(_load_old("v1_playtest.json")).is_equal(OK)
 	assert_int(GameState.day).is_equal(1)
 	assert_float(GameState.minute).is_equal(float(GameState.day_clock().starts))
-	assert_float(GameState.energy).override_failure_message("rested").is_equal(GameState.ENERGY_MAX)
+	assert_float(GameState.energy).override_failure_message("rested").is_equal(GameState.max_energy())
 	assert_int(GameState.hearts_max).is_equal(int(old["hearts_max"]))
 	assert_int(GameState.health).is_equal(int(old["health"]))
 	assert_float(GameState.play_time).is_equal_approx(float(old["play_time"]), 0.01)
@@ -191,6 +230,10 @@ func test_the_clocks_rules_are_data_and_bad_ones_are_reported() -> void:
 	assert_str(errors).contains("unknown rules 'weather'")
 	assert_str(errors).contains("rules 'time': 'seconds_per_hour' must be a number above 0.")
 	assert_str(errors).contains("rules 'time': 'night' must have a 'from' and a 'to'")
+	assert_bool(DataRegistry.has_entry(&"rules", DataRegistry.RULES_ENERGY)).override_failure_message("data/rules/energy.json is loaded").is_true()
+	assert_array(Array(EnergyRules.problems(DataRegistry.get_rules(DataRegistry.RULES_ENERGY)))).is_empty()
+	assert_str(errors).contains("rules 'energy': 'maximum' must be a number above 0.")
+	assert_str(errors).contains("rules 'energy': 'collapse' needs 'coins_lost_most'")
 
 
 func _on_time(day: int, minute: int) -> void:
