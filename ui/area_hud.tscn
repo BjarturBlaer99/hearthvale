@@ -24,7 +24,6 @@ color = Color(0.04, 0.06, 0.08, 0.55)
 layout_mode = 0
 offset_left = 5.0
 offset_top = 5.0
-custom_minimum_size = Vector2(192, 0)
 mouse_filter = 2
 theme_override_constants/separation = 1
 

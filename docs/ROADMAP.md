@@ -204,7 +204,8 @@ cherry trees, which are listed and approved before they are baked. Every area is
   idle animations for villagers and animals (villagers breathe and blink; a chicken standing still blinks);
   enemies in the new palette (theirs since 1c; not redrawn).
   **Done when**: swing timing, hits, speed and collisions are untouched.
-- **1f — UI polish.** Frames, a second larger letter face for headings, the title screen.
+- **1f — UI polish.** Frames, a second larger letter face for headings, the title screen; and the HUD's corner
+  slimmed (carried over from 1a, where it covered the corners of dungeon rooms).
 
 ## P2 — Energy, food and time
 Energy apart from hearts (GDD §5); food and cooking at the hearth; a day of 14 real minutes with light that

@@ -131,7 +131,7 @@ func test_the_huds_corner_fits_what_it_holds() -> void:
 	var hud: AreaHud = village.hud
 	assert_bool(hud.energy.visible).override_failure_message("no energy bar before the energy rules (P2)").is_false()
 	var plain: Vector2 = hud.panel_size()
-	assert_float(plain.y).is_greater(40.0)
+	assert_float(plain.y).override_failure_message("hearts and where you are").is_greater(24.0)
 	hud.show_energy(true)
 	hud.set_energy(60.0, 100.0)
 	assert_float(hud.energy.fraction()).is_equal_approx(0.6, 0.001)

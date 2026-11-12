@@ -71,6 +71,9 @@ Beaten enemies sometimes drop hearts or coins.
 - **The hero** (hero pass): a leather vest, wrist guards, a belt pouch and tall boots over the blue tunic, the
   sword on his back until he swings it, and a small pack. He breathes when he stands, leans into a sprint,
   winds up before a swing, flinches when hit and bends his knees landing from a ledge.
+- **A finished look to the screens** (the pivot, step 1f): a painted evening on the title screen, a larger
+  letter face for headings, corner brackets and a ruled heading on every box, and a smaller corner for the
+  hearts.
 - **Taller people** (the pivot, step 1e): the hero stands two cells tall with his hood down, walks and runs in
   six frames and swings in three; villagers are as tall as he is and breathe and blink; a chicken standing still
   blinks.

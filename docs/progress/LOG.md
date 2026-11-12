@@ -1276,3 +1276,32 @@ Plan: `docs/progress/P1e-plan.md`.
 - **The training dummy, the scarecrow and the goblins are still 24 pixels tall,** shorter than the hero. Enemies and bosses were not redrawn.
 - The arms holding an item up are a pixel wide.
 - The HUD still covers the top corners of dungeon rooms (1f).
+
+## 2026-11-12 — P1f: UI polish (built; not yet tried in play)
+
+Plan: `docs/progress/P1f-plan.md`. The last step of the pivot's visual overhaul (P1).
+
+**Built**
+- **A heading face** (`tools/art/make_font.gd`, `ui/font/hearth_heading.tres`): a second pixel font of size 16, capitals twelve pixels tall, with thick stems, thin bars and small serifs. Forty-three glyphs drawn by hand: capitals, digits and a few marks; a small letter shows as its capital. Pairs that stood too far apart (V and A) are tucked together. The theme offers it as the `Heading` kind of label.
+- **Headings set in it:** the game's name and "The End" at twice its size (the small face was stretched four times before), and Paused, Settings, Items and Quests in their boxes, which are twelve pixels taller for it.
+- **Frames** (`PanelFrame`): a bracket in each corner with a rivet where the inner line turns, in place of the square stud; an inner line lit along the top and left and in shade along the bottom and right; and under a box's heading a rule with a diamond in its middle.
+- **The title screen:** a painted evening over Hearthvale, baked by a new tool (`tools/art/make_title.gd`, `ui/title/backdrop.png`): a dusk sky in dithered bands, a crescent moon, clouds lit from below, far hills, the old keep on its hill, the Old Wood's pines, mist, and the village's roofs among cherry trees (the game's own trees, in evening light) with lamps along the road north. The screen draws what moves: stars that twinkle, the keep's lit window, petals on the wind. The ending screen shares it, with the window dark.
+- **A slimmer HUD corner:** as wide as its words in place of a fixed 202 pixels, and no line for "Carrying: nothing" or "Item: none".
+
+**Checked**
+- 387 tests in 54 suites pass (+5, `tests/ui/polish_test.gd`; one earlier test of the corner's height was updated). Import and boot clean.
+- **Play is as it was:** the menus' options, keys and words are unchanged; the only game script touched is the two lines that tell the HUD what to show.
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: the rule's middle off to one side, an empty line still showing, the corner's box always at its widest, the title's picture pinned to the left, the corner saying it carries nothing.
+- **Frame cost:** draw calls are four fewer than at the last commit in every area measured (the village 320, Elder Bram's house 46, the keep 382, the cistern 231): the two hidden lines. The title's picture is one draw where the old backdrop drew some forty shapes a frame.
+- Screenshots: all 88 retaken. Looked at closely: the title, the ending, the pause menu, the item menu, the quest log, the keep's guard room (the corner), a conversation.
+
+**Known issues and limits**
+- Not tried in play.
+- **The heading face has no small letters:** headings are all capitals. Adding them is another fifty glyphs.
+- **The title's line of story is the old one** ("Something has stirred in the old keep north of the village."). It is story, so it was left for P4.
+- **The mist on the title reads as a flat band** more than as mist. It was softened once; it could go.
+- **The houses on the title are painted for it,** seen from the front. They are not the game's house tiles, which are seen from above.
+- **The controls hint (top right) is as wide as it was.** It is a setting, and can be switched off.
+- **On a screen taller than 16:9** the picture sits at the foot and plain night sky fills the space above it.
+- The petals on the title are single pixels; easy to miss.
+- Still open from 1e: Elder Bram's fire shows above his head, and the hero's head hides most of whoever he talks to from the south.

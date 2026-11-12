@@ -61,6 +61,12 @@ in `docs/DECISIONS.md` are superseded.
   uses it follows. Twenty-one frames a row: six-frame walk and run, a three-frame swing. Villagers are as tall,
   and breathe and blink (`Idling`). Feet, collisions and the sword's reach are where they were: `Sword.HAND`
   only says where the blade is drawn from. See `docs/progress/P1e-plan.md`.
+  **UI polish (P1f, 2026-11-12):** headings are set in a second, larger face (`ui/font/hearth_heading.tres`,
+  size 16, capitals only: a small letter shows as its capital), baked by `tools/art/make_font.gd` and offered by
+  the theme as the `Heading` kind of label. `PanelFrame` draws corner brackets and, with `rule_y`, a rule under
+  a box's heading. The title screen's evening is painted by `tools/art/make_title.gd` (`TitlePicture` has the
+  layout; `TitleBackdrop` draws what moves). The HUD's corner is as wide as its words and hides empty lines.
+  See `docs/progress/P1f-plan.md`.
   **Nature (P1c, 2026-11-12):** trees are tall pictures painted by `tools/art/make_scenery.gd` and stood up at
   load by `Scenery` (the hero walks behind them; a crown fades when anything that matters is behind it). A tree
   still blocks exactly its own cell. Cherry trees are `"cherry"` blocks in `build_maps.gd`; the eight new cells
@@ -105,8 +111,12 @@ godot --headless --path . --import
 # Repaint the wall faces, the pillar and the roof ridges after editing tools/art/make_relief.gd, then re-import
 godot --headless --path . -s res://tools/art/make_relief.gd -- <preview.png>
 godot --headless --path . --import
-# Re-bake the pixel font and the UI theme after editing tools/art/make_font.gd (optional preview of the glyphs)
+# Re-bake both pixel fonts (the small face and the heading face) and the UI theme after editing
+# tools/art/make_font.gd (optional previews of the glyphs: <preview>.png and <preview>_heading.png)
 godot --headless --path . -s res://tools/art/make_font.gd -- <preview.png>
+# Repaint the title screen's picture after editing tools/art/make_title.gd, then re-import
+godot --headless --path . -s res://tools/art/make_title.gd
+godot --headless --path . --import
 # Re-bake sound effects and music after editing tools/audio/make_audio.gd (or just some: -- sword boss), then re-import
 godot --headless --path . -s res://tools/audio/make_audio.gd
 godot --headless --path . --import

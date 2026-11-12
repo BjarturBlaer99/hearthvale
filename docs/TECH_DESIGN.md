@@ -374,6 +374,16 @@ run headless; see CLAUDE.md for the command and gotchas.
 
   The title's picture follows the save: `summary()` also says whether the saved game was finished
   (`EndingSummary.is_finished`), and then the keep's window is dark.
+
+  **The picture** (P1f) is a painted evening over Hearthvale, the size of the screen:
+  - `tools/art/make_title.gd` paints it and bakes `ui/title/backdrop.png`: a dusk sky in dithered bands
+    (`dithered()`, a 4x4 Bayer grid), a moon, clouds, far hills, the old keep, the Old Wood's pines, mist, and the
+    village: houses painted for the picture, and the game's own trees from the scenery atlas in evening light.
+  - `TitlePicture` (`ui/`) has the layout both sides need: the keep's window, the stars that twinkle, where the
+    cherry trees stand.
+  - `TitleBackdrop` draws the picture (in the middle, its foot on the screen's foot: `origin()`) and what moves
+    over it: the stars, the window's light (`keep_lit`), and petals leaving the cherry trees. The ending screen
+    uses the same backdrop with the window dark.
 - **Menus** share a pure `MenuCursor`: options with ids, labels and whether they can be chosen. Moving wraps and
   skips the ones that can't. `MenuInput` names the keys:
   - the movement keys move the cursor
@@ -555,16 +565,26 @@ run headless; see CLAUDE.md for the command and gotchas.
   - **Vignette:** `AreaHud` shades the screen's corners (a radial gradient, under the rest of the HUD).
 - **Screen layout (P1a):** every box is anchored, never placed for one screen size: menus to the middle, the
   dialogue box to the bottom edge, the controls hint to the top right, lines of text across the top or bottom.
-  - The HUD's corner is a `VBoxContainer` (`Panel/Box`): the hearts, the `EnergyBar`, then three lines.
+  - The HUD's corner is a `VBoxContainer` (`Panel/Box`): the hearts, the `EnergyBar`, then up to three lines.
     `AreaHud._fit_panel()` sizes the framed box to it, so it grows with a second row of hearts or with the bar.
+    Since P1f it is as wide as its longest line (`line_width()`, up to `BOX_MAX`, then an ellipsis), and a line
+    with nothing to say is hidden: `AreaController` hands it "" when nothing is carried or no item is in hand.
   - `EnergyBar` (`ui/`) draws a leaf and a framed bar from `set_energy(current, maximum)`: green, amber under a
     half, red at a quarter (`LOW`). It is hidden until the energy rules exist (P2): `AreaHud.show_energy()`.
 - **Lettering** (art pass 4): `tools/art/make_font.gd` paints a 95-glyph pixel font from ASCII art and bakes
   `ui/font/hearth_font.tres` (a bitmap `FontFile`, size 8, line height 11, scaled by whole numbers only) and
   `ui/theme.tres` (that font, and a one-pixel shadow under every label), and sets the project's theme.
-  - Labels ask for size 8, or a whole multiple (the titles are 32). A bitmap font has no outline, so none is set.
-  - `PanelFrame` (`ui/`) is the script on every box's `Panel`: a shadow under the box, an inner line and corner
-    studs over the box's own colour.
+  - Labels ask for size 8, or a whole multiple. A bitmap font has no outline, so none is set.
+  - **The heading face** (P1f): the same tool bakes `ui/font/hearth_heading.tres`, a second face of size 16
+    (capitals twelve pixels tall, line height 18) with thick stems, thin bars and small serifs. It has capitals,
+    digits and a few marks (`HEADING`, a list of rows a glyph); a small letter is given its capital's picture, so
+    any words can be set in it. `HEADING_KERNING` tucks together pairs that stand too far apart (V and A).
+    The theme offers it as a kind of label, `Heading` (gold over a dark shadow): a label takes it with
+    `theme_type_variation`. The game's name and "The End" are set in it at 32, each box's heading at 16.
+  - `PanelFrame` (`ui/`) is the script on every box's `Panel`: over the box's own colour it draws a shadow under
+    the box, an inner line (lit along the top and left, in shade along the bottom and right), a bracket in each
+    corner with a rivet where the inner line turns, and, when the box has a heading (`rule_y`), a rule under it
+    with a diamond in the middle. `bracket_arms()`, `rule_parts()` and `diamond_rows()` say where, and are tested.
 - **Drawing:** `SpriteSheet.draw(canvas, texture, frame, size, origin, flip_h, white, tint)` draws one frame.
   - Origins are rounded so sprites stay on the pixel grid.
   - A negative width mirrors it (side views face left).

@@ -9,6 +9,10 @@ const MESSAGE_TIME: float = 3.0
 const NOTICE_TIME: float = 3.5
 const FLASH_TIME: float = 0.35
 
+## The corner's box is as wide as its longest line, but never wider than this (px): a longer
+## line ends in an ellipsis.
+const BOX_MAX: float = 192.0
+
 ## The corners of the screen: how dark they get, and how far from the middle it starts (0-1).
 const VIGNETTE_COLOR: Color = Color(0.06, 0.03, 0.12, 0.36)
 const VIGNETTE_START: float = 0.58
@@ -74,11 +78,22 @@ func _add_vignette() -> void:
 	move_child(vignette, 0)
 
 
-## The corner's box is as big as what it holds: taller with a second row of hearts or with the
-## energy bar showing.
+## The corner's box is as big as what it holds: as wide as its longest line (or its hearts),
+## taller with a second row of hearts, the energy bar or another line showing.
 func _fit_panel() -> void:
+	var wide: float = 0.0
+	for line: Label in [_area, _items, _equipped]:
+		if line.visible:
+			wide = maxf(wide, line_width(line))
+	_box.custom_minimum_size.x = minf(wide, BOX_MAX)
 	_box.size = _box.get_combined_minimum_size()
 	_panel.size = _box.position * 2.0 + _box.size
+
+
+## How wide `line`'s words are in its own face (px), with room for the shadow under them.
+static func line_width(line: Label) -> float:
+	var face: Font = line.get_theme_font(&"font")
+	return ceilf(face.get_string_size(line.text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, line.get_theme_font_size(&"font_size")).x) + 1.0
 
 
 ## The size of the corner's box (for tests).
@@ -119,15 +134,36 @@ func set_pieces(pieces: int) -> void:
 
 
 func set_area(text: String) -> void:
-	_area.text = text
+	_set_line(_area, text)
 
 
+## What the hero carries; an empty text hides the line.
 func set_items(text: String) -> void:
-	_items.text = text
+	_set_line(_items, text)
 
 
+## The item in hand; an empty text hides the line.
 func set_equipped(text: String) -> void:
-	_equipped.text = text
+	_set_line(_equipped, text)
+
+
+## Shows `text` on `line` (hidden when there is nothing to say), and fits the box again if it
+## changed.
+func _set_line(line: Label, text: String) -> void:
+	if line.text == text and line.visible == (not text.is_empty()):
+		return
+	line.text = text
+	line.visible = not text.is_empty()
+	_fit_panel()
+
+
+## The lines of the corner's box that are showing, top to bottom (for tests).
+func shown_lines() -> PackedStringArray:
+	var lines: PackedStringArray = []
+	for line: Label in [_area, _items, _equipped]:
+		if line.visible:
+			lines.append(line.text)
+	return lines
 
 
 func set_prompt(text: String) -> void:

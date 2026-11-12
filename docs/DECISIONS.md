@@ -517,6 +517,17 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-12 — **P1f: the heading face has capitals only.** Forty-three glyphs drawn by hand; a small letter is
+  given its capital's picture, so any words can be set in it and no heading can come out with a missing letter.
+  Small letters of its own would be another fifty glyphs for six headings.
+- 2026-11-12 — **P1f: the heading face is drawn, not made from the small one.** Doubling the small face gives
+  the same letters with thicker strokes. A face with thick stems, thin bars and serifs reads as a heading.
+- 2026-11-12 — **P1f: the title's picture is baked; only what moves is drawn.** One 640x360 PNG painted by a
+  tool, with the stars, the keep's window and the petals drawn over it. The old backdrop drew hills as polygons
+  every frame. Its trees are the game's own, from the scenery atlas, so the title can't drift from the game.
+- 2026-11-12 — **P1f: the HUD's corner says only what there is to say.** No "Carrying: nothing", no "Item:
+  none", and the box is as wide as its words. In a dungeon room at twice the size it now covers far less of the
+  room's corner. P2 adds an energy bar and a clock there, which is why it was slimmed first.
 - 2026-11-12 — **P1e: the hero is put together from parts.** A head, a body pose and a pair of legs per facing,
   joined by the tool. Thirty-nine frames drawn whole would drift apart; this way one head serves every frame and
   the second half of the walk is the first on the other foot.
