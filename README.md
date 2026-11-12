@@ -68,6 +68,9 @@ Beaten enemies sometimes drop hearts or coins.
 - **Light and lettering** (art pass 4): lamps, hearths, torches and crystals glow; houses, trees and walls cast
   shadows; houses and dungeons are dim away from their lights; specks drift in the air; and all text is the
   game's own pixel font in framed boxes.
+- **The hero** (hero pass): a leather vest, wrist guards, a belt pouch and tall boots over the blue tunic, the
+  sword on his back until he swings it, and a small pack. He breathes when he stands, leans into a sprint,
+  winds up before a swing, flinches when hit and bends his knees landing from a ledge.
 - **The road north:** from the top of the north rise, through the woods.
   - **The North Fields:** a stream with a bridge, a farm plot, slimes, and a goblin archer on a plateau. Keep an eye
     on the tree line beside the road.

@@ -1,7 +1,8 @@
 extends GdUnitTestSuite
 ## The hero's poses in the game (art pass 2): an item just taken is held overhead until the
 ## hero moves, or for a moment; a chest's treasure too; a swing shows the lunge; out of hearts,
-## the hero lies fallen.
+## the hero lies fallen. And the hero pass (2026-11-11): a swing winds up, lunges and settles
+## without changing when it hits; a sprint leans; a hit makes the hero flinch.
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
@@ -60,15 +61,65 @@ func test_a_chests_treasure_is_held_up_too() -> void:
 	assert_bool(fields.interact()).override_failure_message("an open chest gives nothing more").is_false()
 
 
-func test_a_swing_shows_the_lunge_and_ends_with_it() -> void:
+func test_a_swing_winds_up_lunges_settles_and_ends() -> void:
 	GameState.add_item(&"wooden_sword")
 	var village: AreaController = _load(VILLAGE)
 	village.player.face(Vector2.LEFT)
 	assert_bool(village.player.swing()).is_true()
-	assert_that(village.player.shown_region()).is_equal(_frame(PlayerAnimator.ATTACK, PlayerAnimator.Facing.SIDE))
-	village.player.motor.step(Vector2.ZERO, 0.5)
+	assert_that(village.player.shown_region()).override_failure_message("gathering first").is_equal(_frame(PlayerAnimator.WINDUP, PlayerAnimator.Facing.SIDE))
+	assert_bool(village.player.sword.active).override_failure_message("the blade is live from the first frame, as before").is_true()
+	var shown: Array[int] = [PlayerAnimator.WINDUP]
+	for i: int in 240:
+		village.player.motor.step(Vector2.ZERO, 1.0 / 240.0)
+		village.player.sync_from_motor()
+		@warning_ignore("integer_division")
+		var column: int = int(village.player.shown_region().position.x) / 16
+		if shown[-1] != column:
+			shown.append(column)
+		if not village.player.motor.is_attacking():
+			break
+	assert_array(shown).override_failure_message("wind-up, lunge, settle, standing: %s" % [shown]).is_equal([PlayerAnimator.WINDUP, PlayerAnimator.ATTACK, PlayerAnimator.BREATHE, PlayerAnimator.IDLE])
+	assert_int(int(village.player.shown_region().position.y)).override_failure_message("still facing the same way").is_equal(int(PlayerAnimator.Facing.SIDE) * 24)
+
+
+func test_a_sprint_leans_and_a_walk_does_not() -> void:
+	var village: AreaController = _load(VILLAGE)
+	village.player.motor.sprinting = false
+	for i: int in 12:
+		village.player.motor.step(Vector2.DOWN, 1.0 / 60.0)
+		village.player.sync_from_motor()
+		assert_bool(PlayerAnimator.CYCLE.has(_column(village))).override_failure_message("walking shows the walk cycle").is_true()
+	village.player.motor.sprinting = true
+	for i: int in 12:
+		village.player.motor.step(Vector2.DOWN, 1.0 / 60.0)
+		village.player.sync_from_motor()
+		assert_bool(PlayerAnimator.RUN_CYCLE.has(_column(village))).override_failure_message("sprinting shows the run cycle").is_true()
+	village.player.motor.sprinting = false
+
+
+func test_a_hit_makes_the_hero_flinch() -> void:
+	var village: AreaController = _load(VILLAGE)
+	assert_bool(village.player.motor.take_hit(Vector2.RIGHT * 40.0)).is_true()
 	village.player.sync_from_motor()
-	assert_that(village.player.shown_region()).override_failure_message("standing again").is_equal(_frame(PlayerAnimator.IDLE, PlayerAnimator.Facing.SIDE))
+	assert_int(_column(village)).is_equal(PlayerAnimator.HURT)
+	for i: int in 120:
+		village.player.motor.step(Vector2.ZERO, 1.0 / 60.0)
+		village.player.sync_from_motor()
+	assert_int(_column(village)).override_failure_message("then stands as before").is_equal(PlayerAnimator.IDLE)
+
+
+func test_landing_from_a_ledge_hop_bends_the_knees_for_a_moment() -> void:
+	var village: AreaController = _load(VILLAGE)
+	var step: float = 1.0 / 60.0
+	village.player._on_dropped(1)
+	var shown: Array[int] = []
+	for i: int in roundi((PlayerController.HOP_TIME + PlayerController.LAND_TIME) / step) + 6:
+		village.player._physics_process(step)
+		if shown.is_empty() or shown[-1] != _column(village):
+			shown.append(_column(village))
+	assert_array(shown).override_failure_message("in the air, knees bent, standing: %s" % [shown]).is_equal([PlayerAnimator.IDLE, PlayerAnimator.BREATHE, PlayerAnimator.IDLE])
+	assert_float(PlayerController.LAND_TIME).override_failure_message("brief: it never holds the hero up").is_less(0.2)
+	assert_bool(village.player.controls_enabled).is_true()
 
 
 func test_out_of_hearts_the_hero_lies_fallen() -> void:
@@ -78,6 +129,12 @@ func test_out_of_hearts_the_hero_lies_fallen() -> void:
 	assert_int(int(village.player.shown_region().position.x)).is_equal(PlayerAnimator.FALLEN * 16)
 	village.respawn()
 	assert_int(int(village.player.shown_region().position.x)).override_failure_message("up again").is_equal(PlayerAnimator.IDLE * 16)
+
+
+## The sheet column the hero shows.
+func _column(area: AreaController) -> int:
+	@warning_ignore("integer_division")
+	return int(area.player.shown_region().position.x) / 16
 
 
 func _frame(column: int, facing: PlayerAnimator.Facing) -> Rect2:

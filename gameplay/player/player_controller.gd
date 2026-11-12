@@ -8,6 +8,8 @@ extends CharacterBody2D
 
 const HOP_TIME: float = 0.22
 const HOP_HEIGHT: float = 4.0
+## How long the knees stay bent after landing from a hop.
+const LAND_TIME: float = 0.12
 ## Invincibility blinks: visible for half of each period.
 const BLINK_PERIOD: float = 0.12
 const HURT_TINT: Color = Color(1.0, 0.55, 0.55)
@@ -25,6 +27,7 @@ var controls_enabled: bool = true
 var _animator: PlayerAnimator = PlayerAnimator.new()
 var _last_position: Vector2 = Vector2.ZERO
 var _hop_left: float = 0.0
+var _land_left: float = 0.0
 var _attack_was_held: bool = false
 var _shake_left: float = 0.0
 var _shake_time: float = 0.0
@@ -134,7 +137,10 @@ func _physics_process(delta: float) -> void:
 	var before: Vector2 = motor.position
 	motor.step(input, delta)
 	_kick_up_dust(motor.position != before, delta)
+	var was_in_the_air: bool = _hop_left > 0.0
 	_hop_left = maxf(0.0, _hop_left - delta)
+	# Coming down from a ledge hop, the knees bend for a moment.
+	_land_left = LAND_TIME if was_in_the_air and _hop_left <= 0.0 else maxf(0.0, _land_left - delta)
 	_animator.tick(delta)
 	_fall_left = maxf(0.0, _fall_left - delta)
 	if _hold_left > 0.0:
@@ -243,13 +249,19 @@ func _update_visuals() -> void:
 	_last_position = motor.position
 	if _hold_left > 0.0 and (moved > 0.0 or motor.is_attacking()):
 		_end_hold()
+	_animator.sprinting = motor.sprinting and moved > 0.0
 	_animator.update(motor.facing, moved)
 	if motor.state_name == PlayerMotor.DEAD:
 		_animator.pose = PlayerAnimator.Pose.FALLEN
 	elif motor.is_attacking():
 		_animator.pose = PlayerAnimator.Pose.ATTACK
+		_animator.attack_progress = (motor.state as PlayerAttackState).progress()
+	elif motor.state_name == PlayerMotor.HURT:
+		_animator.pose = PlayerAnimator.Pose.HURT
 	elif _hold_left > 0.0:
 		_animator.pose = PlayerAnimator.Pose.HOLD
+	elif _land_left > 0.0:
+		_animator.pose = PlayerAnimator.Pose.LAND
 	else:
 		_animator.pose = PlayerAnimator.Pose.NONE
 	_sprite.region_rect = _animator.region()

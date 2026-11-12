@@ -1094,3 +1094,26 @@ Asked for by the user: improve the graphics substantially, keeping gameplay, con
 - Tiles, sprites and animation are as they were.
 
 **Played** (the user, 2026-11-11): "Feels right". The game ran and closed with no errors or warnings.
+
+## 2026-11-11 — Hero pass: outfit and movement (built; not yet tried in play)
+
+Asked for by the user: a better-looking, better-moving hero, keeping controls and gameplay. The request was written for a 3D character; the hero is a 16x24 sprite, so the plan (`docs/progress/hero-pass-plan.md`) says what each part became and what has no meaning here.
+
+**Built**
+- **Outfit**, on every drawn frame of every facing (189 rows of the ASCII art rewritten in `tools/art/make_player_sprite.gd`): a leather vest over the blue tunic, wrist guards, a belt pouch, pale slate trousers, tall cuffed boots, the sword's hilt over his shoulder with its sheath across his back, a small olive pack, a swept fringe and a mouth. The blue hood and the red scarf stay.
+- **Seven new frames a row** (sixteen in all), made by the tool from the drawn ones: breathe, windup, hurt, and four run frames.
+- **Animation** (`PlayerAnimator`, `PlayerController`): a slow breath while standing; the run frames and a longer stride when sprinting; a swing in three pictures (wind-up, lunge, settle); a flinch when hit; bent knees after a ledge hop. The hilt leaves his back while he swings.
+- Swing timing, the sword's HitBox, speed and collisions are untouched.
+
+**Checked**
+- 345 tests in 48 suites pass (+8: the breath, the run cycle and stride, the swing's three pictures, the hurt and landing poses, the made frames against the drawn ones, and in the village a sprint, a hit, a swing and a landing). Import and boot clean.
+- Mutation checks: five deliberate bugs in runtime code, each caught, files restored: the wind-up after the lunge, walking leaning in place of sprinting, a sprint with a walk's stride, a hit with no flinch, a hero who never breathes.
+- Pictures: the sheet before and after; the idle from the front, the back and the side, and the breathe, wind-up, attack, hurt and run frames at eight times size; the hero in the village square before and after from the same spot.
+
+**Known issues and limits**
+- Not tried in play. Stills can't show how the breath, the lean or the wind-up feel in motion, or whether the wind-up (about a fifth of a swing) is long enough to see.
+- From the front and from behind, the run frames are the walk frames: only the side view leans.
+- The wind-up and the flinch are a drawn frame with the body a pixel lower, not new drawings: no drawn-back sword arm, no follow-through of its own.
+- From the side the hilt doesn't show (the hood and the scarf's tail are in the way); the pack does.
+- The fallen frame is too small to show the new clothes and is unchanged but for its colours.
+- No jump, dodge or climb: the hero has none, and the pass adds no mechanics.

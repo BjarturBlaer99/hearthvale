@@ -123,7 +123,12 @@ res://
   (pure, tested) picks the frame:
   - 4-way facing, and a four-frame walk cycle that advances by distance travelled (so it keeps pace with
     sprinting), with a one-pixel bob on each step
-  - a blink every few seconds while standing
+  - a blink every few seconds while standing, and a slow breath (the `BREATHE` frame for `BREATH_OUT` of every
+    `BREATH_EVERY` seconds)
+  - sprinting (`sprinting`): the leaning run frames, and a longer stride (`RUN_STRIDE`) so the feet keep pace
+  - a swing by `attack_progress` (the motor's): wind-up until `WINDUP_UNTIL`, the lunge, settling from
+    `SETTLE_FROM`. Pictures only: the sword's HitBox is live for the whole swing, as before
+  - poses for a hit (`HURT`, a flinch) and for landing from a ledge hop (`LAND`, for `LAND_TIME`)
   - a pose that overrides both: lunging behind the sword, lying fallen at zero hearts, or holding an item
     overhead (always seen from the front)
 
@@ -432,8 +437,12 @@ run headless; see CLAUDE.md for the command and gotchas.
 ## 14. Sprites
 - **Every actor is pixel art painted in code**, like the hero. The art lives as ASCII in `tools/art/`:
   - `make_player_sprite.gd`: the hero, a blue hood and tunic with a gold hem and a red scarf. Three rows (down,
-    up, side; right is the side row mirrored) of nine 16x24 frames: idle, blink, four walk frames, attack, item
-    held up, fallen. A test checks `PlayerAnimator`'s columns against the tool's.
+    up, side; right is the side row mirrored) of sixteen 16x24 frames. Nine are drawn: idle, blink, four walk
+    frames, attack, item held up, fallen. Seven are made from those by `derived()`: breathe, windup and hurt
+    (`sink()`: the body above the chest a pixel lower) and four run frames (`lean()`: the side view's upper body a
+    pixel forward). A test checks `PlayerAnimator`'s columns against the tool's.
+    Over the tunic he wears a leather vest, wrist guards, a belt pouch, slate trousers and tall boots; the sword's
+    hilt shows over his shoulder (not in the attack frames, when it is in his hand), with a small pack behind.
   - `make_sprites.gd`: everything else, namely slime, bat, goblin archer, the Iron Warden, the Crypt Shade,
     villagers, items and pickups, the crystal switch, the torch, the training dummy and brambles
 

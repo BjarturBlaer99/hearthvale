@@ -455,3 +455,15 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   it. Whole-number scaling only, so a pixel is always a square; label sizes of 10 became 8, and 36 became 32.
 - 2026-11-11 — **The keep and the cistern get no wall torches in this pass.** They would need new decor tiles
   and a re-bake of their maps. Their rooms are lit around the hero only.
+- 2026-11-11 — **The hero pass reads a 3D brief as a sprite's.** The request spoke of a model, a rig, skin weights
+  and IK; the hero is a 16x24 sprite. Clothing became a repaint of the ASCII art, and animation became new frames.
+  Jumping, dodging and climbing were left out: the hero has none of them and the pass adds no mechanics.
+- 2026-11-11 — **The hero keeps his blue hood and red scarf** (the user's earlier requests), and gains the rest
+  over them: vest, wrist guards, pouch, tall boots, sword on his back, pack. His trousers went from cream to
+  pale slate, a working colour that stands apart from the gold hem and the brown boots.
+- 2026-11-11 — **New frames are made from the drawn ones, in the tool.** Breathing, the wind-up and the flinch
+  are a drawn frame with the upper body a pixel lower; the run frames are the walk frames leaning a pixel. They
+  can't drift from the drawn art, and a change of clothes reaches them for free. Frames that need new drawing
+  (a drawn-back sword arm, running from the front) are listed in the plan as not done.
+- 2026-11-11 — **Animation never changes play.** The wind-up and the settle are pictures chosen by how far
+  through the swing the motor is. The blade is live from the first frame and the swing is as long as it was.

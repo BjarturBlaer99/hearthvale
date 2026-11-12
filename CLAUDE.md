@@ -43,6 +43,10 @@ in `docs/DECISIONS.md` are superseded.
   dim away from their lights (for show only; the crypt's dark is the only light that matters to play), and all
   text is Hearthvale's own pixel font, painted from ASCII by `tools/art/make_font.gd` with the UI theme. Label
   sizes are whole multiples of 8; boxes wear `PanelFrame`. See `docs/progress/art-pass-4-plan.md`.
+  **Hero pass (user's request, 2026-11-11):** over the blue tunic the hero wears a leather vest, wrist guards, a
+  belt pouch, slate trousers and tall boots, with his sword on his back and a small pack. Sixteen frames a row:
+  the nine drawn ones, and seven the tool makes from them (breathing, attack wind-up, flinch, four run frames).
+  The animator only picks pictures; swing timing and hits belong to the motor. See `docs/progress/hero-pass-plan.md`.
   **Sound (H10):** all sound effects and music are made in code by `tools/audio/make_audio.gd` (Synth) and baked to
   `audio/`. No external audio; edit the sounds in the tool, never the WAVs.
 
