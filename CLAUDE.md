@@ -93,7 +93,7 @@ godot --headless --path . --quit-after 30
 godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
-# Start partway through to try one part by hand (scenarios in the script: village, warden, crypt, shade,
+# Start partway through to try one part by hand (scenarios in the script: home, village, warden, crypt, shade,
 # ending). An hour after the name starts at that time of day.
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
 godot --path . -s res://tools/playtest.gd -- warden
@@ -188,3 +188,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   dungeons, conversations or menus. Outdoors the ambient light is the hour's; lamps are lit from dusk to dawn.
   A test that needs daylight sets the hour itself (a new game starts at dawn). `P2` is built in five steps:
   see `docs/progress/P2-plan.md`.
+- **Home and sleep (P2b):** the hero's home is the area `home` (the thatched cottage west of the weaver's; its
+  inside is baked by `build_maps.gd` like the other houses). Sleeping is the `sleep` effect of the bed's
+  conversation (`data/dialogue/bed.json`): `GameState.sleep()` starts the next day rested, and the area saves.
+  At 02:00 the hero wakes by his bed. **Anything that ends a day saves the game and changes scene:** a test
+  that does it points `SaveSystem.current_slot` at a slot of its own and replaces the area's `travel`.

@@ -71,6 +71,9 @@ Beaten enemies sometimes drop hearts or coins.
 - **The hero** (hero pass): a leather vest, wrist guards, a belt pouch and tall boots over the blue tunic, the
   sword on his back until he swings it, and a small pack. He breathes when he stands, leans into a sprint,
   winds up before a swing, flinches when hit and bends his knees landing from a ledge.
+- **A home and a bed** (the pivot, step 2b): the thatched cottage west of the weaver's is the hero's own, with
+  a door and a room inside. Sleeping in the bed starts the next day with full hearts and saves the game; stay
+  up until 02:00 and he wakes there anyway.
 - **A day that passes** (the pivot, step 2a): a day runs from 06:00 to 02:00 in fourteen minutes; dawn is
   peach, dusk orange, night blue; lamps light at dusk; the day and the hour show under the hearts.
 - **A finished look to the screens** (the pivot, step 1f): a painted evening on the title screen, a larger

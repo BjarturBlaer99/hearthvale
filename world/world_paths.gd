@@ -3,6 +3,9 @@ extends RefCounted
 ## Where each area's scene lives (TECH_DESIGN §1): res://world/areas/<id>/<id>.tscn.
 
 const START_AREA: StringName = &"village"
+## The hero's home (P2b), and the entry point by his bed, where he wakes.
+const HOME_AREA: StringName = &"home"
+const HOME_BED: StringName = &"bed"
 
 
 static func scene_for(area_id: StringName) -> String:

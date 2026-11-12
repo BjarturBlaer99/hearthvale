@@ -22,5 +22,6 @@ effects (`complete_quest` only means something in a quest stage's `on_enter`, wh
 | `give_item` / `take_item` | `item`, `count` |
 | `set_quest_stage` | `quest`, `stage` |
 | `complete_quest` | — (the quest whose stage it's in; finishes it) |
+| `sleep` | — (the hero sleeps until morning: the next day begins, hearts and energy are full; the area saves the game) |
 
 Combat and dungeon milestones will add types (e.g. `heal`, `open_door`) when they need them.

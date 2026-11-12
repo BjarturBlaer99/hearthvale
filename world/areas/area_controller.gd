@@ -28,6 +28,9 @@ const RESPAWN_DELAY: float = 1.0
 const ROOM_FLASH: float = 0.2
 ## How long the screen stays dark as one day ends and the next begins.
 const DAY_FLASH: float = 1.4
+## What is said on waking: after a night in bed, and after staying up until the day ran out.
+const SLEPT_WORDS: String = "You wake rested. The game is saved."
+const WOKE_LATE_WORDS: String = "You stayed up too late, and woke in your own bed."
 ## How long the hero must push against a block before it slides.
 const PUSH_TIME: float = 0.35
 ## Where "Quit to title" goes.
@@ -176,6 +179,12 @@ func _ready() -> void:
 		EventBus.music_requested.emit(music)
 	EventBus.health_changed.connect(_on_health_changed)
 	EventBus.flag_set.connect(_on_flag_set)
+	EventBus.slept.connect(_on_slept)
+	# Arriving with something to be told (he woke here after the day ran out): say it once.
+	if not GameState.arrival_notice.is_empty():
+		hud.flash(DAY_FLASH)
+		hud.show_message(GameState.arrival_notice)
+		GameState.arrival_notice = ""
 	hud.set_area(area_name)
 	hud.set_health(GameState.health, GameState.max_health())
 	hud.set_pieces(GameState.heart_pieces)
@@ -198,7 +207,10 @@ func _process(delta: float) -> void:
 	if clock_runs():
 		GameState.advance_time(delta)
 		if GameState.is_day_over():
+			# He is on his way home: nothing more of this area this frame (the rest of it
+			# would write where he stood over where he is going).
 			end_the_day()
+			return
 	if _dying:
 		_respawn_left -= delta
 		if _respawn_left <= 0.0:
@@ -569,12 +581,27 @@ func clock_runs() -> bool:
 	return ambience != Ambience.DUNGEON and not (is_talking() or is_in_menu() or _dying or is_in_pit())
 
 
-## The day ran out (02:00). Until the hero has a home and a bed (P2b) he nods off where he
-## stands, and the next day begins there.
+## The day ran out (02:00): the next one begins with the hero by his bed at home, and the game
+## is saved. His hearts are as they were.
 func end_the_day() -> void:
+	if _travelling:
+		return
+	_travelling = true
+	player.controls_enabled = false
 	GameState.start_next_day()
+	GameState.arrival_notice = WOKE_LATE_WORDS
+	GameState.go_to(WorldPaths.HOME_AREA, WorldPaths.HOME_BED)
+	SaveSystem.save_game()
+	travel.call(WorldPaths.scene_for(WorldPaths.HOME_AREA))
+
+
+## The hero slept in his bed (GameState.sleep, from the bed's conversation): the morning comes
+## up out of the dark, and the game is saved.
+func _on_slept(_day: int) -> void:
+	GameState.update_player(area_id, player.motor.cell)
+	SaveSystem.save_game()
 	hud.flash(DAY_FLASH)
-	hud.show_message("You nod off where you stand. A new day begins.")
+	hud.show_message(SLEPT_WORDS)
 
 
 ## Whether the day's light falls here: outdoors, and not in a place that is dark by rule.

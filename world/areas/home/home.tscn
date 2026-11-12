@@ -1,0 +1,58 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://world/areas/area_controller.gd" id="1_area"]
+[ext_resource type="TileSet" path="res://world/tiles/greybox_tiles.tres" id="2_tiles"]
+[ext_resource type="Script" path="res://world/areas/height_shading.gd" id="3_shading"]
+[ext_resource type="PackedScene" path="res://gameplay/player/player.tscn" id="4_player"]
+[ext_resource type="PackedScene" path="res://ui/area_hud.tscn" id="5_hud"]
+[ext_resource type="Script" path="res://gameplay/interactables/area_exit.gd" id="6_exit"]
+[ext_resource type="Script" path="res://gameplay/interactables/bed.gd" id="7_bed"]
+
+[node name="Home" type="Node2D" unique_id=909247244]
+script = ExtResource("1_area")
+area_id = &"home"
+area_name = "Your cottage"
+music = &"village"
+
+[node name="Height" type="TileMapLayer" parent="." unique_id=746255457]
+tile_map_data = PackedByteArray("AAAAAAAAAAAAAAUAAAABAAAAAAAAAAUAAAACAAAAAAAAAAUAAAADAAAAAAAAAAUAAAAEAAAAAAAAAAUAAAAFAAAAAAAAAAUAAAAGAAAAAAAAAAUAAAAHAAAAAAAAAAUAAAAIAAAAAAAAAAUAAAAJAAAAAAAAAAUAAAAKAAAAAAAAAAUAAAAAAAEAAAAAAAUAAAABAAEAAAAAAAUAAAACAAEAAAAAAAUAAAADAAEAAAAAAAUAAAAEAAEAAAAAAAUAAAAFAAEAAAAFAAUAAAAGAAEAAAAAAAUAAAAHAAEAAAAAAAUAAAAIAAEAAAAAAAUAAAAJAAEAAAAAAAUAAAAKAAEAAAAAAAUAAAAAAAIAAAAAAAUAAAABAAIAAAABAA8AAAACAAIAAAABAAQAAAADAAIAAAAEAA8AAAAEAAIAAAABAAQAAAAFAAIAAAABAAQAAAAGAAIAAAABAAQAAAAHAAIAAAADAAUAAAAIAAIAAAADAAUAAAAJAAIAAAAEAAUAAAAKAAIAAAAAAAUAAAAAAAMAAAAAAAUAAAABAAMAAAACAAUAAAACAAMAAAABAAQAAAADAAMAAAABAAQAAAAEAAMAAAABAAQAAAAFAAMAAAABAAQAAAAGAAMAAAABAAQAAAAHAAMAAAABAAQAAAAIAAMAAAABAAQAAAAJAAMAAAABAAQAAAAKAAMAAAAAAAUAAAAAAAQAAAAAAAUAAAABAAQAAAABAAQAAAACAAQAAAABAAQAAAADAAQAAAABAAQAAAAEAAQAAAACAAQAAAAFAAQAAAACAAQAAAAGAAQAAAACAAQAAAAHAAQAAAABAAQAAAAIAAQAAAABAAQAAAAJAAQAAAABAAQAAAAKAAQAAAAAAAUAAAAAAAUAAAAAAAUAAAABAAUAAAABAAQAAAACAAUAAAABAAQAAAADAAUAAAABAAQAAAAEAAUAAAACAAQAAAAFAAUAAAACAAQAAAAGAAUAAAACAAQAAAAHAAUAAAAAAA8AAAAIAAUAAAABAAUAAAAJAAUAAAABAAQAAAAKAAUAAAAAAAUAAAAAAAYAAAAAAAUAAAABAAYAAAABAAQAAAACAAYAAAABAAQAAAADAAYAAAABAAQAAAAEAAYAAAABAAQAAAAFAAYAAAABAAQAAAAGAAYAAAABAAQAAAAHAAYAAAABAAQAAAAIAAYAAAABAAQAAAAJAAYAAAABAAQAAAAKAAYAAAAAAAUAAAAAAAcAAAAAAAUAAAABAAcAAAADAA8AAAACAAcAAAABAAQAAAADAAcAAAABAAQAAAAEAAcAAAABAAQAAAAFAAcAAAABAAQAAAAGAAcAAAABAAQAAAAHAAcAAAABAAQAAAAIAAcAAAABAAQAAAAJAAcAAAAGAA8AAAAKAAcAAAAAAAUAAAAAAAgAAAAAAAUAAAABAAgAAAAAAAUAAAACAAgAAAAAAAUAAAADAAgAAAAAAAUAAAAEAAgAAAAAAAUAAAAFAAgAAAADAAQAAAAGAAgAAAAAAAUAAAAHAAgAAAAAAAUAAAAIAAgAAAAAAAUAAAAJAAgAAAAAAAUAAAAKAAgAAAAAAAUAAAA=")
+tile_set = ExtResource("2_tiles")
+
+[node name="Decor" type="TileMapLayer" parent="." unique_id=1518307462]
+tile_set = ExtResource("2_tiles")
+
+[node name="Spawns" type="TileMapLayer" parent="." unique_id=1066261513]
+tile_set = ExtResource("2_tiles")
+
+[node name="HeightShading" type="Node2D" parent="." unique_id=1008255682]
+script = ExtResource("3_shading")
+
+[node name="Interactables" type="Node2D" parent="." unique_id=407710663]
+
+[node name="Doormat" type="Node2D" parent="Interactables" unique_id=1207237581]
+position = Vector2(80, 128)
+script = ExtResource("6_exit")
+target_area = &"village"
+target_entry = &"home_door"
+
+[node name="Bed" type="Node2D" parent="Interactables" unique_id=1511607315]
+position = Vector2(16, 48)
+script = ExtResource("7_bed")
+dialogue_id = &"bed"
+
+[node name="Entries" type="Node2D" parent="." unique_id=99726273]
+
+[node name="door" type="Marker2D" parent="Entries" unique_id=2049002410]
+position = Vector2(88, 120)
+rotation = -1.5707964
+
+[node name="bed" type="Marker2D" parent="Entries" unique_id=1003316811]
+position = Vector2(40, 56)
+rotation = 1.5707964
+
+[node name="PlayerSpawn" type="Marker2D" parent="." unique_id=1353438223]
+position = Vector2(88, 120)
+
+[node name="Player" parent="." unique_id=1276695144 instance=ExtResource("4_player")]
+
+[node name="HUD" parent="." unique_id=797072901 instance=ExtResource("5_hud")]

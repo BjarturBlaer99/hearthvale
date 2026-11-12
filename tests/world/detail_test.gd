@@ -25,6 +25,8 @@ const SIZES: Dictionary = {
 	&"old_wood": Vector2i(40, 30),
 	# H14's dungeon, the one area added since: under the chapel, so the map above is no bigger.
 	&"crypt": Vector2i(45, 44),
+	# P2b: the inside of the hero's cottage (decision 4 of the pivot), the size of the other houses.
+	&"home": Vector2i(11, 9),
 }
 
 var _area: Node

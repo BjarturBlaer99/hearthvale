@@ -517,6 +517,20 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-12 — **P2b: sleeping is an effect a conversation can have.** The bed asks in words from data, and its
+  first answer carries `sleep`, as a shop's answer carries `give_item`. No new menu and no new kind of
+  interactable beyond a bed that says "Go to bed".
+- 2026-11-12 — **P2b: every morning at home is saved, however he got there.** Sleeping saves (decision 8), and
+  so does waking after the day ran out, so the save never holds a day that has already ended.
+- 2026-11-12 — **P2b: he can sleep at any hour.** The pivot plan sets no bedtime, and a player who wants the
+  next morning shouldn't have to wait for it.
+- 2026-11-12 — **P2b: the bed is against the west wall.** A two-cell hero standing south of a bed hides it. From
+  beside it, both show.
+- 2026-11-12 — **P2b: a new game still starts in the village square.** Waking in bed on the first morning would
+  be a new opening; nobody asked for one.
+- 2026-11-12 — **P2b: words to say on arrival are kept in `GameState` but not saved.** "You stayed up too
+  late" has to cross a change of scene and be said once. It is not game state: a save loaded later has no
+  reason to say it.
 - 2026-11-12 — **P2 is built in five steps, each with a review stop:** the clock and the day, home and sleep,
   energy, food and cooking, hours and night. P1 was six for the same reason: the phase is too big to judge in
   one piece. (My reading of the user's rule to stop for review after each step; they can ask for bigger steps.)

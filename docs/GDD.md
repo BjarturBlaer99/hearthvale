@@ -37,8 +37,8 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
   down (one way, never hurts); trees, rocks, walls, fences and water block the way. No swimming or climbing.
 - **Hearthvale:** houses you can enter, a well, a chapel on the rise, a shop, a fenced field, a pond, and
   **cherry blossom trees** by the chapel, round the pond and along the main path *(P1)*.
-- **The hero's home:** the thatched cottage west of the square, with a bed and a hearth *(P2)*, and a plot of
-  soil across the road *(P3)*.
+- **The hero's home:** the thatched cottage west of the weaver's, with a bed and a hearth, and a plot of soil
+  across the road *(P3)*.
 - **The countryside:** the South Field, the North Fields and the Old Wood.
 - **The dungeons:** the Old Keep, north of the village, and the Chapel Crypt under the chapel. The crypt is
   barred until the keep is quiet. It's dark, and its floor has fallen in. A ruin in the South Field leads down
@@ -80,17 +80,18 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 - **Growth** *(P4, to be proposed)*: three skills (combat, farming, cooking) that rise with use.
 
 ## 6. Time, food and sleep *(P2)*
-*(Built so far: the clock, the day and the light, in step 2a. The rest of this section is still to come.)*
-- **A day** runs from 06:00 to 02:00 in 14 real minutes. At 02:00 the hero passes out, as at zero energy
-  *(until 2b and 2c: a new day simply begins where he stands)*. The clock stops in conversations, in menus and
-  in dungeons.
+*(Built so far: the clock, the day and the light in step 2a; the home, the bed and sleeping in 2b. The rest of
+this section is still to come.)*
+- **A day** runs from 06:00 to 02:00 in 14 real minutes. At 02:00 the hero passes out, as at zero energy, and
+  wakes by his bed the next morning *(what it costs him comes with energy, in 2c)*. The clock stops in
+  conversations, in menus and in dungeons.
 - **Light follows the hour:** peach at dawn, clear by day, orange then violet at dusk, blue at night. Lamps
   light at dusk *(windows too, in 2e)*.
 - **Hours:** Tilda's shop is open 08:00 to 18:00; villagers who stand outdoors go home at 20:00.
 - **Night monsters** (outdoors, 20:00 to 06:00): half as much health again, a little faster, and they see
   further. They drop coins more often.
-- **Sleeping** in the bed at home ends the day, refills energy and hearts, and saves. Saving from the pause menu
-  stays.
+- **Sleeping** in the bed at home ends the day, refills energy and hearts, and saves. He can sleep at any hour.
+  Saving from the pause menu stays.
 - **Food** restores energy; some meals heal a little. Raw crops can be eaten for about a third of their cooked
   worth. Cooking is done at the hearth at home, from recipes.
 

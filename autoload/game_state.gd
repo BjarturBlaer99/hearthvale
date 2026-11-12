@@ -38,6 +38,10 @@ var minute: float = 360.0
 ## The hero's energy, 0..ENERGY_MAX (0 until a game starts).
 var energy: float = 0.0
 
+## Words for the area the hero arrives in to say once (he woke at home after staying up too
+## late). Not part of a save: it is gone once said.
+var arrival_notice: String = ""
+
 var _day_clock: DayClock
 ## Where the hero is: { "area", "cell": [x, y] }, or { "area", "entry" } on the way into an
 ## area through one of its entry points (go_to), until the area places them.
@@ -139,6 +143,15 @@ func start_next_day() -> void:
 	minute = float(day_clock().starts)
 	EventBus.day_started.emit(day)
 	EventBus.time_changed.emit(day, floori(minute))
+
+
+## The hero sleeps in his bed (GDD §6): the next day begins, and he wakes with full hearts and
+## full energy. Whoever runs the area saves the game.
+func sleep() -> void:
+	start_next_day()
+	energy = ENERGY_MAX
+	set_health(max_health())
+	EventBus.slept.emit(day)
 
 
 ## "Day 3  14:20" for the HUD: the clock moves in steps of ten minutes.
@@ -263,6 +276,7 @@ func clear() -> void:
 	day = 1
 	minute = float(day_clock().starts)
 	energy = 0.0
+	arrival_notice = ""
 	flags.clear()
 	quests.clear()
 	inventory.clear()

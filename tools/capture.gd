@@ -113,6 +113,10 @@ const SHOTS: Array = [
 	["93_north_rise_at_night", &"village", Vector2i(24, 9), Vector2.UP, 0, "time:22:00"],
 	["94_fields_at_night", &"north_fields", Vector2i(20, 20), Vector2.DOWN, 0, "time:01:00"],
 	["95_a_house_at_night", &"elder_house", Vector2i(5, 6), Vector2.UP, 0, "time:22:00"],
+	["96_the_cottage_door", &"village", Vector2i(8, 16), Vector2.UP, 0, ""],
+	["97_home", &"home", Vector2i(5, 6), Vector2.UP, 0, ""],
+	["98_the_bed_asks", &"home", Vector2i(2, 3), Vector2.LEFT, 0, "talk"],
+	["99_a_new_morning", &"home", Vector2i(2, 3), Vector2.LEFT, 3, "sleep"],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -195,6 +199,15 @@ func _capture() -> void:
 			game_state.call(&"equip", &"bomb" if shot[5] == "bomb" else &"bow")
 		if shot[5] in ["talk", "accept", "tale", "lantern_talk"]:
 			scene.call(&"interact")
+		if shot[5] == "sleep":
+			# A night in bed, on a slot of its own, caught as the morning's words show.
+			var saves: Node = root.get_node("SaveSystem")
+			var own_slot: int = saves.get(&"current_slot")
+			saves.set(&"current_slot", CAPTURE_SLOT)
+			game_state.call(&"sleep")
+			DirAccess.remove_absolute(str(saves.call(&"slot_path", CAPTURE_SLOT)))
+			saves.set(&"current_slot", own_slot)
+			await _frames(110)
 		if shot[5] == "tale":
 			scene.get(&"hud").get(&"dialogue").call(&"confirm")
 		if shot[5] == "accept":

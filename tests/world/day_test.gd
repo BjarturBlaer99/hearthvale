@@ -10,6 +10,7 @@ const ELDER_HOUSE: String = "res://world/areas/elder_house/elder_house.tscn"
 const KEEP: String = "res://world/areas/keep/keep.tscn"
 const CRYPT: String = "res://world/areas/crypt/crypt.tscn"
 const FRAME: float = 1.0 / 60.0
+const TEST_SLOT: int = 987
 
 var _area: Node
 
@@ -17,12 +18,16 @@ var _area: Node
 func before_test() -> void:
 	GameState.clear()
 	GameState.new_game()
+	SaveSystem.current_slot = TEST_SLOT
 
 
 func after_test() -> void:
 	if is_instance_valid(_area):
 		_area.free()
 	_area = null
+	if SaveSystem.has_slot(TEST_SLOT):
+		DirAccess.remove_absolute(SaveSystem.slot_path(TEST_SLOT))
+	SaveSystem.current_slot = SaveSystem.GAME_SLOT
 	GameState.clear()
 
 
@@ -146,29 +151,25 @@ func test_the_hud_shows_the_day_and_the_hour() -> void:
 	assert_float(keep.hud.panel_size().x).override_failure_message("the corner stays small").is_less(130.0)
 
 
-func test_at_two_in_the_morning_a_new_day_begins() -> void:
+func test_a_day_ends_at_two_where_the_clock_runs_and_never_underground() -> void:
 	var village: AreaController = _load(VILLAGE)
+	var travelled: Array[String] = []
+	village.travel = func(path: String) -> void: travelled.append(path)
 	var clock: DayClock = GameState.day_clock()
-	var where: Vector2i = village.player.motor.cell
-	var hearts: int = GameState.health
-	GameState.add_item(&"coin", 12)
 	GameState.set_time(float(clock.ends) - 1.0)
 	village._process(clock.seconds_per_hour / 60.0 * 0.5)
 	assert_int(GameState.day).override_failure_message("not yet").is_equal(1)
 	village._process(clock.seconds_per_hour / 60.0)
 	assert_int(GameState.day).override_failure_message("02:00: the next day").is_equal(2)
 	assert_float(GameState.minute).is_equal_approx(float(clock.starts), 0.5)
-	assert_str(village.hud.message_text()).contains("new day")
-	assert_that(village.player.motor.cell).override_failure_message("where he stood (until he has a home, P2b)").is_equal(where)
-	assert_int(GameState.health).override_failure_message("no penalty yet").is_equal(hearts)
-	assert_int(GameState.item_count(&"coin")).is_equal(12)
-	village._update_hud()
-	assert_str(village.hud.shown_lines()[0]).is_equal("Day 2  06:00")
+	assert_int(travelled.size()).override_failure_message("and the hero is taken home (tests/world/home_test.gd)").is_equal(1)
 	# In a dungeon the clock stands still, so the day can't end there.
 	GameState.set_time(float(clock.ends))
 	var keep: AreaController = _load(KEEP)
+	keep.travel = func(path: String) -> void: travelled.append(path)
 	keep._process(1.0)
 	assert_int(GameState.day).override_failure_message("no day ends underground").is_equal(2)
+	assert_int(travelled.size()).is_equal(1)
 
 
 func _dusk_glows(glows: Array) -> int:

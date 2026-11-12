@@ -28,6 +28,13 @@ const KEYS: String = "keys"
 ## Each scenario: the area and cell to start in, items to hold, and flags to set. An hour
 ## after the scenario's name starts it at that time of day: -- village 19:30
 const SCENARIOS: Dictionary = {
+	# At home, by the door: for trying the bed.
+	"home": {
+		"area": &"home",
+		"cell": Vector2i(5, 6),
+		"items": [],
+		"flags": [],
+	},
 	# In the village square at the start of the game, with nothing: for watching a day go by.
 	"village": {
 		"area": &"village",

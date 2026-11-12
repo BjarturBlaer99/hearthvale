@@ -81,8 +81,8 @@ func test_houses_have_two_storeys_under_a_gabled_roof_and_stay_solid() -> void:
 		[Vector2i(28, 11), "roof_blue_top_l"], [Vector2i(29, 12), "roof_blue_eave"], [Vector2i(6, 21), "roof_top_l"],
 		# The half-timbered upper floor, then the ground floor with its windows and door.
 		[Vector2i(7, 13), "wall_upper_window"], [Vector2i(8, 13), "wall_upper"], [Vector2i(9, 13), "wall_upper_b"],
-		[Vector2i(7, 14), "wall_window"], [Vector2i(8, 14), "wall"], [Vector2i(10, 14), "wall_window"],
-		[Vector2i(16, 14), "door"],
+		[Vector2i(7, 14), "wall_window"], [Vector2i(9, 14), "wall"], [Vector2i(10, 14), "wall_window"],
+		[Vector2i(8, 14), "door"], [Vector2i(16, 14), "door"],
 		# The chapel: stone, arched windows and a double door.
 		[Vector2i(18, 4), "chapel_wall"], [Vector2i(19, 4), "chapel_window"], [Vector2i(18, 5), "chapel_wall"],
 		[Vector2i(23, 5), "chapel_door_l"], [Vector2i(24, 5), "chapel_door_r"],

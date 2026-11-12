@@ -46,5 +46,8 @@ signal time_changed(day: int, minute: int)
 ## A new day began.
 signal day_started(day: int)
 
+## The hero slept in his bed and woke on `day` (after day_started), rested.
+signal slept(day: int)
+
 ## The item on the item button changed (empty: nothing equipped).
 signal equipped_changed(item_id: StringName)

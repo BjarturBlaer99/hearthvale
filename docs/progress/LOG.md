@@ -1337,3 +1337,32 @@ Plan: `docs/progress/P2-plan.md` (P2 in five steps; this is the first).
 - **A house's light doesn't change with the hour:** indoors it looks the same at noon and at midnight.
 - **A new game starts in peach light,** for the first hour and a half of the day (about a minute).
 - The pause menu's "Time played" is still real time played, not the day.
+
+## 2026-11-12 — P2b: home and sleep (built; not yet tried in play)
+
+Plan: `docs/progress/P2-plan.md` (the second of P2's five steps).
+
+**Built**
+- **The hero has a home:** the thatched cottage west of the weaver's has a door in its front wall, and a one-room inside (a new area, `home`, baked like the other houses): a bed against the west wall, a hearth, a candle, a cupboard, shelves, a table and chair, a plant and a stool.
+- **Sleeping:** face the bed and press E. "Sleep until morning" starts the next day at 06:00 with full hearts and full energy, and saves the game; "Not yet" changes nothing. He can sleep at any hour. The bed's words are a conversation in data, and sleeping is a new effect a conversation can have (`sleep`).
+- **At 02:00 he wakes by his bed** on the next day, in place of where he stood. The game is saved, and a line says he stayed up too late. His hearts are as they were and nothing is lost.
+- **Tools:** a playtest scenario that starts at home (`-- home 21:00`), and four new screenshots (99 in all): the cottage's door, its inside, the bed's question, a morning.
+
+**Checked**
+- 413 tests in 58 suites pass (+7: `tests/world/home_test.gd`, and two in `tests/autoload/day_test.gd`). Import and boot clean.
+- **Hearthvale has exactly one more cell to walk to:** the doorway. The walls beside it and the house behind it are solid, as they were.
+- **A bug found by the new tests and fixed:** after the day ended, the rest of that frame wrote the hero's old place over where he was headed, so he would have arrived in the village instead of by his bed.
+- **Older tests updated:** the list of houses with doors, the tile shown at the cottage's doorway, the count of reachable cells (one more), the count of areas (one more), the count of exits (two more), and 2a's test of the day's end.
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: sleeping not mending his hearts, a night in bed not saved, the frame going on after the day ends, waking at the door and not by the bed, the bed's answer doing nothing.
+- **Frame cost:** draw calls within a few of the last step (the village 325, Elder Bram's house 46, the keep 382, the cistern 231).
+- Screenshots: all 99 taken. Looked at closely: the cottage's front before and after, its inside, the bed's question, the morning after.
+
+**Known issues and limits**
+- Not tried in play.
+- **A new game still starts in the village square,** not in bed.
+- **Nothing is lost by staying up until 02:00 yet.** The cost (half energy, a tenth of his coins) comes with energy, in 2c.
+- **The hearth at home does nothing yet.** Cooking is 2d.
+- **No sound for sleeping or waking.** The new sounds are 2e.
+- **The bed's question has no name above it,** like a sign's words.
+- **Staying up until 02:00 saves the game,** as sleeping does: the save never holds a day that has ended.
+- The cottage looks like the weaver's from outside but for where it stands.

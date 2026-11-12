@@ -70,6 +70,48 @@ func test_time_passes_a_minute_at_a_time_and_stops_when_the_day_is_over() -> voi
 	assert_float(GameState.minute).is_equal(float(clock.starts))
 
 
+func test_sleeping_starts_the_next_day_with_full_hearts_and_energy() -> void:
+	var slept: Array = []
+	var note: Callable = func(day: int) -> void: slept.append([day, GameState.day, GameState.health])
+	EventBus.slept.connect(note)
+	GameState.new_game()
+	GameState.add_heart_container()
+	GameState.damage(5)
+	GameState.energy = 12.0
+	GameState.set_time(float(GameState.day_clock().in_day("23:40")))
+	GameState.sleep()
+	EventBus.slept.disconnect(note)
+	assert_int(GameState.day).is_equal(2)
+	assert_float(GameState.minute).is_equal(float(GameState.day_clock().starts))
+	assert_int(GameState.health).is_equal(GameState.max_health())
+	assert_float(GameState.energy).is_equal(GameState.ENERGY_MAX)
+	assert_array(_days).override_failure_message("a new day is announced").is_equal([2])
+	assert_array(slept).override_failure_message("and then that he slept, once he is rested").is_equal([[2, 2, GameState.max_health()]])
+
+
+func test_a_conversation_can_put_the_hero_to_bed() -> void:
+	assert_bool(DataRegistry.EFFECT_FIELDS.has("sleep")).override_failure_message("'sleep' is an effect data may use").is_true()
+	assert_bool(DataRegistry.has_entry(&"dialogues", &"bed")).override_failure_message("the bed's words are data").is_true()
+	GameState.new_game()
+	GameState.damage(2)
+	var effects: EffectApplier = EffectApplier.new(GameState)
+	assert_bool(effects.apply({"type": "sleep"})).is_true()
+	assert_int(GameState.day).is_equal(2)
+	assert_int(GameState.health).is_equal(GameState.max_health())
+	assert_bool(effects.apply({"type": "nap"})).override_failure_message("an effect nobody knows does nothing").is_false()
+	assert_int(GameState.day).is_equal(2)
+	# The bed's conversation: the first answer sleeps, the second doesn't.
+	var runner: DialogueRunner = DialogueRunner.new(DataRegistry.get_dialogue(&"bed"), GameState)
+	runner.start()
+	assert_int(runner.options().size()).is_equal(2)
+	runner.choose(1)
+	assert_int(GameState.day).override_failure_message("\"Not yet.\"").is_equal(2)
+	runner = DialogueRunner.new(DataRegistry.get_dialogue(&"bed"), GameState)
+	runner.start()
+	runner.choose(0)
+	assert_int(GameState.day).override_failure_message("\"Sleep until morning.\"").is_equal(3)
+
+
 func test_the_day_the_hour_and_the_energy_are_saved() -> void:
 	GameState.new_game()
 	GameState.start_next_day()

@@ -73,6 +73,7 @@ const EFFECT_FIELDS: Dictionary = {
 	"take_item": ["item", "count"],
 	"set_quest_stage": ["quest", "stage"],
 	"complete_quest": [],
+	"sleep": [],
 }
 
 ## A field with one of these names, inside a condition or effect, must name an id

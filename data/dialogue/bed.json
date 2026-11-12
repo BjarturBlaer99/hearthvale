@@ -1,0 +1,18 @@
+{
+  "id": "bed",
+  "start": "ask",
+  "nodes": {
+    "ask": {
+      "speaker": "",
+      "text": "Your bed. Sleep until morning?",
+      "options": [
+        { "text": "Sleep until morning.",
+          "effects": [
+            { "type": "sleep" }
+          ],
+          "next": null },
+        { "text": "Not yet.", "next": null }
+      ]
+    }
+  }
+}

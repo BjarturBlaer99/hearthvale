@@ -54,6 +54,9 @@
         },
         {
           "properties": { "type": { "const": "complete_quest" } }
+        },
+        {
+          "properties": { "type": { "const": "sleep" } }
         }
       ]
     },

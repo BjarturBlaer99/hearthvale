@@ -64,3 +64,41 @@ Nothing is built ahead of its step. Each later step gets its own "done when" lis
 - The bed, the home, sleeping (2b). Energy costs and the bar (2c). Food (2d).
 - Hours for the shop and villagers, night monsters, lit windows, a night tune (2e).
 - Weather, seasons, a calendar: not in the pivot at all.
+
+---
+
+## 2b — Home and sleep
+
+### What changes
+- **The hero has a home** (decision 4): the thatched cottage west of the weaver's, which had no door, gets one
+  in the middle of its front wall, and a one-room inside: a new area, `home`, the size of the other houses,
+  with a bed, a hearth (for cooking, in 2d), a table, shelves and a candle.
+  - This is one new cell the hero can walk to in Hearthvale: the doorway.
+- **Sleeping:** face the bed and press E. The bed asks; "Sleep until morning" ends the day. He wakes at 06:00
+  the next day with full hearts and full energy, and the game is saved. "Not yet" changes nothing. He can sleep
+  at any hour.
+  - The bed's words are a conversation in data, and sleeping is a new effect a conversation can have
+    (`sleep`), like giving an item.
+- **At 02:00 he wakes at home** in place of where he stood (2a's stopgap): the next day begins by his bed, the
+  game is saved, and a line says he stayed up too late. Hearts are as they were; nothing is lost (that is 2c).
+- **Tools:** a playtest scenario that starts at home; screenshots of the cottage's door, its inside, the bed's
+  question and a morning.
+
+### What does not change
+- A new game still starts in the village square.
+- The other houses, the shop, and every other cell of Hearthvale.
+- Saving from the pause menu.
+
+### Done when
+- [x] the cottage has a door that leads to its inside, and the doormat leads back out
+- [x] the hero can reach exactly one more cell of Hearthvale than before: the doorway
+- [x] sleeping in the bed starts the next day at 06:00 with full hearts and energy, and saves
+- [x] "Not yet" changes nothing
+- [x] at 02:00 the hero wakes by his bed on the next day, saved, with his hearts as they were
+- [x] all earlier tests pass; new tests cover the door, the room, the bed and the waking
+- [x] the cottage is compared before and after, outside and in
+- [ ] (yours) sleeping feels right in play
+
+### Not in this step
+- Starting a new game at home, in bed.
+- Cooking at the hearth (2d). What collapsing costs (2c). Furniture to buy or move.

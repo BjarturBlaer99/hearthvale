@@ -10,7 +10,8 @@ extends SceneTree
 ##   and its long west edge is a one-way ledge down to the road;
 ## - houses, the chapel, the well, the pond and the woods are solid;
 ## - the south road leaves the map through a gap in the woods;
-## - two houses have a door in their front wall (tests/world/doors_test.gd).
+## - the houses have a door in their front wall (tests/world/doors_test.gd): the weaver's, the
+##   elder's, the shop's and (P2b) the hero's own cottage, west of the weaver's.
 ## House interiors are 11x9 rooms: log walls, the way out a doormat in the middle of the
 ## bottom wall at (5, 8).
 ## The South Field (H3's enemy ground, tests/world/south_field_test.gd): the road from the
@@ -84,7 +85,8 @@ const MAPS: Dictionary = {
 			[6, 21, 6, 2, 3, "roof"],
 			[6, 23, 6, 1, 3, "wall_upper"],
 			[6, 24, 6, 1, 3, "wall"],
-			# Doors: the weaver's, the elder's and the shop's.
+			# Doors: the hero's own (P2b), the weaver's, the elder's and the shop's.
+			[8, 14, 1, 1, 0, "door"],
 			[16, 14, 1, 1, 0, "door"],
 			[30, 14, 1, 1, 0, "door"],
 			[8, 24, 1, 1, 0, "door"],
@@ -213,6 +215,31 @@ const MAPS: Dictionary = {
 		],
 		"spawns": [
 			[8, 7, 1, 1, "pot"],
+		],
+	},
+	# The hero's home (P2b): one room, with his bed, a hearth to cook at, and a candle. The bed
+	# is against the west wall, so he stands beside it and it is never hidden behind him.
+	"home": {
+		"scene": "res://world/areas/home/home.tscn",
+		"size": Vector2i(11, 9),
+		"base": "floor",
+		"blocks": [
+			[0, 0, 11, 2, 0, "inner_wall"],
+			[0, 0, 1, 9, 0, "inner_wall"],
+			[10, 0, 1, 9, 0, "inner_wall"],
+			[0, 8, 11, 1, 0, "inner_wall"],
+			[5, 8, 1, 1, 0, "doormat"],
+			[5, 1, 1, 1, 0, "hearth"],
+			[1, 2, 1, 1, 0, "cupboard"],
+			[3, 2, 1, 1, 0, "candle"],
+			[1, 3, 1, 1, 0, "bed"],
+			[7, 2, 2, 1, 0, "shelf"],
+			[9, 2, 1, 1, 0, "barrel"],
+			[4, 4, 3, 2, 0, "rug"],
+			[8, 5, 1, 1, 0, "table"],
+			[7, 5, 1, 1, 0, "chair"],
+			[1, 7, 1, 1, 0, "plant"],
+			[9, 7, 1, 1, 0, "stool"],
 		],
 	},
 	"weaver_house": {

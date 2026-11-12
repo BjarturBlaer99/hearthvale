@@ -6,11 +6,13 @@ extends GdUnitTestSuite
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
 const VILLAGE: String = "res://world/areas/village/village.tscn"
-const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"south_field", &"shop", &"ruin_cellar", &"cistern", &"keep", &"north_fields", &"old_wood", &"crypt"]
+const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"home", &"south_field", &"shop", &"ruin_cellar", &"cistern", &"keep", &"north_fields", &"old_wood", &"crypt"]
 ## [house, the cell just outside its door]
 const HOUSES: Array = [
 	[&"elder_house", Vector2i(30, 15)],
 	[&"weaver_house", Vector2i(16, 15)],
+	# The hero's own cottage (P2b).
+	[&"home", Vector2i(8, 15)],
 ]
 
 var _area: Node
@@ -26,7 +28,7 @@ func after_test() -> void:
 	GameState.clear()
 
 
-func test_you_can_enter_two_houses_and_come_out_the_same_door() -> void:
+func test_you_can_enter_the_houses_and_come_out_the_same_door() -> void:
 	for house: Array in HOUSES:
 		var house_id: StringName = house[0]
 		var outside: Vector2i = house[1]
@@ -92,7 +94,8 @@ func test_every_exit_leads_to_an_entry_point_and_every_talker_has_a_conversation
 				var talkable: Talkable = child
 				assert_bool(DataRegistry.has_entry(&"dialogues", talkable.dialogue_id)) \
 					.override_failure_message("%s/%s names dialogue '%s'" % [area_id, child.name, talkable.dialogue_id]).is_true()
-				assert_bool(grid.is_solid(talkable.cell())).override_failure_message("%s/%s stands on open ground" % [area_id, child.name]).is_false()
+				# Whoever talks stands on open ground. A bed is a piece of furniture: it is its tile.
+				assert_bool(grid.is_solid(talkable.cell())).override_failure_message("%s/%s stands on open ground" % [area_id, child.name]).is_equal(child is Bed)
 			if not child is AreaExit:
 				continue
 			exits += 1
@@ -115,4 +118,4 @@ func test_every_exit_leads_to_an_entry_point_and_every_talker_has_a_conversation
 			for other: Node in target.get_node(^"Interactables").get_children():
 				if other is AreaExit:
 					assert_bool((other as AreaExit).covers(entry_cell)).override_failure_message(where + ": arrives on another exit").is_false()
-	assert_int(exits).override_failure_message("three doors and three doormats, the south road, the cellar stairs and the cistern stairs both ways, the north road, the fields' and the wood's roads, the keep's gate both ways, the way out behind the boss, the chapel's two doors and the crypt's stairs").is_equal(22)
+	assert_int(exits).override_failure_message("four doors and four doormats (the hero's own since P2b), the south road, the cellar stairs and the cistern stairs both ways, the north road, the fields' and the wood's roads, the keep's gate both ways, the way out behind the boss, the chapel's two doors and the crypt's stairs").is_equal(24)

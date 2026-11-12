@@ -642,7 +642,14 @@ run headless; see CLAUDE.md for the command and gotchas.
     out unless lamps are lit. A fire or a candle burns at any hour.
   - Once the night dims the picture each lamp gets a pool, warmer and weaker than indoors (`NIGHT_POOL_TINT`,
     `NIGHT_POOL`). The hero has no pool of his own outdoors.
-- **The day's end:** at 02:00 `AreaController.end_the_day()` starts the next day. Until the hero has a home
-  (P2b) that happens where he stands.
+- **The day's end:** at 02:00 `AreaController.end_the_day()` starts the next day, sends the hero to the entry
+  by his bed (`WorldPaths.HOME_AREA`, `HOME_BED`), saves, and leaves `GameState.arrival_notice` for the home
+  area to say once as it loads (words that are not part of a save). `_process` stops there for the frame: the
+  rest of it would write where he stood over where he is going.
+- **Home and sleep (P2b):** `home` is an area like the other houses (the thatched cottage's inside; its door is
+  an `AreaExit` in the village). The bed is a `Bed` (`gameplay/interactables/`), a `Talkable` on the bed's
+  tile whose conversation is data (`data/dialogue/bed.json`). Its first answer has the effect `sleep`:
+  `EffectApplier` calls `GameState.sleep()`, which starts the next day, fills hearts and energy and emits
+  `EventBus.slept`; the area running then saves the game and says so.
 - **Tools:** `tools/capture.gd` takes every shot at noon unless its action is `time:<HH:MM>`;
   `tools/playtest.gd` takes an hour after a scenario's name.
