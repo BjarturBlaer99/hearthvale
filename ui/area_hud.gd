@@ -21,15 +21,19 @@ var _notice_left: float = 0.0
 var _flash_left: float = 0.0
 var _flash_time: float = FLASH_TIME
 
-@onready var hearts: HeartsBar = $Panel/Hearts
+@onready var hearts: HeartsBar = $Panel/Box/Hearts
+## The hero's energy, under the hearts. Hidden until the energy rules exist (P2).
+@onready var energy: EnergyBar = $Panel/Box/Energy
+@onready var _panel: ColorRect = $Panel
+@onready var _box: VBoxContainer = $Panel/Box
 @onready var dialogue: DialogueBox = $DialogueBox
 @onready var item_menu: ItemMenu = $ItemMenu
 @onready var pause_menu: PauseMenu = $PauseMenu
 @onready var _hint: Label = $Hint
 @onready var _hint_panel: ColorRect = $HintPanel
-@onready var _equipped: Label = $Panel/Equipped
-@onready var _area: Label = $Panel/Area
-@onready var _items: Label = $Panel/Items
+@onready var _equipped: Label = $Panel/Box/Equipped
+@onready var _area: Label = $Panel/Box/Area
+@onready var _items: Label = $Panel/Box/Items
 @onready var _prompt: Label = $Prompt
 @onready var _message: Label = $Message
 @onready var _notice: Label = $Notice
@@ -43,6 +47,8 @@ func _ready() -> void:
 	_notice.text = ""
 	_show_settings()
 	EventBus.settings_changed.connect(_show_settings)
+	_box.minimum_size_changed.connect(_fit_panel)
+	_fit_panel()
 
 
 ## Darkens the corners of the screen a little, under everything else on the HUD, to draw the
@@ -66,6 +72,28 @@ func _add_vignette() -> void:
 	vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(vignette)
 	move_child(vignette, 0)
+
+
+## The corner's box is as big as what it holds: taller with a second row of hearts or with the
+## energy bar showing.
+func _fit_panel() -> void:
+	_box.size = _box.get_combined_minimum_size()
+	_panel.size = _box.position * 2.0 + _box.size
+
+
+## The size of the corner's box (for tests).
+func panel_size() -> Vector2:
+	return _panel.size
+
+
+## Shows or hides the energy bar; the box fits itself.
+func show_energy(shown: bool) -> void:
+	energy.visible = shown
+	_fit_panel()
+
+
+func set_energy(current: float, maximum: float) -> void:
+	energy.set_energy(current, maximum)
 
 
 func message_text() -> String:

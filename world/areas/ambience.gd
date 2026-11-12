@@ -21,6 +21,9 @@ const TILE_LIGHTS: Dictionary = {
 	"prop_lamp": [Vector2(8, 3), 22.0, LAMP, 0.30, false],
 }
 
+## How many times bigger than life the camera shows each kind of place (P1a): rooms are small,
+## so houses and dungeons are shown at twice the size. Whole numbers keep pixels square.
+const ZOOM: Dictionary = {OUTDOOR: 1, INTERIOR: 2, DUNGEON: 2}
 ## How dim the unlit parts are (0: not at all), by kind.
 const GLOOM: Dictionary = {OUTDOOR: 0.0, INTERIOR: 0.34, DUNGEON: 0.40}
 ## The hero is always seen: how far the light around them reaches in the gloom (px).

@@ -1,26 +1,34 @@
 # CLAUDE.md — Hearthvale
 
-You are building **Hearthvale**, a **2D top-down action-adventure** (A Link to the Past style) in
-**Godot 4.x (latest stable) using typed GDScript**. Read these before writing any code:
+You are building **Hearthvale**, a **cosy 2D story RPG with farming and survival**, seen from above, in
+**Godot 4.x (latest stable) using typed GDScript**. It began as a top-down action-adventure and **pivoted on
+2026-11-12**: the dungeons, the story and the combat stay, and energy, food, time, farming and a modern
+pixel-art look are added in phases. Read these before writing any code:
 
-1. `docs/GDD.md` — what the game is (design source of truth)
+1. `docs/GDD.md` — what the game is (design source of truth; parts marked *(P1)*–*(P4)* are not built yet)
 2. `docs/TECH_DESIGN.md` — how it is built (architecture source of truth)
-3. `docs/ROADMAP.md` — what to build next, milestone by milestone (the slice H0–H9, phase 2 H10–H15)
-4. `docs/data/` — example data files showing the schemas content must follow
+3. `docs/ROADMAP.md` — what to build next (the slice H0–H9, phase 2 H10–H15, the pivot P1–P4)
+4. `docs/progress/pivot-plan.md` — the pivot's audit, the nine decisions the user approved, and the risks
+5. `docs/data/` — example data files showing the schemas content must follow
 
 ## Current goal
-**Phase 2** in `docs/ROADMAP.md` (H10–H15): grow the finished vertical slice (H0–H9) into a small game of about
-two hours: feel and sound, a blue-suited hero and pixel art everywhere, a more detailed world (not a bigger one),
-quests, a second dungeon, a light story. Do not
-build anything outside the current milestone. Scope creep is the main risk on this project.
+**The pivot** in `docs/ROADMAP.md` (P1–P4), in order: **P1** the visual overhaul (six steps, 1a–1f), **P2**
+energy, food and time, **P3** farming, **P4** RPG and story. Do not build anything outside the current step, and
+ask the user before adding anything the roadmap doesn't list. Scope creep is the main risk on this project.
+
+It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
 History: the project began as "Low Tide", a water-level game (milestones M0–M4 in `docs/progress/LOG.md`). It
 pivoted to Hearthvale on 2026-11-07; the last water version is on the `water-version` branch. Water-era entries
 in `docs/DECISIONS.md` are superseded.
 
 ## How to work
-- Work one milestone at a time, in order. Each milestone has acceptance criteria — meet them, then stop and summarize.
-- Before a milestone, write a short plan in `docs/progress/H<n>-plan.md`. After it, append results and known issues to `docs/progress/LOG.md`.
+- Work one step at a time, in order. Each has acceptance criteria — meet them, then stop and summarize.
+- **During the pivot (the user's rule, 2026-11-12):** at the end of each step all tests pass, new logic has
+  tests, the work is **committed**, and you **stop** with a short summary and screenshots of what changed, so
+  the user can review before the next step. Push only when asked.
+- Before a step, write a short plan in `docs/progress/P<n>-plan.md` (`H<n>-plan.md` for the old milestones). After it, append results and known issues to `docs/progress/LOG.md`.
+- A change to the save format needs a new version number and a migration from old saves, with a test.
 - If a design question isn't answered in the docs, pick the simplest option that keeps systems data-driven, note it in `docs/DECISIONS.md`, and continue.
 - Art and sound are made in code (no external art, audio or asset-store dependencies until the roadmap says so).
   The slice started with placeholder shapes; phase 2 replaced them with pixel art, as below.
@@ -130,7 +138,10 @@ removes the shim, so recreate it after upgrading.
 
 ## Do not
 - Do not hand-edit `.import` files or anything under `.godot/`.
-- Do not add swimming, climbing or stamina: the hero moves like classic Zelda (stairs, ledge hops, solid tiles),
-  plus a hold-to-sprint the user asked for on 2026-11-08 (no stamina). Change the GDD first if that should change.
+- Do not add swimming or climbing: the hero moves on foot (stairs, ledge hops, solid tiles), with a
+  hold-to-sprint. Sprint is free until P2; from P2 it costs **energy**, which the user asked for on 2026-11-12 in
+  place of the old "no stamina" rule. Hearts are life in combat only: energy never costs hearts.
+- Do not let art or animation change gameplay timing, hit detection or collisions, unless a step says so.
+- Do not add areas beyond the hero's home and plot unless the user asks.
 - Do not add a dependency/addon without noting why in `docs/DECISIONS.md`. Allowed now: gdUnit4.
 - Do not write story, dialogue or quest content beyond what the current milestone needs.

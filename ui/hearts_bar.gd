@@ -1,6 +1,6 @@
 class_name HeartsBar
 extends Control
-## The hero's life as a row of hearts (GDD: Zelda-style). Each heart is two halves: full,
+## The hero's life as a row of hearts (GDD §5). Each heart is two halves: full,
 ## half or empty. Ten to a row; more wrap onto a second row. Pieces of heart found toward the
 ## next heart show after the row as a gold heart filling a quarter at a time.
 
@@ -32,6 +32,7 @@ func set_health(halves: int, max_halves: int) -> void:
 		return
 	_halves = halves
 	_max_halves = max_halves
+	_fit()
 	queue_redraw()
 
 
@@ -40,7 +41,20 @@ func set_pieces(pieces: int) -> void:
 	if pieces == _pieces:
 		return
 	_pieces = pieces
+	_fit()
 	queue_redraw()
+
+
+## How many rows the hearts (and the piece heart after them) take.
+func rows() -> int:
+	var shown: int = ceili(_max_halves / 2.0) + (1 if _pieces > 0 else 0)
+	@warning_ignore("integer_division")
+	return maxi(1, (shown + PER_ROW - 1) / PER_ROW)
+
+
+## Asks for the room its rows need, so the box around it fits.
+func _fit() -> void:
+	custom_minimum_size = Vector2(PER_ROW * SPACING.x, rows() * SPACING.y)
 
 
 func pieces_shown() -> int:

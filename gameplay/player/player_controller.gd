@@ -277,10 +277,26 @@ func _update_visuals() -> void:
 	_sprite.visible = not blinking or fmod(motor.invincible_left, BLINK_PERIOD) < BLINK_PERIOD / 2.0
 
 
+## Shows everything `times` bigger than life: 1 outdoors, 2 in houses and dungeons, whose rooms
+## are small. Whole numbers only, so every pixel stays square. Set it before the bounds.
+func set_camera_zoom(times: int) -> void:
+	_camera.zoom = Vector2(maxi(times, 1), maxi(times, 1))
+
+
+func camera_zoom() -> int:
+	return roundi(_camera.zoom.x)
+
+
+## How much of the area the camera shows at once (area pixels).
+func camera_view() -> Vector2i:
+	return Vector2i(get_viewport_rect().size / _camera.zoom)
+
+
 ## Keeps the camera inside `bounds` (area pixels: the whole area, or a dungeon room). Bounds
-## smaller than the screen (a house, a room) sit in the middle of it, on the clear colour.
+## smaller than what the camera shows (a house, a room) sit in the middle of it, on the clear
+## colour.
 func set_camera_bounds(bounds: Rect2i) -> void:
-	var view: Vector2i = Vector2i(get_viewport_rect().size)
+	var view: Vector2i = camera_view()
 	var limits: Rect2i = bounds
 	for axis: int in 2:
 		if bounds.size[axis] < view[axis]:

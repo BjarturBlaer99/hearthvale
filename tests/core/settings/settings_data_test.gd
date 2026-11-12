@@ -6,7 +6,7 @@ extends GdUnitTestSuite
 func test_defaults_match_the_project_window() -> void:
 	var data: SettingsData = SettingsData.new()
 	assert_bool(data.fullscreen).is_false()
-	assert_int(data.window_scale * 480).override_failure_message("3x is the 1440-wide window in project.godot").is_equal(int(ProjectSettings.get_setting("display/window/size/window_width_override")))
+	assert_int(data.window_scale * 640).override_failure_message("3x is the 1920-wide window in project.godot").is_equal(int(ProjectSettings.get_setting("display/window/size/window_width_override")))
 	assert_bool(data.show_controls).is_true()
 
 

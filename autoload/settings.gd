@@ -5,7 +5,7 @@ extends Node
 
 const PATH: String = "user://settings.cfg"
 ## The picture the game draws, before the window scales it up.
-const BASE_SIZE: Vector2i = Vector2i(480, 270)
+const BASE_SIZE: Vector2i = Vector2i(640, 360)
 
 var data: SettingsData = SettingsData.new()
 ## Where they're kept. Tests point it elsewhere.

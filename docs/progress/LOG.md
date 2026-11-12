@@ -1127,3 +1127,28 @@ The user asked for a change of direction: a story-driven RPG with survival and f
 - Checked on this machine: the monitors are 2560x1440 (exactly 640x360 four times); real 2D lights work in the project's renderer, and 24 of them over a full screen cost about 0.9 ms a frame.
 - Nine decisions are waiting on the user (resolution and grid, the indoor camera, the hero's hood, a home for the hero, new cherry tree cells, the day's length, the clock in dungeons, saving, six review stops in phase 1).
 - Nothing in the game changed. `CLAUDE.md`, the GDD and the roadmap are rewritten on approval, before any code.
+
+## 2026-11-12 — The pivot is approved; P1a: the frame (built; not yet tried in play)
+
+**Approved.** The user approved the pivot plan as written, all nine recommendations (`docs/progress/pivot-plan.md`, `docs/DECISIONS.md`). Before any code, `CLAUDE.md`, the GDD and the roadmap were rewritten for the new direction: energy replaces "no stamina", the game is no longer described as a Zelda-like, and the roadmap has the pivot's steps (P1a to 1f, P2, P3, P4). In the GDD, parts not built yet are marked with their phase.
+
+**P1a built** (plan: `docs/progress/P1a-plan.md`)
+- **The picture is 640x360** on the same 16-pixel grid; the window is 1920x1080 at the default 3x, with 2x and 4x in the settings.
+- **The camera's size comes from the kind of place** (`Ambience.ZOOM`): life size outdoors (40 by 22 cells in view), twice that in houses and dungeons, with the room in the middle.
+- **Every screen is anchored:** menus to the middle, the dialogue box to the bottom edge, the controls hint to the top right, the title's and ending's lines across the top and bottom. The title's stars and houses spread across the wider screen.
+- **The HUD's corner** is a column: hearts, the new `EnergyBar` (hidden until P2), three lines of text. Its framed box fits what it holds.
+- The specks in the air cover the wider view.
+- No tile, sprite, map, collision, speed or timing changed, and the save format is the same.
+
+**Checked**
+- 352 tests in 49 suites pass (+7, `tests/ui/frame_test.gd`). Import and boot clean.
+- Mutation checks: five deliberate bugs in runtime code, each caught, files restored: dungeons at life size, a camera that thinks it sees more when it sees less, an empty energy bar showing a sliver, a corner box that never changes size, a piece heart not counted in the hearts' rows.
+- Screenshots: all 88 taken before (from the commit before this step) and after. Looked at closely: the village square, the North Fields, Elder Bram's house, the keep's great hall, the crypt's Dark Path, the title, the pause menu and the ending.
+
+**Known issues and limits**
+- Not tried in play.
+- **The HUD covers the top corners of a dungeon room.** At twice the size a room fills the screen's height, so the HUD's corner and the controls hint sit over the room's top corners. Both are see-through, and the hint can be turned off. Slimming the HUD is left to 1f and P2.
+- **Pixels are twice as big indoors as outdoors.** That is decision 2, and it shows.
+- **More is in view outdoors.** The North Fields, the Old Wood and the South Field are exactly as wide as the screen, so the camera there only moves up and down, and the heart piece on the North Fields' plateau is in view from the road.
+- During the first run of the after shots, 31 of 88 came out at 640x360: the window had shrunk part-way through. Retaking them gave 1920x1080. Not explained; nothing in the game sets that size.
+- The art is unchanged, by design: this step is the frame only.

@@ -157,7 +157,7 @@ beaten with it, pits work, and the Iron Sword does more than the wooden one.
 The story and the ending are in. The "done when" below needs new players: `docs/progress/H15-playtest.md` is the
 guide for running it, and what it finds gets fixed afterwards.
 
-- A light story that ties the two dungeons together (still short: GDD §9), told through villagers and signs, and
+- A light story that ties the two dungeons together (still short: GDD §11), told through villagers and signs, and
   a real ending after the second boss.
 - Fixes from a full playtest with new players.
 
@@ -169,6 +169,62 @@ guide for running it, and what it finds gets fixed afterwards.
 A warmer, softer look, everywhere at once: colour and outlines. No new mechanics, areas or content. Later steps
 (bigger trees, richer ground, the menus' look, the villagers) only if wanted. Plan and checklist:
 `docs/progress/art-pass-3-plan.md`.
+
+---
+
+# The pivot (P1–P4)
+On 2026-11-12 the user changed the game's direction: a story-driven RPG with survival and farming, in a modern
+pixel-art look, with cherry blossom trees in the village. The audit, the options and the nine decisions the user
+approved are in `docs/progress/pivot-plan.md`. H15's "done when" (a new player finishes in about two hours) is
+replaced by P4's.
+
+Rules for every step: the architecture stays (pure logic with tests, thin scenes, state in `GameState`, signals
+on `EventBus`, content as JSON); no external assets; a save format change needs a version and a migration; each
+step ends with tests green, a commit, screenshots and a stop.
+
+## P1 — Visual overhaul
+A modern, cosy pixel-art look of the game's own. **No collision or hitbox changes**, except the cells of the new
+cherry trees, which are listed and approved before they are baked. Every area is photographed before and after.
+
+- **1a — The frame.** 640x360 on the same 16-pixel grid; indoors and in dungeons the camera shows the room at
+  twice the size; every screen laid out again; a HUD with room for hearts and an energy bar (hidden until P2);
+  window sizes of 2x, 3x and 4x.
+  **Done when**: every area and screen fits the new frame, rooms sit in the middle at twice the size, and all
+  earlier tests pass.
+- **1b — Light.** One ambient colour per area and a real light at each lamp, hearth, candle, torch, crystal and
+  the lantern, in place of the glow sprites and the show-only gloom; soft shadows. The crypt's dark stays a rule
+  (`LightRules`), drawn with the same lights.
+  **Done when**: what the crypt's rule says is lit is what is drawn lit, and the frame cost is measured.
+- **1c — Ground and nature.** A new palette and selective outlines; terrain; tall trees the hero walks behind;
+  cherry blossom trees with drifting and settled petals; wind in grass, leaves and cloth; water with ripples,
+  foam and reflections; mist in the Old Wood.
+  **Done when**: the hero is never hidden behind a tree, and reachability is unchanged but for the listed cells.
+- **1d — Buildings, interiors and dungeons** in a taller three-quarter view.
+- **1e — Characters.** The hero taller, hood down, with six-frame walk and run and a drawn three-frame attack;
+  idle animations for villagers and animals; enemies in the new palette.
+  **Done when**: swing timing, hits, speed and collisions are untouched.
+- **1f — UI polish.** Frames, a second larger letter face for headings, the title screen.
+
+## P2 — Energy, food and time
+Energy apart from hearts (GDD §5); food and cooking at the hearth; a day of 14 real minutes with light that
+follows the hour; sleeping ends the day, refills and saves; shop and villager hours; tougher monsters at night;
+the hero's home (the thatched cottage, a door and a one-room interior). The HUD shows hearts, energy, the clock
+and the day. Save version 2, with a migration from version 1.
+**Done when**: the energy rules, food effects, recipes and the clock are unit-tested, an old save loads, and a
+day can be played from waking to sleeping.
+
+## P3 — Farming
+A plot of 18 cells by the hero's home; a hoe, a watering can and seeds on the item button; crops that grow by
+the day and wither unwatered; five crops as data; a buy-and-sell list at Tilda's shop.
+**Done when**: growth is unit-tested, and a crop can be planted, raised, harvested, eaten, cooked and sold.
+
+## P4 — RPG and story
+Proposed in full before it is built, and kept small: the story spread over days (Elder Bram's quest opens after
+the first crop), three skills that rise with use, friendship through talk and gifts, more side quests in the
+quest data format, and an ending screen with days, crops and friendships.
+**Done when**: a new player finishes the main story in six to eight in-game days with no developer help.
+
+---
 
 ## Later (not in phase 2)
 A new region and a bigger world (moved out of phase 2 on 2026-11-08: detail first), more dungeons and items, key

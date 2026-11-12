@@ -465,5 +465,29 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   are a drawn frame with the upper body a pixel lower; the run frames are the walk frames leaning a pixel. They
   can't drift from the drawn art, and a change of clothes reaches them for free. Frames that need new drawing
   (a drawn-back sword arm, running from the front) are listed in the plan as not done.
+- 2026-11-12 — **The pivot.** The user changed the game's direction: a story-driven RPG with survival and
+  farming, a modern pixel-art look, cherry blossom trees. Water-era rules aside, this supersedes "no stamina",
+  free sprint and "A Link to the Past style". The plan and its reasons are in `docs/progress/pivot-plan.md`; the
+  user approved all nine recommendations as written:
+  1. **640x360 on the same 16-pixel grid**, with taller sprites. The resolution alone adds view, not detail; the
+     look comes from tall art, light, wind and water. No gameplay number moves.
+  2. **Indoors and in dungeons the camera shows the room at twice the size**, since rooms are small.
+  3. **The hero wears his hood down**, keeping the blue tunic and red scarf.
+  4. **The hero's home** is the doorless thatched cottage in Hearthvale, with a new one-room interior.
+  5. **About eight new cherry trees block cells** in Hearthvale, listed before baking; North Fields swaps
+     existing trees.
+  6. **A day is 14 real minutes.**
+  7. **The clock stands still in dungeons.**
+  8. **Saving** is by sleeping and from the pause menu.
+  9. **Phase 1 is six steps**, each with a review stop.
+- 2026-11-12 — **P1a: the kind of place sets the camera's size.** `Ambience` already reads outdoors, house or
+  dungeon from the tiles, so the 2x indoor camera needed no property on any scene.
+- 2026-11-12 — **P1a: screens are anchored, not moved.** Shifting every box by the difference between the two
+  screen sizes would have fixed today and broken at the next size. Each box is now tied to the middle or an edge.
+- 2026-11-12 — **P1a: the energy bar exists but is hidden.** The HUD's corner is laid out for hearts and energy
+  now, as the step asks; the bar shows nothing true until P2's rules feed it, so it stays hidden until then.
+- 2026-11-12 — **P1a: the HUD's contents are unchanged.** At twice the size the HUD's corner and the controls
+  hint cover the top corners of a dungeon room (they are see-through). Slimming the HUD is left to 1f and P2,
+  when it gains the energy bar, the clock and the day.
 - 2026-11-11 — **Animation never changes play.** The wind-up and the settle are pictures chosen by how far
   through the swing the motor is. The blade is live from the first frame and the swing is as long as it was.

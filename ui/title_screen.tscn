@@ -25,10 +25,11 @@ mouse_filter = 2
 script = ExtResource("2_backdrop")
 
 [node name="Title" type="Label" parent="."]
-layout_mode = 0
-offset_top = 34.0
-offset_right = 480.0
-offset_bottom = 78.0
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+offset_top = 56.0
+offset_bottom = 100.0
 theme_override_colors/font_color = Color(1, 0.88, 0.55, 1)
 theme_override_font_sizes/font_size = 32
 theme_override_constants/shadow_offset_x = 3
@@ -38,22 +39,28 @@ text = "HEARTHVALE"
 horizontal_alignment = 1
 
 [node name="Subtitle" type="Label" parent="."]
-layout_mode = 0
-offset_top = 80.0
-offset_right = 480.0
-offset_bottom = 92.0
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+offset_top = 104.0
+offset_bottom = 116.0
 theme_override_colors/font_color = Color(0.95, 0.92, 0.85, 1)
 theme_override_font_sizes/font_size = 8
 text = "Something has stirred in the old keep north of the village."
 horizontal_alignment = 1
 
 [node name="Menu" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -90.0
+offset_top = 37.0
+offset_right = 90.0
+offset_bottom = 109.0
 script = ExtResource("90_frame")
-layout_mode = 0
-offset_left = 150.0
-offset_top = 172.0
-offset_right = 330.0
-offset_bottom = 244.0
 mouse_filter = 2
 color = Color(0.05, 0.04, 0.07, 0.78)
 
@@ -68,10 +75,13 @@ theme_override_font_sizes/font_size = 8
 text = "> New game"
 
 [node name="Help" type="Label" parent="."]
-layout_mode = 0
-offset_top = 252.0
-offset_right = 480.0
-offset_bottom = 266.0
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -18.0
+offset_bottom = -4.0
 theme_override_colors/font_color = Color(0.9, 0.9, 0.85, 0.85)
 theme_override_font_sizes/font_size = 8
 text = "W / S: choose    E or Enter: select"

@@ -1,7 +1,7 @@
 # Hearthvale — Technical Design
 
 Engine: **Godot 4.x (latest stable), typed GDScript, 2D top-down.** Tests: **gdUnit4**. Target: desktop
-(Windows/Linux/macOS), keyboard+mouse and gamepad. Rendering: 16×16 tiles, base resolution 480×270 scaled up
+(Windows/Linux/macOS), keyboard+mouse and gamepad. Rendering: 16×16 tiles, base resolution 640×360 (P1a; it was 480×270) scaled up
 (integer scaling, `canvas_items` stretch, nearest filtering), GL Compatibility renderer.
 
 ## 1. Project layout
@@ -231,7 +231,12 @@ res://
 ## 6. Dungeons & puzzles
 - **Rooms:** a dungeon is one area (`dungeon_id` set on its AreaController) cut into equal rooms of `room_size`
   cells (`RoomGrid`, pure).
-  - The camera shows the hero's room, centred when smaller than the screen.
+  - The camera shows the hero's room, centred when smaller than what the camera shows.
+  - **The frame (P1a):** the picture is 640x360. `Ambience.ZOOM` gives the camera's size by kind of place: 1
+    outdoors (40 by 22 cells in view), 2 in houses and dungeons, whose rooms are small (a 15 by 11 room then
+    fills three quarters of the screen's width). Whole numbers only, so pixels stay square.
+    `PlayerController.set_camera_zoom()` is set before the bounds; `camera_view()` is what the camera shows in
+    area pixels, and the bounds are centred against that.
   - A `RoomMask` shades everything outside it, so neighbouring rooms stay hidden.
   - Crossing into another room dims the screen briefly (`update_room`).
 - **Dungeon state** is flags in GameState, named per dungeon by `DungeonState`, so leaving, coming back and
@@ -379,7 +384,7 @@ run headless; see CLAUDE.md for the command and gotchas.
 - **Play time:** `GameState.play_time` counts in the area's `_process`, which a paused tree skips. It's saved.
 - **Settings** (`SettingsMenu` over the `Settings` autoload):
   - fullscreen
-  - window size (2x, 3x or 4x the 480x270 picture)
+  - window size (2x, 3x or 4x the 640x360 picture)
   - whether the HUD shows the controls hint
 
   Changes apply and are saved at once. There's no audio yet, so no volume.
@@ -473,6 +478,12 @@ run headless; see CLAUDE.md for the command and gotchas.
     north-west) shades an open cell; the sun stands in the north-west.
   - `Motes` (`gameplay/ambient/`): a few single-pixel specks pinned to the world, by kind of place.
   - **Vignette:** `AreaHud` shades the screen's corners (a radial gradient, under the rest of the HUD).
+- **Screen layout (P1a):** every box is anchored, never placed for one screen size: menus to the middle, the
+  dialogue box to the bottom edge, the controls hint to the top right, lines of text across the top or bottom.
+  - The HUD's corner is a `VBoxContainer` (`Panel/Box`): the hearts, the `EnergyBar`, then three lines.
+    `AreaHud._fit_panel()` sizes the framed box to it, so it grows with a second row of hearts or with the bar.
+  - `EnergyBar` (`ui/`) draws a leaf and a framed bar from `set_energy(current, maximum)`: green, amber under a
+    half, red at a quarter (`LOW`). It is hidden until the energy rules exist (P2): `AreaHud.show_energy()`.
 - **Lettering** (art pass 4): `tools/art/make_font.gd` paints a 95-glyph pixel font from ASCII art and bakes
   `ui/font/hearth_font.tres` (a bitmap `FontFile`, size 8, line height 11, scaled by whole numbers only) and
   `ui/theme.tres` (that font, and a one-pixel shadow under every label), and sets the project's theme.

@@ -4,7 +4,7 @@ extends SceneTree
 ##   godot --headless --path . --import
 ## The optional preview is the sheet at 6x on a green background, for reviewing the art.
 ##
-## An original Zelda-style adventurer (GDD §10): a blue hood and tunic with a gold-trimmed hem,
+## An original young adventurer (GDD §12): a blue hood and tunic with a gold-trimmed hem,
 ## a red scarf, a leather vest, a brown belt with a gold buckle, slate trousers and tall boots.
 ## Sheet: one row per facing (ROWS: down, up, side facing left; the game flips the side row for
 ## right) and one column per frame (COLUMNS; PlayerAnimator names the same columns, and a test

@@ -14,21 +14,31 @@ mouse_filter = 2
 script = ExtResource("1_menu")
 
 [node name="Border" type="ColorRect" parent="."]
-layout_mode = 0
-offset_left = 139.0
-offset_top = 69.0
-offset_right = 341.0
-offset_bottom = 171.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -101.0
+offset_top = -66.0
+offset_right = 101.0
+offset_bottom = 36.0
 mouse_filter = 2
 color = Color(0.85, 0.74, 0.48, 1)
 
 [node name="Panel" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -65.0
+offset_right = 100.0
+offset_bottom = 35.0
 script = ExtResource("90_frame")
-layout_mode = 0
-offset_left = 140.0
-offset_top = 70.0
-offset_right = 340.0
-offset_bottom = 170.0
 mouse_filter = 2
 color = Color(0.07, 0.06, 0.09, 0.96)
 

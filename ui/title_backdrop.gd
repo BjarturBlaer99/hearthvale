@@ -25,13 +25,15 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var size_now: Vector2 = size
+	# Stars and houses were placed for a screen 480 wide: they spread out over a wider one.
+	var wide: float = size_now.x / 480.0
 	# The sky, in bands from night above to sunset at the horizon.
 	for i: int in 18:
 		var t: float = i / 17.0
 		draw_rect(Rect2(0, size_now.y * 0.62 * t, size_now.x, size_now.y * 0.62 / 17.0 + 1.0), SKY_TOP.lerp(SKY_LOW, t * t))
 	for star: Vector2 in [Vector2(40, 18), Vector2(96, 30), Vector2(150, 12), Vector2(300, 22), Vector2(372, 14), Vector2(430, 34), Vector2(210, 40)]:
 		var twinkle: float = 0.5 + 0.5 * sin(_clock * 2.0 + star.x)
-		draw_rect(Rect2(star, Vector2(1, 1)), Color(1, 1, 0.9, 0.4 + 0.5 * twinkle))
+		draw_rect(Rect2(Vector2(roundf(star.x * wide), star.y), Vector2(1, 1)), Color(1, 1, 0.9, 0.4 + 0.5 * twinkle))
 	# The far hill and the keep on it.
 	_hill(size_now.y * 0.60, 26.0, 0.012, 1.0, HILL_FAR)
 	var base: Vector2 = Vector2(size_now.x * 0.72, size_now.y * 0.50)
@@ -55,7 +57,7 @@ func _draw() -> void:
 	_hill(size_now.y * 0.84, 14.0, 0.028, 0.6, HILL_NEAR)
 	# Hearthvale's roofs in the foreground.
 	for house: Vector3 in [Vector3(48, 0, 0), Vector3(92, 6, 1), Vector3(140, 2, 0), Vector3(372, 4, 1), Vector3(420, 0, 0)]:
-		_house(Vector2(house.x, size_now.y * 0.86 + house.y), house.z > 0.0)
+		_house(Vector2(roundf(house.x * wide), size_now.y * 0.86 + house.y), house.z > 0.0)
 
 
 func _hill(top: float, height: float, frequency: float, phase: float, color: Color) -> void:

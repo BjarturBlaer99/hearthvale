@@ -1,7 +1,7 @@
 class_name SettingsData
 extends RefCounted
 ## The player's settings (docs/TECH_DESIGN.md §12), apart from any save: music and effects
-## volume (0 to VOLUME_MAX), fullscreen, the window size (a whole multiple of the 480x270
+## volume (0 to VOLUME_MAX), fullscreen, the window size (a whole multiple of the 640x360
 ## picture) and whether the HUD shows the controls hint.
 ## Pure: values, how each one steps to the next, its label, and a ConfigFile round trip. The
 ## Settings autoload applies and stores them.

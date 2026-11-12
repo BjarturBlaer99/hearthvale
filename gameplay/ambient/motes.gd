@@ -4,12 +4,12 @@ extends Node2D
 ## a dungeon. A few single pixels that drift, sway and fade in and out, wrapped around the
 ## screen so there are always some in view. For show only.
 
-## The patch of air the specks live in (px): a little more than the screen.
-const FIELD: Vector2 = Vector2(512, 304)
+## The patch of air the specks live in (px): a little more than the 640x360 screen.
+const FIELD: Vector2 = Vector2(672, 392)
 
 ## By Ambience kind: [how many, colour, drift (px/s), sway (px)].
 const LOOKS: Dictionary = {
-	&"outdoor": [18, Color(1.0, 0.97, 0.72, 0.55), Vector2(5.0, 2.0), 5.0],
+	&"outdoor": [24, Color(1.0, 0.97, 0.72, 0.55), Vector2(5.0, 2.0), 5.0],
 	&"interior": [9, Color(1.0, 0.92, 0.75, 0.30), Vector2(1.0, 1.5), 2.0],
 	&"dungeon": [12, Color(0.80, 0.82, 0.95, 0.28), Vector2(-1.5, 1.0), 3.0],
 }

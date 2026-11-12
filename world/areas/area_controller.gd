@@ -142,6 +142,8 @@ func _ready() -> void:
 	for enemy: Enemy in enemies():
 		enemy.setup(terrain, player, rng)
 		enemy.died.connect(_on_enemy_died)
+	ambience = Ambience.kind_of(height_layer, dungeon_id)
+	player.set_camera_zoom(Ambience.ZOOM[ambience])
 	update_room(true)
 	if dark:
 		darkness = Darkness.new()
@@ -553,7 +555,6 @@ func _update_darkness() -> void:
 ## The area's light and air (art pass 4), for show only: glows around what burns or shines,
 ## a soft gloom away from the lights in houses and dungeons, and specks in the air.
 func _add_ambience() -> void:
-	ambience = Ambience.kind_of(height_layer, dungeon_id)
 	glows = Glows.new()
 	glows.fixed = Ambience.tile_glows([height_layer, get_node_or_null(^"Decor")])
 	glows.moving = moving_glows
