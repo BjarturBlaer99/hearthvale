@@ -74,6 +74,14 @@ var ambience: StringName = Ambience.OUTDOOR
 var lighting: AreaLighting
 ## The glows of the tiles that give light (lamp posts, hearths, candles): they never move.
 var tile_glows: Array = []
+## The trees, standing up from the ground and sorted by depth with everyone else (P1c).
+var scenery: Scenery
+## Grass, flowers and washing moving in the wind; cherry petals; the water's surface; mist.
+var sway: TileMapLayer
+var petals: Petals
+var water: WaterSurface
+var reflections: Reflections
+var mist: Mist
 ## Specks drifting in the air.
 var motes: Motes
 
@@ -188,6 +196,9 @@ func _process(delta: float) -> void:
 		if _pit_left <= 0.0:
 			_climb_out()
 	_update_light()
+	scenery.fade_for(standing_points(), delta)
+	if reflections != null:
+		reflections.follow(player)
 	GameState.update_player(area_id, player.motor.cell)
 	_update_hud()
 
@@ -554,10 +565,57 @@ func _add_ambience() -> void:
 	lighting = AreaLighting.new()
 	lighting.setup(ambience, dark)
 	add_child(lighting)
-	tile_glows = Ambience.tile_glows([height_layer, get_node_or_null(^"Decor")])
+	var decor: TileMapLayer = get_node_or_null(^"Decor") as TileMapLayer
+	tile_glows = Ambience.tile_glows([height_layer, decor])
 	motes = Motes.new()
 	motes.kind = ambience
 	add_child(motes)
+	# Nature (P1c): tall trees the hero walks behind, wind, water, petals and mist.
+	scenery = Scenery.new()
+	add_child(scenery)
+	scenery.build(decor)
+	sway = SwayLayer.take_from(decor)
+	if sway != null:
+		add_child(sway)
+		move_child(sway, decor.get_index() + 1)
+	water = WaterSurface.make(height_layer, grid.size)
+	if water != null:
+		add_child(water)
+		move_child(water, height_layer.get_index() + 1)
+		reflections = Reflections.new()
+		reflections.setup(water, scenery)
+		add_child(reflections)
+		move_child(reflections, water.get_index() + 1)
+	petals = Petals.new()
+	add_child(petals)
+	move_child(petals, _shading.get_index() + 1)
+	petals.setup(scenery.cherry_feet(), ground_at)
+	if Ambience.has_mist(area_id):
+		mist = Mist.new()
+		add_child(mist)
+
+
+## What `cell` is to something light landing on it: "open" ground, "water", or "" (a wall, a
+## tree, off the map).
+func ground_at(cell: Vector2i) -> String:
+	if not grid.in_bounds(cell):
+		return ""
+	if height_layer.get_cell_atlas_coords(cell) == GreyboxTiles.coords("water"):
+		return "water"
+	return "" if grid.is_solid(cell) else "open"
+
+
+## Where the hero, every enemy and everything that can be picked up stands (area px): a tree's
+## crown fades while any of them is behind it, so nothing that matters is hidden. Grass, pots
+## and signs don't count: they stay where they are, and the trees would never come back.
+func standing_points() -> Array[Vector2]:
+	var out: Array[Vector2] = [player.position]
+	for child: Node in interactables.get_children():
+		if not child is Node2D or not (child as Node2D).visible:
+			continue
+		if child is Enemy or child is ItemPickup or child.has_method(&"collect"):
+			out.append((child as Node2D).position)
+	return out
 
 
 ## Every light to draw right now (AreaLighting.light dictionaries).

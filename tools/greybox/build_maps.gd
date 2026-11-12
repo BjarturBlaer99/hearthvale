@@ -104,8 +104,18 @@ const MAPS: Dictionary = {
 			# Rocks and trees about the village.
 			[33, 20, 1, 1, 0, "rock"],
 			[16, 26, 1, 1, 0, "rock"],
-			[3, 9, 2, 2, 0, "tree"],
-			[34, 31, 2, 2, 0, "tree"],
+			[3, 9, 2, 2, 0, "cherry"],
+			[34, 31, 2, 2, 0, "cherry"],
+			# P1c: cherry trees by the chapel, round the pond and along the main path. These eight
+			# are new solid cells, approved by the user on 2026-11-12 (tests/world/nature_test.gd).
+			[16, 4, 1, 1, 2, "cherry"],
+			[31, 4, 1, 1, 2, "cherry"],
+			[34, 25, 1, 1, 0, "cherry"],
+			[27, 31, 1, 1, 0, "cherry"],
+			[21, 10, 1, 1, 0, "cherry"],
+			[26, 10, 1, 1, 0, "cherry"],
+			[26, 22, 1, 1, 0, "cherry"],
+			[21, 27, 1, 1, 0, "cherry"],
 			# Woods round the edges; the south road leaves through a gap.
 			[0, 8, 2, 26, 0, "tree"],
 			[46, 8, 2, 4, 0, "tree"],
@@ -514,11 +524,11 @@ const MAPS: Dictionary = {
 			[8, 18, 1, 1, 0, "ground"],
 			# Trees and rocks about the fields.
 			[24, 4, 2, 2, 0, "tree"],
-			[30, 5, 2, 2, 0, "tree"],
+			[30, 5, 2, 2, 0, "cherry"],
 			[8, 13, 1, 1, 0, "rock"],
 			[25, 24, 2, 2, 0, "tree"],
 			[32, 25, 1, 1, 0, "rock"],
-			[16, 22, 2, 2, 0, "tree"],
+			[16, 22, 2, 2, 0, "cherry"],
 			# H12: hay by the farm, logs, a standing stone by the stream, a stump below the plateau.
 			[13, 19, 1, 2, 0, "hay"],
 			[3, 26, 1, 1, 0, "logs"],

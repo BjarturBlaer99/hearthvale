@@ -535,6 +535,7 @@ func _initialize() -> void:
 	_pine_art(GreyboxTiles.coords("prop_tree_b"))
 	_oak_art(GreyboxTiles.coords("prop_tree_c"))
 	_canopy(GreyboxTiles.coords("prop_canopy"))
+	_cherry_art(GreyboxTiles.coords("prop_cherry"))
 	_chimney(GreyboxTiles.coords("chimney"))
 	_cross(GreyboxTiles.coords("cross_l"), true)
 	_cross(GreyboxTiles.coords("cross_r"), false)
@@ -671,6 +672,36 @@ func _tree_art(tile: Vector2i) -> void:
 					shade = shade.darkened(0.25)
 				elif n == 1:
 					shade = shade.lightened(0.18)
+				_px(tile, x, y, shade)
+			elif edge:
+				_px(tile, x, y, OUTLINE)
+
+
+## A cherry tree in blossom, see-through around it. The game stands a tall picture in its place
+## (Scenery, tools/art/make_scenery.gd); this tile marks the cell and shows in the editor.
+func _cherry_art(tile: Vector2i) -> void:
+	var deep: Color = Color(0.76, 0.35, 0.52)
+	var mid: Color = Color(0.91, 0.53, 0.67)
+	var pale: Color = Color(0.98, 0.76, 0.83)
+	_ellipse(tile, Vector2(8.5, 13.8), Vector2(6.5, 2.4), SHADOW)
+	_rect(tile, Rect2i(6, 10, 4, 5), OUTLINE)
+	_rect(tile, Rect2i(7, 10, 2, 4), Color(0.28, 0.17, 0.16))
+	var lobes: Array[Vector3] = [Vector3(5.2, 7.2, 4.3), Vector3(10.8, 7.2, 4.3), Vector3(8.0, 4.4, 4.7), Vector3(8.0, 8.6, 4.4)]
+	for y: int in T:
+		for x: int in T:
+			var at: Vector2 = Vector2(x + 0.5, y + 0.5)
+			var inside: bool = false
+			var edge: bool = false
+			for lobe: Vector3 in lobes:
+				var d: float = at.distance_to(Vector2(lobe.x, lobe.y))
+				inside = inside or d <= lobe.z
+				edge = edge or d <= lobe.z + 1.0
+			if inside:
+				var shade: Color = mid
+				if x + y < 11:
+					shade = pale
+				elif x - y > 4 or y > 9:
+					shade = deep
 				_px(tile, x, y, shade)
 			elif edge:
 				_px(tile, x, y, OUTLINE)

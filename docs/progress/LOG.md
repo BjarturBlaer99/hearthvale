@@ -1179,3 +1179,35 @@ Plan: `docs/progress/P1b-plan.md`.
 - **Cast shadows are wide indoors:** six pixels at twice the size is a broad band under shelves and tables.
 - **No normal maps and no real-time shadows from walls.** The pivot plan said I would try normal maps on dungeon walls and tree trunks; that is moved to 1c and 1d, where those pictures are repainted.
 - Outdoors by day nothing changes but the lamps' glow and the shadows: the hour's colour comes in P2.
+
+## 2026-11-12 — P1c: ground and nature (built; not yet tried in play)
+
+Plan: `docs/progress/P1c-plan.md`. The user approved all eight new cherry tree cells from a marked map of Hearthvale before they were baked.
+
+**Built**
+- **Tall trees:** every tree but the closed canopy of thick woods is now a picture 32 by 40 pixels in five shades (broadleaf, oak, pine, two cherries), stood up in its cell at load (`Scenery`) and sorted by depth with the hero. Each still blocks exactly its own cell. A crown fades while the hero, an enemy or a pickup stands behind it.
+- **Cherry trees in Hearthvale:** eight new one-cell trees ((16,4), (31,4), (34,25), (27,31), (21,10), (26,10), (26,22), (21,27)) and two existing clumps changed to cherry; in the North Fields two existing clumps changed. Petals drift from each tree and lie settled on the grass and the pond.
+- **Wind:** crowns sway; tufts, flowers, crops and washing sway on a layer of their own.
+- **Water:** a moving surface (a swell, glints, sparkles, foam at the bank that widens and narrows), and reflections of the hero and of trees by the bank.
+- **Mist** over the Old Wood.
+- **Palette and outlines:** a little less saturation; outlines dark only on the edge of a shape, soft inside it. All art re-baked (tiles, hero, other sprites, trees).
+
+**Checked**
+- 367 tests in 50 suites pass (+11, `tests/world/nature_test.gd`). Import and boot clean.
+- **Where the hero can go:** the eight cells are solid and hold cherry trees; the cells reachable from the village square went from 1222 to exactly 1214; doors, roads, the stairs, the crypt door and the heart piece's nook are all still reachable. No other map was re-baked.
+- **Never hidden:** for every tree in Hearthvale, standing in the open cell behind it fades that tree.
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: a crown hiding what stands in front of it, trees fading for grass and pots, petals lying on walls, trees mirrored in water to their north, lines inside a shape as dark as its edge.
+- **Frame cost** (windowed, vsync off, 1920x1080, Intel graphics), before to after in the same session: village 3.05 to 3.75 ms, North Fields 1.94 to 2.57 ms, the Old Wood 1.88 to 2.26 ms, the keep 2.12 to 2.49 ms. Timings on this machine drift between sessions (the keep read 3.96 ms in P1b's run), so only compare within a pair.
+- Screenshots: all 88 retaken. Looked at closely: the village square, the north rise, the pond, the hero behind a cherry tree (close crop), the hero's reflection (close crop), the Old Wood road, the North Fields' bridge, the South Field, the keep's great hall.
+
+**Two mistakes found from the screenshots and fixed**
+- The trees came out dark and crimson: my wind shader multiplied the picture by itself (in a canvas shader `COLOR` already holds the texture's colour). Fixed, and the gotcha is in `CLAUDE.md`.
+- Some crowns stayed see-through: tall grass behind a tree counted as "something standing there". Now only the hero, enemies and pickups count.
+
+**Known issues and limits**
+- Not tried in play: the sway, the drifting petals, the water's movement, the mist's drift and the fade as you walk behind a tree only show in motion.
+- **A faded cherry crown over grass looks greyish**, not pink.
+- **Reflections mirror the hero and trees only**, not villagers, enemies or buildings.
+- **The ground tiles themselves were not repainted** (grass, paths): they changed only through the palette and the outline rule. The closed canopy inside thick woods is still a flat tile.
+- **No normal maps.** The pivot plan said I would try them on tree trunks; I did not.
+- The outline change is subtle on tiles: most of their lines were already light.

@@ -459,7 +459,11 @@ run headless; see CLAUDE.md for the command and gotchas.
   below them the same frames as white silhouettes for hit flashes. Edit the art in the tool, never the PNGs.
 - **The colour pass** (art pass 3): all three art tools (the tiles, the hero, the other sprites) hand each picture
   to `PixelGrade.apply()` (`core/art/`, pure) just before saving it.
-  - **Warm colour:** a little more saturation, lights tinted towards yellow and shadows towards violet.
+  - **Warm colour:** a touch more saturation (`SATURATION`, lowered in P1c for a softer picture), lights tinted
+    towards yellow and shadows towards violet.
+  - **Selective outlines** (P1c): an outline pixel that touches a clear pixel is on the edge of its shape and
+    stays dark (`OUTLINE_VALUE`); one inside a shape is only a little darker than what it runs through
+    (`INNER_VALUE`). A picture with no clear pixels, like a wall tile, has no edges: all its lines are soft.
   - **Soft outlines:** each pixel of the tools' outline colour takes a dark, rich shade of the colours beside it
     (never darker than a floor). With nothing coloured beside it, it's a plum-brown `INK`; inside a mass of
     outline colour (a doorway, a stairwell) it stays `DEEP` dark. In the tile atlas an outline looks no further
@@ -494,6 +498,32 @@ run headless; see CLAUDE.md for the command and gotchas.
   - **Cast shadows:** `HeightShading.cast_on(grid, cell)` says whether a taller solid cell to the west (or
     north-west) shades an open cell; the sun stands in the north-west.
   - `Motes` (`gameplay/ambient/`): a few single-pixel specks pinned to the world, by kind of place.
+- **Nature** (P1c), all for show; an area builds it in `_add_ambience()`:
+  - **Tall trees** (`Scenery`, `world/areas/`): at load, every tree tile on the Decor layer but the closed
+    canopy is taken off it and a `Sprite2D` stands in its cell, 32 by 40 pixels from `SceneryAtlas`
+    (`world/tiles/scenery.png`, painted by `tools/art/make_scenery.gd`). `Scenery` is y-sorted, so trees sort by
+    depth with the hero and everything in `Interactables`. A tree's foot is `Scenery.foot_of(cell)`.
+    - The tree's cell is solid as it always was (the Height layer). The crown only overlaps the cells behind.
+    - **Nothing is hidden:** `fade_for(points, delta)` fades the crowns that `hides()` any of
+      `AreaController.standing_points()` (the hero, enemies, anything with `collect()`, item pickups). Grass,
+      pots and signs don't count, or a tree behind them would stay faded.
+    - Crowns sway: one shared shader shifts whole pixels, more the higher above the foot.
+  - **Cherry trees:** a `"cherry"` block in `build_maps.gd` makes a solid cell with a `prop_cherry` tile, which
+    `Scenery` stands up as `cherry` or `cherry_b` by cell. `Petals` (`gameplay/ambient/`) scatters settled petals
+    round each (`scatter(foot)`, the same every time; only on cells `ground_at()` calls "open" or "water") and
+    drifts a few from each crown (`CPUParticles2D`).
+  - **Wind in small things** (`SwayLayer`): tufts, flowers, crops and washing move from Decor to a layer just
+    above it whose shader leans each tile's top rows, each cell in its own time, never past the tile's edge.
+  - **Water** (`WaterSurface`): one rectangle over the water's bounds, just above the Height layer, with a shader
+    that reads a one-pixel-a-cell map of the water: a slow swell, glints, sparkles, and foam at the bank one to
+    three pixels wide. `HeightShading` keeps only the dark line under the bank.
+  - **Reflections** (`Reflections`): a mirror `Sprite2D` (flipped, hanging below the feet) for the hero and for
+    each tree within three cells north of water, shown only on water cells by a shader with the same map.
+  - **Mist** (`Mist`, `gameplay/ambient/`): two layers of noise in four flat steps, pinned to the world, for the
+    areas in `Ambience.MISTY` (the Old Wood).
+  - **A shader gotcha:** in a canvas shader `COLOR` already holds the texture's colour times the node's tint
+    when `fragment()` starts. To sample the texture again, carry the tint from `vertex()` in a varying; don't
+    multiply the new sample by `COLOR`, or the picture is squared and goes dark.
   - **Vignette:** `AreaHud` shades the screen's corners (a radial gradient, under the rest of the HUD).
 - **Screen layout (P1a):** every box is anchored, never placed for one screen size: menus to the middle, the
   dialogue box to the bottom edge, the controls hint to the top right, lines of text across the top or bottom.

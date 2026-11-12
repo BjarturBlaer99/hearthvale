@@ -32,7 +32,9 @@ extends RefCounted
 ##     thatch, the half-timbered upper floor, and the stone chapel
 ##  20 overlays for the Decor layer on houses: chimney, the chapel's cross (two halves), shop sign
 ##  21 chimney smoke, animated: SMOKE_FRAMES frames side by side
-##  22 more trees for the Decor layer: a pine, a broad oak, and a closed canopy for thick woods
+##  22 more trees for the Decor layer: a pine, a broad oak, a closed canopy for thick woods, and
+##     a cherry in blossom. Scenery stands every tree but the canopy up as a tall picture (P1c),
+##     so these tiles only mark where they grow
 
 const TEXTURE_PATH: String = "res://world/tiles/greybox_tiles.png"
 const TILESET_PATH: String = "res://world/tiles/greybox_tiles.tres"
@@ -61,9 +63,9 @@ const ROW_HOUSE: int = 16
 const ROW_HOUSE_DECOR: int = 20
 const ROW_SMOKE: int = 21
 const ROW_TREES: int = 22
-## More trees, all props like "prop_tree". The baker mixes the three kinds by cell and uses
-## the canopy where trees stand on all four sides.
-const TREE_KINDS: Array[String] = ["prop_tree_b", "prop_tree_c", "prop_canopy"]
+## More trees, all props like "prop_tree". The baker mixes the first three kinds by cell and
+## uses the canopy where trees stand on all four sides; a "cherry" block is always a cherry.
+const TREE_KINDS: Array[String] = ["prop_tree_b", "prop_tree_c", "prop_canopy", "prop_cherry"]
 ## House fronts, in atlas order from ROW_HOUSE (eight to a row), all solid at height 3 but for
 ## HOUSE_DOOR_KINDS.
 ## A roof kind is its style ("roof" clay tiles, "roof_blue" slate, "roof_thatch"), then "_top"
@@ -132,7 +134,7 @@ const DETAIL_HEIGHTS: Array[int] = [3, 3, 3, 3, 3]
 const PROP_KINDS: Array[String] = ["prop_tree", "prop_rock", "prop_fence", "well_nw", "well_ne", "well_sw", "well_se"]
 ## Map kinds that become solid ground plus a prop: block kind -> prop (or the "well" 2x2).
 const PROP_BLOCKS: Dictionary = {
-	"tree": "prop_tree", "rock": "prop_rock", "fence": "prop_fence", "well": "well",
+	"tree": "prop_tree", "cherry": "prop_cherry", "rock": "prop_rock", "fence": "prop_fence", "well": "well",
 	"crate": "prop_crate", "keg": "prop_keg", "hay": "prop_hay", "logs": "prop_logs", "stump": "prop_stump",
 	"lamp": "prop_lamp", "standing_stone": "prop_stone", "post": "prop_post", "stall": "stall",
 }

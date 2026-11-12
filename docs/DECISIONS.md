@@ -502,5 +502,20 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
 - 2026-11-12 — **P1b: no normal maps and no hard shadows yet.** The plan was to try normal maps on dungeon walls
   and tree trunks, and that belongs with their repaint (1c, 1d), since the pictures change there. Real-time
   shadows from walls were not tried.
+- 2026-11-12 — **P1c: the user approved all eight new cherry tree cells** from a marked map of Hearthvale:
+  (16,4), (31,4), (34,25), (27,31), (21,10), (26,10), (26,22), (21,27). They are the only collision changes in
+  P1 so far; the village's reachable cells went from 1222 to 1214.
+- 2026-11-12 — **P1c: trees are stood up at load, not re-baked.** `Scenery` takes the tree tiles off the Decor
+  layer and puts tall pictures in their cells. No map but Hearthvale and the North Fields was re-baked, and a
+  tree's cell is solid from the Height layer exactly as before.
+- 2026-11-12 — **P1c: a crown fades for what matters, not for everything.** The first version faded for
+  anything standing behind a tree, and tall grass behind a tree left it see-through for good. Now only the hero,
+  enemies and things that can be picked up count.
+- 2026-11-12 — **P1c: reflections are mirror pictures, not a copy of the screen.** A water shader that reads the
+  screen would have to be drawn after everything it mirrors, and would then also draw over the heads of people
+  standing in front of the water. Mirror sprites masked to the water cells have no such problem; they mirror
+  the hero and the trees, not villagers or enemies.
+- 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
+  outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
 - 2026-11-11 — **Animation never changes play.** The wind-up and the settle are pictures chosen by how far
   through the swing the motor is. The blade is live from the first frame and the swing is as long as it was.

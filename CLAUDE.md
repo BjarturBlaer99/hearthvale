@@ -56,6 +56,11 @@ in `docs/DECISIONS.md` are superseded.
   belt pouch, slate trousers and tall boots, with his sword on his back and a small pack. Sixteen frames a row:
   the nine drawn ones, and seven the tool makes from them (breathing, attack wind-up, flinch, four run frames).
   The animator only picks pictures; swing timing and hits belong to the motor. See `docs/progress/hero-pass-plan.md`.
+  **Nature (P1c, 2026-11-12):** trees are tall pictures painted by `tools/art/make_scenery.gd` and stood up at
+  load by `Scenery` (the hero walks behind them; a crown fades when anything that matters is behind it). A tree
+  still blocks exactly its own cell. Cherry trees are `"cherry"` blocks in `build_maps.gd`; the eight new cells
+  in Hearthvale were approved by the user. Wind, water, reflections, petals and mist are shaders and particles,
+  for show only. See `docs/progress/P1c-plan.md`.
   **Sound (H10):** all sound effects and music are made in code by `tools/audio/make_audio.gd` (Synth) and baked to
   `audio/`. No external audio; edit the sounds in the tool, never the WAVs.
 
@@ -84,6 +89,9 @@ godot --headless --path . -s res://tools/art/make_player_sprite.gd -- <preview.p
 godot --headless --path . --import
 # Repaint the other actors' sprites after editing tools/art/make_sprites.gd, then re-import
 godot --headless --path . -s res://tools/art/make_sprites.gd
+godot --headless --path . --import
+# Repaint the tall trees after editing tools/art/make_scenery.gd (optional 4x preview), then re-import
+godot --headless --path . -s res://tools/art/make_scenery.gd -- <preview.png>
 godot --headless --path . --import
 # Re-bake the pixel font and the UI theme after editing tools/art/make_font.gd (optional preview of the glyphs)
 godot --headless --path . -s res://tools/art/make_font.gd -- <preview.png>
@@ -116,6 +124,9 @@ removes the shim, so recreate it after upgrading.
   gdUnit4's `simulate_action_*` sends InputEvents, which headless mode drops.
 - Area scene tests: load areas one at a time with `tests/support/area_steps.gd` (a loaded area writes
   `GameState.player` every frame) and let it replace `AreaController.travel`, so taking an exit stays in the test.
+
+**Shader gotcha:** in a canvas shader `COLOR` already holds the texture's colour when `fragment()` starts. To
+sample the texture again, pass the tint from `vertex()` in a varying; multiplying by `COLOR` squares the picture.
 
 **Tool-script gotchas (`-s res://tools/...`):**
 - A `-s` script compiles before the autoloads exist. Never name a class that uses an autoload (e.g.

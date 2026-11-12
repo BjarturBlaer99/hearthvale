@@ -183,9 +183,18 @@ func is_holding_up() -> bool:
 	return _hold_left > 0.0
 
 
-## The frame the sprite shows (for tests): its region of the sheet.
+## The frame the sprite shows (for tests, and for the hero's reflection): its region of the
+## sheet, the sheet itself, and whether it is drawn the other way round.
 func shown_region() -> Rect2:
 	return _sprite.region_rect
+
+
+func sheet() -> Texture2D:
+	return _sprite.texture
+
+
+func shown_flipped() -> bool:
+	return _sprite.flip_h
 
 
 func _end_hold() -> void:

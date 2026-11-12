@@ -75,6 +75,9 @@ Beaten enemies sometimes drop hearts or coins.
   houses and dungeon rooms are shown at twice the size. The window is 1920x1080 at the default 3x.
 - **Real light** (the pivot, step 1b): every lamp, hearth, candle, torch and crystal is a light, houses are warm
   and dim, dungeons cool and dim, and shadows have soft edges.
+- **Living nature** (the pivot, step 1c): trees stand tall and you walk behind them; Hearthvale has cherry trees
+  in blossom, with petals on the wind, the grass and the pond; grass and washing move in the wind; water
+  ripples, foams at the bank and mirrors you; the Old Wood has mist.
 - **The road north:** from the top of the north rise, through the woods.
   - **The North Fields:** a stream with a bridge, a farm plot, slimes, and a goblin archer on a plateau. Keep an eye
     on the tree line beside the road.

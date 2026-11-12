@@ -1,0 +1,153 @@
+class_name Scenery
+extends Node2D
+## Tall scenery (P1c, docs/TECH_DESIGN.md §3): the trees of an area as pictures that stand up
+## from the ground, taller and wider than a cell, sorted by depth with the hero and everyone
+## else. A tree still blocks exactly its own cell; its crown only overlaps the cells behind it,
+## so the hero walks behind a tree and in front of it.
+##
+## build() takes the tree tiles off the Decor layer and stands a picture in each one's cell.
+## Crowns sway in the wind (a shader that moves whole pixels, more the higher up). A crown
+## fades while anything stands behind it (fade_for), so nothing is ever hidden. For show only.
+
+## How see-through a crown gets with something behind it, and how fast it changes (per second).
+const FADED: float = 0.4
+const FADE_SPEED: float = 5.0
+## The part of a tree that can hide something, from its foot: half its width, its height, and
+## how far above the foot the crown ends.
+const CROWN_HALF_WIDTH: float = 16.0
+const CROWN_TOP: float = 37.0
+const CROWN_BOTTOM: float = 9.0
+const SWAY_CODE: String = """
+shader_type canvas_item;
+uniform float reach = 37.0;
+uniform float strength = 1.6;
+varying float up;
+varying float phase;
+varying vec4 tint;
+
+void vertex() {
+	tint = COLOR;
+	up = clamp(-VERTEX.y / reach, 0.0, 1.0);
+	vec2 at = (MODEL_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xy;
+	phase = at.x * 0.045 + at.y * 0.03;
+}
+
+void fragment() {
+	float gust = sin(TIME * 1.1 + phase) + 0.5 * sin(TIME * 2.3 + phase * 1.7);
+	float shift = floor(gust * strength * up * up + 0.5);
+	COLOR = texture(TEXTURE, UV + vec2(shift * TEXTURE_PIXEL_SIZE.x, 0.0)) * tint;
+}
+"""
+
+## The tree standing in each cell.
+var by_cell: Dictionary[Vector2i, Sprite2D] = {}
+
+var _faded: Dictionary[Vector2i, bool] = {}
+
+static var _sway: ShaderMaterial
+
+
+func _init() -> void:
+	name = "Scenery"
+	y_sort_enabled = true
+
+
+## Where a tree in `cell` meets the ground (area px): the place it is depth-sorted by.
+static func foot_of(cell: Vector2i) -> Vector2:
+	return Vector2(cell.x * GreyboxTiles.TILE_SIZE + 8.0, cell.y * GreyboxTiles.TILE_SIZE + 14.0)
+
+
+## Whether a tree with its foot at `foot` hides something standing at `point` (its feet, or the
+## corner of its cell): it stands behind the tree, under the crown or within half a cell of it.
+static func hides(foot: Vector2, point: Vector2) -> bool:
+	if point.y >= foot.y - 1.0:
+		return false
+	var crown: Rect2 = Rect2(foot.x - CROWN_HALF_WIDTH - 8.0, foot.y - CROWN_TOP - 4.0, CROWN_HALF_WIDTH * 2.0 + 16.0, CROWN_TOP - CROWN_BOTTOM + 16.0)
+	return crown.has_point(point)
+
+
+## The kind of tall picture (SceneryAtlas.FROM_DECOR) the Decor tile at atlas `coords` becomes,
+## or empty if it isn't one.
+static func kind_of_tile(coords: Vector2i) -> String:
+	for tile: String in SceneryAtlas.FROM_DECOR:
+		if GreyboxTiles.coords(tile) == coords:
+			return SceneryAtlas.FROM_DECOR[tile]
+	return ""
+
+
+## Takes every tree tile off `decor` and stands its tall picture in that cell. Returns how many.
+func build(decor: TileMapLayer) -> int:
+	if decor == null:
+		return 0
+	var texture: Texture2D = load(SceneryAtlas.TEXTURE_PATH)
+	if _sway == null:
+		var shader: Shader = Shader.new()
+		shader.code = SWAY_CODE
+		_sway = ShaderMaterial.new()
+		_sway.shader = shader
+		_sway.set_shader_parameter(&"reach", SceneryAtlas.FOOT.y)
+	for cell: Vector2i in decor.get_used_cells():
+		var kind: String = kind_of_tile(decor.get_cell_atlas_coords(cell))
+		if kind == "":
+			continue
+		decor.erase_cell(cell)
+		var tree: Sprite2D = Sprite2D.new()
+		tree.name = "%s_%d_%d" % [kind.capitalize(), cell.x, cell.y]
+		tree.texture = texture
+		tree.region_enabled = true
+		tree.region_rect = SceneryAtlas.region(SceneryAtlas.variant(kind, cell))
+		tree.centered = false
+		tree.offset = -SceneryAtlas.FOOT
+		tree.position = foot_of(cell)
+		tree.material = _sway
+		tree.set_meta(&"kind", kind)
+		add_child(tree)
+		by_cell[cell] = tree
+	return by_cell.size()
+
+
+## The feet of every cherry tree, in cell order (petals fall round them).
+func cherry_feet() -> Array[Vector2]:
+	var cells: Array[Vector2i] = []
+	for cell: Vector2i in by_cell:
+		if SceneryAtlas.is_cherry(str(by_cell[cell].get_meta(&"kind", ""))):
+			cells.append(cell)
+	cells.sort()
+	var out: Array[Vector2] = []
+	for cell: Vector2i in cells:
+		out.append(foot_of(cell))
+	return out
+
+
+## The cells of the trees that hide something standing at `point`: only trees just below it and
+## to either side can.
+func hiding(point: Vector2) -> Array[Vector2i]:
+	var out: Array[Vector2i] = []
+	var at: Vector2i = Vector2i((point / float(GreyboxTiles.TILE_SIZE)).floor())
+	for dy: int in range(0, 4):
+		for dx: int in range(-2, 3):
+			var cell: Vector2i = at + Vector2i(dx, dy)
+			if by_cell.has(cell) and hides(foot_of(cell), point):
+				out.append(cell)
+	return out
+
+
+## Fades the crowns that hide any of `points` (where the hero and others stand), and brings the
+## rest back, a step of `delta` seconds at a time.
+func fade_for(points: Array[Vector2], delta: float) -> void:
+	var wanted: Dictionary[Vector2i, bool] = {}
+	for point: Vector2 in points:
+		for cell: Vector2i in hiding(point):
+			wanted[cell] = true
+			_faded[cell] = true
+	for cell: Vector2i in _faded.keys():
+		var tree: Sprite2D = by_cell[cell]
+		var target: float = FADED if wanted.has(cell) else 1.0
+		tree.self_modulate.a = move_toward(tree.self_modulate.a, target, FADE_SPEED * delta)
+		if target == 1.0 and tree.self_modulate.a >= 1.0:
+			_faded.erase(cell)
+
+
+## How solid the tree in `cell` is drawn, 0 to 1 (for tests).
+func opacity_of(cell: Vector2i) -> float:
+	return by_cell[cell].self_modulate.a if by_cell.has(cell) else 1.0

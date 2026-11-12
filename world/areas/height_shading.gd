@@ -7,7 +7,7 @@ extends Node2D
 ##   solid things (walls, houses) just a soft shadow. A thin dark edge marks a lower neighbour
 ##   to the west, east or north.
 ## - Soft edges (ground_edges()): grass frays over the edge of a path where the two meet on the
-##   same level, and water gets a dark line under its bank and foam lapping at it.
+##   same level, and water gets a dark line under its bank.
 
 const T: float = 16.0
 const EDGE_COLOR: Color = Color(0.0, 0.0, 0.0, 0.35)
@@ -33,7 +33,6 @@ const ALL_SIDES: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, 
 const FRINGE: StringName = &"fringe"
 const BANK: StringName = &"bank"
 const BANK_SHADE: Color = Color(0.08, 0.20, 0.38, 0.85)
-const FOAM: Color = Color(0.82, 0.92, 1.0, 0.8)
 
 var _grid: HeightGrid
 ## Soft edges to draw: [cell, side, kind].
@@ -191,14 +190,12 @@ static func fringe_color(grass: Color, tone: int) -> Color:
 	return PixelGrade.warm(shade)
 
 
-## Water meeting the land on `side`: a dark line under the bank, and dashes of foam beside it.
+## Water meeting the land on `side`: a dark line under the bank. The foam beside it moves, so
+## WaterSurface draws that (P1c).
 func _draw_bank(cell: Vector2i, side: Vector2i) -> void:
 	var origin: Vector2 = Vector2(cell) * T
 	for along: int in int(T):
 		draw_rect(_strip(origin, side, along, 1.0), BANK_SHADE)
-		@warning_ignore("integer_division")
-		if _mix(cell, side, along / 3) % 3 != 0:
-			draw_rect(_strip(origin, side, along, 1.0, 1.0), FOAM)
 
 
 ## A strip one pixel wide and `depth` deep, `along` pixels down the `side` of the cell at

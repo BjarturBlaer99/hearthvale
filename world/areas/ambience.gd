@@ -25,6 +25,8 @@ const TILE_LIGHTS: Dictionary = {
 ## How many times bigger than life the camera shows each kind of place (P1a): rooms are small,
 ## so houses and dungeons are shown at twice the size. Whole numbers keep pixels square.
 const ZOOM: Dictionary = {OUTDOOR: 1, INTERIOR: 2, DUNGEON: 2}
+## Areas with mist among the trees (P1c).
+const MISTY: Array[StringName] = [&"old_wood"]
 ## The hero is always seen: how far the pool of light around them reaches where it is dim (px).
 const HERO_POOL: float = 88.0
 ## Where it is dim, a glow's pool reaches this much further than the glow itself.
@@ -38,6 +40,10 @@ static func kind_of(height_layer: TileMapLayer, dungeon_id: StringName) -> Strin
 	if height_layer != null and not height_layer.get_used_cells_by_id(GreyboxTiles.SOURCE_ID, GreyboxTiles.coords("inner_wall")).is_empty():
 		return INTERIOR
 	return OUTDOOR
+
+
+static func has_mist(area_id: StringName) -> bool:
+	return MISTY.has(area_id)
 
 
 ## One glow: where (area px), how far, its colour, how strong, and whether it flickers.
