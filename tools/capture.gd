@@ -16,7 +16,7 @@ extends SceneTree
 ## pit, "haunt" lets the Shade come, and "braziers" lights its hall. The area id "title"
 ## shows the title screen instead of an area ("finished": with a finished game saved, in a
 ## slot of its own), and "ending" the ending screen (after two quests and an hour and a bit of
-## play).
+## play). Every shot is taken at noon (NOON), unless its action is "time:<HH:MM>".
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -106,7 +106,16 @@ const SHOTS: Array = [
 	["86_the_ending", &"ending", Vector2i.ZERO, Vector2.DOWN, 0, ""],
 	["87_title_after_the_ending", &"title", Vector2i.ZERO, Vector2.DOWN, 0, "finished"],
 	["88_the_reliquarys_stone", &"crypt", Vector2i(8, 24), Vector2.UP, 0, "lantern_talk"],
+	["89_village_at_dawn", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "time:06:00"],
+	["90_village_at_dusk", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "time:18:45"],
+	["91_village_at_nightfall", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "time:20:00"],
+	["92_village_at_night", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "time:23:30"],
+	["93_north_rise_at_night", &"village", Vector2i(24, 9), Vector2.UP, 0, "time:22:00"],
+	["94_fields_at_night", &"north_fields", Vector2i(20, 20), Vector2.DOWN, 0, "time:01:00"],
+	["95_a_house_at_night", &"elder_house", Vector2i(5, 6), Vector2.UP, 0, "time:22:00"],
 ]
+## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
+const NOON: float = 720.0
 ## The save slot the "finished" title uses, so the player's own save is left alone.
 const CAPTURE_SLOT: int = 994
 
@@ -127,6 +136,8 @@ func _capture() -> void:
 		game_state.call(&"clear")
 		game_state.call(&"new_game")
 		game_state.call(&"damage", shot[4])
+		var clock: RefCounted = game_state.call(&"day_clock")
+		game_state.call(&"set_time", float(clock.call(&"in_day", str(shot[5]).trim_prefix("time:"))) if str(shot[5]).begins_with("time:") else NOON)
 		if str(shot[5]).begins_with("flag:"):
 			game_state.call(&"set_flag", StringName(str(shot[5]).trim_prefix("flag:")), true)
 		if shot[5] == "sunk":

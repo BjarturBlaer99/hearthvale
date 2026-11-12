@@ -26,6 +26,8 @@ extends Node2D
 const RESPAWN_DELAY: float = 1.0
 ## How long the screen dims when the hero walks into another room.
 const ROOM_FLASH: float = 0.2
+## How long the screen stays dark as one day ends and the next begins.
+const DAY_FLASH: float = 1.4
 ## How long the hero must push against a block before it slides.
 const PUSH_TIME: float = 0.35
 ## Where "Quit to title" goes.
@@ -44,6 +46,10 @@ const DIM_RADIUS: float = 20.0
 const RULE_TINT: Color = Color(1.0, 0.97, 0.90)
 ## How much of a glow's colour its pool takes (the rest is white).
 const POOL_TINT: float = 0.22
+## Under the night sky a lamp's pool is warmer and doesn't quite bring back the day: how far
+## its colour leans to the lamp's, and how strong it is.
+const NIGHT_POOL_TINT: float = 0.55
+const NIGHT_POOL: float = 0.78
 
 @export var area_id: StringName = &"village"
 @export var area_name: String = "Hearthvale"
@@ -189,6 +195,10 @@ func _process(delta: float) -> void:
 		return
 	# Runs only while the game isn't paused, so the clock stops behind the pause menu.
 	GameState.add_play_time(delta)
+	if clock_runs():
+		GameState.advance_time(delta)
+		if GameState.is_day_over():
+			end_the_day()
 	if _dying:
 		_respawn_left -= delta
 		if _respawn_left <= 0.0:
@@ -552,11 +562,33 @@ func brightness_at(cell: Vector2i) -> float:
 	return LightRules.brightness(GridBody.cell_center(cell), lights()) if dark else 1.0
 
 
+## Whether the day's clock runs here and now (GDD §6): not in a dungeon, where there is no
+## day; not in a conversation or the item menu; not while the hero is down or in a pit. (Behind
+## the pause menu nothing runs at all.)
+func clock_runs() -> bool:
+	return ambience != Ambience.DUNGEON and not (is_talking() or is_in_menu() or _dying or is_in_pit())
+
+
+## The day ran out (02:00). Until the hero has a home and a bed (P2b) he nods off where he
+## stands, and the next day begins there.
+func end_the_day() -> void:
+	GameState.start_next_day()
+	hud.flash(DAY_FLASH)
+	hud.show_message("You nod off where you stand. A new day begins.")
+
+
+## Whether the day's light falls here: outdoors, and not in a place that is dark by rule.
+func has_daylight() -> bool:
+	return ambience == Ambience.OUTDOOR and not dark
+
+
 ## Hands the lights of this moment to the area's lighting: those that reach what the camera
-## shows.
+## shows. Outdoors the ambient colour is the hour's.
 func _update_light() -> void:
 	if lighting == null:
 		return
+	if has_daylight():
+		lighting.set_ambient(GameState.daylight())
 	var room: Rect2i = RoomGrid.camera_rect(player.motor.cell, room_size, grid.size, GreyboxTiles.TILE_SIZE)
 	lighting.show_lights(scene_lights(), Rect2(room))
 
@@ -642,11 +674,15 @@ func scene_lights() -> Array:
 			if _inside_a_core(glow, lights()):
 				out.append(AreaLighting.light(glow["at"], float(glow["radius"]), glow["color"], AreaLighting.GLOW, float(glow["strength"]), glow["flickers"]))
 		return out
-	if lighting.is_dim():
+	# Indoors the hero stands in a pool of his own. Outdoors the night is dim, not dark, and
+	# only lamps make pools.
+	if lighting.is_dim() and not has_daylight():
 		out.append(AreaLighting.light(player.position + Vector2(0, -8), Ambience.HERO_POOL, Color.WHITE, AreaLighting.POOL))
+	var tint: float = NIGHT_POOL_TINT if has_daylight() else POOL_TINT
+	var strength: float = NIGHT_POOL if has_daylight() else 1.0
 	for glow: Dictionary in glows:
 		if lighting.is_dim():
-			out.append(AreaLighting.light(glow["at"], float(glow["radius"]) * Ambience.REACH, Color.WHITE.lerp(glow["color"], POOL_TINT), AreaLighting.POOL, 1.0, glow["flickers"]))
+			out.append(AreaLighting.light(glow["at"], float(glow["radius"]) * Ambience.REACH, Color.WHITE.lerp(glow["color"], tint), AreaLighting.POOL, strength, glow["flickers"]))
 		out.append(AreaLighting.light(glow["at"], float(glow["radius"]), glow["color"], AreaLighting.GLOW, float(glow["strength"]), glow["flickers"]))
 	return out
 
@@ -654,7 +690,7 @@ func scene_lights() -> Array:
 ## Everything that glows right now (Ambience.glow dictionaries): the tiles that give light,
 ## burning torches, crystals, and a lantern the hero carries.
 func glows_now() -> Array:
-	var out: Array = tile_glows.duplicate()
+	var out: Array = Ambience.shining(tile_glows, GameState.day_clock().lamps_lit(GameState.minute))
 	for child: Node in interactables.get_children():
 		if child is Torch and (child as Torch).is_lit():
 			out.append(Ambience.glow((child as Torch).position + Torch.FLAME_AT, 30.0, Ambience.FIRE, 0.40, true))
@@ -970,6 +1006,7 @@ func _on_enemy_died(enemy: Enemy) -> void:
 
 
 func _update_hud() -> void:
+	hud.set_clock(GameState.time_text())
 	hud.set_area(area_text())
 	# The corner says only what there is to say: nothing carried, no line.
 	hud.set_items(carrying_text() if not GameState.inventory.is_empty() else "")

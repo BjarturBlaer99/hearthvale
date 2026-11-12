@@ -87,7 +87,16 @@ func load_from_slot(slot: int) -> Error:
 ## Brings save data from `from_version` up to GameState.SAVE_VERSION, one step at a time.
 func migrate(data: Dictionary, from_version: int) -> Dictionary:
 	var migrated: Dictionary = data.duplicate(true)
-	# Version 1 is the first format, so there is nothing to migrate yet. Add steps here:
-	# if from_version < 2: migrated = _v1_to_v2(migrated)
+	if from_version < 2:
+		migrated = _v1_to_v2(migrated)
 	migrated["version"] = GameState.SAVE_VERSION
 	return migrated
+
+
+## Version 2 (P2a) added the day, the time of day and the hero's energy. A game saved before
+## them wakes on the first day at the hour days start, rested.
+func _v1_to_v2(data: Dictionary) -> Dictionary:
+	data["day"] = 1
+	data["minute"] = float(GameState.day_clock().starts)
+	data["energy"] = GameState.ENERGY_MAX
+	return data

@@ -36,6 +36,7 @@ var _flash_time: float = FLASH_TIME
 @onready var _hint: Label = $Hint
 @onready var _hint_panel: ColorRect = $HintPanel
 @onready var _equipped: Label = $Panel/Box/Equipped
+@onready var _clock: Label = $Panel/Box/Clock
 @onready var _area: Label = $Panel/Box/Area
 @onready var _items: Label = $Panel/Box/Items
 @onready var _prompt: Label = $Prompt
@@ -82,7 +83,7 @@ func _add_vignette() -> void:
 ## taller with a second row of hearts, the energy bar or another line showing.
 func _fit_panel() -> void:
 	var wide: float = 0.0
-	for line: Label in [_area, _items, _equipped]:
+	for line: Label in _lines():
 		if line.visible:
 			wide = maxf(wide, line_width(line))
 	_box.custom_minimum_size.x = minf(wide, BOX_MAX)
@@ -133,6 +134,11 @@ func set_pieces(pieces: int) -> void:
 	hearts.set_pieces(pieces)
 
 
+## The day and the hour ("Day 3  14:20"), under the hearts.
+func set_clock(text: String) -> void:
+	_set_line(_clock, text)
+
+
 func set_area(text: String) -> void:
 	_set_line(_area, text)
 
@@ -160,10 +166,15 @@ func _set_line(line: Label, text: String) -> void:
 ## The lines of the corner's box that are showing, top to bottom (for tests).
 func shown_lines() -> PackedStringArray:
 	var lines: PackedStringArray = []
-	for line: Label in [_area, _items, _equipped]:
+	for line: Label in _lines():
 		if line.visible:
 			lines.append(line.text)
 	return lines
+
+
+## The corner's lines of words, top to bottom.
+func _lines() -> Array[Label]:
+	return [_clock, _area, _items, _equipped]
 
 
 func set_prompt(text: String) -> void:

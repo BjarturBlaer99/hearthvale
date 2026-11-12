@@ -15,6 +15,7 @@ res://
     dungeons/        # RoomGrid (rooms for the camera), DungeonState (dungeon flags, door rules)
     puzzles/         # PuzzleRules (pushing blocks, sinking them in pits, plates, torches, multi-flag shutters)
     light/           # LightRules (how much light reaches a point in a dark area)
+    time/            # DayClock (the day's rules: its length, the light by the hour, lamps, night)
     art/             # PixelGrade (the art tools' colour pass: warm colour, soft outlines)
     quests/          # ConditionEvaluator, EffectApplier, QuestRunner, QuestState
     combat/          # CombatRules (hit geometry, knockback, weapon choice), Hit
@@ -43,7 +44,7 @@ res://
 |---|---|
 | `EventBus` | Global signals only, no state: `health_changed`, `item_added`, `flag_set`, `quest_updated`, … |
 | `DataRegistry` | Loads and validates all JSON in `res://data` at startup (directory = kind of content); read-only lookups by id. Fails loudly on invalid data. |
-| `GameState` | Owns all persistent state: hearts and health, flags, quests, inventory, where the hero is. `to_dict()` / `from_dict()`. Mutates only through methods that emit `EventBus` signals. |
+| `GameState` | Owns all persistent state: hearts and health, flags, quests, inventory, where the hero is, the day and the time of day, the hero's energy. `to_dict()` / `from_dict()`. Mutates only through methods that emit `EventBus` signals. |
 | `SaveSystem` | Writes `GameState.to_dict()` as JSON to `user://saves/slot_<n>.json` with a `version`; loads and migrates. The menus use one slot (`current_slot`, `save_game()`, `load_game()`, `summary()`). |
 | `Settings` | The player's settings (`SettingsData`), apart from any save: loaded from `user://settings.cfg` at start, applied to the window, saved on every change, announced by `EventBus.settings_changed`. |
 | `Quests` | Runs every quest in `data/quests` (a `QuestRunner` over GameState) whenever a flag, an item or a quest's stage changes, and announces quest news (`EventBus.quest_announced`). Holds no state. |
@@ -344,18 +345,25 @@ res://
 | `data/dialogue/` | one conversation per file |
 | `data/enemies/` | one enemy type per file |
 | `data/breakables/` | one breakable (grass, pot) per file |
+| `data/rules/` | one set of rules per file: the numbers a system runs on (`time.json`: the day's clock) |
 
-DataRegistry validates required fields and resolves every cross-reference at load.
+DataRegistry validates required fields and resolves every cross-reference at load. A set of rules must be one
+the game knows (`RULE_SETS`), and is checked by the class that reads it (`DayClock.problems()`).
 
 ## 9. Save format
 ```json
-{ "version": 1, "hearts_max": 3, "health": 5, "heart_pieces": 0, "play_time": 754.25,
+{ "version": 2, "hearts_max": 3, "health": 5, "heart_pieces": 0, "play_time": 754.25,
+  "day": 3, "minute": 870.5, "energy": 100.0,
   "flags": {}, "quests": {}, "inventory": [{"id": "small_key", "count": 1}],
   "equipped": "bow", "player": {"area": "village", "cell": [23, 20]} }
 ```
 While the hero is on the way into an area, `player` is `{"area": "elder_house", "entry": "door"}` instead of
 a cell, until the area places them. Bump `version` on breaking changes and add a migration step in
 `SaveSystem`.
+- **Version 2** (P2a) added `day` (1 is the first), `minute` (the time of day, in minutes since the midnight
+  the day began on: 360 is 06:00) and `energy`. `SaveSystem._v1_to_v2()` gives a version 1 save the first day,
+  the hour days start and a full bar; a finished game stays finished. Tests load two real version 1 saves
+  (`tests/fixtures/saves/`).
 
 ## 10. Testing
 Every class in `core/` has gdUnit4 tests. Areas get layout tests (reachability from the spawn with the real
@@ -613,3 +621,28 @@ run headless; see CLAUDE.md for the command and gotchas.
     anything.
   - Chickens and butterflies are sprites (`gameplay/art/critters.png`); fireflies are glowing dots drawn in code.
 - `CritterMotion` (`core/ambient/`) is pure and seeded by the area's random numbers.
+
+## 16. Time
+- **The day's rules are data** (`data/rules/time.json`, schema `docs/data/rules.schema.json`): when a day starts
+  (06:00) and ends (02:00), how many real seconds an hour takes (42, so a day is 14 minutes), when lamps are lit,
+  when it is night, and the colour of the light at times of the day.
+- **`DayClock`** (`core/time/`, pure) reads them. A time is a number of minutes since the midnight the day began
+  on, so the small hours carry on past 1440 and a day's times only go up. It moves a time on (`advance()`, which
+  stops at the day's end), and answers `is_over()`, `light_at()` (between two of the rules' times the light is
+  between their colours), `lamps_lit()` and `is_night()` (spans that may run over midnight). `problems()` says
+  what is wrong with a set of rules; the registry calls it at load.
+- **`GameState`** keeps `day` and `minute`. `advance_time(seconds)` moves the clock and emits
+  `EventBus.time_changed(day, minute)` once for each minute of the day; `start_next_day()` emits `day_started`.
+  `time_text()` is the HUD's line ("Day 3  14:20", in steps of ten minutes); `daylight()` is the light now.
+- **The clock runs in an area's `_process`** (`AreaController.clock_runs()`): not in a dungeon, a conversation
+  or the item menu, nor while the hero is down or in a pit; behind the pause menu nothing runs at all.
+- **Light:** outdoors (`has_daylight()`) the area hands the hour's colour to `AreaLighting.set_ambient()` every
+  frame. Houses and dungeons keep their own ambient colour.
+  - Tile lights in `Ambience.LIT_AT_DUSK` (street lamps) carry `at_dusk`, and `Ambience.shining()` leaves them
+    out unless lamps are lit. A fire or a candle burns at any hour.
+  - Once the night dims the picture each lamp gets a pool, warmer and weaker than indoors (`NIGHT_POOL_TINT`,
+    `NIGHT_POOL`). The hero has no pool of his own outdoors.
+- **The day's end:** at 02:00 `AreaController.end_the_day()` starts the next day. Until the hero has a home
+  (P2b) that happens where he stands.
+- **Tools:** `tools/capture.gd` takes every shot at noon unless its action is `time:<HH:MM>`;
+  `tools/playtest.gd` takes an hour after a scenario's name.

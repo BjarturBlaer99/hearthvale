@@ -24,6 +24,9 @@ const TILE_LIGHTS: Dictionary = {
 
 ## How many times bigger than life the camera shows each kind of place (P1a): rooms are small,
 ## so houses and dungeons are shown at twice the size. Whole numbers keep pixels square.
+## The tile lights that are lit only from dusk to dawn (DayClock.lamps_lit): street lamps.
+## A fire or a candle burns at any hour.
+const LIT_AT_DUSK: Array[String] = ["prop_lamp"]
 const ZOOM: Dictionary = {OUTDOOR: 1, INTERIOR: 2, DUNGEON: 2}
 ## Areas with mist among the trees (P1c).
 const MISTY: Array[StringName] = [&"old_wood"]
@@ -46,9 +49,20 @@ static func has_mist(area_id: StringName) -> bool:
 	return MISTY.has(area_id)
 
 
-## One glow: where (area px), how far, its colour, how strong, and whether it flickers.
-static func glow(at: Vector2, radius: float, color: Color, strength: float, flickers: bool) -> Dictionary:
-	return {"at": at, "radius": radius, "color": color, "strength": strength, "flickers": flickers}
+## One glow: where (area px), how far, its colour, how strong, whether it flickers, and
+## whether it waits for dusk to be lit (a street lamp).
+static func glow(at: Vector2, radius: float, color: Color, strength: float, flickers: bool, at_dusk: bool = false) -> Dictionary:
+	return {"at": at, "radius": radius, "color": color, "strength": strength, "flickers": flickers, "at_dusk": at_dusk}
+
+
+## Those of `glows` that shine when lamps are `lamps_lit` or not: one that waits for dusk is
+## left out by day.
+static func shining(glows: Array, lamps_lit: bool) -> Array:
+	var out: Array = []
+	for one: Dictionary in glows:
+		if lamps_lit or not one.get("at_dusk", false):
+			out.append(one)
+	return out
 
 
 ## The glows of every light-giving tile on `layers` (the Height and Decor layers), in cell order.
@@ -62,5 +76,5 @@ static func tile_glows(layers: Array) -> Array:
 			var cells: Array[Vector2i] = (layer as TileMapLayer).get_used_cells_by_id(GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(kind))
 			cells.sort()
 			for cell: Vector2i in cells:
-				out.append(glow(Vector2(cell) * float(GreyboxTiles.TILE_SIZE) + spec[0], spec[1], spec[2], spec[3], spec[4]))
+				out.append(glow(Vector2(cell) * float(GreyboxTiles.TILE_SIZE) + spec[0], spec[1], spec[2], spec[3], spec[4], LIT_AT_DUSK.has(kind)))
 	return out

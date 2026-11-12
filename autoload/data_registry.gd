@@ -18,6 +18,7 @@ const KIND_QUEST: StringName = &"quest"
 const KIND_DIALOGUE: StringName = &"dialogue"
 const KIND_ENEMY: StringName = &"enemy"
 const KIND_BREAKABLE: StringName = &"breakable"
+const KIND_RULES: StringName = &"rules"
 
 ## Directory under DATA_ROOT -> the kind of file it holds.
 const DIRECTORY_KINDS: Dictionary = {
@@ -26,6 +27,7 @@ const DIRECTORY_KINDS: Dictionary = {
 	"dialogue": KIND_DIALOGUE,
 	"enemies": KIND_ENEMY,
 	"breakables": KIND_BREAKABLE,
+	"rules": KIND_RULES,
 }
 
 const REQUIRED_FIELDS: Dictionary = {
@@ -38,7 +40,11 @@ const REQUIRED_FIELDS: Dictionary = {
 	&"dialogue_node": ["speaker", "text", "options"],
 	&"enemy": ["id", "name", "behaviour", "health", "speed", "contact_damage"],
 	&"breakable": ["id", "name", "breaks_on", "drops"],
+	&"rules": ["id"],
 }
+## The sets of rules the game knows (data/rules/<id>.json), by id.
+const RULES_TIME: StringName = &"time"
+const RULE_SETS: Array[StringName] = [RULES_TIME]
 
 ## Enemy behaviour ids (EnemyBrains makes one brain per id) and drop-table entry types.
 const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden", "shade"]
@@ -140,13 +146,18 @@ func get_breakable(id: StringName) -> Dictionary:
 	return get_entry(&"breakables", id)
 
 
+## The numbers a system runs on (data/rules/<id>.json), e.g. &"time" for the day's clock.
+func get_rules(id: StringName) -> Dictionary:
+	return get_entry(&"rules", id)
+
+
 # --- Loading ---------------------------------------------------------------
 
 ## Clears everything and loads all JSON under `root`. Returns the problems found;
 ## an empty result means every file is valid and every reference resolves.
 func load_all(root: String = DATA_ROOT) -> PackedStringArray:
 	errors = []
-	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}}
+	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}}
 	if not DirAccess.dir_exists_absolute(root):
 		errors.append("%s: data directory does not exist." % root)
 		return errors
@@ -189,6 +200,8 @@ func _load_file(path: String, kind: StringName) -> void:
 			_register(path, data, &"enemy", &"enemies")
 		KIND_BREAKABLE:
 			_register(path, data, &"breakable", &"breakables")
+		KIND_RULES:
+			_register(path, data, &"rules", &"rules")
 
 
 ## Registers every object in the array `data[key]`.
@@ -238,6 +251,8 @@ func _validate_references() -> void:
 		_check_enemy(enemy)
 	for breakable: Dictionary in _collections[&"breakables"].values():
 		_check_breakable(breakable)
+	for rules: Dictionary in _collections[&"rules"].values():
+		_check_rules(rules)
 	for item: Dictionary in _collections[&"items"].values():
 		var stats: Variant = item.get("stats", {})
 		if typeof(stats) == TYPE_DICTIONARY and (stats as Dictionary).has("ammo"):
@@ -331,6 +346,18 @@ func _check_enemy(enemy: Dictionary) -> void:
 		elif not WEAK_POINTS.has(str((boss as Dictionary).get("weak_point", "arrow"))):
 			errors.append("%s: %s has unknown weak_point '%s'. Known: %s." % [path, label, boss["weak_point"], ", ".join(WEAK_POINTS)])
 	_check_drops(path, label, enemy)
+
+
+## A set of rules must be one the game knows, and usable by the class that reads it.
+func _check_rules(rules: Dictionary) -> void:
+	var path: String = rules["_source"]
+	var id: StringName = StringName(str(rules["id"]))
+	if not RULE_SETS.has(id):
+		errors.append("%s: unknown rules '%s'. Known: %s." % [path, id, ", ".join(RULE_SETS)])
+		return
+	if id == RULES_TIME:
+		for problem: String in DayClock.problems(rules):
+			errors.append("%s: rules 'time': %s" % [path, problem])
 
 
 func _check_breakable(breakable: Dictionary) -> void:

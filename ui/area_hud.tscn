@@ -39,6 +39,13 @@ layout_mode = 2
 mouse_filter = 2
 script = ExtResource("91_energy")
 
+[node name="Clock" type="Label" parent="Panel/Box"]
+layout_mode = 2
+text_overrun_behavior = 3
+theme_override_colors/font_color = Color(1, 0.9, 0.62, 1)
+theme_override_font_sizes/font_size = 8
+text = "Day 1  06:00"
+
 [node name="Area" type="Label" parent="Panel/Box"]
 layout_mode = 2
 text_overrun_behavior = 3

@@ -1,0 +1,130 @@
+{
+	"equipped": "bow",
+	"flags": {
+		"cistern_b_plate": true,
+		"cistern_c_switch": true,
+		"cistern_e_plate": false,
+		"crypt_hall_a": true,
+		"crypt_hall_b": true,
+		"crypt_knight_a": false,
+		"crypt_knight_b": false,
+		"crypt_knight_c": false,
+		"crypt_path_a": true,
+		"crypt_path_b": true,
+		"crypt_tomb_torch": true,
+		"dungeon/cistern/chest/e_treasure": true,
+		"dungeon/cistern/door/d_cracked": true,
+		"dungeon/cistern/door/secret_wall": true,
+		"dungeon/crypt/block/floor": "3,26",
+		"dungeon/crypt/block/trench": "37,36",
+		"dungeon/crypt/chest/iron_sword": true,
+		"dungeon/crypt/chest/lantern": true,
+		"dungeon/crypt/chest/trench_key": true,
+		"dungeon/crypt/door/floor_bars": true,
+		"dungeon/crypt/door/knight_bars": true,
+		"dungeon/crypt/door/path_bars": true,
+		"dungeon/crypt/door/sword_bars": true,
+		"dungeon/crypt/door/tomb_door": true,
+		"dungeon/crypt/keys": 0,
+		"dungeon/keep/big_key": true,
+		"dungeon/keep/chest/big_key": true,
+		"dungeon/keep/chest/bow": true,
+		"dungeon/keep/chest/gallery_key": true,
+		"dungeon/keep/chest/guard_key": true,
+		"dungeon/keep/chest/quiver": true,
+		"dungeon/keep/chest/store_coins": true,
+		"dungeon/keep/door/boss_door": true,
+		"dungeon/keep/door/crystal_shutter": true,
+		"dungeon/keep/door/east_door": true,
+		"dungeon/keep/door/hall_door": true,
+		"dungeon/keep/door/plate_shutter": true,
+		"dungeon/keep/door/store_wall": true,
+		"dungeon/keep/door/twin_shutter": true,
+		"dungeon/keep/keys": 0,
+		"dungeon/north_fields/chest/meadow_bombs": true,
+		"dungeon/old_wood/door/shrine_wall": true,
+		"dungeon/ruin_cellar/big_key": true,
+		"dungeon/ruin_cellar/chest/big_key": true,
+		"dungeon/ruin_cellar/chest/entry_key": true,
+		"dungeon/ruin_cellar/chest/inner_coins": true,
+		"dungeon/ruin_cellar/door/boss_door": true,
+		"dungeon/ruin_cellar/door/hall_door": true,
+		"dungeon/ruin_cellar/keys": 0,
+		"eggs_delivered": true,
+		"keep_armoury_crystal": true,
+		"keep_bigkey_clear": true,
+		"keep_gallery_clear": true,
+		"keep_guard_clear": true,
+		"keep_heart_container": true,
+		"keep_plate_a": false,
+		"keep_plate_b": false,
+		"keep_twin_high": true,
+		"keep_twin_low": true,
+		"keep_warden_beaten": true,
+		"promised_elder_keep": true,
+		"quest/eggs_for_tilda/complete": true,
+		"quest/eggs_for_tilda/entered": "done",
+		"quest/lost_shuttle/complete": true,
+		"quest/lost_shuttle/entered": "done",
+		"quest/slime_bounty/complete": true,
+		"quest/slime_bounty/entered": "done",
+		"reported_slimes": true,
+		"returned_shuttle": true,
+		"ruin_cellar_hall_cleared": true,
+		"south_field_slimes_beaten": true,
+		"told_oda_eggs": true,
+		"took_cistern_heart_piece": true,
+		"took_fields_heart_piece": true,
+		"took_village_heart_piece": true,
+		"took_weavers_shuttle": true,
+		"took_wood_heart_piece": true,
+		"took_wooden_sword": true
+	},
+	"health": 7,
+	"heart_pieces": 0,
+	"hearts_max": 5,
+	"inventory": [
+		{
+			"count": 1,
+			"id": "wooden_sword"
+		},
+		{
+			"count": 204,
+			"id": "coin"
+		},
+		{
+			"count": 8,
+			"id": "arrow"
+		},
+		{
+			"count": 10,
+			"id": "bomb"
+		},
+		{
+			"count": 1,
+			"id": "bow"
+		},
+		{
+			"count": 1,
+			"id": "lantern"
+		},
+		{
+			"count": 1,
+			"id": "iron_sword"
+		}
+	],
+	"play_time": 1092.04,
+	"player": {
+		"area": "crypt",
+		"cell": [
+			37,
+			16
+		]
+	},
+	"quests": {
+		"eggs_for_tilda": "done",
+		"lost_shuttle": "done",
+		"slime_bounty": "done"
+	},
+	"version": 1
+}

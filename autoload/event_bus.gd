@@ -40,5 +40,11 @@ signal hit_stop(seconds: float)
 ## The camera shakes up to `strength` pixels for `seconds`.
 signal shake(strength: float, seconds: float)
 
+## The day's clock reached a new minute (`minute` counts from the midnight the day began on).
+signal time_changed(day: int, minute: int)
+
+## A new day began.
+signal day_started(day: int)
+
 ## The item on the item button changed (empty: nothing equipped).
 signal equipped_changed(item_id: StringName)

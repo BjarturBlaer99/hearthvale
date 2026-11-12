@@ -517,6 +517,23 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-12 — **P2 is built in five steps, each with a review stop:** the clock and the day, home and sleep,
+  energy, food and cooking, hours and night. P1 was six for the same reason: the phase is too big to judge in
+  one piece. (My reading of the user's rule to stop for review after each step; they can ask for bigger steps.)
+- 2026-11-12 — **P2a: save version 2 holds the day, the minute and the energy at once.** Energy isn't spent
+  until 2c, but it is in the save now so P2 changes the format once, as the pivot plan says.
+- 2026-11-12 — **P2a: time is counted from the midnight the day began on.** 02:00 at a day's end is 1560, not
+  120, so a day's times only go up and "is it later than" is one comparison.
+- 2026-11-12 — **P2a: until he has a home, the hero ends the day where he stands.** At 02:00 a new day begins on
+  the spot, with no penalty. Step 2b moves the waking to his bed; 2c adds what collapsing costs.
+- 2026-11-12 — **P2a: the night is dim, not dark, and the hero carries no light outdoors.** The crypt is the
+  place where the dark is a rule. Outdoors at night every enemy stays easy to see, and only lamps make pools.
+- 2026-11-12 — **P2a: a lamp's pool at night is warm and weaker than indoors.** At full strength it showed the
+  grass under it in noon colours, like a floodlight.
+- 2026-11-12 — **P2a: the HUD's clock moves in steps of ten minutes.** A minute of the day is 0.7 seconds, too
+  fast to read as a ticking number.
+- 2026-11-12 — **P2a: screenshots are taken at noon** unless a shot names an hour, so the 88 older shots can
+  still be compared with earlier steps. A new game starts at dawn, in peach light.
 - 2026-11-12 — **P1f: the heading face has capitals only.** Forty-three glyphs drawn by hand; a small letter is
   given its capital's picture, so any words can be set in it and no heading can come out with a missing letter.
   Small letters of its own would be another fifty glyphs for six headings.

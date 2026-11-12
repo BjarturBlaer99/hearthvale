@@ -98,6 +98,14 @@ func setup(kind: StringName, dark: bool) -> void:
 	_tint.color = ambient
 
 
+## Changes the ambient colour (outdoors it follows the hour).
+func set_ambient(color: Color) -> void:
+	if color == ambient:
+		return
+	ambient = color
+	_tint.color = color
+
+
 ## Whether the ambient colour dims the area, so a pool of light shows.
 func is_dim() -> bool:
 	return ambient.v < 0.95

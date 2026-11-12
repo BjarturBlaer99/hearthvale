@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rules.schema.json",
+  "title": "Rules file (data/rules/<id>.json, one set of rules per file)",
+  "description": "The numbers a system runs on, so tuning needs no code (GDD §6). The file's id says which rules it holds. Known ids: 'time' (the day's clock, read by DayClock).",
+  "type": "object",
+  "required": ["id"],
+  "properties": {
+    "id": { "enum": ["time"], "description": "Which rules these are." }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "id": { "const": "time" } } },
+      "then": {
+        "required": ["day_starts", "day_ends", "seconds_per_hour", "lamps_lit", "night", "light"],
+        "properties": {
+          "day_starts": { "$ref": "#/$defs/time_of_day", "description": "When the hero wakes." },
+          "day_ends": { "$ref": "#/$defs/time_of_day", "description": "When the day runs out. A time before day_starts is in the small hours of the next morning." },
+          "seconds_per_hour": { "type": "number", "exclusiveMinimum": 0, "description": "Real seconds one hour of the day takes." },
+          "lamps_lit": { "$ref": "#/$defs/span", "description": "When lamps are lit. May run over midnight." },
+          "night": { "$ref": "#/$defs/span", "description": "When it is night. May run over midnight." },
+          "light": {
+            "type": "array", "minItems": 1,
+            "description": "The colour of the light outdoors at times of the day, in order from the day's start to its end. Between two times the light is between their colours.",
+            "items": {
+              "type": "object",
+              "required": ["at", "color"],
+              "properties": {
+                "at": { "$ref": "#/$defs/time_of_day" },
+                "color": {
+                  "type": "array", "minItems": 3, "maxItems": 3,
+                  "items": { "type": "number", "minimum": 0, "maximum": 1 },
+                  "description": "Red, green and blue, each 0 to 1. Everything outdoors is multiplied by it: [1, 1, 1] is clear daylight."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "time_of_day": { "type": "string", "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$", "description": "A time on a 24-hour clock, like \"06:00\"." },
+    "span": {
+      "type": "object",
+      "required": ["from", "to"],
+      "properties": { "from": { "$ref": "#/$defs/time_of_day" }, "to": { "$ref": "#/$defs/time_of_day" } }
+    }
+  }
+}

@@ -60,6 +60,8 @@ func test_lamps_hearths_and_candles_glow_where_their_tiles_are() -> void:
 
 
 func test_each_kind_of_place_has_its_ambient_colour() -> void:
+	# Outdoors the light follows the hour (P2a): this is the village at noon.
+	GameState.set_time(float(GameState.day_clock().in_day("12:00")))
 	assert_that(_load(VILLAGE).lighting.ambient).override_failure_message("the sun is out").is_equal(Color.WHITE)
 	assert_bool(_area.lighting.is_dim()).is_false()
 	var house: Color = _load(ELDER_HOUSE).lighting.ambient
@@ -79,10 +81,13 @@ func test_each_kind_of_place_has_its_ambient_colour() -> void:
 
 
 func test_houses_and_dungeons_are_lit_around_the_hero_and_their_lights() -> void:
+	# Outdoors the light and the lamps follow the hour (P2a; tests/world/day_test.gd): at dusk
+	# the lamps are lit and the light is still clear.
+	GameState.set_time(float(GameState.day_clock().in_day("18:30")))
 	var village: AreaController = _load(VILLAGE)
 	village._process(FRAME)
-	assert_int(_of_kind(village, AreaLighting.POOL).size()).override_failure_message("by day nothing needs a pool of light").is_equal(0)
-	assert_int(_of_kind(village, AreaLighting.GLOW).size()).override_failure_message("lamps in view still glow").is_greater(0)
+	assert_int(_of_kind(village, AreaLighting.POOL).size()).override_failure_message("while the light is clear nothing needs a pool").is_equal(0)
+	assert_int(_of_kind(village, AreaLighting.GLOW).size()).override_failure_message("lit lamps in view glow").is_greater(0)
 	var house: AreaController = _load(ELDER_HOUSE)
 	house._process(FRAME)
 	assert_object(house.get(&"darkness")).override_failure_message("the old sheet of dark is gone").is_null()

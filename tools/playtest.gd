@@ -25,8 +25,16 @@ const LOG_DIR: String = "user://playtests"
 ## Add this word to print every key pressed and what the words on screen were (to chase input bugs).
 const KEYS: String = "keys"
 
-## Each scenario: the area and cell to start in, items to hold, and flags to set.
+## Each scenario: the area and cell to start in, items to hold, and flags to set. An hour
+## after the scenario's name starts it at that time of day: -- village 19:30
 const SCENARIOS: Dictionary = {
+	# In the village square at the start of the game, with nothing: for watching a day go by.
+	"village": {
+		"area": &"village",
+		"cell": Vector2i(23, 20),
+		"items": [],
+		"flags": [],
+	},
 	# Outside the Iron Warden's hall: sword, bow, 20 arrows, the boss door already open.
 	"warden": {
 		"area": &"keep",
@@ -97,6 +105,10 @@ func _start() -> void:
 		game_state.call(&"add_item", item[0], item[1])
 	for flag: StringName in scenario["flags"]:
 		game_state.call(&"set_flag", flag, true)
+	for arg: String in args.slice(1):
+		if DayClock.parse(arg) >= 0:
+			game_state.call(&"set_time", float((game_state.call(&"day_clock") as DayClock).in_day(arg)))
+			print("tools/playtest: starting at %s." % arg)
 	game_state.call(&"update_player", scenario["area"], scenario["cell"])
 	change_scene_to_file("res://world/areas/%s/%s.tscn" % [scenario["area"], scenario["area"]])
 

@@ -1,0 +1,11 @@
+{
+	"id": "time",
+	"day_starts": "06:00",
+	"day_ends": "02:00",
+	"seconds_per_hour": 0,
+	"lamps_lit": { "from": "18:30", "to": "06:30" },
+	"night": { "from": "20:00" },
+	"light": [
+		{ "at": "06:00", "color": [1.0, 1.0, 1.0] }
+	]
+}

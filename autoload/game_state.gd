@@ -5,12 +5,14 @@ extends Node
 ## methods, which emit the matching EventBus signal. `to_dict()` / `from_dict()` use the
 ## save format from TECH_DESIGN §9; SaveSystem handles files and version migration.
 
-const SAVE_VERSION: int = 1
+const SAVE_VERSION: int = 2
 const HALVES_PER_HEART: int = 2
 const START_HEARTS: int = 3
 const MAX_HEARTS: int = 20
 ## Pieces of heart that make one heart container.
 const PIECES_PER_HEART: int = 4
+## A full bar of energy. Nothing spends it yet (P2c): it is kept, and saved, from P2a.
+const ENERGY_MAX: float = 100.0
 
 ## Heart containers the hero has (0 until a game starts).
 var hearts_max: int = 0
@@ -28,6 +30,15 @@ var inventory: Array[Dictionary] = []
 var equipped: StringName = &""
 ## Seconds played, counted while an area runs unpaused (add_play_time).
 var play_time: float = 0.0
+## The day of the game: 1 is the first.
+var day: int = 1
+## The time of day, in minutes since the midnight the day began on (DayClock): 360 is 06:00,
+## and 1560 is 02:00 at the day's end.
+var minute: float = 360.0
+## The hero's energy, 0..ENERGY_MAX (0 until a game starts).
+var energy: float = 0.0
+
+var _day_clock: DayClock
 ## Where the hero is: { "area", "cell": [x, y] }, or { "area", "entry" } on the way into an
 ## area through one of its entry points (go_to), until the area places them.
 var player: Dictionary = {}
@@ -38,6 +49,7 @@ func new_game() -> void:
 	clear()
 	hearts_max = START_HEARTS
 	health = max_health()
+	energy = ENERGY_MAX
 
 
 func is_started() -> bool:
@@ -91,6 +103,52 @@ static func format_play_time(seconds: float) -> String:
 	if hours > 0:
 		return "%d:%02d:%02d" % [hours, minutes, total % 60]
 	return "%d:%02d" % [minutes, total % 60]
+
+
+# --- Time ------------------------------------------------------------------
+
+## The rules of the day, from data (data/rules/time.json).
+func day_clock() -> DayClock:
+	if _day_clock == null:
+		_day_clock = DayClock.new(DataRegistry.get_rules(DataRegistry.RULES_TIME))
+	return _day_clock
+
+
+## Lets `seconds` of real time pass on the day's clock, which stops at the day's end. Says so
+## once for each minute of the day that goes by.
+func advance_time(seconds: float) -> void:
+	set_time(day_clock().advance(minute, seconds))
+
+
+## Puts the clock at `to_minute` of this day (kept within the day).
+func set_time(to_minute: float) -> void:
+	var before: int = floori(minute)
+	minute = clampf(to_minute, float(day_clock().starts), float(day_clock().ends))
+	if floori(minute) != before:
+		EventBus.time_changed.emit(day, floori(minute))
+
+
+## Whether the day has run out (02:00).
+func is_day_over() -> bool:
+	return day_clock().is_over(minute)
+
+
+## The next day begins, at the hour days start.
+func start_next_day() -> void:
+	day += 1
+	minute = float(day_clock().starts)
+	EventBus.day_started.emit(day)
+	EventBus.time_changed.emit(day, floori(minute))
+
+
+## "Day 3  14:20" for the HUD: the clock moves in steps of ten minutes.
+func time_text() -> String:
+	return "Day %d  %s" % [day, DayClock.shown(minute)]
+
+
+## The colour of the light outdoors now.
+func daylight() -> Color:
+	return day_clock().light_at(minute)
 
 
 func set_health(value: int) -> void:
@@ -202,6 +260,9 @@ func clear() -> void:
 	health = 0
 	heart_pieces = 0
 	play_time = 0.0
+	day = 1
+	minute = float(day_clock().starts)
+	energy = 0.0
 	flags.clear()
 	quests.clear()
 	inventory.clear()
@@ -220,6 +281,9 @@ func to_dict() -> Dictionary:
 		"health": health,
 		"heart_pieces": heart_pieces,
 		"play_time": snappedf(play_time, 0.01),
+		"day": day,
+		"minute": snappedf(minute, 0.01),
+		"energy": snappedf(energy, 0.01),
 		"flags": _json_safe(flags),
 		"quests": _json_safe(quests),
 		"inventory": stacks,
@@ -236,6 +300,9 @@ func from_dict(data: Dictionary) -> void:
 	health = clampi(int(data.get("health", 0)), 0, max_health())
 	heart_pieces = clampi(int(data.get("heart_pieces", 0)), 0, PIECES_PER_HEART - 1)
 	play_time = maxf(float(data.get("play_time", 0.0)), 0.0)
+	day = maxi(int(data.get("day", 1)), 1)
+	minute = clampf(float(data.get("minute", day_clock().starts)), float(day_clock().starts), float(day_clock().ends))
+	energy = clampf(float(data.get("energy", ENERGY_MAX)), 0.0, ENERGY_MAX)
 	var src_flags: Dictionary = data.get("flags", {})
 	for key: Variant in src_flags:
 		flags[StringName(str(key))] = src_flags[key]

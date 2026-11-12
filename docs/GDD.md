@@ -80,10 +80,12 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 - **Growth** *(P4, to be proposed)*: three skills (combat, farming, cooking) that rise with use.
 
 ## 6. Time, food and sleep *(P2)*
-- **A day** runs from 06:00 to 02:00 in 14 real minutes. At 02:00 the hero passes out, as at zero energy. The
-  clock stops in conversations, in menus and in dungeons.
-- **Light follows the hour:** peach at dawn, clear by day, orange then violet at dusk, blue at night. Lamps and
-  windows light at dusk.
+*(Built so far: the clock, the day and the light, in step 2a. The rest of this section is still to come.)*
+- **A day** runs from 06:00 to 02:00 in 14 real minutes. At 02:00 the hero passes out, as at zero energy
+  *(until 2b and 2c: a new day simply begins where he stands)*. The clock stops in conversations, in menus and
+  in dungeons.
+- **Light follows the hour:** peach at dawn, clear by day, orange then violet at dusk, blue at night. Lamps
+  light at dusk *(windows too, in 2e)*.
 - **Hours:** Tilda's shop is open 08:00 to 18:00; villagers who stand outdoors go home at 20:00.
 - **Night monsters** (outdoors, 20:00 to 06:00): half as much health again, a little faster, and they see
   further. They drop coins more often.

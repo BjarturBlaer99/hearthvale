@@ -1305,3 +1305,35 @@ Plan: `docs/progress/P1f-plan.md`. The last step of the pivot's visual overhaul 
 - **On a screen taller than 16:9** the picture sits at the foot and plain night sky fills the space above it.
 - The petals on the title are single pixels; easy to miss.
 - Still open from 1e: Elder Bram's fire shows above his head, and the hero's head hides most of whoever he talks to from the south.
+
+## 2026-11-12 — P2a: the clock and the day (built; not yet tried in play)
+
+Plan: `docs/progress/P2-plan.md` (P2 in five steps; this is the first).
+
+**Built**
+- **The clock's rules are data** (`data/rules/time.json`, a new kind of data with a schema): the day's start and end, the seconds an hour takes, when lamps are lit, when it is night, and the colour of the light at seven times of the day. The registry checks them on load.
+- **`DayClock`** (`core/time/`, pure) reads them: a day runs from 06:00 to 02:00 in fourteen real minutes.
+- **`GameState`** keeps the day, the time of day and the hero's energy (full, and unused until 2c). **Save version 2**, with a migration from version 1: the first day, 06:00, a full bar, everything else as it was.
+- **The clock runs** in the village, the countryside and houses. It stands still in dungeons, in conversations, in the item menu, while the hero is down, and behind the pause menu.
+- **The light outdoors follows the hour:** peach at dawn, clear from 07:30, orange at 18:30, violet at 19:45, blue from 21:00. Houses and dungeons keep their own light.
+- **Lamps are lit from 18:30 to 06:30** and dark by day. Once the night dims the picture each lamp has a warm pool. The hero has no pool of his own outdoors.
+- **The HUD's corner** shows the day and the hour under the hearts, in steps of ten minutes.
+- **At 02:00 a new day begins** where the hero stands, with a short dark screen and a line of words. No penalty.
+- **Tools:** the screenshot tool takes every shot at noon unless it names an hour, and has seven new shots round the clock (95 in all); the playtest tool takes an hour (`-- village 19:30`) and has a scenario that starts in the village.
+
+**Checked**
+- 406 tests in 57 suites pass (+19: `tests/core/time/day_clock_test.gd`, `tests/autoload/day_test.gd`, `tests/world/day_test.gd`). Three older tests that looked at the village's light now say what hour they mean. Import and boot clean.
+- **Old saves:** a real version 1 save from the whole-game playtest loads with every flag, item, quest and heart as it was; a finished version 1 save is still finished; a save from a later version is refused.
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: the clock running on past the day's end, a span over midnight never true, the clock running in dungeons, an old save waking with no energy, the hero carrying a pool of light outdoors at night.
+- **Frame cost** in the village, noon and night turn about in one run: 2.94 ms and 306 draw calls at noon, 3.54 ms and 321 at night (the lamps' pools and glows). The four areas measured at each step are unchanged in draw calls.
+- Screenshots: all 95 taken. Looked at closely: the village at dawn, noon, dusk, nightfall and night; the North Fields at 01:00; a house at night.
+
+**Known issues and limits**
+- Not tried in play. **Whether fourteen minutes is the right length of day is for a playtest to say.**
+- **The day ends where the hero stands.** The home, the bed and waking there are 2b; what collapsing costs is 2c.
+- **Nothing else knows the hour yet:** the shop, the villagers and the monsters are the same day and night (2e).
+- **A lamp's picture is the same lit or unlit:** its glass is yellow at noon. Only its light goes out.
+- **Windows don't glow at night** (2e), so a house at night is a dark shape beside a lamp.
+- **A house's light doesn't change with the hour:** indoors it looks the same at noon and at midnight.
+- **A new game starts in peach light,** for the first hour and a half of the day (about a minute).
+- The pause menu's "Time played" is still real time played, not the day.

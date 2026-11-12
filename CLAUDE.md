@@ -93,9 +93,11 @@ godot --headless --path . --quit-after 30
 godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
-# Start partway through to try one part by hand (scenarios in the script: warden, crypt, shade, ending).
+# Start partway through to try one part by hand (scenarios in the script: village, warden, crypt, shade,
+# ending). An hour after the name starts at that time of day.
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
 godot --path . -s res://tools/playtest.gd -- warden
+godot --path . -s res://tools/playtest.gd -- village 19:30
 # The whole game for a playtest: from the title, on its own save slot (901, kept between runs; "fresh" empties
 # it), with a log of what happens in user://playtests
 godot --path . -s res://tools/playtest.gd -- full
@@ -179,3 +181,10 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
 - Do not add areas beyond the hero's home and plot unless the user asks.
 - Do not add a dependency/addon without noting why in `docs/DECISIONS.md`. Allowed now: gdUnit4.
 - Do not write story, dialogue or quest content beyond what the current milestone needs.
+
+## The pivot's rules in code (P2 on)
+- **Time (P2a):** a day is 06:00 to 02:00 in 14 real minutes; the numbers are in `data/rules/time.json`, read by
+  `DayClock` (`core/time/`, pure). `GameState` keeps `day` and `minute`. The clock runs in areas but not in
+  dungeons, conversations or menus. Outdoors the ambient light is the hour's; lamps are lit from dusk to dawn.
+  A test that needs daylight sets the hour itself (a new game starts at dawn). `P2` is built in five steps:
+  see `docs/progress/P2-plan.md`.
