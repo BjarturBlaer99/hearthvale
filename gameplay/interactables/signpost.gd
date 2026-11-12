@@ -28,7 +28,7 @@ func _draw() -> void:
 
 
 func _draw_wood() -> void:
-	draw_rect(Rect2(4, 13, 8, 2), Color(0, 0, 0, 0.3))
+	SoftShadow.draw(self, Vector2(8, 14), Vector2(4.5, 1.5))
 	draw_rect(Rect2(6, 5, 4, 10), OUTLINE)
 	draw_rect(Rect2(7, 5, 2, 9), WOOD.darkened(0.3))
 	draw_rect(Rect2(1, -1, 14, 9), OUTLINE)
@@ -40,7 +40,7 @@ func _draw_wood() -> void:
 
 ## A slab with a rounded top on a wider foot, lit from the left, with four carved lines.
 func _draw_stone() -> void:
-	draw_rect(Rect2(2, 14, 12, 2), Color(0, 0, 0, 0.3))
+	SoftShadow.draw(self, Vector2(8, 15), Vector2(6.5, 1.6))
 	draw_rect(Rect2(5, -1, 6, 1), OUTLINE)
 	draw_rect(Rect2(4, 0, 8, 1), OUTLINE)
 	draw_rect(Rect2(3, 1, 10, 12), OUTLINE)

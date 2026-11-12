@@ -489,5 +489,18 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
 - 2026-11-12 — **P1a: the HUD's contents are unchanged.** At twice the size the HUD's corner and the controls
   hint cover the top corners of a dungeon room (they are see-through). Slimming the HUD is left to 1f and P2,
   when it gains the energy bar, the clock and the day.
+- 2026-11-12 — **P1b: pools mix, glows add.** A test in a window showed what the engine's two blends do under
+  a dark ambient colour: "mix" at full strength gives a thing's own colour back exactly, and two that overlap
+  stay at that; "add" piles up and glares. So light that shows things is a mix, and only the bloom is an add.
+- 2026-11-12 — **P1b: the crypt's dark is drawn by the rule's lights and nothing else.** A crystal or a far
+  torch with a light of its own would give itself away in the dark, which the old sheet of dark prevented by
+  lying over everything. So a dark area gets one pool per rule light, and a glow only when it lies wholly
+  inside a light's fully lit core.
+- 2026-11-12 — **P1b: a light's first step starts at its edge.** The old sheet rounded brightness to the nearest
+  of four steps, so the outer twentieth of each light was drawn dark although the rule calls it lit. The new
+  picture rounds up, so drawn and rule agree on where light ends; lights look a shade wider than before.
+- 2026-11-12 — **P1b: no normal maps and no hard shadows yet.** The plan was to try normal maps on dungeon walls
+  and tree trunks, and that belongs with their repaint (1c, 1d), since the pictures change there. Real-time
+  shadows from walls were not tried.
 - 2026-11-11 — **Animation never changes play.** The wind-up and the settle are pictures chosen by how far
   through the swing the motor is. The blade is live from the first frame and the swing is as long as it was.

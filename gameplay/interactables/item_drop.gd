@@ -34,7 +34,7 @@ func collect() -> bool:
 func _draw() -> void:
 	if taken:
 		return
-	draw_circle(CENTER + Vector2(0, 4), 3.0, Color(0, 0, 0, 0.25))
+	SoftShadow.draw(self, CENTER + Vector2(0, 4), Vector2(3, 1.4))
 	if ItemIcons.name_for(item_id) != &"coin":
 		ItemIcons.draw(self, ItemIcons.name_for(item_id), Vector2(0, -1))
 		return

@@ -107,5 +107,5 @@ func _draw() -> void:
 	if not FRAMES.has(frame):
 		return
 	if not broken:
-		draw_rect(Rect2(3, 13, 10, 2), Color(0, 0, 0, 0.22))
+		SoftShadow.draw(self, Vector2(8, 14), Vector2(5, 1.5), 0.8)
 	SpriteSheet.draw(self, SHEET, FRAMES[frame], SIZE, Vector2.ZERO)

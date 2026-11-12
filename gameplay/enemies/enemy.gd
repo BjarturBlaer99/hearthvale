@@ -225,14 +225,14 @@ func _ellipse(center: Vector2, radius: Vector2, color: Color) -> void:
 func _draw_slime() -> void:
 	var phase: float = (brain as HopperBrain).hop_phase()
 	var lift: float = roundf(sin(phase * PI) * 5.0) if phase >= 0.0 else 0.0
-	_ellipse(Vector2(0, 0), Vector2(5, 2), SHADOW)
+	SoftShadow.draw(self, Vector2.ZERO, Vector2(5, 2))
 	var frame: StringName = &"hop" if phase >= 0.0 else (&"wide" if sin(_clock * 6.0) > 0.3 else &"rest")
 	SpriteSheet.draw(self, SLIME_SHEET, SLIME_FRAMES[frame], SMALL, Vector2(-8, -15 - lift), false, _flashing())
 
 
 func _draw_goblin() -> void:
 	var drawing: bool = (brain as ArcherBrain).is_drawing()
-	_ellipse(Vector2(0, 0), Vector2(5, 2), SHADOW)
+	SoftShadow.draw(self, Vector2.ZERO, Vector2(5, 2))
 	var side: bool = absf(brain.facing.x) > absf(brain.facing.y)
 	var frame: StringName = &"front_draw" if drawing else &"front"
 	if side:
@@ -250,6 +250,6 @@ func _draw_goblin() -> void:
 func _draw_bat() -> void:
 	var resting: bool = (brain as FlierBrain).is_resting()
 	var height: float = 4.0 if resting else roundf(10.0 + sin(_clock * 5.0) * 1.5)
-	_ellipse(Vector2(0, 0), Vector2(3.5, 1.5), SHADOW)
+	SoftShadow.draw(self, Vector2.ZERO, Vector2(3.5, 1.5), 0.8)
 	var frame: StringName = &"rest" if resting else (&"up" if sin(_clock * 22.0) > 0.0 else &"down")
 	SpriteSheet.draw(self, BAT_SHEET, BAT_FRAMES[frame], SMALL, Vector2(-8, -8 - height), false, _flashing())

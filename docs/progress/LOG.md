@@ -1152,3 +1152,30 @@ The user asked for a change of direction: a story-driven RPG with survival and f
 - **More is in view outdoors.** The North Fields, the Old Wood and the South Field are exactly as wide as the screen, so the camera there only moves up and down, and the heart piece on the North Fields' plateau is in view from the road.
 - During the first run of the after shots, 31 of 88 came out at 640x360: the window had shrunk part-way through. Retaking them gave 1920x1080. Not explained; nothing in the game sets that size.
 - The art is unchanged, by design: this step is the frame only.
+
+## 2026-11-12 — P1b: light (built; not yet tried in play)
+
+Plan: `docs/progress/P1b-plan.md`.
+
+**Built**
+- **`AreaLighting`**, one per area: an ambient colour (clear outdoors, warm and dim in a house, cool and dim in a dungeon, near black in the crypt) and a pool of real lights (`PointLight2D`), filled every frame.
+- **Two kinds of light:** a pool, which shows what it reaches in its own colours and never glares where two overlap, and a glow, which adds its colour on top.
+- **Which lights:** a glow at every lamp post, hearth, candle, burning torch, crystal and the lantern; where it is dim, also a pool round the hero and round each glow.
+- **The crypt's dark is drawn by the rule's own lights:** one pool per `LightRules` light, at its place and radius, with a picture made from the rule's falloff. Nothing else lights a dark area: a glow is drawn there only when it lies wholly inside a light's fully lit core, so the Reliquary's crystal still gives nothing away.
+- **Soft shadows:** one helper (`SoftShadow`) draws the shadow under the hero, villagers, enemies, bosses, critters, pickups, chests, blocks, torches, signs and pots (22 places); cast shadows from trees, walls and buildings are six pixels in two steps.
+- **Removed:** `Glows` and `Darkness`.
+
+**Checked**
+- 356 tests in 49 suites pass (+4). The tests about the removed nodes were rewritten for the new ones. Import and boot clean.
+- **Drawn light against the rule, in a window:** the crypt's hall, the Dark Path (one light) and the Narthex, about 640 floor points each, comparing pixels with the lighting on and off. Every point the rule calls fully lit was drawn at full colour, no half-lit point was drawn dark or darker than the rule, and the brightest truly dark point was 3% or less. In the hall, one or two points in some runs were drawn faintly lit though the rule calls them dark; each was within half a pixel of a light's edge (lights sit on whole pixels).
+- **Mutation checks:** five deliberate bugs in runtime code. Four were caught at once: pools adding and glows mixing, a light drawn shorter than the rule, the crypt's lights drawn wider than the rule, a crypt that is only dim. **One survived:** a glow shining out in the crypt's dark. No test had a glow standing outside a lit core. Added one (the Reliquary's crystal while the hero is elsewhere); the bug is now caught. Files restored.
+- **Frame cost** (windowed, vsync off, 1920x1080, Intel graphics), before to after: village 3.10 to 3.37 ms, Elder Bram's house 2.90 to 3.59 ms, the keep 3.22 to 3.96 ms, the crypt's hall 3.43 to 5.46 ms. The crypt is the dearest: five pools and their glows over a full screen. All are well inside the 16.7 ms a frame that 60 a second needs.
+- Screenshots: all 88 retaken. Looked at closely: the village square, Elder Bram's house (and a close crop of its floor), the keep's great hall, the crypt's hall and the Dark Path.
+
+**Known issues and limits**
+- Not tried in play: the flicker of fires and the hero's pool moving with him only show in motion.
+- **Lights look a shade wider in the crypt than before.** The old sheet drew the outer twentieth of each light dark although the rule calls it lit; now drawn and rule agree.
+- **Where two half-lit edges cross, it is a little brighter than the rule's "brightest light counts".** Never darker, and never lit where the rule says dark.
+- **Cast shadows are wide indoors:** six pixels at twice the size is a broad band under shelves and tables.
+- **No normal maps and no real-time shadows from walls.** The pivot plan said I would try normal maps on dungeon walls and tree trunks; that is moved to 1c and 1d, where those pictures are repainted.
+- Outdoors by day nothing changes but the lamps' glow and the shadows: the hour's colour comes in P2.

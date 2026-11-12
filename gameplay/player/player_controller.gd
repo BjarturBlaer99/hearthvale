@@ -42,7 +42,7 @@ var _fall_time: float = 1.0
 @onready var hurt_box: HurtBox = $HurtBox
 @onready var sword: Sword = $Sword
 @onready var _sprite: Sprite2D = $Sprite
-@onready var _shadow: Polygon2D = $Shadow
+@onready var _shadow: Node2D = $Shadow
 @onready var _camera: Camera2D = $Camera2D
 
 

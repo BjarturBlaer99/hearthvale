@@ -288,8 +288,12 @@ res://
     edge, and the brightest one counts.
   - The lights are the hero's own (a dim glow, or a lantern's `radius`) and every torch burning in the room on
     screen (`AreaController.lights()`): light doesn't pass a dungeon's walls.
-  - `Darkness` draws it with a shader, in a few steps of brightness, over the tiles and actors and under the
-    room mask and HUD. `brightness_at(cell)` asks the same rule, for tests.
+  - `AreaLighting` draws it (P1b): the area's ambient colour is near black, and each of the rule's lights is a
+    real light at the rule's place and radius, with a picture made from the rule's own falloff in four steps.
+    Nothing else lights a dark area, so what is drawn lit is what the rule says is lit. `brightness_at(cell)`
+    asks the same rule, for tests.
+    - One difference from the rule: it takes the brightest light, while two overlapping pools add up a little
+      where their half-lit edges cross. Never darker than the rule, and never lit where the rule says dark.
   - Shutters can wait on several flags (`open_flags`, any of them, or all with `needs_all`), so a room can have
     two solutions.
 
@@ -468,12 +472,25 @@ run headless; see CLAUDE.md for the command and gotchas.
   - `Ambience` (`world/areas/`) reads what kind of place an area is from its tiles: a dungeon (it has a
     `dungeon_id`), a house's inside (it has inner walls), else outdoors. It also finds the tiles that give light
     (lamp posts, hearths, candles).
-  - `Glows` adds a soft round of colour at each light (blend mode add, z 30, clipped to the map so light doesn't
-    spill into the black around a room). The area gives it the tile lights once and, every frame, the ones that
-    come and go: burning torches, crystals in their colour, the hero's lantern. Fires flicker.
-  - **Gloom:** a second `Darkness` with a soft look (`set_look`: violet, shallow, eight steps) over houses and
-    dungeons that aren't `dark`. Its lights are a pool around the hero (`Ambience.HERO_POOL`) and every glow.
-    `brightness_at()` and `lights()`, the rules play depends on, don't know about it.
+  - **`AreaLighting`** (P1b, `world/areas/`), one per area, in place of the glow sprites and the sheets of dark:
+    - **Ambient colour** by kind of place, through a `CanvasModulate`: clear outdoors, a warm dimness in a
+      house, a cool one in a dungeon (`AMBIENT`), near black in a `dark` area (`DARK`). The HUD is on its own
+      layer and isn't tinted.
+    - **A pool of `PointLight2D` nodes**, filled every frame by `AreaController.scene_lights()`: the lights that
+      reach the room on screen, widest first, at most `MAX_LIGHTS` (the engine lights one drawn thing with at
+      most 16).
+    - **Two kinds of light.** A `POOL` uses the engine's "mix" blend: it shows what it reaches in its own
+      colours, so a white pool undoes the dimness exactly and two pools never glare. A `GLOW` uses "add": the
+      warm bloom round a flame, and a lamp in daylight.
+    - **Which lights** (`scene_lights()`): a glow for every tile that gives light, every burning torch, every
+      crystal (in its colour) and the hero's lantern (`glows_now()`). Where the ambient colour is dim, also a
+      pool round the hero (`Ambience.HERO_POOL`) and round each glow (`Ambience.REACH` times as wide).
+    - Light pictures are made in code (`picture(core, steps)`) from `falloff()`, and kept.
+    - `brightness_at()` and `lights()`, the rules play depends on, are untouched.
+  - **Soft shadows** (P1b): `SoftShadow.draw(canvas, center, radii, strength)` (`gameplay/effects/`) draws the
+    shadow under every actor, pickup and prop: a dark heart and a fainter rim, in violet. `SoftShadowNode` is the
+    same as a node, for the hero's scene. `HeightShading` casts its shadows `CAST` pixels (six) in two steps:
+    the whole shadow in `SHADE_FAR`, the nearer half again in `SHADE_NEAR`.
   - **Cast shadows:** `HeightShading.cast_on(grid, cell)` says whether a taller solid cell to the west (or
     north-west) shades an open cell; the sun stands in the north-west.
   - `Motes` (`gameplay/ambient/`): a few single-pixel specks pinned to the world, by kind of place.

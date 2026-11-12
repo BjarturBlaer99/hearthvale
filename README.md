@@ -73,6 +73,8 @@ Beaten enemies sometimes drop hearts or coins.
   winds up before a swing, flinches when hit and bends his knees landing from a ledge.
 - **A wider picture** (the pivot, step 1a): the game draws 640x360, so more of the world is in view outdoors;
   houses and dungeon rooms are shown at twice the size. The window is 1920x1080 at the default 3x.
+- **Real light** (the pivot, step 1b): every lamp, hearth, candle, torch and crystal is a light, houses are warm
+  and dim, dungeons cool and dim, and shadows have soft edges.
 - **The road north:** from the top of the north rise, through the woods.
   - **The North Fields:** a stream with a bridge, a farm plot, slimes, and a goblin archer on a plateau. Keep an eye
     on the tree line beside the road.

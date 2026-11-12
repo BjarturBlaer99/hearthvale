@@ -111,7 +111,7 @@ func _draw() -> void:
 		for offset: Vector2 in [Vector2(0, -16), Vector2(-10, -8), Vector2(10, -8), Vector2(0, -28)]:
 			draw_arc(offset, 4.0 + spread * 14.0, 0.0, TAU, 20, Color(1, 1, 1, 1.0 - spread), 2.0)
 		return
-	_ellipse(Vector2(0, 0), Vector2(11, 3), Color(SHADOW, 0.2))
+	SoftShadow.draw(self, Vector2.ZERO, Vector2(11, 3), 0.7)
 	var frame: StringName = &"bound"
 	var alpha: float = 1.0
 	var hover: float = 0.0

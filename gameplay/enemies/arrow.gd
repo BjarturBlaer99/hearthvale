@@ -70,7 +70,7 @@ func _stop() -> void:
 func _draw() -> void:
 	if bolt:
 		var at: Vector2 = Vector2(0, -6)
-		draw_circle(Vector2(0, 0), 2.5, Color(0, 0, 0, 0.25))
+		SoftShadow.draw(self, Vector2.ZERO, Vector2(2.5, 1.2))
 		draw_circle(at - direction * 4.0, 2.5, Color(BOLT, 0.35))
 		draw_circle(at, 4.0, Color(BOLT, 0.45))
 		draw_circle(at, 2.5, BOLT)

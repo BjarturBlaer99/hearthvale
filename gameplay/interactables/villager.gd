@@ -39,7 +39,7 @@ func prompt() -> String:
 
 
 func _draw() -> void:
-	_ellipse(Vector2(8, FEET_Y - 1.0), Vector2(6, 2.5), Color(0, 0, 0, 0.35))
+	SoftShadow.draw(self, Vector2(8, FEET_Y - 1.0), Vector2(6, 2.5), 1.1)
 	SpriteSheet.draw(self, _sheet(), FRAMES[&"bearded" if beard else &"plain"], SIZE, Vector2(0, FEET_Y - SIZE.y + 1))
 
 

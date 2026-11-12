@@ -57,7 +57,7 @@ func _draw() -> void:
 	if not is_there():
 		return
 	var lift: float = roundf(3.0 + sin(_clock * 3.0) * 1.5)
-	draw_circle(CENTER + Vector2(0, 6), 4.0, Color(0, 0, 0, 0.25))
+	SoftShadow.draw(self, CENTER + Vector2(0, 6), Vector2(4, 1.8))
 	draw_circle(CENTER - Vector2(0, lift), 10.0, Color(GOLD, 0.18))
 	ItemIcons.draw(self, &"heart_container", Vector2(0, -lift - 1.0))
 	var twinkle: float = fmod(_clock, 1.2)

@@ -55,7 +55,7 @@ func _draw() -> void:
 	if not is_there():
 		return
 	var lift: float = roundf(2.0 + sin(_clock * 3.0) * 1.0)
-	draw_circle(CENTER + Vector2(0, 6), 3.5, Color(0, 0, 0, 0.25))
+	SoftShadow.draw(self, CENTER + Vector2(0, 6), Vector2(3.5, 1.6))
 	draw_circle(CENTER - Vector2(0, lift), 8.0, Color(GOLD, 0.15))
 	ItemIcons.draw(self, &"heart_piece", Vector2(0, -lift - 1.0))
 	if fmod(_clock, 1.4) < 0.3:

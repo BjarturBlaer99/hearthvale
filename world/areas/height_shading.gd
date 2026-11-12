@@ -20,10 +20,13 @@ const STONE_FACE_LINE: Color = Color(0.12, 0.12, 0.15, 0.7)
 ## Cut-stone cliff faces (dungeons) instead of earthy ones; the area sets it.
 var stone_faces: bool = false
 const LIP_COLOR: Color = Color(0.14, 0.10, 0.08, 0.95)
-const FOOT_SHADOW: Color = Color(0.14, 0.06, 0.24, 0.24)
-const SOLID_SHADOW: Color = Color(0.14, 0.06, 0.24, 0.32)
+## Shadows fade out in two steps (P1b): the whole shadow in the faint shade, and the half of
+## it nearest the thing that casts it darkened again.
+const SHADE_FAR: Color = Color(0.14, 0.06, 0.24, 0.15)
+const SHADE_NEAR: Color = Color(0.14, 0.06, 0.24, 0.18)
 ## The sun stands in the north-west: tall solid things also shade the ground to their east.
-const CAST: float = 4.0
+## How far a shadow reaches (px); its darker half is nearest the thing.
+const CAST: float = 6.0
 const SIDES: Array[Vector2i] = [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP]
 const ALL_SIDES: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT]
 ## Kinds of soft edge: grass fraying over a path, and water against its bank.
@@ -127,13 +130,17 @@ static func cast_on(grid: HeightGrid, cell: Vector2i) -> StringName:
 
 func _draw_cast(cell: Vector2i) -> void:
 	var origin: Vector2 = Vector2(cell) * T
+	var near: float = CAST / 2.0
 	match cast_on(_grid, cell):
 		CAST_SIDE:
-			draw_rect(Rect2(origin, Vector2(CAST, T)), SOLID_SHADOW)
+			draw_rect(Rect2(origin, Vector2(CAST, T)), SHADE_FAR)
+			draw_rect(Rect2(origin, Vector2(near, T)), SHADE_NEAR)
 		CAST_SIDE_BELOW:
-			draw_rect(Rect2(origin + Vector2(0.0, CAST), Vector2(CAST, T - CAST)), SOLID_SHADOW)
+			draw_rect(Rect2(origin + Vector2(0.0, CAST), Vector2(CAST, T - CAST)), SHADE_FAR)
+			draw_rect(Rect2(origin + Vector2(0.0, near), Vector2(near, T - near)), SHADE_NEAR)
 		CAST_CORNER:
-			draw_rect(Rect2(origin, Vector2(CAST, CAST)), SOLID_SHADOW)
+			draw_rect(Rect2(origin, Vector2(CAST, CAST)), SHADE_FAR)
+			draw_rect(Rect2(origin, Vector2(near, near)), SHADE_NEAR)
 
 
 ## Whether `from` is a solid thing standing taller than `onto`.
@@ -144,7 +151,8 @@ static func _casts(grid: HeightGrid, from: Vector2i, onto: Vector2i) -> bool:
 ## What shows below a cell that's `levels` higher than the one south of it, from `top` down.
 func _draw_drop(cell: Vector2i, top: Vector2, levels: int) -> void:
 	if _grid.is_solid(cell):
-		draw_rect(Rect2(top, Vector2(T, 4.0)), SOLID_SHADOW)
+		draw_rect(Rect2(top, Vector2(T, CAST)), SHADE_FAR)
+		draw_rect(Rect2(top, Vector2(T, CAST / 2.0)), SHADE_NEAR)
 		return
 	var face: float = minf(float(levels) * 4.0, 12.0)
 	var line: Color = STONE_FACE_LINE if stone_faces else FACE_LINE
@@ -156,7 +164,8 @@ func _draw_drop(cell: Vector2i, top: Vector2, levels: int) -> void:
 	var crack: float = float(posmod(cell.x * 7 + cell.y * 3, 11)) + 2.0
 	draw_line(top + Vector2(crack + 0.5, 1.0), top + Vector2(crack + 0.5, face), line)
 	draw_rect(Rect2(top, Vector2(T, 1.0)), LIP_COLOR)
-	draw_rect(Rect2(top + Vector2(0.0, face), Vector2(T, 2.0)), FOOT_SHADOW)
+	draw_rect(Rect2(top + Vector2(0.0, face), Vector2(T, 4.0)), SHADE_FAR)
+	draw_rect(Rect2(top + Vector2(0.0, face), Vector2(T, 2.0)), SHADE_NEAR)
 
 
 ## Grass fraying over a path's edge: blades of different lengths growing in from `side`, with

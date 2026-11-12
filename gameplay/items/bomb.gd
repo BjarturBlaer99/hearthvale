@@ -68,7 +68,7 @@ func _draw() -> void:
 		draw_circle(Vector2(0, -2), size, Color(1.0, 0.55, 0.15, 0.55 * (1.0 - spread)))
 		draw_circle(Vector2(0, -2), size * 0.6, Color(1.0, 0.85, 0.35, 0.8 * (1.0 - spread)))
 		return
-	draw_circle(Vector2(0, 1), 4.0, Color(0, 0, 0, 0.3))
+	SoftShadow.draw(self, Vector2(0, 1), Vector2(4, 2))
 	# The spark blinks faster as the fuse runs down: the tell for "move away".
 	var period: float = lerpf(0.3, 0.06, 1.0 - fuse_left / fuse)
 	ItemIcons.draw(self, &"bomb" if fmod(fuse_left, period) < period / 2.0 else &"bomb_dim", Vector2(-8, -14))

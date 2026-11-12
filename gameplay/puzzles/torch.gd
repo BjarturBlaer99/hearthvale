@@ -130,7 +130,7 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(3, 13, 10, 2), Color(0, 0, 0, 0.3))
+	SoftShadow.draw(self, Vector2(8, 14), Vector2(5, 1.5))
 	var frame: StringName = &"unlit"
 	if _lit:
 		frame = &"flame_a" if int(_clock * 8.0) % 2 == 0 else &"flame_b"

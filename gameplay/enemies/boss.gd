@@ -118,7 +118,7 @@ func _draw() -> void:
 		for offset: Vector2 in [Vector2(0, -16), Vector2(-10, -8), Vector2(10, -8), Vector2(0, -28)]:
 			draw_arc(offset, 4.0 + spread * 14.0, 0.0, TAU, 20, Color(1, 1, 1, 1.0 - spread), 2.0)
 		return
-	_ellipse(Vector2(0, 0), Vector2(14, 4), SHADOW)
+	SoftShadow.draw(self, Vector2.ZERO, Vector2(14, 4), 1.2)
 	var frame: StringName = &"stand"
 	var flip: bool = false
 	if warden.is_stunned():

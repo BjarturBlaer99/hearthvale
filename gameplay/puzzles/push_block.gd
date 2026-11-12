@@ -130,7 +130,7 @@ func _draw() -> void:
 		draw_rect(Rect2(3, 3, 10, 10), STONE.darkened(0.45))
 		draw_rect(Rect2(4, 4, 8, 8), STONE.darkened(0.28))
 		return
-	draw_rect(Rect2(1, 13, 14, 3), Color(0, 0, 0, 0.3))
+	SoftShadow.draw(self, Vector2(8, 14.5), Vector2(7.5, 2))
 	draw_rect(Rect2(0, 0, 16, 15), OUTLINE)
 	draw_rect(Rect2(1, 1, 14, 13), STONE)
 	draw_rect(Rect2(1, 1, 14, 3), STONE.lightened(0.22))

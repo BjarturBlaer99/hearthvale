@@ -53,7 +53,7 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(BASE.x - 5.0, BASE.y - 1.0, 10.0, 3.0), Color(0, 0, 0, 0.3))
+	SoftShadow.draw(self, BASE + Vector2(0.0, 0.5), Vector2(5.5, 2))
 	var shown: float = WOBBLE_TIME - _wobble_left
 	var lean: float = sin(shown * 30.0) * 0.35 * (_wobble_left / WOBBLE_TIME)
 	draw_set_transform(BASE, lean)

@@ -47,8 +47,9 @@ in `docs/DECISIONS.md` are superseded.
   surround. Tune the look there, not picture by picture. It is Hearthvale's own look: do not copy another game's
   art. See `docs/progress/art-pass-3-plan.md`.
   **Art pass 4 (user's request, 2026-11-11):** light and lettering. Lamps, hearths, torches and crystals glow
-  (`Glows`, `Ambience`), tall things cast shadows east as well as south (`HeightShading`), houses and dungeons are
-  dim away from their lights (for show only; the crypt's dark is the only light that matters to play), and all
+  (real lights since P1b: `AreaLighting`, `Ambience`), tall things cast shadows east as well as south
+  (`HeightShading`), houses and dungeons are dim away from their lights (for show only; the crypt's dark is the
+  only light that matters to play, and it is drawn by the rule's own lights), and all
   text is Hearthvale's own pixel font, painted from ASCII by `tools/art/make_font.gd` with the UI theme. Label
   sizes are whole multiples of 8; boxes wear `PanelFrame`. See `docs/progress/art-pass-4-plan.md`.
   **Hero pass (user's request, 2026-11-11):** over the blue tunic the hero wears a leather vest, wrist guards, a

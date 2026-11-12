@@ -53,7 +53,7 @@ func _draw() -> void:
 		return
 	match kind:
 		&"chicken":
-			draw_rect(Rect2(-4, -1, 8, 2), Color(0, 0, 0, 0.22))
+			SoftShadow.draw(self, Vector2.ZERO, Vector2(4, 1.5))
 			var frame: StringName = &"chicken"
 			if motion.state == CritterMotion.PECK:
 				frame = &"chicken_peck" if fmod(_clock, 0.5) < 0.25 else &"chicken"
@@ -62,7 +62,7 @@ func _draw() -> void:
 			SpriteSheet.draw(self, SHEET, FRAMES[frame], SIZE, Vector2(-8, -14), motion.facing_x > 0.0)
 		&"butterfly":
 			var hover: float = roundf(8.0 + sin(_clock * 3.0) * 2.0)
-			draw_rect(Rect2(-2, -1, 4, 1), Color(0, 0, 0, 0.18))
+			SoftShadow.draw(self, Vector2.ZERO, Vector2(2, 1), 0.7)
 			var wings: String = "open" if fmod(_clock, 0.24) < 0.12 else "closed"
 			SpriteSheet.draw(self, SHEET, FRAMES[StringName(("bluefly_" if _blue else "butterfly_") + wings)], SIZE, Vector2(-8, -8 - hover))
 		&"firefly":

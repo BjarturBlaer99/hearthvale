@@ -3,6 +3,7 @@ extends RefCounted
 ## What kind of place an area is, for its light and air (docs/TECH_DESIGN.md §6, art pass 4),
 ## read from its tiles so no scene has to say: outdoors under the sun, a house's inside by its
 ## hearth, or a dungeon. Also finds the tiles that give light (lamp posts, hearths, candles).
+## AreaLighting turns the kind into an ambient colour and the glows into real lights (P1b).
 ## Pure but for reading the layers.
 
 const OUTDOOR: StringName = &"outdoor"
@@ -24,11 +25,9 @@ const TILE_LIGHTS: Dictionary = {
 ## How many times bigger than life the camera shows each kind of place (P1a): rooms are small,
 ## so houses and dungeons are shown at twice the size. Whole numbers keep pixels square.
 const ZOOM: Dictionary = {OUTDOOR: 1, INTERIOR: 2, DUNGEON: 2}
-## How dim the unlit parts are (0: not at all), by kind.
-const GLOOM: Dictionary = {OUTDOOR: 0.0, INTERIOR: 0.34, DUNGEON: 0.40}
-## The hero is always seen: how far the light around them reaches in the gloom (px).
+## The hero is always seen: how far the pool of light around them reaches where it is dim (px).
 const HERO_POOL: float = 88.0
-## A glow lights the gloom this much further than it is drawn.
+## Where it is dim, a glow's pool reaches this much further than the glow itself.
 const REACH: float = 2.1
 
 
@@ -58,12 +57,4 @@ static func tile_glows(layers: Array) -> Array:
 			cells.sort()
 			for cell: Vector2i in cells:
 				out.append(glow(Vector2(cell) * float(GreyboxTiles.TILE_SIZE) + spec[0], spec[1], spec[2], spec[3], spec[4]))
-	return out
-
-
-## The lights (LightRules) that `glows` cast into the gloom.
-static func lights_of(glows: Array) -> Array:
-	var out: Array = []
-	for one: Dictionary in glows:
-		out.append(LightRules.light(one["at"], float(one["radius"]) * REACH))
 	return out

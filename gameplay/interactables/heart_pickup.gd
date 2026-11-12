@@ -38,5 +38,5 @@ func collect() -> bool:
 func _draw() -> void:
 	if taken:
 		return
-	draw_circle(CENTER + Vector2(0, 5), 3.0, Color(0, 0, 0, 0.25))
+	SoftShadow.draw(self, CENTER + Vector2(0, 5), Vector2(3, 1.4))
 	ItemIcons.draw(self, &"heart")

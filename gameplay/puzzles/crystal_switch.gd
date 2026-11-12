@@ -73,6 +73,6 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(2, 12, 12, 3), Color(0, 0, 0, 0.3))
+	SoftShadow.draw(self, Vector2(8, 14), Vector2(6.5, 2))
 	var frame: StringName = &"white" if _flash > 0.0 else (&"blue" if is_on() else &"red")
 	SpriteSheet.draw(self, SHEET, FRAMES[frame], Vector2i(16, 16), Vector2(0, -1))

@@ -252,7 +252,7 @@ func test_a_brief_torch_starts_every_visit_unlit() -> void:
 func test_the_dark_shows_only_what_light_reaches() -> void:
 	var crypt: AreaController = _load(CRYPT)
 	assert_bool(crypt.dark).is_true()
-	assert_object(crypt.darkness).is_not_null()
+	assert_that(crypt.lighting.ambient).override_failure_message("the crypt's own dark").is_equal(AreaLighting.DARK)
 	assert_float(crypt.brightness_at(Vector2i(22, 38))).override_failure_message("the Narthex is lit by its braziers").is_greater(0.5)
 	assert_float(crypt.hero_light_radius()).is_equal(AreaController.DIM_RADIUS)
 	_face(crypt, DARK_PATH, Vector2.UP)
@@ -264,14 +264,13 @@ func test_the_dark_shows_only_what_light_reaches() -> void:
 	assert_float(crypt.brightness_at(DARK_PATH + Vector2i(0, -2))).override_failure_message("with the Lantern it can").is_greater(0.5)
 	assert_float(crypt.brightness_at(DARK_PATH + Vector2i(0, -5))).override_failure_message("but not the far end of the room").is_equal(0.0)
 	crypt._process(FRAME)
-	assert_int(crypt.darkness.shown.size()).is_equal(1)
-	assert_that(crypt.darkness.rect).override_failure_message("the dark covers the room on screen").is_equal(Rect2(480, 176, 240, 176))
+	assert_int(_pools(crypt).size()).override_failure_message("one pool of light: the hero's").is_equal(1)
 	_open(crypt, Vector2i(39, 13), Vector2.UP)
 	crypt._process(FRAME)
-	assert_int(crypt.darkness.shown.size()).override_failure_message("a lit torch is a light").is_equal(2)
+	assert_int(_pools(crypt).size()).override_failure_message("a lit torch is a light").is_equal(2)
 	assert_float(crypt.brightness_at(Vector2i(39, 13))).is_greater(0.5)
 	var village: AreaController = _load(VILLAGE)
-	assert_object(village.darkness).override_failure_message("the village isn't dark").is_null()
+	assert_that(village.lighting.ambient).override_failure_message("the village isn't dark").is_equal(Color.WHITE)
 	assert_float(village.brightness_at(Vector2i(2, 30))).is_equal(1.0)
 
 
@@ -535,3 +534,8 @@ func _reachable(area: AreaController, start: Vector2i) -> Dictionary:
 				seen[next] = true
 				queue.append(next)
 	return seen
+
+
+## The pools of light the crypt's lighting last showed (the rule's lights, drawn).
+func _pools(area: AreaController) -> Array:
+	return area.lighting.shown.filter(func(one: Dictionary) -> bool: return one["kind"] == AreaLighting.POOL)

@@ -63,7 +63,7 @@ func use() -> String:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(2, 12, 12, 3), Color(0, 0, 0, 0.3))
+	SoftShadow.draw(self, Vector2(8, 14), Vector2(6.5, 2))
 	if opened():
 		draw_rect(Rect2(1, 5, 14, 9), OUTLINE)
 		draw_rect(Rect2(2, 6, 12, 7), WOOD)

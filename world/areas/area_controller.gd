@@ -40,8 +40,10 @@ const PIT_DAMAGE: int = 1
 const PIT_TIME: float = 0.5
 ## How far the hero's own glow reaches in the dark without a lantern (px).
 const DIM_RADIUS: float = 20.0
-## The colour of the gloom in houses and dungeons: a deep violet, not black.
-const GLOOM_SHADE: Color = Color(0.07, 0.04, 0.14)
+## The colour of a rule's light in the dark: all but white, so things show in their own colours.
+const RULE_TINT: Color = Color(1.0, 0.97, 0.90)
+## How much of a glow's colour its pool takes (the rest is white).
+const POOL_TINT: float = 0.22
 
 @export var area_id: StringName = &"village"
 @export var area_name: String = "Hearthvale"
@@ -51,7 +53,7 @@ const GLOOM_SHADE: Color = Color(0.07, 0.04, 0.14)
 @export var room_size: Vector2i = Vector2i.ZERO
 ## The tune this area plays (audio/music); empty: whatever is playing carries on.
 @export var music: StringName = &""
-## A dark area (the crypt): only what lights reach is seen (Darkness, LightRules).
+## A dark area (the crypt): only what lights reach is seen (LightRules, drawn by AreaLighting).
 @export var dark: bool = false
 
 var grid: HeightGrid
@@ -66,14 +68,12 @@ var last_projectile: Node2D
 var current_room: Vector2i = Vector2i.ZERO
 ## Shades everything outside the current room (dungeons only), or null.
 var room_mask: RoomMask
-## The dark over a `dark` area, or null.
-var darkness: Darkness
 ## What kind of place this is for light and air (Ambience): outdoors, a house, a dungeon.
 var ambience: StringName = Ambience.OUTDOOR
-## The warm light around lamps, fires, torches and crystals.
-var glows: Glows
-## The soft dimness of a house or a dungeon away from its lights, or null (outdoors, or `dark`).
-var gloom: Darkness
+## The area's ambient colour and its real lights (P1b).
+var lighting: AreaLighting
+## The glows of the tiles that give light (lamp posts, hearths, candles): they never move.
+var tile_glows: Array = []
 ## Specks drifting in the air.
 var motes: Motes
 
@@ -145,11 +145,8 @@ func _ready() -> void:
 	ambience = Ambience.kind_of(height_layer, dungeon_id)
 	player.set_camera_zoom(Ambience.ZOOM[ambience])
 	update_room(true)
-	if dark:
-		darkness = Darkness.new()
-		add_child(darkness)
 	_add_ambience()
-	_update_darkness()
+	_update_light()
 	hud.dialogue.closed.connect(_on_dialogue_closed)
 	hud.item_menu.chosen.connect(_on_item_chosen)
 	hud.item_menu.closed.connect(_on_item_menu_closed)
@@ -190,7 +187,7 @@ func _process(delta: float) -> void:
 		_pit_left -= delta
 		if _pit_left <= 0.0:
 			_climb_out()
-	_update_darkness()
+	_update_light()
 	GameState.update_player(area_id, player.motor.cell)
 	_update_hud()
 
@@ -542,39 +539,56 @@ func brightness_at(cell: Vector2i) -> float:
 	return LightRules.brightness(GridBody.cell_center(cell), lights()) if dark else 1.0
 
 
-func _update_darkness() -> void:
-	if darkness == null and gloom == null:
+## Hands the lights of this moment to the area's lighting: those that reach what the camera
+## shows.
+func _update_light() -> void:
+	if lighting == null:
 		return
-	var rect: Rect2i = RoomGrid.camera_rect(player.motor.cell, room_size, grid.size, GreyboxTiles.TILE_SIZE)
-	if darkness != null:
-		darkness.show_lights(lights(), Rect2(rect))
-	if gloom != null:
-		gloom.show_lights(gloom_lights(), Rect2(rect))
+	var room: Rect2i = RoomGrid.camera_rect(player.motor.cell, room_size, grid.size, GreyboxTiles.TILE_SIZE)
+	lighting.show_lights(scene_lights(), Rect2(room))
 
 
-## The area's light and air (art pass 4), for show only: glows around what burns or shines,
-## a soft gloom away from the lights in houses and dungeons, and specks in the air.
+## The area's light and air, for show only: its ambient colour and real lights (P1b), and
+## specks in the air.
 func _add_ambience() -> void:
-	glows = Glows.new()
-	glows.fixed = Ambience.tile_glows([height_layer, get_node_or_null(^"Decor")])
-	glows.moving = moving_glows
-	var used: Rect2i = height_layer.get_used_rect()
-	add_child(Glows.framed(glows, Rect2(used.position * GreyboxTiles.TILE_SIZE, used.size * GreyboxTiles.TILE_SIZE)))
+	lighting = AreaLighting.new()
+	lighting.setup(ambience, dark)
+	add_child(lighting)
+	tile_glows = Ambience.tile_glows([height_layer, get_node_or_null(^"Decor")])
 	motes = Motes.new()
 	motes.kind = ambience
 	add_child(motes)
-	var depth: float = Ambience.GLOOM[ambience]
-	if dark or depth <= 0.0:
-		return
-	gloom = Darkness.new()
-	gloom.z_index = 38
-	gloom.set_look(GLOOM_SHADE, depth, 8, 0.2)
-	add_child(gloom)
 
 
-## The glows that come and go: burning torches, crystals, and a lantern the hero carries.
-func moving_glows() -> Array:
+## Every light to draw right now (AreaLighting.light dictionaries).
+## - In a `dark` area: a pool for each of the rule's lights (lights()), at the rule's place and
+##   radius, and nothing else that could show what the rule says is dark. Glows sit inside a
+##   light's fully lit core.
+## - Elsewhere: a glow for everything that shines; and where the ambient colour is dim, a pool
+##   round the hero and round each glow.
+func scene_lights() -> Array:
 	var out: Array = []
+	var glows: Array = glows_now()
+	if dark:
+		for rule: Dictionary in lights():
+			out.append(AreaLighting.light(rule["at"], float(rule["radius"]), RULE_TINT, AreaLighting.POOL, 1.0, false, true))
+		for glow: Dictionary in glows:
+			if _inside_a_core(glow, lights()):
+				out.append(AreaLighting.light(glow["at"], float(glow["radius"]), glow["color"], AreaLighting.GLOW, float(glow["strength"]), glow["flickers"]))
+		return out
+	if lighting.is_dim():
+		out.append(AreaLighting.light(player.position + Vector2(0, -8), Ambience.HERO_POOL, Color.WHITE, AreaLighting.POOL))
+	for glow: Dictionary in glows:
+		if lighting.is_dim():
+			out.append(AreaLighting.light(glow["at"], float(glow["radius"]) * Ambience.REACH, Color.WHITE.lerp(glow["color"], POOL_TINT), AreaLighting.POOL, 1.0, glow["flickers"]))
+		out.append(AreaLighting.light(glow["at"], float(glow["radius"]), glow["color"], AreaLighting.GLOW, float(glow["strength"]), glow["flickers"]))
+	return out
+
+
+## Everything that glows right now (Ambience.glow dictionaries): the tiles that give light,
+## burning torches, crystals, and a lantern the hero carries.
+func glows_now() -> Array:
+	var out: Array = tile_glows.duplicate()
 	for child: Node in interactables.get_children():
 		if child is Torch and (child as Torch).is_lit():
 			out.append(Ambience.glow((child as Torch).position + Torch.FLAME_AT, 30.0, Ambience.FIRE, 0.40, true))
@@ -582,15 +596,18 @@ func moving_glows() -> Array:
 			var crystal: CrystalSwitch = child
 			out.append(Ambience.glow(crystal.position + Vector2(8, 6), 18.0, CrystalSwitch.BLUE if crystal.is_on() else CrystalSwitch.RED, 0.30, false))
 	if hero_light_radius() > DIM_RADIUS:
-		out.append(Ambience.glow(player.position + Vector2(0, -8), hero_light_radius() * 0.7, Ambience.LAMP, 0.16, true))
+		out.append(Ambience.glow(player.position + Vector2(0, -8), hero_light_radius() * 0.5, Ambience.LAMP, 0.16, true))
 	return out
 
 
-## What lights the gloom: a pool around the hero, and every glow.
-func gloom_lights() -> Array:
-	var out: Array = [LightRules.light(player.position + Vector2(0, -8), Ambience.HERO_POOL)]
-	out.append_array(Ambience.lights_of(glows.all()))
-	return out
+## Whether `glow` lies wholly inside the fully lit core of one of `rule_lights`: there it can
+## add its colour without showing anything the rule says is dark.
+static func _inside_a_core(glow: Dictionary, rule_lights: Array) -> bool:
+	for rule: Dictionary in rule_lights:
+		var core: float = float(rule["radius"]) * LightRules.CORE
+		if (glow["at"] as Vector2).distance_to(rule["at"]) + float(glow["radius"]) <= core:
+			return true
+	return false
 
 
 ## The hero stepped into a pit: PIT_DAMAGE off their hearts and gone for PIT_TIME, then back on
