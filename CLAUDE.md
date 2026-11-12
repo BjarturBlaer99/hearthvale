@@ -61,6 +61,10 @@ in `docs/DECISIONS.md` are superseded.
   still blocks exactly its own cell. Cherry trees are `"cherry"` blocks in `build_maps.gd`; the eight new cells
   in Hearthvale were approved by the user. Wind, water, reflections, petals and mist are shaders and particles,
   for show only. See `docs/progress/P1c-plan.md`.
+  **Buildings (P1d, 2026-11-12):** walls show a lit front face where the floor lies south of them and a flat top
+  elsewhere (`WallRelief`), pillars stand taller than their cells and roofs have a ridge (`Scenery`), all painted
+  by `tools/art/make_relief.gd` and drawn over the map at load. The Height layer is untouched: no map is re-baked
+  for looks. See `docs/progress/P1d-plan.md`.
   **Sound (H10):** all sound effects and music are made in code by `tools/audio/make_audio.gd` (Synth) and baked to
   `audio/`. No external audio; edit the sounds in the tool, never the WAVs.
 
@@ -92,6 +96,9 @@ godot --headless --path . -s res://tools/art/make_sprites.gd
 godot --headless --path . --import
 # Repaint the tall trees after editing tools/art/make_scenery.gd (optional 4x preview), then re-import
 godot --headless --path . -s res://tools/art/make_scenery.gd -- <preview.png>
+godot --headless --path . --import
+# Repaint the wall faces, the pillar and the roof ridges after editing tools/art/make_relief.gd, then re-import
+godot --headless --path . -s res://tools/art/make_relief.gd -- <preview.png>
 godot --headless --path . --import
 # Re-bake the pixel font and the UI theme after editing tools/art/make_font.gd (optional preview of the glyphs)
 godot --headless --path . -s res://tools/art/make_font.gd -- <preview.png>

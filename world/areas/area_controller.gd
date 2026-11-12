@@ -78,6 +78,8 @@ var tile_glows: Array = []
 var scenery: Scenery
 ## Grass, flowers and washing moving in the wind; cherry petals; the water's surface; mist.
 var sway: TileMapLayer
+## Walls with a front face and a top (P1d), or null in an area with no such walls.
+var relief: WallRelief
 var petals: Petals
 var water: WaterSurface
 var reflections: Reflections
@@ -574,6 +576,12 @@ func _add_ambience() -> void:
 	scenery = Scenery.new()
 	add_child(scenery)
 	scenery.build(decor)
+	# Buildings (P1d): walls with a face and a top, pillars that stand, roofs with a ridge.
+	scenery.build_stone(height_layer)
+	relief = WallRelief.make(height_layer, grid.size, room_size)
+	if relief != null:
+		add_child(relief)
+		move_child(relief, height_layer.get_index() + 1)
 	sway = SwayLayer.take_from(decor)
 	if sway != null:
 		add_child(sway)

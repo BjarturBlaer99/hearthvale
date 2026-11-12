@@ -1211,3 +1211,34 @@ Plan: `docs/progress/P1c-plan.md`. The user approved all eight new cherry tree c
 - **The ground tiles themselves were not repainted** (grass, paths): they changed only through the palette and the outline rule. The closed canopy inside thick woods is still a flat tile.
 - **No normal maps.** The pivot plan said I would try them on tree trunks; I did not.
 - The outline change is subtle on tiles: most of their lines were already light.
+
+## 2026-11-12 — P1d: buildings, interiors and dungeons (built; not yet tried in play)
+
+Plan: `docs/progress/P1d-plan.md`.
+
+**Built**
+- **Walls with a face and a top** (`WallRelief`): a wall cell with open floor to its south shows a front face, lit along the top and dark at the floor (bricks in dungeons, boards under a beam in houses, mossy blocks on ruins); every other wall cell shows a flat top. A face is eight pixels taller than its cell and rises over the foot of the wall behind it, except into the next room of a dungeon.
+- **Pillars stand up:** 28 pixels tall, sorted by depth, so the hero walks behind them.
+- **Roofs have a ridge:** a strip over each roof's top row in its own thatch, tile or slate, sloping at the gable ends, sorted so that whoever walks behind a house has their feet hidden by it.
+- All of it is drawn over the map at load. **No map file changed.**
+
+**Checked**
+- 374 tests in 51 suites pass (+7, `tests/world/buildings_test.gd`). Import and boot clean. `git status` shows no `.tscn` changed.
+- **Blocking is as it was:** in the keep, every wall cell with relief still holds its wall tile and is still solid; every pillar's cell and every ridge's cell too.
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: a face where more wall lies to the south, a face rising into the next room, a ridge sorted behind the hero, pillars counted as trees, the ridge on the eaves.
+- **Frame cost.** Draw calls, which are steady: the keep 383 before and 386 after, the cistern 231 and 235, Elder Bram's house 49 and 50, the village 322 and 325. Time, switching the walls on and off in turn in one run (six rounds each): the keep 6.19 ms on and 6.26 ms off (no measurable cost), Elder Bram's house 2.06 on and 1.69 off. All the standing scenery in the village (trees, ridges): 2.90 on and 2.69 off.
+- Screenshots: all 88 retaken. Looked at closely: the keep's great hall, Elder Bram's house, the cistern's push room, the crypt's hall, the chapel rise, the Old Wood's shrine.
+
+**Two mistakes found and fixed on the way**
+- **A strip of brick at the foot of each dungeon room:** the next room's north wall rose eight pixels into this room's south wall. A face no longer rises out of its own room.
+- **The keep's draw calls went from 383 to 1020:** each wall cell was its own draw. The relief is now put together once into one picture the size of the map.
+- Also toned down: a speckled grain on the wall tops.
+
+**Known issues and limits**
+- Not tried in play.
+- **A block of brick stands in a side wall above each east or west door.** By the rule it is a face (the door is open floor to its south), and it reads as the wall's end over the doorway, but it is the least convincing part.
+- **Dungeon wall tops are nearly as dark as the black around the room.** Meant (the walls rise into the dark), but the room's outline is softer than it was.
+- **A roof's ridge hides the feet of anyone behind the house, a pillar the feet of anyone behind it.** Never more than the feet, so neither fades.
+- **Frame times on this machine drift a lot between runs** (the same build read 1.75 ms and 3.77 ms in the same house minutes apart), so only the in-run comparisons above mean anything.
+- **No normal maps.** The pivot plan's promise to try them is dropped: a wall is now a painted lit face and a dark top.
+- House fronts, furniture, floors and doors were not repainted.

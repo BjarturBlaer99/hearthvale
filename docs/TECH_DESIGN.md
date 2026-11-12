@@ -521,6 +521,22 @@ run headless; see CLAUDE.md for the command and gotchas.
     each tree within three cells north of water, shown only on water cells by a shader with the same map.
   - **Mist** (`Mist`, `gameplay/ambient/`): two layers of noise in four flat steps, pinned to the world, for the
     areas in `Ambience.MISTY` (the Old Wood).
+- **Buildings** (P1d), for show, built in `_add_ambience()` like the trees: pictures over the map, the Height
+  layer untouched.
+  - **Walls with a face and a top** (`WallRelief`, `world/areas/`): for the wall tiles in
+    `ReliefAtlas.MATERIALS` (dungeon walls of stone, house walls of timber, outdoor ruins), `part_of()` says
+    which part a cell shows: its FACE if the cell to its south is in the map and isn't wall, else its TOP.
+    - A face is 24 pixels tall and rises eight over the foot of the wall behind it (`rises()`), unless that wall
+      is in the next room of a dungeon (the first row of a room) or isn't there at all. Then the short face is
+      used; a wall one cell thick shows a strip of top above it.
+    - Tops are edged with light where the wall ends to the north or west and with shadow to the east.
+    - The whole relief is put together once into one picture the size of the map (`_compose()`), so it costs
+      one draw. Drawn per cell it tripled the keep's draw calls.
+  - **Pillars and ridges** (`Scenery.build_stone()`): a 28-pixel pillar over each pillar tile, and an 8-pixel
+    strip of ridge over each cell of a roof's top row (`ReliefAtlas.ridge_of(kind)` gives the roof's style and
+    whether it is a gable end). Both are sorted by depth: a ridge sits just inside the building's top edge, so
+    whoever walks behind the house is drawn first. Neither sways or fades.
+  - `ReliefAtlas` (`world/tiles/relief.png`) is painted by `tools/art/make_relief.gd`.
   - **A shader gotcha:** in a canvas shader `COLOR` already holds the texture's colour times the node's tint
     when `fragment()` starts. To sample the texture again, carry the tint from `vertex()` in a varying; don't
     multiply the new sample by `COLOR`, or the picture is squared and goes dark.

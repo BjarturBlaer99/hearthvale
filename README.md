@@ -78,6 +78,8 @@ Beaten enemies sometimes drop hearts or coins.
 - **Living nature** (the pivot, step 1c): trees stand tall and you walk behind them; Hearthvale has cherry trees
   in blossom, with petals on the wind, the grass and the pond; grass and washing move in the wind; water
   ripples, foams at the bank and mirrors you; the Old Wood has mist.
+- **Walls with height** (the pivot, step 1d): dungeon and house walls show a lit front and a dark top, pillars
+  stand tall, and roofs have a ridge you walk behind.
 - **The road north:** from the top of the north rise, through the woods.
   - **The North Fields:** a stream with a bridge, a farm plot, slimes, and a goblin archer on a plateau. Keep an eye
     on the tree line beside the road.

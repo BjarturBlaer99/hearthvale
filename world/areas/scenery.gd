@@ -17,6 +17,15 @@ const FADE_SPEED: float = 5.0
 const CROWN_HALF_WIDTH: float = 16.0
 const CROWN_TOP: float = 37.0
 const CROWN_BOTTOM: float = 9.0
+## Every roof tile kind (GreyboxTiles): the solid roofs, their ridge and eave details, and the
+## house fronts' roofs with gable ends.
+const ROOF_TILES: Array[String] = [
+	"roof", "roof_blue", "roof_top", "roof_eave", "roof_blue_top", "roof_blue_eave",
+	"roof_l", "roof_r", "roof_top_l", "roof_top_r", "roof_eave_l", "roof_eave_r",
+	"roof_blue_l", "roof_blue_r", "roof_blue_top_l", "roof_blue_top_r", "roof_blue_eave_l", "roof_blue_eave_r",
+	"roof_thatch", "roof_thatch_l", "roof_thatch_r", "roof_thatch_top", "roof_thatch_top_l", "roof_thatch_top_r",
+	"roof_thatch_eave", "roof_thatch_eave_l", "roof_thatch_eave_r",
+]
 const SWAY_CODE: String = """
 shader_type canvas_item;
 uniform float reach = 37.0;
@@ -41,6 +50,11 @@ void fragment() {
 
 ## The tree standing in each cell.
 var by_cell: Dictionary[Vector2i, Sprite2D] = {}
+## Things of stone that stand taller than their cell (P1d): the pillar in each cell, and the
+## strip of ridge over each cell of a roof's top row. They don't sway and they don't fade: a
+## pillar hides no more than the feet of whoever is behind it, and a ridge the same.
+var pillars: Dictionary[Vector2i, Sprite2D] = {}
+var ridges: Dictionary[Vector2i, Sprite2D] = {}
 
 var _faded: Dictionary[Vector2i, bool] = {}
 
@@ -104,6 +118,57 @@ func build(decor: TileMapLayer) -> int:
 		add_child(tree)
 		by_cell[cell] = tree
 	return by_cell.size()
+
+
+## Stands a tall pillar on every pillar tile of `layer` (the Height layer, which keeps the tile:
+## the cell blocks as it did), and raises a strip of ridge over the top row of every roof where
+## the cell to its north isn't more roof. Returns how many it added.
+func build_stone(layer: TileMapLayer) -> int:
+	var texture: Texture2D = load(ReliefAtlas.TEXTURE_PATH)
+	for cell: Vector2i in layer.get_used_cells_by_id(GreyboxTiles.SOURCE_ID, GreyboxTiles.coords("pillar")):
+		var pillar: Sprite2D = _stone(texture, ReliefAtlas.pillar())
+		pillar.name = "Pillar_%d_%d" % [cell.x, cell.y]
+		pillar.offset = -ReliefAtlas.PILLAR_FOOT
+		pillar.position = foot_of(cell)
+		pillars[cell] = pillar
+	for cell: Vector2i in layer.get_used_cells():
+		var ridge: Array = ReliefAtlas.ridge_of(kind_at(layer, cell))
+		if ridge.is_empty() or not ReliefAtlas.ridge_of(kind_at(layer, cell + Vector2i.UP)).is_empty() or is_roof(kind_at(layer, cell + Vector2i.UP)):
+			continue
+		var strip: Sprite2D = _stone(texture, ReliefAtlas.ridge(ridge[0], ridge[1]))
+		strip.name = "Ridge_%d_%d" % [cell.x, cell.y]
+		# Sorted just inside the building's top edge: whoever walks behind the house is drawn
+		# first, and the ridge covers their feet.
+		strip.offset = Vector2(0.0, -float(ReliefAtlas.RIDGE_SIZE.y) - 1.0)
+		strip.position = Vector2(cell.x * GreyboxTiles.TILE_SIZE, cell.y * GreyboxTiles.TILE_SIZE + 1.0)
+		ridges[cell] = strip
+	return pillars.size() + ridges.size()
+
+
+## The GreyboxTiles kind of the house or roof tile at `cell` of `layer`, or empty for anything
+## else (HOUSE_KINDS and the roof DETAIL_KINDS are the only tiles a ridge cares about).
+static func kind_at(layer: TileMapLayer, cell: Vector2i) -> String:
+	var coords: Vector2i = layer.get_cell_atlas_coords(cell)
+	if coords.x < 0:
+		return ""
+	for kind: String in ROOF_TILES:
+		if GreyboxTiles.coords(kind) == coords:
+			return kind
+	return ""
+
+
+static func is_roof(kind: String) -> bool:
+	return kind.begins_with("roof")
+
+
+func _stone(texture: Texture2D, region: Rect2) -> Sprite2D:
+	var piece: Sprite2D = Sprite2D.new()
+	piece.texture = texture
+	piece.region_enabled = true
+	piece.region_rect = region
+	piece.centered = false
+	add_child(piece)
+	return piece
 
 
 ## The feet of every cherry tree, in cell order (petals fall round them).

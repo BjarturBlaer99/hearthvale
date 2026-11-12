@@ -517,5 +517,20 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-12 — **P1d: buildings get height the way trees did, over the map and not in it.** Wall faces, tall
+  pillars and roof ridges are drawn at load over a Height layer that doesn't change, so no cell's blocking can
+  change and no map file is touched.
+- 2026-11-12 — **P1d: a face never rises into the next room.** A dungeon's north wall has the next room's south
+  wall behind it, and that room is on screen alone. The first version let the face rise eight pixels into it,
+  and it showed as a strip of brick at the foot of the room above.
+- 2026-11-12 — **P1d: the walls are one picture.** Drawn cell by cell the relief took the keep from 383 draw
+  calls to 1020. Put together once into a picture the size of the map it is one draw, and switching it on and
+  off in one run shows no cost in the keep and 0.4 ms in a house.
+- 2026-11-12 — **P1d: light on walls is painted, not normal-mapped.** A wall is now a lit face and a dark top,
+  which is the shading normal maps would have given, and it stays in whole pixels. No normal maps were built;
+  the pivot plan's promise to try them is dropped.
+- 2026-11-12 — **Frame times on this machine can't be compared across runs.** The same build read 1.75 ms and
+  3.77 ms in the same house in two runs minutes apart. Draw calls are steady, and an effect can be timed by
+  switching it on and off in turn within one run.
 - 2026-11-11 — **Animation never changes play.** The wind-up and the settle are pictures chosen by how far
   through the swing the motor is. The blade is live from the first frame and the swing is as long as it was.
