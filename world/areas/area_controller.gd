@@ -34,6 +34,8 @@ const SLEPT_WORDS: String = "You wake rested. The game is saved."
 const WOKE_LATE_WORDS: String = "You stayed up too late, and woke in your own bed."
 const COLLAPSED_WORDS: String = "You collapsed, and woke in your own bed."
 const COINS_LOST_WORDS: String = " You lost %d coins on the way."
+## The tune that plays outdoors at night in place of the area's own.
+const NIGHT_TUNE: StringName = &"night"
 ## What is said when he eats (the food's name, then what it gave), and when he needn't.
 const ATE_WORDS: String = "%s: %s."
 const NOT_HUNGRY_WORDS: String = "You aren't hungry."
@@ -101,6 +103,8 @@ var scenery: Scenery
 var sway: TileMapLayer
 ## Walls with a front face and a top (P1d), or null in an area with no such walls.
 var relief: WallRelief
+## The houses' lit windows (P2e), if the area has any.
+var windows: WindowGlow
 var petals: Petals
 var water: WaterSurface
 var reflections: Reflections
@@ -123,6 +127,9 @@ var _collapsing: bool = false
 var _collapse_left: float = 0.0
 ## The hero's energy at the last change, to tell when he crosses into being tired.
 var _energy_was: float = 0.0
+var _hours: Hours
+## The tune this area last asked for.
+var _tune: StringName = &""
 ## Where the hero arrived in this area, facing which way: where they come back after falling.
 var _entrance_cell: Vector2i = Vector2i.ZERO
 var _entrance_facing: Vector2 = Vector2.DOWN
@@ -175,10 +182,12 @@ func _ready() -> void:
 	_safe_cell = _entrance_cell
 	player.motor.cell_changed.connect(_on_cell_changed)
 	rng.randomize()
+	ambience = Ambience.kind_of(height_layer, dungeon_id)
 	for enemy: Enemy in enemies():
+		# Met outdoors at night, a monster is tougher (P2e). It is decided here, as the area loads.
+		enemy.night = is_night_outdoors()
 		enemy.setup(terrain, player, rng)
 		enemy.died.connect(_on_enemy_died)
-	ambience = Ambience.kind_of(height_layer, dungeon_id)
 	player.set_camera_zoom(Ambience.ZOOM[ambience])
 	update_room(true)
 	_add_ambience()
@@ -192,8 +201,9 @@ func _ready() -> void:
 	for boss: Enemy in enemies():
 		if boss is ArenaBoss:
 			(boss as ArenaBoss).calm_music = music
-	if music != &"":
-		EventBus.music_requested.emit(music)
+	_play_tune()
+	_keep_hours()
+	EventBus.time_changed.connect(_on_time_changed)
 	EventBus.health_changed.connect(_on_health_changed)
 	EventBus.flag_set.connect(_on_flag_set)
 	EventBus.slept.connect(_on_slept)
@@ -203,6 +213,7 @@ func _ready() -> void:
 	_energy_was = GameState.energy
 	# Arriving with something to be told (he woke here after the day ran out): say it once.
 	if not GameState.arrival_notice.is_empty():
+		EventBus.sound.emit(&"morning")
 		hud.flash(DAY_FLASH)
 		hud.show_message(GameState.arrival_notice)
 		GameState.arrival_notice = ""
@@ -358,6 +369,9 @@ func interact() -> bool:
 			if usable is Chest:
 				player.hold_up(ItemIcons.name_for((usable as Chest).item_id))
 			return true
+	if shut_door_in_front() != null:
+		_say_shut(shut_door_in_front())
+		return true
 	return false
 
 
@@ -630,6 +644,7 @@ func collapse() -> void:
 		return
 	_collapsing = true
 	_collapse_left = COLLAPSE_TIME
+	EventBus.sound.emit(&"collapse")
 	player.controls_enabled = false
 	player.hurt_box.enabled = false
 	player.lie_down()
@@ -672,8 +687,91 @@ func _on_energy_changed(current: float, maximum: float) -> void:
 func _on_slept(_day: int) -> void:
 	GameState.update_player(area_id, player.motor.cell)
 	SaveSystem.save_game()
+	EventBus.sound.emit(&"morning")
 	hud.flash(DAY_FLASH)
 	hud.show_message(SLEPT_WORDS)
+
+
+## Whether it is night out of doors here and now: monsters are tougher, and the night tune
+## plays.
+func is_night_outdoors() -> bool:
+	return has_daylight() and GameState.day_clock().is_night(GameState.minute)
+
+
+## Who keeps what hours (data/rules/hours.json).
+func hours() -> Hours:
+	if _hours == null:
+		_hours = Hours.new(DataRegistry.get_rules(DataRegistry.RULES_HOURS))
+	return _hours
+
+
+## The tune for here and now: the area's own, or the night's out of doors after nightfall.
+func tune_now() -> StringName:
+	return NIGHT_TUNE if music != &"" and is_night_outdoors() else music
+
+
+## Asks for the tune for here and now, when it is another than the one last asked for (so a
+## tune something else has asked for meanwhile, a boss's, is left to play).
+func _play_tune() -> void:
+	var tune: StringName = tune_now()
+	if tune == &"" or tune == _tune:
+		return
+	_tune = tune
+	EventBus.music_requested.emit(tune)
+
+
+## The doors that keep hours (AreaExit.hours).
+func doors_with_hours() -> Array[AreaExit]:
+	var out: Array[AreaExit] = []
+	for child: Node in interactables.get_children():
+		if child is AreaExit and (child as AreaExit).hours != &"":
+			out.append(child as AreaExit)
+	return out
+
+
+## Whether `door` is shut at this hour.
+func is_shut(door: AreaExit) -> bool:
+	return door.hours != &"" and not hours().is_open(door.hours, GameState.minute)
+
+
+## The shut door in the cell the hero faces, or null.
+func shut_door_in_front() -> AreaExit:
+	for door: AreaExit in doors_with_hours():
+		if door.covers(player.front_cell()) and is_shut(door):
+			return door
+	return null
+
+
+## Tells the hero that `door` is shut.
+func _say_shut(door: AreaExit) -> void:
+	EventBus.sound.emit(&"nope")
+	hud.show_message(hours().shut_words(door.hours))
+
+
+## Keeps everyone's hours (GDD §6). A door that keeps hours is solid while it is shut. Villagers
+## who stand outdoors go home for the night and are back in the morning: gone, they can't be
+## seen or talked to, and their cell is free. Nobody leaves in the middle of a conversation,
+## and nobody comes back onto the hero.
+func _keep_hours() -> void:
+	for door: AreaExit in doors_with_hours():
+		for x: int in door.size.x:
+			for y: int in door.size.y:
+				terrain.set_occupied(door.cell() + Vector2i(x, y), is_shut(door))
+	if not has_daylight() or is_talking():
+		return
+	var out: bool = hours().villagers_out(GameState.minute)
+	for child: Node in interactables.get_children():
+		var villager: Villager = child as Villager
+		if villager == null or villager.present == out or (out and player.motor.cell == villager.cell()):
+			continue
+		villager.set_present(out)
+		terrain.set_occupied(villager.cell(), out)
+
+
+## A new minute of the day: the hours kept, and the tune.
+func _on_time_changed(_day: int, _minute: int) -> void:
+	_keep_hours()
+	_play_tune()
 
 
 ## Whether the day's light falls here: outdoors, and not in a place that is dark by rule.
@@ -688,6 +786,8 @@ func _update_light() -> void:
 		return
 	if has_daylight():
 		lighting.set_ambient(GameState.daylight())
+	if windows != null:
+		windows.set_lit(GameState.day_clock().lamps_lit(GameState.minute))
 	var room: Rect2i = RoomGrid.camera_rect(player.motor.cell, room_size, grid.size, GreyboxTiles.TILE_SIZE)
 	lighting.show_lights(scene_lights(), Rect2(room))
 
@@ -725,6 +825,16 @@ func _add_ambience() -> void:
 		reflections.setup(water, scenery)
 		add_child(reflections)
 		move_child(reflections, water.get_index() + 1)
+	# Houses' windows, lit with the lamps (P2e): over the walls and whatever is painted on them,
+	# under everything that stands in front of a wall.
+	windows = WindowGlow.make(height_layer)
+	if windows != null:
+		add_child(windows)
+		var under: Node = height_layer
+		for layer: Node in [water, reflections, relief]:
+			if layer != null and layer.get_index() > under.get_index():
+				under = layer
+		move_child(windows, under.get_index() + 1)
 	petals = Petals.new()
 	add_child(petals)
 	move_child(petals, _shading.get_index() + 1)
@@ -920,6 +1030,10 @@ func respawn() -> void:
 func take_exit(exit: AreaExit) -> void:
 	if _travelling:
 		return
+	# A door that keeps hours is shut outside them (GDD §6): the hero stays, and is told.
+	if is_shut(exit):
+		_say_shut(exit)
+		return
 	_travelling = true
 	player.controls_enabled = false
 	GameState.go_to(exit.target_area, exit.target_entry)
@@ -999,6 +1113,9 @@ func _on_cell_changed(cell: Vector2i) -> void:
 	var exit: AreaExit = exit_at(cell)
 	if exit != null:
 		take_exit(exit)
+	elif shut_door_in_front() != null:
+		# He has walked up to a door that is shut: he is told why it won't open.
+		_say_shut(shut_door_in_front())
 
 
 func _on_dialogue_closed() -> void:
@@ -1055,7 +1172,7 @@ func _on_item_chosen(item_id: StringName) -> void:
 	if not Food.is_food(item):
 		GameState.equip(item_id)
 	elif GameState.eat(item_id):
-		EventBus.sound.emit(&"heart")
+		EventBus.sound.emit(&"eat")
 		hud.show_message(ATE_WORDS % [str(item.get("name", item_id)), Food.gives_text(item)])
 	else:
 		EventBus.sound.emit(&"nope")

@@ -10,6 +10,8 @@ extends Node2D
 
 signal died(enemy: Enemy)
 
+## A monster met at night shows in the dark: it is drawn in this tint whatever the hour's light.
+const NIGHT_TINT: Color = Color(0.86, 0.62, 0.92)
 const POOF_TIME: float = 0.35
 ## How long the game freezes when a blow lands on it.
 const HIT_STOP: float = 0.05
@@ -24,6 +26,9 @@ const SHADOW: Color = Color(0, 0, 0, 0.3)
 @export var stays_beaten: bool = false
 
 var data: Dictionary = {}
+## Whether it is met out of doors at night (the area says so before setup): it is set up from
+## its data as the night makes it (NightRules), and tinted so the difference shows.
+var night: bool = false
 var brain: EnemyBrain
 var body: GridBody
 var terrain: TerrainQuery
@@ -55,6 +60,12 @@ func setup(terrain_query: TerrainQuery, hero: Node2D, rng: RandomNumberGenerator
 	if data.is_empty():
 		push_warning("%s: no enemy '%s' in data/enemies." % [name, enemy_id])
 		return false
+	if night:
+		data = NightRules.new(DataRegistry.get_rules(DataRegistry.RULES_NIGHT)).strengthen(data)
+		var unshaded: CanvasItemMaterial = CanvasItemMaterial.new()
+		unshaded.light_mode = CanvasItemMaterial.LIGHT_MODE_UNSHADED
+		material = unshaded
+		modulate = NIGHT_TINT
 	terrain = terrain_query
 	target = hero
 	_rng = rng

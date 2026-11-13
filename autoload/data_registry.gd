@@ -48,7 +48,9 @@ const REQUIRED_FIELDS: Dictionary = {
 ## The sets of rules the game knows (data/rules/<id>.json), by id.
 const RULES_TIME: StringName = &"time"
 const RULES_ENERGY: StringName = &"energy"
-const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY]
+const RULES_HOURS: StringName = &"hours"
+const RULES_NIGHT: StringName = &"night"
+const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT]
 
 ## Enemy behaviour ids (EnemyBrains makes one brain per id) and drop-table entry types.
 const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden", "shade"]
@@ -374,7 +376,16 @@ func _check_rules(rules: Dictionary) -> void:
 	if not RULE_SETS.has(id):
 		errors.append("%s: unknown rules '%s'. Known: %s." % [path, id, ", ".join(RULE_SETS)])
 		return
-	var problems: PackedStringArray = DayClock.problems(rules) if id == RULES_TIME else EnergyRules.problems(rules)
+	var problems: PackedStringArray = []
+	match id:
+		RULES_TIME:
+			problems = DayClock.problems(rules)
+		RULES_ENERGY:
+			problems = EnergyRules.problems(rules)
+		RULES_HOURS:
+			problems = Hours.problems(rules)
+		RULES_NIGHT:
+			problems = NightRules.problems(rules)
 	for problem: String in problems:
 		errors.append("%s: rules '%s': %s" % [path, id, problem])
 

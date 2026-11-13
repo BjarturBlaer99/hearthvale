@@ -71,6 +71,9 @@ Beaten enemies sometimes drop hearts or coins.
 - **The hero** (hero pass): a leather vest, wrist guards, a belt pouch and tall boots over the blue tunic, the
   sword on his back until he swings it, and a small pack. He breathes when he stands, leans into a sprint,
   winds up before a swing, flinches when hit and bends his knees landing from a ledge.
+- **Hours and night** (the pivot, step 2e): Tilda's shop is open from 08:00 to 18:00; villagers who stand
+  outdoors go home at 20:00 and are back at 06:00; house windows are lit from dusk to dawn; monsters met in the
+  fields and the wood at night are tougher and drop coins more often; and the night has a tune of its own.
 - **Food and cooking** (the pivot, step 2d): berries, mushrooms and fallen cherry blossom to gather, back each
   morning; bread at Tilda's; food is eaten from the item menu for energy; and the hearth at home cooks from
   recipes (cherry blossom tea, for a start).

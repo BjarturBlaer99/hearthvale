@@ -349,10 +349,11 @@ res://
 | `data/enemies/` | one enemy type per file |
 | `data/breakables/` | one breakable (grass, pot) per file |
 | `data/recipes/` | one recipe per file: what a dish needs and what it makes |
-| `data/rules/` | one set of rules per file: the numbers a system runs on (`time.json`: the day's clock; `energy.json`: the hero's energy) |
+| `data/rules/` | one set of rules per file: the numbers a system runs on (`time.json`: the day's clock; `energy.json`: the hero's energy; `hours.json`: who is where when; `night.json`: what the night does to monsters) |
 
 DataRegistry validates required fields and resolves every cross-reference at load. A set of rules must be one
-the game knows (`RULE_SETS`), and is checked by the class that reads it (`DayClock.problems()`).
+the game knows (`RULE_SETS`), and is checked by the class that reads it (`DayClock.problems()`,
+`EnergyRules.problems()`, `Hours.problems()`, `NightRules.problems()`).
 
 ## 9. Save format
 ```json
@@ -437,14 +438,15 @@ run headless; see CLAUDE.md for the command and gotchas.
     attack and release; mixing; a note sequencer; and PCM16.
   - Notes are written `C4:2` (a note and its length in eighth notes); `R` is a rest, and drum tracks use `K`, `S`
     and `H`.
-  - `tools/audio/make_audio.gd` holds every effect's recipe and the four original songs, and bakes them to
+  - `tools/audio/make_audio.gd` holds every effect's recipe and the five original songs, and bakes them to
     `audio/sfx/<id>.wav` and `audio/music/<id>.wav` (22050 Hz, mono, 16-bit). Edit sounds in the tool, never the
     WAVs, then re-import.
 - **Playing:** the `Audio` autoload.
   - Effects: `EventBus.sound(id)` plays on one of eight voices on the `SFX` bus.
   - Music: `EventBus.music_requested(id)` loops on the `Music` bus (the same tune again carries on; empty stops).
     Each area names its `music`: village tunes for the village and its houses, countryside outdoors, dungeon
-    underground. The title plays the village tune.
+    underground. The title plays the village tune. Out of doors at night the area asks for the night's tune
+    in place of its own (§19).
   - A `Boss` asks for its `fight_music` when it wakes, and gives the area's tune back when it resets or falls.
   - Headless it keeps track but plays nothing (no one hears it, and a sound playing at quit races the dummy mixer).
 - **Who sounds:** the node where the action happens emits the sound.
@@ -704,3 +706,35 @@ run headless; see CLAUDE.md for the command and gotchas.
   dish, and says so when he hasn't. `AreaController.talk_to()` opens whatever a `Talkable.dialogue()` returns,
   so the hearth needs no screen of its own.
 - **The shop:** bread is a line in Tilda's conversation, like arrows and bombs.
+
+## 19. Hours and night
+- **Hours are data** (`data/rules/hours.json`): `places` (a place's id, when its door is open, and the words
+  said at it when it is shut) and `outdoors` (when villagers who stand outdoors are out). `Hours`
+  (`core/time/`, pure) reads them: `is_open(place, minute)`, `shut_words(place)`, `villagers_out(minute)`. A
+  place the rules don't name keeps no hours. Spans may run over midnight (`DayClock.span_of()`, `within()`).
+- **A door keeps hours** by naming its place: `AreaExit.hours` (the village's `ShopDoor` has `&"shop"`).
+  `AreaController._keep_hours()` runs as the area loads and on every `EventBus.time_changed`: a shut door's
+  cell is occupied, so the hero can't stand in the doorway. Walking up to it (`_on_cell_changed`, facing it)
+  or trying it (`interact()`) says the place's words; `take_exit()` refuses a shut door whoever asks. Doors
+  the other way (the shop's doormat) keep no hours: he can always leave.
+- **Villagers go home:** outdoors (`has_daylight()`), `_keep_hours()` sets every `Villager` present or away
+  (`set_present()`): away, it is hidden, `covers()` nothing (so there is nobody to talk to) and its cell is
+  free. Nobody leaves during a conversation, and nobody comes back onto the cell the hero stands in; both are
+  put right at the next minute. Villagers indoors are never touched. Nobody walks anywhere.
+- **Night monsters:** the night's numbers are data (`data/rules/night.json`). `NightRules` (`core/enemies/`,
+  pure) has `strengthen(enemy_data)`, which returns a copy with more health (rounded up), speed and sight and
+  heavier coin drops; bosses come back unchanged. As an area loads, `AreaController` sets `Enemy.night` from
+  `is_night_outdoors()` before `setup()`, and the enemy is set up from the strengthened copy. It is decided
+  once: a monster met by day stays a day monster at nightfall, and the other way round. Dungeons have no
+  night. Damage, knockback, hit boxes and timings are the data's own.
+  - A night monster is drawn unshaded in `Enemy.NIGHT_TINT`, so it shows in the dark. For show only.
+- **Lit windows:** `WindowGlow` (`world/areas/`) is made at load from the window tiles of the Height layer
+  (`GLASS`: each window tile and where its glass is). It draws a warm pane over each, unshaded so the night
+  doesn't dim it, over the walls and under everything that stands in front of them. `_update_light()` lights
+  it with the lamps (`DayClock.lamps_lit()`). Only the village has windows to light.
+- **The tune:** `AreaController.tune_now()` is the area's `music`, or `NIGHT_TUNE` when `is_night_outdoors()`.
+  `_play_tune()` asks for it at load and on `time_changed`, but only when it is another than the one it last
+  asked for, so a boss's tune is left alone.
+- **Sounds:** `eat` (eating), `collapse` (as he falls), `morning` (a cock-crow: after sleeping, and when he
+  wakes at home after a day that ran out).
+- **Tools:** `tools/capture.gd` has the action `shut` (the hero tries the shop's door at 19:00).

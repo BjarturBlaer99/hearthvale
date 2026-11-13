@@ -14,7 +14,7 @@ const SFX: Array[String] = [
 	"sword", "hit", "enemy_die", "hurt", "heart", "coin", "item_get", "heart_get", "door", "solved",
 	"secret", "arrow", "bomb_set", "bomb", "crystal", "push", "plate", "clink", "stomp", "gaze", "stun",
 	"boss_die", "menu_move", "menu_select", "pause", "nope", "cut", "pot", "quest",
-	"torch", "snuff", "fall", "sink", "whiff",
+	"torch", "snuff", "fall", "sink", "whiff", "eat", "morning", "collapse",
 ]
 
 ## Each song: tempo, bars (4/4; every track must last bars x 8 eighths), and its tracks.
@@ -43,6 +43,17 @@ const SONGS: Dictionary = {
 		{"wave": "drums", "volume": 0.22, "notes":
 			"K:2 H:2 S:2 H:2 K:2 H:2 S:2 H:2 K:2 H:2 S:2 H:2 K:2 K:1 H:1 S:2 H:2 " +
 			"K:2 H:2 S:2 H:2 K:2 H:2 S:2 H:2 K:2 H:2 S:2 H:2 K:2 S:2 S:2 S:2"},
+	]},
+	# Still and slow, A minor, for the open air after dark: | Am | F | C | G | Am | Dm | F G | Am |
+	"night": {"bpm": 72, "bars": 8, "tracks": [
+		{"wave": "triangle", "volume": 0.22, "notes":
+			"A4:4 C5:2 E5:2 D5:6 R:2 C5:4 A4:2 G4:2 A4:6 R:2 " +
+			"E5:4 D5:2 C5:2 D5:4 A4:4 G4:2 A4:2 C5:2 D5:2 A4:6 R:2"},
+		{"wave": "triangle", "volume": 0.26, "notes":
+			"A2:8 F2:8 C3:8 G2:8 A2:8 D2:8 F2:4 G2:4 A2:8"},
+		{"wave": "square", "duty": 0.125, "volume": 0.04, "notes":
+			"R:4 E6:1 R:3 R:4 A5:1 R:3 R:4 G5:1 R:3 R:4 D6:1 R:3 " +
+			"R:4 E6:1 R:3 R:4 F5:1 R:3 R:4 C6:1 R:3 R:4 E5:1 R:3"},
 	]},
 	# Sparse and watchful, A minor: | Am | F | G | Em | Am | F | Dm E | Am |
 	"dungeon": {"bpm": 84, "bars": 8, "tracks": [
@@ -173,6 +184,27 @@ static func effect(id: String) -> PackedFloat32Array:
 			return Synth.join([_note("E5", 0.08), _note("A5", 0.08), _note("C#6", 0.22, 0.16)])
 		"nope":
 			return Synth.join([Synth.tone(&"square", 185, 185, 0.08, 0.25, 0.002, 0.02), Synth.tone(&"square", 147, 147, 0.13, 0.25, 0.002, 0.08)])
+		"eat":
+			# Two bites and a swallow.
+			return Synth.join([
+				Synth.tone(&"noise", 1900, 900, 0.07, 0.30, 0.002, 0.04, 0.5, 41), Synth.silence(0.05),
+				Synth.tone(&"noise", 1600, 700, 0.08, 0.28, 0.002, 0.05, 0.5, 42), Synth.silence(0.06),
+				Synth.tone(&"sine", 300, 420, 0.09, 0.22, 0.01, 0.05),
+			])
+		"morning":
+			# A cock crowing: three rising calls and a long falling one.
+			return Synth.join([
+				Synth.tone(&"square", 620, 820, 0.09, 0.20, 0.004, 0.02, 0.25), Synth.silence(0.03),
+				Synth.tone(&"square", 820, 900, 0.08, 0.20, 0.004, 0.02, 0.25), Synth.silence(0.03),
+				Synth.tone(&"square", 900, 1240, 0.17, 0.22, 0.004, 0.03, 0.25),
+				Synth.tone(&"square", 1240, 640, 0.42, 0.22, 0.004, 0.26, 0.25),
+			])
+		"collapse":
+			# Out of energy: a long sigh downwards, and a soft fall.
+			return Synth.join([
+				Synth.tone(&"triangle", 520, 150, 0.55, 0.30, 0.02, 0.2),
+				Synth.mix(Synth.tone(&"noise", 500, 120, 0.2, 0.32, 0.002, 0.14, 0.5, 43), Synth.tone(&"square", 110, 55, 0.2, 0.25, 0.002, 0.14)),
+			])
 	push_error("tools/audio: no recipe for sound '%s'" % id)
 	return Synth.silence(0.05)
 

@@ -2,11 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "rules.schema.json",
   "title": "Rules file (data/rules/<id>.json, one set of rules per file)",
-  "description": "The numbers a system runs on, so tuning needs no code (GDD §6). The file's id says which rules it holds. Known ids: 'time' (the day's clock, read by DayClock) and 'energy' (the hero's energy, read by EnergyRules).",
+  "description": "The numbers a system runs on, so tuning needs no code (GDD §6). The file's id says which rules it holds. Known ids: 'time' (the day's clock, read by DayClock), 'energy' (the hero's energy, read by EnergyRules), 'hours' (when places are open and villagers are out, read by Hours) and 'night' (what the night does to monsters, read by NightRules).",
   "type": "object",
   "required": ["id"],
   "properties": {
-    "id": { "enum": ["time", "energy"], "description": "Which rules these are." }
+    "id": { "enum": ["time", "energy", "hours", "night"], "description": "Which rules these are." }
   },
   "allOf": [
     {
@@ -76,9 +76,44 @@
           }
         }
       }
+    },
+    {
+      "if": { "properties": { "id": { "const": "hours" } } },
+      "then": {
+        "required": ["places", "outdoors"],
+        "properties": {
+          "places": {
+            "type": "object",
+            "description": "A place's id (an AreaExit's `hours`), then when its door is open. May run over midnight.",
+            "additionalProperties": {
+              "type": "object",
+              "required": ["from", "to"],
+              "properties": {
+                "from": { "$ref": "#/$defs/time_of_day" },
+                "to": { "$ref": "#/$defs/time_of_day" },
+                "shut": { "type": "string", "description": "What is said at the door when it is shut." }
+              }
+            }
+          },
+          "outdoors": { "$ref": "#/$defs/span", "description": "When villagers who stand outdoors are out; the rest of the day they have gone home." }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "id": { "const": "night" } } },
+      "then": {
+        "required": ["health", "speed", "sight", "coin_drops"],
+        "description": "What a monster met outdoors at night (the 'night' span of the time rules) is multiplied by. 1 leaves it as by day.",
+        "properties": {
+          "health": { "type": "number", "exclusiveMinimum": 0, "description": "Rounded up." },
+          "speed": { "type": "number", "exclusiveMinimum": 0 },
+          "sight": { "type": "number", "exclusiveMinimum": 0 },
+          "coin_drops": { "type": "number", "exclusiveMinimum": 0, "description": "The weight of each coin drop in its table." }
+        }
+      }
     }
   ],
-  "$comment": "Energy rules (id 'energy'): see the second entry of allOf.",
+  "$comment": "One entry of allOf for each id: time, energy, hours, night.",
   "$defs": {
     "time_of_day": { "type": "string", "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$", "description": "A time on a 24-hour clock, like \"06:00\"." },
     "span": {

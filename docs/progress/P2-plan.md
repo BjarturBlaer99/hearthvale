@@ -187,3 +187,44 @@ Nothing is built ahead of its step. Each later step gets its own "done when" lis
 ### Not in this step
 - Crops and the meals made from them (P3). Eating raw crops (P3). Selling food (P3).
 - A sound for eating or cooking (2e). Hunger: he never needs to eat, only to rest.
+
+---
+
+## 2e — Hours and night
+
+### What changes
+- **Hours are data** (`data/rules/hours.json`, read by a pure `Hours` in `core/time/`): when a place is open
+  and when villagers who stand outdoors are out.
+- **Tilda's shop is open from 08:00 to 18:00.** Outside those hours its door stays shut (solid): walking up
+  to it, or trying it, says so and when it opens. If the hero is inside at closing time he can still buy, and
+  leave.
+- **Villagers who stand outdoors go home at 20:00** and are back at 06:00: Farmer Oda, Pip, Guard Rolf, the
+  shepherd Edda. While they are gone their cell is free to walk through. Bram, Wenna and Tilda are indoors
+  and stay.
+- **Windows are lit** from dusk to dawn, with the lamps: every house window glows warm in the dark. For show.
+- **Monsters met outdoors at night** (20:00 to 06:00) have half as much health again, are 15% faster, see
+  30% further, and drop coins twice as often. The numbers are data (`data/rules/night.json`, read by a pure
+  `NightRules`). They are drawn pale, whatever the hour's light, so they show in the dark and the difference
+  shows. It is decided as the area loads: a monster already
+  there at nightfall is as it was. Dungeons have no night.
+- **A night tune** plays outdoors at night in place of the area's own; and three new sounds: eating, the
+  cock-crow of a new morning, and collapsing.
+
+### What does not change
+- Where the hero can walk by day. Monsters by day, and in dungeons at any hour.
+- Quests: a villager who has gone home can't be talked to until morning, and nothing else about a quest
+  changes.
+
+### Done when
+- [x] hours and the night's numbers are data, checked on load, and `Hours` and `NightRules` are unit-tested
+- [x] the shop's door is shut outside its hours and says when it opens
+- [x] outdoor villagers are gone from 20:00 to 06:00, can't be talked to, and leave their cells free
+- [x] house windows are lit from dusk to dawn
+- [x] monsters outdoors are tougher when the area loads at night, and only then
+- [x] the night tune plays outdoors at night; the three new sounds play where they should
+- [x] all earlier tests pass
+- [ ] (yours) a whole day can be played from waking to sleeping, and feels like one
+
+### Not in this step
+- Villagers walking home, or being found there. Shops other than Tilda's. Monsters that only come out at
+  night. Weather.

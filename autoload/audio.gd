@@ -15,9 +15,9 @@ const SFX: Array[StringName] = [
 	&"sword", &"hit", &"enemy_die", &"hurt", &"heart", &"coin", &"item_get", &"heart_get", &"door",
 	&"solved", &"secret", &"arrow", &"bomb_set", &"bomb", &"crystal", &"push", &"plate", &"clink",
 	&"stomp", &"gaze", &"stun", &"boss_die", &"menu_move", &"menu_select", &"pause", &"nope", &"cut",
-	&"pot", &"quest", &"torch", &"snuff", &"fall", &"sink", &"whiff",
+	&"pot", &"quest", &"torch", &"snuff", &"fall", &"sink", &"whiff", &"eat", &"morning", &"collapse",
 ]
-const MUSIC: Array[StringName] = [&"village", &"countryside", &"dungeon", &"boss"]
+const MUSIC: Array[StringName] = [&"village", &"countryside", &"dungeon", &"boss", &"night"]
 const MUSIC_BUS: StringName = &"Music"
 const SFX_BUS: StringName = &"SFX"
 ## Sound effects that can overlap.

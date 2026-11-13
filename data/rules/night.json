@@ -1,0 +1,7 @@
+{
+	"id": "night",
+	"health": 1.5,
+	"speed": 1.15,
+	"sight": 1.3,
+	"coin_drops": 2.0
+}

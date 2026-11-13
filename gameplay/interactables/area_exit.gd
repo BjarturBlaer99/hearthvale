@@ -9,6 +9,9 @@ extends Node2D
 @export var target_area: StringName
 @export var target_entry: StringName
 @export var size: Vector2i = Vector2i.ONE
+## The place whose hours this door keeps (data/rules/hours.json, e.g. &"shop"): outside them it
+## is shut, and the area says so. Empty: always open.
+@export var hours: StringName
 
 
 func cell() -> Vector2i:

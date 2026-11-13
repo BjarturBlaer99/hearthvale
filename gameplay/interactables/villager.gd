@@ -29,6 +29,10 @@ const FEET_Y: float = 14.0 - LIFT
 @export var hair_color: Color = Color(0.35, 0.22, 0.12)
 @export var beard: bool = false
 
+## Whether they are here. A villager who stands outdoors goes home for the night (P2e): the area
+## keeps their hours, and frees their cell while they are away.
+var present: bool = true
+
 var _idling: Idling
 var _look: Idling.Look = Idling.Look.REST
 
@@ -48,6 +52,17 @@ func _process(delta: float) -> void:
 ## The frame of the sheet showing now: this villager's picture, breathing out or blinking.
 func frame() -> StringName:
 	return StringName(("bearded" if beard else "plain") + str(LOOKS[_look]))
+
+
+## Sends them home, or brings them back.
+func set_present(here: bool) -> void:
+	present = here
+	visible = here
+
+
+## Gone home, they are nowhere to be talked to.
+func covers(at: Vector2i) -> bool:
+	return present and super(at)
 
 
 func display_name() -> String:

@@ -517,6 +517,22 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-13 — **P2e: a monster is a night monster if the area loads at night.** Changing one in the middle
+  of a fight (its health, its speed) would be felt as a cheat, so nightfall changes nobody already there; it
+  takes leaving and coming back. The other way too: one met at 05:00 is still tough at 07:00.
+- 2026-11-13 — **P2e: the night's numbers where the pivot plan gave none:** sight 1.3 times, coin drops twice
+  as likely (the plan said "see further" and "more often"). Both are in `data/rules/night.json`.
+- 2026-11-13 — **P2e: night monsters are drawn unshaded, in a pale violet.** A tint alone was lost in the
+  dark: they were harder to see than by day, as well as tougher. Unshaded they stand out of the night, which
+  also tells him which kind they are.
+- 2026-11-13 — **P2e: a shut door is solid.** The first version let him step into the doorway and told him
+  there. Now the cell is blocked, and he is told as he walks up to it facing it, or tries it. The shop can
+  always be left: only the door from the village keeps hours, and Tilda serves whoever is inside.
+- 2026-11-13 — **P2e: villagers who go home are simply gone.** Nobody walks home and nobody can be found
+  there: the houses that have insides have their own people. A quest that needs one of them waits for morning.
+- 2026-11-13 — **P2e: the window light is a pane drawn over the glass, not a real light.** Sixteen real lights
+  would cost draw calls for a glow nobody stands in. The lamps light the ground; the windows only shine.
+- 2026-11-13 — **P2e: indoors keeps its own tune at night,** as it keeps its own light.
 - 2026-11-12 — **P2d: only the recipes whose makings exist are in the game yet.** Cherry blossom tea is the one
   recipe. Soup, stew, pie, roast turnip and bread from wheat need crops; they are files to add in P3, with no
   code. Adding them now would list dishes nobody can cook.

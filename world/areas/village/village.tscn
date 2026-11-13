@@ -111,6 +111,7 @@ position = Vector2(128, 384)
 script = ExtResource("6_exit")
 target_area = &"shop"
 target_entry = &"door"
+hours = &"shop"
 
 [node name="SouthRoad" type="Node2D" parent="Interactables" unique_id=1841894214]
 position = Vector2(352, 560)

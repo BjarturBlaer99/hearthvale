@@ -201,3 +201,10 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   `GameState.eat()`, from the item menu. A recipe is a file in `data/recipes/`; the hearth at home lists them
   all (`Cooking.dialogue()` builds its conversation), so **a new dish is data only**. Things to gather are
   `ForageSpot` nodes in an area's `Interactables`, back each morning; keep them clear of tree crowns.
+- **Hours and night (P2e):** who is where when is in `data/rules/hours.json`, read by `Hours` (`core/time/`,
+  pure). A door keeps hours by naming its place (`AreaExit.hours`; the shop's is `&"shop"`): shut, its cell is
+  solid and the area says the place's words. Villagers who stand outdoors are away from 20:00 to 06:00
+  (`Villager.present`), so **a test that talks to one sets the hour itself.** Monsters met outdoors at night
+  are set up from `NightRules.strengthen()` (`data/rules/night.json`), decided once as the area loads; never
+  in dungeons, never bosses. Windows are lit with the lamps (`WindowGlow`), and outdoors at night the tune is
+  `night`. All for show except the door, the villagers and the monsters' numbers.

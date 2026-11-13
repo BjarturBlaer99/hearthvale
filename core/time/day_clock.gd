@@ -34,8 +34,8 @@ func _init(rules: Dictionary = {}) -> void:
 	starts = parse(str(rules.get("day_starts", DEFAULTS["day_starts"])))
 	ends = in_day(str(rules.get("day_ends", DEFAULTS["day_ends"])))
 	seconds_per_hour = maxf(float(rules.get("seconds_per_hour", DEFAULTS["seconds_per_hour"])), 0.001)
-	_lamps = _span(rules.get("lamps_lit", DEFAULTS["lamps_lit"]))
-	_night = _span(rules.get("night", DEFAULTS["night"]))
+	_lamps = span_of(rules.get("lamps_lit", DEFAULTS["lamps_lit"]))
+	_night = span_of(rules.get("night", DEFAULTS["night"]))
 	for stop: Variant in rules.get("light", DEFAULTS["light"]):
 		var color: Array = (stop as Dictionary)["color"]
 		lights.append([in_day(str((stop as Dictionary)["at"])), Color(float(color[0]), float(color[1]), float(color[2]))])
@@ -104,12 +104,12 @@ func light_at(minute: float) -> Color:
 
 ## Whether lamps are lit at `minute` (from dusk, through the night, to dawn).
 func lamps_lit(minute: float) -> bool:
-	return _within(minute, _lamps)
+	return within(minute, _lamps)
 
 
 ## Whether it is night at `minute`.
 func is_night(minute: float) -> bool:
-	return _within(minute, _night)
+	return within(minute, _night)
 
 
 ## What is wrong with `rules` as a clock's rules, in words: nothing, if they can be used.
@@ -151,13 +151,13 @@ static func problems(rules: Dictionary) -> PackedStringArray:
 
 
 ## A span of the day from the rules ("from" and "to"), as minutes since midnight.
-static func _span(rule: Variant) -> Vector2i:
+static func span_of(rule: Variant) -> Vector2i:
 	var span: Dictionary = rule if typeof(rule) == TYPE_DICTIONARY else {}
 	return Vector2i(parse(str(span.get("from", "00:00"))), parse(str(span.get("to", "00:00"))))
 
 
 ## Whether the time of day at `minute` is inside `span`, which may run over midnight.
-static func _within(minute: float, span: Vector2i) -> bool:
+static func within(minute: float, span: Vector2i) -> bool:
 	var of_day: int = posmod(floori(minute), DAY)
 	if span.x <= span.y:
 		return of_day >= span.x and of_day < span.y

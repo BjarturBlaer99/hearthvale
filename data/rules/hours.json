@@ -1,0 +1,7 @@
+{
+	"id": "hours",
+	"places": {
+		"shop": { "from": "08:00", "to": "18:00", "shut": "Tilda's shop is shut. She opens at 08:00 and closes at 18:00." }
+	},
+	"outdoors": { "from": "06:00", "to": "20:00" }
+}

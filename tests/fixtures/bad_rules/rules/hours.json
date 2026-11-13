@@ -1,0 +1,8 @@
+{
+	"id": "hours",
+	"places": {
+		"shop": { "from": "08:00" },
+		"inn": { "from": "10:00", "to": "23:00", "shut": 5 }
+	},
+	"outdoors": { "from": "dawn", "to": "20:00" }
+}

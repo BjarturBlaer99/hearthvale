@@ -1,0 +1,6 @@
+{
+	"id": "night",
+	"health": 0,
+	"speed": "fast",
+	"sight": 1.3
+}

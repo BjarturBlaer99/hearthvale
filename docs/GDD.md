@@ -81,16 +81,21 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 
 ## 6. Time, food and sleep *(P2)*
 *(Built so far: the clock, the day and the light in step 2a; the home, the bed and sleeping in 2b; energy in
-2c; food, foraging and cooking in 2d, with the meals made from crops to follow in P3. Hours and night monsters
-are still to come.)*
+2c; food, foraging and cooking in 2d, with the meals made from crops to follow in P3; hours and the night in
+2e.)*
 - **A day** runs from 06:00 to 02:00 in 14 real minutes. At 02:00 the hero passes out, as at zero energy, and
   wakes by his bed the next morning with half his energy and a tenth of his coins gone. The clock stops in
   conversations, in menus and in dungeons.
 - **Light follows the hour:** peach at dawn, clear by day, orange then violet at dusk, blue at night. Lamps
-  light at dusk *(windows too, in 2e)*.
-- **Hours:** Tilda's shop is open 08:00 to 18:00; villagers who stand outdoors go home at 20:00.
-- **Night monsters** (outdoors, 20:00 to 06:00): half as much health again, a little faster, and they see
-  further. They drop coins more often.
+  and house windows light at dusk and go out at dawn.
+- **Hours:** Tilda's shop is open 08:00 to 18:00: outside those hours its door is shut and says when it
+  opens (once inside, he can always leave). Villagers who stand outdoors go home at 20:00 and are back at
+  06:00; those indoors stay where they are.
+- **Night monsters** (outdoors, 20:00 to 06:00): half as much health again, 15% faster, and they see 30%
+  further. They drop coins twice as often. They hit no harder. A monster is a night monster if he comes upon
+  it at night: it is decided as he enters the area. Dungeons have no night, and bosses are never changed.
+  Night monsters show pale in the dark.
+- **The night has its own tune** out of doors.
 - **Sleeping** in the bed at home ends the day, refills energy and hearts, and saves. He can sleep at any hour.
   Saving from the pause menu stays.
 - **Food** restores energy; some meals heal a little. Raw crops can be eaten for about a third of their cooked

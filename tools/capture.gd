@@ -127,6 +127,9 @@ const SHOTS: Array = [
 	["104_fallen_blossom", &"village", Vector2i(20, 28), Vector2.RIGHT, 0, ""],
 	["105_food_in_the_item_menu", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "food_menu"],
 	["106_the_hearth_lists_what_to_cook", &"home", Vector2i(5, 2), Vector2.UP, 0, "cook"],
+	["107_the_shop_is_shut", &"village", Vector2i(8, 25), Vector2.UP, 0, "shut"],
+	["108_monsters_at_night", &"south_field", Vector2i(12, 12), Vector2.LEFT, 0, "time:22:00"],
+	["109_lit_windows", &"village", Vector2i(12, 16), Vector2.UP, 0, "time:21:30"],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -209,6 +212,10 @@ func _capture() -> void:
 			game_state.call(&"equip", &"bomb" if shot[5] == "bomb" else &"bow")
 		if shot[5] == "cook":
 			game_state.call(&"add_item", &"cherry_blossom", 4)
+		if shot[5] == "shut":
+			# An hour after closing: the hero tries the shop's door.
+			game_state.call(&"set_time", float(clock.call(&"in_day", "19:00")))
+			scene.call(&"interact")
 		if shot[5] in ["talk", "accept", "tale", "lantern_talk", "cook"]:
 			scene.call(&"interact")
 		if shot[5] == "sleep":

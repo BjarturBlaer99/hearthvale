@@ -1432,3 +1432,42 @@ Plan: `docs/progress/P2-plan.md` (the fourth of P2's five steps).
 - **Standing at the hearth, the hero hides the fire,** as he hides whoever he talks to from the south.
 - A berry bush is small and dark on dark grass; it may be easy to miss.
 - Eating is from the menu only: there is no button to eat what is in hand.
+
+## 2026-11-13 — P2e: hours and night (built; not yet tried in play). P2 is complete.
+
+Plan: `docs/progress/P2-plan.md` (the last of P2's five steps).
+
+**Built**
+- **Hours are data** (`data/rules/hours.json`, read by `Hours` in `core/time/`, pure): when a place's door is open, what is said at it when it is shut, and when villagers who stand outdoors are out.
+- **Tilda's shop is open from 08:00 to 18:00.** Outside those hours the door from the village is shut and solid. Walking up to it, or trying it, says "Tilda's shop is shut. She opens at 08:00 and closes at 18:00." Once inside he can always buy and leave.
+- **Villagers who stand outdoors go home at 20:00 and are back at 06:00:** Farmer Oda, Pip, Guard Rolf and the shepherd Edda. Gone, they can't be seen or talked to and their cell is free. Nobody leaves in the middle of a conversation, and nobody comes back onto the hero. Bram, Wenna and Tilda are indoors and stay.
+- **Monsters met outdoors at night** (20:00 to 06:00) have half as much health again (rounded up), are 15% faster, see 30% further and drop coins twice as often. The numbers are data (`data/rules/night.json`, read by `NightRules` in `core/enemies/`, pure). It is decided as the area loads. Not in dungeons, and never bosses. They hit no harder.
+- **Night monsters show pale in the dark:** they are drawn unshaded in a pale violet.
+- **House windows are lit** from dusk to dawn, with the lamps: sixteen panes in the village (`WindowGlow`). For show.
+- **A night tune** (`night`, the fifth song) plays out of doors at night in place of the area's own. Houses and dungeons keep theirs.
+- **Three new sounds:** eating, collapsing, and a cock-crow when a new day begins (after sleeping, and when he wakes at home after a day that ran out).
+- **Tools:** three new screenshots (109 in all): the shut shop, monsters at night, lit windows.
+
+**Checked**
+- 461 tests in 65 suites pass (+22: `tests/core/time/hours_test.gd`, `tests/core/enemies/night_rules_test.gd`, `tests/world/night_test.gd`). No older test needed changing. Import and boot clean.
+- **Where the hero can walk by day is unchanged:** no map was re-baked. The only cells that change are the shop's doorway (solid while shut) and the villagers' own cells (free while they are away).
+- **Combat is unchanged by day and in dungeons:** a test loads the South Field by day and a cellar at 23:00 and finds every monster as its data says. At night, damage, knockback and timings are still the data's own.
+- **Found on the way:** with a tint alone, night monsters were harder to see than by day; and a shut door that could be stepped into left him standing in the doorway. Both changed before the tests were written (see `docs/DECISIONS.md`).
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: a place the rules don't name being shut, night health rounded down, villagers coming back onto the hero, night monsters in dungeons, the tune asked for again every minute (which would cut off a boss's).
+- **Frame cost:** draw calls within one of the last step (the village 331, Elder Bram's house 46, the keep 382, the cistern 231). The village at night is 326 against 316 at noon, lamps and windows together.
+- **The player's own save was not touched** by the tools or the tests (the night tests use slot 985).
+- Screenshots: all 109 taken. Looked at closely: the shut shop at 19:00, the village at 21:30 and 23:30 (windows lit, nobody out), the South Field at 22:00 and the North Fields at 01:00 (pale monsters, no shepherd).
+
+**Known issues and limits**
+- Not tried in play. **A whole day from waking to sleeping has not been played by anyone yet**: that is the one line of P2 still open.
+- **Villagers vanish at 20:00 and appear at 06:00** where they stand. Nobody walks home.
+- **A quest that needs Oda, Pip, Rolf or Edda waits for morning.** Nothing says where they have gone.
+- **Nightfall changes nobody already there.** Staying in a field from 19:00 to 21:00 keeps its day monsters; leaving and coming back brings the night's. The same the other way at dawn.
+- **The night's numbers are starting values** (one file): whether three hits on a slime and faster bats are fair on a tired hero is for a playtest to say.
+- **Night monsters look pale rather than fearsome,** and by daylight (one met at 05:00 and still there at 07:00) they look washed out.
+- **Windows are lit from 18:30,** an hour and a half before the light goes: they show as bright panes in daylight.
+- **The shop says its hours only at the door.** No sign shows them, and Tilda doesn't mention them.
+- **At 18:00 a hero inside the shop is not asked to leave,** and can buy all night.
+- The night tune is short (27 seconds) and loops.
+- Still open from earlier steps: Elder Bram's fire shows above his head; the hero's head hides whoever he talks to from the south; the heading face has no small letters.
+
