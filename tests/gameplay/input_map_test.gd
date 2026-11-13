@@ -1,14 +1,17 @@
 extends GdUnitTestSuite
 ## The input map in project.godot: every action works from the keyboard (physical keys,
-## so any layout) and from a gamepad, but interact, which is the left mouse button (the user's
-## request, 2026-11-13); and actions from the old design are gone.
+## so any layout) and from a gamepad, but the two on the mouse (the user's requests,
+## 2026-11-13): the left button uses what is in hand, the right button interacts. Actions from
+## the old design are gone.
 
-const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down", &"interact", &"attack", &"sprint", &"use_item", &"item_menu", &"pause"]
+const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down", &"interact", &"use_hand", &"attack", &"sprint", &"use_item", &"item_menu", &"pause"]
 const RETIRED: Array[StringName] = [&"debug_cycle_water"]
 
 
-## The one action that isn't on a key.
-const ON_THE_MOUSE: StringName = &"interact"
+## The actions that are on the mouse and on no key, each with its button.
+const ON_THE_MOUSE: Dictionary = {&"interact": MOUSE_BUTTON_RIGHT, &"use_hand": MOUSE_BUTTON_LEFT}
+## The one that a gamepad has no button of its own for: its X and Y do the sword and the item.
+const MOUSE_ONLY: StringName = &"use_hand"
 
 
 func test_every_action_has_a_physical_key_and_a_gamepad_binding() -> void:
@@ -21,32 +24,39 @@ func test_every_action_has_a_physical_key_and_a_gamepad_binding() -> void:
 				has_key = true
 			if event is InputEventJoypadButton or event is InputEventJoypadMotion:
 				has_pad = true
-		assert_bool(has_key != (action == ON_THE_MOUSE) and has_pad).override_failure_message("%s: key=%s pad=%s" % [action, has_key, has_pad]).is_true()
+		assert_bool(has_key != ON_THE_MOUSE.has(action)).override_failure_message("%s: key=%s" % [action, has_key]).is_true()
+		assert_bool(has_pad != (action == MOUSE_ONLY)).override_failure_message("%s: pad=%s" % [action, has_pad]).is_true()
 
 
-func test_the_left_mouse_button_interacts_and_no_key_does() -> void:
-	var buttons: Array = []
-	for event: InputEvent in InputMap.action_get_events(&"interact"):
-		assert_bool(event is InputEventKey).override_failure_message("no key interacts").is_false()
-		if event is InputEventMouseButton:
-			buttons.append((event as InputEventMouseButton).button_index)
-	assert_array(buttons).contains_exactly([MOUSE_BUTTON_LEFT])
-	assert_array(_physical_keys(&"interact")).is_empty()
-	# A click is interact; the other mouse buttons and the old key are not.
-	assert_bool(_mouse(MOUSE_BUTTON_LEFT, true).is_action_pressed(&"interact")).is_true()
-	assert_bool(_mouse(MOUSE_BUTTON_LEFT, false).is_action_pressed(&"interact")).override_failure_message("letting go isn't a second press").is_false()
-	assert_bool(_mouse(MOUSE_BUTTON_RIGHT, true).is_action_pressed(&"interact")).is_false()
-	assert_bool(_mouse(MOUSE_BUTTON_WHEEL_UP, true).is_action_pressed(&"interact")).is_false()
+func test_the_left_button_uses_the_hand_and_the_right_button_interacts() -> void:
+	for action: StringName in ON_THE_MOUSE:
+		var buttons: Array = []
+		for event: InputEvent in InputMap.action_get_events(action):
+			assert_bool(event is InputEventKey).override_failure_message("no key does %s" % action).is_false()
+			if event is InputEventMouseButton:
+				buttons.append((event as InputEventMouseButton).button_index)
+		assert_array(buttons).override_failure_message(String(action)).contains_exactly([ON_THE_MOUSE[action]])
+		assert_array(_physical_keys(action)).is_empty()
+	# Each click is its own action and not the other's.
+	assert_bool(_mouse(MOUSE_BUTTON_LEFT, true).is_action_pressed(&"use_hand")).is_true()
+	assert_bool(_mouse(MOUSE_BUTTON_LEFT, true).is_action_pressed(&"interact")).is_false()
+	assert_bool(_mouse(MOUSE_BUTTON_RIGHT, true).is_action_pressed(&"interact")).is_true()
+	assert_bool(_mouse(MOUSE_BUTTON_RIGHT, true).is_action_pressed(&"use_hand")).is_false()
+	assert_bool(_mouse(MOUSE_BUTTON_LEFT, false).is_action_pressed(&"use_hand")).override_failure_message("letting go isn't a second press").is_false()
+	for button: MouseButton in [MOUSE_BUTTON_MIDDLE, MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		assert_bool(_mouse(button, true).is_action_pressed(&"interact") or _mouse(button, true).is_action_pressed(&"use_hand")).is_false()
 	var key: InputEventKey = InputEventKey.new()
 	key.physical_keycode = KEY_E
 	key.pressed = true
-	assert_bool(key.is_action_pressed(&"interact")).override_failure_message("E no longer interacts").is_false()
-	# No other action is on the mouse: moving, the sword and the item stay on the keys.
+	assert_bool(key.is_action_pressed(&"interact") or key.is_action_pressed(&"use_hand")).override_failure_message("E does nothing").is_false()
+	# No other action is on the mouse: moving stays on the keys, and the sword and the item
+	# keep their own keys beside the left click.
 	for action: StringName in ACTIONS:
-		if action == ON_THE_MOUSE:
+		if ON_THE_MOUSE.has(action):
 			continue
 		for event: InputEvent in InputMap.action_get_events(action):
 			assert_bool(event is InputEventMouseButton).override_failure_message("%s is not on the mouse" % action).is_false()
+	assert_array(_physical_keys(&"use_item")).contains(KEY_Q)
 
 
 func test_retired_actions_are_gone() -> void:

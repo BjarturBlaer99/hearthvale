@@ -152,9 +152,11 @@ removes the shim, so recreate it after upgrading.
   gdUnit4's `simulate_action_*` sends InputEvents, which headless mode drops.
 - Area scene tests: load areas one at a time with `tests/support/area_steps.gd` (a loaded area writes
   `GameState.player` every frame) and let it replace `AreaController.travel`, so taking an exit stays in the test.
-- **Interact is the left mouse button.** A test hands a click (an `InputEventMouseButton`, pressed) straight to
-  a node's `_unhandled_input()`. Every screen calls `MenuInput.let_clicks_through(self)` as it starts, or a
-  Control would swallow the click; write a prompt with `MenuInput.prompt()`, never with a key's name.
+- **The mouse: left click is `use_hand`, right click is `interact`.** A test hands a click (an
+  `InputEventMouseButton`, pressed) straight to a node's `_unhandled_input()`, or calls
+  `AreaController.use_hand()` / `interact()`. Every screen calls `MenuInput.let_clicks_through(self)` as it
+  starts, or a Control would swallow the click; write a prompt with `MenuInput.prompt()`, never with a key's
+  name.
 
 **Shader gotcha:** in a canvas shader `COLOR` already holds the texture's colour when `fragment()` starts. To
 sample the texture again, pass the tint from `vertex()` in a varying; multiplying by `COLOR` squares the picture.
@@ -187,8 +189,10 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
 - Do not let art or animation change gameplay timing, hit detection or collisions, unless a step says so.
 - Do not add motion to the scenery (wind, drifting petals or mist, smoke, specks): only the water moves, at
   the user's request of 2026-11-13.
-- Do not put anything but `interact` on the mouse, and never make the pointer matter: it is a button. The
-  user asked on 2026-11-13 for moving to stay on the keys and interact to be the mouse.
+- Do not make the mouse a pointer, and keep its two buttons as the user set them on 2026-11-13, as in
+  farming games: **left click uses what is in hand** (`AreaController.use_hand()`: the sword, or the tool or
+  item on the item button), **right click interacts** with people and things. Moving stays on the keys; Space
+  and Q still do the sword and the item.
 - Do not add areas beyond the hero's home and plot unless the user asks.
 - Do not add a dependency/addon without noting why in `docs/DECISIONS.md`. Allowed now: gdUnit4.
 - Do not write story, dialogue or quest content beyond what the current milestone needs.

@@ -19,10 +19,11 @@ volume, fullscreen, window size, the controls hint), or quit to the title. The g
 |---|---|---|
 | Move (8 directions) | WASD / arrow keys | Left stick / d-pad |
 | Sprint (hold) | Shift | B |
-| Talk / read / pick up / harvest | Left mouse button (a click anywhere) | A |
-| Choose an answer | W / S or arrows, then a click | d-pad, then A |
-| Swing the sword (once you have it) | Space / J | X |
-| Use the equipped item (bow, bombs) | Q / K | Y |
+| Use what is in hand: the sword, or the tool or item on the item button | Left mouse button (a click anywhere) | X (sword), Y (item) |
+| Talk / read / pick up / harvest | Right mouse button | A |
+| Choose an answer | W / S or arrows, then a right click or Enter | d-pad, then A |
+| Swing the sword whatever is in hand | Space / J | X |
+| Use the item on the item button (bow, bombs, hoe, can, seeds) | Q / K | Y |
 | Item menu (choose what's equipped) | Tab / I | Back |
 | Pause menu (save, settings, quit) | Esc / P | Start |
 
@@ -71,12 +72,13 @@ Beaten enemies sometimes drop hearts or coins.
 - **The hero** (hero pass): a leather vest, wrist guards, a belt pouch and tall boots over the blue tunic, the
   sword on his back until he swings it, and a small pack. He breathes when he stands, leans into a sprint,
   winds up before a swing, flinches when hit and bends his knees landing from a ledge.
-- **A still world, and a click to interact** (asked for on 2026-11-13): nothing in the scenery moves but the
-  water, and talking, picking up and choosing are on the left mouse button. Moving, the sword and the item
-  are on the keys as before.
+- **A still world, and the mouse** (asked for on 2026-11-13): nothing in the scenery moves but the water.
+  The left mouse button uses what is in hand: the sword, or a tool where there is work for it (the hoe, the
+  can and seeds on the plot; the sword everywhere else). The right button talks, picks up and harvests.
+  Moving is on the keys as before, and Space and Q still do the sword and the item.
 - **Seeds and crops** (the pivot, step 3b): turnips, carrots, wheat, potatoes and pumpkins. A seed is planted
   from the item button in tilled soil; a crop grows a stage each morning if it was watered the day before,
-  withers after two dry mornings in a row, and waits when ripe; a click picks it. The harvest can be eaten raw. A
+  withers after two dry mornings in a row, and waits when ripe; a right click picks it. The harvest can be eaten raw. A
   first pouch of turnip seeds lies in the cottage (seeds are sold from step 3c).
 - **A plot to farm** (the pivot, step 3a): eighteen cells of soil between Tilda's shop and the well. The hoe
   and the watering can lie in the hero's cottage and go on the item button: the hoe tills a cell, the can
@@ -126,7 +128,7 @@ Beaten enemies sometimes drop hearts or coins.
   until the Iron Warden is beaten (ask Guard Rolf).
   - It's dark. The first rooms are lit by braziers; further in you see only what your own light reaches.
   - **Pits:** stepping into one costs half a heart and puts you back at its edge. Push a block in to bridge one.
-  - **The Lantern** is in a tomb behind the first locked door. Carry it and you see further, and a click lights torches.
+  - **The Lantern** is in a tomb behind the first locked door. Carry it and you see further, and a right click lights torches.
     Lit torches open barred doors; in the Knight's Tomb three of them burn only for a few seconds.
   - **The Iron Sword** is in the Knight's Tomb, and hits harder than the wooden one.
   - **The Crypt Shade** waits behind the boss door. Blows pass through it: light all four braziers in its hall

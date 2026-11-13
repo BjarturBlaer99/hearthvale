@@ -34,6 +34,9 @@ const SLEPT_WORDS: String = "You wake rested. The game is saved."
 const WOKE_LATE_WORDS: String = "You stayed up too late, and woke in your own bed."
 const COLLAPSED_WORDS: String = "You collapsed, and woke in your own bed."
 const COINS_LOST_WORDS: String = " You lost %d coins on the way."
+## The item type of a sword: chosen in the item menu, it is taken in hand (the item button is
+## emptied).
+const SWORD_TYPE: String = "weapon_melee"
 ## The prompts for a crop the hero faces, and what is said when he has picked one, cleared a
 ## withered one, or has no room for another.
 const PICK_PROMPT: String = "Pick the %s"
@@ -352,6 +355,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	var used: bool = false
 	if event.is_action_pressed(&"interact"):
 		used = interact()
+	elif event.is_action_pressed(&"use_hand"):
+		used = use_hand()
 	elif event.is_action_pressed(&"use_item"):
 		used = use_item()
 	elif event.is_action_pressed(&"item_menu"):
@@ -558,12 +563,39 @@ func use_item() -> bool:
 	return false
 
 
-## Opens the item menu with the equippable items held, then the food. Returns whether it
-## opened.
+## Uses what the hero has in hand (the left mouse button; GDD §5): his sword, unless something
+## on the item button comes first. A weapon there (the bow, bombs) is used. A farm tool or a
+## seed is used when he faces what it is for (his plot, or water), and anywhere else he swings
+## his sword, so a hoe in hand doesn't leave him unarmed; with no sword, the tool says what it
+## is for. The sword and the item keep their own buttons too. Returns whether anything was done.
+func use_hand() -> bool:
+	if _busy() or not player.controls_enabled:
+		return false
+	var item: Dictionary = DataRegistry.get_item(GameState.equipped)
+	if item.is_empty():
+		return player.swing()
+	if ToolUse.kind_of(item).is_empty() or faces_farm_work() or PlayerController.best_sword().is_empty():
+		return use_item()
+	return player.swing()
+
+
+## Whether the hero faces something a farm tool or a seed is for: a cell of his plot, or water.
+func faces_farm_work() -> bool:
+	var front: Vector2i = player.front_cell()
+	return (plot != null and plot.covers(front)) or is_water_source(front)
+
+
+## Opens the item menu: the sword (when there is something else it could give way to), the
+## equippable items held, then the food. Returns whether it opened.
 func open_item_menu() -> bool:
 	if _busy() or not player.controls_enabled:
 		return false
-	var held: Array[Dictionary] = Inventory.equippable_held(GameState.inventory, DataRegistry.entries(&"items"))
+	var held: Array[Dictionary] = []
+	var for_button: Array[Dictionary] = Inventory.equippable_held(GameState.inventory, DataRegistry.entries(&"items"))
+	# Choosing the sword empties the item button, so the left click swings it again.
+	if not for_button.is_empty() and not PlayerController.best_sword().is_empty():
+		held.append(PlayerController.best_sword())
+	held.append_array(for_button)
 	held.append_array(Food.edible_held(GameState.inventory, DataRegistry.entries(&"items")))
 	if held.is_empty():
 		hud.show_message("No items yet.")
@@ -1292,7 +1324,10 @@ func _on_quit_to_title() -> void:
 ## The item menu's choice: something for the item button is put on it; food is eaten.
 func _on_item_chosen(item_id: StringName) -> void:
 	var item: Dictionary = DataRegistry.get_item(item_id)
-	if not Food.is_food(item):
+	if str(item.get("type", "")) == SWORD_TYPE:
+		# The sword in hand: nothing on the item button.
+		GameState.equip(&"")
+	elif not Food.is_food(item):
 		GameState.equip(item_id)
 	elif GameState.eat(item_id):
 		EventBus.sound.emit(&"eat")

@@ -525,12 +525,28 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   - **Left as they were, as my reading of "environment":** the flicker of fires, lamps and torches (light),
     creatures (chickens, butterflies, fireflies), people breathing and blinking, pickups that bob, and the
     title screen's stars and petals. Each is one line to still if the user wants it.
-- 2026-11-13 — **Interact is the left mouse button** (the user's request: "move is the same but interact is
-  mouse"). The simplest reading: the interact action moved from E to the mouse, as a button. Nothing is
-  pointed at; the hero still faces what he acts on. E no longer interacts (one line in
-  `tools/setup_input_map.gd` to give it back as well). The sword, the item and the menus stay on the keys,
-  and the gamepad is unchanged. Because every menu takes interact as its yes, a click also answers and
-  chooses.
+- 2026-11-13 — **Left click uses what is in hand, right click interacts** (the user, after trying the first
+  version: "attacking should be left click and using hoe and other items should be left click and similar to
+  the controls in stardew valley and right click should be to interact with other characters and items").
+  This replaces the entry below, which had interact on the left button.
+  - **One button, two things to use.** Hearthvale has a sword button and an item button; farming games have
+    one "use" button for whatever is held. The left click is a new action (`use_hand`) that picks between the
+    two: the item if it is a weapon, or a tool with work in front of it; otherwise the sword.
+  - **A tool gives way to the sword where it has no work.** With the hoe in hand off the plot, a left click
+    swings the sword. The other reading (the hoe says "not here") would leave him unarmed in a field until he
+    opened a menu. On the plot a tool with nothing to do still says why, and he doesn't hack at his crops.
+  - **The sword is a line in the item menu** when something else could be in hand, so the bow can be put
+    away with the mouse alone. Choosing it empties the item button.
+  - **A left click doesn't answer a conversation.** It swings the sword, and words that open in the middle of
+    a fight (a boss's last) would be skipped by the next swing. Right click and Enter answer.
+  - **Space and Q are kept.** The sword and the item are still one press away whatever is in hand, which the
+    dungeons were built round. The gamepad is unchanged.
+  - **Not done, and not asked:** a row of tools along the bottom of the screen with number keys or the wheel
+    to pick from, which is how those games switch tools. Tools are still chosen in the item menu (Tab).
+  - **The pointer still doesn't matter:** he works the cell he faces, not the one under the pointer.
+- 2026-11-13 — *(Replaced the same day, above.)* **Interact is the left mouse button** (the user's request:
+  "move is the same but interact is mouse"). The simplest reading: the interact action moved from E to the
+  mouse, as a button. E no longer interacts.
 - 2026-11-13 — **No screen takes the mouse for itself.** Input is read in `_unhandled_input`, which a Control
   under the pointer cuts off, so every screen sets all its Controls to ignore the mouse as it starts. The
   game has no clickable parts, so nothing is lost.

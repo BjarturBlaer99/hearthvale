@@ -45,8 +45,10 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
   to a small cellar and cistern.
 
 ## 5. The hero
-- Moves in 8 directions and faces 4, on the keys. **A click of the left mouse button / A** interacts (it is
-  a button: where the click lands doesn't matter). Hold **Shift / B** to sprint. **Esc / Start** pauses:
+- Moves in 8 directions and faces 4, on the keys. The mouse is as in farming games: **the left button uses
+  what is in hand** (the sword, or the tool or item on the item button) and **the right button / A
+  interacts** with people and things. They are buttons: where a click lands doesn't matter, and he acts on
+  what he faces. Hold **Shift / B** to sprint. **Esc / Start** pauses:
   save, quests, settings, quit to the title.
 - **Life: hearts**, for combat only. Start with **3**. Most hits cost **half a heart**. A **heart container**
   (from a boss) adds a heart and refills you; four **heart pieces** make a container. Hearts drop from enemies,
@@ -72,13 +74,16 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 | **Wooden Sword** | Hearthvale's training yard | Swing in an arc in front of you |
 | **Bow & arrows** | The Old Keep (its item) | Hit enemies and switches at range; arrows are ammo |
 | **Bombs** | Hearthvale shop | Blow open cracked walls; hurt enemies |
-| **Lantern** | The crypt (its item) | Carried: lights the dark around you, and lets you light torches with a click |
+| **Lantern** | The crypt (its item) | Carried: lights the dark around you, and lets you light torches with a right click |
 | **Iron Sword** | The crypt's Knight's Tomb | Stronger sword: half as hard again as the wooden one |
 | **Hoe**, **watering can** | Home, by the door | Used from the item button, like the bow, on the cell you face |
 | **Seeds** *(3b)* | Home (a first pouch), Tilda's shop *(3c)* | Planted from the item button |
 
-- The sword is always on the attack button; one item is equipped on the item button. The Lantern needs no
-  button: it works while it's carried. Food is eaten from the item menu *(P2)*.
+- The sword is always on the attack button (Space); one item is equipped on the item button (Q). The Lantern
+  needs no button: it works while it's carried. Food is eaten from the item menu *(P2)*.
+- **In hand** (the left mouse button): with nothing on the item button, the sword. The bow or bombs on it:
+  those. A farm tool or seeds on it: the tool where there is work for it (facing the plot, or water for the
+  can), and the sword everywhere else. Choosing the sword in the item menu empties the item button.
 - **Growth** *(P4, to be proposed)*: three skills (combat, farming, cooking) that rise with use.
 
 ## 6. Time, food and sleep *(P2)*
@@ -127,8 +132,8 @@ and the meals come in 3c.)*
   costs no energy. The first pouch (five turnip seeds) lies at home with the tools; the rest are bought.
 - **Watering starts the dry count again.** A ripe crop waits to be picked: it needs no more water and never
   withers.
-- **Picking:** facing a ripe crop, a click puts it in the pack and leaves tilled soil. Facing a withered one,
-  a click clears it away. Neither costs energy.
+- **Picking:** facing a ripe crop, a right click puts it in the pack and leaves tilled soil. Facing a withered
+  one, a right click clears it away. Neither costs energy.
 - **Crops never block.** The hero walks through his plot whatever grows there and tramples nothing.
 - **Raw**, a crop gives about a third of what it is worth cooked: turnip 7 energy, carrot 7, wheat 5, potato 8,
   pumpkin 22.
@@ -161,7 +166,7 @@ Enemies sometimes drop hearts or coins.
   (bombs), and shutter doors that open when every enemy in the room is beaten.
 - **Pits:** stepping into one costs half a heart and puts you back at its edge. A push block pushed in fills
   it. Enemies on foot keep out; bats and arrows cross.
-- **The dark and torches:** in a dark dungeon you see only what light reaches. With the Lantern, a click lights a
+- **The dark and torches:** in a dark dungeon you see only what light reaches. With the Lantern, a right click lights a
   torch; lit torches open doors. Some burn only for a few seconds, so several must be lit in one go.
 - Each mechanic is introduced on its own, then combined.
 

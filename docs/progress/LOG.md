@@ -1586,3 +1586,37 @@ Asked for between steps 3b and 3c: "get rid of the animations on the environment
 - **E does nothing now.** If both were wanted, it is one entry in `tools/setup_input_map.gd`.
 - The sway layer's room in the tree atlas (clear pixels to each side of a crown) is still there, unused.
 
+## 2026-11-13 — The mouse, as the user wants it: left click uses, right click interacts (not yet tried in play)
+
+The user tried the first version (interact on the left button) and asked for this instead: "attacking should be left click and using hoe and other items should be left click and similar to the controls in stardew valley and right click should be to interact with other characters and items". The still world needed no change. The decisions are in `docs/DECISIONS.md`.
+
+**Built**
+- **Right click interacts:** talks, reads, picks up, opens, harvests. (A gamepad's A is unchanged.)
+- **Left click uses what is in hand** (a new action, `use_hand`; `AreaController.use_hand()`):
+  - nothing on the item button: the sword;
+  - the bow or bombs on it: those;
+  - the hoe, the can or seeds on it: the tool when he faces his plot (or water, for the can), where it works or says why not; anywhere else, the sword.
+- **The sword is a line in the item menu** when something else could be in hand. Choosing it empties the item button, so the left click swings again.
+- **Space and Q still do the sword and the item,** whatever is in hand. Moving is unchanged.
+- **Menus take either click as yes.** A conversation is answered with the right click or Enter, never the left: it swings the sword.
+- **The screens say so:** "Left click: sword / item   Right click: talk / take" on the HUD (its box is a little wider), "[Right click] Pick the Turnip" in prompts, "[Right click]" in a conversation.
+
+**Checked**
+- 531 tests in 74 suites pass (+6: `tests/ui/mouse_test.gd` rewritten, the input map's test). Import and boot clean.
+- **Real clicks through a window** (a scratch script): a left click facing a villager starts no conversation and a right click does; a left click doesn't answer and right clicks do; on open grass a left click swings the sword though the hoe is on the item button; facing the plot it tills; a left click chooses in the item menu, resumes from the pause menu and starts a game from the title. All nine steps passed.
+- **A tool in hand doesn't leave him unarmed:** a test stands him in the South Field with the hoe on the item button, and a left click swings.
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: a tool that never gives way to the sword, water that is no work for the can, a left click that answers a conversation, choosing the sword putting it on the item button, the left click interacting.
+- **The player's own save was not touched** (the click check ran on slot 995 and removed it).
+- Screenshots looked at: the HUD's keys (the box fits both lines now), the answer mark, the prompt at a ripe turnip.
+
+**Known issues and limits**
+- Not tried in play.
+- **No row of tools to pick from.** Farming games switch tools with number keys or the wheel; here it is still the item menu (Tab), so hoe, seeds and can are three trips to the menu. That was not asked for and is not built.
+- **The pointer still doesn't matter:** he works the cell he faces, not the one under the pointer.
+- **Facing the plot with a tool that has nothing to do, a left click says why and doesn't swing.** A monster standing on the plot could only be hit with Space; there are none in Hearthvale.
+- **With the bow or bombs in hand a left click never swings the sword:** choose the sword in the menu, or press Space.
+- **A left click facing a villager swings the sword at them** (it does them no harm).
+- **The HUD shows no line for the sword in hand:** "Item:" is simply gone when the item button is empty.
+- **Every left click costs a swing's energy** where there is nothing else to do with it, including the click that brings the window to the front.
+- The hint box in the top right is wider and covers a little more of the screen.
+

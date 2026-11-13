@@ -445,16 +445,26 @@ run headless; see CLAUDE.md for the command and gotchas.
   `crypt_shade_beaten`, and `Signpost` inscriptions in the keep, by the chapel and in the crypt. They are
   `stone`: drawn as a standing stone with carved lines, where a wayside sign is a wooden post.
 
-- **Interact is the left mouse button** (the user's request, 2026-11-13; `tools/setup_input_map.gd`). Moving,
-  the sword, the item and the menus' keys are where they were, and a gamepad is unchanged; E no longer does
-  anything. The mouse is a button, not a pointer: where the click lands doesn't matter.
-  - Every menu reads `interact` as its yes (`MenuInput.is_confirm()`, `is_answer()`), so a click answers a
-    conversation and chooses in the item menu, the pause menu, the title and the ending.
+- **The mouse** (the user's requests, 2026-11-13; `tools/setup_input_map.gd`), as in farming games: the left
+  button uses what the hero has in hand (the action `use_hand`), the right button interacts (`interact`).
+  Moving is on the keys as it was; the sword (Space) and the item (Q) keep their own keys too; a gamepad is
+  unchanged; E no longer does anything. The buttons are buttons, not a pointer: where a click lands doesn't
+  matter, and the hero acts on what he faces.
+  - **What is in hand** is `AreaController.use_hand()`'s to say. With nothing on the item button: the sword.
+    A weapon there (the bow, bombs): that weapon. A farm tool or a seed: the tool when he faces what it is for
+    (`faces_farm_work()`: a cell of his plot, or water), where it works or says why not; anywhere else the
+    sword, so a hoe in hand doesn't leave him unarmed. With no sword at all the tool says what it is for.
+  - **The sword can be taken in hand again** from the item menu: when he holds something for the item button,
+    the menu lists his best sword first, and choosing it empties the item button (`GameState.equip(&"")`).
+  - Every menu takes either click as its yes (`MenuInput.is_confirm()`: interact, use_hand or Enter). A
+    conversation is answered with interact or Enter only (`is_answer()`): nothing that swings the sword
+    answers, so a swing as the words open doesn't skip them.
   - Everything reads input in `_unhandled_input`, and a `Control` under the pointer would take the click
     first. `MenuInput.let_clicks_through(root)` sets every Control under a screen to ignore the mouse; the
     HUD, the title and the ending call it as they start. **A new screen must call it too.**
-  - `MenuInput.INTERACT_KEY` ("Click") is what the button is called on screen, and `MenuInput.prompt()` makes
-    the HUD's prompt ("[Click] Pick the Turnip"). The help lines in the scenes say "Click" in words.
+  - `MenuInput.INTERACT_KEY` ("Right click") is what the interact button is called on screen, and
+    `MenuInput.prompt()` makes the HUD's prompt ("[Right click] Pick the Turnip"). The help lines in the
+    scenes say "Click" where either button does.
   - Headless tests hand a click straight to a node's `_unhandled_input()`; a scratch script that pushed real
     clicks through a window found them working in the world, a conversation, each menu and the title.
 - **A long item list scrolls** (P3b): the item menu shows `ItemMenu.ROWS` lines (five). `window_top()` moves

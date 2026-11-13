@@ -1,7 +1,7 @@
 class_name ItemMenu
 extends Control
-## The item menu (Tab): the items for the item button that the hero holds, with their ammo,
-## then the food he carries, with what each gives (P2d). Up/down (or left/right) moves the
+## The item menu (Tab): the hero's sword (to take it in hand again), the items for the item
+## button that he holds, with their ammo, then the food he carries, with what each gives (P2d). Up/down (or left/right) moves the
 ## cursor; a click picks the highlighted item and closes; Tab closes without changing anything. The
 ## area equips or eats the chosen item (`chosen`) and keeps the hero still while the menu is
 ## open. The box shows ROWS lines: a longer list (tools, seeds and a harvest, P3b) scrolls to
@@ -120,7 +120,7 @@ func shown_lines() -> PackedStringArray:
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
-	if event.is_action_pressed(&"interact") or event.is_action_pressed(&"use_item"):
+	if event.is_action_pressed(&"interact") or event.is_action_pressed(&"use_item") or event.is_action_pressed(&"use_hand"):
 		confirm()
 	elif event.is_action_pressed(&"item_menu"):
 		close()

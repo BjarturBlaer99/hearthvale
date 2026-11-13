@@ -71,7 +71,7 @@ layout_mode = 1
 anchors_preset = -1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -220.0
+offset_left = -234.0
 offset_top = 6.0
 offset_right = -6.0
 offset_bottom = 31.0
@@ -90,7 +90,7 @@ offset_right = -10.0
 offset_bottom = 30.0
 theme_override_colors/font_color = Color(0.95, 0.95, 0.9, 0.85)
 theme_override_font_sizes/font_size = 8
-text = "WASD: move   Shift: sprint   Click: talk / use\nSpace: sword   Q: item   Tab: items   Esc: menu"
+text = "WASD: move   Shift: sprint   Tab: items   Esc: menu\nLeft click: sword / item   Right click: talk / take"
 horizontal_alignment = 2
 
 [node name="Message" type="Label" parent="."]

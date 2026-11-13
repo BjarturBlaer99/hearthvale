@@ -126,7 +126,7 @@ func test_there_are_things_to_gather_and_each_is_back_the_next_morning() -> void
 	assert_that(mushrooms.frame()).is_equal(&"mushrooms")
 	wood.player.motor.place(mushrooms.cell())
 	wood._update_hud()
-	assert_str(wood.hud.get_node(^"Prompt").text).is_equal("[Click] Pick up the Mushrooms")
+	assert_str(wood.hud.get_node(^"Prompt").text).is_equal("[Right click] Pick up the Mushrooms")
 	assert_bool(wood.interact()).is_true()
 	assert_int(GameState.item_count(&"mushroom")).is_equal(mushrooms.count)
 	assert_bool(mushrooms.taken()).is_true()

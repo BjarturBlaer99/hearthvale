@@ -182,7 +182,8 @@ func set_prompt(text: String) -> void:
 	_prompt.text = text
 
 
-## What the prompt says now ("[Click] Pick the Turnip"), or "" when there is nothing to do here.
+## What the prompt says now ("[Right click] Pick the Turnip"), or "" when there is nothing to do
+## here.
 func prompt_text() -> String:
 	return _prompt.text
 
