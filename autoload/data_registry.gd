@@ -19,6 +19,7 @@ const KIND_DIALOGUE: StringName = &"dialogue"
 const KIND_ENEMY: StringName = &"enemy"
 const KIND_BREAKABLE: StringName = &"breakable"
 const KIND_RULES: StringName = &"rules"
+const KIND_RECIPE: StringName = &"recipe"
 
 ## Directory under DATA_ROOT -> the kind of file it holds.
 const DIRECTORY_KINDS: Dictionary = {
@@ -28,6 +29,7 @@ const DIRECTORY_KINDS: Dictionary = {
 	"enemies": KIND_ENEMY,
 	"breakables": KIND_BREAKABLE,
 	"rules": KIND_RULES,
+	"recipes": KIND_RECIPE,
 }
 
 const REQUIRED_FIELDS: Dictionary = {
@@ -41,6 +43,7 @@ const REQUIRED_FIELDS: Dictionary = {
 	&"enemy": ["id", "name", "behaviour", "health", "speed", "contact_damage"],
 	&"breakable": ["id", "name", "breaks_on", "drops"],
 	&"rules": ["id"],
+	&"recipe": ["id", "makes", "needs"],
 }
 ## The sets of rules the game knows (data/rules/<id>.json), by id.
 const RULES_TIME: StringName = &"time"
@@ -148,6 +151,11 @@ func get_breakable(id: StringName) -> Dictionary:
 	return get_entry(&"breakables", id)
 
 
+## What a dish needs and what it makes (data/recipes/<id>.json).
+func get_recipe(id: StringName) -> Dictionary:
+	return get_entry(&"recipes", id)
+
+
 ## The numbers a system runs on (data/rules/<id>.json), e.g. &"time" for the day's clock.
 func get_rules(id: StringName) -> Dictionary:
 	return get_entry(&"rules", id)
@@ -159,7 +167,7 @@ func get_rules(id: StringName) -> Dictionary:
 ## an empty result means every file is valid and every reference resolves.
 func load_all(root: String = DATA_ROOT) -> PackedStringArray:
 	errors = []
-	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}}
+	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}, &"recipes": {}}
 	if not DirAccess.dir_exists_absolute(root):
 		errors.append("%s: data directory does not exist." % root)
 		return errors
@@ -204,6 +212,8 @@ func _load_file(path: String, kind: StringName) -> void:
 			_register(path, data, &"breakable", &"breakables")
 		KIND_RULES:
 			_register(path, data, &"rules", &"rules")
+		KIND_RECIPE:
+			_register(path, data, &"recipe", &"recipes")
 
 
 ## Registers every object in the array `data[key]`.
@@ -255,10 +265,17 @@ func _validate_references() -> void:
 		_check_breakable(breakable)
 	for rules: Dictionary in _collections[&"rules"].values():
 		_check_rules(rules)
+	var known: Callable = func(id: String) -> bool: return _collections[&"items"].has(StringName(id))
+	for recipe: Dictionary in _collections[&"recipes"].values():
+		for problem: String in Cooking.problems(recipe, known):
+			errors.append("%s: recipe '%s': %s" % [recipe["_source"], recipe["id"], problem])
 	for item: Dictionary in _collections[&"items"].values():
 		var stats: Variant = item.get("stats", {})
 		if typeof(stats) == TYPE_DICTIONARY and (stats as Dictionary).has("ammo"):
 			_check_id(item["_source"], "item '%s' ammo" % item["id"], &"items", str(stats["ammo"]))
+		if Food.is_food(item):
+			for problem: String in Food.problems(item):
+				errors.append("%s: item '%s': %s" % [item["_source"], item["id"], problem])
 
 
 func _check_quest(quest: Dictionary) -> void:

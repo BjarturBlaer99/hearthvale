@@ -18,7 +18,8 @@ extends SceneTree
 ## slot of its own), and "ending" the ending screen (after two quests and an hour and a bit of
 ## play). Every shot is taken at noon (NOON), unless its action is "time:<HH:MM>".
 ## "energy:<n>" leaves the hero with that much energy; "collapse" takes it all (he is caught
-## lying where he fell, and never gets home: nothing is saved).
+## lying where he fell, and never gets home: nothing is saved). "food_menu" opens the item menu
+## with food in hand and a bar half spent; "cook" faces the hearth with the makings of tea.
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -121,6 +122,11 @@ const SHOTS: Array = [
 	["99_a_new_morning", &"home", Vector2i(2, 3), Vector2.LEFT, 3, "sleep"],
 	["100_tired", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "energy:18"],
 	["101_out_of_energy", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "collapse"],
+	["102_wild_berries", &"north_fields", Vector2i(7, 15), Vector2.LEFT, 0, ""],
+	["103_mushrooms_in_the_wood", &"old_wood", Vector2i(5, 19), Vector2.LEFT, 0, ""],
+	["104_fallen_blossom", &"village", Vector2i(20, 28), Vector2.RIGHT, 0, ""],
+	["105_food_in_the_item_menu", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "food_menu"],
+	["106_the_hearth_lists_what_to_cook", &"home", Vector2i(5, 2), Vector2.UP, 0, "cook"],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -201,7 +207,9 @@ func _capture() -> void:
 			for item: Array in [[&"bow", 1], [&"arrow", 10], [&"bomb", 3]]:
 				game_state.call(&"add_item", item[0], item[1])
 			game_state.call(&"equip", &"bomb" if shot[5] == "bomb" else &"bow")
-		if shot[5] in ["talk", "accept", "tale", "lantern_talk"]:
+		if shot[5] == "cook":
+			game_state.call(&"add_item", &"cherry_blossom", 4)
+		if shot[5] in ["talk", "accept", "tale", "lantern_talk", "cook"]:
 			scene.call(&"interact")
 		if shot[5] == "sleep":
 			# A night in bed, on a slot of its own, caught as the morning's words show.
@@ -256,6 +264,12 @@ func _capture() -> void:
 					child.call(&"light")
 			await create_timer(0.5).timeout
 		elif shot[5] == "menu":
+			scene.call(&"open_item_menu")
+			await _frames(2)
+		elif shot[5] == "food_menu":
+			for item: Array in [[&"bow", 1], [&"arrow", 10], [&"bread", 2], [&"wild_berries", 3], [&"blossom_tea", 1]]:
+				game_state.call(&"add_item", item[0], item[1])
+			game_state.call(&"set_energy", 48.0)
 			scene.call(&"open_item_menu")
 			await _frames(2)
 		elif shot[5] == "shoot":

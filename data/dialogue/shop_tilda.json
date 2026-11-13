@@ -53,7 +53,33 @@
             ] } }
           ],
           "next": "cannot" },
+        { "text": "A loaf of bread (6 coins)",
+          "conditions": [
+            { "type": "has_item", "item": "coin", "count": 6 },
+            { "type": "not", "condition": { "type": "has_item", "item": "bread", "count": 10 } }
+          ],
+          "effects": [
+            { "type": "take_item", "item": "coin", "count": 6 },
+            { "type": "give_item", "item": "bread", "count": 1 }
+          ],
+          "next": "bread" },
+        { "text": "A loaf of bread (6 coins)",
+          "conditions": [
+            { "type": "not", "condition": { "type": "all", "of": [
+              { "type": "has_item", "item": "coin", "count": 6 },
+              { "type": "not", "condition": { "type": "has_item", "item": "bread", "count": 10 } }
+            ] } }
+          ],
+          "next": "cannot" },
         { "text": "Just looking.", "next": null }
+      ]
+    },
+    "bread": {
+      "speaker": "tilda",
+      "text": "Baked this morning. It'll keep you on your feet.",
+      "options": [
+        { "text": "Something else.", "next": "greet" },
+        { "text": "Goodbye.", "next": null }
       ]
     },
     "eggs": {

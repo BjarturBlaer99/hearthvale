@@ -13,7 +13,7 @@
         "properties": {
           "id": { "type": "string", "minLength": 1 },
           "name": { "type": "string" },
-          "type": { "enum": ["weapon_melee", "weapon_ranged", "ammo", "bomb", "lantern", "key", "currency", "consumable", "quest", "heart"] },
+          "type": { "enum": ["weapon_melee", "weapon_ranged", "ammo", "bomb", "lantern", "key", "currency", "consumable", "quest", "heart", "food", "ingredient"], "description": "'food' is eaten from the item menu (its stats say what it gives); an 'ingredient' is only cooked with." },
           "icon": { "type": "string", "description": "The item's picture (a frame of gameplay/art/items.png, ItemIcons.FRAMES). Without one, its type decides." },
           "stackable": { "type": "boolean", "default": false },
           "max_stack": { "type": "integer", "minimum": 1 },
@@ -27,7 +27,9 @@
               "ammo": { "type": "string" },
               "speed": { "type": "number", "minimum": 1 },
               "fuse": { "type": "number", "minimum": 0 },
-              "radius": { "type": "number", "minimum": 0 }
+              "radius": { "type": "number", "minimum": 0 },
+              "energy": { "type": "number", "minimum": 0, "description": "Food: the energy it gives when eaten." },
+              "hearts": { "type": "number", "minimum": 0, "description": "Food: the hearts it mends when eaten (0.5 is half a heart)." }
             }
           }
         }

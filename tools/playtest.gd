@@ -29,6 +29,14 @@ const KEYS: String = "keys"
 ## after the scenario's name starts it at that time of day, and energy=<n> with that much
 ## energy: -- village 19:30 energy=12
 const SCENARIOS: Dictionary = {
+	# At home by the hearth, a little tired, with bread, berries and the makings of tea: for
+	# trying food and cooking.
+	"kitchen": {
+		"area": &"home",
+		"cell": Vector2i(5, 3),
+		"items": [[&"cherry_blossom", 4], [&"bread", 2], [&"wild_berries", 4], [&"coin", 20]],
+		"flags": [],
+	},
 	# At home, by the door: for trying the bed.
 	"home": {
 		"area": &"home",

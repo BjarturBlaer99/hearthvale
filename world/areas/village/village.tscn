@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" path="res://gameplay/interactables/brambles.tscn" id="10_brambles"]
 [ext_resource type="Script" path="res://gameplay/interactables/heart_pickup.gd" id="11_heart"]
 [ext_resource type="Script" path="res://gameplay/dungeons/dungeon_door.gd" id="h14_door"]
+[ext_resource type="Script" path="res://gameplay/interactables/forage_spot.gd" id="p2d_forage"]
 [ext_resource type="Script" path="res://gameplay/interactables/heart_piece.gd" id="v12_piece"]
 [ext_resource type="Script" path="res://gameplay/interactables/villager.gd" id="v12_villager"]
 
@@ -35,6 +36,30 @@ tile_set = ExtResource("2_tiles")
 script = ExtResource("3_shading")
 
 [node name="Interactables" type="Node2D" parent="." unique_id=2146029989]
+
+[node name="BlossomA" type="Node2D" parent="Interactables" unique_id=905573807]
+position = Vector2(336, 448)
+script = ExtResource("p2d_forage")
+kind = &"blossoms"
+item_id = &"cherry_blossom"
+count = 2
+taken_flag = &"forage/village/BlossomA"
+
+[node name="BlossomB" type="Node2D" parent="Interactables" unique_id=809386516]
+position = Vector2(416, 368)
+script = ExtResource("p2d_forage")
+kind = &"blossoms"
+item_id = &"cherry_blossom"
+count = 2
+taken_flag = &"forage/village/BlossomB"
+
+[node name="BlossomC" type="Node2D" parent="Interactables" unique_id=573770359]
+position = Vector2(544, 416)
+script = ExtResource("p2d_forage")
+kind = &"blossoms"
+item_id = &"cherry_blossom"
+count = 2
+taken_flag = &"forage/village/BlossomC"
 
 [node name="HomeDoor" type="Node2D" parent="Interactables" unique_id=343673525]
 position = Vector2(128, 224)

@@ -92,10 +92,11 @@ func test_every_exit_leads_to_an_entry_point_and_every_talker_has_a_conversation
 		for child: Node in scene.get_node(^"Interactables").get_children():
 			if child is Talkable:
 				var talkable: Talkable = child
-				assert_bool(DataRegistry.has_entry(&"dialogues", talkable.dialogue_id)) \
+				# A hearth's words are built from the recipes; everyone else names a file in data.
+				assert_bool(not talkable.dialogue().is_empty() and (child is Hearth or DataRegistry.has_entry(&"dialogues", talkable.dialogue_id))) \
 					.override_failure_message("%s/%s names dialogue '%s'" % [area_id, child.name, talkable.dialogue_id]).is_true()
-				# Whoever talks stands on open ground. A bed is a piece of furniture: it is its tile.
-				assert_bool(grid.is_solid(talkable.cell())).override_failure_message("%s/%s stands on open ground" % [area_id, child.name]).is_equal(child is Bed)
+				# Whoever talks stands on open ground. A bed or a hearth is furniture: it is its tile.
+				assert_bool(grid.is_solid(talkable.cell())).override_failure_message("%s/%s stands on open ground" % [area_id, child.name]).is_equal(child is Bed or child is Hearth)
 			if not child is AreaExit:
 				continue
 			exits += 1

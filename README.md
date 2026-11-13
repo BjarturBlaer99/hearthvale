@@ -71,6 +71,9 @@ Beaten enemies sometimes drop hearts or coins.
 - **The hero** (hero pass): a leather vest, wrist guards, a belt pouch and tall boots over the blue tunic, the
   sword on his back until he swings it, and a small pack. He breathes when he stands, leans into a sprint,
   winds up before a swing, flinches when hit and bends his knees landing from a ledge.
+- **Food and cooking** (the pivot, step 2d): berries, mushrooms and fallen cherry blossom to gather, back each
+  morning; bread at Tilda's; food is eaten from the item menu for energy; and the hearth at home cooks from
+  recipes (cherry blossom tea, for a start).
 - **Energy** (the pivot, step 2c): a bar under the hearts. Sprinting, swinging the sword and shooting the bow
   spend it. Low on energy the hero slows; out of it he collapses and wakes at home, a little poorer. Sleep
   refills it. It never costs a heart.

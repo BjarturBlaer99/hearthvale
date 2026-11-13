@@ -17,10 +17,11 @@ res://
     light/           # LightRules (how much light reaches a point in a dark area)
     time/            # DayClock (the day's rules: its length, the light by the hour, lamps, night)
     energy/          # EnergyRules (what things cost, tiredness, what collapsing costs)
+    cooking/         # Cooking (recipes, and the hearth's list as a conversation)
     art/             # PixelGrade (the art tools' colour pass: warm colour, soft outlines)
     quests/          # ConditionEvaluator, EffectApplier, QuestRunner, QuestState
     combat/          # CombatRules (hit geometry, knockback, weapon choice), Hit
-    inventory/       # Inventory (stack limits, the item button, ammo, a lantern's reach)
+    inventory/       # Inventory (stack limits, the item button, ammo, a lantern's reach), Food (what food gives)
     dialogue/        # DialogueRunner
     menus/           # MenuCursor (a menu's options and cursor), EndingSummary (the ending screen's lines)
     audio/           # Synth (oscillators, noise, envelopes, a note sequencer, PCM16)
@@ -347,6 +348,7 @@ res://
 | `data/dialogue/` | one conversation per file |
 | `data/enemies/` | one enemy type per file |
 | `data/breakables/` | one breakable (grass, pot) per file |
+| `data/recipes/` | one recipe per file: what a dish needs and what it makes |
 | `data/rules/` | one set of rules per file: the numbers a system runs on (`time.json`: the day's clock; `energy.json`: the hero's energy) |
 
 DataRegistry validates required fields and resolves every cross-reference at load. A set of rules must be one
@@ -679,3 +681,26 @@ run headless; see CLAUDE.md for the command and gotchas.
   (`end_the_day()`) goes the same way, so it costs the same.
 - **The HUD:** the area shows the `EnergyBar` and keeps it to `energy_changed`; a line of words says when he
   crosses into being tired or too tired to run.
+
+## 18. Food and cooking
+- **Food is an item type** (`food`), whose `stats` say the `energy` it gives and the `hearts` it mends (0.5 is
+  half a heart). An `ingredient` is only cooked with. `Food` (`core/inventory/`, pure) reads them:
+  `energy_of()`, `halves_of()`, `would_help()` (it gives energy and the bar isn't full, or mends hearts and some
+  are missing), `gives_text()` for the menu, and `problems()`, which the registry runs on every food item.
+- **Eating:** `GameState.eat(item_id)` uses one and applies it, or returns false and uses nothing when it
+  wouldn't help. The item menu lists what goes on the item button, then the food (`Food.edible_held()`);
+  `AreaController._on_item_chosen()` equips the one and eats the other.
+- **Foraging:** `ForageSpot` (`gameplay/interactables/`) is an `ItemPickup` that grows back: its flag holds the
+  day it was last gathered, and it is `taken()` only on that day. It lies on the ground, blocks nothing, and is
+  picked up like any item. Its two pictures (grown, gathered) are in `gameplay/art/forage.png`.
+  - A spot must not lie under a tree's crown: a crown fades for anything that can be picked up behind it, and
+    would stay faded. A test checks every spot.
+- **Recipes are data** (`data/recipes/<id>.json`, schema `docs/data/recipe.schema.json`): `makes` (an item and
+  how many) and `needs` (items and how many). The registry checks every item id (`Cooking.problems()`).
+- **Cooking:** `Hearth` (`gameplay/interactables/`) is a `Talkable` on the hearth's tile at home. Its
+  `dialogue()` isn't a file: `Cooking.dialogue()` (`core/cooking/`, pure) builds a conversation from the
+  recipes, in the shape of the ones in `data/dialogue`. Each recipe is an answer that takes the makings and
+  gives the dish (the shared `take_item` and `give_item` effects) when the hero has them and room to carry the
+  dish, and says so when he hasn't. `AreaController.talk_to()` opens whatever a `Talkable.dialogue()` returns,
+  so the hearth needs no screen of its own.
+- **The shop:** bread is a line in Tilda's conversation, like arrows and bombs.

@@ -10,6 +10,11 @@
     { "id": "big_key", "name": "Big Key", "type": "key" },
     { "id": "coin", "name": "Coin", "type": "currency", "stackable": true, "max_stack": 999 },
     { "id": "weavers_shuttle", "name": "Weaver's Shuttle", "type": "quest", "icon": "shuttle" },
-    { "id": "egg_basket", "name": "Basket of Eggs", "type": "quest" }
+    { "id": "egg_basket", "name": "Basket of Eggs", "type": "quest" },
+    { "id": "wild_berries", "name": "Wild Berries", "type": "food", "icon": "berries", "stackable": true, "max_stack": 20, "stats": { "energy": 8 } },
+    { "id": "mushroom", "name": "Mushrooms", "type": "food", "icon": "mushroom", "stackable": true, "max_stack": 20, "stats": { "energy": 6 } },
+    { "id": "bread", "name": "Bread", "type": "food", "icon": "bread", "stackable": true, "max_stack": 10, "stats": { "energy": 30 } },
+    { "id": "cherry_blossom", "name": "Cherry Blossoms", "type": "ingredient", "icon": "blossom", "stackable": true, "max_stack": 30 },
+    { "id": "blossom_tea", "name": "Cherry Blossom Tea", "type": "food", "icon": "tea", "stackable": true, "max_stack": 10, "stats": { "energy": 15 } }
   ]
 }

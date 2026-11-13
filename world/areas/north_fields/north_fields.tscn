@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" path="res://gameplay/enemies/enemy.tscn" id="7_enemy"]
 [ext_resource type="Script" path="res://gameplay/dungeons/chest.gd" id="8_chest"]
 [ext_resource type="Script" path="res://gameplay/interactables/signpost.gd" id="9_sign"]
+[ext_resource type="Script" path="res://gameplay/interactables/forage_spot.gd" id="p2d_forage"]
 [ext_resource type="Script" path="res://gameplay/interactables/item_pickup.gd" id="q13_pickup"]
 [ext_resource type="Script" path="res://gameplay/interactables/heart_piece.gd" id="v12_piece"]
 [ext_resource type="Script" path="res://gameplay/interactables/villager.gd" id="v12_villager"]
@@ -35,6 +36,20 @@ tile_set = ExtResource("2_tiles")
 script = ExtResource("3_shading")
 
 [node name="Interactables" type="Node2D" parent="." unique_id=1684340222]
+
+[node name="BerriesA" type="Node2D" parent="Interactables" unique_id=752300301]
+position = Vector2(96, 240)
+script = ExtResource("p2d_forage")
+item_id = &"wild_berries"
+count = 2
+taken_flag = &"forage/north_fields/BerriesA"
+
+[node name="BerriesB" type="Node2D" parent="Interactables" unique_id=1000323191]
+position = Vector2(544, 384)
+script = ExtResource("p2d_forage")
+item_id = &"wild_berries"
+count = 2
+taken_flag = &"forage/north_fields/BerriesB"
 
 [node name="SouthRoad" type="Node2D" parent="Interactables" unique_id=316643559]
 position = Vector2(320, 464)

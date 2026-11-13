@@ -139,6 +139,19 @@ func spend_energy(amount: float) -> void:
 	set_energy(energy_rules().after(energy, maxf(amount, 0.0)))
 
 
+## Eats one `item_id` (GDD §6): its energy, and the hearts a meal mends. Returns false, and
+## uses nothing, if he has none, it isn't food, or it would do him no good (a full bar and
+## nothing to mend).
+func eat(item_id: StringName) -> bool:
+	var item: Dictionary = DataRegistry.get_item(item_id)
+	if item_count(item_id) <= 0 or not Food.would_help(item, energy, max_energy(), health, max_health()):
+		return false
+	add_item(item_id, -1)
+	set_energy(energy + Food.energy_of(item))
+	heal(Food.halves_of(item))
+	return true
+
+
 ## Whether the hero has no energy left: he collapses (the area sees to it).
 func is_exhausted() -> bool:
 	return is_started() and energy_rules().is_spent(energy)

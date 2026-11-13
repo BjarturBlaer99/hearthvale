@@ -143,3 +143,47 @@ Nothing is built ahead of its step. Each later step gets its own "done when" lis
 ### Not in this step
 - Food, and anything else that gives energy back (2d). Hoeing and watering costs (P3).
 - A sound for tiring or collapsing (2e). Night monsters (2e).
+
+---
+
+## 2d — Food and cooking
+
+### What changes
+- **Food is a kind of item** (`food`), with the energy it gives and, for some meals, hearts. Five items come
+  with this step: wild berries (8 energy), mushrooms (6), bread (30), cherry blossom tea (15), and cherry
+  blossoms, which are only an ingredient.
+- **Eating:** the item menu (Tab) lists food under the bow and the bombs. Choosing one eats it: energy goes up,
+  the item is used. With a full bar and nothing to heal he isn't hungry, and nothing is used.
+- **Foraging:** berries, mushrooms and fallen cherry blossom lie in the world. Stand on one and press E, as
+  for any item. Each grows back the next morning. Ten spots: berries in the North Fields (two) and the South
+  Field, mushrooms in the Old Wood (four), blossom under three of Hearthvale's cherry trees.
+  - They are not solid: nothing about where the hero can walk changes.
+- **Bread at Tilda's:** a new line in her shop, 6 coins a loaf.
+- **Recipes are data** (`data/recipes/`, a new kind, with a schema): what a dish needs and what it makes. One
+  recipe comes with this step, cherry blossom tea from three blossoms. The meals made from crops (soup, stew,
+  pie, roast turnip, bread from wheat) are recipes too, and arrive with the crops in P3, as data only.
+- **Cooking:** face the hearth at home and press E. It lists every recipe with what it needs; choosing one
+  you have the makings of uses them and gives the dish. The list is a conversation built from the recipes, so
+  it needs no new screen.
+- **Tools:** a playtest scenario at the hearth with the makings of tea; screenshots of a forage spot, the item
+  menu with food, and the hearth's list.
+
+### What does not change
+- The bow and bombs in the item menu, and the item button.
+- Hearts and how they are healed in a fight (hearts from grass and enemies).
+- Elder Bram's hearth and the others: only the hero's own is for cooking.
+
+### Done when
+- [x] food and recipes are data, checked on load, with schemas
+- [x] eating from the item menu gives energy (and hearts, for a meal that has them) and uses the item
+- [x] a full hero isn't hungry: nothing is used
+- [x] each forage spot gives its item once a day and is back the next morning
+- [x] no forage spot blocks a cell, and each can be walked to
+- [x] Tilda sells bread
+- [x] the hearth at home lists the recipes; cooking one uses the makings and gives the dish
+- [x] all earlier tests pass
+- [ ] (yours) there is enough to eat in a day, and not too much
+
+### Not in this step
+- Crops and the meals made from them (P3). Eating raw crops (P3). Selling food (P3).
+- A sound for eating or cooking (2e). Hunger: he never needs to eat, only to rest.

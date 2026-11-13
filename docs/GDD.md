@@ -81,7 +81,8 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 
 ## 6. Time, food and sleep *(P2)*
 *(Built so far: the clock, the day and the light in step 2a; the home, the bed and sleeping in 2b; energy in
-2c. Food, cooking, hours and night monsters are still to come.)*
+2c; food, foraging and cooking in 2d, with the meals made from crops to follow in P3. Hours and night monsters
+are still to come.)*
 - **A day** runs from 06:00 to 02:00 in 14 real minutes. At 02:00 the hero passes out, as at zero energy, and
   wakes by his bed the next morning with half his energy and a tenth of his coins gone. The clock stops in
   conversations, in menus and in dungeons.

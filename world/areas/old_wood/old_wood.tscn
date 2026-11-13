@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" path="res://gameplay/enemies/enemy.tscn" id="7_enemy"]
 [ext_resource type="Script" path="res://gameplay/dungeons/dungeon_door.gd" id="10_door"]
 [ext_resource type="Script" path="res://gameplay/interactables/heart_piece.gd" id="11_piece"]
+[ext_resource type="Script" path="res://gameplay/interactables/forage_spot.gd" id="p2d_forage"]
 
 [node name="OldWood" type="Node2D" unique_id=1789553448]
 script = ExtResource("1_area")
@@ -32,6 +33,34 @@ tile_set = ExtResource("2_tiles")
 script = ExtResource("3_shading")
 
 [node name="Interactables" type="Node2D" parent="." unique_id=2090937824]
+
+[node name="MushroomsA" type="Node2D" parent="Interactables" unique_id=146746924]
+position = Vector2(64, 304)
+script = ExtResource("p2d_forage")
+kind = &"mushrooms"
+item_id = &"mushroom"
+taken_flag = &"forage/old_wood/MushroomsA"
+
+[node name="MushroomsB" type="Node2D" parent="Interactables" unique_id=246515183]
+position = Vector2(176, 112)
+script = ExtResource("p2d_forage")
+kind = &"mushrooms"
+item_id = &"mushroom"
+taken_flag = &"forage/old_wood/MushroomsB"
+
+[node name="MushroomsC" type="Node2D" parent="Interactables" unique_id=2002872356]
+position = Vector2(432, 192)
+script = ExtResource("p2d_forage")
+kind = &"mushrooms"
+item_id = &"mushroom"
+taken_flag = &"forage/old_wood/MushroomsC"
+
+[node name="MushroomsD" type="Node2D" parent="Interactables" unique_id=227638767]
+position = Vector2(416, 368)
+script = ExtResource("p2d_forage")
+kind = &"mushrooms"
+item_id = &"mushroom"
+taken_flag = &"forage/old_wood/MushroomsD"
 
 [node name="SouthRoad" type="Node2D" parent="Interactables" unique_id=1091217381]
 position = Vector2(288, 464)

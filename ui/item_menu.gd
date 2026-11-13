@@ -1,9 +1,10 @@
 class_name ItemMenu
 extends Control
-## The item menu (Tab): the items for the item button that the hero holds, with their ammo.
-## Up/down (or left/right) moves the cursor; E equips the highlighted item and closes; Tab
-## closes without changing anything. The area equips the chosen item (`chosen`) and keeps the
-## hero still while the menu is open.
+## The item menu (Tab): the items for the item button that the hero holds, with their ammo,
+## then the food he carries, with what each gives (P2d). Up/down (or left/right) moves the
+## cursor; E picks the highlighted item and closes; Tab closes without changing anything. The
+## area equips or eats the chosen item (`chosen`) and keeps the hero still while the menu is
+## open.
 
 signal chosen(item_id: StringName)
 signal closed
@@ -19,6 +20,8 @@ var selected: int = 0
 ## "Bow (Arrows x10)", "Bombs x3": an item and what it has left to use.
 static func describe(item: Dictionary) -> String:
 	var name_text: String = str(item.get("name", item.get("id", "?")))
+	if Food.is_food(item):
+		return "%s x%d (%s)" % [name_text, GameState.item_count(StringName(str(item.get("id", "")))), Food.gives_text(item)]
 	var ammo: String = Inventory.ammo_for(item)
 	if ammo.is_empty():
 		return name_text

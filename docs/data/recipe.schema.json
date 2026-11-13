@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "recipe.schema.json",
+  "title": "Recipe file (data/recipes/<id>.json, one recipe per file)",
+  "description": "Something cooked at the hearth at the hero's home (GDD §6, TECH_DESIGN §18): what it needs and what it makes. Every item id must be in data/items. The hearth lists every recipe; adding one needs no code.",
+  "type": "object",
+  "required": ["id", "makes", "needs"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "makes": {
+      "type": "object",
+      "required": ["item"],
+      "description": "The dish, usually a 'food' item.",
+      "properties": {
+        "item": { "type": "string", "minLength": 1 },
+        "count": { "type": "integer", "minimum": 1, "default": 1 }
+      }
+    },
+    "needs": {
+      "type": "array", "minItems": 1,
+      "description": "What is used up, each with how many.",
+      "items": {
+        "type": "object",
+        "required": ["item", "count"],
+        "properties": {
+          "item": { "type": "string", "minLength": 1 },
+          "count": { "type": "integer", "minimum": 1 }
+        }
+      }
+    }
+  }
+}

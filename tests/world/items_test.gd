@@ -84,7 +84,7 @@ func test_the_shop_sells_arrows_and_bombs_for_coins() -> void:
 	Steps.stand_before(shop, "Tilda")
 	assert_bool(shop.interact()).is_true()
 	var box: DialogueBox = shop.hud.dialogue
-	assert_array(Array(box.shown_options())).is_equal(["Ten arrows (5 coins)", "Three bombs (8 coins)", "Just looking."])
+	assert_array(Array(box.shown_options())).override_failure_message("and bread, since P2d (tests/world/food_test.gd)").is_equal(["Ten arrows (5 coins)", "Three bombs (8 coins)", "A loaf of bread (6 coins)", "Just looking."])
 	box.confirm()
 	assert_int(GameState.item_count(&"arrow")).is_equal(10)
 	assert_int(GameState.item_count(&"coin")).is_equal(15)

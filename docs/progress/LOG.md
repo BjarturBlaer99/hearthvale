@@ -1399,3 +1399,36 @@ Plan: `docs/progress/P2-plan.md` (the third of P2's five steps).
 - **A collapse in the middle of a boss fight sends him home:** the fight starts again next time, as after a fall.
 - **Under 10 energy the only way to zero is swinging or shooting** (twenty swings), since he can no longer run.
 - Hoeing and watering costs are in the plan but not in the data yet: they come with the tools, in P3.
+
+## 2026-11-13 — P2d: food and cooking (built; not yet tried in play)
+
+Plan: `docs/progress/P2-plan.md` (the fourth of P2's five steps).
+
+**Built**
+- **Food is a kind of item** (`food`, with the energy and hearts it gives in its data; `Food` in `core/inventory/`, pure). Five items: wild berries (8 energy), mushrooms (6), bread (30), cherry blossom tea (15), and cherry blossoms, an ingredient.
+- **Eating from the item menu:** food is listed under the bow and the bombs with what it gives. Choosing it eats one. A hero with a full bar and nothing to mend isn't hungry, and nothing is used.
+- **Ten things to gather,** each back the next morning (`ForageSpot`, a pickup that grows back): berries in the North Fields (two) and the South Field, mushrooms in the Old Wood (four), fallen blossom in front of three of Hearthvale's cherry trees. They block nothing.
+- **Bread at Tilda's,** 6 coins a loaf.
+- **Recipes are data** (`data/recipes/`, a new kind, with a schema). One so far: cherry blossom tea from three blossoms.
+- **Cooking at the hearth at home:** it lists every recipe with what it needs, as a conversation built from the recipes (`Cooking`, `core/cooking/`, pure). No new screen.
+- **Art:** five item pictures and six forage pictures, painted in the sprite tool.
+- **Tools:** a playtest scenario at the hearth (`-- kitchen`); five new screenshots (106 in all).
+
+**Checked**
+- 439 tests in 62 suites pass (+12: `tests/core/cooking/cooking_test.gd`, `tests/world/food_test.gd`). Import and boot clean.
+- **Where the hero can walk is unchanged:** no Height layer changed (the four areas were re-baked and their tile data came out identical), and no forage spot occupies a cell.
+- **Found and fixed on the way:** a spot beside a tree's trunk lay under its crown, and the crown stayed faded for it. Five spots moved; a test now checks that none lies under a crown.
+- **Older tests updated:** the list of item ids, the shop's answers (bread is the third), who may have words that aren't a file (the hearth), and the sprite sheets with named frames.
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: a full hero still eating, eating not using up the food, what is gathered never growing back, cooking not using the makings, the item menu not listing food.
+- **Frame cost:** draw calls within a few of the last step (the village 330 with its three blossom patches, Elder Bram's house 46, the keep 382, the cistern 231).
+- Screenshots: all 106 taken. Looked at closely: the item menu with food, the hearth's list, berries in the North Fields, mushrooms in the Old Wood, the new pictures enlarged.
+
+**Known issues and limits**
+- Not tried in play. **How much there is to eat is a guess:** about a hundred energy a day lies about for someone who walks to all ten spots, and bread is 6 coins. Both are data.
+- **Only one recipe can be cooked,** since the other meals need crops (P3). The hearth's list is short until then.
+- **None of this step's food mends hearts.** The rule is built and tested with made-up meals; the first real one is mushroom soup, in P3.
+- **The "Carrying" line on the HUD gets long** with food in the pack, and is cut off at the box's width.
+- **No sound of its own for eating or cooking:** eating uses the heart's chime (2e).
+- **Standing at the hearth, the hero hides the fire,** as he hides whoever he talks to from the south.
+- A berry bush is small and dark on dark grass; it may be easy to miss.
+- Eating is from the menu only: there is no button to eat what is in hand.

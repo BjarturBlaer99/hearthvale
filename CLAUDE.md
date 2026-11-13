@@ -93,7 +93,7 @@ godot --headless --path . --quit-after 30
 godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
-# Start partway through to try one part by hand (scenarios in the script: home, village, warden, crypt, shade,
+# Start partway through to try one part by hand (scenarios in the script: kitchen, home, village, warden, crypt, shade,
 # ending). An hour after the name starts at that time of day, and energy=<n> with that much energy.
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
 godot --path . -s res://tools/playtest.gd -- warden
@@ -197,3 +197,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   `GameState.energy` is spent by sprinting (while he runs), a swing and a shot; under 25 he is slower, under 10
   he can't sprint, and at zero he collapses and wakes at home with half a bar and a tenth of his coins gone.
   Staying up until 02:00 costs the same. A hero left at zero energy in an area collapses on its next frame.
+- **Food and cooking (P2d):** food is an item of type `food` (its `stats` give `energy` and `hearts`); eating is
+  `GameState.eat()`, from the item menu. A recipe is a file in `data/recipes/`; the hearth at home lists them
+  all (`Cooking.dialogue()` builds its conversation), so **a new dish is data only**. Things to gather are
+  `ForageSpot` nodes in an area's `Interactables`, back each morning; keep them clear of tree crowns.

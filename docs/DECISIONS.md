@@ -517,6 +517,21 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-12 — **P2d: only the recipes whose makings exist are in the game yet.** Cherry blossom tea is the one
+  recipe. Soup, stew, pie, roast turnip and bread from wheat need crops; they are files to add in P3, with no
+  code. Adding them now would list dishes nobody can cook.
+- 2026-11-12 — **P2d: the hearth's list is a conversation built from the recipes.** The dialogue box and the
+  shared `take_item` and `give_item` effects already do everything a cooking list needs, the way Tilda's shop
+  does. No new screen.
+- 2026-11-12 — **P2d: things to gather are pickups that grow back, not solid bushes.** The hero stands on one
+  and presses E, as for any item. Nothing about where he can walk changes, and no map is re-laid.
+- 2026-11-12 — **P2d: a full hero isn't hungry.** Food that would do nothing isn't used up.
+- 2026-11-12 — **P2d: bread costs 6 coins.** The pivot plan gives bread's energy (30) but no price. It is a
+  starting value, in Tilda's conversation.
+- 2026-11-12 — **P2d: how much there is to gather is a starting value too:** ten spots, giving six berries,
+  four mushrooms and six blossoms a day (about a hundred energy in all, for someone who walks to every one).
+- 2026-11-12 — **P2d: blossom lies in front of its tree, never beside the trunk.** A crown fades for anything
+  that can be picked up behind it; a spot beside a trunk kept its tree faded for good. A test now checks.
 - 2026-11-12 — **P2c: sprint costs energy only for frames in which he ran.** Holding the key against a wall or
   standing still costs nothing: the cost is for the running, not for the key.
 - 2026-11-12 — **P2c: collapse is checked every frame, not only when energy changes.** A hero who reaches zero

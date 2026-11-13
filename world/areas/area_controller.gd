@@ -34,6 +34,9 @@ const SLEPT_WORDS: String = "You wake rested. The game is saved."
 const WOKE_LATE_WORDS: String = "You stayed up too late, and woke in your own bed."
 const COLLAPSED_WORDS: String = "You collapsed, and woke in your own bed."
 const COINS_LOST_WORDS: String = " You lost %d coins on the way."
+## What is said when he eats (the food's name, then what it gave), and when he needn't.
+const ATE_WORDS: String = "%s: %s."
+const NOT_HUNGRY_WORDS: String = "You aren't hungry."
 ## What is said as the hero tires, and as he drops.
 const TIRED_WORDS: String = "You are getting tired."
 const WORN_OUT_WORDS: String = "You are too tired to run."
@@ -450,15 +453,20 @@ func pick_up(pickup: ItemPickup) -> bool:
 
 ## Opens `talkable`'s conversation in the dialogue box; the hero stands still until it ends.
 func talk_to(talkable: Talkable) -> bool:
-	return open_dialogue(talkable.dialogue_id)
+	return _open_conversation(talkable.dialogue(), "%s's" % talkable.name)
 
 
 ## Opens conversation `dialogue_id` (data/dialogue) in the dialogue box; the hero stands still
 ## until it ends. Returns false if there's no such conversation.
 func open_dialogue(dialogue_id: StringName) -> bool:
-	var data: Dictionary = DataRegistry.get_dialogue(dialogue_id)
+	return _open_conversation(DataRegistry.get_dialogue(dialogue_id), "'%s' in data/dialogue" % dialogue_id)
+
+
+## Opens the conversation `data` (in the shape of data/dialogue: a villager's from a file, the
+## hearth's built from the recipes). `what` names it if it is empty.
+func _open_conversation(data: Dictionary, what: String) -> bool:
 	if data.is_empty():
-		push_warning("%s: no dialogue '%s' in data/dialogue." % [area_id, dialogue_id])
+		push_warning("%s: no dialogue: %s." % [area_id, what])
 		return false
 	player.controls_enabled = false
 	hud.set_prompt("")
@@ -520,11 +528,13 @@ func use_item() -> bool:
 	return false
 
 
-## Opens the item menu with the equippable items held. Returns whether it opened.
+## Opens the item menu with the equippable items held, then the food. Returns whether it
+## opened.
 func open_item_menu() -> bool:
 	if _busy() or not player.controls_enabled:
 		return false
 	var held: Array[Dictionary] = Inventory.equippable_held(GameState.inventory, DataRegistry.entries(&"items"))
+	held.append_array(Food.edible_held(GameState.inventory, DataRegistry.entries(&"items")))
 	if held.is_empty():
 		hud.show_message("No items yet.")
 		return false
@@ -1039,8 +1049,17 @@ func _on_quit_to_title() -> void:
 	travel.call(TITLE_SCENE)
 
 
+## The item menu's choice: something for the item button is put on it; food is eaten.
 func _on_item_chosen(item_id: StringName) -> void:
-	GameState.equip(item_id)
+	var item: Dictionary = DataRegistry.get_item(item_id)
+	if not Food.is_food(item):
+		GameState.equip(item_id)
+	elif GameState.eat(item_id):
+		EventBus.sound.emit(&"heart")
+		hud.show_message(ATE_WORDS % [str(item.get("name", item_id)), Food.gives_text(item)])
+	else:
+		EventBus.sound.emit(&"nope")
+		hud.show_message(NOT_HUNGRY_WORDS)
 
 
 func _on_item_menu_closed() -> void:

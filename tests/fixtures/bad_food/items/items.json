@@ -1,0 +1,6 @@
+{
+  "items": [
+    { "id": "stone_soup", "name": "Stone Soup", "type": "food", "stats": { "energy": 0 } },
+    { "id": "petal", "name": "Petals", "type": "ingredient", "stackable": true, "max_stack": 9 }
+  ]
+}
