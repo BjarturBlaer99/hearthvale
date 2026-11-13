@@ -38,12 +38,19 @@ static func is_confirm(event: InputEvent) -> bool:
 	return event.is_action_pressed(&"interact") or event.is_action_pressed(&"use_hand") or event.is_action_pressed(&"ui_accept")
 
 
-## Answering a conversation: interact (the right mouse button) or Enter, but nothing that
-## swings the sword (Space is both; so is the left mouse button), so swinging as the words
-## open doesn't skip them.
+## What the button that answers a conversation is called on screen.
+const ANSWER_KEY: String = "Left click"
+
+
+## Answering a conversation: the left mouse button (the user's request, 2026-11-13), Enter, or
+## A on a pad. Not the right mouse button, which starts conversations, and not Space, which
+## only swings the sword. The left button swings it too, so the box that asks waits a moment
+## after its words appear (DialogueBox.SWING_GRACE).
 static func is_answer(event: InputEvent) -> bool:
-	if event.is_action_pressed(&"interact"):
+	if event.is_action_pressed(&"use_hand"):
 		return true
+	if event.is_action_pressed(&"interact"):
+		return not event is InputEventMouseButton
 	return event.is_action_pressed(&"ui_accept") and not event.is_action(&"attack")
 
 

@@ -47,8 +47,8 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 ## 5. The hero
 - Moves in 8 directions and faces 4, on the keys. The mouse is as in farming games: **the left button uses
   what is in hand** (the sword, or the tool or item on the item button) and **the right button / A
-  interacts** with people and things. They are buttons: where a click lands doesn't matter, and he acts on
-  what he faces. Hold **Shift / B** to sprint. **Esc / Start** pauses:
+  interacts** with people and things. In a conversation the left button answers and reads on. They are buttons:
+  where a click lands doesn't matter, and he acts on what he faces. Hold **Shift / B** to sprint. **Esc / Start** pauses:
   save, quests, settings, quit to the title.
 - **Life: hearts**, for combat only. Start with **3**. Most hits cost **half a heart**. A **heart container**
   (from a boss) adds a heart and refills you; four **heart pieces** make a container. Hearts drop from enemies,

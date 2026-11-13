@@ -456,15 +456,18 @@ run headless; see CLAUDE.md for the command and gotchas.
     sword, so a hoe in hand doesn't leave him unarmed. With no sword at all the tool says what it is for.
   - **The sword can be taken in hand again** from the item menu: when he holds something for the item button,
     the menu lists his best sword first, and choosing it empties the item button (`GameState.equip(&"")`).
-  - Every menu takes either click as its yes (`MenuInput.is_confirm()`: interact, use_hand or Enter). A
-    conversation is answered with interact or Enter only (`is_answer()`): nothing that swings the sword
-    answers, so a swing as the words open doesn't skip them.
+  - Every menu takes either click as its yes (`MenuInput.is_confirm()`: interact, use_hand or Enter).
+  - **A conversation is answered with the left click** (`MenuInput.is_answer()`: use_hand, Enter, or A on a
+    pad; the user's request). The right click starts a conversation and doesn't answer one; Space never did.
+    The left click is also the sword's button, so `DialogueBox` takes no left click as an answer for its
+    first `SWING_GRACE` (0.3 s): a swing made as a conversation opens by itself (a boss's last words) doesn't
+    skip its first line. Enter answers at once.
   - Everything reads input in `_unhandled_input`, and a `Control` under the pointer would take the click
     first. `MenuInput.let_clicks_through(root)` sets every Control under a screen to ignore the mouse; the
     HUD, the title and the ending call it as they start. **A new screen must call it too.**
   - `MenuInput.INTERACT_KEY` ("Right click") is what the interact button is called on screen, and
-    `MenuInput.prompt()` makes the HUD's prompt ("[Right click] Pick the Turnip"). The help lines in the
-    scenes say "Click" where either button does.
+    `MenuInput.prompt()` makes the HUD's prompt ("[Right click] Pick the Turnip"). `ANSWER_KEY` ("Left
+    click") is the mark in a conversation. The help lines in the scenes say "Click" where either button does.
   - Headless tests hand a click straight to a node's `_unhandled_input()`; a scratch script that pushed real
     clicks through a window found them working in the world, a conversation, each menu and the title.
 - **A long item list scrolls** (P3b): the item menu shows `ItemMenu.ROWS` lines (five). `window_top()` moves

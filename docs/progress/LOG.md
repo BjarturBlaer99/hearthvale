@@ -1620,3 +1620,22 @@ The user tried the first version (interact on the left button) and asked for thi
 - **Every left click costs a swing's energy** where there is nothing else to do with it, including the click that brings the window to the front.
 - The hint box in the top right is wider and covers a little more of the screen.
 
+## 2026-11-13 — A left click answers in a conversation (the user's correction; not yet tried in play)
+
+The user tried the second version and said: "when speaking to another character selecting the text should be left click not right click".
+
+**Built**
+- **In a conversation the left click answers and reads on.** The right click, which starts a conversation, no longer answers one. Enter and a gamepad's A answer as before; Space never did.
+- **The first 0.3 seconds of a conversation take no left click.** The left click is also the sword's button, and this keeps a swing made as words open by themselves (a boss's last) from skipping the first line.
+- The mark in a conversation says "[Left click]".
+
+**Checked**
+- 532 tests in 74 suites pass (+1). Import and boot clean.
+- **Real clicks through a window:** a right click starts a conversation; a left click at once answers nothing; a right click doesn't answer; left clicks then carry it to its end, and no sword is swung meanwhile.
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: a right click answering, a left click not answering, no wait for a swing as the words open, a wait that never ends, a wait not started again for a new conversation.
+
+**Known issues and limits**
+- Not tried in play.
+- **Right click talks, left click answers:** two buttons for one conversation. It is what was asked for, and what farming games do.
+- **A very fast left click after the right click is ignored** (under a third of a second).
+

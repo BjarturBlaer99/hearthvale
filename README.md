@@ -21,7 +21,7 @@ volume, fullscreen, window size, the controls hint), or quit to the title. The g
 | Sprint (hold) | Shift | B |
 | Use what is in hand: the sword, or the tool or item on the item button | Left mouse button (a click anywhere) | X (sword), Y (item) |
 | Talk / read / pick up / harvest | Right mouse button | A |
-| Choose an answer | W / S or arrows, then a right click or Enter | d-pad, then A |
+| Choose an answer, or read on | W / S or arrows, then a left click or Enter | d-pad, then A |
 | Swing the sword whatever is in hand | Space / J | X |
 | Use the item on the item button (bow, bombs, hoe, can, seeds) | Q / K | Y |
 | Item menu (choose what's equipped) | Tab / I | Back |
@@ -74,7 +74,8 @@ Beaten enemies sometimes drop hearts or coins.
   winds up before a swing, flinches when hit and bends his knees landing from a ledge.
 - **A still world, and the mouse** (asked for on 2026-11-13): nothing in the scenery moves but the water.
   The left mouse button uses what is in hand: the sword, or a tool where there is work for it (the hoe, the
-  can and seeds on the plot; the sword everywhere else). The right button talks, picks up and harvests.
+  can and seeds on the plot; the sword everywhere else), and answers in a conversation. The right button
+  talks, picks up and harvests.
   Moving is on the keys as before, and Space and Q still do the sword and the item.
 - **Seeds and crops** (the pivot, step 3b): turnips, carrots, wheat, potatoes and pumpkins. A seed is planted
   from the item button in tilled soil; a crop grows a stage each morning if it was watered the day before,

@@ -54,12 +54,21 @@ func test_the_prompt_names_the_right_click() -> void:
 	assert_str(village.hud.prompt_text()).override_failure_message("nothing to do here, nothing said").is_equal("")
 
 
-func test_either_click_is_a_menus_yes_but_only_the_right_one_answers() -> void:
+func test_either_click_is_a_menus_yes_and_the_left_one_answers() -> void:
 	assert_bool(MenuInput.is_confirm(_click(MOUSE_BUTTON_LEFT))).is_true()
 	assert_bool(MenuInput.is_confirm(_click(MOUSE_BUTTON_RIGHT))).is_true()
 	assert_bool(MenuInput.is_confirm(_click(MOUSE_BUTTON_MIDDLE))).override_failure_message("the middle button is nothing").is_false()
-	assert_bool(MenuInput.is_answer(_click(MOUSE_BUTTON_RIGHT))).is_true()
-	assert_bool(MenuInput.is_answer(_click(MOUSE_BUTTON_LEFT))).override_failure_message("a swing as the words open doesn't skip them").is_false()
+	# In a conversation the left click answers; the right click, which starts one, doesn't.
+	assert_str(MenuInput.ANSWER_KEY).is_equal("Left click")
+	assert_bool(MenuInput.is_answer(_click(MOUSE_BUTTON_LEFT))).is_true()
+	assert_bool(MenuInput.is_answer(_click(MOUSE_BUTTON_RIGHT))).override_failure_message("a right click doesn't answer").is_false()
+	# A pad's A and Enter answer as they did; Space, which only swings the sword, doesn't.
+	var pad: InputEventJoypadButton = InputEventJoypadButton.new()
+	pad.button_index = JOY_BUTTON_A
+	pad.pressed = true
+	assert_bool(MenuInput.is_answer(pad)).override_failure_message("A on a pad").is_true()
+	assert_bool(MenuInput.is_answer(_key(KEY_ENTER))).override_failure_message("Enter").is_true()
+	assert_bool(MenuInput.is_answer(_key(KEY_SPACE))).override_failure_message("Space swings; it doesn't answer").is_false()
 	for button: MouseButton in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT]:
 		assert_bool(MenuInput.is_back(_click(button)) or MenuInput.is_up(_click(button)) or MenuInput.is_down(_click(button))).is_false()
 		var released: InputEventMouseButton = _click(button)
@@ -67,7 +76,7 @@ func test_either_click_is_a_menus_yes_but_only_the_right_one_answers() -> void:
 		assert_bool(MenuInput.is_confirm(released)).override_failure_message("letting go isn't a second yes").is_false()
 
 
-func test_a_right_click_talks_and_answers_and_either_click_chooses() -> void:
+func test_a_right_click_talks_a_left_click_answers_and_either_click_chooses() -> void:
 	GameState.add_item(&"bow")
 	GameState.add_item(&"arrow", 5)
 	GameState.add_item(&"bread", 2)
@@ -76,13 +85,17 @@ func test_a_right_click_talks_and_answers_and_either_click_chooses() -> void:
 	Steps.stand_before(village, "FarmerOda")
 	village._unhandled_input(_click(MOUSE_BUTTON_RIGHT))
 	assert_bool(village.is_talking()).override_failure_message("a right click starts the conversation").is_true()
-	village.hud.dialogue._unhandled_input(_click(MOUSE_BUTTON_LEFT))
-	assert_bool(village.is_talking()).override_failure_message("a left click doesn't answer").is_true()
+	var box: DialogueBox = village.hud.dialogue
+	var first: String = box.shown_text()
+	var answers: PackedStringArray = box.shown_options()
+	box._process(DialogueBox.SWING_GRACE + 0.05)
+	box._unhandled_input(_click(MOUSE_BUTTON_RIGHT))
+	assert_bool(village.is_talking() and box.shown_text() == first and box.shown_options() == answers).override_failure_message("a right click doesn't answer").is_true()
 	for i: int in 30:
 		if not village.is_talking():
 			break
-		village.hud.dialogue._unhandled_input(_click(MOUSE_BUTTON_RIGHT))
-	assert_bool(village.is_talking()).override_failure_message("right clicks carry it to its end").is_false()
+		box._unhandled_input(_click(MOUSE_BUTTON_LEFT))
+	assert_bool(village.is_talking()).override_failure_message("left clicks carry it to its end").is_false()
 	assert_int(GameState.item_count(&"arrow")).override_failure_message("no arrow was loosed meanwhile").is_equal(5)
 	# The item menu: either click chooses the line under the cursor.
 	village.player.motor.place(GRASS)
@@ -98,6 +111,33 @@ func test_a_right_click_talks_and_answers_and_either_click_chooses() -> void:
 	# With nobody before him a right click does nothing.
 	village._unhandled_input(_click(MOUSE_BUTTON_RIGHT))
 	assert_bool(village.is_talking() or village.is_in_menu()).is_false()
+
+
+func test_a_swing_as_the_words_appear_doesnt_skip_them() -> void:
+	var village: AreaController = _load(VILLAGE)
+	Steps.stand_before(village, "FarmerOda")
+	assert_bool(village.interact()).is_true()
+	var box: DialogueBox = village.hud.dialogue
+	var first: String = box.shown_text()
+	assert_float(box.open_for).override_failure_message("just opened").is_equal(0.0)
+	# The left click is the sword's button too: in the first moment it answers nothing.
+	box._unhandled_input(_click(MOUSE_BUTTON_LEFT))
+	box._process(DialogueBox.SWING_GRACE * 0.5)
+	box._unhandled_input(_click(MOUSE_BUTTON_LEFT))
+	assert_bool(village.is_talking() and box.shown_text() == first).override_failure_message("the first words are still there").is_true()
+	# Enter is nobody's sword: it answers at once.
+	box._unhandled_input(_key(KEY_ENTER))
+	assert_bool(village.is_talking() and box.shown_text() == first).override_failure_message("Enter answered").is_false()
+	# A moment later the left click answers; and the wait starts again with each conversation.
+	for i: int in 30:
+		if not village.is_talking():
+			break
+		box._process(DialogueBox.SWING_GRACE)
+		box._unhandled_input(_click(MOUSE_BUTTON_LEFT))
+	assert_bool(village.is_talking()).is_false()
+	assert_bool(village.interact()).is_true()
+	assert_float(box.open_for).override_failure_message("a new conversation, a new wait").is_equal(0.0)
+	assert_float(DialogueBox.SWING_GRACE).override_failure_message("short enough not to be felt").is_between(0.15, 0.5)
 
 
 func test_a_left_click_swings_the_sword_when_nothing_else_is_in_hand() -> void:
@@ -308,7 +348,8 @@ func test_every_screen_names_the_clicks_and_none_names_e() -> void:
 	assert_bool(all.contains("WASD: move")).override_failure_message("moving is as it was").is_true()
 	assert_bool(all.contains("Left click: sword / item")).is_true()
 	assert_bool(all.contains("Right click: talk / take")).is_true()
-	assert_bool(all.contains("[Right click]")).override_failure_message("the answer mark in a conversation").is_true()
+	assert_bool(all.contains("[Left click]")).override_failure_message("the answer mark in a conversation").is_true()
+	assert_bool(all.contains("[Right click]")).override_failure_message("no conversation is answered with the right click").is_false()
 
 
 ## Checks that no Control under `root` (or `root` itself) takes mouse input. Returns how many
@@ -343,6 +384,14 @@ func _face_plot(area: AreaController, cell: Vector2i) -> void:
 func _rest(area: AreaController) -> void:
 	for i: int in 40:
 		area.player.motor.step(Vector2.ZERO, FRAME)
+
+
+func _key(code: Key) -> InputEventKey:
+	var event: InputEventKey = InputEventKey.new()
+	event.keycode = code
+	event.physical_keycode = code
+	event.pressed = true
+	return event
 
 
 func _click(button: MouseButton) -> InputEventMouseButton:

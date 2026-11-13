@@ -537,8 +537,11 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
     opened a menu. On the plot a tool with nothing to do still says why, and he doesn't hack at his crops.
   - **The sword is a line in the item menu** when something else could be in hand, so the bow can be put
     away with the mouse alone. Choosing it empties the item button.
-  - **A left click doesn't answer a conversation.** It swings the sword, and words that open in the middle of
-    a fight (a boss's last) would be skipped by the next swing. Right click and Enter answer.
+  - **A left click answers a conversation, and a right click doesn't** (the user, after trying it: "when
+    speaking to another character selecting the text should be left click not right click"). My first version
+    had it the other way round, to keep a swing from skipping words that open in the middle of a fight (a
+    boss's last). That is kept another way: the box takes no left click as an answer for its first 0.3
+    seconds. Enter and a pad's A answer as before.
   - **Space and Q are kept.** The sword and the item are still one press away whatever is in hand, which the
     dungeons were built round. The gamepad is unchanged.
   - **Not done, and not asked:** a row of tools along the bottom of the screen with number keys or the wheel

@@ -1,18 +1,24 @@
 class_name DialogueBox
 extends Control
 ## The text box at the bottom of the screen (docs/TECH_DESIGN.md §7): who is speaking, what
-## they say, and the answers to pick from (up/down to move, interact or Enter to choose). It
-## shows a DialogueRunner, which holds the conversation; the area keeps the hero still while
-## it's open. On a node with no answers (a sign), the same keys close it.
+## they say, and the answers to pick from (up/down to move, a left click or Enter to choose).
+## It shows a DialogueRunner, which holds the conversation; the area keeps the hero still
+## while it's open. On a node with no answers (a sign), the same keys close it.
 
 ## The conversation is over and the box has hidden.
 signal closed
 
 const CURSOR: String = "> "
+## How long after the words appear a left click is not yet an answer (s). The left click is
+## also the sword's button: a swing made as a conversation opens by itself (a boss's last
+## words) would otherwise skip its first line.
+const SWING_GRACE: float = 0.3
 
 var runner: DialogueRunner
 ## Index of the highlighted answer among the visible ones.
 var selected: int = 0
+## How long the box has been open (s).
+var open_for: float = 0.0
 
 @onready var _name: Label = $Panel/Lines/Name
 @onready var _text: Label = $Panel/Lines/Text
@@ -21,7 +27,13 @@ var selected: int = 0
 
 
 func _ready() -> void:
+	_more.text = "[%s]" % MenuInput.ANSWER_KEY
 	hide()
+
+
+func _process(delta: float) -> void:
+	if is_open():
+		open_for += delta
 
 
 ## Shows `dialogue_runner`, starting it if it hasn't started.
@@ -29,6 +41,7 @@ func open(dialogue_runner: DialogueRunner) -> void:
 	runner = dialogue_runner
 	runner.ended.connect(_on_ended, CONNECT_ONE_SHOT)
 	selected = 0
+	open_for = 0.0
 	show()
 	if not runner.is_running():
 		runner.start()
@@ -83,7 +96,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	# Held from before: the last answer can end the game's scene, and the box leaves the tree.
 	var viewport: Viewport = get_viewport()
 	if MenuInput.is_answer(event):
-		confirm()
+		# A left click in the first moment is taken for a swing of the sword, and goes nowhere.
+		if not (event.is_action_pressed(&"use_hand") and open_for < SWING_GRACE):
+			confirm()
 	elif event.is_action_pressed(&"move_up"):
 		move_cursor(-1)
 	elif event.is_action_pressed(&"move_down"):

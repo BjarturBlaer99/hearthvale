@@ -191,8 +191,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   the user's request of 2026-11-13.
 - Do not make the mouse a pointer, and keep its two buttons as the user set them on 2026-11-13, as in
   farming games: **left click uses what is in hand** (`AreaController.use_hand()`: the sword, or the tool or
-  item on the item button), **right click interacts** with people and things. Moving stays on the keys; Space
-  and Q still do the sword and the item.
+  item on the item button) and answers in a conversation; **right click interacts** with people and things.
+  Moving stays on the keys; Space and Q still do the sword and the item.
 - Do not add areas beyond the hero's home and plot unless the user asks.
 - Do not add a dependency/addon without noting why in `docs/DECISIONS.md`. Allowed now: gdUnit4.
 - Do not write story, dialogue or quest content beyond what the current milestone needs.
