@@ -1,0 +1,5 @@
+{
+  "items": [
+    { "id": "loaf", "name": "Loaf", "type": "food", "stats": { "energy": 10 } }
+  ]
+}

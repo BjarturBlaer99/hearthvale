@@ -1,0 +1,13 @@
+{
+  "id": "guard_rolf",
+  "name": "Guard Rolf",
+  "dialogue": "guard_rolf",
+  "likes": [
+    "bread",
+    "mushroom_soup"
+  ],
+  "thanks": {
+    "liked": "A watchman's dream, that. My thanks.",
+    "other": "Thoughtful. My thanks."
+  }
+}

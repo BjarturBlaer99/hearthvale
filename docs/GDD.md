@@ -186,8 +186,24 @@ Enemies sometimes drop hearts or coins.
   what the crops give, one at a time, at each crop's price, and nothing else. The list stays open for as many
   deals as he likes and says why one can't be made: not enough coins, no room to carry it, a full purse. She
   is open from 08:00 to 18:00 (§6).
-- Villagers give hints and small quests (data-driven). **Friendship** grows from talking and from gifts they
-  like, and opens small quests and recipes *(P4, to be proposed)*.
+- Villagers give hints and small quests (data-driven).
+- **Friendship** *(P4c)* is twenty points a villager, a mark for every four: five marks.
+  - The first talk of a day is worth 1 point.
+  - A gift is worth 3 if they like it and 1 if not. One gift a villager a day.
+  - Food and what is cooked with can be given, and nothing else. With something to give, a villager's
+    conversation offers "I brought you something.", which opens a list of what he carries.
+  - A mark gained is said once; the pause menu's Friends page shows every villager's marks.
+  - What friendship opens (small quests, recipes, a present) is step 4d.
+
+| Villager | Likes |
+|---|---|
+| Elder Bram | Vegetable stew, cherry blossom tea |
+| Wenna | Cherry blossoms, cherry blossom tea |
+| Tilda | Pumpkin pie, wheat |
+| Farmer Oda | Bread, pumpkin |
+| Pip | Wild berries, pumpkin pie |
+| Guard Rolf | Bread, mushroom soup |
+| Shepherd Edda | Mushroom soup, carrots |
 
 ## 11. Story
 Something has stirred in the old keep north of Hearthvale, and Elder Bram asks the hero to quiet it.

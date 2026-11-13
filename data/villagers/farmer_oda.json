@@ -1,0 +1,13 @@
+{
+  "id": "farmer_oda",
+  "name": "Farmer Oda",
+  "dialogue": "farmer_oda",
+  "likes": [
+    "bread",
+    "pumpkin"
+  ],
+  "thanks": {
+    "liked": "That's the stuff. You know a farmer's heart.",
+    "other": "Much obliged."
+  }
+}

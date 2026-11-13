@@ -1,0 +1,13 @@
+{
+  "id": "wenna",
+  "name": "Wenna",
+  "dialogue": "wenna_weaver",
+  "likes": [
+    "cherry_blossom",
+    "blossom_tea"
+  ],
+  "thanks": {
+    "liked": "Oh, lovely! Just what I was wishing for.",
+    "other": "For me? Thank you."
+  }
+}

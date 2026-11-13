@@ -22,6 +22,7 @@ const KIND_RULES: StringName = &"rules"
 const KIND_RECIPE: StringName = &"recipe"
 const KIND_CROP: StringName = &"crop"
 const KIND_SHOP: StringName = &"shop"
+const KIND_VILLAGER: StringName = &"villager"
 
 ## Directory under DATA_ROOT -> the kind of file it holds.
 const DIRECTORY_KINDS: Dictionary = {
@@ -34,6 +35,7 @@ const DIRECTORY_KINDS: Dictionary = {
 	"recipes": KIND_RECIPE,
 	"crops": KIND_CROP,
 	"shops": KIND_SHOP,
+	"villagers": KIND_VILLAGER,
 }
 
 const REQUIRED_FIELDS: Dictionary = {
@@ -50,6 +52,7 @@ const REQUIRED_FIELDS: Dictionary = {
 	&"recipe": ["id", "makes", "needs"],
 	&"crop": ["id", "name", "days", "seed", "gives", "seed_price", "sells_for"],
 	&"shop": ["id", "name", "sells"],
+	&"villager": ["id", "name", "dialogue", "likes", "thanks"],
 }
 ## The sets of rules the game knows (data/rules/<id>.json), by id.
 const RULES_TIME: StringName = &"time"
@@ -58,7 +61,8 @@ const RULES_HOURS: StringName = &"hours"
 const RULES_NIGHT: StringName = &"night"
 const RULES_FARM: StringName = &"farm"
 const RULES_SKILLS: StringName = &"skills"
-const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM, RULES_SKILLS]
+const RULES_FRIENDSHIP: StringName = &"friendship"
+const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM, RULES_SKILLS, RULES_FRIENDSHIP]
 
 ## Enemy behaviour ids (EnemyBrains makes one brain per id) and drop-table entry types.
 const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden", "shade"]
@@ -91,6 +95,7 @@ const EFFECT_FIELDS: Dictionary = {
 	"sleep": [],
 	"shop": ["shop", "mode"],
 	"practise": ["skill", "deed"],
+	"gift": ["villager"],
 }
 
 ## A field with one of these names, inside a condition or effect, must name an id
@@ -99,6 +104,7 @@ const REFERENCE_FIELDS: Dictionary = {
 	"item": &"items",
 	"quest": &"quests",
 	"shop": &"shops",
+	"villager": &"villagers",
 }
 
 ## Problems found by the last load_all(), as "file: what is wrong" lines.
@@ -180,6 +186,11 @@ func get_shop(id: StringName) -> Dictionary:
 	return get_entry(&"shops", id)
 
 
+## A villager (data/villagers/<id>.json): their name, their conversation and what they like.
+func get_villager(id: StringName) -> Dictionary:
+	return get_entry(&"villagers", id)
+
+
 ## The numbers a system runs on (data/rules/<id>.json), e.g. &"time" for the day's clock.
 func get_rules(id: StringName) -> Dictionary:
 	return get_entry(&"rules", id)
@@ -191,7 +202,7 @@ func get_rules(id: StringName) -> Dictionary:
 ## an empty result means every file is valid and every reference resolves.
 func load_all(root: String = DATA_ROOT) -> PackedStringArray:
 	errors = []
-	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}, &"recipes": {}, &"crops": {}, &"shops": {}}
+	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}, &"recipes": {}, &"crops": {}, &"shops": {}, &"villagers": {}}
 	if not DirAccess.dir_exists_absolute(root):
 		errors.append("%s: data directory does not exist." % root)
 		return errors
@@ -242,6 +253,8 @@ func _load_file(path: String, kind: StringName) -> void:
 			_register(path, data, &"crop", &"crops")
 		KIND_SHOP:
 			_register(path, data, &"shop", &"shops")
+		KIND_VILLAGER:
+			_register(path, data, &"villager", &"villagers")
 
 
 ## Registers every object in the array `data[key]`.
@@ -305,6 +318,17 @@ func _validate_references() -> void:
 	for shop: Dictionary in _collections[&"shops"].values():
 		for problem: String in Shop.problems(shop, item_of):
 			errors.append("%s: shop '%s': %s" % [shop["_source"], shop["id"], problem])
+	# Villagers: each can be used, and no two share a conversation (it is how one is known).
+	var friendship: Friendship = Friendship.new(get_rules(RULES_FRIENDSHIP))
+	var has_dialogue: Callable = func(id: String) -> bool: return _collections[&"dialogues"].has(StringName(id))
+	var spoken_for: Dictionary = {}
+	for villager: Dictionary in _collections[&"villagers"].values():
+		for problem: String in friendship.villager_problems(villager, item_of, has_dialogue):
+			errors.append("%s: villager '%s': %s" % [villager["_source"], villager["id"], problem])
+		var theirs: String = str(villager["dialogue"])
+		if spoken_for.has(theirs):
+			errors.append("%s: villager '%s' has the conversation '%s', which villager '%s' has already." % [villager["_source"], villager["id"], theirs, spoken_for[theirs]])
+		spoken_for[theirs] = villager["id"]
 	for item: Dictionary in _collections[&"items"].values():
 		var stats: Variant = item.get("stats", {})
 		if Crops.is_seed(item):
@@ -442,6 +466,12 @@ func _check_rules(rules: Dictionary) -> void:
 			problems = Farm.problems(rules)
 		RULES_SKILLS:
 			problems = Skills.problems(rules, EnergyRules.COSTS)
+		RULES_FRIENDSHIP:
+			var item_types: Array = []
+			for item: Dictionary in _collections[&"items"].values():
+				if not item_types.has(str(item["type"])):
+					item_types.append(str(item["type"]))
+			problems = Friendship.problems(rules, item_types)
 	for problem: String in problems:
 		errors.append("%s: rules '%s': %s" % [path, id, problem])
 

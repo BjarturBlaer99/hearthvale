@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://ui/item_menu.tscn" id="4_menu"]
 [ext_resource type="PackedScene" path="res://ui/pause_menu.tscn" id="5_pause"]
 [ext_resource type="PackedScene" path="res://ui/shop_menu.tscn" id="p3c_shop"]
+[ext_resource type="PackedScene" path="res://ui/gift_menu.tscn" id="p4c_gifts"]
 [ext_resource type="Script" path="res://ui/panel_frame.gd" id="90_frame"]
 [ext_resource type="Script" path="res://ui/energy_bar.gd" id="91_energy"]
 
@@ -132,6 +133,8 @@ horizontal_alignment = 1
 [node name="ItemMenu" parent="." instance=ExtResource("4_menu")]
 
 [node name="ShopMenu" parent="." instance=ExtResource("p3c_shop")]
+
+[node name="GiftMenu" parent="." instance=ExtResource("p4c_gifts")]
 
 [node name="Fade" type="ColorRect" parent="."]
 anchors_preset = 15

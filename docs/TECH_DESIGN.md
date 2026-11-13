@@ -956,3 +956,35 @@ P4b (`docs/progress/P4-plan.md` section 11). Three skills that rise with use and
 - **Tools:** `tools/playtest.gd` takes `skills=<level>`; `tools/capture.gd` has the actions `skill_up`,
   `skills_pause` and `cook_menu`.
 
+## 24. Friendship
+P4c (`docs/progress/P4-plan.md` section 12). Talking and gifts make friends of the seven villagers.
+- **The rules are data** (`data/rules/friendship.json`, in `docs/data/rules.schema.json`): `marks` (5),
+  `points_per_mark` (4), `talk` (1), `liked_gift` (3), `other_gift` (1), and `gift_types` (the item types that
+  can be given: `food` and `ingredient`).
+- **The villagers are data** (`data/villagers/<id>.json`, `docs/data/villager.schema.json`): `name`, `dialogue`
+  (the conversation that is theirs), `likes` (item ids) and `thanks` (what they say to a gift they `liked` and
+  to any `other`). A villager is known by their conversation, so no scene names one:
+  `AreaController.villager_of(talkable)` looks a `Villager` up by its `dialogue_id`. DataRegistry checks that
+  no two villagers share a conversation and that everything liked can be given.
+- **`Friendship`** (`core/friendship/`, pure) reads the rules: `marks_at()`, `after()`, `gift_points()`,
+  `is_giftable()`, `giftable_held()`, and the statics `likes()`, `villager_of()`, `thanks()`,
+  `with_gift_answer()`; `problems()` and `villager_problems()` for the load check. It keeps no points.
+- **`GameState`** holds `friends` (saved since version 4): villager id to `points`, `talked` and `gift` (the
+  days of the last talk and the last gift). `greet()` gives the day's first talk its point; `can_give()` and
+  `give_gift()` keep it to one gift a villager a day; `add_friendship()` stops at a full friendship and emits
+  `EventBus.friend_mark_gained(villager, marks)` when a mark is reached.
+- **Giving:**
+  - `AreaController.talk_to()` greets a villager, and if a gift can be given today and he carries one, opens
+    a copy of the conversation with the answer "I brought you something." added to the node it begins at
+    (`DialogueRunner.opening()`), before its last answer. The data in DataRegistry is never changed.
+  - The answer's effect is `gift` (a villager id): `GameState.request_gift()` emits
+    `EventBus.gift_requested`, and the area opens the list when the conversation closes, as it does a shop's.
+  - `GiftMenu` (`ui/gift_menu.gd`, on the HUD as `gift_menu`) lists `GameState.gifts_held()`; choosing one
+    gives it, emits `given`, and closes. The area shows the villager's words as a message. The clock and the
+    hero wait while it is open (`is_in_menu()`).
+- **Shown:** a mark gained is a notice at the top of the screen and the sound `friend`. The pause menu has
+  **Friends** (`FriendsPage`, `ui/friends_page.gd`): every villager by name with `FriendMarks`, a row of five
+  blossoms drawn in code like the hearts.
+- **Tools:** `tools/playtest.gd -- gifts` starts beside Pip with a pack of food; `tools/capture.gd` has the
+  actions `gift_talk`, `gift_list`, `gift_given` and `friends_page`.
+

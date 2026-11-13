@@ -63,6 +63,10 @@
           "properties": { "type": { "const": "sleep" } }
         },
         {
+          "properties": { "type": { "const": "gift" }, "villager": { "$ref": "#/$defs/id" } },
+          "required": ["villager"]
+        },
+        {
           "properties": { "type": { "const": "practise" }, "skill": { "type": "string", "minLength": 1 }, "deed": { "type": "string", "minLength": 1 } },
           "required": ["skill", "deed"]
         },

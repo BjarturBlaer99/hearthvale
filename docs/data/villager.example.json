@@ -1,0 +1,13 @@
+{
+  "id": "pip",
+  "name": "Pip",
+  "dialogue": "pip",
+  "likes": [
+    "wild_berries",
+    "pumpkin_pie"
+  ],
+  "thanks": {
+    "liked": "For me? This is the best thing ever!",
+    "other": "Thanks! Mum says to say thanks."
+  }
+}

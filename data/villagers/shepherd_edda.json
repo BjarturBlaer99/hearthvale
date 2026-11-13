@@ -1,0 +1,13 @@
+{
+  "id": "shepherd_edda",
+  "name": "Shepherd Edda",
+  "dialogue": "shepherd_edda",
+  "likes": [
+    "mushroom_soup",
+    "carrot"
+  ],
+  "thanks": {
+    "liked": "Just the thing on a cold hill. Bless you.",
+    "other": "That's kind. Thank you."
+  }
+}

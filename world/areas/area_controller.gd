@@ -146,6 +146,8 @@ var _hours: Hours
 ## The shop a conversation asked for ({ "shop": id, "mode": Shop.BUY or Shop.SELL }): its list
 ## opens when the conversation closes.
 var _shop_due: Dictionary = {}
+## The villager whose gift list a conversation asked for, until the conversation closes.
+var _gift_due: StringName = &""
 ## The tune this area last asked for.
 var _tune: StringName = &""
 ## Where the hero arrived in this area, facing which way: where they come back after falling.
@@ -215,6 +217,10 @@ func _ready() -> void:
 	hud.item_menu.closed.connect(_on_item_menu_closed)
 	hud.shop_menu.closed.connect(_on_item_menu_closed)
 	EventBus.shop_requested.connect(_on_shop_requested)
+	hud.gift_menu.closed.connect(_on_item_menu_closed)
+	hud.gift_menu.given.connect(_on_gift_given)
+	EventBus.gift_requested.connect(_on_gift_requested)
+	EventBus.friend_mark_gained.connect(_on_friend_mark_gained)
 	hud.pause_menu.quit_to_title.connect(_on_quit_to_title)
 	EventBus.hit_stop.connect(hit_stop)
 	EventBus.quest_announced.connect(_on_quest_announced)
@@ -491,8 +497,26 @@ func pick_up(pickup: ItemPickup) -> bool:
 
 
 ## Opens `talkable`'s conversation in the dialogue box; the hero stands still until it ends.
+## A villager is greeted (the first talk of a day is worth a little friendship), and where the
+## conversation begins it gains the answer that gives them a gift, if there is one to give
+## and none was given today (P4c).
 func talk_to(talkable: Talkable) -> bool:
-	return _open_conversation(talkable.dialogue(), "%s's" % talkable.name)
+	var data: Dictionary = talkable.dialogue()
+	var villager: Dictionary = villager_of(talkable)
+	if not villager.is_empty() and not data.is_empty():
+		var who: StringName = StringName(str(villager["id"]))
+		GameState.greet(who)
+		if GameState.can_give(who) and not GameState.gifts_held().is_empty():
+			data = Friendship.with_gift_answer(data, str(DialogueRunner.new(data, GameState).opening()), String(who))
+	return _open_conversation(data, "%s's" % talkable.name)
+
+
+## The villager `talkable` is (a data entry: the one whose conversation it has), or {} for a
+## sign, the bed, the hearth, or anyone the data doesn't name.
+func villager_of(talkable: Talkable) -> Dictionary:
+	if not (talkable is Villager):
+		return {}
+	return Friendship.villager_of(DataRegistry.entries(&"villagers"), String(talkable.dialogue_id))
 
 
 ## Opens conversation `dialogue_id` (data/dialogue) in the dialogue box; the hero stands still
@@ -615,7 +639,7 @@ func open_item_menu() -> bool:
 
 
 func is_in_menu() -> bool:
-	return hud.item_menu.is_open() or hud.shop_menu.is_open()
+	return hud.item_menu.is_open() or hud.shop_menu.is_open() or hud.gift_menu.is_open()
 
 
 ## Opens a shop's buy-and-sell list on `mode` (Shop.BUY or Shop.SELL; GDD §9). The hero stands
@@ -632,6 +656,34 @@ func open_shop(shop_id: StringName, mode: StringName) -> bool:
 
 func _on_shop_requested(shop_id: StringName, mode: StringName) -> void:
 	_shop_due = {"shop": shop_id, "mode": mode}
+
+
+## Opens the list of what the hero can give `villager_id` (P4c, GDD §10). He stands still while
+## it is open, and the clock with him. Returns whether it opened.
+func open_gifts(villager_id: StringName) -> bool:
+	var villager: Dictionary = DataRegistry.get_villager(villager_id)
+	if villager.is_empty() or _busy():
+		return false
+	player.controls_enabled = false
+	hud.set_prompt("")
+	hud.gift_menu.open(villager)
+	return true
+
+
+func _on_gift_requested(villager_id: StringName) -> void:
+	_gift_due = villager_id
+
+
+## A gift was given: the villager says their words.
+func _on_gift_given(villager_id: StringName, _item_id: StringName, liked: bool) -> void:
+	EventBus.sound.emit(&"item_get" if liked else &"menu_select")
+	hud.show_message(Friendship.thanks(DataRegistry.get_villager(villager_id), liked))
+
+
+## A friendship reached another mark: it is said at the top of the screen, with a chime.
+func _on_friend_mark_gained(villager_id: StringName, marks: int) -> void:
+	EventBus.sound.emit(&"friend")
+	hud.show_notice(GameState.friendship().mark_words(str(DataRegistry.get_villager(villager_id).get("name", villager_id)), marks))
 
 
 ## "Item: Bow (Arrows x10)" for the HUD.
@@ -1316,6 +1368,11 @@ func _on_dialogue_closed() -> void:
 		var due: Dictionary = _shop_due
 		_shop_due = {}
 		open_shop(due["shop"], due["mode"])
+	elif _gift_due != &"":
+		# ...or for the list of what he can give: the same.
+		var who: StringName = _gift_due
+		_gift_due = &""
+		open_gifts(who)
 
 
 ## Leaves for the ending screen (the game's last conversation just closed). The hero's place

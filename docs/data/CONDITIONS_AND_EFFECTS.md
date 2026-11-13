@@ -24,6 +24,7 @@ effects (`complete_quest` only means something in a quest stage's `on_enter`, wh
 | `set_quest_stage` | `quest`, `stage` |
 | `complete_quest` | — (the quest whose stage it's in; finishes it) |
 | `sleep` | — (the hero sleeps until morning: the next day begins, hearts and energy are full; the area saves the game) |
+| `gift` | `villager` (a villager id from `data/villagers`). The list of what the hero can give them opens when the conversation is over. The game adds an answer with this effect to a villager's conversation by itself; a file needs it only for something out of the ordinary |
 | `practise` | `skill`, `deed` (a skill and one of its deeds in `data/rules/skills.json`, e.g. `cooking` and `dish`). The skill gains that deed's points |
 | `shop` | `shop` (a shop id from `data/shops`), `mode` (`buy` or `sell`: the list it opens on). The shop's buy-and-sell list opens when the conversation is over |
 

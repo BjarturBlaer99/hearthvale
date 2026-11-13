@@ -31,6 +31,17 @@ const KEYS: String = "keys"
 ## A scenario's "flags" came true long ago (no day is kept for them); its "today" flags came
 ## true this very day, for what waits a day on them (the crypt's bars).
 const SCENARIOS: Dictionary = {
+	# In Hearthvale beside Pip, with a pack of things to give: something each villager likes and
+	# plenty they don't. Elder Bram, Wenna and Tilda are indoors; Oda and Rolf stand in the
+	# village; Edda is in the North Fields. One gift a villager a day: the bed at home ends one.
+	"gifts": {
+		"area": &"village",
+		"cell": Vector2i(27, 26),
+		"items": [[&"wooden_sword", 1], [&"wild_berries", 5], [&"bread", 3], [&"pumpkin_pie", 2], [&"vegetable_stew", 1],
+			[&"blossom_tea", 2], [&"cherry_blossom", 4], [&"mushroom_soup", 2], [&"carrot", 3], [&"wheat", 3], [&"pumpkin", 1],
+			[&"turnip", 4]],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"planted_first_crop"],
+	},
 	# In Elder Bram's house with the tools taken and a first seed counted as planted: his quest
 	# opens. The promise takes the chain off the keep's gate.
 	"bram": {

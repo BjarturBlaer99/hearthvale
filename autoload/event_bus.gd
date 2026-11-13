@@ -64,3 +64,11 @@ signal shop_requested(shop_id: StringName, mode: StringName)
 
 ## One of the hero's skills rose to `level` (P4b; Skills): said once, as it happens.
 signal skill_rose(skill: StringName, level: int)
+
+## The hero's friendship with `villager` reached another mark (P4c; Friendship): said once.
+signal friend_mark_gained(villager: StringName, marks: int)
+
+## A conversation asks for the list of what the hero can give `villager` (the `gift` effect):
+## whoever runs the area opens it when the conversation is over.
+signal gift_requested(villager: StringName)
+

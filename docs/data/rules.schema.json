@@ -2,11 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "rules.schema.json",
   "title": "Rules file (data/rules/<id>.json, one set of rules per file)",
-  "description": "The numbers a system runs on, so tuning needs no code (GDD §6). The file's id says which rules it holds. Known ids: 'time' (the day's clock, read by DayClock), 'energy' (the hero's energy, read by EnergyRules), 'hours' (when places are open and villagers are out, read by Hours), 'night' (what the night does to monsters, read by NightRules), 'farm' (the hero's plot, read by Farm) and 'skills' (the hero's skills, read by Skills).",
+  "description": "The numbers a system runs on, so tuning needs no code (GDD §6). The file's id says which rules it holds. Known ids: 'time' (the day's clock, read by DayClock), 'energy' (the hero's energy, read by EnergyRules), 'hours' (when places are open and villagers are out, read by Hours), 'night' (what the night does to monsters, read by NightRules), 'farm' (the hero's plot, read by Farm), 'skills' (the hero's skills, read by Skills) and 'friendship' (what talk and gifts are worth, read by Friendship).",
   "type": "object",
   "required": ["id"],
   "properties": {
-    "id": { "enum": ["time", "energy", "hours", "night", "farm", "skills"], "description": "Which rules these are." }
+    "id": { "enum": ["time", "energy", "hours", "night", "farm", "skills", "friendship"], "description": "Which rules these are." }
   },
   "allOf": [
     {
@@ -167,9 +167,27 @@
           }
         }
       }
+    },
+    {
+      "if": { "properties": { "id": { "const": "friendship" } } },
+      "then": {
+        "required": ["marks", "points_per_mark", "talk", "liked_gift", "other_gift", "gift_types"],
+        "properties": {
+          "marks": { "type": "integer", "minimum": 1, "description": "How many marks a full friendship is." },
+          "points_per_mark": { "type": "integer", "minimum": 1, "description": "The points that make one mark." },
+          "talk": { "type": "integer", "minimum": 0, "description": "The points for the first talk with a villager in a day." },
+          "liked_gift": { "type": "integer", "minimum": 0, "description": "The points for a gift the villager likes. At least other_gift." },
+          "other_gift": { "type": "integer", "minimum": 0, "description": "The points for any other gift." },
+          "gift_types": {
+            "type": "array", "minItems": 1,
+            "items": { "type": "string" },
+            "description": "The item types that can be given (types that items in data/items have)."
+          }
+        }
+      }
     }
   ],
-  "$comment": "One entry of allOf for each id: time, energy, hours, night, farm, skills.",
+  "$comment": "One entry of allOf for each id: time, energy, hours, night, farm, skills, friendship.",
   "$defs": {
     "time_of_day": { "type": "string", "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$", "description": "A time on a 24-hour clock, like \"06:00\"." },
     "span": {

@@ -326,7 +326,8 @@ func test_a_game_saved_before_the_gates_is_past_them() -> void:
 	var house: AreaController = _load(ELDER_HOUSE)
 	Steps.stand_before(house, "Bram")
 	house.interact()
-	assert_array(Array(house.hud.dialogue.shown_options())).is_equal(["What lights?", "Goodbye."])
+	# (He carries turnips and bread, so there is something to give: P4c.)
+	assert_array(Array(house.hud.dialogue.shown_options())).is_equal(["What lights?", Friendship.GIVE_WORDS, "Goodbye."])
 	_say(house, "Goodbye.")
 	# Had the Warden fallen in that save, the bars would be up and the quest in the crypt.
 	var fallen: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(OLD_SAVE))

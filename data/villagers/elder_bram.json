@@ -1,0 +1,13 @@
+{
+  "id": "elder_bram",
+  "name": "Elder Bram",
+  "dialogue": "elder_bram",
+  "likes": [
+    "vegetable_stew",
+    "blossom_tea"
+  ],
+  "thanks": {
+    "liked": "Ah, my favourite. You spoil an old man.",
+    "other": "Kind of you. Thank you."
+  }
+}

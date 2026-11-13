@@ -17,8 +17,8 @@ energy, food and time, **P3** farming, **P4** RPG and story. Do not build anythi
 ask the user before adding anything the roadmap doesn't list. Scope creep is the main risk on this project.
 **P1, P2 and P3 are built** (P3 finished on 2026-11-13). **P4 is under way:** the user approved its proposal as
 written on 2026-11-13 (`docs/progress/P4-plan.md`: ten decisions, four steps, each with its own list). **4a
-(the story over days) and 4b (skills) are built;** 4c (friendship and gifts) and 4d (side quests, recipes, the
-ending) follow, each started by the user.
+(the story over days), 4b (skills) and 4c (friendship and gifts) are built;** 4d (side quests, recipes, the
+ending) is the last, started by the user.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -101,7 +101,7 @@ godot --headless --path . --quit-after 30
 godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
-# Start partway through to try one part by hand (scenarios in the script: bram, gate, rest, farm, market, kitchen, home, village,
+# Start partway through to try one part by hand (scenarios in the script: gifts, bram, gate, rest, farm, market, kitchen, home, village,
 # warden, crypt, shade, ending). An hour after the name starts at that time of day, energy=<n> with that much energy,
 # and skills=<level> with every skill at that level.
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
@@ -264,4 +264,12 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   dish (anything a recipe makes) gives a better cook more. A skill changes energy only: never hearts, damage,
   speed or timing. Cooking is counted by the effect `practise`, which the hearth's conversation gives each
   dish. **A test that tills ten cells, or beats ten monsters, has raised a level:** work is cheaper after it.
+- **Friendship (P4c):** the numbers are in `data/rules/friendship.json`, read by `Friendship`
+  (`core/friendship/`, pure); a villager is a file in `data/villagers/` naming their conversation, what they
+  like and their words of thanks, so **a new villager to befriend is data only** (and a `Villager` node with
+  that conversation). `GameState.friends` holds the points and the days of the last talk and gift: go through
+  `greet()`, `give_gift()` and `add_friendship()`. The answer "I brought you something." is added by
+  `AreaController.talk_to()` to a copy of the conversation: **never write it into a dialogue file.** It shows
+  only when a gift can be given today and he carries food or an ingredient, so **a test that lists a
+  villager's answers with food in the pack sees it.** The pause menu has six lines now (Friends).
 

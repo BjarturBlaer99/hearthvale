@@ -33,6 +33,7 @@ var _flash_time: float = FLASH_TIME
 @onready var dialogue: DialogueBox = $DialogueBox
 @onready var item_menu: ItemMenu = $ItemMenu
 @onready var shop_menu: ShopMenu = $ShopMenu
+@onready var gift_menu: GiftMenu = $GiftMenu
 @onready var pause_menu: PauseMenu = $PauseMenu
 @onready var _hint: Label = $Hint
 @onready var _hint_panel: ColorRect = $HintPanel

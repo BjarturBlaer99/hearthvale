@@ -58,6 +58,7 @@ var arrival_notice: String = ""
 var _day_clock: DayClock
 var _energy_rules: EnergyRules
 var _skills: Skills
+var _friendship: Friendship
 ## The hero's plot (P3): made from the farm's rules when first asked for. Saved.
 var _farm: Farm
 ## Where the hero is: { "area", "cell": [x, y] }, or { "area", "entry" } on the way into an
@@ -227,6 +228,83 @@ func practise(skill: StringName, deed: StringName) -> int:
 	if after > before:
 		EventBus.skill_rose.emit(skill, after)
 	return points
+
+
+# --- Friends ---------------------------------------------------------------
+
+## The rules of friendship, from data (data/rules/friendship.json).
+func friendship() -> Friendship:
+	if _friendship == null:
+		_friendship = Friendship.new(DataRegistry.get_rules(DataRegistry.RULES_FRIENDSHIP))
+	return _friendship
+
+
+## The hero's friendship with `villager` (a villager id), in points and in marks.
+func friend_points(villager: StringName) -> int:
+	return int((friends.get(villager, {}) as Dictionary).get("points", 0))
+
+
+func friend_marks(villager: StringName) -> int:
+	return friendship().marks_at(friend_points(villager))
+
+
+## The hero talks to `villager`: the first time in a day is worth a little friendship. Returns
+## the points gained (0 for a second talk that day, or someone who is no villager).
+func greet(villager: StringName) -> int:
+	if DataRegistry.get_villager(villager).is_empty() or Friendship.talked_on(friends.get(villager, {}), day):
+		return 0
+	_friend(villager)["talked"] = day
+	return add_friendship(villager, friendship().talk)
+
+
+## Whether `villager` can be given something today: one gift a villager a day.
+func can_give(villager: StringName) -> bool:
+	return not DataRegistry.get_villager(villager).is_empty() and not Friendship.given_on(friends.get(villager, {}), day)
+
+
+## What the hero carries that can be given (item data entries), in the order it was picked up.
+func gifts_held() -> Array[Dictionary]:
+	return friendship().giftable_held(inventory, DataRegistry.entries(&"items"))
+
+
+## Gives `villager` one `item_id`: it leaves the pack, and the friendship grows, more if they
+## like it. Returns { "liked", "points" }, or {} if nothing was given: no such villager, a
+## gift already given today, none of that item, or a thing that can't be given.
+func give_gift(villager: StringName, item_id: StringName) -> Dictionary:
+	var who: Dictionary = DataRegistry.get_villager(villager)
+	if not can_give(villager) or item_count(item_id) <= 0 or not friendship().is_giftable(DataRegistry.get_item(item_id)):
+		return {}
+	add_item(item_id, -1)
+	_friend(villager)["gift"] = day
+	var liked: bool = Friendship.likes(who, String(item_id))
+	return {"liked": liked, "points": add_friendship(villager, friendship().gift_points(liked))}
+
+
+## Adds `points` to the friendship with `villager`, up to a full one. A mark gained is said
+## (EventBus.friend_mark_gained). Returns the points added.
+func add_friendship(villager: StringName, points: int) -> int:
+	if DataRegistry.get_villager(villager).is_empty():
+		return 0
+	var friend: Dictionary = _friend(villager)
+	var before: int = int(friend["points"])
+	var after: int = friendship().after(before, points)
+	friend["points"] = after
+	if friendship().marks_at(after) > friendship().marks_at(before):
+		EventBus.friend_mark_gained.emit(villager, friendship().marks_at(after))
+	return after - before
+
+
+## A conversation asks for the list of what can be given `villager` (the `gift` effect):
+## whoever runs the area opens it.
+func request_gift(villager: StringName) -> void:
+	EventBus.gift_requested.emit(villager)
+
+
+## The record of the friendship with `villager`, made if there is none yet.
+func _friend(villager: StringName) -> Dictionary:
+	if not friends.has(villager):
+		friends[villager] = {"points": 0, "talked": 0, "gift": 0}
+	return friends[villager]
 
 
 # --- Time ------------------------------------------------------------------

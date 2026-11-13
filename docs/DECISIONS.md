@@ -517,6 +517,31 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-13 — **P4c: a villager is known by their conversation.** Their data names it, and the area looks a
+  `Villager` up by the conversation it has. No scene was touched and no node got a new property. Two villagers
+  may not share one, which the load check refuses.
+- 2026-11-13 — **P4c: the answer that gives is added to a copy of the conversation** as it opens, at the node
+  it begins at, before its last answer. The plan asked for no conversation file to change, and the data in the
+  registry is never changed either. It is not offered where the conversation goes on to.
+- 2026-11-13 — **P4c: the answer shows only when it would do something:** a gift can still be given that day
+  and he carries one. An answer that led to "you have nothing to give" would be a line of noise in every
+  conversation of the game.
+- 2026-11-13 — **P4c: food and ingredients can be given.** The plan says "food and crops"; crops are food
+  already, and Wenna likes cherry blossoms, which are an ingredient. The types are data.
+- 2026-11-13 — **P4c: the gift list is a list of its own, in the shape of Tilda's.** Her list is two tabs, a
+  purse and a deal that stays open; a gift is one choice and done. They share the frame, the cursor and the
+  scrolling, not the script.
+- 2026-11-13 — **P4c: a gift at a full friendship is still taken.** The villager thanks him and nothing more
+  is gained. Refusing it would need words of its own for a case few will meet.
+- 2026-11-13 — **P4c: what a villager says to a gift is in their data,** two lines each: one for a gift they
+  like and one for any other. The words tell the player which it was; the Friends page does not list likes.
+- 2026-11-13 — **P4c: the Friends page shows all seven from the start,** unmet ones with no marks. It tells a
+  new player who there is to meet. — Alternative: only those he has spoken to.
+- 2026-11-13 — **P4c: marks are blossoms drawn in code,** as the hearts are, pink in bloom and dark in bud.
+  Hearts are life in this game, so friendship has a picture of its own.
+- 2026-11-13 — **P4c: the condition "so many marks" and the effect "add friendship" wait for 4d.** The plan
+  lists them among P4's new conditions and effects; only the side quests and recipes would use them, and their
+  shape is better chosen with that content in hand.
 - 2026-11-13 — **P4b: a dish is anything a recipe makes, and the cook's level counts when it is eaten.** A
   dish does not remember who made it, so Tilda's bread, which is the bread the hearth bakes, is richer for a
   good cook too. — Alternative: marking each dish as his own, which would need items that differ one from

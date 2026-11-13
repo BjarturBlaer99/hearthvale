@@ -288,3 +288,50 @@ anything but food and crops, more than one gift a day, a calendar or seasons, cr
 - Skills changing damage, speed or anything but energy.
 - Friendship (4c); side quests, recipes and the ending's lines (4d).
 
+## 12. Step 4c — Friendship and gifts
+
+### What changes
+- **The seven villagers are data** (`data/villagers/<id>.json`, a new kind with a schema): a name, the
+  conversation that is theirs, the gifts they like (section 5's table), and what they say to a gift they like
+  and to any other. Nothing in a scene changes: the game knows who is spoken to by the conversation.
+- **Friendship is twenty points a villager, a mark for every four** (five marks). The numbers are data
+  (`data/rules/friendship.json`), read by a new pure `Friendship` (`core/friendship/`).
+  - Talking to a villager for the first time in a day: 1 point.
+  - A gift: 3 points if they like it, 1 for any other. One gift a villager a day.
+- **What can be given:** food and what is cooked with (so cherry blossoms can be). Not tools, seeds, coins or
+  anything else.
+- **Giving:** a villager's conversation gains the answer "I brought you something." where it begins, when he
+  has not given them anything that day and carries something that can be given. It is added by the game: no
+  conversation file changes. Choosing it opens a list of what he carries, in the shape of Tilda's list; he
+  picks one thing, the villager says their words, and the list closes.
+- **A mark gained is said once,** at the top of the screen, with a chime of its own (a new sound).
+- **A "Friends" page in the pause menu,** beside "Quests": every villager and their marks, drawn as five small
+  blossoms, and a line that says how friendship grows.
+- **A new effect, `gift`** (a villager), which opens the list when the conversation is over, as `shop` does.
+- **Tools:** a playtest scenario by Pip with a pack of food (`-- gifts`); new screenshots.
+
+### What does not change
+- The villagers' conversations as files, where they stand, and their hours: those who stand outdoors are
+  away from 20:00 to 06:00, so there is no talk and no gift then.
+- The save format: friendship has had its place since version 4 (step 4a). A game saved before this step
+  has no friends yet.
+- What a gift is worth to the hero if he eats it instead: food is food.
+
+### Done when
+- [x] the villagers and the numbers are data, checked on load, with schemas; `Friendship` is unit-tested:
+      marks, what a talk and a gift give, what can be given
+- [x] the first talk of a day gives a point, and a second that day gives none
+- [x] a liked gift gives three points and another gives one; a second gift that day can't be given
+- [x] the answer shows only when there is something to give and nothing was given that day; no conversation
+      file is changed for it
+- [x] a mark gained is said once, with a chime; the Friends page shows every villager's marks
+- [x] friendship goes through a save, and a version 3 save has none
+- [x] all earlier tests pass
+- [ ] (yours) giving feels worth the food, and the marks come at a pace that feels right
+
+### Not in this step
+- What friendship opens: the side quests, the recipes and the presents are step 4d. So are the condition
+  that asks for so many marks and the effect that adds friendship, which only they would use.
+- Birthdays, villagers who walk about, gifts of anything but food, more than one gift a day (section 9).
+- Showing on the Friends page what each villager likes: it is found by giving.
+

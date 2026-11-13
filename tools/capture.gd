@@ -25,7 +25,10 @@ extends SceneTree
 ## has begun before every shot, so its notice is not in each of them, except "begin": a game's
 ## first moment, with the notice. "skill_up" tills the cell that raises the hero's farming;
 ## "skills_pause" opens the pause menu with skills at different levels; "cook_menu" opens the
-## item menu of a hero at the top level of cooking, with dishes and plain food.
+## item menu of a hero at the top level of cooking, with dishes and plain food. With food in
+## his pack before Pip: "gift_talk" shows the answer that gives, "gift_list" the list it
+## opens, and "gift_given" a gift Pip likes, which makes a first mark. "friends_page" opens the
+## pause menu's Friends page with friendships at different marks.
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -158,6 +161,10 @@ const SHOTS: Array = [
 	["129_a_skill_rises", &"village", Vector2i(14, 19), Vector2.RIGHT, 0, "skill_up"],
 	["130_skills_in_the_pause_menu", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "skills_pause"],
 	["131_a_good_cooks_dishes", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "cook_menu"],
+	["132_something_to_give", &"village", Vector2i(27, 25), Vector2.UP, 0, "gift_talk"],
+	["133_the_gift_list", &"village", Vector2i(27, 25), Vector2.UP, 0, "gift_list"],
+	["134_a_gift_pip_likes", &"village", Vector2i(27, 25), Vector2.UP, 0, "gift_given"],
+	["135_the_friends_page", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "friends_page"],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -281,6 +288,14 @@ func _capture() -> void:
 			for item: Array in [[&"vegetable_stew", 1], [&"roast_turnip", 2], [&"bread", 2], [&"turnip", 3], [&"wild_berries", 4]]:
 				game_state.call(&"add_item", item[0], item[1])
 			game_state.call(&"set_energy", 30.0)
+		if shot[5] in ["gift_talk", "gift_list", "gift_given"]:
+			for item: Array in [[&"wild_berries", 4], [&"bread", 2], [&"cherry_blossom", 3], [&"turnip", 2], [&"pumpkin_pie", 1], [&"carrot", 2]]:
+				game_state.call(&"add_item", item[0], item[1])
+		if shot[5] == "friends_page":
+			# Friendships at every stage: none, a first point, and so on up to a full one.
+			var points: Dictionary = {&"elder_bram": 9, &"farmer_oda": 4, &"guard_rolf": 1, &"pip": 20, &"tilda": 13, &"wenna": 17}
+			for villager: StringName in points:
+				game_state.call(&"add_friendship", villager, points[villager])
 		if shot[5] in ["farm", "hoe", "tools_menu", "fill"]:
 			# The farm's tools in hand, the can half full; and for "farm" a morning's work done:
 			# two rows tilled, the first of them watered.
@@ -296,8 +311,16 @@ func _capture() -> void:
 			# An hour after closing: the hero tries the shop's door.
 			game_state.call(&"set_time", float(clock.call(&"in_day", "19:00")))
 			scene.call(&"interact")
-		if shot[5] in ["talk", "accept", "tale", "lantern_talk", "cook", "lights", "try"]:
+		if shot[5] in ["talk", "accept", "tale", "lantern_talk", "cook", "lights", "try", "gift_talk", "gift_list", "gift_given"]:
 			scene.call(&"interact")
+		if shot[5] in ["gift_talk", "gift_list", "gift_given"]:
+			# The answer that gives is the second of Pip's three.
+			scene.get(&"hud").get(&"dialogue").call(&"move_cursor", 1)
+			if shot[5] != "gift_talk":
+				scene.get(&"hud").get(&"dialogue").call(&"confirm")
+			if shot[5] == "gift_given":
+				# Berries, which he likes: with the day's first talk that is a first mark.
+				scene.get(&"hud").get(&"gift_menu").call(&"confirm")
 		if shot[5] == "sleep":
 			# A night in bed, on a slot of its own, caught as the morning's words show.
 			var saves: Node = root.get_node("SaveSystem")
@@ -395,6 +418,10 @@ func _capture() -> void:
 			scene.call(&"open_pause_menu")
 			scene.get(&"hud").get(&"pause_menu").call(&"choose", &"quests")
 			scene.get(&"hud").get(&"pause_menu").get(&"quest_log").call(&"move_cursor", 1)
+			await _frames(2)
+		elif shot[5] == "friends_page":
+			scene.call(&"open_pause_menu")
+			scene.get(&"hud").get(&"pause_menu").call(&"choose", &"friends")
 			await _frames(2)
 		elif shot[5] == "story_log":
 			scene.call(&"open_pause_menu")

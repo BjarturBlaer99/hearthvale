@@ -15,7 +15,7 @@ const SFX: Array[String] = [
 	"secret", "arrow", "bomb_set", "bomb", "crystal", "push", "plate", "clink", "stomp", "gaze", "stun",
 	"boss_die", "menu_move", "menu_select", "pause", "nope", "cut", "pot", "quest",
 	"torch", "snuff", "fall", "sink", "whiff", "eat", "morning", "collapse",
-	"hoe", "pour", "fill", "plant", "harvest", "skill",
+	"hoe", "pour", "fill", "plant", "harvest", "skill", "friend",
 ]
 
 ## Each song: tempo, bars (4/4; every track must last bars x 8 eighths), and its tracks.
@@ -183,6 +183,9 @@ static func effect(id: String) -> PackedFloat32Array:
 			return Synth.mix(crack, Synth.tone(&"noise", 7000, 5000, 0.05, 0.2, 0.001, 0.04, 0.5, 25), 0.09)
 		"quest":
 			return Synth.join([_note("E5", 0.08), _note("A5", 0.08), _note("C#6", 0.22, 0.16)])
+		"friend":
+			# A friendship grows: two soft steps up and a held note, lower and rounder than a skill's.
+			return Synth.join([Synth.tone(&"sine", 392.0, 392.0, 0.09, 0.26, 0.01, 0.04), Synth.tone(&"sine", 494.0, 494.0, 0.09, 0.26, 0.01, 0.04), Synth.tone(&"sine", 587.0, 587.0, 0.30, 0.28, 0.01, 0.22)])
 		"skill":
 			# A skill rises: three quick steps up a chord and its top note held.
 			return Synth.join([_note("C5", 0.06), _note("E5", 0.06), _note("G5", 0.06), _note("C6", 0.26, 0.18)])

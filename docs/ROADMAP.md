@@ -234,7 +234,8 @@ The proposal (`docs/progress/P4-plan.md`) was approved as written on 2026-11-13.
   first crop, the keep's gate chained until then, the crypt open the morning after the keep. Save version 4.
 - **4b — Skills.** *Built 2026-11-13.* Combat, farming and cooking rise with use and make their work cheaper
   (cooking: dishes richer). Shown in the pause menu.
-- **4c — Friendship and gifts.**
+- **4c — Friendship and gifts.** *Built 2026-11-13.* Villagers as data, a point for the day's first talk,
+  one gift a villager a day, five marks, and a Friends page in the pause menu.
 - **4d — Side quests, recipes and the ending.**
 
 ---

@@ -1,0 +1,13 @@
+{
+  "id": "tilda",
+  "name": "Tilda",
+  "dialogue": "shop_tilda",
+  "likes": [
+    "pumpkin_pie",
+    "wheat"
+  ],
+  "thanks": {
+    "liked": "Now that I can't get at any price. Thank you!",
+    "other": "A gift, for a shopkeeper? Thank you."
+  }
+}

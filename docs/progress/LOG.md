@@ -1772,3 +1772,46 @@ Plan: `docs/progress/P4-plan.md`, section 11 (the second of P4's four steps).
 - **Watering and planting give no points:** the plan names tilling and picking only.
 - **A dish's energy is shown rounded** ("+24 energy" for 24.2); the bar takes the exact number.
 
+## 2026-11-13 — P4c: friendship and gifts (built; not yet tried in play)
+
+Plan: `docs/progress/P4-plan.md`, section 12 (the third of P4's four steps).
+
+**Built**
+- **The seven villagers are data** (`data/villagers/<id>.json`, a new kind with a schema): a name, the conversation that is theirs, what they like, and what they say to a gift they like and to any other. No scene changed: the game knows who is spoken to by the conversation.
+- **Friendship is twenty points a villager, a mark for every four,** with the numbers in data (`data/rules/friendship.json`; `Friendship` in `core/friendship/`, pure):
+  - the first talk of a day: 1 point
+  - a gift they like: 3 points; any other: 1
+  - one gift a villager a day
+- **What can be given:** food and what is cooked with (cherry blossoms). Not tools, seeds, coins, keys or anything else.
+- **Giving:** where a villager's conversation begins it gains the answer "I brought you something.", when a gift can still be given that day and he carries one. It opens a list of what he carries ("A gift for Pip"); he picks one thing, it is given, the villager says their words, and the list closes. No conversation file was changed.
+- **What each villager likes** is the plan's table: Elder Bram stew and tea, Wenna blossoms and tea, Tilda pumpkin pie and wheat, Farmer Oda bread and pumpkin, Pip berries and pumpkin pie, Guard Rolf bread and mushroom soup, Shepherd Edda mushroom soup and carrots.
+- **A mark gained is said once,** at the top of the screen ("Pip: friendship 1 of 5."), with a chime of its own (a new sound, `friend`).
+- **A "Friends" page in the pause menu,** beside "Quests": every villager by name with five small blossoms, in bloom for each mark, and the line "Talk to them each day, and bring a gift they like."
+- **A new effect, `gift`** (a villager): it opens the list when the conversation is over, as `shop` does.
+- **Tools:** a playtest scenario beside Pip with a pack of food (`-- gifts`); four new screenshots (135 in all).
+
+**Checked**
+- 638 tests in 87 suites pass (+27: `tests/core/friendship/friendship_test.gd`, `tests/autoload/friends_state_test.gd`, `tests/world/friends_test.gd`). Import and boot clean.
+- **The plan's numbers:** a talk 1 point, once a day for each villager; a liked gift 3 and another 1; a second gift the same day is not given and stays in the pack; four points a mark, five marks, twenty points and no more.
+- **The answer is there only when it would do something:** not with only tools, seeds and coins in the pack, not after that day's gift, not at the hearth or a sign; and only where the conversation begins.
+- **No conversation file is changed:** Pip's data in the registry is compared before and after.
+- **It works where conversations differ:** Elder Bram's welcome to a newcomer (another opening), Tilda's four answers (it scrolls, and her own list still opens).
+- **A mark is said once:** one notice and one chime; a full friendship gains nothing more, though a gift is still taken.
+- **The clock and the hero wait** while the list is open; leaving it gives nothing and keeps the day's gift.
+- **Saves:** friendship goes through a save (still version 4), with the days of the last talk and gift; a real version 3 save has no friends.
+- **Three older tests failed first:** two counted the pause menu's lines (six now), and one listed Elder Bram's answers for a hero who carries turnips and bread.
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: every talk worth a point, any number of gifts a day, any gift worth as much as a liked one, the answer that gives always there, a hoe that can be given.
+- **Frame cost:** draw calls as before (the village 313, Elder Bram's house 45, the keep 382, the cistern 231).
+- Screenshots: all 135 taken. Looked at closely: the answer in Pip's conversation, the list, a gift he likes with the mark's notice, the Friends page.
+
+**Known issues and limits**
+- Not tried in play. **Whether the marks come at a pace that feels right** is for a playtest: with a liked gift and a talk every day a mark takes a day; by talk alone four days. Both numbers are data.
+- **Friendship opens nothing yet.** The side quests, the recipes and the presents are step 4d, and so are the condition and the effect that would let data ask for marks or give friendship.
+- **Nothing in the game says what a villager likes** before the first gift: their words on receiving one are the only sign. The Friends page lists marks, not likes.
+- **The Friends page shows all seven from the start,** including those not yet met.
+- **A gift at a full friendship is still taken,** for no gain.
+- **Villagers who stand outdoors are away from 20:00 to 06:00,** as before: Oda, Pip, Rolf and Edda can't be talked to or given anything then. Bram and Wenna are indoors at all hours; Tilda's door is shut after 18:00.
+- **The gift list is its own script,** in the shape of Tilda's, not her list reused: hers is two tabs, a purse and many deals.
+- **The pause menu's list is full** at six lines. Its note sits five pixels lower to leave a gap under them.
+- **A mark and a quest's news share the line at the top,** so the later of two at once is the one shown.
+

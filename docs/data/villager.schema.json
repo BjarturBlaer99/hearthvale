@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "villager.schema.json",
+  "title": "Villager file (data/villagers/<id>.json, one villager per file)",
+  "description": "A villager the hero can befriend (GDD \u00a710, TECH_DESIGN \u00a724): who they are, which conversation is theirs, what they like to be given, and what they say to a gift. A villager is known by their conversation: a Villager node with that dialogue_id is this villager, so no two villagers may share one. What talk and gifts are worth is in data/rules/friendship.json.",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "dialogue",
+    "likes",
+    "thanks"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "As the Friends page and their words of thanks name them: \"Farmer Oda\"."
+    },
+    "dialogue": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The id of their conversation in data/dialogue."
+    },
+    "likes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Item ids they like to be given. Each must be an item that can be given (a type in the friendship rules' gift_types). May be empty."
+    },
+    "thanks": {
+      "type": "object",
+      "required": [
+        "liked",
+        "other"
+      ],
+      "description": "What they say to a gift, shown after their name.",
+      "properties": {
+        "liked": {
+          "type": "string",
+          "minLength": 1,
+          "description": "To a gift they like."
+        },
+        "other": {
+          "type": "string",
+          "minLength": 1,
+          "description": "To any other gift."
+        }
+      }
+    }
+  }
+}

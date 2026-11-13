@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://ui/pause_menu.gd" id="1_pause"]
 [ext_resource type="PackedScene" path="res://ui/settings_menu.tscn" id="2_settings"]
 [ext_resource type="PackedScene" path="res://ui/quest_log.tscn" id="3_quests"]
+[ext_resource type="PackedScene" path="res://ui/friends_page.tscn" id="p4c_friends"]
 [ext_resource type="Script" path="res://ui/panel_frame.gd" id="90_frame"]
 
 [node name="PauseMenu" type="Control"]
@@ -88,9 +89,9 @@ text = "> Resume"
 [node name="Note" type="Label" parent="Panel"]
 layout_mode = 0
 offset_left = 10.0
-offset_top = 155.0
+offset_top = 160.0
 offset_right = 210.0
-offset_bottom = 185.0
+offset_bottom = 186.0
 theme_override_colors/font_color = Color(0.95, 0.75, 0.55, 1)
 theme_override_font_sizes/font_size = 8
 autowrap_mode = 3
@@ -109,4 +110,7 @@ text = "Click: choose   Esc: resume"
 layout_mode = 1
 
 [node name="QuestLog" parent="." instance=ExtResource("3_quests")]
+layout_mode = 1
+
+[node name="FriendsPage" parent="." instance=ExtResource("p4c_friends")]
 layout_mode = 1

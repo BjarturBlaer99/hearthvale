@@ -1,0 +1,15 @@
+{
+  "id": "baker",
+  "start": "hello",
+  "nodes": {
+    "hello": {
+      "speaker": "",
+      "text": "Hello.",
+      "options": [
+        { "text": "For you.", "effects": [{ "type": "gift", "villager": "baker" }], "next": null },
+        { "text": "For someone.", "effects": [{ "type": "gift", "villager": "nobody" }], "next": null },
+        { "text": "For whom?", "effects": [{ "type": "gift" }], "next": null }
+      ]
+    }
+  }
+}

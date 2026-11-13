@@ -95,7 +95,7 @@ func test_the_pause_menu_stops_the_game_and_saves() -> void:
 	assert_bool(village.can_process()).override_failure_message("the area stops").is_false()
 	assert_bool(village.hud.pause_menu.can_process()).override_failure_message("the menu doesn't").is_true()
 	var menu: PauseMenu = village.hud.pause_menu
-	assert_array(Array(menu.shown_lines())).is_equal(["> Resume", "  Save", "  Quests", "  Settings", "  Quit to title"])
+	assert_array(Array(menu.shown_lines())).is_equal(["> Resume", "  Save", "  Quests", "  Friends", "  Settings", "  Quit to title"])
 	var status: String = (menu.get_node(^"Panel/Status") as Label).text
 	assert_str(status).contains("Hearts 3").contains("Heart pieces 0 of 4").contains("Time played")
 	menu.choose(PauseMenu.SAVE)
@@ -202,7 +202,9 @@ func test_a_choice_that_changes_the_scene_doesnt_trip_over_the_menu_leaving() ->
 	village.travel = func(_path: String) -> void: village.get_parent().remove_child(village)
 	village.open_pause_menu()
 	var menu: PauseMenu = village.hud.pause_menu
-	menu.move_cursor(4)
+	# Up from the first line wraps to the last, Quit to title, however long the list grows.
+	menu.move_cursor(-1)
+	assert_that(menu.cursor.selected_id()).is_equal(PauseMenu.QUIT)
 	menu._unhandled_input(_pressed(&"interact"))
 	assert_bool(village.is_inside_tree()).override_failure_message("Quit to title left the area").is_false()
 	assert_bool(get_tree().paused).is_false()

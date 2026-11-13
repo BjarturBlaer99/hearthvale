@@ -72,6 +72,11 @@ Beaten enemies sometimes drop hearts or coins.
 - **The hero** (hero pass): a leather vest, wrist guards, a belt pouch and tall boots over the blue tunic, the
   sword on his back until he swings it, and a small pack. He breathes when he stands, leans into a sprint,
   winds up before a swing, flinches when hit and bends his knees landing from a ledge.
+- **Friendship and gifts** (the pivot, step 4c): talk to a villager and the first talk of the day is worth a
+  little friendship. Carry food and their conversation offers "I brought you something.", which opens a list
+  of what you carry: one gift a villager a day, and one they like is worth three times another. Four points
+  make a mark and five marks a full friendship; a mark gained is said at the top of the screen. The pause
+  menu's **Friends** page shows everyone's marks.
 - **Skills** (the pivot, step 4b): combat, farming and cooking rise with use, five levels each. Monsters
   beaten raise combat, cells tilled and crops picked raise farming, dishes cooked raise cooking. Each level
   takes a tenth off the energy of that skill's work (a swing and a shot; the hoe and the can), and each level
