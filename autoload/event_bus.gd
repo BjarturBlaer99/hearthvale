@@ -61,3 +61,6 @@ signal farm_changed
 ## A conversation asked for a shop's buy-and-sell list (the `shop` effect): `mode` is the list
 ## to open on (Shop.BUY or Shop.SELL). The area opens it when the conversation is over.
 signal shop_requested(shop_id: StringName, mode: StringName)
+
+## One of the hero's skills rose to `level` (P4b; Skills): said once, as it happens.
+signal skill_rose(skill: StringName, level: int)

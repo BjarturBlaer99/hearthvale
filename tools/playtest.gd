@@ -26,8 +26,8 @@ const LOG_DIR: String = "user://playtests"
 const KEYS: String = "keys"
 
 ## Each scenario: the area and cell to start in, items to hold, and flags to set. An hour
-## after the scenario's name starts it at that time of day, and energy=<n> with that much
-## energy: -- village 19:30 energy=12
+## after the scenario's name starts it at that time of day, energy=<n> with that much energy,
+## and skills=<level> with every skill at that level: -- village 19:30 energy=12 skills=3
 ## A scenario's "flags" came true long ago (no day is kept for them); its "today" flags came
 ## true this very day, for what waits a day on them (the crypt's bars).
 const SCENARIOS: Dictionary = {
@@ -182,6 +182,13 @@ func _start() -> void:
 		elif arg.begins_with("energy=") and arg.trim_prefix("energy=").is_valid_float():
 			game_state.call(&"set_energy", float(arg.trim_prefix("energy=")))
 			print("tools/playtest: starting with %s energy." % arg.trim_prefix("energy="))
+		elif arg.begins_with("skills=") and arg.trim_prefix("skills=").is_valid_int():
+			# Every skill at that level: each has just the points the level begins at.
+			var skills: Skills = game_state.call(&"skills")
+			var level: int = clampi(int(arg.trim_prefix("skills=")), 1, skills.top_level())
+			for skill: StringName in skills.ids():
+				(game_state.get(&"skill_points") as Dictionary)[skill] = skills.thresholds[level - 1]
+			print("tools/playtest: starting with every skill at level %d." % level)
 	game_state.call(&"update_player", scenario["area"], scenario["cell"])
 	change_scene_to_file("res://world/areas/%s/%s.tscn" % [scenario["area"], scenario["area"]])
 

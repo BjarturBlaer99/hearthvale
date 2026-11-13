@@ -5,6 +5,8 @@ extends RefCounted
 var flags: Dictionary = {}
 var items: Dictionary = {}
 var quests: Dictionary = {}
+## Every deed practised, in order: [skill, deed].
+var practised: Array = []
 
 
 func set_flag(flag: StringName, value: Variant) -> void:
@@ -17,6 +19,10 @@ func add_item(item_id: StringName, count: int) -> void:
 
 func set_quest_stage(quest_id: StringName, stage_id: StringName) -> void:
 	quests[String(quest_id)] = String(stage_id)
+
+
+func practise(skill: StringName, deed: StringName) -> void:
+	practised.append([String(skill), String(deed)])
 
 
 func to_dict() -> Dictionary:

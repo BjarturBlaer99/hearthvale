@@ -1,0 +1,16 @@
+{
+  "id": "teacher",
+  "start": "lesson",
+  "nodes": {
+    "lesson": {
+      "speaker": "",
+      "text": "A lesson.",
+      "options": [
+        { "text": "Till.", "effects": [{ "type": "practise", "skill": "farming", "deed": "till" }], "next": null },
+        { "text": "Weed.", "effects": [{ "type": "practise", "skill": "farming", "deed": "weed" }], "next": null },
+        { "text": "Fish.", "effects": [{ "type": "practise", "skill": "fishing", "deed": "till" }], "next": null },
+        { "text": "Idle.", "effects": [{ "type": "practise", "skill": "farming" }], "next": null }
+      ]
+    }
+  }
+}

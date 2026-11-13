@@ -247,7 +247,8 @@ func test_ten_pours_water_ten_cells_and_the_morning_dries_them() -> void:
 	assert_int(GameState.farm().count_of(Farm.WATERED)).is_equal(10)
 	assert_int(GameState.item_count(&"water")).is_equal(0)
 	assert_str(village.hud.message_text()).is_equal(ToolUse.CAN_EMPTY)
-	assert_float(GameState.energy).override_failure_message("ten energy for ten cells").is_equal(90.0)
+	# Twelve cells tilled made him level 2 at farming (P4b): a pour costs nine tenths of one energy.
+	assert_float(GameState.energy).override_failure_message("nine energy for ten cells, at level 2").is_equal_approx(91.0, 0.001)
 	assert_str(AreaController.equipped_text()).is_equal("Item: Watering Can (Water x0)")
 	GameState.start_next_day()
 	assert_int(GameState.farm().count_of(Farm.WATERED)).override_failure_message("dry by morning").is_equal(0)
@@ -256,7 +257,7 @@ func test_ten_pours_water_ten_cells_and_the_morning_dries_them() -> void:
 	assert_int(GameState.item_count(&"water")).override_failure_message("the can doesn't fill itself").is_equal(0)
 
 
-func test_tilling_the_whole_plot_costs_thirty_six_energy_and_worn_out_he_collapses() -> void:
+func test_tilling_the_whole_plot_costs_less_as_his_farming_rises_and_a_tool_that_does_nothing_costs_nothing() -> void:
 	var rules: EnergyRules = GameState.energy_rules()
 	assert_float(rules.cost(EnergyRules.HOE)).is_equal(2.0)
 	assert_float(rules.cost(EnergyRules.WATER)).is_equal(1.0)
@@ -269,7 +270,9 @@ func test_tilling_the_whole_plot_costs_thirty_six_energy_and_worn_out_he_collaps
 		assert_bool(village.use_item()).override_failure_message("tilling %s" % cell).is_true()
 		_rest(village)
 	assert_int(GameState.farm().count_of(Farm.TILLED)).is_equal(18)
-	assert_float(GameState.energy).is_equal(100.0 - 36.0)
+	# Ten cells at two energy each; the tenth raises his farming (P4b), and the last eight cost 1.8.
+	assert_float(GameState.energy).is_equal_approx(100.0 - 20.0 - 8.0 * 1.8, 0.001)
+	assert_int(GameState.skill_level(Skills.FARMING)).is_equal(2)
 	assert_int(GameState.health).is_equal(hearts)
 	# A tool that does nothing costs nothing, however tired he is.
 	GameState.set_energy(1.5)

@@ -735,6 +735,9 @@ run headless; see CLAUDE.md for the command and gotchas.
 - **`EnergyRules`** (`core/energy/`, pure) reads them and answers `cost()`, `is_low()`, `can_sprint()`,
   `is_spent()`, `move_factor()`, `cooldown_factor()`, `wake_energy()` and `coins_lost()`. `problems()` checks a
   set of rules at load.
+- **What work costs the hero** is `GameState.energy_cost(action)`: the rules' cost, less what his skill at
+  that work takes off it (P4b, section 23). A swing, a shot, the hoe and the can ask it; sprinting asks the
+  rules, since no skill eases it.
 - **`GameState`** holds `energy` (saved since version 2). `spend_energy()` and `set_energy()` keep it between
   nothing and a full bar and emit `EventBus.energy_changed`. `is_exhausted()` is true at zero. `collapse()`
   is the state's part of collapsing: the next day, half a bar, the coins gone; it returns how many.
@@ -925,4 +928,31 @@ kind of door, and four flags.
   `today` flags as of that day. The older scenarios start past the gates. `tools/capture.gd` starts the main
   quest before each shot, so its notice is not in every picture (but for `begin`, a game's first moment), and
   has the actions `lights`, `story_log` and `try`.
+
+## 23. Skills
+P4b (`docs/progress/P4-plan.md` section 11). Three skills that rise with use and change only energy.
+- **The rules are data** (`data/rules/skills.json`, in `docs/data/rules.schema.json`): `levels` (the points
+  each level begins at: 0, 10, 25, 50, 90), `step` (0.1: the share a level above the first takes off a cost or
+  adds to a dish), and `skills`, each with a `name`, its `gains` (points by deed), the costs it `eases`
+  (EnergyRules' names) and whether it `enriches_dishes`.
+- **`Skills`** (`core/skills/`, pure) reads them: `level_at()`, `next_at()`, `gain()`, `cost_factor()`,
+  `dish_factor()`, `line()` for the pause menu, `risen_words()`, and `problems()` for the load check. It keeps
+  no points.
+- **`GameState`** holds `skill_points` (saved since version 4). `practise(skill, deed)` adds the deed's points
+  and emits `EventBus.skill_rose(skill, level)` when the level rises. `skill_level()`, `energy_cost()` and
+  `food_energy()` are what the rest of the game asks.
+- **Where points come from:**
+  - combat: `AreaController._on_enemy_died()` (a `monster`, or a `boss` for an `ArenaBoss`)
+  - farming: `GameState.till_soil()` (`till`) and `harvest()` (`harvest`)
+  - cooking: the effect `practise`, which `Cooking.dialogue()` gives each dish's answer after its `give_item`
+- **What a level does:**
+  - combat eases `swing` and `shot`; farming eases `hoe` and `water`. The hoe is paid before the cell is
+    tilled, so the stroke that raises farming costs the old price.
+  - cooking enriches dishes. A dish is anything a recipe makes (`Cooking.is_dish()`), and the level counts
+    when it is eaten (`GameState.eat()` adds `food_energy()`). Hearts are the dish's own.
+- **Shown:** `AreaController.pause_status()` has the line `Skills.line()` gives; a rise is a notice at the top
+  of the screen and the sound `skill`. `ItemMenu.describe()` and the words on eating say what a dish gives him
+  now (`Food.gives_text(item, energy)`).
+- **Tools:** `tools/playtest.gd` takes `skills=<level>`; `tools/capture.gd` has the actions `skill_up`,
+  `skills_pause` and `cook_menu`.
 

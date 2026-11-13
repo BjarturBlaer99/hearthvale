@@ -17,7 +17,7 @@ energy, food and time, **P3** farming, **P4** RPG and story. Do not build anythi
 ask the user before adding anything the roadmap doesn't list. Scope creep is the main risk on this project.
 **P1, P2 and P3 are built** (P3 finished on 2026-11-13). **P4 is under way:** the user approved its proposal as
 written on 2026-11-13 (`docs/progress/P4-plan.md`: ten decisions, four steps, each with its own list). **4a
-(the story over days) is built;** 4b (skills), 4c (friendship and gifts) and 4d (side quests, recipes, the
+(the story over days) and 4b (skills) are built;** 4c (friendship and gifts) and 4d (side quests, recipes, the
 ending) follow, each started by the user.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
@@ -102,7 +102,8 @@ godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
 # Start partway through to try one part by hand (scenarios in the script: bram, gate, rest, farm, market, kitchen, home, village,
-# warden, crypt, shade, ending). An hour after the name starts at that time of day, and energy=<n> with that much energy.
+# warden, crypt, shade, ending). An hour after the name starts at that time of day, energy=<n> with that much energy,
+# and skills=<level> with every skill at that level.
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
 godot --path . -s res://tools/playtest.gd -- warden
 godot --path . -s res://tools/playtest.gd -- village 19:30 energy=12
@@ -256,4 +257,11 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   `Quests.refresh()` first, since the main quest begins with a chime. **Save version 4** (one change for all
   of P4: `flag_days`, `tally`, and `skills` and `friends`, which nothing changes until 4b and 4c); an older
   save loads past the gates.
+- **Skills (P4b):** the numbers are in `data/rules/skills.json`, read by `Skills` (`core/skills/`, pure).
+  `GameState.skill_points` holds the points; **go through `GameState.practise(skill, deed)`** (it says when a
+  level rises: `EventBus.skill_rose`). **What work costs is `GameState.energy_cost(action)`, never
+  `energy_rules().cost()`** (but for sprinting), and what food gives is `GameState.food_energy(item_id)`: a
+  dish (anything a recipe makes) gives a better cook more. A skill changes energy only: never hearts, damage,
+  speed or timing. Cooking is counted by the effect `practise`, which the hearth's conversation gives each
+  dish. **A test that tills ten cells, or beats ten monsters, has raised a level:** work is cheaper after it.
 

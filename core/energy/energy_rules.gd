@@ -21,6 +21,8 @@ const SHOT: String = "shot"
 ## Farm work (P3): tilling a cell with the hoe, watering one with the can.
 const HOE: String = "hoe"
 const WATER: String = "water"
+## Every cost the rules name: what a skill may make cheaper (Skills' `eases`).
+const COSTS: Array[String] = [SPRINT, SWING, SHOT, HOE, WATER]
 
 ## A full bar.
 var maximum: float
@@ -109,7 +111,7 @@ static func problems(rules: Dictionary) -> PackedStringArray:
 	if typeof(costs) != TYPE_DICTIONARY:
 		out.append("'costs' must be an object of what things cost.")
 	else:
-		for action: String in [SPRINT, SWING, SHOT, HOE, WATER]:
+		for action: String in COSTS:
 			if not _is_number((costs as Dictionary).get(action)) or float(costs[action]) < 0.0:
 				out.append("'costs' needs '%s', a number of 0 or more." % action)
 	var low: Variant = rules.get("low")

@@ -32,10 +32,12 @@ static func would_help(item: Dictionary, energy: float, max_energy: float, healt
 
 
 ## "+30 energy", "+35 energy, +half a heart", "+1 heart": what `item` gives, for a menu.
-static func gives_text(item: Dictionary) -> String:
+## `energy` is what it gives the hero now, if that isn't what its data says (a good cook's dish).
+static func gives_text(item: Dictionary, energy: float = -1.0) -> String:
 	var parts: PackedStringArray = []
-	if energy_of(item) > 0.0:
-		parts.append("+%d energy" % roundi(energy_of(item)))
+	var gives: float = energy if energy >= 0.0 else energy_of(item)
+	if gives > 0.0:
+		parts.append("+%d energy" % roundi(gives))
 	var halves: int = halves_of(item)
 	if halves == 1:
 		parts.append("+half a heart")

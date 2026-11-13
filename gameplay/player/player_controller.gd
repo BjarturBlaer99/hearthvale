@@ -113,7 +113,7 @@ func swing() -> bool:
 	var energy: EnergyRules = GameState.energy_rules()
 	if not motor.attack(direction, float(stats["cooldown"]) * energy.cooldown_factor(GameState.energy)):
 		return false
-	GameState.spend_energy(energy.cost(EnergyRules.SWING))
+	GameState.spend_energy(GameState.energy_cost(EnergyRules.SWING))
 	sword.swing(Vector2(direction), stats, ItemIcons.name_for(StringName(str(weapon.get("id", "")))))
 	EventBus.sound.emit(&"sword")
 	sync_from_motor()

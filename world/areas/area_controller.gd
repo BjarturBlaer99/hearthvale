@@ -218,6 +218,7 @@ func _ready() -> void:
 	hud.pause_menu.quit_to_title.connect(_on_quit_to_title)
 	EventBus.hit_stop.connect(hit_stop)
 	EventBus.quest_announced.connect(_on_quest_announced)
+	EventBus.skill_rose.connect(_on_skill_rose)
 	for boss: Enemy in enemies():
 		if boss is ArenaBoss:
 			(boss as ArenaBoss).calm_music = music
@@ -525,9 +526,11 @@ func is_paused() -> bool:
 	return hud.pause_menu.is_open()
 
 
-## The pause menu's summary: hearts and heart pieces, keys in a dungeon, and the play time.
+## The pause menu's summary: hearts and heart pieces, his skills' levels, keys in a dungeon,
+## and the play time.
 func pause_status() -> String:
 	var lines: PackedStringArray = ["Hearts %d   Heart pieces %d of %d" % [GameState.hearts_max, GameState.heart_pieces, GameState.PIECES_PER_HEART]]
+	lines.append(GameState.skills().line(GameState.skill_points))
 	if dungeon_id != &"":
 		var keys: int = int(GameState.get_flag(DungeonState.keys_flag(dungeon_id), 0))
 		var big_key: bool = GameState.get_flag(DungeonState.big_key_flag(dungeon_id)) == true
@@ -642,7 +645,7 @@ func _shoot(bow: Dictionary, ammo: StringName) -> bool:
 	var direction: Vector2i = player.facing_direction()
 	if not player.motor.attack(direction, float(stats.get("cooldown", 0.45))):
 		return false
-	GameState.spend_energy(GameState.energy_rules().cost(EnergyRules.SHOT))
+	GameState.spend_energy(GameState.energy_cost(EnergyRules.SHOT))
 	GameState.add_item(ammo, -1)
 	EventBus.sound.emit(&"arrow")
 	var arrow: Arrow = Arrow.new()
@@ -672,17 +675,17 @@ func _use_tool(item: Dictionary) -> bool:
 		return false
 	if not player.motor.attack(player.facing_direction(), ToolUse.time_of(item)):
 		return false
-	var energy: EnergyRules = GameState.energy_rules()
 	match use["does"]:
 		ToolUse.TILL:
+			# Paid before the cell is tilled: the stroke that raises his farming costs the old price.
+			GameState.spend_energy(GameState.energy_cost(EnergyRules.HOE))
 			GameState.till_soil(plot.plot_cell(front))
-			GameState.spend_energy(energy.cost(EnergyRules.HOE))
 			EventBus.sound.emit(&"hoe")
 			Burst.spawn(interactables, GridBody.cell_center(front), &"dust")
 		ToolUse.WATER:
 			GameState.water_soil(plot.plot_cell(front))
 			GameState.add_item(held, -1)
-			GameState.spend_energy(energy.cost(EnergyRules.WATER))
+			GameState.spend_energy(GameState.energy_cost(EnergyRules.WATER))
 			EventBus.sound.emit(&"pour")
 			Burst.spawn(interactables, GridBody.cell_center(front), &"drops")
 		ToolUse.FILL:
@@ -1351,6 +1354,12 @@ func _on_quest_announced(quest_id: StringName, what: StringName) -> void:
 	hud.show_notice(Quests.announcement(quest_id, what))
 
 
+## A skill rose: it is said at the top of the screen, with a chime.
+func _on_skill_rose(skill: StringName, level: int) -> void:
+	EventBus.sound.emit(&"skill")
+	hud.show_notice(GameState.skills().risen_words(skill, level))
+
+
 func _on_quit_to_title() -> void:
 	_travelling = true
 	player.controls_enabled = false
@@ -1367,7 +1376,7 @@ func _on_item_chosen(item_id: StringName) -> void:
 		GameState.equip(item_id)
 	elif GameState.eat(item_id):
 		EventBus.sound.emit(&"eat")
-		hud.show_message(ATE_WORDS % [str(item.get("name", item_id)), Food.gives_text(item)])
+		hud.show_message(ATE_WORDS % [str(item.get("name", item_id)), Food.gives_text(item, GameState.food_energy(item_id))])
 	else:
 		EventBus.sound.emit(&"nope")
 		hud.show_message(NOT_HUNGRY_WORDS)
@@ -1414,8 +1423,10 @@ func _refresh_doors() -> void:
 			terrain.set_sealed(cell, not open)
 
 
-## When the last enemy sharing a clear flag falls, the flag is set (a shutter may open).
+## A monster beaten is practice at combat (P4b), a boss much more. When the last enemy sharing
+## a clear flag falls, the flag is set (a shutter may open).
 func _on_enemy_died(enemy: Enemy) -> void:
+	GameState.practise(Skills.COMBAT, Skills.BOSS if enemy is ArenaBoss else Skills.MONSTER)
 	if enemy.clear_flag == &"":
 		return
 	for other: Enemy in enemies():

@@ -1,0 +1,22 @@
+{
+  "id": "skills",
+  "levels": [0, 10, 25, 50, 90],
+  "step": 0.1,
+  "skills": {
+    "combat": {
+      "name": "Combat",
+      "gains": { "monster": 1, "boss": 10 },
+      "eases": ["swing", "shot"]
+    },
+    "farming": {
+      "name": "Farming",
+      "gains": { "till": 1, "harvest": 2 },
+      "eases": ["hoe", "water"]
+    },
+    "cooking": {
+      "name": "Cooking",
+      "gains": { "dish": 2 },
+      "enriches_dishes": true
+    }
+  }
+}

@@ -1721,3 +1721,54 @@ decisions stand as recommended. Section 10 of the plan is this step's own list.
 - **Skills and friendship have places in a save and nothing else:** nothing reads or changes them yet.
 - **The chain is drawn in code,** like the game's other doors, not painted by an art tool.
 
+## 2026-11-13 — P4b: skills (built; not yet tried in play)
+
+Plan: `docs/progress/P4-plan.md`, section 11 (the second of P4's four steps).
+
+**Built**
+- **Three skills, five levels each,** with the numbers in data (`data/rules/skills.json`, a new set of rules with a schema; `Skills` in `core/skills/`, pure). Levels begin at 0, 10, 25, 50 and 90 points.
+- **What raises them:**
+  - combat: 1 for a monster beaten, 10 for a boss
+  - farming: 1 for a cell tilled, 2 for a crop picked
+  - cooking: 2 for a dish cooked
+- **What a level does:** each level above the first takes a tenth off the energy of the skill's work, or adds a tenth to a dish.
+
+| Skill | Level 1 | Level 2 | Level 5 |
+|---|---|---|---|
+| Combat: a swing, a shot | 0.5 | 0.45 | 0.3 |
+| Farming: the hoe | 2 | 1.8 | 1.2 |
+| Farming: the can | 1 | 0.9 | 0.6 |
+| Cooking: a vegetable stew | 60 | 66 | 84 |
+
+- **A level rising is said once,** at the top of the screen ("Farming rose to level 2."), with a chime of its own (a new sound, `skill`, made by the audio tool).
+- **The pause menu has a line for them:** "Combat 3   Farming 4   Cooking 2".
+- **The item menu and the words on eating say what a dish gives him now:** at the top level a stew reads "+84 energy, +1 heart".
+- **A new effect for conversations and quests, `practise`** (a skill and a deed): it is how the hearth counts a dish.
+- **Two small layout changes that came with it:** the pause menu's list sits six pixels lower, since its status is four lines now; the item menu is 24 pixels wider, so a dish's line with its hearts stays inside the frame (the stew's already poked out of it).
+- **Tools:** `skills=<level>` after a playtest scenario's name; three new screenshots (131 in all).
+
+**Checked**
+- 611 tests in 84 suites pass (+29: `tests/core/skills/skills_test.gd`, `tests/autoload/skills_state_test.gd`, `tests/world/skills_test.gd`). Import and boot clean.
+- **The plan's table, number by number:** a swing, a shot, the hoe and the can at each of the five levels, through the game itself (the left click, the item button), and a stew at each level.
+- **Each deed gives its points once:** a slime beaten (and not a slime only hurt, nor one beaten twice), the Warden, a cell tilled (and not a stroke that tills nothing), a crop picked (and not one that isn't ripe), a dish cooked at the hearth (and not one he hasn't the makings of).
+- **The stroke that raises farming costs the old price,** and the next one the new.
+- **A rise is said once:** one notice and one chime, and nothing more at later points or past the top level.
+- **Hearts are untouched:** a stew mends one heart at any level; the sword's numbers are the item's own.
+- **Sprinting costs what it did** at every level.
+- **Saves:** skill points go through a save (still version 4); a real version 3 save starts every skill at level 1.
+- **Two older tests failed first,** both in the farm's suite: they till twelve and eighteen cells, which now reaches level 2 on the way. They say so now (ten pours cost 9; the whole plot costs 34.4, not 36).
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: a level coming a point late, work costing the same at every level, a level said to rise at every point, a boss worth no more than a slime, a good cook getting more out of raw food too.
+- **Frame cost:** draw calls as before (the village 313, Elder Bram's house 45, the keep 382, the cistern 231).
+- Screenshots: all 131 taken. Looked at closely: the notice as a level rises, the pause menu with its new line (and the gap under it), the item menu of a cook at the top level, before and after it was widened.
+
+**Known issues and limits**
+- Not tried in play. **Whether a tenth a level is felt** is the plan's own doubt: it shows over a day's work, not in one swing. If it reads as nothing, the plan's next thing to try is a named perk a skill.
+- **Tilda's bread is richer for a good cook too.** It is the same item as the bread the hearth bakes, and an item does not remember who made it. So is tea, and any dish a quest might give.
+- **Combat can be raised by going back to the same monsters:** they come back when an area is entered again. Ten slimes are level 2; ninety are level 5. The numbers are data.
+- **The pause menu shows levels only:** not the points, nor how far the next level is.
+- **A level is said in the same place as a quest's news,** so if both happen at once the later one shows.
+- **The notice is hard to read over a thatched roof** (pale yellow on straw), as a quest's is.
+- **Points keep counting past the top level** and do nothing there.
+- **Watering and planting give no points:** the plan names tilling and picking only.
+- **A dish's energy is shown rounded** ("+24 energy" for 24.2); the bar takes the exact number.
+

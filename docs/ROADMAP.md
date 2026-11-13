@@ -232,7 +232,8 @@ quest data format, and an ending screen with days, crops and friendships.
 The proposal (`docs/progress/P4-plan.md`) was approved as written on 2026-11-13. Four steps:
 - **4a — The story over days.** *Built 2026-11-13.* A main quest from the first morning, Bram's quest after the
   first crop, the keep's gate chained until then, the crypt open the morning after the keep. Save version 4.
-- **4b — Skills.** Combat, farming and cooking rise with use.
+- **4b — Skills.** *Built 2026-11-13.* Combat, farming and cooking rise with use and make their work cheaper
+  (cooking: dishes richer). Shown in the pause menu.
 - **4c — Friendship and gifts.**
 - **4d — Side quests, recipes and the ending.**
 

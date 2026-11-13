@@ -63,6 +63,10 @@
           "properties": { "type": { "const": "sleep" } }
         },
         {
+          "properties": { "type": { "const": "practise" }, "skill": { "type": "string", "minLength": 1 }, "deed": { "type": "string", "minLength": 1 } },
+          "required": ["skill", "deed"]
+        },
+        {
           "properties": { "type": { "const": "shop" }, "shop": { "$ref": "#/$defs/id" }, "mode": { "enum": ["buy", "sell"] } },
           "required": ["shop", "mode"]
         }

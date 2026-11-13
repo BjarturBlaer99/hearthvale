@@ -72,6 +72,11 @@ Beaten enemies sometimes drop hearts or coins.
 - **The hero** (hero pass): a leather vest, wrist guards, a belt pouch and tall boots over the blue tunic, the
   sword on his back until he swings it, and a small pack. He breathes when he stands, leans into a sprint,
   winds up before a swing, flinches when hit and bends his knees landing from a ledge.
+- **Skills** (the pivot, step 4b): combat, farming and cooking rise with use, five levels each. Monsters
+  beaten raise combat, cells tilled and crops picked raise farming, dishes cooked raise cooking. Each level
+  takes a tenth off the energy of that skill's work (a swing and a shot; the hoe and the can), and each level
+  of cooking adds a tenth to the energy a dish gives. A level rising is said at the top of the screen, and
+  the pause menu shows all three. Skills never change hearts, damage or speed.
 - **The story over days** (the pivot, step 4a): a new game begins with a quest, "A Place of Your Own", in the
   quest log (Esc, Quests). It says where your cottage is, how to till and plant, and what comes next. Elder
   Bram welcomes a newcomer and speaks of the old keep only once a first seed is in the ground. Until he gives

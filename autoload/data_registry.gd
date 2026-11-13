@@ -57,7 +57,8 @@ const RULES_ENERGY: StringName = &"energy"
 const RULES_HOURS: StringName = &"hours"
 const RULES_NIGHT: StringName = &"night"
 const RULES_FARM: StringName = &"farm"
-const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM]
+const RULES_SKILLS: StringName = &"skills"
+const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM, RULES_SKILLS]
 
 ## Enemy behaviour ids (EnemyBrains makes one brain per id) and drop-table entry types.
 const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden", "shade"]
@@ -89,6 +90,7 @@ const EFFECT_FIELDS: Dictionary = {
 	"complete_quest": [],
 	"sleep": [],
 	"shop": ["shop", "mode"],
+	"practise": ["skill", "deed"],
 }
 
 ## A field with one of these names, inside a condition or effect, must name an id
@@ -438,6 +440,8 @@ func _check_rules(rules: Dictionary) -> void:
 			problems = NightRules.problems(rules)
 		RULES_FARM:
 			problems = Farm.problems(rules)
+		RULES_SKILLS:
+			problems = Skills.problems(rules, EnergyRules.COSTS)
 	for problem: String in problems:
 		errors.append("%s: rules '%s': %s" % [path, id, problem])
 
@@ -535,6 +539,8 @@ func _check_effect_list(path: String, where: String, list: Variant) -> void:
 		_check_reference_fields(path, w, effect)
 		if type_name == "set_quest_stage":
 			_check_stage(path, w, str(effect["quest"]), str(effect["stage"]))
+		if type_name == "practise" and not Skills.new(get_rules(RULES_SKILLS)).has_deed(StringName(str(effect["skill"])), StringName(str(effect["deed"]))):
+			errors.append("%s: %s: no skill '%s' grows by a deed '%s' (data/rules/skills.json)." % [path, w, effect["skill"], effect["deed"]])
 		if type_name == "shop" and not Shop.MODES.has(StringName(str(effect["mode"]))):
 			errors.append("%s: %s: a shop's 'mode' must be 'buy' or 'sell', not '%s'." % [path, w, effect["mode"]])
 

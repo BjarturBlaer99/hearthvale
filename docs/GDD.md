@@ -84,7 +84,17 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 - **In hand** (the left mouse button): with nothing on the item button, the sword. The bow or bombs on it:
   those. A farm tool or seeds on it: the tool where there is work for it (facing the plot, or water for the
   can), and the sword everywhere else. Choosing the sword in the item menu empties the item button.
-- **Growth** *(P4, to be proposed)*: three skills (combat, farming, cooking) that rise with use.
+- **Growth** *(P4b)*: three skills that rise with use, five levels each, at 0, 10, 25, 50 and 90 points.
+
+| Skill | Raised by | Each level above the first |
+|---|---|---|
+| Combat | 1 for a monster beaten, 10 for a boss | A swing and a shot cost a tenth less energy |
+| Farming | 1 for a cell tilled, 2 for a crop picked | The hoe and the can cost a tenth less energy |
+| Cooking | 2 for a dish cooked | A dish gives a tenth more energy |
+
+  At level 5 a swing costs 0.3, a cell hoed 1.2 and watered 0.6, and a stew gives 84. A level rising is said
+  once, and the pause menu shows the three. A dish is anything a recipe makes, so bread bought from Tilda is
+  richer for a good cook too. Skills change energy and nothing else: never hearts, damage, speed or timing.
 
 ## 6. Time, food and sleep *(P2)*
 *(Built so far: the clock, the day and the light in step 2a; the home, the bed and sleeping in 2b; energy in

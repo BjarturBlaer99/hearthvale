@@ -27,7 +27,8 @@ var top: int = 0
 static func describe(item: Dictionary) -> String:
 	var name_text: String = str(item.get("name", item.get("id", "?")))
 	if Food.is_food(item):
-		return "%s x%d (%s)" % [name_text, GameState.item_count(StringName(str(item.get("id", "")))), Food.gives_text(item)]
+		var id: StringName = StringName(str(item.get("id", "")))
+		return "%s x%d (%s)" % [name_text, GameState.item_count(id), Food.gives_text(item, GameState.food_energy(id))]
 	var ammo: String = Inventory.ammo_for(item)
 	if ammo.is_empty():
 		return name_text

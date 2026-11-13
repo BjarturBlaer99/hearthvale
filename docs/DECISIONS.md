@@ -517,6 +517,25 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-13 — **P4b: a dish is anything a recipe makes, and the cook's level counts when it is eaten.** A
+  dish does not remember who made it, so Tilda's bread, which is the bread the hearth bakes, is richer for a
+  good cook too. — Alternative: marking each dish as his own, which would need items that differ one from
+  another; the inventory has only counts.
+- 2026-11-13 — **P4b: cooking is counted by an effect, `practise`.** Cooking is the hearth's conversation
+  giving and taking items, so the points come the same way. Any conversation or quest can use it.
+- 2026-11-13 — **P4b: which costs a skill eases is data** (`eases`), like the points and the levels. `Skills`
+  knows nothing of swords or hoes.
+- 2026-11-13 — **P4b: the hoe is paid before the cell is tilled.** The stroke that raises farming costs the
+  old price, and the next one the new. Otherwise the very stroke that earns the level would be cheaper for it.
+- 2026-11-13 — **P4b: a rise is a notice at the top of the screen,** where a quest's news goes, with a chime
+  of its own. The line at the bottom is taken by "Picked: Turnip." and the like, and by the hearth's words.
+- 2026-11-13 — **P4b: points are given where the deed is done in the game's state** (`till_soil`, `harvest`),
+  so nothing that tills or picks can forget them. A monster's are given by the area that hears it fall.
+- 2026-11-13 — **P4b: every monster beaten counts,** by the sword, an arrow or a bomb, by day or at night, and
+  monsters come back when an area is entered again. Combat can be raised by going back to the slimes. That is
+  "improves with use"; whether it is too easy is for a playtest, and the numbers are data.
+- 2026-11-13 — **P4b: the pause menu's line is levels only.** No points and no bar toward the next level: the
+  plan keeps a skills screen out of P4.
 - 2026-11-13 — **P4: the proposal was approved as written** (the user: "Approve as written"). All ten
   decisions in `docs/progress/P4-plan.md` §3 stand as recommended: three skills of five levels that only make
   work cheaper and meals better; the keep's gate chained until Bram's word; his word as soon as a first seed is

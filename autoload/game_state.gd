@@ -57,6 +57,7 @@ var arrival_notice: String = ""
 
 var _day_clock: DayClock
 var _energy_rules: EnergyRules
+var _skills: Skills
 ## The hero's plot (P3): made from the farm's rules when first asked for. Saved.
 var _farm: Farm
 ## Where the hero is: { "area", "cell": [x, y] }, or { "area", "entry" } on the way into an
@@ -147,6 +148,12 @@ func set_energy(value: float) -> void:
 	EventBus.energy_changed.emit(energy, max_energy())
 
 
+## What `action` (one of EnergyRules' costs) costs the hero now: the rules' cost, less what
+## his skill at that work takes off it (P4b).
+func energy_cost(action: String) -> float:
+	return energy_rules().cost(action) * skills().cost_factor(action, skill_points)
+
+
 ## Spends `amount` of energy (what a swing costs, or a moment's running). It never goes under
 ## nothing.
 func spend_energy(amount: float) -> void:
@@ -160,10 +167,20 @@ func eat(item_id: StringName) -> bool:
 	var item: Dictionary = DataRegistry.get_item(item_id)
 	if item_count(item_id) <= 0 or not Food.would_help(item, energy, max_energy(), health, max_health()):
 		return false
+	var gives: float = food_energy(item_id)
 	add_item(item_id, -1)
-	set_energy(energy + Food.energy_of(item))
+	set_energy(energy + gives)
 	heal(Food.halves_of(item))
 	return true
+
+
+## The energy eating one `item_id` gives the hero now. A dish (anything a recipe makes) gives
+## more to a better cook (P4b); other food gives what its data says.
+func food_energy(item_id: StringName) -> float:
+	var gives: float = Food.energy_of(DataRegistry.get_item(item_id))
+	if Cooking.is_dish(DataRegistry.entries(&"recipes"), String(item_id)):
+		gives *= skills().dish_factor(skill_points)
+	return gives
 
 
 ## Whether the hero has no energy left: he collapses (the area sees to it).
@@ -181,6 +198,35 @@ func collapse() -> int:
 	if lost > 0:
 		add_item(COIN, -lost)
 	return lost
+
+
+# --- Skills ----------------------------------------------------------------
+
+## The rules of the hero's skills, from data (data/rules/skills.json).
+func skills() -> Skills:
+	if _skills == null:
+		_skills = Skills.new(DataRegistry.get_rules(DataRegistry.RULES_SKILLS))
+	return _skills
+
+
+## The hero's level at `skill`: 1 until its points reach the second level.
+func skill_level(skill: StringName) -> int:
+	return skills().level_of(skill, skill_points)
+
+
+## The hero does a `deed` that `skill` grows by (Skills' deeds: a monster beaten, a cell
+## tilled, a dish cooked). Its points are added, and if that raises its level, it is said
+## (EventBus.skill_rose). Returns the points gained: 0 if the skill doesn't grow by that.
+func practise(skill: StringName, deed: StringName) -> int:
+	var points: int = skills().gain(skill, deed)
+	if points <= 0:
+		return 0
+	var before: int = skill_level(skill)
+	skill_points[skill] = int(skill_points.get(skill, 0)) + points
+	var after: int = skill_level(skill)
+	if after > before:
+		EventBus.skill_rose.emit(skill, after)
+	return points
 
 
 # --- Time ------------------------------------------------------------------
@@ -222,6 +268,7 @@ func farm() -> Farm:
 func till_soil(cell: Vector2i) -> bool:
 	if not farm().till(cell):
 		return false
+	practise(Skills.FARMING, Skills.TILL)
 	EventBus.farm_changed.emit()
 	return true
 
@@ -267,6 +314,7 @@ func harvest(cell: Vector2i) -> Dictionary:
 	farm().harvest(cell, Crops.days_of(crop))
 	add_item(item_id, int(given["count"]))
 	add_tally(CROPS_PICKED, int(given["count"]))
+	practise(Skills.FARMING, Skills.HARVEST)
 	EventBus.farm_changed.emit()
 	return given
 

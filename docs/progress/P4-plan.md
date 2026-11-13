@@ -243,3 +243,48 @@ anything but food and crops, more than one gift a day, a calendar or seasons, cr
 - A tutorial, pop-up hints or markers on a map: the quest log's words are the help.
 - A new place to start the game, or a scene of arriving.
 
+## 11. Step 4b — Skills
+
+### What changes
+- **Three skills, five levels each,** as section 5 has them: combat, farming and cooking, with levels at 0,
+  10, 25, 50 and 90 points. The numbers are data (`data/rules/skills.json`), read by a new pure `Skills`
+  (`core/skills/`).
+- **What raises them:** a monster beaten 1 point of combat and a boss 10; a cell tilled 1 point of farming
+  and a crop picked 2; a dish cooked 2 points of cooking.
+- **What a level does:** each level above the first takes a tenth off the energy a skill's work costs: a
+  swing and a shot for combat, the hoe and the can for farming. Each level of cooking adds a tenth to the
+  energy a dish gives. Which costs a skill eases is in the data too.
+- **A dish is anything a recipe makes,** and the cook's level counts when it is eaten. So Tilda's bread, which
+  is the same bread the hearth bakes, is richer for a good cook too. (A dish does not remember who made it.)
+- **Cooking is counted through a new effect, `practise`,** which the hearth's conversation gives each dish.
+  Any conversation or quest may use it.
+- **A level rising is said once,** at the top of the screen ("Farming rose to level 2."), with a chime of its
+  own (a new sound, made by the audio tool).
+- **The pause menu shows the three levels** on a line of its own: "Combat 2   Farming 3   Cooking 1".
+- **The item menu and the words on eating** show what a dish gives him now, not what its data says.
+- **Tools:** `skills=<level>` after a playtest scenario's name starts with every skill at that level; new
+  screenshots.
+
+### What does not change
+- Hearts, damage, speed, cooldowns and every timing: a skill only changes energy.
+- Sprinting costs what it did, at every level.
+- What food gives in hearts, and what food that is not cooked gives (berries, raw crops).
+- The save format: skill points have had their place since version 4 (step 4a). A game saved before this
+  step starts every skill at level 1.
+
+### Done when
+- [x] the skills' numbers are data, checked on load, with a schema; `Skills` is unit-tested: levels, points,
+      what a level takes off and adds
+- [x] a monster, a boss, a tilled cell, a picked crop and a cooked dish each give their points, once
+- [x] at each level a swing, a shot, the hoe and the can cost what section 5's table says, and a dish gives
+      what it says; sprinting and hearts are as they were
+- [x] a level rising is said once, with a chime; the pause menu shows the three levels
+- [x] skill points go through a save, and a version 3 save starts at level 1
+- [x] all earlier tests pass
+- [ ] (yours) a level is felt over a day's work, not only read in the menu
+
+### Not in this step
+- Perks, a hero level, a skills screen, a bar toward the next level: not in P4 (section 9).
+- Skills changing damage, speed or anything but energy.
+- Friendship (4c); side quests, recipes and the ending's lines (4d).
+

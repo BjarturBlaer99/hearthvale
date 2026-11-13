@@ -23,7 +23,9 @@ extends SceneTree
 ## "lights" talks to Elder Bram once a first crop is in; "story_log" opens the quest log of a
 ## game just begun; "try" tries what the hero faces (the keep's chained gate). The main quest
 ## has begun before every shot, so its notice is not in each of them, except "begin": a game's
-## first moment, with the notice.
+## first moment, with the notice. "skill_up" tills the cell that raises the hero's farming;
+## "skills_pause" opens the pause menu with skills at different levels; "cook_menu" opens the
+## item menu of a hero at the top level of cooking, with dishes and plain food.
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -153,6 +155,9 @@ const SHOTS: Array = [
 	["126_the_gate_unchained", &"old_wood", Vector2i(19, 5), Vector2.UP, 0, "flag:keep_gate_open"],
 	["127_the_day_the_warden_fell", &"village", Vector2i(23, 7), Vector2.UP, 0, "flag:keep_warden_beaten"],
 	["128_a_game_begins", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "begin"],
+	["129_a_skill_rises", &"village", Vector2i(14, 19), Vector2.RIGHT, 0, "skill_up"],
+	["130_skills_in_the_pause_menu", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "skills_pause"],
+	["131_a_good_cooks_dishes", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "cook_menu"],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -263,6 +268,19 @@ func _capture() -> void:
 			for item: Array in [[&"hoe", 1], [&"watering_can", 1], [&"water", 6], [&"turnip_seeds", 5], [&"carrot_seeds", 3], [&"pumpkin_seeds", 2], [&"turnip", 4], [&"pumpkin", 1]]:
 				game_state.call(&"add_item", item[0], item[1])
 			game_state.call(&"equip", &"turnip_seeds")
+		if shot[5] == "skill_up":
+			# One point short of the second level of farming, with the hoe in hand.
+			(game_state.get(&"skill_points") as Dictionary)[&"farming"] = 9
+			game_state.call(&"add_item", &"hoe", 1)
+			game_state.call(&"equip", &"hoe")
+		if shot[5] == "skills_pause":
+			for skill: Array in [[&"combat", 30], [&"farming", 55], [&"cooking", 12]]:
+				(game_state.get(&"skill_points") as Dictionary)[skill[0]] = skill[1]
+		if shot[5] == "cook_menu":
+			(game_state.get(&"skill_points") as Dictionary)[&"cooking"] = 90
+			for item: Array in [[&"vegetable_stew", 1], [&"roast_turnip", 2], [&"bread", 2], [&"turnip", 3], [&"wild_berries", 4]]:
+				game_state.call(&"add_item", item[0], item[1])
+			game_state.call(&"set_energy", 30.0)
 		if shot[5] in ["farm", "hoe", "tools_menu", "fill"]:
 			# The farm's tools in hand, the can half full; and for "farm" a morning's work done:
 			# two rows tilled, the first of them watered.
@@ -346,12 +364,15 @@ func _capture() -> void:
 			scene.call(&"interact")
 			scene.get(&"hud").get(&"dialogue").call(&"move_cursor", 4)
 			await _frames(2)
-		elif shot[5] in ["tools_menu", "seeds_menu"]:
+		elif shot[5] in ["tools_menu", "seeds_menu", "cook_menu"]:
 			scene.call(&"open_item_menu")
 			await _frames(2)
 		elif shot[5] in ["hoe", "fill", "plant"]:
 			scene.call(&"use_item")
 			await _frames(7)
+		elif shot[5] == "skill_up":
+			scene.call(&"use_item")
+			await _frames(20)
 		elif shot[5] == "food_menu":
 			for item: Array in [[&"bow", 1], [&"arrow", 10], [&"bread", 2], [&"wild_berries", 3], [&"blossom_tea", 1]]:
 				game_state.call(&"add_item", item[0], item[1])
@@ -379,7 +400,7 @@ func _capture() -> void:
 			scene.call(&"open_pause_menu")
 			scene.get(&"hud").get(&"pause_menu").call(&"choose", &"quests")
 			await _frames(2)
-		elif shot[5] in ["pause", "settings"]:
+		elif shot[5] in ["pause", "settings", "skills_pause"]:
 			scene.call(&"open_pause_menu")
 			if shot[5] == "settings":
 				scene.get(&"hud").get(&"pause_menu").call(&"choose", &"settings")

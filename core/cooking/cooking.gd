@@ -7,7 +7,7 @@ extends RefCounted
 ## The hearth's list is a conversation built from the recipes (dialogue()), in the shape of the
 ## ones in data/dialogue, so the dialogue box and the shared conditions and effects do the rest:
 ## an answer for each dish, which cooks it if the hero has the makings and room for it, and
-## says so if he hasn't.
+## says so if he hasn't. Cooking a dish is practice at cooking (P4b: the `practise` effect).
 
 const ASK: String = "ask"
 const LACKING: String = "lacking"
@@ -26,6 +26,15 @@ static func can_cook(recipe: Dictionary, held: Dictionary) -> bool:
 		if int(held.get(str(need["item"]), 0)) < int(need["count"]):
 			return false
 	return not (recipe.get("needs", []) as Array).is_empty()
+
+
+## Whether `item_id` is a dish: something one of `recipes` makes.
+static func is_dish(recipes: Array, item_id: String) -> bool:
+	for recipe: Variant in recipes:
+		var makes: Variant = (recipe as Dictionary).get("makes") if typeof(recipe) == TYPE_DICTIONARY else null
+		if typeof(makes) == TYPE_DICTIONARY and str((makes as Dictionary).get("item", "")) == item_id:
+			return true
+	return false
 
 
 ## "3 Cherry Blossoms" or "2 Mushrooms, 1 Potato": what `recipe` needs, in words. `names` maps
@@ -59,6 +68,7 @@ static func dialogue(recipes: Array, items: Dictionary) -> Dictionary:
 		if most < Inventory.UNLIMITED:
 			able.append({"type": "not", "condition": {"type": "has_item", "item": dish, "count": most - made + 1}})
 		effects.append({"type": "give_item", "item": dish, "count": made})
+		effects.append({"type": "practise", "skill": String(Skills.COOKING), "deed": String(Skills.DISH)})
 		var cooked: String = "cooked_%s" % str(recipe["id"])
 		answers.append({"text": words, "conditions": able, "effects": effects, "next": cooked})
 		answers.append({"text": words, "conditions": [{"type": "not", "condition": {"type": "all", "of": able}}], "next": LACKING})
