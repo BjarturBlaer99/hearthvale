@@ -128,7 +128,8 @@ Nothing is built ahead of its step. Each later step gets its own "done when" lis
 - [x] the first pouch of turnip seeds is found at home
 - [x] the farm's crops survive a save, and a save from step 3a still loads
 - [x] all earlier tests pass
-- [ ] (yours) raising a first turnip, from the pouch to the pack, reads clearly without being told how
+- [x] (yours) raising a first turnip, from the pouch to the pack, reads clearly without being told how (tried
+      on 2026-11-13 in the `farm` scenario, with the steps listed for him: "feels right")
 
 ### Not in this step
 - Buying seeds, selling crops, the meals (3c).

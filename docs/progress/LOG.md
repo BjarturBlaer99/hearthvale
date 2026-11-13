@@ -1512,7 +1512,7 @@ Plan: `docs/progress/P3-plan.md` (the first of P3's three steps: 3a the plot and
 - **He can fill the can at any open water,** the stream in the North Fields too, though the plot is only in Hearthvale.
 - The "Carrying" line is longer still with two tools in it.
 
-## 2026-11-13 — P3b: seeds and crops (built; not yet tried in play)
+## 2026-11-13 — P3b: seeds and crops (built; tried in play by the user: "feels right")
 
 Plan: `docs/progress/P3-plan.md` (the second of P3's three steps).
 
@@ -1544,7 +1544,7 @@ Plan: `docs/progress/P3-plan.md` (the second of P3's three steps).
 - Screenshots: all 119 taken. Looked at closely: the plot in the middle of a season (every crop growing and ripe, a seed, a sprout, a withered one); the prompt at a ripe turnip; the pouch on the cottage floor; the item menu with seven lines; all 23 new pictures enlarged.
 
 **Known issues and limits**
-- Not tried in play. **Whether the first turnip reads without being told how** is for a playtest: nothing in the game says to till, plant and water, or that a crop needs water every day.
+- **Tried by the user on 2026-11-13** (the `farm` scenario, with tools and seeds in hand and the steps listed for him): raising a crop "feels right". **Whether a new player works it out untold,** starting from the pouch at home, is still unknown: nothing in the game says to till, plant and water, or that a crop needs water every day.
 - **Seeds can't be bought until 3c.** In the real game the five turnip seeds at home are all there are for one more step.
 - **Nothing shows which crops were watered today** but the colour of their soil, and nothing warns that a crop has had a dry morning.
 - **Standing below a crop, the hero's head hides it** (he is two cells tall). The prompt says what is there.
