@@ -3,8 +3,8 @@ extends Node2D
 ## A door in a dungeon wall (docs/TECH_DESIGN.md §6), `size` cells (1x2 through a thick wall
 ## between rooms). Kinds (DungeonState):
 ## - open: a doorway, never closed
-## - locked: E with a small key spends the key and opens it for good
-## - boss: E with the big key opens it for good (the key isn't spent)
+## - locked: interact with a small key spends the key and opens it for good
+## - boss: interact with the big key opens it for good (the key isn't spent)
 ## - shutter: bars that lift once `open_flag` is set (a room cleared), or any of `open_flags`
 ##   (all of them with `needs_all`): a plate, a switch... With `stays_open`, once lifted they
 ##   stay lifted for good (a solved puzzle stays solved).
@@ -114,7 +114,7 @@ func _shutter_values() -> Array:
 	return values
 
 
-## What E does while the hero faces it, after "[E] ", or empty for nothing.
+## What interact does while the hero faces it (the HUD's prompt), or empty for nothing.
 func prompt() -> String:
 	if is_open():
 		return ""
@@ -126,7 +126,7 @@ func prompt() -> String:
 	return ""
 
 
-## The hero presses E facing it: opens a locked door (spending a key) or the boss door (with
+## The hero interacts facing it: opens a locked door (spending a key) or the boss door (with
 ## the big key) when they can. Returns a message for the HUD (empty: nothing to say).
 func use() -> String:
 	if is_open():

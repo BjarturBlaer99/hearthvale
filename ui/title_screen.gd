@@ -1,8 +1,8 @@
 class_name TitleScreen
 extends Control
 ## The title screen, the game's first scene (docs/TECH_DESIGN.md §12): Continue (when there's
-## a save, saying where and how long), New game, Settings and Quit. Up and down pick, E or
-## Enter chooses. Its picture follows the save: the keep's window is dark once the game is
+## a save, saying where and how long), New game, Settings and Quit. Up and down pick, a click
+## or Enter chooses. Its picture follows the save: the keep's window is dark once the game is
 ## finished.
 
 const CONTINUE: StringName = &"continue"
@@ -28,6 +28,7 @@ func _init() -> void:
 
 func _ready() -> void:
 	get_tree().paused = false
+	MenuInput.let_clicks_through(self)
 	EventBus.music_requested.emit(&"village")
 	refresh()
 

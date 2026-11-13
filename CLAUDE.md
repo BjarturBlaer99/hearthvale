@@ -70,8 +70,12 @@ in `docs/DECISIONS.md` are superseded.
   **Nature (P1c, 2026-11-12):** trees are tall pictures painted by `tools/art/make_scenery.gd` and stood up at
   load by `Scenery` (the hero walks behind them; a crown fades when anything that matters is behind it). A tree
   still blocks exactly its own cell. Cherry trees are `"cherry"` blocks in `build_maps.gd`; the eight new cells
-  in Hearthvale were approved by the user. Wind, water, reflections, petals and mist are shaders and particles,
-  for show only. See `docs/progress/P1c-plan.md`.
+  in Hearthvale were approved by the user. Water and its reflections move; the rest of the scenery is still
+  (below). For show only. See `docs/progress/P1c-plan.md`.
+  **A still world (user's request, 2026-11-13):** the scenery doesn't move, except the water (its tile, its
+  surface, its reflections). Grass, flowers, washing and trees stand still, fallen petals lie where they are,
+  the mist doesn't drift, chimney smoke is one picture, and there are no specks in the air (`SwayLayer` and
+  `Motes` are gone). Creatures, people, pickups and the flicker of fires were left as they were.
   **Buildings (P1d, 2026-11-12):** walls show a lit front face where the floor lies south of them and a flat top
   elsewhere (`WallRelief`), pillars stand taller than their cells and roofs have a ridge (`Scenery`), all painted
   by `tools/art/make_relief.gd` and drawn over the map at load. The Height layer is untouched: no map is re-baked
@@ -148,6 +152,9 @@ removes the shim, so recreate it after upgrading.
   gdUnit4's `simulate_action_*` sends InputEvents, which headless mode drops.
 - Area scene tests: load areas one at a time with `tests/support/area_steps.gd` (a loaded area writes
   `GameState.player` every frame) and let it replace `AreaController.travel`, so taking an exit stays in the test.
+- **Interact is the left mouse button.** A test hands a click (an `InputEventMouseButton`, pressed) straight to
+  a node's `_unhandled_input()`. Every screen calls `MenuInput.let_clicks_through(self)` as it starts, or a
+  Control would swallow the click; write a prompt with `MenuInput.prompt()`, never with a key's name.
 
 **Shader gotcha:** in a canvas shader `COLOR` already holds the texture's colour when `fragment()` starts. To
 sample the texture again, pass the tint from `vertex()` in a varying; multiplying by `COLOR` squares the picture.
@@ -178,6 +185,10 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   hold-to-sprint. Since P2c sprint costs **energy**, which the user asked for on 2026-11-12 in place of the
   old "no stamina" rule. Hearts are life in combat only: energy never costs hearts.
 - Do not let art or animation change gameplay timing, hit detection or collisions, unless a step says so.
+- Do not add motion to the scenery (wind, drifting petals or mist, smoke, specks): only the water moves, at
+  the user's request of 2026-11-13.
+- Do not put anything but `interact` on the mouse, and never make the pointer matter: it is a button. The
+  user asked on 2026-11-13 for moving to stay on the keys and interact to be the mouse.
 - Do not add areas beyond the hero's home and plot unless the user asks.
 - Do not add a dependency/addon without noting why in `docs/DECISIONS.md`. Allowed now: gdUnit4.
 - Do not write story, dialogue or quest content beyond what the current milestone needs.

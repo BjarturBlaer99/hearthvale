@@ -6,8 +6,8 @@ extends Node2D
 ## so the hero walks behind a tree and in front of it.
 ##
 ## build() takes the tree tiles off the Decor layer and stands a picture in each one's cell.
-## Crowns sway in the wind (a shader that moves whole pixels, more the higher up). A crown
-## fades while anything stands behind it (fade_for), so nothing is ever hidden. For show only.
+## A crown fades while anything stands behind it (fade_for), so nothing is ever hidden. The
+## trees stand still: they swayed in the wind until 2026-11-13. For show only.
 
 ## How see-through a crown gets with something behind it, and how fast it changes (per second).
 const FADED: float = 0.4
@@ -26,39 +26,16 @@ const ROOF_TILES: Array[String] = [
 	"roof_thatch", "roof_thatch_l", "roof_thatch_r", "roof_thatch_top", "roof_thatch_top_l", "roof_thatch_top_r",
 	"roof_thatch_eave", "roof_thatch_eave_l", "roof_thatch_eave_r",
 ]
-const SWAY_CODE: String = """
-shader_type canvas_item;
-uniform float reach = 37.0;
-uniform float strength = 1.6;
-varying float up;
-varying float phase;
-varying vec4 tint;
-
-void vertex() {
-	tint = COLOR;
-	up = clamp(-VERTEX.y / reach, 0.0, 1.0);
-	vec2 at = (MODEL_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xy;
-	phase = at.x * 0.045 + at.y * 0.03;
-}
-
-void fragment() {
-	float gust = sin(TIME * 1.1 + phase) + 0.5 * sin(TIME * 2.3 + phase * 1.7);
-	float shift = floor(gust * strength * up * up + 0.5);
-	COLOR = texture(TEXTURE, UV + vec2(shift * TEXTURE_PIXEL_SIZE.x, 0.0)) * tint;
-}
-"""
 
 ## The tree standing in each cell.
 var by_cell: Dictionary[Vector2i, Sprite2D] = {}
 ## Things of stone that stand taller than their cell (P1d): the pillar in each cell, and the
-## strip of ridge over each cell of a roof's top row. They don't sway and they don't fade: a
+## strip of ridge over each cell of a roof's top row. They don't fade: a
 ## pillar hides no more than the feet of whoever is behind it, and a ridge the same.
 var pillars: Dictionary[Vector2i, Sprite2D] = {}
 var ridges: Dictionary[Vector2i, Sprite2D] = {}
 
 var _faded: Dictionary[Vector2i, bool] = {}
-
-static var _sway: ShaderMaterial
 
 
 func _init() -> void:
@@ -94,12 +71,6 @@ func build(decor: TileMapLayer) -> int:
 	if decor == null:
 		return 0
 	var texture: Texture2D = load(SceneryAtlas.TEXTURE_PATH)
-	if _sway == null:
-		var shader: Shader = Shader.new()
-		shader.code = SWAY_CODE
-		_sway = ShaderMaterial.new()
-		_sway.shader = shader
-		_sway.set_shader_parameter(&"reach", SceneryAtlas.FOOT.y)
 	for cell: Vector2i in decor.get_used_cells():
 		var kind: String = kind_of_tile(decor.get_cell_atlas_coords(cell))
 		if kind == "":
@@ -113,7 +84,6 @@ func build(decor: TileMapLayer) -> int:
 		tree.centered = false
 		tree.offset = -SceneryAtlas.FOOT
 		tree.position = foot_of(cell)
-		tree.material = _sway
 		tree.set_meta(&"kind", kind)
 		add_child(tree)
 		by_cell[cell] = tree

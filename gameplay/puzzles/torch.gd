@@ -1,6 +1,6 @@
 class_name Torch
 extends Node2D
-## A standing brazier (docs/TECH_DESIGN.md §6). The hero lights it with E while carrying a
+## A standing brazier (docs/TECH_DESIGN.md §6). The hero lights it with interact while carrying a
 ## lantern. Burning, it sets `flag` (shutters can wait on it) and lights the dark around it.
 ## - `always_lit`: burns from the start and never goes out (the crypt's first rooms).
 ## - `burn_time` above zero: goes out by itself after that many seconds, flickering first
@@ -93,14 +93,14 @@ func light_source() -> Dictionary:
 	return LightRules.light(position + FLAME_AT, light_radius * (1.0 + 0.04 * sin(_clock * 9.0)))
 
 
-## What E does while the hero faces it, after "[E] ", or empty for nothing.
+## What interact does while the hero faces it (the HUD's prompt), or empty for nothing.
 func prompt() -> String:
 	if _lit:
 		return ""
 	return "Light the torch" if has_lantern() else "An unlit torch"
 
 
-## The hero presses E facing it: lights it, if they carry a lantern. Returns a message for the
+## The hero interacts facing it: lights it, if they carry a lantern. Returns a message for the
 ## HUD (empty: nothing to say).
 func use() -> String:
 	if _lit:

@@ -67,12 +67,9 @@ func _initialize() -> void:
 			_fixed(source, GreyboxTiles.coords(kind), 3, true)
 	for kind: String in GreyboxTiles.HOUSE_DECOR_KINDS:
 		_fixed(source, GreyboxTiles.coords(kind), 0, false)
-	var smoke: Vector2i = GreyboxTiles.coords("smoke")
-	_fixed(source, smoke, 0, false)
-	source.set_tile_animation_columns(smoke, GreyboxTiles.SMOKE_FRAMES)
-	source.set_tile_animation_frames_count(smoke, GreyboxTiles.SMOKE_FRAMES)
-	for frame: int in GreyboxTiles.SMOKE_FRAMES:
-		source.set_tile_animation_frame_duration(smoke, frame, GreyboxTiles.SMOKE_FRAME_TIME)
+	# Chimney smoke stands still (the user's request, 2026-11-13): the first of its painted
+	# frames, and the others unused.
+	_fixed(source, GreyboxTiles.coords("smoke"), 0, false)
 	for kind: String in GreyboxTiles.TREE_KINDS:
 		_fixed(source, GreyboxTiles.coords(kind), 0, false)
 	# Spawn markers: never walked on (the area clears them), open ground in the editor.

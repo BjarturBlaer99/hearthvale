@@ -87,7 +87,8 @@ res://
     sides of it (`GreyboxTiles.TREE_KINDS`).
 
   Chimneys, the chapel's cross and the shop's sign are overlays (`HOUSE_DECOR_KINDS`) that a map's `decor` blocks
-  put on house tiles; `smoke` above a chimney is an animated tile (`SMOKE_FRAMES`).
+  put on house tiles; `smoke` above a chimney is a still tile: the first of the `SMOKE_FRAMES` painted (it was animated until
+  2026-11-13).
 
   The chapel's two doors (`HOUSE_DOOR_KINDS`) are the exception among house fronts: open, and level with the rise,
   because they lead down to the crypt. A `pit` is a floor tile (walkable as far as the tiles go) that the area
@@ -444,6 +445,18 @@ run headless; see CLAUDE.md for the command and gotchas.
   `crypt_shade_beaten`, and `Signpost` inscriptions in the keep, by the chapel and in the crypt. They are
   `stone`: drawn as a standing stone with carved lines, where a wayside sign is a wooden post.
 
+- **Interact is the left mouse button** (the user's request, 2026-11-13; `tools/setup_input_map.gd`). Moving,
+  the sword, the item and the menus' keys are where they were, and a gamepad is unchanged; E no longer does
+  anything. The mouse is a button, not a pointer: where the click lands doesn't matter.
+  - Every menu reads `interact` as its yes (`MenuInput.is_confirm()`, `is_answer()`), so a click answers a
+    conversation and chooses in the item menu, the pause menu, the title and the ending.
+  - Everything reads input in `_unhandled_input`, and a `Control` under the pointer would take the click
+    first. `MenuInput.let_clicks_through(root)` sets every Control under a screen to ignore the mouse; the
+    HUD, the title and the ending call it as they start. **A new screen must call it too.**
+  - `MenuInput.INTERACT_KEY` ("Click") is what the button is called on screen, and `MenuInput.prompt()` makes
+    the HUD's prompt ("[Click] Pick the Turnip"). The help lines in the scenes say "Click" in words.
+  - Headless tests hand a click straight to a node's `_unhandled_input()`; a scratch script that pushed real
+    clicks through a window found them working in the world, a conversation, each menu and the title.
 - **A long item list scrolls** (P3b): the item menu shows `ItemMenu.ROWS` lines (five). `window_top()` moves
   the first line shown only as far as it must to keep the cursor in view, and the bottom corner says where
   he is ("3/7 v": the marks show which way there is more).
@@ -550,8 +563,11 @@ run headless; see CLAUDE.md for the command and gotchas.
     the whole shadow in `SHADE_FAR`, the nearer half again in `SHADE_NEAR`.
   - **Cast shadows:** `HeightShading.cast_on(grid, cell)` says whether a taller solid cell to the west (or
     north-west) shades an open cell; the sun stands in the north-west.
-  - `Motes` (`gameplay/ambient/`): a few single-pixel specks pinned to the world, by kind of place.
 - **Nature** (P1c), all for show; an area builds it in `_add_ambience()`:
+  - **Only the water moves** (the user's request, 2026-11-13). Until then crowns swayed (a shader on each
+    tree), tufts, flowers and washing leaned in the wind on a layer of their own (`SwayLayer`), petals drifted
+    from the cherry trees, specks hung in the air (`Motes`), the mist drifted and chimney smoke played four
+    frames. `SwayLayer` and `Motes` are gone; the rest stands still. Do not add motion to the scenery.
   - **Tall trees** (`Scenery`, `world/areas/`): at load, every tree tile on the Decor layer but the closed
     canopy is taken off it and a `Sprite2D` stands in its cell, 32 by 40 pixels from `SceneryAtlas`
     (`world/tiles/scenery.png`, painted by `tools/art/make_scenery.gd`). `Scenery` is y-sorted, so trees sort by
@@ -560,20 +576,18 @@ run headless; see CLAUDE.md for the command and gotchas.
     - **Nothing is hidden:** `fade_for(points, delta)` fades the crowns that `hides()` any of
       `AreaController.standing_points()` (the hero, enemies, anything with `collect()`, item pickups). Grass,
       pots and signs don't count, or a tree behind them would stay faded.
-    - Crowns sway: one shared shader shifts whole pixels, more the higher above the foot.
+    - A tree has no material: it stands still.
   - **Cherry trees:** a `"cherry"` block in `build_maps.gd` makes a solid cell with a `prop_cherry` tile, which
     `Scenery` stands up as `cherry` or `cherry_b` by cell. `Petals` (`gameplay/ambient/`) scatters settled petals
-    round each (`scatter(foot)`, the same every time; only on cells `ground_at()` calls "open" or "water") and
-    drifts a few from each crown (`CPUParticles2D`).
-  - **Wind in small things** (`SwayLayer`): tufts, flowers, crops and washing move from Decor to a layer just
-    above it whose shader leans each tile's top rows, each cell in its own time, never past the tile's edge.
+    round each (`scatter(foot)`, the same every time; only on cells `ground_at()` calls "open" or "water").
+    None are in the air.
   - **Water** (`WaterSurface`): one rectangle over the water's bounds, just above the Height layer, with a shader
     that reads a one-pixel-a-cell map of the water: a slow swell, glints, sparkles, and foam at the bank one to
     three pixels wide. `HeightShading` keeps only the dark line under the bank.
   - **Reflections** (`Reflections`): a mirror `Sprite2D` (flipped, hanging below the feet) for the hero and for
     each tree within three cells north of water, shown only on water cells by a shader with the same map.
   - **Mist** (`Mist`, `gameplay/ambient/`): two layers of noise in four flat steps, pinned to the world, for the
-    areas in `Ambience.MISTY` (the Old Wood).
+    areas in `Ambience.MISTY` (the Old Wood). It lies still: its shader reads no time.
 - **Buildings** (P1d), for show, built in `_add_ambience()` like the trees: pictures over the map, the Height
   layer untouched.
   - **Walls with a face and a top** (`WallRelief`, `world/areas/`): for the wall tiles in
@@ -588,7 +602,7 @@ run headless; see CLAUDE.md for the command and gotchas.
   - **Pillars and ridges** (`Scenery.build_stone()`): a 28-pixel pillar over each pillar tile, and an 8-pixel
     strip of ridge over each cell of a roof's top row (`ReliefAtlas.ridge_of(kind)` gives the roof's style and
     whether it is a gable end). Both are sorted by depth: a ridge sits just inside the building's top edge, so
-    whoever walks behind the house is drawn first. Neither sways or fades.
+    whoever walks behind the house is drawn first. Neither fades.
   - `ReliefAtlas` (`world/tiles/relief.png`) is painted by `tools/art/make_relief.gd`.
   - **A shader gotcha:** in a canvas shader `COLOR` already holds the texture's colour times the node's tint
     when `fragment()` starts. To sample the texture again, carry the tint from `vertex()` in a varying; don't

@@ -56,7 +56,6 @@ func test_the_plot_lies_between_the_shop_and_the_well() -> void:
 		assert_bool(village.grid.is_solid(cell) or village.terrain.is_occupied(cell)).override_failure_message("%s is open" % cell).is_false()
 		assert_int(village.terrain.standing_level(cell)).is_equal(0)
 		assert_int(decor.get_cell_source_id(cell)).override_failure_message("nothing grows at %s" % cell).is_equal(-1)
-		assert_bool(village.sway != null and village.sway.get_cell_source_id(cell) != -1).override_failure_message("nothing sways at %s" % cell).is_false()
 		assert_object(village.exit_at(cell)).is_null()
 	# Drawn over the map and under whatever stands on it.
 	for under: Node in [village.height_layer, decor]:

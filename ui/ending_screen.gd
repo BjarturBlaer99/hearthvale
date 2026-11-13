@@ -4,7 +4,7 @@ extends Control
 ## (the area comes here when the flag AreaController.ENDING_FLAG is set). "The End" over the
 ## title's picture with the keep's window dark, what the game took (EndingSummary), and two
 ## choices: keep exploring (back to where the hero stood) or save and go to the title. Up and
-## down pick, E or Enter chooses.
+## down pick, a click or Enter chooses.
 
 const KEEP_EXPLORING: StringName = &"explore"
 const SAVE_AND_QUIT: StringName = &"save_quit"
@@ -25,6 +25,7 @@ func _init() -> void:
 
 func _ready() -> void:
 	get_tree().paused = false
+	MenuInput.let_clicks_through(self)
 	EventBus.music_requested.emit(&"village")
 	cursor.set_options([
 		MenuCursor.option(KEEP_EXPLORING, "Keep exploring"),

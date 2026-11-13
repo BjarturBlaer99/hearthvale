@@ -26,6 +26,6 @@ func dialogue() -> Dictionary:
 	return DataRegistry.get_dialogue(dialogue_id)
 
 
-## The HUD prompt for using it, after "[E] ".
+## The HUD prompt for using it, after the interact button's name.
 func prompt() -> String:
 	return "Talk"

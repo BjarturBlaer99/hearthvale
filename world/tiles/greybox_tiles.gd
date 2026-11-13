@@ -31,7 +31,8 @@ extends RefCounted
 ##  16-19 house fronts (HOUSE_KINDS): roofs with a gable's barge board on their left or right edge,
 ##     thatch, the half-timbered upper floor, and the stone chapel
 ##  20 overlays for the Decor layer on houses: chimney, the chapel's cross (two halves), shop sign
-##  21 chimney smoke, animated: SMOKE_FRAMES frames side by side
+##  21 chimney smoke: SMOKE_FRAMES frames side by side, of which the game shows the first (it
+##     stands still since 2026-11-13)
 ##  22 more trees for the Decor layer: a pine, a broad oak, a closed canopy for thick woods, and
 ##     a cherry in blossom. Scenery stands every tree but the canopy up as a tall picture (P1c),
 ##     so these tiles only mark where they grow
@@ -85,9 +86,9 @@ const HOUSE_DOOR_KINDS: Array[String] = ["chapel_door_l", "chapel_door_r"]
 const HOUSE_DOOR_HEIGHT: int = 2
 ## Overlays that sit on house tiles, on the Decor layer.
 const HOUSE_DECOR_KINDS: Array[String] = ["chimney", "cross_l", "cross_r", "shop_sign"]
-## Chimney smoke's animation: frames, and how long each shows (seconds).
+## How many frames of chimney smoke the tile texture has. The game shows the first: the smoke
+## stands still.
 const SMOKE_FRAMES: int = 4
-const SMOKE_FRAME_TIME: float = 0.35
 const PROPS_B_KINDS: Array[String] = ["prop_crate", "prop_keg", "prop_hay", "prop_logs", "prop_stump", "prop_lamp", "prop_stone", "bucket"]
 const PROPS_C_KINDS: Array[String] = ["stall_nw", "stall_n", "stall_ne", "stall_sw", "stall_s", "stall_se", "laundry", "prop_post"]
 ## More solid indoor furniture, with shading heights like FURNITURE_HEIGHTS.

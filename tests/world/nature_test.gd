@@ -3,9 +3,10 @@ extends GdUnitTestSuite
 ## exactly its own cell, and a crown fades while the hero, an enemy or a pickup stands behind
 ## it, so nothing is hidden. Hearthvale has cherry trees: eight in new cells the user approved,
 ## and nothing else about where the hero can go has changed. Petals lie only on open ground and
-## water; grass, flowers and washing sway on a layer of their own; water has a moving surface
-## and mirrors the hero and the trees on its bank; the Old Wood has mist. Outlines are dark on
-## the edge of a shape and soft inside it.
+## water; water has a moving surface and mirrors the hero and the trees on its bank; the Old
+## Wood has mist. Nothing else in the scenery moves (the user's request, 2026-11-13): grass,
+## flowers, washing, trees, petals, mist and chimney smoke are still. Outlines are dark on the
+## edge of a shape and soft inside it.
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
@@ -58,7 +59,7 @@ func test_every_tree_stands_up_and_still_blocks_exactly_its_own_cell() -> void:
 	assert_int(_load(ELDER_HOUSE).scenery.by_cell.size()).override_failure_message("no trees indoors").is_equal(0)
 
 
-func test_the_tall_pictures_fit_their_atlas_with_room_to_sway() -> void:
+func test_the_tall_pictures_fit_their_atlas_with_room_to_spare() -> void:
 	var atlas: Texture2D = load(SceneryAtlas.TEXTURE_PATH)
 	assert_that(Vector2i(atlas.get_size())).is_equal(Vector2i(SceneryAtlas.CELL.x * SceneryAtlas.KINDS.size(), SceneryAtlas.CELL.y))
 	var image: Image = atlas.get_image()
@@ -71,7 +72,7 @@ func test_the_tall_pictures_fit_their_atlas_with_room_to_sway() -> void:
 				if image.get_pixel(region.position.x + x, region.position.y + y).a > 0.0:
 					painted += 1
 		assert_int(painted).override_failure_message("'%s' is painted" % kind).is_greater(300)
-		# Clear pixels to either side: a crown leaning in the wind never shows its neighbour.
+		# Clear pixels to either side: a crown never shows its neighbour.
 		for y: int in SceneryAtlas.CELL.y:
 			for dx: int in [-2, -1, region.size.x, region.size.x + 1]:
 				assert_float(image.get_pixel(region.position.x + dx, y).a).override_failure_message("'%s' has clear padding" % kind).is_equal(0.0)
@@ -171,25 +172,45 @@ func test_petals_lie_only_on_open_ground_and_water_and_always_in_the_same_places
 		if ground == "water":
 			afloat += 1
 	assert_int(afloat).override_failure_message("some float on the pond").is_greater(0)
-	assert_int(village.petals.get_child_count()).override_failure_message("petals drift from every cherry tree").is_equal(village.scenery.cherry_feet().size())
+	assert_int(village.scenery.cherry_feet().size()).is_greater(8)
+	assert_int(village.petals.get_child_count()).override_failure_message("none are in the air").is_equal(0)
 	assert_int(_load(OLD_WOOD).petals.settled.size()).override_failure_message("no cherry trees, no petals").is_equal(0)
 
 
-func test_grass_flowers_and_washing_sway_on_a_layer_of_their_own() -> void:
+func test_nothing_in_the_scenery_moves_but_the_water() -> void:
 	var village: AreaController = _load(VILLAGE)
 	var decor: TileMapLayer = village.get_node(^"Decor")
-	var moving: Array[Vector2i] = []
-	for kind: String in SwayLayer.KINDS:
-		moving.append(GreyboxTiles.coords(kind))
+	# Grass, flowers and washing are plain tiles on the Decor layer: no layer of their own, no wind.
+	var small: int = 0
+	for kind: String in ["tuft", "flowers_red", "flowers_yellow", "flowers_blue", "laundry"]:
 		assert_bool(GreyboxTiles.is_decor(kind)).override_failure_message("'%s' is a decoration: it never blocks" % kind).is_true()
-	for cell: Vector2i in decor.get_used_cells():
-		assert_bool(moving.has(decor.get_cell_atlas_coords(cell))).override_failure_message("nothing that sways is left on Decor (%s)" % cell).is_false()
-	assert_int(village.sway.get_used_cells().size()).override_failure_message("tufts and flowers moved over").is_greater(20)
-	for cell: Vector2i in village.sway.get_used_cells():
-		assert_bool(moving.has(village.sway.get_cell_atlas_coords(cell))).is_true()
-	assert_bool(village.sway.material is ShaderMaterial).override_failure_message("the wind is a shader").is_true()
-	assert_int(village.sway.get_index()).override_failure_message("just above Decor").is_equal(decor.get_index() + 1)
-	assert_bool(decor.get_used_cells().size() > 0).override_failure_message("lamps, crates and the well stay put").is_true()
+		small += decor.get_used_cells_by_id(GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(kind)).size()
+	assert_int(small).override_failure_message("tufts, flowers and washing lie on Decor").is_greater(20)
+	assert_object(decor.material).override_failure_message("no shader moves them").is_null()
+	var layers: Array = []
+	for child: Node in village.get_children():
+		if child is TileMapLayer:
+			layers.append(String(child.name))
+	assert_array(layers).override_failure_message("no layer for the wind").contains_exactly(["Height", "Decor", "Spawns"])
+	assert_bool(&"sway" in village or &"motes" in village).override_failure_message("no wind and no specks in the air").is_false()
+	# Trees stand still, and no petal is in the air.
+	assert_int(village.scenery.by_cell.size()).is_greater(50)
+	for tree: Sprite2D in village.scenery.by_cell.values():
+		assert_object(tree.material).override_failure_message("%s doesn't sway" % tree.name).is_null()
+	assert_int(village.petals.get_child_count()).is_equal(0)
+	assert_object(village.petals.material).is_null()
+	# Chimney smoke is one still picture.
+	var source: TileSetAtlasSource = decor.tile_set.get_source(GreyboxTiles.SOURCE_ID)
+	assert_int(decor.get_used_cells_by_id(GreyboxTiles.SOURCE_ID, GreyboxTiles.coords("smoke")).size()).override_failure_message("the chimneys still smoke").is_equal(4)
+	assert_int(source.get_tile_animation_frames_count(GreyboxTiles.coords("smoke"))).override_failure_message("the smoke stands still").is_equal(1)
+	# The water is the one thing that moves: its tile plays its frames, and its surface keeps time.
+	assert_int(source.get_tile_animation_frames_count(Vector2i(0, GreyboxTiles.ROW_WATER))).is_equal(GreyboxTiles.WATER_FRAMES)
+	assert_str((village.water.material as ShaderMaterial).shader.code).override_failure_message("the water's surface moves").contains("TIME")
+	# Mist lies still over the Old Wood, and its trees stand as still.
+	var wood: AreaController = _load(OLD_WOOD)
+	assert_str((wood.mist.material as ShaderMaterial).shader.code).override_failure_message("the mist doesn't drift").not_contains("TIME")
+	for tree: Sprite2D in wood.scenery.by_cell.values():
+		assert_object(tree.material).is_null()
 
 
 func test_water_has_a_moving_surface_and_mirrors_the_hero_and_the_trees_on_its_bank() -> void:
@@ -225,6 +246,7 @@ func test_the_old_wood_has_mist_and_nowhere_else() -> void:
 	assert_object(_load(KEEP).mist).is_null()
 	assert_bool(Ambience.has_mist(&"old_wood")).is_true()
 	assert_bool(Ambience.has_mist(&"crypt")).is_false()
+	assert_str(Mist.CODE).override_failure_message("it lies still").not_contains("TIME")
 
 
 func test_outlines_are_dark_on_the_edge_of_a_shape_and_soft_inside_it() -> void:

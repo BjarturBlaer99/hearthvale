@@ -110,20 +110,19 @@ var lighting: AreaLighting
 var tile_glows: Array = []
 ## The trees, standing up from the ground and sorted by depth with everyone else (P1c).
 var scenery: Scenery
-## Grass, flowers and washing moving in the wind; cherry petals; the water's surface; mist.
-var sway: TileMapLayer
 ## Walls with a front face and a top (P1d), or null in an area with no such walls.
 var relief: WallRelief
 ## The houses' lit windows (P2e), if the area has any.
 var windows: WindowGlow
 ## The hero's plot (P3), if it lies in this area.
 var plot: FarmPlot
+## Nature that is only for show (P1c): petals lying round the cherry trees; the water's surface
+## and what it mirrors; mist. The water is the one thing in the scenery that moves (the user's
+## request, 2026-11-13): grass, trees, petals, mist and smoke are still.
 var petals: Petals
 var water: WaterSurface
 var reflections: Reflections
 var mist: Mist
-## Specks drifting in the air.
-var motes: Motes
 
 var _travelling: bool = false
 ## The ending flag was just set: the ending screen comes when the conversation closes.
@@ -927,10 +926,7 @@ func _add_ambience() -> void:
 			plot = child as FarmPlot
 			plot.clear_ground(decor)
 	tile_glows = Ambience.tile_glows([height_layer, decor])
-	motes = Motes.new()
-	motes.kind = ambience
-	add_child(motes)
-	# Nature (P1c): tall trees the hero walks behind, wind, water, petals and mist.
+	# Nature (P1c): tall trees the hero walks behind, water, petals and mist.
 	scenery = Scenery.new()
 	add_child(scenery)
 	scenery.build(decor)
@@ -940,10 +936,6 @@ func _add_ambience() -> void:
 	if relief != null:
 		add_child(relief)
 		move_child(relief, height_layer.get_index() + 1)
-	sway = SwayLayer.take_from(decor)
-	if sway != null:
-		add_child(sway)
-		move_child(sway, decor.get_index() + 1)
 	water = WaterSurface.make(height_layer, grid.size)
 	if water != null:
 		add_child(water)
@@ -1372,14 +1364,14 @@ func _update_hud() -> void:
 		return
 	var pickup: ItemPickup = pickup_under_player()
 	if pickup != null:
-		hud.set_prompt("[E] Pick up the %s" % pickup.item_name())
+		hud.set_prompt(MenuInput.prompt("Pick up the %s" % pickup.item_name()))
 		return
 	var talkable: Talkable = talkable_in_front()
 	if talkable != null:
-		hud.set_prompt("[E] %s" % talkable.prompt())
+		hud.set_prompt(MenuInput.prompt(talkable.prompt()))
 		return
 	var usable: Node2D = usable_in_front()
 	var text: String = str(usable.call(&"prompt")) if usable != null else ""
 	if text.is_empty():
 		text = crop_prompt()
-	hud.set_prompt("[E] %s" % text if not text.is_empty() else "")
+	hud.set_prompt(MenuInput.prompt(text) if not text.is_empty() else "")

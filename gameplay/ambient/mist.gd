@@ -1,8 +1,9 @@
 class_name Mist
 extends Node2D
-## Mist among the trees (P1c): two slow layers of pale cloud drifting over the Old Wood, in a
-## few flat steps like the rest of the art. It follows the camera but is pinned to the world,
-## so walking doesn't drag it along. Above the hero, under the HUD. For show only.
+## Mist among the trees (P1c): two layers of pale cloud lying over the Old Wood, in a few flat
+## steps like the rest of the art. It lies still (it drifted until 2026-11-13). It follows the
+## camera but is pinned to the world, so walking doesn't drag it along. Above the hero, under
+## the HUD. For show only.
 
 ## How thick it gets at most, and the patch it covers round the camera (px).
 const THICKEST: float = 0.20
@@ -20,8 +21,8 @@ void vertex() {
 
 void fragment() {
 	vec2 p = floor(at / 2.0) * 2.0;
-	float near = texture(cloud, p / 320.0 + vec2(TIME * 0.011, TIME * 0.004)).r;
-	float far = texture(cloud, p / 520.0 - vec2(TIME * 0.006, -TIME * 0.003)).r;
+	float near = texture(cloud, p / 320.0).r;
+	float far = texture(cloud, p / 520.0 + vec2(0.37, 0.61)).r;
 	float thick = clamp((near * 0.6 + far * 0.6 - 0.42) * 2.2, 0.0, 1.0);
 	thick = floor(thick * 4.0 + 0.5) / 4.0;
 	COLOR = vec4(tint.rgb, thick * thickest);

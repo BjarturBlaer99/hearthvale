@@ -78,5 +78,5 @@ offset_right = 394.0
 offset_bottom = 96.0
 theme_override_colors/font_color = Color(1, 0.84, 0.45, 1)
 theme_override_font_sizes/font_size = 8
-text = "[E]"
+text = "[Click]"
 horizontal_alignment = 2

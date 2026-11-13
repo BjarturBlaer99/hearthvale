@@ -80,4 +80,4 @@ offset_right = 190.0
 offset_bottom = 107.0
 theme_override_colors/font_color = Color(0.7, 0.7, 0.65, 1)
 theme_override_font_sizes/font_size = 8
-text = "E: equip or eat   Tab: close"
+text = "Click: choose   Tab: close"

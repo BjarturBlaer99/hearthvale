@@ -517,6 +517,23 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-13 — **The scenery is still but for the water** (the user's request: "get rid of the animations on
+  the environment except the water animation"). Gone: the wind in tufts, flowers, crops and washing
+  (`SwayLayer`) and in tree crowns, petals in the air, specks in the air (`Motes`). Kept as still pictures:
+  the mist (it no longer drifts), chimney smoke (the first of its four frames), fallen petals. Still moving:
+  the water's tile, its surface and its reflections.
+  - **Left as they were, as my reading of "environment":** the flicker of fires, lamps and torches (light),
+    creatures (chickens, butterflies, fireflies), people breathing and blinking, pickups that bob, and the
+    title screen's stars and petals. Each is one line to still if the user wants it.
+- 2026-11-13 — **Interact is the left mouse button** (the user's request: "move is the same but interact is
+  mouse"). The simplest reading: the interact action moved from E to the mouse, as a button. Nothing is
+  pointed at; the hero still faces what he acts on. E no longer interacts (one line in
+  `tools/setup_input_map.gd` to give it back as well). The sword, the item and the menus stay on the keys,
+  and the gamepad is unchanged. Because every menu takes interact as its yes, a click also answers and
+  chooses.
+- 2026-11-13 — **No screen takes the mouse for itself.** Input is read in `_unhandled_input`, which a Control
+  under the pointer cuts off, so every screen sets all its Controls to ignore the mouse as it starts. The
+  game has no clickable parts, so nothing is lost.
 - 2026-11-13 — **P3b: a ripe crop waits.** It needs no more water and never withers, however long it stands.
   The docs say when a crop withers but not whether a finished one can; losing a ripe pumpkin to a missed day
   would punish the wrong thing.

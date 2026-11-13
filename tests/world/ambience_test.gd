@@ -4,9 +4,9 @@ extends GdUnitTestSuite
 ## that shines: lamps, hearths, candles, torches, crystals, the lantern. Houses and dungeons are
 ## dim away from their lights but never around the hero. In the crypt the only pools of light
 ## are the rule's own (LightRules), at the rule's place and reach, so what is drawn lit is what
-## the rule says is lit. Shadows are soft; tall things shade the ground to their east; specks
-## drift in the air. Every label uses Hearthvale's own pixel font, and every box the shared
-## frame.
+## the rule says is lit. Shadows are soft; tall things shade the ground to their east. Every
+## label uses Hearthvale's own pixel font, and every box the shared frame. (Specks drifted in
+## the air until 2026-11-13.)
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 const FontTool: GDScript = preload("res://tools/art/make_font.gd")
@@ -227,19 +227,6 @@ func test_tall_things_shade_the_ground_to_their_east() -> void:
 				assert_bool(grid.is_solid(west) and grid.height_at(west) > grid.height_at(cell)).override_failure_message("something taller stands to the west").is_true()
 	for kind: StringName in [HeightShading.CAST_SIDE, HeightShading.CAST_SIDE_BELOW, HeightShading.CAST_CORNER]:
 		assert_int(int(kinds.get(kind, 0))).override_failure_message("the village has '%s' shadows" % kind).is_greater(0)
-
-
-func test_specks_drift_inside_their_field_the_same_way_every_time() -> void:
-	for kind: StringName in [Ambience.OUTDOOR, Ambience.INTERIOR, Ambience.DUNGEON]:
-		assert_bool(Motes.LOOKS.has(kind)).override_failure_message("a look for '%s'" % kind).is_true()
-		assert_int(int(Motes.LOOKS[kind][0])).override_failure_message("a few, not a snowstorm").is_between(4, 24)
-	for index: int in 20:
-		for seconds: float in [0.0, 7.5, 600.0]:
-			var at: Vector2 = Motes.speck_at(index, seconds, Vector2(5.0, 2.0), 5.0)
-			assert_bool(Rect2(Vector2.ZERO, Motes.FIELD).has_point(at)).override_failure_message("speck %d at %s" % [index, at]).is_true()
-			assert_that(Motes.speck_at(index, seconds, Vector2(5.0, 2.0), 5.0)).is_equal(at)
-	assert_that(Motes.speck_at(3, 1.0, Vector2(5.0, 2.0), 5.0)).override_failure_message("they move").is_not_equal(Motes.speck_at(3, 2.0, Vector2(5.0, 2.0), 5.0))
-	assert_that(_load(KEEP).motes.kind).is_equal(Ambience.DUNGEON)
 
 
 func test_the_font_has_every_letter_the_game_can_print() -> void:

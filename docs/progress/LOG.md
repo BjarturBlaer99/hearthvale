@@ -1554,3 +1554,35 @@ Plan: `docs/progress/P3-plan.md` (the second of P3's three steps).
 - **The wheat's picture as an item** looks more like a trident than a sheaf.
 - The "Carrying" line is longer again with seeds and crops in the pack.
 
+## 2026-11-13 — A still world, and interact on the mouse (the user's request; not yet tried in play)
+
+Asked for between steps 3b and 3c: "get rid of the animations on the environment except the water animation", and "change the controls so move is the same but interact is mouse". No plan file; the decisions are in `docs/DECISIONS.md`.
+
+**Built**
+- **The scenery is still.** Gone: the wind in tufts, flowers, crops and washing (`SwayLayer`, deleted) and in tree crowns (their shader), petals in the air, specks in the air (`Motes`, deleted).
+- **Kept as still pictures:** the mist over the Old Wood (it no longer drifts), chimney smoke (one frame of its four), the fallen petals round the cherry trees.
+- **The water moves as before:** its tile's frames, its surface, and its reflections.
+- **Interact is the left mouse button** (a gamepad's A is unchanged). E no longer does anything. The mouse is a button: where the click lands doesn't matter, and the hero still faces what he acts on.
+- **A click is every menu's yes:** it answers a conversation and chooses in the item menu, the pause menu, the title and the ending. Enter still works where it did.
+- **Every screen names the click:** the HUD's keys ("Click: talk / use"), its prompts ("[Click] Pick the Turnip"), the answer mark, and the help lines of the item menu, the pause menu, the title and the ending.
+- **No screen takes the mouse for itself** (`MenuInput.let_clicks_through`), so a click anywhere reaches the game.
+
+**Checked**
+- 525 tests in 74 suites pass (+5 on balance: `tests/ui/mouse_test.gd`, one in the input map's test, one for the still scenery; the tests of the sway layer and the specks went with them). Import and boot clean.
+- **Real clicks through a window** (a scratch script, since headless tests can't send them): a click over the HUD's corner starts a conversation, clicks answer it to its end, a click eats the bread under the item menu's cursor, a click resumes from the pause menu, a click on the title starts a game. All seven steps passed.
+- **Nothing about play changed:** no map was re-baked. The tileset lost five lines (the smoke's animation) and no tile moved.
+- **Mutation checks:** five deliberate bugs in runtime code, files restored. Four were caught: prompts naming E again, the mist drifting again, a shader on the trees again, petals in the air again. **One was not:** taking the HUD's call to `let_clicks_through` away changes nothing, because the HUD's own scenes already ignore the mouse. Taking it from the title or the ending is caught (their root would swallow the click). The HUD's call is a second guard, not the only one.
+- **Frame cost:** the village is 19 draw calls down (313 from 332); Elder Bram's house 45, the keep 382, the cistern 231.
+- **The player's own save was not touched** (the click check ran on slot 995 and removed it).
+- Screenshots: all 119 taken. Looked at closely: the HUD's keys, the pause menu, the title, the Old Wood under its still mist.
+
+**Known issues and limits**
+- Not tried in play. Stillness can't be seen in a screenshot: that nothing moves but the water is checked by tests, not by eye.
+- **What I left moving, as not "the environment":** the flicker of fires, lamps and torches; creatures (chickens, butterflies, fireflies); people breathing and blinking; pickups that bob; the title screen's stars and petals. Each is one line to still.
+- **Still smoke over a chimney and a frozen lean in nothing** may look odd where motion used to explain the picture.
+- **Every click interacts,** including the click that brings the window to the front.
+- **The mouse can't point:** it can't choose a line in a menu or a cell in the plot. Menus still move with W and S.
+- **The hint in a conversation is "[Click]"**, wider than "[E]" was.
+- **E does nothing now.** If both were wanted, it is one entry in `tools/setup_input_map.gd`.
+- The sway layer's room in the tree atlas (clear pixels to each side of a crown) is still there, unused.
+

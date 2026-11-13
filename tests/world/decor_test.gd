@@ -109,7 +109,7 @@ func test_houses_carry_chimneys_that_smoke_a_cross_and_a_sign() -> void:
 	assert_that(decor.get_cell_atlas_coords(Vector2i(24, 2))).is_equal(GreyboxTiles.coords("cross_r"))
 	assert_that(decor.get_cell_atlas_coords(Vector2i(9, 23))).override_failure_message("the shop's sign").is_equal(GreyboxTiles.coords("shop_sign"))
 	var source: TileSetAtlasSource = decor.tile_set.get_source(GreyboxTiles.SOURCE_ID)
-	assert_int(source.get_tile_animation_frames_count(smoke)).override_failure_message("the smoke drifts").is_equal(GreyboxTiles.SMOKE_FRAMES)
+	assert_int(source.get_tile_animation_frames_count(smoke)).override_failure_message("the smoke stands still (2026-11-13)").is_equal(1)
 
 
 func test_woods_mix_three_kinds_of_tree_and_close_into_a_canopy() -> void:

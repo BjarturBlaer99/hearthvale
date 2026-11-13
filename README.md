@@ -19,8 +19,8 @@ volume, fullscreen, window size, the controls hint), or quit to the title. The g
 |---|---|---|
 | Move (8 directions) | WASD / arrow keys | Left stick / d-pad |
 | Sprint (hold) | Shift | B |
-| Talk / read / pick up | E | A |
-| Choose an answer | W / S or arrows, then E | d-pad, then A |
+| Talk / read / pick up / harvest | Left mouse button (a click anywhere) | A |
+| Choose an answer | W / S or arrows, then a click | d-pad, then A |
 | Swing the sword (once you have it) | Space / J | X |
 | Use the equipped item (bow, bombs) | Q / K | Y |
 | Item menu (choose what's equipped) | Tab / I | Back |
@@ -66,14 +66,17 @@ Beaten enemies sometimes drop hearts or coins.
 - **A warmer look** (art pass 3): sunnier grass, warmer paths, brighter water, and soft coloured outlines in
   place of black ones, on everything.
 - **Light and lettering** (art pass 4): lamps, hearths, torches and crystals glow; houses, trees and walls cast
-  shadows; houses and dungeons are dim away from their lights; specks drift in the air; and all text is the
+  shadows; houses and dungeons are dim away from their lights; and all text is the
   game's own pixel font in framed boxes.
 - **The hero** (hero pass): a leather vest, wrist guards, a belt pouch and tall boots over the blue tunic, the
   sword on his back until he swings it, and a small pack. He breathes when he stands, leans into a sprint,
   winds up before a swing, flinches when hit and bends his knees landing from a ledge.
+- **A still world, and a click to interact** (asked for on 2026-11-13): nothing in the scenery moves but the
+  water, and talking, picking up and choosing are on the left mouse button. Moving, the sword and the item
+  are on the keys as before.
 - **Seeds and crops** (the pivot, step 3b): turnips, carrots, wheat, potatoes and pumpkins. A seed is planted
   from the item button in tilled soil; a crop grows a stage each morning if it was watered the day before,
-  withers after two dry mornings in a row, and waits when ripe; E picks it. The harvest can be eaten raw. A
+  withers after two dry mornings in a row, and waits when ripe; a click picks it. The harvest can be eaten raw. A
   first pouch of turnip seeds lies in the cottage (seeds are sold from step 3c).
 - **A plot to farm** (the pivot, step 3a): eighteen cells of soil between Tilda's shop and the well. The hoe
   and the watering can lie in the hero's cottage and go on the item button: the hoe tills a cell, the can
@@ -103,8 +106,8 @@ Beaten enemies sometimes drop hearts or coins.
 - **Real light** (the pivot, step 1b): every lamp, hearth, candle, torch and crystal is a light, houses are warm
   and dim, dungeons cool and dim, and shadows have soft edges.
 - **Living nature** (the pivot, step 1c): trees stand tall and you walk behind them; Hearthvale has cherry trees
-  in blossom, with petals on the wind, the grass and the pond; grass and washing move in the wind; water
-  ripples, foams at the bank and mirrors you; the Old Wood has mist.
+  in blossom, with fallen petals on the grass and the pond; water ripples, foams at the bank and mirrors
+  you; the Old Wood has mist. Only the water moves.
 - **Walls with height** (the pivot, step 1d): dungeon and house walls show a lit front and a dark top, pillars
   stand tall, and roofs have a ridge you walk behind.
 - **The road north:** from the top of the north rise, through the woods.
@@ -123,7 +126,7 @@ Beaten enemies sometimes drop hearts or coins.
   until the Iron Warden is beaten (ask Guard Rolf).
   - It's dark. The first rooms are lit by braziers; further in you see only what your own light reaches.
   - **Pits:** stepping into one costs half a heart and puts you back at its edge. Push a block in to bridge one.
-  - **The Lantern** is in a tomb behind the first locked door. Carry it and you see further, and E lights torches.
+  - **The Lantern** is in a tomb behind the first locked door. Carry it and you see further, and a click lights torches.
     Lit torches open barred doors; in the Knight's Tomb three of them burn only for a few seconds.
   - **The Iron Sword** is in the Knight's Tomb, and hits harder than the wooden one.
   - **The Crypt Shade** waits behind the boss door. Blows pass through it: light all four braziers in its hall

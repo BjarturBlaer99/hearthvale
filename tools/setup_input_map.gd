@@ -4,6 +4,9 @@ extends SceneTree
 ##   godot --headless --path . -s res://tools/setup_input_map.gd
 ## Keys are physical, so WASD sits in the same place on any keyboard layout.
 ## Gamepad events apply to every connected device.
+## Interact is the left mouse button (the user's request, 2026-11-13): the hero is moved with the
+## keys and talks, picks up and chooses with a click. It is a button, not a pointer: where the
+## click lands doesn't matter.
 
 const DEADZONE: float = 0.25
 ## Actions from earlier designs, cleared if present.
@@ -15,7 +18,7 @@ func _initialize() -> void:
 	_action("move_right", [_key(KEY_D), _key(KEY_RIGHT), _axis(JOY_AXIS_LEFT_X, 1.0), _button(JOY_BUTTON_DPAD_RIGHT)])
 	_action("move_up", [_key(KEY_W), _key(KEY_UP), _axis(JOY_AXIS_LEFT_Y, -1.0), _button(JOY_BUTTON_DPAD_UP)])
 	_action("move_down", [_key(KEY_S), _key(KEY_DOWN), _axis(JOY_AXIS_LEFT_Y, 1.0), _button(JOY_BUTTON_DPAD_DOWN)])
-	_action("interact", [_key(KEY_E), _button(JOY_BUTTON_A)])
+	_action("interact", [_mouse(MOUSE_BUTTON_LEFT), _button(JOY_BUTTON_A)])
 	_action("attack", [_key(KEY_SPACE), _key(KEY_J), _button(JOY_BUTTON_X)])
 	_action("sprint", [_key(KEY_SHIFT), _button(JOY_BUTTON_B)])
 	_action("use_item", [_key(KEY_Q), _key(KEY_K), _button(JOY_BUTTON_Y)])
@@ -39,6 +42,13 @@ func _key(physical: Key) -> InputEventKey:
 	var event: InputEventKey = InputEventKey.new()
 	event.device = -1
 	event.physical_keycode = physical
+	return event
+
+
+func _mouse(button: MouseButton) -> InputEventMouseButton:
+	var event: InputEventMouseButton = InputEventMouseButton.new()
+	event.device = -1
+	event.button_index = button
 	return event
 
 
