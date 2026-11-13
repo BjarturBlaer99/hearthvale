@@ -1,0 +1,9 @@
+{
+	"id": "pea",
+	"name": "Pea",
+	"days": 2,
+	"seed": "pea_seeds",
+	"gives": { "item": "bean", "count": 1 },
+	"seed_price": 1,
+	"sells_for": 2
+}

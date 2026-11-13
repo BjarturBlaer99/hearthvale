@@ -12,6 +12,8 @@ const FRAMES: Dictionary = {
 	&"lantern": 12, &"iron_sword": 13,
 	&"berries": 14, &"mushroom": 15, &"bread": 16, &"blossom": 17, &"tea": 18,
 	&"hoe": 19, &"watering_can": 20, &"water": 21,
+	&"turnip": 22, &"carrot": 23, &"wheat": 24, &"potato": 25, &"pumpkin": 26,
+	&"turnip_seeds": 27, &"carrot_seeds": 28, &"wheat_seeds": 29, &"potato_seeds": 30, &"pumpkin_seeds": 31,
 }
 
 

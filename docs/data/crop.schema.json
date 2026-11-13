@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "crop.schema.json",
+  "title": "Crop file (data/crops/<id>.json, one crop per file)",
+  "description": "Something that grows in the hero's plot (GDD §7, TECH_DESIGN §20): how long it takes, the seed that plants it, what a harvest gives and what Tilda pays. Every item id must be in data/items. A new crop needs no new logic: this file, a seed item, the item it gives, and its pictures (named in FarmPlot.CROP_FRAMES and ItemIcons.FRAMES).",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "days",
+    "seed",
+    "gives",
+    "seed_price",
+    "sells_for"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "As the game says it: \"Pick the Turnip\"."
+    },
+    "days": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many watered mornings it takes to ripen. A morning after a dry day doesn't count; two of those in a row wither it (data/rules/farm.json)."
+    },
+    "seed": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The item that plants it: an item of type 'seed' whose stats.crop is this crop's id."
+    },
+    "gives": {
+      "type": "object",
+      "required": [
+        "item"
+      ],
+      "description": "What a harvest puts in the pack.",
+      "properties": {
+        "item": {
+          "type": "string",
+          "minLength": 1
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        }
+      }
+    },
+    "seed_price": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "What one seed costs at Tilda's, in coins."
+    },
+    "sells_for": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "What Tilda pays for one of what it gives, in coins."
+    }
+  }
+}

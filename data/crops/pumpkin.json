@@ -1,0 +1,9 @@
+{
+	"id": "pumpkin",
+	"name": "Pumpkin",
+	"days": 8,
+	"seed": "pumpkin_seeds",
+	"gives": { "item": "pumpkin", "count": 1 },
+	"seed_price": 20,
+	"sells_for": 60
+}

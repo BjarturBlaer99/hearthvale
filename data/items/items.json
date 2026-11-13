@@ -18,6 +18,16 @@
     { "id": "blossom_tea", "name": "Cherry Blossom Tea", "type": "food", "icon": "tea", "stackable": true, "max_stack": 10, "stats": { "energy": 15 } },
     { "id": "hoe", "name": "Hoe", "type": "tool", "icon": "hoe", "stats": { "tool": "hoe", "cooldown": 0.4 } },
     { "id": "watering_can", "name": "Watering Can", "type": "tool", "icon": "watering_can", "stats": { "tool": "water", "ammo": "water", "cooldown": 0.4 } },
-    { "id": "water", "name": "Water", "type": "ammo", "icon": "water", "stackable": true, "max_stack": 10 }
+    { "id": "water", "name": "Water", "type": "ammo", "icon": "water", "stackable": true, "max_stack": 10 },
+    { "id": "turnip_seeds", "name": "Turnip Seeds", "type": "seed", "icon": "turnip_seeds", "stackable": true, "max_stack": 30, "stats": { "crop": "turnip" } },
+    { "id": "carrot_seeds", "name": "Carrot Seeds", "type": "seed", "icon": "carrot_seeds", "stackable": true, "max_stack": 30, "stats": { "crop": "carrot" } },
+    { "id": "wheat_seeds", "name": "Wheat Seeds", "type": "seed", "icon": "wheat_seeds", "stackable": true, "max_stack": 30, "stats": { "crop": "wheat" } },
+    { "id": "potato_seeds", "name": "Seed Potatoes", "type": "seed", "icon": "potato_seeds", "stackable": true, "max_stack": 30, "stats": { "crop": "potato" } },
+    { "id": "pumpkin_seeds", "name": "Pumpkin Seeds", "type": "seed", "icon": "pumpkin_seeds", "stackable": true, "max_stack": 30, "stats": { "crop": "pumpkin" } },
+    { "id": "turnip", "name": "Turnip", "type": "food", "icon": "turnip", "stackable": true, "max_stack": 30, "stats": { "energy": 7 } },
+    { "id": "carrot", "name": "Carrot", "type": "food", "icon": "carrot", "stackable": true, "max_stack": 30, "stats": { "energy": 7 } },
+    { "id": "wheat", "name": "Wheat", "type": "food", "icon": "wheat", "stackable": true, "max_stack": 30, "stats": { "energy": 5 } },
+    { "id": "potato", "name": "Potato", "type": "food", "icon": "potato", "stackable": true, "max_stack": 30, "stats": { "energy": 8 } },
+    { "id": "pumpkin", "name": "Pumpkin", "type": "food", "icon": "pumpkin", "stackable": true, "max_stack": 30, "stats": { "energy": 22 } }
   ]
 }

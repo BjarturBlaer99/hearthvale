@@ -222,11 +222,54 @@ func water_soil(cell: Vector2i) -> bool:
 	return true
 
 
-## The next day begins, at the hour days start. The plot wakes to its morning.
+## Plants a crop (a crop id) in a tilled, empty cell of the plot. Returns whether it did.
+func plant_crop(cell: Vector2i, crop_id: StringName) -> bool:
+	if DataRegistry.get_crop(crop_id).is_empty() or not farm().plant(cell, String(crop_id)):
+		return false
+	EventBus.farm_changed.emit()
+	return true
+
+
+## Whether the crop in a cell of the plot is ready to pick.
+func is_crop_ripe(cell: Vector2i) -> bool:
+	return farm().is_ripe(cell, Crops.days_of(DataRegistry.get_crop(StringName(farm().crop_at(cell)))))
+
+
+## How far along the crop in a cell of the plot is (a Farm phase), or "" if nothing grows there.
+func crop_phase(cell: Vector2i) -> StringName:
+	return farm().phase_of(cell, Crops.days_of(DataRegistry.get_crop(StringName(farm().crop_at(cell)))))
+
+
+## Picks the ripe crop in a cell of the plot into the pack. Returns what it gave
+## ({ "item", "count" }), or {} if nothing was picked: nothing ripe there, or no room for it.
+func harvest(cell: Vector2i) -> Dictionary:
+	if not is_crop_ripe(cell):
+		return {}
+	var crop: Dictionary = DataRegistry.get_crop(StringName(farm().crop_at(cell)))
+	var given: Dictionary = Crops.gives(crop)
+	var item_id: StringName = StringName(str(given["item"]))
+	if Inventory.room_for(item_count(item_id), DataRegistry.get_item(item_id)) < int(given["count"]):
+		return {}
+	farm().harvest(cell, Crops.days_of(crop))
+	add_item(item_id, int(given["count"]))
+	EventBus.farm_changed.emit()
+	return given
+
+
+## Clears a withered crop out of a cell of the plot. Returns whether one was there.
+func clear_crop(cell: Vector2i) -> bool:
+	if not farm().clear_withered(cell):
+		return false
+	EventBus.farm_changed.emit()
+	return true
+
+
+## The next day begins, at the hour days start. The plot wakes to its morning: what was
+## watered grows, what wasn't goes a day drier.
 func start_next_day() -> void:
 	day += 1
 	minute = float(day_clock().starts)
-	farm().new_day()
+	farm().new_day(Crops.days_by_id(DataRegistry.entries(&"crops")))
 	EventBus.farm_changed.emit()
 	EventBus.day_started.emit(day)
 	EventBus.time_changed.emit(day, floori(minute))
@@ -418,7 +461,7 @@ func from_dict(data: Dictionary) -> void:
 		inventory.append({"id": StringName(str(entry["id"])), "count": int(entry["count"])})
 	equipped = StringName(str(data.get("equipped", "")))
 	player = _whole_numbers_as_int(data.get("player", {}))
-	farm().load_saved(data.get("farm", {}))
+	farm().load_saved(data.get("farm", {}), DataRegistry.ids(&"crops"))
 
 
 ## JSON may return 12 as 12.0. Cells and counts are ints, so turn whole floats back into

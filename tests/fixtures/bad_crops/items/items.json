@@ -1,0 +1,7 @@
+{
+  "items": [
+    { "id": "bean_seeds", "name": "Bean Seeds", "type": "seed", "stackable": true, "max_stack": 9, "stats": { "crop": "bean" } },
+    { "id": "bean", "name": "Beans", "type": "food", "stackable": true, "max_stack": 9, "stats": { "energy": 3 } },
+    { "id": "fern_spores", "name": "Fern Spores", "type": "seed", "stats": { "crop": "fern" } }
+  ]
+}

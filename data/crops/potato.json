@@ -1,0 +1,9 @@
+{
+	"id": "potato",
+	"name": "Potato",
+	"days": 5,
+	"seed": "potato_seeds",
+	"gives": { "item": "potato", "count": 1 },
+	"seed_price": 10,
+	"sells_for": 24
+}

@@ -83,3 +83,54 @@ Nothing is built ahead of its step. Each later step gets its own "done when" lis
 - Seeds, crops, growth, withering, harvest (3b). Buying and selling, meals (3c).
 - A scarecrow, fences round the plot, fertiliser, sprinklers, bigger plots, weather, seasons: not in the
   pivot at all.
+
+---
+
+## 3b — Seeds and crops
+
+### What changes
+- **Crops are data** (`data/crops/<id>.json`, a new kind, with a schema): a crop's name, how many mornings it
+  takes to ripen, the seed that plants it, what it gives when harvested, and its two prices (used in 3c). Five
+  crops: turnip (3 days), carrot (4), wheat (5), potato (5), pumpkin (8). **A sixth crop is a file, two items
+  and its pictures: no new logic.**
+- **Seeds** are items (a new type, `seed`, naming their crop). They go on the item button like the tools:
+  used facing a tilled cell with nothing in it, one seed is planted. Planting costs no energy.
+- **A pouch of five turnip seeds** lies in the hero's home with the tools (approved on 2026-11-13). Every
+  other seed is bought, from 3c on.
+- **Growth** (`Farm`, pure, tested): each morning a crop that was watered the day before grows one stage; one
+  that wasn't has had a dry morning, and after two dry mornings in a row it withers. Watering resets the
+  count. A ripe crop waits to be picked: it needs no more water and never withers.
+- **Harvest:** facing a ripe crop, E picks it: the crop goes in the pack and the cell is tilled soil again.
+  Harvesting costs no energy. Facing a withered crop, E clears it away for nothing.
+- **Crops in the soil never block:** the hero walks through his plot whatever grows there, and tramples
+  nothing. The hoe leaves a planted cell alone.
+- **The harvest is food:** each crop is an item that can be eaten raw from the item menu, for about a third of
+  what it is worth cooked (turnip 7, carrot 7, wheat 5, potato 8, pumpkin 22 energy).
+- **The farm is saved** with its crops, in the same version 3: a cell's crop, its stage and its dry mornings
+  are new fields with defaults, and a save from step 3a loads as it is.
+- **Art:** each crop in the soil (seeded, sprouting, growing, ripe, withered), five seed pouches and five
+  crops as items, painted in the sprite tool.
+- **Sound:** planting and harvesting.
+- **Tools:** the `farm` playtest scenario gains seeds; new screenshots.
+- **The item menu scrolls** (found on the way): tools, seeds and a harvest are more lines than its box holds.
+
+### What does not change
+- Where the hero can walk. The tools from 3a. Hearts: farming never costs one.
+- The shop: seeds can't be bought and crops can't be sold until 3c. The hearth: no new recipes until 3c.
+
+### Done when
+- [x] crops are data, checked on load, with a schema; a seed names a crop that exists
+- [x] growth is unit-tested: a stage a watered morning, withering after two dry mornings in a row, a ripe
+      crop that waits
+- [x] a seed is planted from the item button in a tilled, empty cell, and nowhere else
+- [x] a ripe crop is harvested with E into the pack; a withered one is cleared
+- [x] every crop can be raised from seed to harvest in its number of days, and eaten raw
+- [x] the first pouch of turnip seeds is found at home
+- [x] the farm's crops survive a save, and a save from step 3a still loads
+- [x] all earlier tests pass
+- [ ] (yours) raising a first turnip, from the pouch to the pack, reads clearly without being told how
+
+### Not in this step
+- Buying seeds, selling crops, the meals (3c).
+- Crops that regrow, giant crops, seasons, fertiliser, crows, quality: not in the pivot at all.
+

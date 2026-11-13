@@ -5,7 +5,7 @@ extends RefCounted
 ## in GameState.inventory's shape ({ "id", "count" }). GameState applies them.
 
 ## Item types that can sit on the item button.
-const EQUIPPABLE_TYPES: Array[String] = ["weapon_ranged", "bomb", "tool"]
+const EQUIPPABLE_TYPES: Array[String] = ["weapon_ranged", "bomb", "tool", "seed"]
 ## No data means no limit (tests and items not in data yet).
 const UNLIMITED: int = 1 << 30
 
@@ -28,14 +28,14 @@ static func is_equippable(item: Dictionary) -> bool:
 	return EQUIPPABLE_TYPES.has(str(item.get("type", "")))
 
 
-## The item using up something when used: a ranged weapon's ammo, a bomb itself, what a tool
-## holds (the watering can's water). Empty if none.
+## The item using up something when used: a ranged weapon's ammo, a bomb or a seed itself,
+## what a tool holds (the watering can's water). Empty if none.
 static func ammo_for(item: Dictionary) -> String:
 	match str(item.get("type", "")):
 		"weapon_ranged", "tool":
 			var stats: Variant = item.get("stats", {})
 			return str((stats as Dictionary).get("ammo", "")) if typeof(stats) == TYPE_DICTIONARY else ""
-		"bomb":
+		"bomb", "seed":
 			return str(item.get("id", ""))
 	return ""
 

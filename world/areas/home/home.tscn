@@ -58,6 +58,13 @@ script = ExtResource("p3_pickup")
 item_id = &"watering_can"
 taken_flag = &"took_watering_can"
 
+[node name="TurnipSeeds" type="Node2D" parent="Interactables"]
+position = Vector2(96, 112)
+script = ExtResource("p3_pickup")
+item_id = &"turnip_seeds"
+count = 5
+taken_flag = &"took_first_seeds"
+
 [node name="Entries" type="Node2D" parent="." unique_id=99726273]
 
 [node name="door" type="Marker2D" parent="Entries" unique_id=2049002410]

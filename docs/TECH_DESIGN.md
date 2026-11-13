@@ -349,6 +349,7 @@ res://
 | `data/enemies/` | one enemy type per file |
 | `data/breakables/` | one breakable (grass, pot) per file |
 | `data/recipes/` | one recipe per file: what a dish needs and what it makes |
+| `data/crops/` | one crop per file: how long it takes, its seed, what it gives, its prices |
 | `data/rules/` | one set of rules per file: the numbers a system runs on (`time.json`: the day's clock; `energy.json`: the hero's energy; `hours.json`: who is where when; `night.json`: what the night does to monsters; `farm.json`: the hero's plot) |
 
 DataRegistry validates required fields and resolves every cross-reference at load. A set of rules must be one
@@ -375,7 +376,11 @@ a cell, until the area places them. Bump `version` on breaking changes and add a
   its north-west corner), each with whether it is watered. A cell that isn't listed is bare. Loading leaves out
   anything that isn't a cell of the plot. `SaveSystem._v2_to_v3()` gives a version 2 save an untouched plot; a
   test loads a real version 2 save. The can's water is an item in the inventory, so nothing more is saved for
-  it. A cell's crop joins `farm` in 3b as a field with a default: the format stays version 3.
+  it.
+  - A cell with something planted in it also has `crop` (a crop id), `stage` (the mornings it has grown),
+    `dry` (the dry mornings in a row) and `withered` (P3b). They are fields with defaults, so the format is
+    still version 3 and a save from step 3a loads as it is. A crop the game doesn't know is left out as the
+    save loads, and its soil kept.
 
 ## 10. Testing
 Every class in `core/` has gdUnit4 tests. Areas get layout tests (reachability from the spawn with the real
@@ -438,6 +443,10 @@ run headless; see CLAUDE.md for the command and gotchas.
 - **The story** is data only: conversations whose options are gated on the flags `keep_warden_beaten` and
   `crypt_shade_beaten`, and `Signpost` inscriptions in the keep, by the chapel and in the crypt. They are
   `stone`: drawn as a standing stone with carved lines, where a wayside sign is a wooden post.
+
+- **A long item list scrolls** (P3b): the item menu shows `ItemMenu.ROWS` lines (five). `window_top()` moves
+  the first line shown only as far as it must to keep the cursor in view, and the bottom corner says where
+  he is ("3/7 v": the marks show which way there is more).
 
 ## 13. Audio & feel
 - **Made in code, baked to files** (no external assets):
@@ -772,6 +781,34 @@ run headless; see CLAUDE.md for the command and gotchas.
   for the tool's `cooldown` (he stands still, in his swing pose), the farm changed, the energy spent, a sound,
   a puff, and a `ToolFlash` (the tool's picture dipping over the cell). A use that does nothing costs nothing.
   - `is_water_source(cell)`: a water tile on the Height layer, or one of the well's four Decor tiles.
-- **Where the tools are:** two `ItemPickup`s in the hero's home, by the door.
-- **Tools:** `tools/playtest.gd -- farm` starts on the road by the plot with both tools; `tools/capture.gd`
-  has the actions `farm`, `hoe`, `fill` and `tools_menu`.
+- **Where the tools are:** two `ItemPickup`s in the hero's home, by the door, and beside them the first pouch
+  of five turnip seeds.
+- **Crops are data** (P3b; `data/crops/<id>.json`, schema `docs/data/crop.schema.json`): `days`, `seed`,
+  `gives`, `seed_price`, `sells_for`. `Crops` (`core/farming/`, pure) reads them and checks them
+  (`problems()`: the seed must be a seed that names this crop, the item it gives must exist). A seed is an
+  item of type `seed` whose stats name its `crop`; the registry checks that the crop exists.
+  - What a crop gives is an ordinary `food` item, so it is eaten from the item menu and cooked with like any
+    other. There is no item type for crops.
+- **Growth** is `Farm`'s: `plant()`, `new_day(days_by_crop)`, `is_ripe()`, `phase_of()`, `harvest()`,
+  `clear_withered()`. A morning adds a stage to a crop that was watered the day before; an unwatered one
+  counts a dry morning, and `wither_after` of those in a row wither it; watering starts the count again. A
+  ripe crop is skipped: it neither grows nor withers. `Farm` is told how many mornings each crop takes, so
+  it knows nothing of the data.
+  - `phase_of()` is what shows: `SEEDED` (stage 0), `SPROUT` (the first half), `GROWING` (the second),
+    `RIPE`, `WITHERED`.
+- **Through `GameState`:** `plant_crop()`, `harvest()` (which checks the pack has room, then adds what the
+  crop gives), `clear_crop()`, `is_crop_ripe()`, `crop_phase()`. `start_next_day()` hands `new_day()` the
+  days of every crop.
+- **Planting** is a use of the item button like a tool's: `ToolUse.kind_of()` is `SEED` for a seed, and
+  `decide()` takes whether something already grows in the cell. A seed is used up itself
+  (`Inventory.ammo_for()`, as a bomb is). Planting costs no energy.
+- **Picking** is `interact()`: after pickups, people and doors, `AreaController.crop_in_front()` finds a ripe
+  or a withered crop in the cell the hero faces, `crop_prompt()` words the HUD's prompt, and `_tend_crop()`
+  picks the one or clears the other. Neither costs energy.
+- **Pictures:** `gameplay/art/crops.png` has three frames every crop shares (seeded, sprout, withered) and
+  two of its own for each crop (growing, ripe); `FarmPlot.crop_frame()` picks one, falling back to the shared
+  ones for a crop with none. All are 16 by 16 and drawn flat by the plot, under everyone: a crop never
+  blocks, hides or is hidden.
+- **Tools:** `tools/playtest.gd -- farm` starts on the road by the plot with both tools and seeds of every
+  crop; `tools/capture.gd` has the actions `farm`, `hoe`, `fill`, `tools_menu`, `crops` (a plot in the
+  middle of a season), `plant` and `seeds_menu`.

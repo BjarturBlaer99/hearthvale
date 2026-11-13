@@ -15,7 +15,7 @@ const SFX: Array[String] = [
 	"secret", "arrow", "bomb_set", "bomb", "crystal", "push", "plate", "clink", "stomp", "gaze", "stun",
 	"boss_die", "menu_move", "menu_select", "pause", "nope", "cut", "pot", "quest",
 	"torch", "snuff", "fall", "sink", "whiff", "eat", "morning", "collapse",
-	"hoe", "pour", "fill",
+	"hoe", "pour", "fill", "plant", "harvest",
 ]
 
 ## Each song: tempo, bars (4/4; every track must last bars x 8 eighths), and its tracks.
@@ -219,6 +219,19 @@ static func effect(id: String) -> PackedFloat32Array:
 				Synth.tone(&"sine", 280, 480, 0.08, 0.22, 0.01, 0.04), Synth.silence(0.03),
 				Synth.tone(&"sine", 340, 600, 0.08, 0.22, 0.01, 0.04), Synth.silence(0.03),
 				Synth.tone(&"sine", 420, 760, 0.11, 0.22, 0.01, 0.07),
+			])
+		"plant":
+			# A seed pressed into the soil: two soft pats.
+			return Synth.join([
+				Synth.tone(&"noise", 420, 180, 0.06, 0.26, 0.003, 0.045, 0.5, 54), Synth.silence(0.05),
+				Synth.tone(&"noise", 360, 150, 0.07, 0.22, 0.003, 0.05, 0.5, 55),
+			])
+		"harvest":
+			# A crop pulled from the soil: a quick rustle up, and a bright little chime.
+			return Synth.join([
+				Synth.tone(&"noise", 700, 2200, 0.09, 0.20, 0.004, 0.05, 0.5, 56),
+				Synth.tone(&"triangle", 660, 660, 0.07, 0.24, 0.004, 0.03),
+				Synth.tone(&"triangle", 990, 990, 0.13, 0.24, 0.004, 0.09),
 			])
 		"collapse":
 			# Out of energy: a long sigh downwards, and a soft fall.

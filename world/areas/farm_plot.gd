@@ -1,14 +1,24 @@
 class_name FarmPlot
 extends Node2D
 ## The hero's plot as it lies in an area (P3, GDD §7): a bed of soil, each cell drawn bare,
-## tilled or watered as GameState's Farm says. Position = the top-left corner of its first
-## cell; its size is the farm rules'. It is ground to walk on: it blocks nothing and nothing is
-## picked up from it. The area works its cells with the tools (AreaController.use_item).
+## tilled or watered as GameState's Farm says, with whatever grows in it. Position = the
+## top-left corner of its first cell; its size is the farm rules'. It is ground to walk on: it
+## blocks nothing, crops and all. The area works its cells with the tools and seeds
+## (AreaController.use_item) and picks what is ripe (interact).
 
 const SHEET: Texture2D = preload("res://gameplay/art/soil.png")
 ## Frames in the order the tool paints them (a test checks).
 const FRAMES: Dictionary = {&"bare": 0, &"bare_b": 1, &"tilled": 2, &"watered": 3}
 const CELL: Vector2i = Vector2i(16, 16)
+## What grows (gameplay/art/crops.png), in the order the tool paints the frames (a test
+## checks): three pictures every crop shares, then each crop growing and ripe.
+const CROPS: Texture2D = preload("res://gameplay/art/crops.png")
+const CROP_FRAMES: Dictionary = {
+	&"seeded": 0, &"sprout": 1, &"withered": 2,
+	&"turnip_growing": 3, &"turnip_ripe": 4, &"carrot_growing": 5, &"carrot_ripe": 6,
+	&"wheat_growing": 7, &"wheat_ripe": 8, &"potato_growing": 9, &"potato_ripe": 10,
+	&"pumpkin_growing": 11, &"pumpkin_ripe": 12,
+}
 ## The bed's rim: a dark shade of the soil, a pixel wide, so it reads as dug and not as a path.
 const RIM: Color = Color(0.30, 0.20, 0.13)
 
@@ -72,6 +82,18 @@ static func frame_for(state: StringName, cell: Vector2i) -> StringName:
 	return state
 
 
+## The picture for `crop` (a crop id) at `phase` (a Farm phase): its own while it is growing
+## or ripe; the one every crop shares when it is just planted, a sprout or withered, and for a
+## crop that has no pictures of its own.
+static func crop_frame(crop: String, phase: StringName) -> StringName:
+	var own: StringName = StringName("%s_%s" % [crop, phase])
+	if CROP_FRAMES.has(own):
+		return own
+	if CROP_FRAMES.has(phase):
+		return phase
+	return &"sprout"
+
+
 func _draw() -> void:
 	var farm: Farm = GameState.farm()
 	var size: Vector2i = plot_size()
@@ -84,3 +106,9 @@ func _draw() -> void:
 	draw_rect(Rect2(0.0, bed.y - 1.0, bed.x, 1.0), RIM)
 	draw_rect(Rect2(0.0, 0.0, 1.0, bed.y), RIM)
 	draw_rect(Rect2(bed.x - 1.0, 0.0, 1.0, bed.y), RIM)
+	# What grows, over the soil and its rim.
+	for y: int in size.y:
+		for x: int in size.x:
+			var cell: Vector2i = Vector2i(x, y)
+			if farm.has_crop(cell):
+				SpriteSheet.draw(self, CROPS, CROP_FRAMES[crop_frame(farm.crop_at(cell), GameState.crop_phase(cell))], CELL, Vector2(cell * CELL))

@@ -20,6 +20,7 @@ const KIND_ENEMY: StringName = &"enemy"
 const KIND_BREAKABLE: StringName = &"breakable"
 const KIND_RULES: StringName = &"rules"
 const KIND_RECIPE: StringName = &"recipe"
+const KIND_CROP: StringName = &"crop"
 
 ## Directory under DATA_ROOT -> the kind of file it holds.
 const DIRECTORY_KINDS: Dictionary = {
@@ -30,6 +31,7 @@ const DIRECTORY_KINDS: Dictionary = {
 	"breakables": KIND_BREAKABLE,
 	"rules": KIND_RULES,
 	"recipes": KIND_RECIPE,
+	"crops": KIND_CROP,
 }
 
 const REQUIRED_FIELDS: Dictionary = {
@@ -44,6 +46,7 @@ const REQUIRED_FIELDS: Dictionary = {
 	&"breakable": ["id", "name", "breaks_on", "drops"],
 	&"rules": ["id"],
 	&"recipe": ["id", "makes", "needs"],
+	&"crop": ["id", "name", "days", "seed", "gives", "seed_price", "sells_for"],
 }
 ## The sets of rules the game knows (data/rules/<id>.json), by id.
 const RULES_TIME: StringName = &"time"
@@ -159,6 +162,11 @@ func get_recipe(id: StringName) -> Dictionary:
 	return get_entry(&"recipes", id)
 
 
+## What grows from a seed, how long it takes and what it gives (data/crops/<id>.json).
+func get_crop(id: StringName) -> Dictionary:
+	return get_entry(&"crops", id)
+
+
 ## The numbers a system runs on (data/rules/<id>.json), e.g. &"time" for the day's clock.
 func get_rules(id: StringName) -> Dictionary:
 	return get_entry(&"rules", id)
@@ -170,7 +178,7 @@ func get_rules(id: StringName) -> Dictionary:
 ## an empty result means every file is valid and every reference resolves.
 func load_all(root: String = DATA_ROOT) -> PackedStringArray:
 	errors = []
-	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}, &"recipes": {}}
+	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}, &"recipes": {}, &"crops": {}}
 	if not DirAccess.dir_exists_absolute(root):
 		errors.append("%s: data directory does not exist." % root)
 		return errors
@@ -217,6 +225,8 @@ func _load_file(path: String, kind: StringName) -> void:
 			_register(path, data, &"rules", &"rules")
 		KIND_RECIPE:
 			_register(path, data, &"recipe", &"recipes")
+		KIND_CROP:
+			_register(path, data, &"crop", &"crops")
 
 
 ## Registers every object in the array `data[key]`.
@@ -272,8 +282,16 @@ func _validate_references() -> void:
 	for recipe: Dictionary in _collections[&"recipes"].values():
 		for problem: String in Cooking.problems(recipe, known):
 			errors.append("%s: recipe '%s': %s" % [recipe["_source"], recipe["id"], problem])
+	var item_of: Callable = func(id: String) -> Dictionary: return _collections[&"items"].get(StringName(id), {})
+	var is_crop: Callable = func(id: String) -> bool: return _collections[&"crops"].has(StringName(id))
+	for crop: Dictionary in _collections[&"crops"].values():
+		for problem: String in Crops.problems(crop, item_of):
+			errors.append("%s: crop '%s': %s" % [crop["_source"], crop["id"], problem])
 	for item: Dictionary in _collections[&"items"].values():
 		var stats: Variant = item.get("stats", {})
+		if Crops.is_seed(item):
+			for problem: String in Crops.seed_problems(item, is_crop):
+				errors.append("%s: item '%s': %s" % [item["_source"], item["id"], problem])
 		if typeof(stats) == TYPE_DICTIONARY and (stats as Dictionary).has("ammo"):
 			_check_id(item["_source"], "item '%s' ammo" % item["id"], &"items", str(stats["ammo"]))
 		if Food.is_food(item):

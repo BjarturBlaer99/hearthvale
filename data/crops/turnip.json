@@ -1,0 +1,9 @@
+{
+	"id": "turnip",
+	"name": "Turnip",
+	"days": 3,
+	"seed": "turnip_seeds",
+	"gives": { "item": "turnip", "count": 1 },
+	"seed_price": 5,
+	"sells_for": 12
+}

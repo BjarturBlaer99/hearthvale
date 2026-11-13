@@ -1512,3 +1512,45 @@ Plan: `docs/progress/P3-plan.md` (the first of P3's three steps: 3a the plot and
 - **He can fill the can at any open water,** the stream in the North Fields too, though the plot is only in Hearthvale.
 - The "Carrying" line is longer still with two tools in it.
 
+## 2026-11-13 — P3b: seeds and crops (built; not yet tried in play)
+
+Plan: `docs/progress/P3-plan.md` (the second of P3's three steps).
+
+**Built**
+- **Crops are data** (`data/crops/`, a new kind, with a schema; read by `Crops` in `core/farming/`, pure): turnip (3 days), carrot (4), wheat (5), potato (5), pumpkin (8), each with its seed, what it gives and its two prices (for 3c).
+- **Seeds** are items of a new type, `seed`. On the item button, one is planted in the tilled, empty cell the hero faces. Planting costs no energy.
+- **A first pouch of five turnip seeds** lies in the cottage with the tools.
+- **Growth** (`Farm`, pure): each morning a crop that was watered the day before grows a stage; an unwatered one has a dry morning, and two of those in a row wither it. Watering starts the count again. A ripe crop waits.
+- **Picking:** facing a ripe crop, E puts it in the pack ("[E] Pick the Turnip") and leaves tilled soil. Facing a withered one, E clears it away. Neither costs energy. A full pack leaves the crop in the soil.
+- **Crops never block:** he walks through the plot whatever grows there. The hoe leaves a planted cell alone.
+- **The harvest is food:** turnip 7 energy raw, carrot 7, wheat 5, potato 8, pumpkin 22.
+- **Saved** in the same version 3: a planted cell also keeps its crop, its stage and its dry mornings.
+- **The item menu scrolls:** it shows five lines and says where the cursor is ("3/7 v").
+- **Art:** thirteen crop pictures (three every crop shares, two of its own for each) and ten item pictures (five crops, five seed pouches), painted in the sprite tool.
+- **Sound:** planting and harvesting.
+- **Tools:** the `farm` playtest scenario has seeds of every crop; four new screenshots (119 in all).
+
+**Checked**
+- 520 tests in 73 suites pass (+28: `tests/core/farming/growth_test.gd`, `tests/core/farming/crops_test.gd`, `tests/world/crops_test.gd`, `tests/autoload/crop_save_test.gd`). The new ones passed on their first run. Import and boot clean.
+- **Every crop was raised as a player raises it:** a test tills, plants and waters a cell for each crop from the item button, waters it each day, and finds each ripe on the morning its data says (3, 4, 5, 5, 8); then picks and eats each.
+- **Where the hero can walk is unchanged:** a test walks him across a plot full of ripe pumpkins, and finds the farm as it was.
+- **Saves:** a save made by step 3a (soil with nothing in it) loads as it is; the version 2 and version 1 saves still load; a crop the game doesn't know is left out and its soil kept.
+- **Hearts are never touched:** the season in the test ends with full hearts.
+- **Older tests updated:** the list of item ids (ten more). The heading test caught the menu's new count sitting above the box's rule; it moved to the bottom line.
+- **Found on the way:** the item menu ran out of its box at seven lines (tools, seeds, two crops), so it scrolls now.
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: a crop growing unwatered, one dry morning withering a crop, a ripe crop withering, planting that uses no seed, a harvest lost when the pack is full.
+- **Frame cost:** draw calls as the last step (the village 332, Elder Bram's house 46, the keep 382, the cistern 231).
+- **The player's own save was not touched** by the tools or the tests (the tests use slots 982 and 983).
+- Screenshots: all 119 taken. Looked at closely: the plot in the middle of a season (every crop growing and ripe, a seed, a sprout, a withered one); the prompt at a ripe turnip; the pouch on the cottage floor; the item menu with seven lines; all 23 new pictures enlarged.
+
+**Known issues and limits**
+- Not tried in play. **Whether the first turnip reads without being told how** is for a playtest: nothing in the game says to till, plant and water, or that a crop needs water every day.
+- **Seeds can't be bought until 3c.** In the real game the five turnip seeds at home are all there are for one more step.
+- **Nothing shows which crops were watered today** but the colour of their soil, and nothing warns that a crop has had a dry morning.
+- **Standing below a crop, the hero's head hides it** (he is two cells tall). The prompt says what is there.
+- **Crops are small:** a cell each, drawn flat. Wheat and pumpkins fill their cells; a seed is a few pixels.
+- **A ripe crop never spoils,** so a plot can be left ripe for as long as he likes.
+- **The numbers are starting values:** the raw energies are mine (a third of the cooked ones in the plan, roughly), and all are data.
+- **The wheat's picture as an item** looks more like a trident than a sheaf.
+- The "Carrying" line is longer again with seeds and crops in the pack.
+

@@ -37,13 +37,14 @@ const SCENARIOS: Dictionary = {
 		"items": [[&"cherry_blossom", 4], [&"bread", 2], [&"wild_berries", 4], [&"coin", 20]],
 		"flags": [],
 	},
-	# On the road by the plot, with the hoe and the watering can (empty: the well is to the
-	# east) and a sword: for trying the farm.
+	# On the road by the plot, with the hoe, the watering can (empty: the well is to the east),
+	# seeds of every crop and a sword: for trying the farm. The bed at home ends a day.
 	"farm": {
 		"area": &"village",
 		"cell": Vector2i(15, 17),
-		"items": [[&"wooden_sword", 1], [&"hoe", 1], [&"watering_can", 1]],
-		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can"],
+		"items": [[&"wooden_sword", 1], [&"hoe", 1], [&"watering_can", 1], [&"turnip_seeds", 5], [&"carrot_seeds", 3],
+			[&"wheat_seeds", 3], [&"potato_seeds", 3], [&"pumpkin_seeds", 2]],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds"],
 	},
 	# At home, by the door: for trying the bed.
 	"home": {

@@ -136,6 +136,10 @@ const SHOTS: Array = [
 	["113_the_tools_at_home", &"home", Vector2i(6, 6), Vector2.DOWN, 0, ""],
 	["114_tools_in_the_item_menu", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "tools_menu"],
 	["115_filling_the_can_at_the_well", &"village", Vector2i(17, 19), Vector2.RIGHT, 0, "fill"],
+	["116_crops_growing_and_ripe", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "crops"],
+	["117_a_ripe_turnip_to_pick", &"village", Vector2i(12, 20), Vector2.UP, 0, "crops"],
+	["118_planting_a_seed", &"village", Vector2i(17, 20), Vector2.UP, 0, "plant"],
+	["119_seeds_and_crops_in_the_item_menu", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "seeds_menu"],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -218,6 +222,25 @@ func _capture() -> void:
 			game_state.call(&"equip", &"bomb" if shot[5] == "bomb" else &"bow")
 		if shot[5] == "cook":
 			game_state.call(&"add_item", &"cherry_blossom", 4)
+		if shot[5] in ["crops", "plant", "seeds_menu"]:
+			# The plot in the middle of a season: the top row growing, the middle row ripe (a column
+			# a crop: turnip, carrot, wheat, potato, pumpkin), and along the bottom a seed just
+			# planted, a sprout and a withered crop. The last column is tilled and empty.
+			var cells: Dictionary = {}
+			var raised: Array = [["turnip", 2, 3], ["carrot", 2, 4], ["wheat", 3, 5], ["potato", 3, 5], ["pumpkin", 4, 8]]
+			for x: int in raised.size():
+				cells["%d,0" % x] = {"watered": true, "crop": raised[x][0], "stage": raised[x][1]}
+				cells["%d,1" % x] = {"watered": false, "crop": raised[x][0], "stage": raised[x][2]}
+			cells["0,2"] = {"watered": true, "crop": "carrot", "stage": 0}
+			cells["1,2"] = {"watered": true, "crop": "pumpkin", "stage": 1}
+			cells["2,2"] = {"watered": false, "crop": "wheat", "stage": 2, "dry": 2, "withered": true}
+			for y: int in 3:
+				cells["5,%d" % y] = {"watered": y == 0}
+			(game_state.call(&"farm") as Farm).load_saved({"cells": cells})
+			root.get_node("EventBus").emit_signal(&"farm_changed")
+			for item: Array in [[&"hoe", 1], [&"watering_can", 1], [&"water", 6], [&"turnip_seeds", 5], [&"carrot_seeds", 3], [&"pumpkin_seeds", 2], [&"turnip", 4], [&"pumpkin", 1]]:
+				game_state.call(&"add_item", item[0], item[1])
+			game_state.call(&"equip", &"turnip_seeds")
 		if shot[5] in ["farm", "hoe", "tools_menu", "fill"]:
 			# The farm's tools in hand, the can half full; and for "farm" a morning's work done:
 			# two rows tilled, the first of them watered.
@@ -290,10 +313,10 @@ func _capture() -> void:
 		elif shot[5] == "menu":
 			scene.call(&"open_item_menu")
 			await _frames(2)
-		elif shot[5] == "tools_menu":
+		elif shot[5] in ["tools_menu", "seeds_menu"]:
 			scene.call(&"open_item_menu")
 			await _frames(2)
-		elif shot[5] in ["hoe", "fill"]:
+		elif shot[5] in ["hoe", "fill", "plant"]:
 			scene.call(&"use_item")
 			await _frames(7)
 		elif shot[5] == "food_menu":

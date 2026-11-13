@@ -214,3 +214,9 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   It lies in Hearthvale as a `FarmPlot` node (cells 12..17, 18..20): ground to walk on, drawn over the map,
   **no map re-baked.** The hoe and the can are items of type `tool`; `ToolUse.decide()` (pure) says what a use
   does and the area does it. The can's water is the item `water` (its `ammo`). **Save version 3.**
+- **Crops (P3b):** a crop is a file in `data/crops/` (days, seed, what it gives, prices), read by `Crops`
+  (pure); its seed is an item of type `seed` and its harvest an ordinary `food` item, so **a new crop is data
+  and pictures, no logic.** `Farm` does the growing (a stage each watered morning, withered after two dry
+  ones in a row, a ripe crop waits); go through `GameState.plant_crop()`, `harvest()` and `clear_crop()`.
+  Seeds are planted from the item button, ripe crops picked with E. Crop pictures are 16x16 and flat
+  (`FarmPlot.CROP_FRAMES`): crops never block. The item menu scrolls past five lines.

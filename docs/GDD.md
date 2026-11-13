@@ -114,14 +114,23 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 | Pumpkin pie | 1 pumpkin, 1 wheat | 80 | two |
 
 ## 7. Farming *(P3)*
-*(Built so far: the plot, the hoe and the watering can in step 3a. Seeds and crops come in 3b, buying and
-selling and the meals in 3c.)*
+*(Built so far: the plot, the hoe and the watering can in step 3a; seeds and crops in 3b. Buying and selling
+and the meals come in 3c.)*
 - **The plot:** 18 cells of soil (6 by 3) across the road from the cottages, between Tilda's shop and the
   well. It is ground: the hero walks over it.
 - Hoe a cell, plant a seed, water it. A crop grows one stage each morning if it was watered the day before. Two
   dry mornings in a row and it withers. The watering can holds ten pours and refills at the well or the pond.
 - A tool works on the cell the hero faces, and takes a moment. A tool with nothing to do says so and costs
   nothing. Watered soil is dry again each morning; tilled soil stays tilled.
+- **Seeds** go on the item button like the tools: one is planted in the tilled, empty cell he faces. Planting
+  costs no energy. The first pouch (five turnip seeds) lies at home with the tools; the rest are bought.
+- **Watering starts the dry count again.** A ripe crop waits to be picked: it needs no more water and never
+  withers.
+- **Picking:** facing a ripe crop, E puts it in the pack and leaves tilled soil. Facing a withered one, E
+  clears it away. Neither costs energy.
+- **Crops never block.** The hero walks through his plot whatever grows there and tramples nothing.
+- **Raw**, a crop gives about a third of what it is worth cooked: turnip 7 energy, carrot 7, wheat 5, potato 8,
+  pumpkin 22.
 - No seasons and no weather.
 - Harvested crops can be eaten, cooked, sold, or given to villagers *(P4)*.
 

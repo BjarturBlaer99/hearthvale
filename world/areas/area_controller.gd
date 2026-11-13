@@ -34,6 +34,13 @@ const SLEPT_WORDS: String = "You wake rested. The game is saved."
 const WOKE_LATE_WORDS: String = "You stayed up too late, and woke in your own bed."
 const COLLAPSED_WORDS: String = "You collapsed, and woke in your own bed."
 const COINS_LOST_WORDS: String = " You lost %d coins on the way."
+## The prompts for a crop the hero faces, and what is said when he has picked one, cleared a
+## withered one, or has no room for another.
+const PICK_PROMPT: String = "Pick the %s"
+const CLEAR_PROMPT: String = "Clear the withered %s"
+const PICKED_WORDS: String = "Picked: %s."
+const CLEARED_WORDS: String = "You clear away the withered %s."
+const NO_ROOM_WORDS: String = "Your pack holds no more %s."
 ## What is said when the watering can has been filled.
 const CAN_FILLED_WORDS: String = "The watering can is full."
 ## The well's four tiles (GreyboxTiles kinds, on the Decor layer): the can fills at any of them.
@@ -375,6 +382,8 @@ func interact() -> bool:
 			if usable is Chest:
 				player.hold_up(ItemIcons.name_for((usable as Chest).item_id))
 			return true
+	if _tend_crop():
+		return true
 	if shut_door_in_front() != null:
 		_say_shut(shut_door_in_front())
 		return true
@@ -535,7 +544,7 @@ func use_item() -> bool:
 		EventBus.sound.emit(&"nope")
 		hud.show_message("Nothing on the item button yet.")
 		return false
-	if ToolUse.is_farm_tool(item):
+	if not ToolUse.kind_of(item).is_empty():
 		return _use_tool(item)
 	var ammo: String = Inventory.ammo_for(item)
 	if not ammo.is_empty() and GameState.item_count(StringName(ammo)) <= 0:
@@ -594,15 +603,17 @@ func _shoot(bow: Dictionary, ammo: StringName) -> bool:
 	return true
 
 
-## Uses a farm tool on the cell the hero faces (P3, GDD §7): the hoe tills, the can waters, or
-## fills at the well or the pond. ToolUse decides what happens; a use that does nothing says
-## why and costs nothing. The hero stands still for the tool's time, as for the bow.
+## Works the cell the hero faces with what is on the item button (P3, GDD §7): the hoe tills,
+## the can waters (or fills at the well or the pond), a seed is planted. ToolUse decides what
+## happens; a use that does nothing says why and costs nothing. The hero stands still for the
+## tool's time, as for the bow.
 func _use_tool(item: Dictionary) -> bool:
 	var front: Vector2i = player.front_cell()
 	var holds: Dictionary = DataRegistry.get_item(StringName(Inventory.ammo_for(item)))
 	var held: StringName = StringName(str(holds.get("id", "")))
+	var growing: bool = plot != null and plot.covers(front) and GameState.farm().has_crop(plot.plot_cell(front))
 	var use: Dictionary = ToolUse.decide(ToolUse.kind_of(item), plot.soil_at(front) if plot != null else &"",
-		is_water_source(front), GameState.item_count(held), Inventory.capacity(holds) if not holds.is_empty() else 0)
+		is_water_source(front), GameState.item_count(held), Inventory.capacity(holds) if not holds.is_empty() else 0, growing)
 	if use["does"] == ToolUse.NOTHING:
 		EventBus.sound.emit(&"nope")
 		hud.show_message(str(use["says"]))
@@ -626,8 +637,61 @@ func _use_tool(item: Dictionary) -> bool:
 			GameState.add_item(held, Inventory.room_for(GameState.item_count(held), holds))
 			EventBus.sound.emit(&"fill")
 			hud.show_message(CAN_FILLED_WORDS)
+		ToolUse.PLANT:
+			GameState.plant_crop(plot.plot_cell(front), StringName(Crops.crop_of_seed(item)))
+			GameState.add_item(held, -1)
+			EventBus.sound.emit(&"plant")
+			Burst.spawn(interactables, GridBody.cell_center(front), &"dust", 0.6)
 	ToolFlash.spawn(interactables, Vector2(front) * GridBody.TILE, ItemIcons.name_for(StringName(str(item.get("id", "")))), ToolUse.time_of(item))
 	player.sync_from_motor()
+	return true
+
+
+## The crop in the plot cell the hero faces that his hands can do something with: a ripe one
+## to pick, a withered one to clear. { "cell": the plot's own cell, "name": the crop's name,
+## "phase": Farm.RIPE or Farm.WITHERED }, or {} if there is none.
+func crop_in_front() -> Dictionary:
+	var front: Vector2i = player.front_cell()
+	if plot == null or not plot.covers(front):
+		return {}
+	var cell: Vector2i = plot.plot_cell(front)
+	var phase: StringName = GameState.crop_phase(cell)
+	if phase != Farm.RIPE and phase != Farm.WITHERED:
+		return {}
+	var crop: Dictionary = DataRegistry.get_crop(StringName(GameState.farm().crop_at(cell)))
+	return {"cell": cell, "name": str(crop.get("name", GameState.farm().crop_at(cell))), "phase": phase}
+
+
+## "Pick the Turnip" or "Clear the withered Turnip" for the crop the hero faces, or "".
+func crop_prompt() -> String:
+	var crop: Dictionary = crop_in_front()
+	if crop.is_empty():
+		return ""
+	return (PICK_PROMPT if crop["phase"] == Farm.RIPE else CLEAR_PROMPT) % crop["name"]
+
+
+## Picks the ripe crop the hero faces into his pack, or clears a withered one away (GDD §7).
+## Neither costs energy. Returns whether there was a crop to tend.
+func _tend_crop() -> bool:
+	var crop: Dictionary = crop_in_front()
+	if crop.is_empty():
+		return false
+	var front: Vector2i = player.front_cell()
+	if crop["phase"] == Farm.WITHERED:
+		GameState.clear_crop(crop["cell"])
+		EventBus.sound.emit(&"plant")
+		Burst.spawn(interactables, GridBody.cell_center(front), &"dust", 0.6)
+		hud.show_message(CLEARED_WORDS % str(crop["name"]).to_lower())
+		return true
+	var given: Dictionary = GameState.harvest(crop["cell"])
+	if given.is_empty():
+		EventBus.sound.emit(&"nope")
+		hud.show_message(NO_ROOM_WORDS % str(crop["name"]).to_lower())
+		return true
+	EventBus.sound.emit(&"harvest")
+	Burst.spawn(interactables, GridBody.cell_center(front), &"leaves")
+	var item_name: String = str(DataRegistry.get_item(StringName(str(given["item"]))).get("name", given["item"]))
+	hud.show_message(PICKED_WORDS % (item_name if int(given["count"]) == 1 else "%s x%d" % [item_name, int(given["count"])]))
 	return true
 
 
@@ -1316,4 +1380,6 @@ func _update_hud() -> void:
 		return
 	var usable: Node2D = usable_in_front()
 	var text: String = str(usable.call(&"prompt")) if usable != null else ""
+	if text.is_empty():
+		text = crop_prompt()
 	hud.set_prompt("[E] %s" % text if not text.is_empty() else "")

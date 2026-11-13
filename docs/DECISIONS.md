@@ -517,6 +517,30 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-13 — **P3b: a ripe crop waits.** It needs no more water and never withers, however long it stands.
+  The docs say when a crop withers but not whether a finished one can; losing a ripe pumpkin to a missed day
+  would punish the wrong thing.
+- 2026-11-13 — **P3b: what a crop gives is a `food` item, not an item type of its own.** It is eaten and
+  cooked with by what already exists. The pivot plan listed "crop" among the new types; the crop's file says
+  everything else about it (days, seed, prices), so the item needed no type.
+- 2026-11-13 — **P3b: what each crop gives raw** (the plan says "about a third of their cooked value"):
+  turnip 7 (roast turnip is 22), carrot 7 and potato 8 (a third of the stew's 60 between three), wheat 5
+  (bread is 30 from two), pumpkin 22 (most of a pie's 80). They are in the items' data.
+- 2026-11-13 — **P3b: a first pouch of five turnip seeds lies at home** with the tools (the user's yes,
+  2026-11-13), so the first crop needs no coins and no shop.
+- 2026-11-13 — **P3b: picking is E, facing the crop,** as tools work the cell he faces. E on a growing crop
+  does nothing; on a withered one it clears it. The hoe leaves a planted cell alone, so a crop can't be dug
+  up by a slip.
+- 2026-11-13 — **P3b: crops are drawn flat, a cell high, and never block.** A crop he could walk behind would
+  need sorting against him and would hide what he does at the plot's edge; one that blocked would make the
+  middle row of a full plot unreachable.
+- 2026-11-13 — **P3b: planting costs no energy.** The plan's table gives costs for hoeing and watering and
+  says harvesting is free; it doesn't mention planting.
+- 2026-11-13 — **P3b: the phases every crop shares.** Just planted, a sprout and withered look the same for
+  every crop; each has two pictures of its own (growing, ripe). A crop is a sprout for the first half of its
+  days and growing for the second.
+- 2026-11-13 — **P3b: the item menu scrolls.** With tools, five seeds and a harvest the list ran out of its
+  box. It shows five lines and says where the cursor is in the list. Nothing else about the menu changed.
 - 2026-11-13 — **P3a: the plot is one house east of where the plan put it.** Straight across the road from
   the hero's door (cells 6..11) the shop's roof stands over the third row and hides half of it, and a crop
   there would be half hidden too. At cells 12..17 all eighteen cells show, and the well is at its edge.

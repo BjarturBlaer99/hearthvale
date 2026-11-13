@@ -71,9 +71,13 @@ Beaten enemies sometimes drop hearts or coins.
 - **The hero** (hero pass): a leather vest, wrist guards, a belt pouch and tall boots over the blue tunic, the
   sword on his back until he swings it, and a small pack. He breathes when he stands, leans into a sprint,
   winds up before a swing, flinches when hit and bends his knees landing from a ledge.
+- **Seeds and crops** (the pivot, step 3b): turnips, carrots, wheat, potatoes and pumpkins. A seed is planted
+  from the item button in tilled soil; a crop grows a stage each morning if it was watered the day before,
+  withers after two dry mornings in a row, and waits when ripe; E picks it. The harvest can be eaten raw. A
+  first pouch of turnip seeds lies in the cottage (seeds are sold from step 3c).
 - **A plot to farm** (the pivot, step 3a): eighteen cells of soil between Tilda's shop and the well. The hoe
   and the watering can lie in the hero's cottage and go on the item button: the hoe tills a cell, the can
-  waters it and fills at the well or the pond. Watered soil is dry again by morning. Nothing grows yet.
+  waters it and fills at the well or the pond. Watered soil is dry again by morning.
 - **Hours and night** (the pivot, step 2e): Tilda's shop is open from 08:00 to 18:00; villagers who stand
   outdoors go home at 20:00 and are back at 06:00; house windows are lit from dusk to dawn; monsters met in the
   fields and the wood at night are tougher and drop coins more often; and the night has a tune of its own.

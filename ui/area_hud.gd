@@ -181,6 +181,11 @@ func set_prompt(text: String) -> void:
 	_prompt.text = text
 
 
+## What the prompt says now ("[E] Pick the Turnip"), or "" when there is nothing to do here.
+func prompt_text() -> String:
+	return _prompt.text
+
+
 func show_message(text: String) -> void:
 	_message.text = text
 	_message_left = MESSAGE_TIME
