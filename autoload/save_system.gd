@@ -89,6 +89,8 @@ func migrate(data: Dictionary, from_version: int) -> Dictionary:
 	var migrated: Dictionary = data.duplicate(true)
 	if from_version < 2:
 		migrated = _v1_to_v2(migrated)
+	if from_version < 3:
+		migrated = _v2_to_v3(migrated)
 	migrated["version"] = GameState.SAVE_VERSION
 	return migrated
 
@@ -99,4 +101,10 @@ func _v1_to_v2(data: Dictionary) -> Dictionary:
 	data["day"] = 1
 	data["minute"] = float(GameState.day_clock().starts)
 	data["energy"] = GameState.max_energy()
+	return data
+
+
+## Version 3 (P3a) added the farm. A game saved before it has an untouched plot.
+func _v2_to_v3(data: Dictionary) -> Dictionary:
+	data["farm"] = {"cells": {}}
 	return data

@@ -5,7 +5,7 @@ extends Node
 ## methods, which emit the matching EventBus signal. `to_dict()` / `from_dict()` use the
 ## save format from TECH_DESIGN §9; SaveSystem handles files and version migration.
 
-const SAVE_VERSION: int = 2
+const SAVE_VERSION: int = 3
 const HALVES_PER_HEART: int = 2
 const START_HEARTS: int = 3
 const MAX_HEARTS: int = 20
@@ -45,6 +45,8 @@ var arrival_notice: String = ""
 
 var _day_clock: DayClock
 var _energy_rules: EnergyRules
+## The hero's plot (P3): made from the farm's rules when first asked for. Saved.
+var _farm: Farm
 ## Where the hero is: { "area", "cell": [x, y] }, or { "area", "entry" } on the way into an
 ## area through one of its entry points (go_to), until the area places them.
 var player: Dictionary = {}
@@ -197,10 +199,35 @@ func is_day_over() -> bool:
 	return day_clock().is_over(minute)
 
 
-## The next day begins, at the hour days start.
+## The hero's plot: which of its cells are tilled and which watered (GDD §7).
+func farm() -> Farm:
+	if _farm == null:
+		_farm = Farm.new(DataRegistry.get_rules(DataRegistry.RULES_FARM))
+	return _farm
+
+
+## Tills a cell of the plot (the plot's own cell). Returns whether it did.
+func till_soil(cell: Vector2i) -> bool:
+	if not farm().till(cell):
+		return false
+	EventBus.farm_changed.emit()
+	return true
+
+
+## Waters a tilled cell of the plot. Returns whether it did.
+func water_soil(cell: Vector2i) -> bool:
+	if not farm().water(cell):
+		return false
+	EventBus.farm_changed.emit()
+	return true
+
+
+## The next day begins, at the hour days start. The plot wakes to its morning.
 func start_next_day() -> void:
 	day += 1
 	minute = float(day_clock().starts)
+	farm().new_day()
+	EventBus.farm_changed.emit()
 	EventBus.day_started.emit(day)
 	EventBus.time_changed.emit(day, floori(minute))
 
@@ -337,6 +364,7 @@ func clear() -> void:
 	minute = float(day_clock().starts)
 	energy = 0.0
 	arrival_notice = ""
+	_farm = null
 	flags.clear()
 	quests.clear()
 	inventory.clear()
@@ -363,6 +391,7 @@ func to_dict() -> Dictionary:
 		"inventory": stacks,
 		"equipped": String(equipped),
 		"player": _json_safe(player),
+		"farm": farm().to_dict(),
 	}
 
 
@@ -389,6 +418,7 @@ func from_dict(data: Dictionary) -> void:
 		inventory.append({"id": StringName(str(entry["id"])), "count": int(entry["count"])})
 	equipped = StringName(str(data.get("equipped", "")))
 	player = _whole_numbers_as_int(data.get("player", {}))
+	farm().load_saved(data.get("farm", {}))
 
 
 ## JSON may return 12 as 12.0. Cells and counts are ints, so turn whole floats back into

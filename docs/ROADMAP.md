@@ -219,6 +219,8 @@ day can be played from waking to sleeping.
 A plot of 18 cells by the hero's home; a hoe, a watering can and seeds on the item button; crops that grow by
 the day and wither unwatered; five crops as data; a buy-and-sell list at Tilda's shop.
 **Done when**: growth is unit-tested, and a crop can be planted, raised, harvested, eaten, cooked and sold.
+Built in three steps (`docs/progress/P3-plan.md`): **3a** the plot and the tools (save version 3), **3b** seeds
+and crops, **3c** the shop's list and the meals.
 
 ## P4 — RPG and story
 Proposed in full before it is built, and kept small: the story spread over days (Elder Bram's quest opens after

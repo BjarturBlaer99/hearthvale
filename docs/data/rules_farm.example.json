@@ -1,0 +1,5 @@
+{
+	"id": "farm",
+	"plot": { "columns": 6, "rows": 3 },
+	"wither_after": 2
+}

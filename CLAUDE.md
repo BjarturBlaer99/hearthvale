@@ -93,7 +93,7 @@ godot --headless --path . --quit-after 30
 godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
-# Start partway through to try one part by hand (scenarios in the script: kitchen, home, village, warden, crypt, shade,
+# Start partway through to try one part by hand (scenarios in the script: farm, kitchen, home, village, warden, crypt, shade,
 # ending). An hour after the name starts at that time of day, and energy=<n> with that much energy.
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
 godot --path . -s res://tools/playtest.gd -- warden
@@ -208,3 +208,9 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   are set up from `NightRules.strengthen()` (`data/rules/night.json`), decided once as the area loads; never
   in dungeons, never bosses. Windows are lit with the lamps (`WindowGlow`), and outdoors at night the tune is
   `night`. All for show except the door, the villagers and the monsters' numbers.
+- **Farming (P3a; `docs/progress/P3-plan.md` has P3's three steps):** the plot is `GameState.farm()`, a pure
+  `Farm` (`core/farming/`) in the plot's own cells; the rules are `data/rules/farm.json`. Change it only
+  through `GameState.till_soil()` and `water_soil()`, which tell whoever draws it (`EventBus.farm_changed`).
+  It lies in Hearthvale as a `FarmPlot` node (cells 12..17, 18..20): ground to walk on, drawn over the map,
+  **no map re-baked.** The hoe and the can are items of type `tool`; `ToolUse.decide()` (pure) says what a use
+  does and the area does it. The can's water is the item `water` (its `ammo`). **Save version 3.**

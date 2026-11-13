@@ -38,7 +38,7 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 - **Hearthvale:** houses you can enter, a well, a chapel on the rise, a shop, a fenced field, a pond, and
   **cherry blossom trees** by the chapel, round the pond and along the main path *(P1)*.
 - **The hero's home:** the thatched cottage west of the weaver's, with a bed and a hearth, and a plot of soil
-  across the road *(P3)*.
+  across the road, between the shop and the well.
 - **The countryside:** the South Field, the North Fields and the Old Wood.
 - **The dungeons:** the Old Keep, north of the village, and the Chapel Crypt under the chapel. The crypt is
   barred until the keep is quiet. It's dark, and its floor has fallen in. A ruin in the South Field leads down
@@ -56,8 +56,8 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 |---|---|
 | Sprinting | 0.25 a second |
 | A sword swing or a bow shot | 0.5 |
-| Hoeing a cell *(P3)* | 2 |
-| Watering a cell *(P3)* | 1 |
+| Hoeing a cell | 2 |
+| Watering a cell | 1 |
 | Walking, talking, harvesting | nothing |
 
   - **Low** (under 25): movement at 85%, the sword 30% slower. Under 10, no sprinting.
@@ -73,7 +73,8 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 | **Bombs** | Hearthvale shop | Blow open cracked walls; hurt enemies |
 | **Lantern** | The crypt (its item) | Carried: lights the dark around you, and lets you light torches with E |
 | **Iron Sword** | The crypt's Knight's Tomb | Stronger sword: half as hard again as the wooden one |
-| **Hoe**, **watering can**, **seeds** *(P3)* | Home, Tilda's shop | Used from the item button, like the bow |
+| **Hoe**, **watering can** | Home, by the door | Used from the item button, like the bow, on the cell you face |
+| **Seeds** *(3b)* | Home (a first pouch), Tilda's shop *(3c)* | Planted from the item button |
 
 - The sword is always on the attack button; one item is equipped on the item button. The Lantern needs no
   button: it works while it's carried. Food is eaten from the item menu *(P2)*.
@@ -113,9 +114,14 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 | Pumpkin pie | 1 pumpkin, 1 wheat | 80 | two |
 
 ## 7. Farming *(P3)*
-- **The plot:** 18 cells of soil across the road from the hero's cottage.
+*(Built so far: the plot, the hoe and the watering can in step 3a. Seeds and crops come in 3b, buying and
+selling and the meals in 3c.)*
+- **The plot:** 18 cells of soil (6 by 3) across the road from the cottages, between Tilda's shop and the
+  well. It is ground: the hero walks over it.
 - Hoe a cell, plant a seed, water it. A crop grows one stage each morning if it was watered the day before. Two
   dry mornings in a row and it withers. The watering can holds ten pours and refills at the well or the pond.
+- A tool works on the cell the hero faces, and takes a moment. A tool with nothing to do says so and costs
+  nothing. Watered soil is dry again each morning; tilled soil stays tilled.
 - No seasons and no weather.
 - Harvested crops can be eaten, cooked, sold, or given to villagers *(P4)*.
 

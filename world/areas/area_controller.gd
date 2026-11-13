@@ -34,6 +34,10 @@ const SLEPT_WORDS: String = "You wake rested. The game is saved."
 const WOKE_LATE_WORDS: String = "You stayed up too late, and woke in your own bed."
 const COLLAPSED_WORDS: String = "You collapsed, and woke in your own bed."
 const COINS_LOST_WORDS: String = " You lost %d coins on the way."
+## What is said when the watering can has been filled.
+const CAN_FILLED_WORDS: String = "The watering can is full."
+## The well's four tiles (GreyboxTiles kinds, on the Decor layer): the can fills at any of them.
+const WELL_KINDS: Array[String] = ["well_nw", "well_ne", "well_sw", "well_se"]
 ## The tune that plays outdoors at night in place of the area's own.
 const NIGHT_TUNE: StringName = &"night"
 ## What is said when he eats (the food's name, then what it gave), and when he needn't.
@@ -105,6 +109,8 @@ var sway: TileMapLayer
 var relief: WallRelief
 ## The houses' lit windows (P2e), if the area has any.
 var windows: WindowGlow
+## The hero's plot (P3), if it lies in this area.
+var plot: FarmPlot
 var petals: Petals
 var water: WaterSurface
 var reflections: Reflections
@@ -529,6 +535,8 @@ func use_item() -> bool:
 		EventBus.sound.emit(&"nope")
 		hud.show_message("Nothing on the item button yet.")
 		return false
+	if ToolUse.is_farm_tool(item):
+		return _use_tool(item)
 	var ammo: String = Inventory.ammo_for(item)
 	if not ammo.is_empty() and GameState.item_count(StringName(ammo)) <= 0:
 		EventBus.sound.emit(&"nope")
@@ -584,6 +592,56 @@ func _shoot(bow: Dictionary, ammo: StringName) -> bool:
 	last_projectile = arrow
 	player.sync_from_motor()
 	return true
+
+
+## Uses a farm tool on the cell the hero faces (P3, GDD §7): the hoe tills, the can waters, or
+## fills at the well or the pond. ToolUse decides what happens; a use that does nothing says
+## why and costs nothing. The hero stands still for the tool's time, as for the bow.
+func _use_tool(item: Dictionary) -> bool:
+	var front: Vector2i = player.front_cell()
+	var holds: Dictionary = DataRegistry.get_item(StringName(Inventory.ammo_for(item)))
+	var held: StringName = StringName(str(holds.get("id", "")))
+	var use: Dictionary = ToolUse.decide(ToolUse.kind_of(item), plot.soil_at(front) if plot != null else &"",
+		is_water_source(front), GameState.item_count(held), Inventory.capacity(holds) if not holds.is_empty() else 0)
+	if use["does"] == ToolUse.NOTHING:
+		EventBus.sound.emit(&"nope")
+		hud.show_message(str(use["says"]))
+		return false
+	if not player.motor.attack(player.facing_direction(), ToolUse.time_of(item)):
+		return false
+	var energy: EnergyRules = GameState.energy_rules()
+	match use["does"]:
+		ToolUse.TILL:
+			GameState.till_soil(plot.plot_cell(front))
+			GameState.spend_energy(energy.cost(EnergyRules.HOE))
+			EventBus.sound.emit(&"hoe")
+			Burst.spawn(interactables, GridBody.cell_center(front), &"dust")
+		ToolUse.WATER:
+			GameState.water_soil(plot.plot_cell(front))
+			GameState.add_item(held, -1)
+			GameState.spend_energy(energy.cost(EnergyRules.WATER))
+			EventBus.sound.emit(&"pour")
+			Burst.spawn(interactables, GridBody.cell_center(front), &"drops")
+		ToolUse.FILL:
+			GameState.add_item(held, Inventory.room_for(GameState.item_count(held), holds))
+			EventBus.sound.emit(&"fill")
+			hud.show_message(CAN_FILLED_WORDS)
+	ToolFlash.spawn(interactables, Vector2(front) * GridBody.TILE, ItemIcons.name_for(StringName(str(item.get("id", "")))), ToolUse.time_of(item))
+	player.sync_from_motor()
+	return true
+
+
+## Whether the watering can fills at `cell`: open water (the pond, a stream) or the well.
+func is_water_source(cell: Vector2i) -> bool:
+	if ground_at(cell) == "water":
+		return true
+	var decor: TileMapLayer = get_node_or_null(^"Decor") as TileMapLayer
+	if decor == null or decor.get_cell_source_id(cell) == -1:
+		return false
+	for kind: String in WELL_KINDS:
+		if decor.get_cell_atlas_coords(cell) == GreyboxTiles.coords(kind):
+			return true
+	return false
 
 
 func _set_bomb(item: Dictionary) -> bool:
@@ -799,6 +857,11 @@ func _add_ambience() -> void:
 	lighting.setup(ambience, dark)
 	add_child(lighting)
 	var decor: TileMapLayer = get_node_or_null(^"Decor") as TileMapLayer
+	# The plot (P3) is a bed of soil: the flowers that grew on its cells are taken off.
+	for child: Node in get_children():
+		if child is FarmPlot:
+			plot = child as FarmPlot
+			plot.clear_ground(decor)
 	tile_glows = Ambience.tile_glows([height_layer, decor])
 	motes = Motes.new()
 	motes.kind = ambience
@@ -1059,7 +1122,11 @@ static func entry_facing(marker: Node2D) -> Vector2:
 ## "Carrying: ..." for the HUD, from the inventory in GameState.
 static func carrying_text() -> String:
 	var names: PackedStringArray = []
+	# What a tool holds (the can's water) is in the tool, not in the pack.
+	var in_tools: Array[String] = Inventory.held_in_tools(DataRegistry.entries(&"items"))
 	for stack: Dictionary in GameState.inventory:
+		if in_tools.has(String(stack["id"])):
+			continue
 		var item_name: String = str(DataRegistry.get_item(stack["id"]).get("name", stack["id"]))
 		names.append(item_name if int(stack["count"]) == 1 else "%s x%d" % [item_name, int(stack["count"])])
 	return "Carrying: %s" % (", ".join(names) if not names.is_empty() else "nothing")

@@ -1,0 +1,7 @@
+{
+  "items": [
+    { "id": "spade", "name": "Spade", "type": "tool", "stats": { "tool": "dig" } },
+    { "id": "jug", "name": "Jug", "type": "tool", "stats": { "tool": "water" } },
+    { "id": "bucket", "name": "Bucket", "type": "tool", "stats": { "tool": "water", "ammo": "rain" } }
+  ]
+}

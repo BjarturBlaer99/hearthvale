@@ -11,6 +11,7 @@ const KINDS: Dictionary = {
 	&"dust": {"count": 7, "speed": 26.0, "life": 0.42, "color": Color(0.80, 0.72, 0.58, 0.85), "size": 2.0, "drift": -14.0},
 	&"sparkle": {"count": 7, "speed": 38.0, "life": 0.5, "color": Color(1.0, 0.88, 0.40), "size": 1.0, "drift": -24.0},
 	&"leaves": {"count": 8, "speed": 34.0, "life": 0.5, "color": Color(0.46, 0.74, 0.30), "size": 2.0, "drift": 40.0},
+	&"drops": {"count": 7, "speed": 30.0, "life": 0.4, "color": Color(0.58, 0.80, 0.96, 0.9), "size": 1.0, "drift": 70.0},
 	&"shards": {"count": 8, "speed": 46.0, "life": 0.4, "color": Color(0.76, 0.46, 0.26), "size": 2.0, "drift": 90.0},
 }
 

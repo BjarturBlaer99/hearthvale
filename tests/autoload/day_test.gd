@@ -158,7 +158,7 @@ func test_the_day_the_hour_and_the_energy_are_saved() -> void:
 	GameState.set_time(float(GameState.day_clock().in_day("21:15")))
 	GameState.energy = 41.5
 	GameState.update_player(&"village", Vector2i(20, 18))
-	assert_int(GameState.SAVE_VERSION).is_equal(2)
+	assert_int(GameState.SAVE_VERSION).override_failure_message("version 2 brought the day; the farm made it 3 (P3a)").is_greater_equal(2)
 	var before: String = JSON.stringify(GameState.to_dict(), "", true)
 	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
 	GameState.new_game()
@@ -199,7 +199,7 @@ func test_a_version_1_save_loads_as_the_first_morning_with_all_else_as_it_was() 
 		assert_int(GameState.item_count(StringName(str(stack["id"])))).override_failure_message(str(stack["id"])).is_equal(int(stack["count"]))
 	assert_int(GameState.quests.size()).is_equal((old["quests"] as Dictionary).size())
 	assert_str(str(GameState.player["area"])).is_equal(str(old["player"]["area"]))
-	assert_int(int(GameState.to_dict()["version"])).override_failure_message("saved again, it is version 2").is_equal(2)
+	assert_int(int(GameState.to_dict()["version"])).override_failure_message("saved again, it is in today's format").is_equal(GameState.SAVE_VERSION)
 	assert_bool(EndingSummary.is_finished(GameState.to_dict()["flags"])).override_failure_message("this one wasn't finished").is_false()
 
 

@@ -15,6 +15,9 @@
     { "id": "mushroom", "name": "Mushrooms", "type": "food", "icon": "mushroom", "stackable": true, "max_stack": 20, "stats": { "energy": 6 } },
     { "id": "bread", "name": "Bread", "type": "food", "icon": "bread", "stackable": true, "max_stack": 10, "stats": { "energy": 30 } },
     { "id": "cherry_blossom", "name": "Cherry Blossoms", "type": "ingredient", "icon": "blossom", "stackable": true, "max_stack": 30 },
-    { "id": "blossom_tea", "name": "Cherry Blossom Tea", "type": "food", "icon": "tea", "stackable": true, "max_stack": 10, "stats": { "energy": 15 } }
+    { "id": "blossom_tea", "name": "Cherry Blossom Tea", "type": "food", "icon": "tea", "stackable": true, "max_stack": 10, "stats": { "energy": 15 } },
+    { "id": "hoe", "name": "Hoe", "type": "tool", "icon": "hoe", "stats": { "tool": "hoe", "cooldown": 0.4 } },
+    { "id": "watering_can", "name": "Watering Can", "type": "tool", "icon": "watering_can", "stats": { "tool": "water", "ammo": "water", "cooldown": 0.4 } },
+    { "id": "water", "name": "Water", "type": "ammo", "icon": "water", "stackable": true, "max_stack": 10 }
   ]
 }

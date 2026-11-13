@@ -16,6 +16,7 @@ const SFX: Array[StringName] = [
 	&"solved", &"secret", &"arrow", &"bomb_set", &"bomb", &"crystal", &"push", &"plate", &"clink",
 	&"stomp", &"gaze", &"stun", &"boss_die", &"menu_move", &"menu_select", &"pause", &"nope", &"cut",
 	&"pot", &"quest", &"torch", &"snuff", &"fall", &"sink", &"whiff", &"eat", &"morning", &"collapse",
+	&"hoe", &"pour", &"fill",
 ]
 const MUSIC: Array[StringName] = [&"village", &"countryside", &"dungeon", &"boss", &"night"]
 const MUSIC_BUS: StringName = &"Music"

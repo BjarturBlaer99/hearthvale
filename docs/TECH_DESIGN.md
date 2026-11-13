@@ -349,18 +349,20 @@ res://
 | `data/enemies/` | one enemy type per file |
 | `data/breakables/` | one breakable (grass, pot) per file |
 | `data/recipes/` | one recipe per file: what a dish needs and what it makes |
-| `data/rules/` | one set of rules per file: the numbers a system runs on (`time.json`: the day's clock; `energy.json`: the hero's energy; `hours.json`: who is where when; `night.json`: what the night does to monsters) |
+| `data/rules/` | one set of rules per file: the numbers a system runs on (`time.json`: the day's clock; `energy.json`: the hero's energy; `hours.json`: who is where when; `night.json`: what the night does to monsters; `farm.json`: the hero's plot) |
 
 DataRegistry validates required fields and resolves every cross-reference at load. A set of rules must be one
 the game knows (`RULE_SETS`), and is checked by the class that reads it (`DayClock.problems()`,
-`EnergyRules.problems()`, `Hours.problems()`, `NightRules.problems()`).
+`EnergyRules.problems()`, `Hours.problems()`, `NightRules.problems()`, `Farm.problems()`). A tool item is
+checked by `ToolUse.problems()`.
 
 ## 9. Save format
 ```json
-{ "version": 2, "hearts_max": 3, "health": 5, "heart_pieces": 0, "play_time": 754.25,
+{ "version": 3, "hearts_max": 3, "health": 5, "heart_pieces": 0, "play_time": 754.25,
   "day": 3, "minute": 870.5, "energy": 100.0,
   "flags": {}, "quests": {}, "inventory": [{"id": "small_key", "count": 1}],
-  "equipped": "bow", "player": {"area": "village", "cell": [23, 20]} }
+  "equipped": "bow", "player": {"area": "village", "cell": [23, 20]},
+  "farm": {"cells": {"0,0": {"watered": false}, "4,2": {"watered": true}}} }
 ```
 While the hero is on the way into an area, `player` is `{"area": "elder_house", "entry": "door"}` instead of
 a cell, until the area places them. Bump `version` on breaking changes and add a migration step in
@@ -369,6 +371,11 @@ a cell, until the area places them. Bump `version` on breaking changes and add a
   the day began on: 360 is 06:00) and `energy`. `SaveSystem._v1_to_v2()` gives a version 1 save the first day,
   the hour days start and a full bar; a finished game stays finished. Tests load two real version 1 saves
   (`tests/fixtures/saves/`).
+- **Version 3** (P3a) added `farm`: the tilled cells of the plot, by the plot's own cell ("column,row" from
+  its north-west corner), each with whether it is watered. A cell that isn't listed is bare. Loading leaves out
+  anything that isn't a cell of the plot. `SaveSystem._v2_to_v3()` gives a version 2 save an untouched plot; a
+  test loads a real version 2 save. The can's water is an item in the inventory, so nothing more is saved for
+  it. A cell's crop joins `farm` in 3b as a field with a default: the format stays version 3.
 
 ## 10. Testing
 Every class in `core/` has gdUnit4 tests. Areas get layout tests (reachability from the spawn with the real
@@ -459,6 +466,7 @@ run headless; see CLAUDE.md for the command and gotchas.
   - Bombs: bomb_set, bomb.
   - The Warden: stomp, gaze, clink, stun.
   - Menus: menu_move, menu_select, pause; nope when an item can't be used.
+  - The farm (the area, as a tool is used): hoe, pour, fill; nope when a tool has nothing to do.
 - **Feel:**
   - **Hit-stop:** `EventBus.hit_stop(seconds)` makes the area run `Engine.time_scale` at `HIT_STOP_SCALE` until that
     much real time passes. Leaving an area always ends it. It's 0.05 s for a landed blow, 0.08 s when the hero is
@@ -738,3 +746,32 @@ run headless; see CLAUDE.md for the command and gotchas.
 - **Sounds:** `eat` (eating), `collapse` (as he falls), `morning` (a cock-crow: after sleeping, and when he
   wakes at home after a day that ran out).
 - **Tools:** `tools/capture.gd` has the action `shut` (the hero tries the shop's door at 19:00).
+
+## 20. Farming
+- **The farm's rules are data** (`data/rules/farm.json`): the plot's size in cells (6 by 3) and how many dry
+  mornings wither a crop (3b). What hoeing and watering cost is in the energy rules (`hoe`, `water`).
+- **`Farm`** (`core/farming/`, pure) is the plot: which cells are tilled and which watered. Cells are the
+  plot's own ((0, 0) is its north-west corner), so the plot can lie anywhere. `till()` and `water()` return
+  whether they did anything; `new_day()` dries the soil and leaves it tilled; `to_dict()` and `load_saved()`
+  are its save.
+- **`GameState.farm()`** keeps the one farm (made from the rules when first asked for, thrown away by
+  `clear()`). `till_soil()` and `water_soil()` change it and emit `EventBus.farm_changed`;
+  `start_next_day()` calls `new_day()`, so sleeping, collapsing and staying up all dry the soil.
+- **`FarmPlot`** (`world/areas/`) is the plot as it lies in an area: a node at the plot's north-west corner
+  (Hearthvale's is at cell (12, 18), between the shop and the well). It draws each cell from
+  `gameplay/art/soil.png` (bare in two kinds, tilled, watered) and redraws on `farm_changed`. It blocks
+  nothing and nothing is picked up from it. As the area loads it takes the Decor tiles off its cells
+  (`clear_ground()`): no map is re-baked for it. It sits just after the Decor layer in the scene.
+- **Tools** are items of type `tool` whose stats name the `tool` (`hoe`, or `water` for the can). They go on
+  the item button (`Inventory.EQUIPPABLE_TYPES`). The can names what it holds as its `ammo` (the item
+  `water`, ten at most), so the item menu and the HUD say "Watering Can (Water x7)" with the code the bow
+  uses. `Inventory.held_in_tools()` keeps the water out of the "Carrying" line.
+- **`ToolUse`** (`core/farming/`, pure) decides what a use does: `decide(kind, soil, at_water, pours, holds)`
+  returns what it does (`TILL`, `WATER`, `FILL` or nothing) and the words for when it does nothing.
+  `AreaController._use_tool()` asks it about the cell the hero faces, then does it: the motor's attack state
+  for the tool's `cooldown` (he stands still, in his swing pose), the farm changed, the energy spent, a sound,
+  a puff, and a `ToolFlash` (the tool's picture dipping over the cell). A use that does nothing costs nothing.
+  - `is_water_source(cell)`: a water tile on the Height layer, or one of the well's four Decor tiles.
+- **Where the tools are:** two `ItemPickup`s in the hero's home, by the door.
+- **Tools:** `tools/playtest.gd -- farm` starts on the road by the plot with both tools; `tools/capture.gd`
+  has the actions `farm`, `hoe`, `fill` and `tools_menu`.

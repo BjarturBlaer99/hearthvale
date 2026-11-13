@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://gameplay/interactables/area_exit.gd" id="6_exit"]
 [ext_resource type="Script" path="res://gameplay/interactables/bed.gd" id="7_bed"]
 [ext_resource type="Script" path="res://gameplay/interactables/hearth.gd" id="p2d_hearth"]
+[ext_resource type="Script" path="res://gameplay/interactables/item_pickup.gd" id="p3_pickup"]
 
 [node name="Home" type="Node2D" unique_id=909247244]
 script = ExtResource("1_area")
@@ -44,6 +45,18 @@ target_entry = &"home_door"
 position = Vector2(16, 48)
 script = ExtResource("7_bed")
 dialogue_id = &"bed"
+
+[node name="Hoe" type="Node2D" parent="Interactables"]
+position = Vector2(112, 112)
+script = ExtResource("p3_pickup")
+item_id = &"hoe"
+taken_flag = &"took_hoe"
+
+[node name="WateringCan" type="Node2D" parent="Interactables"]
+position = Vector2(128, 112)
+script = ExtResource("p3_pickup")
+item_id = &"watering_can"
+taken_flag = &"took_watering_can"
 
 [node name="Entries" type="Node2D" parent="." unique_id=99726273]
 

@@ -5,7 +5,7 @@ extends RefCounted
 ## in GameState.inventory's shape ({ "id", "count" }). GameState applies them.
 
 ## Item types that can sit on the item button.
-const EQUIPPABLE_TYPES: Array[String] = ["weapon_ranged", "bomb"]
+const EQUIPPABLE_TYPES: Array[String] = ["weapon_ranged", "bomb", "tool"]
 ## No data means no limit (tests and items not in data yet).
 const UNLIMITED: int = 1 << 30
 
@@ -28,15 +28,26 @@ static func is_equippable(item: Dictionary) -> bool:
 	return EQUIPPABLE_TYPES.has(str(item.get("type", "")))
 
 
-## The item using up something when used: a ranged weapon's ammo, a bomb itself. Empty if none.
+## The item using up something when used: a ranged weapon's ammo, a bomb itself, what a tool
+## holds (the watering can's water). Empty if none.
 static func ammo_for(item: Dictionary) -> String:
 	match str(item.get("type", "")):
-		"weapon_ranged":
+		"weapon_ranged", "tool":
 			var stats: Variant = item.get("stats", {})
 			return str((stats as Dictionary).get("ammo", "")) if typeof(stats) == TYPE_DICTIONARY else ""
 		"bomb":
 			return str(item.get("id", ""))
 	return ""
+
+
+## The ids of what tools hold (the watering can's water), among `items` (data entries). It is
+## in the tool, not in the pack: lists of what is carried leave it out.
+static func held_in_tools(items: Array) -> Array[String]:
+	var out: Array[String] = []
+	for item: Variant in items:
+		if typeof(item) == TYPE_DICTIONARY and str((item as Dictionary).get("type", "")) == "tool" and not ammo_for(item).is_empty():
+			out.append(ammo_for(item))
+	return out
 
 
 ## The items of `type` that `stacks` hold, looked up in `items` (data entries), in the order

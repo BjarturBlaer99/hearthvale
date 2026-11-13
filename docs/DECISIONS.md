@@ -517,6 +517,27 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-13 — **P3a: the plot is one house east of where the plan put it.** Straight across the road from
+  the hero's door (cells 6..11) the shop's roof stands over the third row and hides half of it, and a crop
+  there would be half hidden too. At cells 12..17 all eighteen cells show, and the well is at its edge.
+- 2026-11-13 — **P3a: the plot is drawn over the map, not baked into it.** A `FarmPlot` node draws the soil
+  and takes the three flowers off its cells as the area loads. The Height layer is untouched, so where the
+  hero can walk is the same by construction, and the plot can be moved by moving one node.
+- 2026-11-13 — **P3a: the farm is kept in the plot's own cells,** not the map's: a save made today still
+  fits if the plot is moved.
+- 2026-11-13 — **P3a: the can's water is an item, carried like arrows.** The item menu, the HUD's item line
+  and "out of..." already speak of ammo, so the can needed no display of its own and no new field in the save.
+  The "Carrying" line leaves it out: it is in the can.
+- 2026-11-13 — **P3a: the tools lie in the hero's home, by the door,** as pickups (GDD §4 says "Home"). An old
+  save finds them there. The can starts empty, which sends him to the well once.
+- 2026-11-13 — **P3a: tilled soil stays tilled for good.** Nothing grows over it and no day undoes it. Only
+  the water is gone by morning.
+- 2026-11-13 — **P3a: no new hero frames for the tools.** He uses his swing pose, and the tool's picture
+  dips over the cell it works. Tools in his hands would be twelve more frames a tool.
+- 2026-11-13 — **P3a: a tool with nothing to do costs nothing** and says why. The words about the soil come
+  before the words about the can: "till it first" is more use than "the can is empty".
+- 2026-11-13 — **P3a: the save stays version 3 through P3.** A cell's crop joins it in 3b as a field with a
+  default.
 - 2026-11-13 — **P2e: a monster is a night monster if the area loads at night.** Changing one in the middle
   of a fight (its health, its speed) would be felt as a cheat, so nightfall changes nobody already there; it
   takes leaving and coming back. The other way too: one met at 05:00 is still tough at 07:00.

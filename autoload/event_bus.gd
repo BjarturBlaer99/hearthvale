@@ -54,3 +54,6 @@ signal slept(day: int)
 
 ## The item on the item button changed (empty: nothing equipped).
 signal equipped_changed(item_id: StringName)
+
+## The hero's plot changed (a cell tilled or watered, or a new morning): whoever draws it redraws.
+signal farm_changed

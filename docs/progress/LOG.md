@@ -1471,3 +1471,44 @@ Plan: `docs/progress/P2-plan.md` (the last of P2's five steps).
 - The night tune is short (27 seconds) and loops.
 - Still open from earlier steps: Elder Bram's fire shows above his head; the hero's head hides whoever he talks to from the south; the heading face has no small letters.
 
+## 2026-11-13 — P3a: the plot and the tools (built; not yet tried in play)
+
+Plan: `docs/progress/P3-plan.md` (the first of P3's three steps: 3a the plot and the tools, 3b seeds and crops, 3c the shop's list and the meals).
+
+**Built**
+- **The plot:** eighteen cells of soil (6 by 3) in Hearthvale, between Tilda's shop and the well. It is drawn over the grass (`FarmPlot`); the hero walks over it as before.
+- **The farm's rules are data** (`data/rules/farm.json`, read by `Farm` in `core/farming/`, pure): the plot's size, and how many dry mornings wither a crop (for 3b). Hoeing (2) and watering (1) joined the energy rules.
+- **Two tools,** lying in the hero's cottage by the door: the hoe and the watering can. They go on the item button from the item menu.
+- **The hoe** tills the bare cell he faces: 2 energy.
+- **The watering can** waters the tilled cell he faces: 1 energy and one pour of ten. Facing the well or the pond it fills, for nothing. It starts empty.
+- **A tool with nothing to do says why and costs nothing** (`ToolUse`, pure): off the plot, soil already tilled, soil already wet, bare soil under the can, an empty can, a full can at the well.
+- **Each morning the watered soil is dry again.** Tilled soil stays tilled.
+- **Save version 3,** with a migration from version 2 (an untouched plot).
+- **Art:** soil (bare in two kinds, tilled, watered) and three item pictures (hoe, can, a drop of water), painted in the sprite tool. The tool's picture dips over the cell it works; the hero uses his swing pose.
+- **Sound:** the hoe, a pour, the can filling.
+- **Tools:** a playtest scenario at the plot (`-- farm`); six new screenshots (115 in all).
+
+**Checked**
+- 492 tests in 69 suites pass (+31: `tests/core/farming/farm_test.gd`, `tests/core/farming/tool_use_test.gd`, `tests/world/farm_test.gd`, `tests/autoload/farm_save_test.gd`). Import and boot clean.
+- **Where the hero can walk is unchanged:** no map was re-baked (the village scene gained one node; its Height layer is the same data). A test walks him across all six cells and down through all three rows.
+- **Old saves:** a real version 2 save (written before the format changed) loads with an untouched plot and everything else as it was; the two version 1 saves still load, a finished one still finished.
+- **Hearts are never touched:** tilling the whole plot costs 36 energy and no heart.
+- **Older tests updated:** the list of item ids (three more), and two lines that named save version 2.
+- **Found on the way:** straight across the road from the hero's door the shop's roof hid half of the third row, so the plot is one house further east (see `docs/DECISIONS.md`). And a function named `is_tool` clashed with one every script has; it is `is_farm_tool`.
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: soil that never dries, an empty can that still waters, watering that uses no pour, hoeing that costs no energy, a version 2 save loaded without its migration.
+- **Frame cost:** draw calls within two of the last step (the village 333 with the plot, Elder Bram's house 46, the keep 382, the cistern 231).
+- **The player's own save was not touched** by the tools or the tests (the save tests use slot 984).
+- Screenshots: all 115 taken. Looked at closely: the bare plot; rows tilled and watered; the hoe at work; the tools on the cottage floor; the item menu; the can filling at the well.
+
+**Known issues and limits**
+- Not tried in play. **Whether eighteen cells feel like work or like a chore is for a playtest:** tilling them all is 18 strokes and 36 energy; watering them all is 18 pours, so two trips to the well, and 18 energy.
+- **Nothing grows yet.** For this one step the plot can only be dug and wetted (3b brings seeds).
+- **The plot is not straight across from the hero's door** but one house east, in front of the weaver's (the reason is above).
+- **The bed of soil has a hard, square edge.** It reads as dug, but it is plainer than the paths' soft edges.
+- **The hero swings an empty hand:** the tool shows over the cell, not in his grip.
+- **No hint on the HUD** says which button works a tool, beyond the controls line ("Q: item").
+- **Nothing says the tools are at home.** A new player finds them by walking in; an old save's hero has to go and look.
+- **The hoe can't undo its work,** and nothing else can: a tilled cell stays tilled.
+- **He can fill the can at any open water,** the stream in the North Fields too, though the plot is only in Hearthvale.
+- The "Carrying" line is longer still with two tools in it.
+

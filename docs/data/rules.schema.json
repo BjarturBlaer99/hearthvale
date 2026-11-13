@@ -2,11 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "rules.schema.json",
   "title": "Rules file (data/rules/<id>.json, one set of rules per file)",
-  "description": "The numbers a system runs on, so tuning needs no code (GDD §6). The file's id says which rules it holds. Known ids: 'time' (the day's clock, read by DayClock), 'energy' (the hero's energy, read by EnergyRules), 'hours' (when places are open and villagers are out, read by Hours) and 'night' (what the night does to monsters, read by NightRules).",
+  "description": "The numbers a system runs on, so tuning needs no code (GDD §6). The file's id says which rules it holds. Known ids: 'time' (the day's clock, read by DayClock), 'energy' (the hero's energy, read by EnergyRules), 'hours' (when places are open and villagers are out, read by Hours), 'night' (what the night does to monsters, read by NightRules) and 'farm' (the hero's plot, read by Farm).",
   "type": "object",
   "required": ["id"],
   "properties": {
-    "id": { "enum": ["time", "energy", "hours", "night"], "description": "Which rules these are." }
+    "id": { "enum": ["time", "energy", "hours", "night", "farm"], "description": "Which rules these are." }
   },
   "allOf": [
     {
@@ -46,12 +46,14 @@
           "maximum": { "type": "number", "exclusiveMinimum": 0, "description": "A full bar." },
           "costs": {
             "type": "object",
-            "required": ["sprint_per_second", "swing", "shot"],
+            "required": ["sprint_per_second", "swing", "shot", "hoe", "water"],
             "description": "What things cost. Anything not named here is free.",
             "properties": {
               "sprint_per_second": { "type": "number", "minimum": 0, "description": "Each second the hero runs." },
               "swing": { "type": "number", "minimum": 0, "description": "A swing of the sword." },
-              "shot": { "type": "number", "minimum": 0, "description": "A shot of the bow." }
+              "shot": { "type": "number", "minimum": 0, "description": "A shot of the bow." },
+              "hoe": { "type": "number", "minimum": 0, "description": "Tilling a cell of the plot with the hoe." },
+              "water": { "type": "number", "minimum": 0, "description": "Watering a cell of the plot with the can." }
             }
           },
           "low": {
@@ -111,9 +113,27 @@
           "coin_drops": { "type": "number", "exclusiveMinimum": 0, "description": "The weight of each coin drop in its table." }
         }
       }
+    },
+    {
+      "if": { "properties": { "id": { "const": "farm" } } },
+      "then": {
+        "required": ["plot", "wither_after"],
+        "properties": {
+          "plot": {
+            "type": "object",
+            "required": ["columns", "rows"],
+            "description": "The size of the hero's plot in cells. Where it lies is the FarmPlot node's position in its area.",
+            "properties": {
+              "columns": { "type": "integer", "minimum": 1 },
+              "rows": { "type": "integer", "minimum": 1 }
+            }
+          },
+          "wither_after": { "type": "integer", "minimum": 1, "description": "How many dry mornings in a row wither a crop." }
+        }
+      }
     }
   ],
-  "$comment": "One entry of allOf for each id: time, energy, hours, night.",
+  "$comment": "One entry of allOf for each id: time, energy, hours, night, farm.",
   "$defs": {
     "time_of_day": { "type": "string", "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$", "description": "A time on a 24-hour clock, like \"06:00\"." },
     "span": {

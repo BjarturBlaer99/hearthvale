@@ -1,0 +1,52 @@
+{
+	"day": 3,
+	"energy": 62.5,
+	"equipped": "bow",
+	"flags": {
+		"met_elder_bram": true
+	},
+	"health": 5,
+	"heart_pieces": 0,
+	"hearts_max": 3,
+	"inventory": [
+		{
+			"count": 1,
+			"id": "wooden_sword"
+		},
+		{
+			"count": 1,
+			"id": "bow"
+		},
+		{
+			"count": 12,
+			"id": "arrow"
+		},
+		{
+			"count": 47,
+			"id": "coin"
+		},
+		{
+			"count": 2,
+			"id": "bread"
+		},
+		{
+			"count": 5,
+			"id": "wild_berries"
+		},
+		{
+			"count": 3,
+			"id": "cherry_blossom"
+		}
+	],
+	"minute": 860.0,
+	"play_time": 1834.25,
+	"player": {
+		"area": "village",
+		"cell": [
+			9,
+			19
+		]
+	},
+	"quests": {},
+	"version": 2
+}

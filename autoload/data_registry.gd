@@ -50,7 +50,8 @@ const RULES_TIME: StringName = &"time"
 const RULES_ENERGY: StringName = &"energy"
 const RULES_HOURS: StringName = &"hours"
 const RULES_NIGHT: StringName = &"night"
-const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT]
+const RULES_FARM: StringName = &"farm"
+const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM]
 
 ## Enemy behaviour ids (EnemyBrains makes one brain per id) and drop-table entry types.
 const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden", "shade"]
@@ -278,6 +279,9 @@ func _validate_references() -> void:
 		if Food.is_food(item):
 			for problem: String in Food.problems(item):
 				errors.append("%s: item '%s': %s" % [item["_source"], item["id"], problem])
+		if ToolUse.is_farm_tool(item):
+			for problem: String in ToolUse.problems(item):
+				errors.append("%s: item '%s': %s" % [item["_source"], item["id"], problem])
 
 
 func _check_quest(quest: Dictionary) -> void:
@@ -386,6 +390,8 @@ func _check_rules(rules: Dictionary) -> void:
 			problems = Hours.problems(rules)
 		RULES_NIGHT:
 			problems = NightRules.problems(rules)
+		RULES_FARM:
+			problems = Farm.problems(rules)
 	for problem: String in problems:
 		errors.append("%s: rules '%s': %s" % [path, id, problem])
 

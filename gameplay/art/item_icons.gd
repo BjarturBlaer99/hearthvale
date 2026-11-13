@@ -11,6 +11,7 @@ const FRAMES: Dictionary = {
 	&"heart": 7, &"heart_container": 8, &"heart_piece": 9, &"gem": 10, &"shuttle": 11,
 	&"lantern": 12, &"iron_sword": 13,
 	&"berries": 14, &"mushroom": 15, &"bread": 16, &"blossom": 17, &"tea": 18,
+	&"hoe": 19, &"watering_can": 20, &"water": 21,
 }
 
 

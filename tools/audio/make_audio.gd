@@ -15,6 +15,7 @@ const SFX: Array[String] = [
 	"secret", "arrow", "bomb_set", "bomb", "crystal", "push", "plate", "clink", "stomp", "gaze", "stun",
 	"boss_die", "menu_move", "menu_select", "pause", "nope", "cut", "pot", "quest",
 	"torch", "snuff", "fall", "sink", "whiff", "eat", "morning", "collapse",
+	"hoe", "pour", "fill",
 ]
 
 ## Each song: tempo, bars (4/4; every track must last bars x 8 eighths), and its tracks.
@@ -198,6 +199,26 @@ static func effect(id: String) -> PackedFloat32Array:
 				Synth.tone(&"square", 820, 900, 0.08, 0.20, 0.004, 0.02, 0.25), Synth.silence(0.03),
 				Synth.tone(&"square", 900, 1240, 0.17, 0.22, 0.004, 0.03, 0.25),
 				Synth.tone(&"square", 1240, 640, 0.42, 0.22, 0.004, 0.26, 0.25),
+			])
+		"hoe":
+			# The blade bites the soil: a dull thud and a scrape.
+			return Synth.join([
+				Synth.mix(Synth.tone(&"noise", 520, 160, 0.09, 0.34, 0.002, 0.07, 0.5, 51), Synth.tone(&"square", 130, 70, 0.09, 0.22, 0.002, 0.06)),
+				Synth.tone(&"noise", 1400, 600, 0.09, 0.16, 0.01, 0.06, 0.5, 52),
+			])
+		"pour":
+			# Water from the can's rose: a soft hiss, and two drops after.
+			return Synth.join([
+				Synth.tone(&"noise", 2600, 1700, 0.24, 0.17, 0.04, 0.12, 0.5, 53),
+				Synth.tone(&"sine", 880, 620, 0.05, 0.12, 0.004, 0.03), Synth.silence(0.04),
+				Synth.tone(&"sine", 760, 540, 0.05, 0.10, 0.004, 0.03),
+			])
+		"fill":
+			# The can goes under: three rising gulps.
+			return Synth.join([
+				Synth.tone(&"sine", 280, 480, 0.08, 0.22, 0.01, 0.04), Synth.silence(0.03),
+				Synth.tone(&"sine", 340, 600, 0.08, 0.22, 0.01, 0.04), Synth.silence(0.03),
+				Synth.tone(&"sine", 420, 760, 0.11, 0.22, 0.01, 0.07),
 			])
 		"collapse":
 			# Out of energy: a long sigh downwards, and a soft fall.

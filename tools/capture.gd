@@ -130,6 +130,12 @@ const SHOTS: Array = [
 	["107_the_shop_is_shut", &"village", Vector2i(8, 25), Vector2.UP, 0, "shut"],
 	["108_monsters_at_night", &"south_field", Vector2i(12, 12), Vector2.LEFT, 0, "time:22:00"],
 	["109_lit_windows", &"village", Vector2i(12, 16), Vector2.UP, 0, "time:21:30"],
+	["110_the_plot", &"village", Vector2i(15, 17), Vector2.DOWN, 0, ""],
+	["111_soil_tilled_and_watered", &"village", Vector2i(14, 20), Vector2.RIGHT, 0, "farm"],
+	["112_the_hoe_at_work", &"village", Vector2i(14, 19), Vector2.RIGHT, 0, "hoe"],
+	["113_the_tools_at_home", &"home", Vector2i(6, 6), Vector2.DOWN, 0, ""],
+	["114_tools_in_the_item_menu", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "tools_menu"],
+	["115_filling_the_can_at_the_well", &"village", Vector2i(17, 19), Vector2.RIGHT, 0, "fill"],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -212,6 +218,17 @@ func _capture() -> void:
 			game_state.call(&"equip", &"bomb" if shot[5] == "bomb" else &"bow")
 		if shot[5] == "cook":
 			game_state.call(&"add_item", &"cherry_blossom", 4)
+		if shot[5] in ["farm", "hoe", "tools_menu", "fill"]:
+			# The farm's tools in hand, the can half full; and for "farm" a morning's work done:
+			# two rows tilled, the first of them watered.
+			for item: Array in [[&"hoe", 1], [&"watering_can", 1], [&"water", 5]]:
+				game_state.call(&"add_item", item[0], item[1])
+			game_state.call(&"equip", &"watering_can" if shot[5] == "fill" else &"hoe")
+			if shot[5] == "farm":
+				for x: int in 6:
+					for y: int in 2:
+						game_state.call(&"till_soil", Vector2i(x, y))
+					game_state.call(&"water_soil", Vector2i(x, 0))
 		if shot[5] == "shut":
 			# An hour after closing: the hero tries the shop's door.
 			game_state.call(&"set_time", float(clock.call(&"in_day", "19:00")))
@@ -273,6 +290,12 @@ func _capture() -> void:
 		elif shot[5] == "menu":
 			scene.call(&"open_item_menu")
 			await _frames(2)
+		elif shot[5] == "tools_menu":
+			scene.call(&"open_item_menu")
+			await _frames(2)
+		elif shot[5] in ["hoe", "fill"]:
+			scene.call(&"use_item")
+			await _frames(7)
 		elif shot[5] == "food_menu":
 			for item: Array in [[&"bow", 1], [&"arrow", 10], [&"bread", 2], [&"wild_berries", 3], [&"blossom_tea", 1]]:
 				game_state.call(&"add_item", item[0], item[1])

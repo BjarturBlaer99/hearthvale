@@ -9,7 +9,7 @@ extends RefCounted
 ## What a missing rule falls back to (a test checks they are the game's own rules).
 const DEFAULTS: Dictionary = {
 	"maximum": 100.0,
-	"costs": {"sprint_per_second": 0.25, "swing": 0.5, "shot": 0.5},
+	"costs": {"sprint_per_second": 0.25, "swing": 0.5, "shot": 0.5, "hoe": 2.0, "water": 1.0},
 	"low": {"below": 25.0, "move": 0.85, "cooldown": 1.3},
 	"no_sprint_below": 10.0,
 	"collapse": {"wake_share": 0.5, "coins_lost_share": 0.1, "coins_lost_most": 30},
@@ -18,6 +18,9 @@ const DEFAULTS: Dictionary = {
 const SPRINT: String = "sprint_per_second"
 const SWING: String = "swing"
 const SHOT: String = "shot"
+## Farm work (P3): tilling a cell with the hoe, watering one with the can.
+const HOE: String = "hoe"
+const WATER: String = "water"
 
 ## A full bar.
 var maximum: float
@@ -106,7 +109,7 @@ static func problems(rules: Dictionary) -> PackedStringArray:
 	if typeof(costs) != TYPE_DICTIONARY:
 		out.append("'costs' must be an object of what things cost.")
 	else:
-		for action: String in [SPRINT, SWING, SHOT]:
+		for action: String in [SPRINT, SWING, SHOT, HOE, WATER]:
 			if not _is_number((costs as Dictionary).get(action)) or float(costs[action]) < 0.0:
 				out.append("'costs' needs '%s', a number of 0 or more." % action)
 	var low: Variant = rules.get("low")

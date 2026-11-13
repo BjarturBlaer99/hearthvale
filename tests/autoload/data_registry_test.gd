@@ -19,14 +19,15 @@ func test_project_data_loads_without_errors() -> void:
 
 
 func test_starting_items_are_registered_in_id_order() -> void:
-	# (P2d added the food: blossom_tea, bread, cherry_blossom, mushroom, wild_berries.)
+	# (P2d added the food: blossom_tea, bread, cherry_blossom, mushroom, wild_berries. P3a added
+	# the farm's tools: hoe, watering_can, and the water the can holds.)
 	_registry.load_all()
-	assert_array(_registry.ids(&"items")).is_equal([&"arrow", &"big_key", &"blossom_tea", &"bomb", &"bow", &"bread", &"cherry_blossom", &"coin", &"egg_basket", &"iron_sword", &"lantern", &"mushroom", &"small_key", &"weavers_shuttle", &"wild_berries", &"wooden_sword"])
+	assert_array(_registry.ids(&"items")).is_equal([&"arrow", &"big_key", &"blossom_tea", &"bomb", &"bow", &"bread", &"cherry_blossom", &"coin", &"egg_basket", &"hoe", &"iron_sword", &"lantern", &"mushroom", &"small_key", &"water", &"watering_can", &"weavers_shuttle", &"wild_berries", &"wooden_sword"])
 	assert_str(_registry.get_item(&"wooden_sword").get("name", "")).is_equal("Wooden Sword")
 	var found: Array = []
 	for entry: Dictionary in _registry.entries(&"items"):
 		found.append(entry["id"])
-	assert_array(found).is_equal(["arrow", "big_key", "blossom_tea", "bomb", "bow", "bread", "cherry_blossom", "coin", "egg_basket", "iron_sword", "lantern", "mushroom", "small_key", "weavers_shuttle", "wild_berries", "wooden_sword"])
+	assert_array(found).is_equal(["arrow", "big_key", "blossom_tea", "bomb", "bow", "bread", "cherry_blossom", "coin", "egg_basket", "hoe", "iron_sword", "lantern", "mushroom", "small_key", "water", "watering_can", "weavers_shuttle", "wild_berries", "wooden_sword"])
 
 
 func test_missing_required_field_is_reported_and_not_loaded() -> void:
