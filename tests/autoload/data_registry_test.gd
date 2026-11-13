@@ -21,14 +21,15 @@ func test_project_data_loads_without_errors() -> void:
 func test_starting_items_are_registered_in_id_order() -> void:
 	# (P2d added the food: blossom_tea, bread, cherry_blossom, mushroom, wild_berries. P3a added
 	# the farm's tools: hoe, watering_can, and the water the can holds. P3b added the five crops
-	# and a seed for each.)
+	# and a seed for each. P3c added four dishes: mushroom_soup, pumpkin_pie, roast_turnip,
+	# vegetable_stew.)
 	_registry.load_all()
-	assert_array(_registry.ids(&"items")).is_equal([&"arrow", &"big_key", &"blossom_tea", &"bomb", &"bow", &"bread", &"carrot", &"carrot_seeds", &"cherry_blossom", &"coin", &"egg_basket", &"hoe", &"iron_sword", &"lantern", &"mushroom", &"potato", &"potato_seeds", &"pumpkin", &"pumpkin_seeds", &"small_key", &"turnip", &"turnip_seeds", &"water", &"watering_can", &"weavers_shuttle", &"wheat", &"wheat_seeds", &"wild_berries", &"wooden_sword"])
+	assert_array(_registry.ids(&"items")).is_equal([&"arrow", &"big_key", &"blossom_tea", &"bomb", &"bow", &"bread", &"carrot", &"carrot_seeds", &"cherry_blossom", &"coin", &"egg_basket", &"hoe", &"iron_sword", &"lantern", &"mushroom", &"mushroom_soup", &"potato", &"potato_seeds", &"pumpkin", &"pumpkin_pie", &"pumpkin_seeds", &"roast_turnip", &"small_key", &"turnip", &"turnip_seeds", &"vegetable_stew", &"water", &"watering_can", &"weavers_shuttle", &"wheat", &"wheat_seeds", &"wild_berries", &"wooden_sword"])
 	assert_str(_registry.get_item(&"wooden_sword").get("name", "")).is_equal("Wooden Sword")
 	var found: Array = []
 	for entry: Dictionary in _registry.entries(&"items"):
 		found.append(entry["id"])
-	assert_array(found).is_equal(["arrow", "big_key", "blossom_tea", "bomb", "bow", "bread", "carrot", "carrot_seeds", "cherry_blossom", "coin", "egg_basket", "hoe", "iron_sword", "lantern", "mushroom", "potato", "potato_seeds", "pumpkin", "pumpkin_seeds", "small_key", "turnip", "turnip_seeds", "water", "watering_can", "weavers_shuttle", "wheat", "wheat_seeds", "wild_berries", "wooden_sword"])
+	assert_array(found).is_equal(["arrow", "big_key", "blossom_tea", "bomb", "bow", "bread", "carrot", "carrot_seeds", "cherry_blossom", "coin", "egg_basket", "hoe", "iron_sword", "lantern", "mushroom", "mushroom_soup", "potato", "potato_seeds", "pumpkin", "pumpkin_pie", "pumpkin_seeds", "roast_turnip", "small_key", "turnip", "turnip_seeds", "vegetable_stew", "water", "watering_can", "weavers_shuttle", "wheat", "wheat_seeds", "wild_berries", "wooden_sword"])
 
 
 func test_missing_required_field_is_reported_and_not_loaded() -> void:

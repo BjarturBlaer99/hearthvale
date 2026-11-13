@@ -57,6 +57,10 @@
         },
         {
           "properties": { "type": { "const": "sleep" } }
+        },
+        {
+          "properties": { "type": { "const": "shop" }, "shop": { "$ref": "#/$defs/id" }, "mode": { "enum": ["buy", "sell"] } },
+          "required": ["shop", "mode"]
         }
       ]
     },

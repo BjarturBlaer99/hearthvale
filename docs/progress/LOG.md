@@ -1639,3 +1639,41 @@ The user tried the second version and said: "when speaking to another character 
 - **Right click talks, left click answers:** two buttons for one conversation. It is what was asked for, and what farming games do.
 - **A very fast left click after the right click is ignored** (under a third of a second).
 
+## 2026-11-13 — P3c: the shop's list and meals (built; not yet tried in play). P3 is complete.
+
+Plan: `docs/progress/P3-plan.md` (the last of P3's three steps).
+
+**Built**
+- **Tilda's shop is data** (`data/shops/tilda.json`, a new kind, with a schema; `Shop` in `core/shop/`, pure): her own wares and prices, that she sells seeds, that she buys crops. Seed prices and crop prices are the crops' own.
+- **A buy-and-sell list** on the HUD (`ShopMenu`), in place of her one-line-per-ware conversation:
+  - **Buy:** ten arrows 5 coins, three bombs 8, bread 6 (as before), and a seed of each crop: turnip 5, wheat 6, carrot 8, potato 10, pumpkin 20.
+  - **Sell:** the harvest, one at a time: turnip 12, wheat 10, carrot 18, potato 24, pumpkin 60. She buys nothing else.
+  - It shows the purse, stays open for as many deals as he likes, and says what the last deal was or why it couldn't be made (not enough coins, no room, a full purse).
+- **Her conversation opens it:** "Let me see what you sell." and "I have crops to sell." (a new effect for conversations, `shop`). The eggs she is owed are still asked for there.
+- **Five meals from crops, as recipes** (data only): roast turnip (22 energy), mushroom soup (35, half a heart), vegetable stew (60, one heart), pumpkin pie (80, two hearts), and bread from two wheat (30). Four new dishes, with pictures.
+- **A conversation with many answers scrolls:** four show at a time, and the corner says where he is ("^ 5/7 v"). The hearth lists six dishes now.
+- **Tools:** a playtest scenario at her counter (`-- market`); the kitchen scenario has crops to cook; the farm scenario has 30 coins; three new screenshots (122 in all).
+
+**Checked**
+- 550 tests in 78 suites pass (+18: `tests/core/shop/shop_test.gd`, `tests/world/shop_test.gd`, `tests/world/meals_test.gd`, `tests/world/farm_round_test.gd`). The new ones passed on their first run. Import and boot clean.
+- **The roadmap's "done when" for P3:** one test takes the tools and the first seeds from the cottage, tills and plants five cells with the left click, waters them for three days, picks five turnips with the right click, eats one raw, roasts one at the hearth and eats it, sells two to Tilda through her conversation, and buys four seeds with the coins.
+- **The prices are the GDD's:** a test reads every line of both lists.
+- **A deal that can't be made changes nothing:** the game's whole state is compared before and after.
+- **The meals give what the GDD's table says,** and each is worth more than its makings eaten raw.
+- **Older tests updated:** the list of item ids (four more); buying bread, arrows and bombs (through the list now); the hearth's answers (six dishes).
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: a ware sold to an empty purse, a ware sold with no room to carry it, a crop sold for nothing, the clock running while the list is open, a long list of answers not scrolling.
+- **Frame cost:** draw calls as before (the village 312, Elder Bram's house 45, the keep 382, the cistern 231).
+- **The save format is unchanged:** coins and items were already saved.
+- Screenshots: all 122 taken. Looked at closely: her conversation, the list to buy from with a deal made, the list to sell on, the hearth's dishes scrolled, the four dish pictures enlarged.
+
+**Known issues and limits**
+- Not tried in play. **Whether the farm pays for itself at a pace that feels right** is for a playtest: a turnip seed is 5 coins and sells for 12 after three days of watering; a pumpkin is 20 and 60 after eight. All are data.
+- **Selling is one crop a click.** A plot of eighteen turnips is eighteen clicks; there is no "sell all".
+- **She buys only crops:** not berries, mushrooms, meals or anything found.
+- **Seeds are the only thing that isn't listed in her file:** they come from the crops, so a crop can't be kept off her list.
+- **The list is worked with the keys and a click,** not by pointing: W and S move, A and D turn to the other list.
+- **A conversation shows four answers** even where five would fit under a one-line question.
+- **Bread can be bought for 6 coins or baked from two wheat that sell for 20:** baking it is a loss in coins. The numbers are the plan's.
+- **The hearth's dish names are long:** "Vegetable Stew (1 Potato, 1 Carrot, 1 Turnip)" nearly reaches the corner's count.
+- **P4 is not started,** and is to be proposed first.
+

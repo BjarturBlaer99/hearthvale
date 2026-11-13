@@ -140,6 +140,9 @@ const SHOTS: Array = [
 	["117_a_ripe_turnip_to_pick", &"village", Vector2i(12, 20), Vector2.UP, 0, "crops"],
 	["118_planting_a_seed", &"village", Vector2i(17, 20), Vector2.UP, 0, "plant"],
 	["119_seeds_and_crops_in_the_item_menu", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "seeds_menu"],
+	["120_tildas_list_to_buy_from", &"shop", Vector2i(5, 4), Vector2.UP, 0, "shop_buy"],
+	["121_selling_the_harvest", &"shop", Vector2i(5, 4), Vector2.UP, 0, "shop_sell"],
+	["122_meals_at_the_hearth", &"home", Vector2i(5, 2), Vector2.UP, 0, "meals"],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -222,6 +225,10 @@ func _capture() -> void:
 			game_state.call(&"equip", &"bomb" if shot[5] == "bomb" else &"bow")
 		if shot[5] == "cook":
 			game_state.call(&"add_item", &"cherry_blossom", 4)
+		if shot[5] in ["shop_buy", "shop_sell", "meals"]:
+			# A purse and a harvest: enough to buy seeds, to sell, and to cook every dish.
+			for item: Array in [[&"coin", 34], [&"turnip", 4], [&"carrot", 2], [&"wheat", 6], [&"potato", 2], [&"pumpkin", 1], [&"mushroom", 3]]:
+				game_state.call(&"add_item", item[0], item[1])
 		if shot[5] in ["crops", "plant", "seeds_menu"]:
 			# The plot in the middle of a season: the top row growing, the middle row ripe (a column
 			# a crop: turnip, carrot, wheat, potato, pumpkin), and along the bottom a seed just
@@ -312,6 +319,17 @@ func _capture() -> void:
 			await create_timer(0.5).timeout
 		elif shot[5] == "menu":
 			scene.call(&"open_item_menu")
+			await _frames(2)
+		elif shot[5] in ["shop_buy", "shop_sell"]:
+			scene.call(&"open_shop", &"tilda", &"sell" if shot[5] == "shop_sell" else &"buy")
+			var counter: Node = scene.get(&"hud").get(&"shop_menu")
+			# One deal made, so the line that says so shows; and the cursor moved down the list.
+			counter.call(&"move_cursor", 3 if shot[5] == "shop_buy" else 1)
+			counter.call(&"confirm")
+			await _frames(2)
+		elif shot[5] == "meals":
+			scene.call(&"interact")
+			scene.get(&"hud").get(&"dialogue").call(&"move_cursor", 4)
 			await _frames(2)
 		elif shot[5] in ["tools_menu", "seeds_menu"]:
 			scene.call(&"open_item_menu")

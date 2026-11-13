@@ -84,34 +84,34 @@ func test_the_shop_sells_arrows_and_bombs_for_coins() -> void:
 	Steps.stand_before(shop, "Tilda")
 	assert_bool(shop.interact()).is_true()
 	var box: DialogueBox = shop.hud.dialogue
-	assert_array(Array(box.shown_options())).override_failure_message("and bread, since P2d (tests/world/food_test.gd)").is_equal(["Ten arrows (5 coins)", "Three bombs (8 coins)", "A loaf of bread (6 coins)", "Just looking."])
+	assert_array(Array(box.shown_options())).override_failure_message("her wares are a list since P3c (tests/world/shop_test.gd)").is_equal(["Let me see what you sell.", "I have crops to sell.", "Just looking."])
 	box.confirm()
+	assert_bool(box.is_open()).is_false()
+	var counter: ShopMenu = shop.hud.shop_menu
+	assert_bool(counter.is_open()).override_failure_message("her list opens when the words are done").is_true()
+	assert_bool(counter.confirm()).is_true()
 	assert_int(GameState.item_count(&"arrow")).is_equal(10)
 	assert_int(GameState.item_count(&"coin")).is_equal(15)
-	box.confirm()
-	box.move_cursor(1)
-	box.confirm()
+	counter.move_cursor(1)
+	assert_bool(counter.confirm()).is_true()
 	assert_int(GameState.item_count(&"bomb")).is_equal(3)
 	assert_int(GameState.item_count(&"coin")).is_equal(7)
 
-	# Seven coins don't buy bombs: choosing them only gets an explanation.
-	box.confirm()
-	box.move_cursor(1)
-	box.confirm()
-	assert_str(box.shown_text()).contains("Come back when")
+	# Seven coins don't buy bombs: the list says why, and nothing changes.
+	assert_bool(counter.confirm()).is_false()
+	assert_str(counter.note_text()).is_equal(Shop.NO_COINS)
 	assert_int(GameState.item_count(&"bomb")).is_equal(3)
 	assert_int(GameState.item_count(&"coin")).is_equal(7)
-	box.move_cursor(1)
-	box.confirm()
-	assert_bool(box.is_open()).is_false()
 
 	# A full quiver: no more arrows sold, and no coins taken.
 	GameState.add_item(&"arrow", 50)
 	assert_int(GameState.item_count(&"arrow")).override_failure_message("a quiver holds 30").is_equal(30)
-	shop.interact()
-	box.confirm()
-	assert_str(box.shown_text()).contains("Come back when")
+	counter.move_cursor(-1)
+	assert_bool(counter.confirm()).is_false()
+	assert_str(counter.note_text()).is_equal(Shop.NO_ROOM)
 	assert_int(GameState.item_count(&"coin")).is_equal(7)
+	counter.close()
+	assert_bool(shop.player.controls_enabled).is_true()
 
 
 func test_the_item_menu_equips_and_the_choice_survives_a_save() -> void:

@@ -77,10 +77,15 @@ Beaten enemies sometimes drop hearts or coins.
   can and seeds on the plot; the sword everywhere else), and answers in a conversation. The right button
   talks, picks up and harvests.
   Moving is on the keys as before, and Space and Q still do the sword and the item.
+- **Tilda's list, and meals from the harvest** (the pivot, step 3c): talk to Tilda for a list to buy from
+  (seeds of every crop, bread, arrows, bombs) and one to sell your harvest on. At home the hearth cooks five
+  meals from crops: roast turnip, mushroom soup, vegetable stew, pumpkin pie, and bread from wheat. The
+  stronger ones mend hearts as well as giving energy. With this the farm pays for itself: plant, water,
+  harvest, then eat, cook or sell.
 - **Seeds and crops** (the pivot, step 3b): turnips, carrots, wheat, potatoes and pumpkins. A seed is planted
   from the item button in tilled soil; a crop grows a stage each morning if it was watered the day before,
   withers after two dry mornings in a row, and waits when ripe; a right click picks it. The harvest can be eaten raw. A
-  first pouch of turnip seeds lies in the cottage (seeds are sold from step 3c).
+  first pouch of turnip seeds lies in the cottage; Tilda sells the rest.
 - **A plot to farm** (the pivot, step 3a): eighteen cells of soil between Tilda's shop and the well. The hoe
   and the watering can lie in the hero's cottage and go on the item button: the hoe tills a cell, the can
   waters it and fills at the well or the pond. Watered soil is dry again by morning.

@@ -13,9 +13,6 @@ signal closed
 const CURSOR: String = "> "
 ## How many lines the box has room for.
 const ROWS: int = 5
-## The marks for "more above" and "more below" beside the count.
-const MORE_ABOVE: String = "^"
-const MORE_BELOW: String = "v"
 
 var items: Array[Dictionary] = []
 var selected: int = 0
@@ -39,27 +36,6 @@ static func describe(item: Dictionary) -> String:
 		return "%s x%d" % [name_text, count]
 	var ammo_name: String = str(DataRegistry.get_item(StringName(ammo)).get("name", ammo))
 	return "%s (%s x%d)" % [name_text, ammo_name, count]
-
-
-## The first line to show of `count`, in a box of `rows`, so that the `cursor` line is in
-## view: `first` (where the list stood) moved only as far as it must be.
-static func window_top(first: int, cursor: int, count: int, rows: int) -> int:
-	if count <= rows:
-		return 0
-	var out: int = clampi(first, 0, count - rows)
-	if cursor < out:
-		out = cursor
-	elif cursor >= out + rows:
-		out = cursor - rows + 1
-	return out
-
-
-## "^ 4/9 v" for a list longer than the box (the marks only where there is more that way),
-## and nothing for one that fits.
-static func count_text(first: int, cursor: int, count: int, rows: int) -> String:
-	if count <= rows:
-		return ""
-	return "%s %d/%d %s" % [MORE_ABOVE if first > 0 else " ", cursor + 1, count, MORE_BELOW if first + rows < count else " "]
 
 
 func _ready() -> void:
@@ -134,9 +110,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _refresh() -> void:
-	top = window_top(top, selected, items.size(), ROWS)
+	top = MenuCursor.window_top(top, selected, items.size(), ROWS)
 	var lines: PackedStringArray = []
 	for i: int in range(top, mini(top + ROWS, items.size())):
 		lines.append((CURSOR if i == selected else "  ") + describe(items[i]))
 	_list.text = "\n".join(lines)
-	_count.text = count_text(top, selected, items.size(), ROWS)
+	_count.text = MenuCursor.count_text(top, selected, items.size(), ROWS)

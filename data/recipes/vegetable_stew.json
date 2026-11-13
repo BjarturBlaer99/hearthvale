@@ -1,0 +1,9 @@
+{
+	"id": "vegetable_stew",
+	"makes": { "item": "vegetable_stew", "count": 1 },
+	"needs": [
+		{ "item": "potato", "count": 1 },
+		{ "item": "carrot", "count": 1 },
+		{ "item": "turnip", "count": 1 }
+	]
+}

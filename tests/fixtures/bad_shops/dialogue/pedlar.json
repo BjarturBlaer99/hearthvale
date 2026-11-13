@@ -1,0 +1,15 @@
+{
+  "id": "pedlar",
+  "start": "greet",
+  "nodes": {
+    "greet": {
+      "speaker": "",
+      "text": "Wares, wares.",
+      "options": [
+        { "text": "Show me.", "effects": [ { "type": "shop", "shop": "nowhere", "mode": "buy" } ], "next": null },
+        { "text": "Trade with me.", "effects": [ { "type": "shop", "shop": "kiosk", "mode": "barter" } ], "next": null },
+        { "text": "No.", "next": null }
+      ]
+    }
+  }
+}

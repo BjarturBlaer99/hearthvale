@@ -148,19 +148,21 @@ func test_there_are_things_to_gather_and_each_is_back_the_next_morning() -> void
 
 
 func test_tilda_sells_bread() -> void:
+	# Her wares are a list since P3c (tests/world/shop_test.gd): bread is its third line.
 	GameState.add_item(&"coin", 13)
 	var shop: AreaController = _load(SHOP)
-	_talk(shop, "Tilda")
-	assert_bool(Array(shop.hud.dialogue.shown_options()).has("A loaf of bread (6 coins)")).is_true()
-	_say(shop, "A loaf of bread (6 coins)")
+	assert_bool(shop.open_shop(&"tilda", Shop.BUY)).is_true()
+	var counter: ShopMenu = shop.hud.shop_menu
+	assert_str(counter.shown_lines()[2]).is_equal("  Bread: 6 coins")
+	counter.move_cursor(2)
+	assert_bool(counter.confirm()).is_true()
 	assert_int(GameState.item_count(&"bread")).is_equal(1)
 	assert_int(GameState.item_count(&"coin")).is_equal(7)
-	_say(shop, "Something else.")
-	_say(shop, "A loaf of bread (6 coins)")
+	assert_bool(counter.confirm()).is_true()
 	assert_int(GameState.item_count(&"bread")).is_equal(2)
-	_say(shop, "Something else.")
-	_say(shop, "A loaf of bread (6 coins)")
-	assert_int(GameState.item_count(&"bread")).override_failure_message("one coin buys no bread").is_equal(2)
+	assert_bool(counter.confirm()).override_failure_message("one coin buys no bread").is_false()
+	assert_str(counter.note_text()).is_equal(Shop.NO_COINS)
+	assert_int(GameState.item_count(&"bread")).is_equal(2)
 	assert_int(GameState.item_count(&"coin")).is_equal(1)
 
 
@@ -177,8 +179,10 @@ func test_the_hearth_at_home_cooks_from_the_recipes() -> void:
 	assert_bool(home.interact()).is_true()
 	assert_bool(home.is_talking()).is_true()
 	assert_str(home.hud.dialogue.shown_text()).is_equal(Cooking.ASK_WORDS)
-	assert_array(Array(home.hud.dialogue.shown_options())).override_failure_message("every recipe in data, then the way out").is_equal(["Cherry Blossom Tea (3 Cherry Blossoms)", Cooking.LEAVE_WORDS])
-	assert_int(DataRegistry.entries(&"recipes").size()).is_equal(1)
+	assert_array(Array(home.hud.dialogue.shown_options())).override_failure_message("every recipe in data, then the way out").is_equal([
+		"Cherry Blossom Tea (3 Cherry Blossoms)", "Bread (2 Wheat)", "Mushroom Soup (2 Mushrooms, 1 Potato)",
+		"Pumpkin Pie (1 Pumpkin, 1 Wheat)", "Roast Turnip (1 Turnip)", "Vegetable Stew (1 Potato, 1 Carrot, 1 Turnip)", Cooking.LEAVE_WORDS])
+	assert_int(DataRegistry.entries(&"recipes").size()).override_failure_message("tea, and the five meals of P3c (tests/world/meals_test.gd)").is_equal(6)
 	home._process(2.0)
 	assert_float(GameState.minute).override_failure_message("the clock stands still while he cooks").is_equal(minute)
 	_say(home, "Cherry Blossom Tea (3 Cherry Blossoms)")

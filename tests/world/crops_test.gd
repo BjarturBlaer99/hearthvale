@@ -289,18 +289,18 @@ func test_crops_have_their_pictures() -> void:
 
 
 func test_a_long_item_list_scrolls_to_keep_the_cursor_in_view() -> void:
-	assert_int(ItemMenu.window_top(0, 0, 3, 5)).override_failure_message("a list that fits doesn't scroll").is_equal(0)
-	assert_int(ItemMenu.window_top(0, 4, 9, 5)).is_equal(0)
-	assert_int(ItemMenu.window_top(0, 5, 9, 5)).override_failure_message("down a line at a time").is_equal(1)
-	assert_int(ItemMenu.window_top(1, 8, 9, 5)).is_equal(4)
-	assert_int(ItemMenu.window_top(4, 6, 9, 5)).override_failure_message("it stays while the cursor is in view").is_equal(4)
-	assert_int(ItemMenu.window_top(4, 3, 9, 5)).override_failure_message("and up a line at a time").is_equal(3)
-	assert_int(ItemMenu.window_top(4, 0, 9, 5)).override_failure_message("wrapping to the top").is_equal(0)
-	assert_int(ItemMenu.window_top(7, 8, 9, 5)).override_failure_message("never past the end").is_equal(4)
-	assert_str(ItemMenu.count_text(0, 0, 3, 5)).is_equal("")
-	assert_str(ItemMenu.count_text(0, 2, 9, 5)).is_equal("  3/9 v")
-	assert_str(ItemMenu.count_text(2, 4, 9, 5)).is_equal("^ 5/9 v")
-	assert_str(ItemMenu.count_text(4, 8, 9, 5)).is_equal("^ 9/9  ")
+	assert_int(MenuCursor.window_top(0, 0, 3, 5)).override_failure_message("a list that fits doesn't scroll").is_equal(0)
+	assert_int(MenuCursor.window_top(0, 4, 9, 5)).is_equal(0)
+	assert_int(MenuCursor.window_top(0, 5, 9, 5)).override_failure_message("down a line at a time").is_equal(1)
+	assert_int(MenuCursor.window_top(1, 8, 9, 5)).is_equal(4)
+	assert_int(MenuCursor.window_top(4, 6, 9, 5)).override_failure_message("it stays while the cursor is in view").is_equal(4)
+	assert_int(MenuCursor.window_top(4, 3, 9, 5)).override_failure_message("and up a line at a time").is_equal(3)
+	assert_int(MenuCursor.window_top(4, 0, 9, 5)).override_failure_message("wrapping to the top").is_equal(0)
+	assert_int(MenuCursor.window_top(7, 8, 9, 5)).override_failure_message("never past the end").is_equal(4)
+	assert_str(MenuCursor.count_text(0, 0, 3, 5)).is_equal("")
+	assert_str(MenuCursor.count_text(0, 2, 9, 5)).is_equal("  3/9 v")
+	assert_str(MenuCursor.count_text(2, 4, 9, 5)).is_equal("^ 5/9 v")
+	assert_str(MenuCursor.count_text(4, 8, 9, 5)).is_equal("^ 9/9  ")
 	# In the game: tools, five kinds of seed and a harvest are twelve lines in a box of five.
 	for item: Array in [[&"hoe", 1], [&"watering_can", 1], [&"turnip_seeds", 5], [&"carrot_seeds", 3], [&"wheat_seeds", 3], [&"potato_seeds", 3], [&"pumpkin_seeds", 2],
 			[&"turnip", 4], [&"carrot", 2], [&"wheat", 6], [&"potato", 1], [&"pumpkin", 1]]:

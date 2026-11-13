@@ -21,6 +21,7 @@ const KIND_BREAKABLE: StringName = &"breakable"
 const KIND_RULES: StringName = &"rules"
 const KIND_RECIPE: StringName = &"recipe"
 const KIND_CROP: StringName = &"crop"
+const KIND_SHOP: StringName = &"shop"
 
 ## Directory under DATA_ROOT -> the kind of file it holds.
 const DIRECTORY_KINDS: Dictionary = {
@@ -32,6 +33,7 @@ const DIRECTORY_KINDS: Dictionary = {
 	"rules": KIND_RULES,
 	"recipes": KIND_RECIPE,
 	"crops": KIND_CROP,
+	"shops": KIND_SHOP,
 }
 
 const REQUIRED_FIELDS: Dictionary = {
@@ -47,6 +49,7 @@ const REQUIRED_FIELDS: Dictionary = {
 	&"rules": ["id"],
 	&"recipe": ["id", "makes", "needs"],
 	&"crop": ["id", "name", "days", "seed", "gives", "seed_price", "sells_for"],
+	&"shop": ["id", "name", "sells"],
 }
 ## The sets of rules the game knows (data/rules/<id>.json), by id.
 const RULES_TIME: StringName = &"time"
@@ -84,6 +87,7 @@ const EFFECT_FIELDS: Dictionary = {
 	"set_quest_stage": ["quest", "stage"],
 	"complete_quest": [],
 	"sleep": [],
+	"shop": ["shop", "mode"],
 }
 
 ## A field with one of these names, inside a condition or effect, must name an id
@@ -91,6 +95,7 @@ const EFFECT_FIELDS: Dictionary = {
 const REFERENCE_FIELDS: Dictionary = {
 	"item": &"items",
 	"quest": &"quests",
+	"shop": &"shops",
 }
 
 ## Problems found by the last load_all(), as "file: what is wrong" lines.
@@ -167,6 +172,11 @@ func get_crop(id: StringName) -> Dictionary:
 	return get_entry(&"crops", id)
 
 
+## What a shop sells and buys (data/shops/<id>.json).
+func get_shop(id: StringName) -> Dictionary:
+	return get_entry(&"shops", id)
+
+
 ## The numbers a system runs on (data/rules/<id>.json), e.g. &"time" for the day's clock.
 func get_rules(id: StringName) -> Dictionary:
 	return get_entry(&"rules", id)
@@ -178,7 +188,7 @@ func get_rules(id: StringName) -> Dictionary:
 ## an empty result means every file is valid and every reference resolves.
 func load_all(root: String = DATA_ROOT) -> PackedStringArray:
 	errors = []
-	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}, &"recipes": {}, &"crops": {}}
+	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}, &"recipes": {}, &"crops": {}, &"shops": {}}
 	if not DirAccess.dir_exists_absolute(root):
 		errors.append("%s: data directory does not exist." % root)
 		return errors
@@ -227,6 +237,8 @@ func _load_file(path: String, kind: StringName) -> void:
 			_register(path, data, &"recipe", &"recipes")
 		KIND_CROP:
 			_register(path, data, &"crop", &"crops")
+		KIND_SHOP:
+			_register(path, data, &"shop", &"shops")
 
 
 ## Registers every object in the array `data[key]`.
@@ -287,6 +299,9 @@ func _validate_references() -> void:
 	for crop: Dictionary in _collections[&"crops"].values():
 		for problem: String in Crops.problems(crop, item_of):
 			errors.append("%s: crop '%s': %s" % [crop["_source"], crop["id"], problem])
+	for shop: Dictionary in _collections[&"shops"].values():
+		for problem: String in Shop.problems(shop, item_of):
+			errors.append("%s: shop '%s': %s" % [shop["_source"], shop["id"], problem])
 	for item: Dictionary in _collections[&"items"].values():
 		var stats: Variant = item.get("stats", {})
 		if Crops.is_seed(item):
@@ -502,6 +517,8 @@ func _check_effect_list(path: String, where: String, list: Variant) -> void:
 		_check_reference_fields(path, w, effect)
 		if type_name == "set_quest_stage":
 			_check_stage(path, w, str(effect["quest"]), str(effect["stage"]))
+		if type_name == "shop" and not Shop.MODES.has(StringName(str(effect["mode"]))):
+			errors.append("%s: %s: a shop's 'mode' must be 'buy' or 'sell', not '%s'." % [path, w, effect["mode"]])
 
 
 func _has_fields(path: String, where: String, what: String, type_name: String,

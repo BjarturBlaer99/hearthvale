@@ -375,6 +375,34 @@ func add_item(item_id: StringName, count: int = 1) -> int:
 	return applied
 
 
+## Buys one of a shop's wares (Shop.wares: { "item", "count", "price" }): the coins go and the
+## ware comes. Returns "" if it was bought, or why not in Shop's words; then nothing changed.
+func buy(ware: Dictionary) -> String:
+	var item_id: StringName = StringName(str(ware.get("item", "")))
+	var why_not: String = Shop.why_not_buy(ware, item_count(COIN), item_count(item_id), DataRegistry.get_item(item_id))
+	if why_not.is_empty():
+		add_item(COIN, -int(ware.get("price", 0)))
+		add_item(item_id, int(ware.get("count", 1)))
+	return why_not
+
+
+## Sells one of what a shop buys (Shop.offers: { "item", "price" }): it goes and the coins
+## come. Returns "" if it was sold, or why not in Shop's words; then nothing changed.
+func sell(offer: Dictionary) -> String:
+	var item_id: StringName = StringName(str(offer.get("item", "")))
+	var why_not: String = Shop.why_not_sell({"count": item_count(item_id), "price": offer.get("price", 0)},
+		item_count(COIN), Inventory.capacity(DataRegistry.get_item(COIN)))
+	if why_not.is_empty():
+		add_item(item_id, -1)
+		add_item(COIN, int(offer.get("price", 0)))
+	return why_not
+
+
+## A conversation asks for a shop's list (the `shop` effect): whoever runs the area opens it.
+func request_shop(shop_id: StringName, mode: StringName) -> void:
+	EventBus.shop_requested.emit(shop_id, mode)
+
+
 ## Puts `item_id` on the item button (empty to clear it).
 func equip(item_id: StringName) -> void:
 	if equipped == item_id:

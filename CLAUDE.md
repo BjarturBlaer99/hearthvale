@@ -15,6 +15,8 @@ pixel-art look are added in phases. Read these before writing any code:
 **The pivot** in `docs/ROADMAP.md` (P1–P4), in order: **P1** the visual overhaul (six steps, 1a–1f), **P2**
 energy, food and time, **P3** farming, **P4** RPG and story. Do not build anything outside the current step, and
 ask the user before adding anything the roadmap doesn't list. Scope creep is the main risk on this project.
+**P1, P2 and P3 are built** (P3 finished on 2026-11-13). **P4 is next, and is proposed to the user before any
+of it is built** (`docs/progress/pivot-plan.md` §7 has its outline).
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -97,7 +99,7 @@ godot --headless --path . --quit-after 30
 godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
-# Start partway through to try one part by hand (scenarios in the script: farm, kitchen, home, village, warden, crypt, shade,
+# Start partway through to try one part by hand (scenarios in the script: farm, market, kitchen, home, village, warden, crypt, shade,
 # ending). An hour after the name starts at that time of day, and energy=<n> with that much energy.
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
 godot --path . -s res://tools/playtest.gd -- warden
@@ -233,5 +235,10 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   (pure); its seed is an item of type `seed` and its harvest an ordinary `food` item, so **a new crop is data
   and pictures, no logic.** `Farm` does the growing (a stage each watered morning, withered after two dry
   ones in a row, a ripe crop waits); go through `GameState.plant_crop()`, `harvest()` and `clear_crop()`.
-  Seeds are planted from the item button, ripe crops picked with E. Crop pictures are 16x16 and flat
-  (`FarmPlot.CROP_FRAMES`): crops never block. The item menu scrolls past five lines.
+  Seeds are planted from the item button, ripe crops picked with interact (the right click). Crop pictures
+  are 16x16 and flat (`FarmPlot.CROP_FRAMES`): crops never block. The item menu scrolls past five lines.
+- **The shop and meals (P3c):** a shop is a file in `data/shops/` (`Shop`, `core/shop/`, pure, says what is on
+  its lists and why a deal can't be made); `GameState.buy()` and `sell()` make the deals; `ShopMenu` on the HUD
+  is the counter. A conversation opens it with the effect `shop`, when its words are done. Seeds and crop
+  prices come from `data/crops`, so **a new crop needs no change to the shop.** The meals are recipes and food
+  items only. Long lists scroll through `MenuCursor.window_top()`: use it, don't grow a box.

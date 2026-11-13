@@ -1,0 +1,7 @@
+{
+	"id": "bread",
+	"makes": { "item": "bread", "count": 1 },
+	"needs": [
+		{ "item": "wheat", "count": 2 }
+	]
+}

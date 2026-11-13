@@ -88,8 +88,7 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 
 ## 6. Time, food and sleep *(P2)*
 *(Built so far: the clock, the day and the light in step 2a; the home, the bed and sleeping in 2b; energy in
-2c; food, foraging and cooking in 2d, with the meals made from crops to follow in P3; hours and the night in
-2e.)*
+2c; food, foraging and cooking in 2d; hours and the night in 2e; the meals made from crops in step 3c.)*
 - **A day** runs from 06:00 to 02:00 in 14 real minutes. At 02:00 the hero passes out, as at zero energy, and
   wakes by his bed the next morning with half his energy and a tenth of his coins gone. The clock stops in
   conversations, in menus and in dungeons.
@@ -120,8 +119,8 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 | Pumpkin pie | 1 pumpkin, 1 wheat | 80 | two |
 
 ## 7. Farming *(P3)*
-*(Built so far: the plot, the hoe and the watering can in step 3a; seeds and crops in 3b. Buying and selling
-and the meals come in 3c.)*
+*(Built: the plot, the hoe and the watering can in step 3a; seeds and crops in 3b; buying, selling and the
+meals in 3c.)*
 - **The plot:** 18 cells of soil (6 by 3) across the road from the cottages, between Tilda's shop and the
   well. It is ground: the hero walks over it.
 - Hoe a cell, plant a seed, water it. A crop grows one stage each morning if it was watered the day before. Two
@@ -171,8 +170,12 @@ Enemies sometimes drop hearts or coins.
 - Each mechanic is introduced on its own, then combined.
 
 ## 10. Village & economy
-- **Coins** drop from enemies, grass and pots, and come from selling crops *(P3)*.
-- **Tilda's shop** sells bombs and arrows, and bread *(P2)* and seeds *(P3)*; it buys crops *(P3)*.
+- **Coins** drop from enemies, grass and pots, and come from selling crops.
+- **Tilda's shop** has a list to buy from and a list to sell on, opened from her conversation. She sells ten
+  arrows (5 coins), three bombs (8), a loaf of bread (6), and a seed of each crop at its price (§7). She buys
+  what the crops give, one at a time, at each crop's price, and nothing else. The list stays open for as many
+  deals as he likes and says why one can't be made: not enough coins, no room to carry it, a full purse. She
+  is open from 08:00 to 18:00 (§6).
 - Villagers give hints and small quests (data-driven). **Friendship** grows from talking and from gifts they
   like, and opens small quests and recipes *(P4, to be proposed)*.
 

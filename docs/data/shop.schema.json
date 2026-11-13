@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "shop.schema.json",
+  "title": "Shop file (data/shops/<id>.json, one shop per file)",
+  "description": "A shop's buy-and-sell list (GDD §10, TECH_DESIGN §21): its own wares with their prices, whether it sells seeds, and whether it buys crops. Seed prices and what a crop sells for are the crop's own (data/crops), so a new crop is on the lists without touching the shop. A conversation opens the list with the `shop` effect.",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "sells"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The heading of its list: \"Tilda's Shop\"."
+    },
+    "sells": {
+      "type": "array",
+      "description": "Its own wares, in the order they are listed. May be empty (a shop that sells only seeds).",
+      "items": {
+        "type": "object",
+        "required": [
+          "item",
+          "price"
+        ],
+        "properties": {
+          "item": {
+            "type": "string",
+            "minLength": 1,
+            "description": "An item id from data/items."
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1,
+            "description": "How many one deal gives (ten arrows). All of them must fit in the pack."
+          },
+          "price": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "What one deal costs, in coins."
+          }
+        }
+      }
+    },
+    "sells_seeds": {
+      "type": "boolean",
+      "default": false,
+      "description": "Also sells a seed of every crop at the crop's seed_price, cheapest first."
+    },
+    "buys_crops": {
+      "type": "boolean",
+      "default": false,
+      "description": "Buys what every crop gives, one at a time, at the crop's sells_for."
+    }
+  }
+}

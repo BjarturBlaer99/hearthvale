@@ -1,0 +1,5 @@
+{
+  "items": [
+    { "id": "bread", "name": "Bread", "type": "food", "stackable": true, "max_stack": 9, "stats": { "energy": 3 } }
+  ]
+}

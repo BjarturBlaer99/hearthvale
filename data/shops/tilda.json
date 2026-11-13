@@ -1,0 +1,11 @@
+{
+	"id": "tilda",
+	"name": "Tilda's Shop",
+	"sells": [
+		{ "item": "arrow", "count": 10, "price": 5 },
+		{ "item": "bomb", "count": 3, "price": 8 },
+		{ "item": "bread", "count": 1, "price": 6 }
+	],
+	"sells_seeds": true,
+	"buys_crops": true
+}

@@ -13,10 +13,15 @@ const CURSOR: String = "> "
 ## also the sword's button: a swing made as a conversation opens by itself (a boss's last
 ## words) would otherwise skip its first line.
 const SWING_GRACE: float = 0.3
+## How many answers show at a time. A longer list (the hearth's dishes) scrolls to keep the
+## cursor in view, and the corner says where in it he is.
+const OPTION_ROWS: int = 4
 
 var runner: DialogueRunner
 ## Index of the highlighted answer among the visible ones.
 var selected: int = 0
+## The first answer shown.
+var top: int = 0
 ## How long the box has been open (s).
 var open_for: float = 0.0
 
@@ -27,7 +32,6 @@ var open_for: float = 0.0
 
 
 func _ready() -> void:
-	_more.text = "[%s]" % MenuInput.ANSWER_KEY
 	hide()
 
 
@@ -41,6 +45,7 @@ func open(dialogue_runner: DialogueRunner) -> void:
 	runner = dialogue_runner
 	runner.ended.connect(_on_ended, CONNECT_ONE_SHOT)
 	selected = 0
+	top = 0
 	open_for = 0.0
 	show()
 	if not runner.is_running():
@@ -74,6 +79,7 @@ func confirm() -> void:
 		runner.choose(selected)
 	if is_open():
 		selected = 0
+		top = 0
 		_refresh()
 
 
@@ -119,9 +125,22 @@ func _refresh() -> void:
 	_name.visible = not _name.text.is_empty()
 	_text.text = runner.text()
 	var texts: PackedStringArray = runner.option_texts()
+	top = MenuCursor.window_top(top, selected, texts.size(), OPTION_ROWS)
 	var lines: PackedStringArray = []
-	for i: int in texts.size():
+	for i: int in range(top, mini(top + OPTION_ROWS, texts.size())):
 		lines.append((CURSOR if i == selected else "  ") + texts[i])
 	_options.text = "\n".join(lines)
 	_options.visible = not texts.is_empty()
-	_more.visible = texts.is_empty()
+	# The corner: how to read on when there is nothing to choose, or where he is in a long list.
+	_more.text = "[%s]" % MenuInput.ANSWER_KEY if texts.is_empty() else MenuCursor.count_text(top, selected, texts.size(), OPTION_ROWS)
+	_more.visible = not _more.text.is_empty()
+
+
+## The answers on screen now, with the cursor's mark (at most OPTION_ROWS of them).
+func shown_option_lines() -> PackedStringArray:
+	return _options.text.split("\n") if is_open() and _options.visible else PackedStringArray()
+
+
+## What the corner says: how to read on, where he is in a long list of answers, or nothing.
+func corner_text() -> String:
+	return _more.text if is_open() and _more.visible else ""

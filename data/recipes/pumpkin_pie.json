@@ -1,0 +1,8 @@
+{
+	"id": "pumpkin_pie",
+	"makes": { "item": "pumpkin_pie", "count": 1 },
+	"needs": [
+		{ "item": "pumpkin", "count": 1 },
+		{ "item": "wheat", "count": 1 }
+	]
+}

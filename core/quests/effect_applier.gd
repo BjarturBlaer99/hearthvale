@@ -3,7 +3,7 @@ extends RefCounted
 ## Applies the shared effect vocabulary (docs/data/CONDITIONS_AND_EFFECTS.md) to a game state:
 ## GameState, or any object with the same methods (tests use a stand-in):
 ##   set_flag(flag, value), add_item(item_id, count), set_quest_stage(quest_id, stage_id),
-##   sleep().
+##   sleep(), request_shop(shop_id, mode).
 ## Pure apart from those calls. DataRegistry has already validated the effects' shape and ids.
 
 var _state: Object
@@ -27,6 +27,8 @@ func apply(effect: Dictionary) -> bool:
 			_state.call(&"set_quest_stage", StringName(str(effect["quest"])), StringName(str(effect["stage"])))
 		"sleep":
 			_state.call(&"sleep")
+		"shop":
+			_state.call(&"request_shop", StringName(str(effect["shop"])), StringName(str(effect["mode"])))
 		_:
 			return false
 	return true

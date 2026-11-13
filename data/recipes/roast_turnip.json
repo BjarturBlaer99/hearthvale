@@ -1,0 +1,7 @@
+{
+	"id": "roast_turnip",
+	"makes": { "item": "roast_turnip", "count": 1 },
+	"needs": [
+		{ "item": "turnip", "count": 1 }
+	]
+}

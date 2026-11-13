@@ -8,6 +8,32 @@ var options: Array[Dictionary] = []
 var selected: int = 0
 
 
+## The marks for "more above" and "more below" beside a long list's count.
+const MORE_ABOVE: String = "^"
+const MORE_BELOW: String = "v"
+
+
+## The first line to show of `count`, in a box of `rows`, so that the `cursor` line is in
+## view: `first` (where the list stood) moved only as far as it must be.
+static func window_top(first: int, cursor: int, count: int, rows: int) -> int:
+	if count <= rows:
+		return 0
+	var out: int = clampi(first, 0, count - rows)
+	if cursor < out:
+		out = cursor
+	elif cursor >= out + rows:
+		out = cursor - rows + 1
+	return out
+
+
+## "^ 4/9 v" for a list longer than its box (the marks only where there is more that way),
+## and nothing for one that fits.
+static func count_text(first: int, cursor: int, count: int, rows: int) -> String:
+	if count <= rows:
+		return ""
+	return "%s %d/%d %s" % [MORE_ABOVE if first > 0 else " ", cursor + 1, count, MORE_BELOW if first + rows < count else " "]
+
+
 ## One option: {"id", "text", "enabled"}.
 static func option(id: StringName, text: String, enabled: bool = true) -> Dictionary:
 	return {"id": id, "text": text, "enabled": enabled}

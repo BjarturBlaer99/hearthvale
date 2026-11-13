@@ -34,7 +34,8 @@ const SCENARIOS: Dictionary = {
 	"kitchen": {
 		"area": &"home",
 		"cell": Vector2i(5, 3),
-		"items": [[&"cherry_blossom", 4], [&"bread", 2], [&"wild_berries", 4], [&"coin", 20]],
+		"items": [[&"cherry_blossom", 4], [&"bread", 2], [&"wild_berries", 4], [&"coin", 20], [&"turnip", 3], [&"carrot", 1],
+			[&"wheat", 3], [&"potato", 2], [&"pumpkin", 1], [&"mushroom", 2]],
 		"flags": [],
 	},
 	# On the road by the plot, with the hoe, the watering can (empty: the well is to the east),
@@ -43,7 +44,16 @@ const SCENARIOS: Dictionary = {
 		"area": &"village",
 		"cell": Vector2i(15, 17),
 		"items": [[&"wooden_sword", 1], [&"hoe", 1], [&"watering_can", 1], [&"turnip_seeds", 5], [&"carrot_seeds", 3],
-			[&"wheat_seeds", 3], [&"potato_seeds", 3], [&"pumpkin_seeds", 2]],
+			[&"wheat_seeds", 3], [&"potato_seeds", 3], [&"pumpkin_seeds", 2], [&"coin", 30]],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds"],
+	},
+	# In Tilda's shop at her counter, with coins and a harvest: for trying her list. (Start it by
+	# day: the shop is shut from 18:00 to 08:00, and he could not get back in.)
+	"market": {
+		"area": &"shop",
+		"cell": Vector2i(5, 4),
+		"items": [[&"wooden_sword", 1], [&"hoe", 1], [&"watering_can", 1], [&"coin", 40], [&"turnip", 6], [&"carrot", 3],
+			[&"wheat", 4], [&"potato", 2], [&"pumpkin", 1]],
 		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds"],
 	},
 	# At home, by the door: for trying the bed.

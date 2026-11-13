@@ -1,0 +1,8 @@
+{
+	"id": "kiosk",
+	"name": "Kiosk",
+	"sells": [
+		{ "item": "gem", "price": 3 },
+		{ "item": "bread", "price": -2 }
+	]
+}

@@ -143,6 +143,9 @@ var _collapse_left: float = 0.0
 ## The hero's energy at the last change, to tell when he crosses into being tired.
 var _energy_was: float = 0.0
 var _hours: Hours
+## The shop a conversation asked for ({ "shop": id, "mode": Shop.BUY or Shop.SELL }): its list
+## opens when the conversation closes.
+var _shop_due: Dictionary = {}
 ## The tune this area last asked for.
 var _tune: StringName = &""
 ## Where the hero arrived in this area, facing which way: where they come back after falling.
@@ -210,6 +213,8 @@ func _ready() -> void:
 	hud.dialogue.closed.connect(_on_dialogue_closed)
 	hud.item_menu.chosen.connect(_on_item_chosen)
 	hud.item_menu.closed.connect(_on_item_menu_closed)
+	hud.shop_menu.closed.connect(_on_item_menu_closed)
+	EventBus.shop_requested.connect(_on_shop_requested)
 	hud.pause_menu.quit_to_title.connect(_on_quit_to_title)
 	EventBus.hit_stop.connect(hit_stop)
 	EventBus.quest_announced.connect(_on_quest_announced)
@@ -607,7 +612,23 @@ func open_item_menu() -> bool:
 
 
 func is_in_menu() -> bool:
-	return hud.item_menu.is_open()
+	return hud.item_menu.is_open() or hud.shop_menu.is_open()
+
+
+## Opens a shop's buy-and-sell list on `mode` (Shop.BUY or Shop.SELL; GDD §9). The hero stands
+## still while it is open, and the clock with him. Returns whether it opened.
+func open_shop(shop_id: StringName, mode: StringName) -> bool:
+	var shop: Dictionary = DataRegistry.get_shop(shop_id)
+	if shop.is_empty() or _busy():
+		return false
+	player.controls_enabled = false
+	hud.set_prompt("")
+	hud.shop_menu.open(shop, mode)
+	return true
+
+
+func _on_shop_requested(shop_id: StringName, mode: StringName) -> void:
+	_shop_due = {"shop": shop_id, "mode": mode}
 
 
 ## "Item: Bow (Arrows x10)" for the HUD.
@@ -1277,6 +1298,11 @@ func _on_dialogue_closed() -> void:
 	player.controls_enabled = true
 	if _ending_due:
 		show_ending()
+	elif not _shop_due.is_empty():
+		# The conversation asked for a shop's list: it opens now that the words are done.
+		var due: Dictionary = _shop_due
+		_shop_due = {}
+		open_shop(due["shop"], due["mode"])
 
 
 ## Leaves for the ending screen (the game's last conversation just closed). The hero's place

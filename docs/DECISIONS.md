@@ -517,6 +517,25 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-13 — **P3c: the shop is a list on the HUD, opened by her conversation.** The pivot plan said her
+  one-line-per-ware conversation "won't stretch to seeds and crops". Her conversation keeps what is hers to
+  say (the eggs she is owed) and two answers open the list, on buying or on selling. A new effect, `shop`,
+  does it, so any conversation can open any shop.
+- 2026-11-13 — **P3c: seeds and crop prices are the crops' own, not the shop's.** The shop's file says only
+  that it sells seeds and buys crops. A sixth crop is then on both lists with no change to the shop.
+- 2026-11-13 — **P3c: she buys only what crops give.** Not what is foraged, not meals, not anything else. The
+  GDD says "it buys crops". It keeps the farm the one way to earn at her counter.
+- 2026-11-13 — **P3c: her old wares keep their prices and sizes:** ten arrows 5 coins, three bombs 8, bread 6.
+  A deal is all or nothing: all ten arrows must fit.
+- 2026-11-13 — **P3c: crops are sold one at a time,** and the list stays open. A line for "sell all" was not
+  asked for; eighteen turnips are eighteen clicks.
+- 2026-11-13 — **P3c: a full purse refuses a sale** (999 coins) and keeps the crop, as a full pack keeps a
+  crop in the soil.
+- 2026-11-13 — **P3c: the meals are data only.** Four dishes and five recipes; bread can now be baked from
+  two wheat as well as bought. The numbers are the pivot plan's table.
+- 2026-11-13 — **P3c: a conversation shows four answers and scrolls.** The hearth's six dishes ran out of its
+  box, as the item menu's lines did in 3b. The scrolling is shared now (`MenuCursor.window_top()`), and the
+  hearth stays a conversation: it needed no screen of its own.
 - 2026-11-13 — **The scenery is still but for the water** (the user's request: "get rid of the animations on
   the environment except the water animation"). Gone: the wind in tufts, flowers, crops and washing
   (`SwayLayer`) and in tree crowns, petals in the air, specks in the air (`Motes`). Kept as still pictures:

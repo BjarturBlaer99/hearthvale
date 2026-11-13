@@ -135,3 +135,47 @@ Nothing is built ahead of its step. Each later step gets its own "done when" lis
 - Buying seeds, selling crops, the meals (3c).
 - Crops that regrow, giant crops, seasons, fertiliser, crows, quality: not in the pivot at all.
 
+---
+
+## 3c — The shop's list and meals
+
+### What changes
+- **Tilda's shop is data** (`data/shops/tilda.json`, a new kind, with a schema): the wares she sells with their
+  prices, whether she sells seeds, whether she buys crops. Seed prices and what a crop sells for are the
+  crop's own (`data/crops`), so **a new crop is on her list without touching the shop.**
+- **A buy-and-sell list** (`ShopMenu`, a new box on the HUD) in place of her one-line-per-ware conversation:
+  - **Buy:** ten arrows (5 coins), three bombs (8), a loaf of bread (6), and a seed of each crop at its price
+    (turnip 5, carrot 8, wheat 6, potato 10, pumpkin 20). The prices of her old wares are unchanged.
+  - **Sell:** what the hero's crops gave, one at a time, at the crop's price (turnip 12, carrot 18, wheat 10,
+    potato 24, pumpkin 60). She buys nothing else.
+  - It stays open for as many deals as he likes, shows his coins, and says why a deal can't be made (not
+    enough coins, no room to carry it, a full purse).
+- **Her conversation** keeps the eggs she is owed, and opens the list: "Let me see what you sell." and "I have
+  crops to sell." (a new effect for conversations, `shop`).
+- **`Shop`** (`core/shop/`, pure, tested): what is on each list, what a deal costs and gives, and why not.
+- **Five meals from crops, as recipes** (data only; GDD §6): roast turnip (1 turnip: 22 energy), mushroom soup
+  (2 mushrooms, 1 potato: 35, half a heart), vegetable stew (potato, carrot, turnip: 60, one heart), pumpkin
+  pie (1 pumpkin, 1 wheat: 80, two hearts), and bread from 2 wheat (30). Four new dishes as items, with
+  pictures.
+- **A conversation with many answers scrolls** (the hearth now lists six dishes): four answers show at a time.
+- **Tools:** a playtest scenario in the shop with coins and a harvest (`-- market`); the kitchen scenario
+  gains crops; new screenshots.
+
+### What does not change
+- Growing: the plot, the tools, the crops and their days are as in 3a and 3b.
+- The shop's hours (08:00 to 18:00), and where the hero can walk.
+- The save format: coins and items are already saved.
+
+### Done when
+- [x] the shop is data, checked on load, with a schema; `Shop` is unit-tested: lists, prices, refusals
+- [x] seeds and her old wares are bought from the list, and crops are sold on it, for the prices in the GDD
+- [x] a deal that can't be made says why and changes nothing
+- [x] the five meals are recipes that the hearth lists and cooks, each giving what the GDD says
+- [x] a crop is planted, raised, harvested, eaten, cooked and sold in one test, as the roadmap asks
+- [x] all earlier tests pass
+- [ ] (yours) a week of farming pays for itself and feels worth doing
+
+### Not in this step
+- Other shops, haggling, prices that change, selling anything but crops, a shipping bin: not in the pivot.
+- P4 (skills, friendship, gifts, the story's new gate) is proposed before it is built.
+

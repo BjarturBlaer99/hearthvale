@@ -1,0 +1,8 @@
+{
+	"id": "mushroom_soup",
+	"makes": { "item": "mushroom_soup", "count": 1 },
+	"needs": [
+		{ "item": "mushroom", "count": 2 },
+		{ "item": "potato", "count": 1 }
+	]
+}

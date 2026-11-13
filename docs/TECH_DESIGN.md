@@ -351,6 +351,7 @@ res://
 | `data/breakables/` | one breakable (grass, pot) per file |
 | `data/recipes/` | one recipe per file: what a dish needs and what it makes |
 | `data/crops/` | one crop per file: how long it takes, its seed, what it gives, its prices |
+| `data/shops/` | one shop per file: its wares and prices, whether it sells seeds and buys crops |
 | `data/rules/` | one set of rules per file: the numbers a system runs on (`time.json`: the day's clock; `energy.json`: the hero's energy; `hours.json`: who is where when; `night.json`: what the night does to monsters; `farm.json`: the hero's plot) |
 
 DataRegistry validates required fields and resolves every cross-reference at load. A set of rules must be one
@@ -470,9 +471,11 @@ run headless; see CLAUDE.md for the command and gotchas.
     click") is the mark in a conversation. The help lines in the scenes say "Click" where either button does.
   - Headless tests hand a click straight to a node's `_unhandled_input()`; a scratch script that pushed real
     clicks through a window found them working in the world, a conversation, each menu and the title.
-- **A long item list scrolls** (P3b): the item menu shows `ItemMenu.ROWS` lines (five). `window_top()` moves
-  the first line shown only as far as it must to keep the cursor in view, and the bottom corner says where
-  he is ("3/7 v": the marks show which way there is more).
+- **A long list scrolls** (P3b, P3c): `MenuCursor.window_top()` (pure) moves the first line shown only as far
+  as it must to keep the cursor in view, and `count_text()` says where he is ("3/7 v": the marks show which
+  way there is more). The item menu and the shop's list show five lines (`ROWS`); a conversation shows four
+  answers (`DialogueBox.OPTION_ROWS`), with the count in the corner where "[Left click]" stands when there is
+  nothing to choose.
 
 ## 13. Audio & feel
 - **Made in code, baked to files** (no external assets):
@@ -749,7 +752,10 @@ run headless; see CLAUDE.md for the command and gotchas.
   gives the dish (the shared `take_item` and `give_item` effects) when the hero has them and room to carry the
   dish, and says so when he hasn't. `AreaController.talk_to()` opens whatever a `Talkable.dialogue()` returns,
   so the hearth needs no screen of its own.
-- **The shop:** bread is a line in Tilda's conversation, like arrows and bombs.
+- **The shop:** bread is a line of Tilda's list, like arrows and bombs (§21; until P3c each was a line of her
+  conversation).
+- **Meals from crops** (P3c) are five more recipes and four more food items: no code. The hearth's
+  conversation lists six dishes, so a conversation's answers scroll (§12).
 
 ## 19. Hours and night
 - **Hours are data** (`data/rules/hours.json`): `places` (a place's id, when its door is open, and the words
@@ -839,3 +845,29 @@ run headless; see CLAUDE.md for the command and gotchas.
 - **Tools:** `tools/playtest.gd -- farm` starts on the road by the plot with both tools and seeds of every
   crop; `tools/capture.gd` has the actions `farm`, `hoe`, `fill`, `tools_menu`, `crops` (a plot in the
   middle of a season), `plant` and `seeds_menu`.
+
+## 21. The shop
+- **A shop is data** (P3c; `data/shops/<id>.json`, schema `docs/data/shop.schema.json`): `name`, `sells` (its
+  own wares: an item, how many a deal gives, the price), `sells_seeds` and `buys_crops`. Seed prices and what
+  a crop sells for are in `data/crops`, so a new crop is on both lists without touching the shop. There is
+  one shop, `tilda`.
+- **`Shop`** (`core/shop/`, pure) says what is on each list: `wares(shop, crops)` (her own wares in order,
+  then a seed of every crop, cheapest first) and `offers(shop, crops, stacks)` (the harvest he carries, with
+  how many and the price of one). `why_not_buy()` and `why_not_sell()` say why a deal can't be made: not
+  enough coins, no room for all a deal gives, a full purse. `problems()` is run by the registry on every shop.
+- **`GameState.buy(ware)` and `sell(offer)`** make a deal or return why not (Shop's words), and then nothing
+  has changed. Selling is one at a time. Coins and items are already saved: the save format is as it was.
+- **`ShopMenu`** (`ui/`, a child of the HUD) is the counter: the two lists as tabs ("[Buy]  Sell"), the purse
+  beside them, five lines of the list at a time, a line that says what the last deal was or why it couldn't
+  be made, and the help. Up and down move, left and right turn to the other list, either click or Enter makes
+  the deal, Tab or Esc leaves. It stays open for as many deals as he likes.
+- **A conversation opens it** with the effect `shop` (`shop`, `mode`): `EffectApplier` calls
+  `GameState.request_shop()`, which emits `EventBus.shop_requested`; the area keeps it (`_shop_due`) and
+  calls `open_shop()` when the conversation closes. The registry checks that the shop exists and that the
+  mode is `buy` or `sell`. While the list is open `is_in_menu()` is true: the hero stands still and the clock
+  with him.
+- **Tilda's conversation** (`data/dialogue/shop_tilda.json`) has the eggs she is owed, "Let me see what you
+  sell.", "I have crops to sell." and "Just looking."
+- **Tools:** `tools/playtest.gd -- market` starts at her counter with coins and a harvest; `tools/capture.gd`
+  has the actions `shop_buy`, `shop_sell` and `meals`.
+
