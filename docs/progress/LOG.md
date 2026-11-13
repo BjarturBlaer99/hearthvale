@@ -1677,3 +1677,47 @@ Plan: `docs/progress/P3-plan.md` (the last of P3's three steps).
 - **The hearth's dish names are long:** "Vegetable Stew (1 Potato, 1 Carrot, 1 Turnip)" nearly reaches the corner's count.
 - **P4 is not started,** and is to be proposed first.
 
+## 2026-11-13 — P4 approved; P4a: the story over days (built; not yet tried in play)
+
+Plan: `docs/progress/P4-plan.md`. The user approved the proposal as written ("Approve as written"): all ten
+decisions stand as recommended. Section 10 of the plan is this step's own list.
+
+**Built**
+- **A main quest, "A Place of Your Own",** in the quest log from the first morning (`data/quests/a_place_of_your_own.json`). It begins by itself and says so at the top of the screen. Six stages, each with words that say where to go:
+  1. the cottage, and the hoe, the can and the seeds inside its door
+  2. the plot, and how to till and plant ("Choose the hoe with Tab and left click to till a patch")
+  3. Elder Bram, in the blue-roofed house (and: water it each morning, the can fills at the well)
+  4. the Old Keep, by way of the sword in the training yard
+  5. home, to sleep: the chapel's bars lift at dawn
+  6. the crypt
+- **Elder Bram welcomes a newcomer.** Before a first seed is planted he says which cottage and plot are the hero's and sends him to settle in, and says nothing of the keep. After it he speaks as before, and his promise now also has the chain taken off the keep's gate.
+- **The keep's gate in the Old Wood is chained** until he gives that word: a gate of planks under a chain and a padlock. Walking up to it, or trying it, says "The keep's gate is chained shut. Elder Bram in Hearthvale has the say over it."
+- **The crypt's bars lift at dawn on the day after the Warden falls,** not at once. Sleeping, staying up until 02:00 and collapsing all bring that dawn.
+- **Words changed to match:** Bram's promise ("I will have the chain taken off the keep's gate"), his tale ("the bars will not hold past dawn"), Guard Rolf's two answers about the chapel door, the keep's closing words ("By dawn they will be up"), and the title's line: "A cottage, a plot of soil, and lights over the old keep."
+- **Three new things data may say,** each checked on load and in the schemas: a quest's `auto_start`, a conversation's `openings` (other nodes to begin at, with conditions), and the condition `days_since` (so many dawns since a flag came true).
+- **A new kind of door,** `chained`: opens on a flag like a shutter, with words of its own.
+- **Save version 4,** the one change of format for all of P4: the day each flag came true, a tally (crops picked, counted from now on), and places for skill points and friendship that stay empty until 4b and 4c. A version 3 save loads with those empty and past the story's gates: its first crop counts as planted, the keep's gate is open, and the crypt's bars are up if its Warden had fallen. No promise to Bram is added to it.
+- **The quests chime once** when a quest runs through several stages at once (an old save catching up, a playtest scenario).
+- **Tools:** playtest scenarios `bram` (in his house, the first crop in), `gate` (below the chained gate) and `rest` (by the chapel on the day the Warden fell); the older scenarios start past the gates; six new screenshots (128 in all); the older ones of Bram, the keep's gate and the chapel's door now show the new story.
+
+**Checked**
+- 582 tests in 81 suites pass (+32: `tests/core/story/story_gates_test.gd`, `tests/autoload/story_save_test.gd`, `tests/world/story_days_test.gd`, and more in the condition, quest and conversation suites). Import and boot clean.
+- **The plan's "done when":** a new game has the quest and it moves on through the first day and to the end; Bram's welcome and his words after the first crop; the gate holds, says why, and opens on his word; the bars are down on the day the Warden falls (even at 01:30) and up after a night; the three new things in data are refused when wrong; a real version 3 save, made inside the keep before the format changed, loads past the gates with its day, plot, pack, flags and quest as they were; versions 1 and 2 still load.
+- **Nineteen older tests failed first,** all for the reason the step exists: they walked into the keep, or had Bram speak of it, on a new game. Each now says what it stands on (Bram's word, a first crop), or expects the main quest in the log.
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: the bars lifting on the day the Warden falls, a chained gate that is never shut, an old save not put past the gates, the quests not hearing the dawn, Bram never welcoming a newcomer.
+- **Frame cost:** draw calls as before: Elder Bram's house 45, the keep 382, the cistern 231, the village 313 (312 before, which is within what the village's creatures vary it by; it reads 314 for the three and a half seconds the quest's notice shows).
+- Screenshots: all 128 taken. Looked at closely: the gate chained and unchained (enlarged), Bram's welcome, his tale, the quest log on a new game and at each of the seven stages (the words fit the box), the log with four quests, the title.
+
+**Known issues and limits**
+- Not tried in play. **Whether the first day reads clearly to someone new, and whether the story runs to six to eight days,** is for a playtest. The plan proposes a whole-game playtest now, before 4b.
+- **The notice of the quest shows for a few seconds at the top of the screen** when a game begins. A player who misses it has the quest log (Esc, Quests); nothing else on screen points there.
+- **The journal names keys in its words** ("Tab", "left click"). They are data, not read from the input map.
+- **The quest log's list holds five lines,** and four quests and "Back" now fill it. 4d adds four side quests: the list will need to scroll, as the item menu and the shop do.
+- **Refusing Bram ("Not me.") leaves the gate chained** until the player goes back and promises. The journal's line is "Hear Elder Bram out".
+- **The gate says its words each time he steps up to it,** as the shut shop does.
+- **An old save says "Quest updated: A Place of Your Own"** the first time it loads, as the quest catches up.
+- **The main quest counts on the ending screen** among the quests finished. The ending's lines are redone in 4d.
+- **A day is kept for every flag that comes true,** so a save is a little longer (a number a flag).
+- **Skills and friendship have places in a save and nothing else:** nothing reads or changes them yet.
+- **The chain is drawn in code,** like the game's other doors, not painted by an art tool.
+

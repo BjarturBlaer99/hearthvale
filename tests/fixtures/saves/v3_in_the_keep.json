@@ -1,0 +1,95 @@
+{
+	"day": 4,
+	"energy": 71.5,
+	"equipped": "bow",
+	"farm": {
+		"cells": {
+			"0,0": {
+				"crop": "turnip",
+				"dry": 1,
+				"stage": 2,
+				"watered": false,
+				"withered": false
+			},
+			"0,1": {
+				"watered": false
+			},
+			"1,0": {
+				"crop": "carrot",
+				"dry": 2,
+				"stage": 1,
+				"watered": false,
+				"withered": true
+			},
+			"2,0": {
+				"watered": false
+			}
+		}
+	},
+	"flags": {
+		"dungeon/keep/keys": 1,
+		"quest/lost_shuttle/entered": "find",
+		"took_first_seeds": true,
+		"took_hoe": true,
+		"took_watering_can": true,
+		"took_wooden_sword": true
+	},
+	"health": 4,
+	"heart_pieces": 0,
+	"hearts_max": 3,
+	"inventory": [
+		{
+			"count": 1,
+			"id": "wooden_sword"
+		},
+		{
+			"count": 1,
+			"id": "bow"
+		},
+		{
+			"count": 14,
+			"id": "arrow"
+		},
+		{
+			"count": 58,
+			"id": "coin"
+		},
+		{
+			"count": 1,
+			"id": "hoe"
+		},
+		{
+			"count": 1,
+			"id": "watering_can"
+		},
+		{
+			"count": 4,
+			"id": "water"
+		},
+		{
+			"count": 2,
+			"id": "turnip_seeds"
+		},
+		{
+			"count": 3,
+			"id": "turnip"
+		},
+		{
+			"count": 1,
+			"id": "bread"
+		}
+	],
+	"minute": 795.0,
+	"play_time": 2610.5,
+	"player": {
+		"area": "keep",
+		"cell": [
+			22,
+			30
+		]
+	},
+	"quests": {
+		"lost_shuttle": "find"
+	},
+	"version": 3
+}

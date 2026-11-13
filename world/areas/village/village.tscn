@@ -165,7 +165,7 @@ script = ExtResource("h14_door")
 door_id = &"crypt_bars"
 kind = &"shutter"
 size = Vector2i(2, 1)
-open_flag = &"keep_warden_beaten"
+open_flag = &"crypt_open"
 
 [node name="CryptDoorL" type="Node2D" parent="Interactables" unique_id=1054063380]
 position = Vector2(368, 80)

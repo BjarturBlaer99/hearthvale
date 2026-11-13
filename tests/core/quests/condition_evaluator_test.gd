@@ -56,3 +56,42 @@ func test_unmet_lists_what_is_missing_in_order() -> void:
 	assert_array(_check.unmet([key, rich, flag])).is_equal([rich, flag])
 	assert_bool(_check.all_met([key])).is_true()
 	assert_bool(_check.all_met([])).is_true()
+
+
+func test_days_since_counts_the_dawns_since_a_flag_came_true() -> void:
+	# The Warden fell on day 4. `on` is the evaluator as it would be on a given day.
+	var on: Callable = func(today: int) -> ConditionEvaluator:
+		return ConditionEvaluator.new({
+			"day": today,
+			"flags": {"warden_fell": true, "old_news": true, "gate": false, "visits": 3},
+			"flag_days": {"warden_fell": 4, "gate": 2},
+		})
+	var a_day: Dictionary = {"type": "days_since", "flag": "warden_fell", "days": 1}
+	var two_days: Dictionary = {"type": "days_since", "flag": "warden_fell", "days": 2}
+	assert_bool((on.call(4) as ConditionEvaluator).is_met(a_day)).override_failure_message("not on the day itself").is_false()
+	assert_bool((on.call(5) as ConditionEvaluator).is_met(a_day)).override_failure_message("the next dawn").is_true()
+	assert_bool((on.call(5) as ConditionEvaluator).is_met(two_days)).is_false()
+	assert_bool((on.call(6) as ConditionEvaluator).is_met(two_days)).is_true()
+	assert_bool((on.call(9) as ConditionEvaluator).is_met(a_day)).override_failure_message("and ever after").is_true()
+	var today: ConditionEvaluator = on.call(5)
+	assert_int(today.days_since("warden_fell")).is_equal(1)
+	assert_int((on.call(4) as ConditionEvaluator).days_since("warden_fell")).is_equal(0)
+	assert_int((on.call(3) as ConditionEvaluator).days_since("warden_fell")).override_failure_message("never before its day").is_equal(0)
+
+
+func test_days_since_needs_the_flag_to_be_true_and_takes_an_undated_one_as_long_ago() -> void:
+	var check: ConditionEvaluator = ConditionEvaluator.new({
+		"day": 5,
+		"flags": {"old_news": true, "gate": false, "visits": 3},
+		"flag_days": {"gate": 2},
+	})
+	assert_bool(check.is_met({"type": "days_since", "flag": "never_set", "days": 1})).is_false()
+	assert_int(check.days_since("never_set")).is_equal(-1)
+	assert_bool(check.is_met({"type": "days_since", "flag": "gate", "days": 1})).override_failure_message("a flag that is false, whatever its day").is_false()
+	assert_bool(check.is_met({"type": "days_since", "flag": "visits", "days": 1})).override_failure_message("a number is not a yes").is_false()
+	# True, with no day kept: it came true before days were kept (an older save).
+	assert_int(check.days_since("old_news")).is_equal(ConditionEvaluator.LONG_AGO)
+	assert_bool(check.is_met({"type": "days_since", "flag": "old_news", "days": 400})).is_true()
+	# A state that keeps no days at all (a stand-in) is on day 1.
+	var bare: ConditionEvaluator = ConditionEvaluator.new({"flags": {"done": true}})
+	assert_bool(bare.is_met({"type": "days_since", "flag": "done", "days": 1})).is_true()

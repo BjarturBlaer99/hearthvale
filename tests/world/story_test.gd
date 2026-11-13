@@ -37,6 +37,9 @@ func after_test() -> void:
 
 
 func test_elder_bram_speaks_to_each_point_in_the_game() -> void:
+	# A newcomer is welcomed; once his first crop is in, Bram speaks of the keep (P4a).
+	assert_array(Array(_options(&"elder_bram"))).override_failure_message("before the first crop: a welcome").is_equal(["What should I do first?", "Goodbye."])
+	GameState.set_flag(StoryGates.FIRST_CROP, true)
 	var before: PackedStringArray = _options(&"elder_bram")
 	assert_bool(Array(before).has("What lights?")).is_true()
 	assert_bool(Array(before).has("The keep is quiet. The Warden fell.")).is_false()
@@ -65,6 +68,8 @@ func test_brams_tale_ties_the_keep_to_the_crypt_and_says_what_to_do() -> void:
 
 func test_guard_rolf_has_a_quiet_watch_at_the_end() -> void:
 	GameState.set_flag(&"keep_warden_beaten", true)
+	assert_bool(Array(_options(&"guard_rolf")).has("The chapel door stands open.")).override_failure_message("not until the bars are up, at dawn").is_false()
+	GameState.set_flag(StoryGates.CRYPT_OPEN, true)
 	assert_bool(Array(_options(&"guard_rolf")).has("The chapel door stands open.")).is_true()
 	assert_bool(Array(_options(&"guard_rolf")).has("The crypt is quiet.")).is_false()
 	GameState.set_flag(&"crypt_shade_beaten", true)

@@ -1,8 +1,9 @@
-# P4 — RPG and story (proposal)
+# P4 — RPG and story
 
-The fourth and last phase of the pivot (`docs/ROADMAP.md` P4). **This is a proposal: nothing in it is built,**
-and nothing will be until you approve it, as you asked ("Propose before building anything new in this phase;
-keep it small").
+The fourth and last phase of the pivot (`docs/ROADMAP.md` P4). It was written as a proposal, as you asked
+("Propose before building anything new in this phase; keep it small"), and **you approved it as written on
+2026-11-13:** all ten decisions in section 3 stand as recommended. Each of the four steps has its own list
+further down (section 10 on), written before the step is built.
 
 ## 1. What you asked for (2026-11-12)
 - Keep Sir Aldric, the Iron Warden and the Crypt Shade at the core, but spread the story over days: Elder
@@ -189,3 +190,56 @@ through every step.
 A hero level or stat points, skill trees, perks, new weapons or monsters, new dungeons or areas, villagers who
 walk about or keep a daily round, birthdays, festivals, romance, visiting villagers at home at night, gifts of
 anything but food and crops, more than one gift a day, a calendar or seasons, crafting.
+
+## 10. Step 4a — The story over days
+
+### What changes
+- **A main quest, "A Place of Your Own"** (`data/quests/a_place_of_your_own.json`), in the quest log from the
+  first morning. It begins by itself: a quest may now say `"auto_start": true`. Its stages are the six in
+  section 5, and each stage's words say where to go.
+- **The first seed planted is remembered** (the flag `planted_first_crop`), which is what the quest and Elder
+  Bram wait for.
+- **Elder Bram greets a newcomer differently.** A conversation may now have `openings`: other places to begin,
+  each with conditions, tried in order before its usual `start`. Before the first crop he welcomes the hero,
+  says which cottage and plot are his and sends him to settle in. After it he speaks of the lights as he does
+  today, and his promise also has the chain taken off the keep's gate (the flag `keep_gate_open`).
+- **The keep's gate is chained** until then: a new kind of door, `chained`, in the Old Wood in front of the
+  way in. It is drawn in code like the other doors. Walking up to it, or interacting with it, says that it is
+  chained and that Elder Bram has the say over it.
+- **The crypt's bars lift at dawn on the day after the Warden falls** (the flag `crypt_open`, set by the main
+  quest). For that a flag's day is remembered (`GameState.flag_days`), with a new condition, `days_since`.
+- **Words that spoke of the bars lifting at once** now speak of dawn: Bram's tale, Guard Rolf's two answers,
+  the keep's closing words.
+- **The title's line** becomes "A cottage, a plot of soil, and lights over the old keep."
+- **Save version 4,** the one change of format for the whole phase. New in a save: the day each flag was set,
+  skill points, friendship, and a tally (crops picked). Only the flags' days and the tally are used in this
+  step: the skills' and the friends' places are kept empty until 4b and 4c. A version 3 save loads with all
+  of them empty and counts as past the story's gates: the first crop counts as planted, the keep's gate is
+  open, and the crypt's bars are up if the Warden has fallen.
+- **Crops picked are counted** from now on, for the ending in 4d.
+- **Tools:** playtest scenarios in Elder Bram's house with a first crop in (`-- bram`), below the chained
+  gate (`-- gate`) and by the chapel on the day the Warden fell (`-- rest`); the first morning is `-- village`
+  or the whole game (`-- full`); the old scenarios start past the gates; new screenshots.
+
+### What does not change
+- The maps: none is re-baked. The gate and the bars are nodes in their areas.
+- The dungeons, the bosses, combat, energy, the farm's rules, the shop, the hours, the three side quests.
+- Where a new game begins (the square in Hearthvale).
+
+### Done when
+- [x] a new game has "A Place of Your Own" in the quest log, and it moves on as the hero takes the tools,
+      plants a seed, speaks to Bram, quiets the keep, sleeps, and ends the Shade
+- [x] before the first crop Elder Bram welcomes the hero and does not speak of the keep; after it he does
+- [x] the keep's gate can't be passed on a new game, and says why, naming Elder Bram; after the promise it can
+- [x] the crypt's bars stay down on the day the Warden falls and are up the next morning
+- [x] `days_since`, `auto_start` and `openings` are checked on load, in the schemas, and unit-tested
+- [x] a version 3 save loads as version 4, past the gates, with nothing lost; versions 1 and 2 still load
+- [x] the title shows the new line
+- [x] all earlier tests pass
+- [ ] (yours) the first day reads clearly to someone who has never played: where to go, and why the keep waits
+
+### Not in this step
+- Skills (4b), friendship and gifts (4c), the new side quests, recipes and the ending's lines (4d).
+- A tutorial, pop-up hints or markers on a map: the quest log's words are the help.
+- A new place to start the game, or a scene of arriving.
+

@@ -517,6 +517,44 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-13 — **P4: the proposal was approved as written** (the user: "Approve as written"). All ten
+  decisions in `docs/progress/P4-plan.md` §3 stand as recommended: three skills of five levels that only make
+  work cheaper and meals better; the keep's gate chained until Bram's word; his word as soon as a first seed is
+  planted; the crypt's bars up at dawn the day after the Warden; friendship in five marks of four points;
+  gifts from a list; side quests and recipes at two marks and a present at four; old saves past the gates;
+  four steps.
+- 2026-11-13 — **P4a: the keep's gate is a door, not a rule about the exit.** The chapel's bars were already
+  a `DungeonDoor` standing in front of an exit, so the gate is one too, of a new kind (`chained`) with its own
+  words. Nothing about exits changed. — Alternative: a flag on `AreaExit`, as the shop's hours are; it would
+  have needed its own drawing and its own words.
+- 2026-11-13 — **P4a: the gate's chain is drawn in code, like every door.** Locks, bars and cracked walls are
+  drawn by `DungeonDoor`; a baked picture for one gate would have been the odd one out.
+- 2026-11-13 — **P4a: a flag's day is kept for every flag that comes true,** not only the Warden's. It is one
+  rule with no list to keep up, and the condition `days_since` can then wait on anything. A save grows by a
+  number a flag. Flags that hold counts or words have no day.
+- 2026-11-13 — **P4a: the crypt opens through the quest.** The main quest's `rest` stage waits a dawn and its
+  next stage sets `crypt_open`, which the bars and Guard Rolf read. The quest always exists (it starts by
+  itself), so the story's timing is in one data file. — Alternative: bars that count days themselves.
+- 2026-11-13 — **P4a: the main quest starts by itself** (`auto_start`), at the first update of a game, and
+  announces itself like any quest. `Quests` does nothing with no game started, so it does not begin on the
+  title screen.
+- 2026-11-13 — **P4a: the main quest catches up.** Each stage moves on by a flag that later progress also
+  sets, so a hero who is further along (an old save, a playtest scenario) runs through the earlier stages at
+  once. A seed planted before all three things are taken from the cottage also moves it on.
+- 2026-11-13 — **P4a: Bram's welcome is an opening, not a new conversation.** A dialogue may list `openings`:
+  nodes to begin at when their conditions are met. His welcome is for a hero with no first crop and no Warden
+  beaten, so nothing later in the story can fall back into it.
+- 2026-11-13 — **P4a: the journal tells a new player how to farm.** "Choose the hoe with Tab and left click to
+  till a patch" is in the second stage's words. There is no tutorial and no pop-up: the plan says the quest
+  log is the help.
+- 2026-11-13 — **P4a: an old save is given no promise.** The migration opens the gate and counts a first crop
+  as planted, but does not set `promised_elder_keep`: Bram and Wenna would speak of a promise the player never
+  made.
+- 2026-11-13 — **P4a: version 4 holds places for skills and friendship now,** empty, so the format changes once
+  for the phase as the plan says. `friends` is `points`, `talked` (the day) and `gift` (the day) a villager;
+  `skills` is points a skill. If 4b or 4c need another shape, that is a version 5.
+- 2026-11-13 — **P4a: the main quest counts among the quests on the ending screen** ("Quests finished 4 of
+  4"). It is a quest like the others; the ending's lines are redone in 4d.
 - 2026-11-13 — **P3c: the shop is a list on the HUD, opened by her conversation.** The pivot plan said her
   one-line-per-ware conversation "won't stretch to seeds and crops". Her conversation keeps what is hers to
   say (the eggs she is owed) and two answers open the list, on buying or on selling. A new effect, `shop`,

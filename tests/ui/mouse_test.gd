@@ -26,6 +26,8 @@ func before_test() -> void:
 	GameState.new_game()
 	GameState.set_time(float(GameState.day_clock().in_day("12:00")))
 	SaveSystem.current_slot = TEST_SLOT
+	# The main quest begins with the game, with a chime: before these tests listen.
+	Quests.refresh()
 	_heard.clear()
 	EventBus.sound.connect(_on_sound)
 

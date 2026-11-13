@@ -191,7 +191,8 @@ func test_a_version_1_save_loads_as_the_first_morning_with_all_else_as_it_was() 
 	assert_int(GameState.health).is_equal(int(old["health"]))
 	assert_float(GameState.play_time).is_equal_approx(float(old["play_time"]), 0.01)
 	assert_that(GameState.equipped).is_equal(StringName(str(old["equipped"])))
-	assert_int(GameState.flags.size()).override_failure_message("every flag").is_equal((old["flags"] as Dictionary).size())
+	# Every flag it had, and those that put an old game past the story's gates (version 4).
+	assert_int(GameState.flags.size()).override_failure_message("every flag").is_equal(StoryGates.past_the_gates(old["flags"]).size())
 	for flag: String in old["flags"]:
 		assert_that(GameState.get_flag(StringName(flag), null)).override_failure_message(flag).is_equal(old["flags"][flag])
 	assert_int(GameState.inventory.size()).is_equal((old["inventory"] as Array).size())

@@ -916,6 +916,12 @@ func shut_door_in_front() -> AreaExit:
 	return null
 
 
+## What the chained gate in the cell the hero faces says, or "" if there is none (or it is open).
+func chained_words_in_front() -> String:
+	var gate: DungeonDoor = usable_in_front() as DungeonDoor
+	return gate.words() if gate != null else ""
+
+
 ## Tells the hero that `door` is shut.
 func _say_shut(door: AreaExit) -> void:
 	EventBus.sound.emit(&"nope")
@@ -1292,6 +1298,10 @@ func _on_cell_changed(cell: Vector2i) -> void:
 	elif shut_door_in_front() != null:
 		# He has walked up to a door that is shut: he is told why it won't open.
 		_say_shut(shut_door_in_front())
+	elif not chained_words_in_front().is_empty():
+		# ...or to a gate that is chained: he is told whose word would open it.
+		EventBus.sound.emit(&"nope")
+		hud.show_message(chained_words_in_front())
 
 
 func _on_dialogue_closed() -> void:

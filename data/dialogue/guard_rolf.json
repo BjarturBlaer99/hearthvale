@@ -58,7 +58,7 @@
           "conditions": [
             {
               "type": "flag",
-              "flag": "keep_warden_beaten",
+              "flag": "crypt_open",
               "value": false
             }
           ],
@@ -69,7 +69,7 @@
           "conditions": [
             {
               "type": "flag",
-              "flag": "keep_warden_beaten",
+              "flag": "crypt_open",
               "value": true
             },
             {
@@ -178,7 +178,7 @@
     },
     "crypt_barred": {
       "speaker": "rolf",
-      "text": "That door leads down to the old crypt. The bars dropped the night the keep woke, and no hand has shifted them since. Quiet the keep and they may rise.",
+      "text": "That door leads down to the old crypt. The bars dropped the night the keep woke, and no hand has shifted them since. Quiet the keep and they may rise with the next dawn.",
       "options": [
         {
           "text": "Goodbye.",
@@ -188,7 +188,7 @@
     },
     "crypt_open": {
       "speaker": "rolf",
-      "text": "The bars lifted when the keep fell quiet. It's black as pitch down there, and the floor has fallen in. Find a light before you go deep.",
+      "text": "The bars lifted at dawn, the morning after the keep fell quiet. It's black as pitch down there, and the floor has fallen in. Find a light before you go deep.",
       "options": [
         {
           "text": "Goodbye.",

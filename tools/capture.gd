@@ -20,6 +20,10 @@ extends SceneTree
 ## "energy:<n>" leaves the hero with that much energy; "collapse" takes it all (he is caught
 ## lying where he fell, and never gets home: nothing is saved). "food_menu" opens the item menu
 ## with food in hand and a bar half spent; "cook" faces the hearth with the makings of tea.
+## "lights" talks to Elder Bram once a first crop is in; "story_log" opens the quest log of a
+## game just begun; "try" tries what the hero faces (the keep's chained gate). The main quest
+## has begun before every shot, so its notice is not in each of them, except "begin": a game's
+## first moment, with the notice.
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -28,7 +32,7 @@ const SHOTS: Array = [
 	["5_village_field_and_pond", &"village", Vector2i(20, 29), Vector2.DOWN, 0, ""],
 	["6_reading_the_sign", &"village", Vector2i(26, 19), Vector2.UP, 0, "talk"],
 	["7_elder_house", &"elder_house", Vector2i(5, 6), Vector2.UP, 0, ""],
-	["8_talking_to_bram", &"elder_house", Vector2i(5, 4), Vector2.UP, 0, "talk"],
+	["8_talking_to_bram", &"elder_house", Vector2i(5, 4), Vector2.UP, 0, "lights"],
 	["9_weaver_house", &"weaver_house", Vector2i(7, 4), Vector2.UP, 0, ""],
 	["10_training_yard", &"village", Vector2i(8, 30), Vector2.RIGHT, 2, ""],
 	["11_swinging_at_the_dummy", &"village", Vector2i(9, 29), Vector2.RIGHT, 0, "swing"],
@@ -86,7 +90,7 @@ const SHOTS: Array = [
 	["63_walking", &"village", Vector2i(23, 17), Vector2.LEFT, 0, "walk"],
 	["64_fallen", &"south_field", Vector2i(12, 12), Vector2.LEFT, 0, "fall"],
 	["65_chapel_door_barred", &"village", Vector2i(23, 7), Vector2.UP, 0, ""],
-	["66_chapel_door_open", &"village", Vector2i(23, 7), Vector2.UP, 0, "flag:keep_warden_beaten"],
+	["66_chapel_door_open", &"village", Vector2i(23, 7), Vector2.UP, 0, "flag:crypt_open"],
 	["67_crypt_narthex", &"crypt", Vector2i(22, 41), Vector2.UP, 0, ""],
 	["68_crypt_trench", &"crypt", Vector2i(33, 38), Vector2.RIGHT, 0, ""],
 	["69_crypt_trench_bridged", &"crypt", Vector2i(36, 37), Vector2.RIGHT, 0, "sunk"],
@@ -143,6 +147,12 @@ const SHOTS: Array = [
 	["120_tildas_list_to_buy_from", &"shop", Vector2i(5, 4), Vector2.UP, 0, "shop_buy"],
 	["121_selling_the_harvest", &"shop", Vector2i(5, 4), Vector2.UP, 0, "shop_sell"],
 	["122_meals_at_the_hearth", &"home", Vector2i(5, 2), Vector2.UP, 0, "meals"],
+	["123_the_story_in_the_quest_log", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "story_log"],
+	["124_bram_welcomes_a_newcomer", &"elder_house", Vector2i(5, 4), Vector2.UP, 0, "talk"],
+	["125_the_keeps_gate_is_chained", &"old_wood", Vector2i(19, 4), Vector2.UP, 0, "try"],
+	["126_the_gate_unchained", &"old_wood", Vector2i(19, 5), Vector2.UP, 0, "flag:keep_gate_open"],
+	["127_the_day_the_warden_fell", &"village", Vector2i(23, 7), Vector2.UP, 0, "flag:keep_warden_beaten"],
+	["128_a_game_begins", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "begin"],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -170,6 +180,11 @@ func _capture() -> void:
 		game_state.call(&"set_time", float(clock.call(&"in_day", str(shot[5]).trim_prefix("time:"))) if str(shot[5]).begins_with("time:") else NOON)
 		if str(shot[5]).begins_with("flag:"):
 			game_state.call(&"set_flag", StringName(str(shot[5]).trim_prefix("flag:")), true)
+		if shot[5] == "lights":
+			game_state.call(&"set_flag", &"planted_first_crop", true)
+		# The main quest begins by itself: here, where there is no HUD yet to announce it.
+		if shot[5] != "begin":
+			root.get_node("Quests").call(&"refresh")
 		if shot[5] == "sunk":
 			game_state.call(&"set_flag", &"dungeon/crypt/block/trench", "37,36")
 		if shot[5] in ["lantern", "haunt", "braziers", "lantern_talk"]:
@@ -263,7 +278,7 @@ func _capture() -> void:
 			# An hour after closing: the hero tries the shop's door.
 			game_state.call(&"set_time", float(clock.call(&"in_day", "19:00")))
 			scene.call(&"interact")
-		if shot[5] in ["talk", "accept", "tale", "lantern_talk", "cook"]:
+		if shot[5] in ["talk", "accept", "tale", "lantern_talk", "cook", "lights", "try"]:
 			scene.call(&"interact")
 		if shot[5] == "sleep":
 			# A night in bed, on a slot of its own, caught as the morning's words show.
@@ -359,6 +374,10 @@ func _capture() -> void:
 			scene.call(&"open_pause_menu")
 			scene.get(&"hud").get(&"pause_menu").call(&"choose", &"quests")
 			scene.get(&"hud").get(&"pause_menu").get(&"quest_log").call(&"move_cursor", 1)
+			await _frames(2)
+		elif shot[5] == "story_log":
+			scene.call(&"open_pause_menu")
+			scene.get(&"hud").get(&"pause_menu").call(&"choose", &"quests")
 			await _frames(2)
 		elif shot[5] in ["pause", "settings"]:
 			scene.call(&"open_pause_menu")

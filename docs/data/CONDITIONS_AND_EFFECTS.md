@@ -12,6 +12,7 @@ effects (`complete_quest` only means something in a quest stage's `on_enter`, wh
 | `has_item` | `item`, `count` | inventory has ≥ count |
 | `quest_stage` | `quest`, `stage` | quest is in that stage |
 | `quest_status` | `quest`, `status` | quest is `not_started`, `active` or `complete` |
+| `days_since` | `flag`, `days` | the flag is `true` and at least `days` dawns (a whole number, 1 or more) have passed since it came true. Not met on the day itself. A flag that came true before days were kept (a save older than version 4) counts as long ago |
 | `all` / `any` | `of: [conditions]` | logical and / or |
 | `not` | `condition` | negation |
 

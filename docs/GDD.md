@@ -190,8 +190,17 @@ broken the lock, and has to finish what Aldric began: down into the dark with a 
 It's told in a few lines: Elder Bram before and after the keep, inscriptions in the keep, by the chapel door and
 in the crypt, and the closing words of each dungeon. The main story ends when the Shade does.
 
-*(P4)* The story spreads over days: Elder Bram's quest opens once the hero has settled in and planted a first
-crop. The aim is the main story in six to eight in-game days.
+**Over days (P4a).** The story is spread over the days of the game, and a main quest, "A Place of Your Own",
+is in the quest log from the first morning. Its words say where to go at each stage:
+1. Find the cottage and take what lies inside its door: the hoe, the watering can, a pouch of seeds.
+2. Till a patch of the plot and plant a seed.
+3. See Elder Bram. Before the first crop he only welcomes the hero and sends him to settle in. After it he
+   speaks of the lights over the keep and asks for the promise.
+4. Quiet the Old Keep. Its gate in the Old Wood is chained until Bram gives his word.
+5. Rest. The chapel's bars lift at dawn on the day after the Warden falls.
+6. Go down into the crypt.
+
+The aim is the main story in six to eight in-game days. Whether it runs to that is for a playtest.
 
 ## 12. Tone & look
 Warm and cosy: a storybook countryside in modern pixel art. Green meadows, cherry blossom, half-timbered houses

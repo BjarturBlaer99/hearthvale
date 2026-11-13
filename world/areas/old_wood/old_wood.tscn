@@ -76,6 +76,15 @@ target_area = &"keep"
 target_entry = &"entrance"
 size = Vector2i(2, 1)
 
+[node name="KeepChain" type="Node2D" parent="Interactables"]
+position = Vector2(288, 48)
+script = ExtResource("10_door")
+door_id = &"keep_chain"
+kind = &"chained"
+size = Vector2i(2, 1)
+open_flag = &"keep_gate_open"
+shut_words = "The keep's gate is chained shut. Elder Bram in Hearthvale has the say over it."
+
 [node name="ShrineWall" type="Node2D" parent="Interactables" unique_id=1835865615]
 position = Vector2(480, 208)
 script = ExtResource("10_door")

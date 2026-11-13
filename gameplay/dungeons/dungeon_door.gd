@@ -9,6 +9,8 @@ extends Node2D
 ##   (all of them with `needs_all`): a plate, a switch... With `stays_open`, once lifted they
 ##   stay lifted for good (a solved puzzle stays solved).
 ## - cracked: a cracked wall; a bomb's blast opens it for good (nothing else does)
+## - chained: a gate chained shut until `open_flag` is set (the Old Keep's, until Elder Bram
+##   gives the word). Trying it says `shut_words`, and so does walking up to it (the area).
 ## A closed door fills its cells; the area keeps them occupied. Opened locked, boss and cracked
 ## doors are flags in GameState (DungeonState.door_flag). Position = the top-left corner of its
 ## first cell. The area calls set_dungeon().
@@ -18,6 +20,8 @@ const WOOD: Color = Color(0.45, 0.28, 0.14)
 const IRON: Color = Color(0.40, 0.42, 0.46)
 const GOLD: Color = Color(0.95, 0.78, 0.28)
 const BOSS_RED: Color = Color(0.45, 0.12, 0.14)
+## What a chained gate says when its scene gives it no words of its own.
+const CHAINED_WORDS: String = "The gate is chained shut."
 
 @export var door_id: StringName
 @export var kind: StringName = DungeonState.LOCKED
@@ -29,6 +33,8 @@ const BOSS_RED: Color = Color(0.45, 0.12, 0.14)
 @export var needs_all: bool = false
 ## Shutters only: once its flags have lifted the bars, they stay up for good (a door flag).
 @export var stays_open: bool = false
+## Chained gates only: what trying the gate says (who has the say over it).
+@export_multiline var shut_words: String = ""
 ## Cracked walls only: the stone they're made of (dungeon walls; a ruin's lighter stone outdoors).
 @export var stone: Color = Color(0.22, 0.22, 0.28)
 
@@ -90,6 +96,8 @@ func is_open() -> bool:
 			if stays_open and GameState.get_flag(DungeonState.door_flag(dungeon_id, door_id)) == true:
 				return true
 			return PuzzleRules.shutter_open(_shutter_values(), needs_all)
+		DungeonState.CHAINED:
+			return PuzzleRules.shutter_open(_shutter_values(), needs_all)
 	return GameState.get_flag(DungeonState.door_flag(dungeon_id, door_id)) == true
 
 
@@ -123,6 +131,8 @@ func prompt() -> String:
 			return "Unlock the door" if _can_unlock() else "Locked door"
 		DungeonState.BOSS:
 			return "Open the boss door" if _can_unlock() else "Boss door"
+		DungeonState.CHAINED:
+			return "Try the gate"
 	return ""
 
 
@@ -148,7 +158,17 @@ func use() -> String:
 			return "Bars block the way."
 		DungeonState.CRACKED:
 			return "The wall is cracked. Something strong might break it."
+		DungeonState.CHAINED:
+			EventBus.sound.emit(&"nope")
+			return words()
 	return ""
+
+
+## What a chained gate says while it is shut (empty for any other door, or once it is open).
+func words() -> String:
+	if kind != DungeonState.CHAINED or is_open():
+		return ""
+	return shut_words if not shut_words.is_empty() else CHAINED_WORDS
 
 
 func _keys() -> int:
@@ -183,12 +203,34 @@ func _draw() -> void:
 				_lock(center, 4.0)
 		DungeonState.CRACKED:
 			_draw_cracked(area)
+		DungeonState.CHAINED:
+			_draw_chained(area)
 		DungeonState.SHUTTER:
 			draw_rect(area, Color(0, 0, 0, 0.45))
 			for x: float in range(2, int(area.size.x), 4):
 				draw_rect(Rect2(x, 0, 2, area.size.y), OUTLINE)
 				draw_rect(Rect2(x, 0, 1, area.size.y), IRON)
 			draw_rect(Rect2(0, 2, area.size.x, 2), IRON.darkened(0.2))
+
+
+## A gate of dark planks under two iron bands, with a chain slung across it from post to post
+## and a padlock where it hangs lowest.
+func _draw_chained(area: Rect2) -> void:
+	var planks: Color = WOOD.darkened(0.25)
+	draw_rect(area, OUTLINE)
+	draw_rect(area.grow(-1.0), planks)
+	for x: float in range(4, int(area.size.x), 4):
+		draw_rect(Rect2(x, 1, 1, area.size.y - 2.0), planks.darkened(0.4))
+	for y: float in [3.0, area.size.y - 4.0]:
+		draw_rect(Rect2(1, y, area.size.x - 2.0, 1), IRON.darkened(0.35))
+	var middle: Vector2 = area.size / 2.0
+	# A link every three pixels, lower toward the middle: the chain sags.
+	for x: float in range(2, int(area.size.x) - 1, 3):
+		var along: float = (x + 0.5 - middle.x) / middle.x
+		var y: float = roundf(middle.y - 3.0 + (1.0 - along * along) * 3.0)
+		draw_rect(Rect2(x - 1.0, y - 1.0, 4, 3), OUTLINE)
+		draw_rect(Rect2(x, y, 2, 1), IRON.lightened(0.25))
+	_lock(Vector2(middle.x, middle.y + 2.0), 3.0)
 
 
 ## A crack-riddled stretch of dungeon wall.

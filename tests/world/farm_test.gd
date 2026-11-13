@@ -22,6 +22,8 @@ var _heard: Array[StringName] = []
 func before_test() -> void:
 	GameState.clear()
 	GameState.new_game()
+	# The main quest begins with the game, with a chime: before these tests listen.
+	Quests.refresh()
 	_heard.clear()
 	EventBus.sound.connect(_on_sound)
 

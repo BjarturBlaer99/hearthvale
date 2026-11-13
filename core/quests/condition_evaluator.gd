@@ -5,6 +5,9 @@ extends RefCounted
 ## snapshot. DataRegistry has already validated the conditions' shape and ids, so anything
 ## unrecognised here simply counts as not met.
 
+## What days_since() gives for a flag that came true before days were kept (an older save).
+const LONG_AGO: int = 1000000
+
 var _state: Dictionary
 
 
@@ -22,6 +25,8 @@ func is_met(condition: Dictionary) -> bool:
 			return str(_section("quests").get(str(condition["quest"]), "")) == str(condition["stage"])
 		"quest_status":
 			return String(QuestState.status_in(_section("quests"), _section("flags"), str(condition["quest"]))) == str(condition["status"])
+		"days_since":
+			return days_since(str(condition["flag"])) >= int(condition["days"])
 		"all":
 			return all_met(condition["of"])
 		"any":
@@ -45,6 +50,18 @@ func unmet(conditions: Array) -> Array[Dictionary]:
 		if not is_met(condition):
 			out.append(condition)
 	return out
+
+
+## How many dawns have passed since `flag` came true: 0 on the day itself, -1 if it isn't
+## true. A flag with no day kept counts as LONG_AGO.
+func days_since(flag: String) -> int:
+	var value: Variant = _section("flags").get(flag, false)
+	if typeof(value) != TYPE_BOOL or not value:
+		return -1
+	var days: Dictionary = _section("flag_days")
+	if not days.has(flag):
+		return LONG_AGO
+	return maxi(int(_state.get("day", 1)) - int(days[flag]), 0)
 
 
 func item_count(item_id: String) -> int:

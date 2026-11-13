@@ -1,10 +1,51 @@
 {
   "id": "elder_bram",
   "start": "greet",
+  "openings": [
+    {
+      "conditions": [
+        {
+          "type": "flag",
+          "flag": "planted_first_crop",
+          "value": false
+        },
+        {
+          "type": "flag",
+          "flag": "keep_warden_beaten",
+          "value": false
+        }
+      ],
+      "node": "welcome"
+    }
+  ],
   "speakers": {
     "bram": "Elder Bram"
   },
   "nodes": {
+    "welcome": {
+      "speaker": "bram",
+      "text": "So you are the one who has taken the old cottage. Welcome to Hearthvale. It is the thatched house at the west end of the lane, and the plot by the well is yours.",
+      "options": [
+        {
+          "text": "What should I do first?",
+          "next": "settle"
+        },
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "settle": {
+      "speaker": "bram",
+      "text": "Settle in. Take the tools by your door, till a patch and put a seed in it. Tilda sells more seed in the red house. Come and see me when your first crop is in the ground.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
     "greet": {
       "speaker": "bram",
       "text": "Ah, come in, come in. Have you seen the lights over the old keep at night?",
@@ -85,6 +126,11 @@
               "type": "set_flag",
               "flag": "promised_elder_keep",
               "value": true
+            },
+            {
+              "type": "set_flag",
+              "flag": "keep_gate_open",
+              "value": true
             }
           ],
           "next": "promise"
@@ -97,7 +143,7 @@
     },
     "promise": {
       "speaker": "bram",
-      "text": "Bless you. Take the old wooden sword from the training yard first. Then follow the road north past the chapel, through the fields and the Old Wood, to the keep.",
+      "text": "Bless you. I will have the chain taken off the keep's gate. Take the old wooden sword from the training yard, then go north past the chapel, through the fields and the Old Wood.",
       "options": [
         {
           "text": "Goodbye.",
@@ -117,7 +163,7 @@
     },
     "kept": {
       "speaker": "bram",
-      "text": "Good. I sleep easier for it. The road north past the chapel leads through the fields and the Old Wood to the keep.",
+      "text": "Good. I sleep easier for it. The gate is unchained. The road north past the chapel leads through the fields and the Old Wood to the keep.",
       "options": [
         {
           "text": "Goodbye.",
@@ -127,7 +173,7 @@
     },
     "tale": {
       "speaker": "bram",
-      "text": "Then the old tale is true, and I sent you to break a lock. Long ago Sir Aldric bound a Shade under our chapel, and set the Warden to watch it. With the Warden fallen, the bars are up.",
+      "text": "Then the old tale is true, and I sent you to break a lock. Long ago Sir Aldric bound a Shade under our chapel, and set the Warden to watch it. With the Warden fallen, the bars will not hold past dawn.",
       "options": [
         {
           "text": "What now?",

@@ -29,8 +29,8 @@ func test_a_new_game_has_an_untouched_plot() -> void:
 	assert_int(GameState.farm().count_of(Farm.BARE)).is_equal(18)
 	assert_int(GameState.farm().wither_after).is_equal(int(DataRegistry.get_rules(DataRegistry.RULES_FARM)["wither_after"]))
 	assert_dict(GameState.to_dict()["farm"]).is_equal({"cells": {}})
-	assert_int(int(GameState.to_dict()["version"])).is_equal(3)
-	assert_int(GameState.SAVE_VERSION).is_equal(3)
+	assert_int(int(GameState.to_dict()["version"])).is_equal(GameState.SAVE_VERSION)
+	assert_int(GameState.SAVE_VERSION).override_failure_message("the farm came with version 3").is_greater_equal(3)
 
 
 func test_tilling_and_watering_say_so_and_only_when_they_did() -> void:
@@ -71,7 +71,7 @@ func test_the_farm_survives_a_save() -> void:
 	GameState.update_player(&"village", Vector2i(14, 19))
 	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
 	var on_disk: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveSystem.slot_path(TEST_SLOT)))
-	assert_int(int(on_disk["version"])).is_equal(3)
+	assert_int(int(on_disk["version"])).is_equal(GameState.SAVE_VERSION)
 	assert_dict(on_disk["farm"]).is_equal({"cells": {"0,0": {"watered": false}, "4,2": {"watered": true}}})
 	GameState.clear()
 	assert_int(GameState.farm().count_of(Farm.BARE)).override_failure_message("cleared").is_equal(18)
@@ -89,7 +89,7 @@ func test_a_version_2_save_loads_with_an_untouched_plot_and_all_else_as_it_was()
 	assert_int(int(old["version"])).is_equal(2)
 	assert_bool(old.has("farm")).override_failure_message("version 2 knew no farm").is_false()
 	var migrated: Dictionary = SaveSystem.migrate(old, 2)
-	assert_int(int(migrated["version"])).is_equal(3)
+	assert_int(int(migrated["version"])).is_equal(GameState.SAVE_VERSION)
 	assert_dict(migrated["farm"]).override_failure_message("the step from 2 to 3 adds an untouched plot").is_equal({"cells": {}})
 	assert_float(float(migrated["energy"])).override_failure_message("and leaves the rest alone").is_equal(float(old["energy"]))
 	assert_int(_load_old("v2_third_day.json")).is_equal(OK)
@@ -108,10 +108,10 @@ func test_a_version_2_save_loads_with_an_untouched_plot_and_all_else_as_it_was()
 	assert_dict(GameState.player).is_equal({"area": "village", "cell": [9, 19]})
 	assert_int(GameState.item_count(&"hoe") + GameState.item_count(&"watering_can")).override_failure_message("the tools still lie at home for him").is_equal(0)
 	assert_bool(GameState.get_flag(&"took_hoe") == true).is_false()
-	# Saved again, it is a version 3 save.
+	# Saved again, it is a save of today's version.
 	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
 	var again: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveSystem.slot_path(TEST_SLOT)))
-	assert_int(int(again["version"])).is_equal(3)
+	assert_int(int(again["version"])).is_equal(GameState.SAVE_VERSION)
 	assert_dict(again["farm"]).is_equal({"cells": {}})
 
 
@@ -123,12 +123,12 @@ func test_a_version_1_save_still_loads() -> void:
 	assert_int(GameState.day).override_failure_message("through the first step too").is_equal(1)
 	assert_float(GameState.energy).is_equal(GameState.max_energy())
 	assert_int(GameState.hearts_max).is_equal(int(old["hearts_max"]))
-	assert_int(GameState.flags.size()).is_equal((old["flags"] as Dictionary).size())
+	assert_int(GameState.flags.size()).override_failure_message("its flags, and the story's gates behind it").is_equal(StoryGates.past_the_gates(old["flags"]).size())
 	assert_int(_load_old("v1_finished.json")).is_equal(OK)
 	assert_bool(GameState.get_flag(EndingSummary.FINISHED_FLAG) == true).override_failure_message("a finished game is still finished").is_true()
 	# The migration by itself: each step adds what its version brought.
 	var migrated: Dictionary = SaveSystem.migrate(old, 1)
-	assert_int(int(migrated["version"])).is_equal(3)
+	assert_int(int(migrated["version"])).is_equal(GameState.SAVE_VERSION)
 	assert_dict(migrated["farm"]).is_equal({"cells": {}})
 	assert_bool(migrated.has("day") and migrated.has("energy")).is_true()
 	assert_bool(old.has("farm")).override_failure_message("the old data is left alone").is_false()

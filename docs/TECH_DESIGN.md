@@ -254,7 +254,9 @@ res://
   - `dungeon/<id>/door/<door>` and `dungeon/<id>/chest/<chest>`
   - Outside dungeons the area's id stands in (`AreaController.flag_scope()`), so a cracked wall or a chest works
     in the countryside too. A cracked wall's `stone` colour can match a ruin.
-- **Doors** (`DungeonDoor`): `open`, `locked`, `boss`, `shutter`.
+- **Doors** (`DungeonDoor`): `open`, `locked`, `boss`, `shutter`. Two more came later: `cracked` (a bomb opens
+  it) and `chained` (P4a: a gate that opens on its `open_flag` like a shutter, says its `shut_words` when the
+  hero tries it or walks up to it, and is drawn as planks under a chain and a padlock).
   - E opens a locked door with a small key (spent), or the boss door with the big key (kept).
   - A shutter lifts when its `open_flag` is set. Enemies sharing a `clear_flag` set it when the last one falls.
     With `stays_open` it records itself open for good once lifted (`latch()`), so a solved puzzle stays solved.
@@ -320,13 +322,17 @@ res://
     first of its stage's transitions whose condition is met. It repeats until nothing changes, with a cap in
     case quest data goes round in a loop.
   - Quests start when anything sets their stage: a dialogue option's `set_quest_stage` effect, or `start()`.
+    A quest marked `"auto_start": true` starts by itself at the first `update()` of a game (P4a: the main
+    quest; nobody gives it).
   - The `quest_status` condition (`not_started`, `active`, `complete`) lets a giver's conversation offer a quest
     only once.
-  - The `Quests` autoload calls `update()` when EventBus reports a flag, item or stage change, and when an area
-    loads. It announces "New quest", "Quest updated" and "Quest complete" with a sound. The area shows the
+  - The `Quests` autoload calls `update()` when EventBus reports a flag, item or stage change, when a day
+    starts (a stage may wait for a dawn: the `days_since` condition) and when an area loads. With no game
+    started it does nothing. It announces "New quest", "Quest updated" and "Quest complete" with a sound. The area shows the
     announcement as a notice at the top of the screen, clear of the dialogue box.
   - DataRegistry rejects a quest no stage of which completes it.
 - **The quests so far** (each a different shape):
+  - A Place of Your Own: the main story, in six stages (section 22). It starts by itself.
   - The Lost Shuttle: fetch an item lying in the world.
   - Eggs for Tilda: carry an item from one villager to another, then report back.
   - Slimes in the South Field: a bounty. The slimes share a `clear_flag` that the quest waits on.
@@ -334,6 +340,8 @@ res://
   type decides.
 - Dialogue is a JSON node graph (`docs/data/dialogue.example.json`): nodes with speaker, text and options;
   options have conditions, effects and `next` (null ends); an optional `speakers` map gives display names.
+  An optional `openings` list gives other nodes to begin at, each with conditions: the first whose conditions
+  are all met is used in place of `start` (P4a: Elder Bram greets a newcomer differently).
 - `DialogueRunner` (`core/dialogue/`, pure) plays one conversation against a game state (GameState, or a
   stand-in in tests): the current node's speaker and text, the options whose conditions are met, `choose(i)`
   (apply the option's effects, go to `next`) and `advance()` for a node with no options (a sign).
@@ -361,11 +369,13 @@ checked by `ToolUse.problems()`.
 
 ## 9. Save format
 ```json
-{ "version": 3, "hearts_max": 3, "health": 5, "heart_pieces": 0, "play_time": 754.25,
+{ "version": 4, "hearts_max": 3, "health": 5, "heart_pieces": 0, "play_time": 754.25,
   "day": 3, "minute": 870.5, "energy": 100.0,
-  "flags": {}, "quests": {}, "inventory": [{"id": "small_key", "count": 1}],
+  "flags": {"keep_warden_beaten": true}, "flag_days": {"keep_warden_beaten": 3},
+  "quests": {}, "inventory": [{"id": "small_key", "count": 1}],
   "equipped": "bow", "player": {"area": "village", "cell": [23, 20]},
-  "farm": {"cells": {"0,0": {"watered": false}, "4,2": {"watered": true}}} }
+  "farm": {"cells": {"0,0": {"watered": false}, "4,2": {"watered": true}}},
+  "skills": {}, "friends": {}, "tally": {"crops_picked": 7} }
 ```
 While the hero is on the way into an area, `player` is `{"area": "elder_house", "entry": "door"}` instead of
 a cell, until the area places them. Bump `version` on breaking changes and add a migration step in
@@ -383,6 +393,15 @@ a cell, until the area places them. Bump `version` on breaking changes and add a
     `dry` (the dry mornings in a row) and `withered` (P3b). They are fields with defaults, so the format is
     still version 3 and a save from step 3a loads as it is. A crop the game doesn't know is left out as the
     save loads, and its soil kept.
+- **Version 4** (P4a) is the one change of format for the whole of P4. It added:
+  - `flag_days`: the day each flag came true (`GameState.set_flag` keeps it for a plain `true`, and forgets it
+    when the flag is unset). A flag with no day counts as long ago.
+  - `tally`: what the game has counted (`crops_picked`, by `GameState.harvest`).
+  - `skills` (skill id to points) and `friends` (villager id to `points`, `talked`, `gift`): kept, saved and
+    loaded, but nothing changes them until steps 4b and 4c.
+  - `SaveSystem._v3_to_v4()` gives an older save all four empty, and puts it past the story's gates
+    (`StoryGates.past_the_gates()`): the first crop counts as planted, the keep's gate is open, and the crypt's
+    bars are up if the Warden had fallen. A test loads a real version 3 save made inside the keep.
 
 ## 10. Testing
 Every class in `core/` has gdUnit4 tests. Areas get layout tests (reachability from the spawn with the real
@@ -444,7 +463,8 @@ run headless; see CLAUDE.md for the command and gotchas.
   - **Keep exploring** goes back to the area and cell the hero stood on. **Save and go to the title** saves first.
 - **The story** is data only: conversations whose options are gated on the flags `keep_warden_beaten` and
   `crypt_shade_beaten`, and `Signpost` inscriptions in the keep, by the chapel and in the crypt. They are
-  `stone`: drawn as a standing stone with carved lines, where a wayside sign is a wooden post.
+  `stone`: drawn as a standing stone with carved lines, where a wayside sign is a wooden post. Since P4a it
+  is spread over days, with a main quest (section 22).
 
 - **The mouse** (the user's requests, 2026-11-13; `tools/setup_input_map.gd`), as in farming games: the left
   button uses what the hero has in hand (the action `use_hand`), the right button interacts (`interact`).
@@ -870,4 +890,39 @@ run headless; see CLAUDE.md for the command and gotchas.
   sell.", "I have crops to sell." and "Just looking."
 - **Tools:** `tools/playtest.gd -- market` starts at her counter with coins and a harvest; `tools/capture.gd`
   has the actions `shop_buy`, `shop_sell` and `meals`.
+
+## 22. The story over days
+P4a (`docs/progress/P4-plan.md`). The story is still data; what is new is three small things data may say, a
+kind of door, and four flags.
+- **The flags** (`StoryGates`, `core/story/`, pure, has their names):
+  - `planted_first_crop`: set by `GameState.plant_crop()` the first time a seed goes in.
+  - `keep_gate_open`: set by Elder Bram's promise ("I'll keep watch."), with `promised_elder_keep`.
+  - `keep_warden_beaten`: as before, set when the Iron Warden falls.
+  - `crypt_open`: set by the main quest at the first dawn after the Warden falls.
+- **The main quest** (`data/quests/a_place_of_your_own.json`) starts by itself (`auto_start`) and has six
+  stages: take what lies in the cottage, plant a seed, hear Elder Bram out, quiet the keep, sleep, end the
+  Shade. Each stage's journal says where to go and how. Its conditions are such that a hero further along
+  catches up: an old save starts the quest and runs straight to where he is.
+- **Elder Bram** (`data/dialogue/elder_bram.json`) has an opening for a hero with no first crop and no Warden
+  beaten: a welcome, and what to do first. Otherwise he speaks as before, and his promise unchains the gate.
+- **The keep's gate** is `KeepChain` in the Old Wood: a `chained` `DungeonDoor` over the same two cells as the
+  exit `KeepGate`, open on `keep_gate_open`. Shut, its cells are solid. `AreaController` says its words when
+  the hero steps into the cell before it facing it (`chained_words_in_front()`), as it does for a shop that is
+  shut.
+- **The crypt's bars** (`CryptBars` in Hearthvale) open on `crypt_open`, not on the Warden's fall. The quest's
+  `rest` stage moves on by `{"type": "days_since", "flag": "keep_warden_beaten", "days": 1}`, and its `crypt`
+  stage sets the flag. `Quests` hears `EventBus.day_started`, so this happens as he wakes, before the morning's
+  save.
+- **`days_since`** (`ConditionEvaluator.days_since()`): how many dawns since a flag came true, from the
+  snapshot's `day` and `flag_days`. Not true on the day itself.
+- **Old saves** are past the gates (section 9, version 4).
+- **One chime.** A quest that runs through several stages in one update (an old save catching up) is
+  announced at each, but `Quests` chimes once.
+- **Words that changed** with the timing: Bram's promise and his tale, Guard Rolf's two answers about the
+  chapel door (now on `crypt_open`), the keep's closing words, and the title's line.
+- **Tools:** `tools/playtest.gd` has `bram` (in his house, the first crop in), `gate` (below the chained gate)
+  and `rest` (by the chapel on the day the Warden fell). A scenario's `flags` are set as of long ago and its
+  `today` flags as of that day. The older scenarios start past the gates. `tools/capture.gd` starts the main
+  quest before each shot, so its notice is not in every picture (but for `begin`, a game's first moment), and
+  has the actions `lights`, `story_log` and `try`.
 

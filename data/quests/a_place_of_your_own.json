@@ -1,0 +1,219 @@
+{
+  "id": "a_place_of_your_own",
+  "title": "A Place of Your Own",
+  "auto_start": true,
+  "start_stage": "settle",
+  "stages": {
+    "settle": {
+      "journal": "Your cottage is the thatched house at the west end of the lane in Hearthvale. Take what lies inside its door.",
+      "objectives": [
+        {
+          "id": "take_hoe",
+          "text": "Take the hoe",
+          "complete_when": {
+            "type": "flag",
+            "flag": "took_hoe",
+            "value": true
+          }
+        },
+        {
+          "id": "take_can",
+          "text": "Take the watering can",
+          "complete_when": {
+            "type": "flag",
+            "flag": "took_watering_can",
+            "value": true
+          }
+        },
+        {
+          "id": "take_seeds",
+          "text": "Take the seeds",
+          "complete_when": {
+            "type": "flag",
+            "flag": "took_first_seeds",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "any",
+            "of": [
+              {
+                "type": "all",
+                "of": [
+                  {
+                    "type": "flag",
+                    "flag": "took_hoe",
+                    "value": true
+                  },
+                  {
+                    "type": "flag",
+                    "flag": "took_watering_can",
+                    "value": true
+                  },
+                  {
+                    "type": "flag",
+                    "flag": "took_first_seeds",
+                    "value": true
+                  }
+                ]
+              },
+              {
+                "type": "flag",
+                "flag": "planted_first_crop",
+                "value": true
+              }
+            ]
+          },
+          "to": "plant"
+        }
+      ]
+    },
+    "plant": {
+      "journal": "Your plot is across the lane from your door, by the well. Choose the hoe with Tab and left click to till a patch. Plant a seed in it the same way.",
+      "objectives": [
+        {
+          "id": "plant_seed",
+          "text": "Plant a seed",
+          "complete_when": {
+            "type": "flag",
+            "flag": "planted_first_crop",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "planted_first_crop",
+            "value": true
+          },
+          "to": "bram"
+        }
+      ]
+    },
+    "bram": {
+      "journal": "Your first seed is in the ground. Water it each morning: the can fills at the well. Elder Bram, in the blue-roofed house, wants a word.",
+      "objectives": [
+        {
+          "id": "see_bram",
+          "text": "Hear Elder Bram out",
+          "complete_when": {
+            "type": "flag",
+            "flag": "keep_gate_open",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "keep_gate_open",
+            "value": true
+          },
+          "to": "keep"
+        }
+      ]
+    },
+    "keep": {
+      "journal": "Elder Bram has had the chain taken off the Old Keep's gate. Take the sword from the training yard, then go north through the fields and the Old Wood.",
+      "objectives": [
+        {
+          "id": "take_sword",
+          "text": "Take the wooden sword",
+          "complete_when": {
+            "type": "flag",
+            "flag": "took_wooden_sword",
+            "value": true
+          }
+        },
+        {
+          "id": "quiet_keep",
+          "text": "Quiet the Old Keep",
+          "complete_when": {
+            "type": "flag",
+            "flag": "keep_warden_beaten",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "keep_warden_beaten",
+            "value": true
+          },
+          "to": "rest"
+        }
+      ]
+    },
+    "rest": {
+      "journal": "The Iron Warden has fallen, and something stirs under the chapel. Its bars will lift at dawn. Go home and sleep.",
+      "objectives": [
+        {
+          "id": "sleep",
+          "text": "Sleep until morning",
+          "complete_when": {
+            "type": "days_since",
+            "flag": "keep_warden_beaten",
+            "days": 1
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "days_since",
+            "flag": "keep_warden_beaten",
+            "days": 1
+          },
+          "to": "crypt"
+        }
+      ]
+    },
+    "crypt": {
+      "journal": "The bars under the chapel are up. Elder Bram knows the old tale. It is dark below: find a light before you go deep.",
+      "on_enter": [
+        {
+          "type": "set_flag",
+          "flag": "crypt_open",
+          "value": true
+        }
+      ],
+      "objectives": [
+        {
+          "id": "end_shade",
+          "text": "End what lies in the crypt",
+          "complete_when": {
+            "type": "flag",
+            "flag": "crypt_shade_beaten",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "crypt_shade_beaten",
+            "value": true
+          },
+          "to": "done"
+        }
+      ]
+    },
+    "done": {
+      "journal": "The Shade is gone. Hearthvale sleeps easy, and the cottage is yours.",
+      "on_enter": [
+        {
+          "type": "complete_quest"
+        }
+      ]
+    }
+  }
+}

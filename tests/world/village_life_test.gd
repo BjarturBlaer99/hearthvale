@@ -24,6 +24,8 @@ func after_test() -> void:
 
 
 func test_bram_talks_from_data_and_a_choice_sets_a_flag() -> void:
+	# The hero has settled in: Bram speaks of the keep (P4a; a newcomer gets a welcome instead).
+	GameState.set_flag(StoryGates.FIRST_CROP, true)
 	_area = Steps.load_area(ELDER_HOUSE)
 	var house: AreaController = _area
 	var bram: Talkable = Steps.stand_before(house, "Bram")
@@ -73,6 +75,7 @@ func test_the_hero_stands_still_while_talking() -> void:
 
 
 func test_the_flag_survives_leaving_the_area() -> void:
+	GameState.set_flag(StoryGates.FIRST_CROP, true)
 	_area = Steps.load_area(ELDER_HOUSE)
 	var house: AreaController = _area
 	Steps.stand_before(house, "Bram")

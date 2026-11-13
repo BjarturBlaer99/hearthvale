@@ -229,6 +229,13 @@ the first crop), three skills that rise with use, friendship through talk and gi
 quest data format, and an ending screen with days, crops and friendships.
 **Done when**: a new player finishes the main story in six to eight in-game days with no developer help.
 
+The proposal (`docs/progress/P4-plan.md`) was approved as written on 2026-11-13. Four steps:
+- **4a — The story over days.** *Built 2026-11-13.* A main quest from the first morning, Bram's quest after the
+  first crop, the keep's gate chained until then, the crypt open the morning after the keep. Save version 4.
+- **4b — Skills.** Combat, farming and cooking rise with use.
+- **4c — Friendship and gifts.**
+- **4d — Side quests, recipes and the ending.**
+
 ---
 
 ## Later (not in phase 2)

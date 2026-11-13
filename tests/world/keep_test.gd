@@ -40,6 +40,8 @@ func after_test() -> void:
 
 
 func test_the_keeps_gate_is_at_the_top_of_the_old_wood() -> void:
+	# With Elder Bram's word: the gate is unchained (P4a; tests/world/story_days_test.gd).
+	GameState.set_flag(StoryGates.KEEP_GATE, true)
 	GameState.go_to(&"old_wood", &"keep_gate")
 	var wood: AreaController = _load(WOOD)
 	var gate: Vector2i = wood.player.motor.cell

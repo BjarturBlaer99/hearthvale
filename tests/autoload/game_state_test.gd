@@ -83,6 +83,8 @@ func test_missing_flag_reads_as_false() -> void:
 
 
 func test_flag_changes_are_announced_once() -> void:
+	# The game's own quests hear flags too: let them settle first, so only this flag is heard.
+	Quests.refresh()
 	var received: Array = []
 	var on_flag: Callable = func(flag: StringName, value: Variant) -> void: received.append([flag, value])
 	EventBus.flag_set.connect(on_flag)

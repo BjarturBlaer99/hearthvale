@@ -54,8 +54,12 @@ func test_the_crypt_is_under_the_chapel_and_barred_until_the_keep_is_quiet() -> 
 	assert_str(Steps.walk_until_travel(village, Vector2.UP, 90)).override_failure_message("the bars hold").is_equal("")
 	village.player.face(Vector2.UP)
 	assert_bool(village.interact()).override_failure_message("E says why").is_true()
-	GameState.set_flag(&"keep_warden_beaten", true)
-	assert_bool(bars.is_open()).is_true()
+	# The Warden falls, with the story behind it: the bars hold until the next dawn (P4a).
+	for flag: StringName in [StoryGates.FIRST_CROP, StoryGates.KEEP_GATE, StoryGates.WARDEN_BEATEN]:
+		GameState.set_flag(flag, true)
+	assert_bool(bars.is_open()).override_failure_message("not on the day the Warden falls").is_false()
+	GameState.start_next_day()
+	assert_bool(bars.is_open()).override_failure_message("at dawn the day after").is_true()
 	var crypt: AreaController = _load(Steps.walk_until_travel(village, Vector2.UP, 90))
 	assert_str(crypt.area_name).is_equal("The Chapel Crypt")
 	assert_that(crypt.current_room).is_equal(Vector2i(1, 3))
@@ -68,7 +72,7 @@ func test_guard_rolf_says_why_the_door_is_barred_and_when_it_opens() -> void:
 	before.start()
 	assert_bool(Array(before.option_texts()).has("Why is the chapel door barred?")).is_true()
 	assert_bool(Array(before.option_texts()).has("The chapel door stands open.")).is_false()
-	GameState.set_flag(&"keep_warden_beaten", true)
+	GameState.set_flag(StoryGates.CRYPT_OPEN, true)
 	var after: DialogueRunner = DialogueRunner.new(DataRegistry.get_dialogue(&"guard_rolf"), GameState)
 	after.start()
 	assert_bool(Array(after.option_texts()).has("The chapel door stands open.")).is_true()

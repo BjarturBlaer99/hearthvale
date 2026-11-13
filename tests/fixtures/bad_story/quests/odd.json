@@ -1,0 +1,20 @@
+{
+  "id": "odd",
+  "title": "Odd",
+  "auto_start": "yes",
+  "start_stage": "a",
+  "stages": {
+    "a": {
+      "journal": "A",
+      "transitions": [
+        { "when": { "type": "days_since", "flag": "x", "days": 0 }, "to": "b" },
+        { "when": { "type": "days_since", "flag": "x", "days": "soon" }, "to": "b" },
+        { "when": { "type": "days_since", "flag": "x" }, "to": "b" }
+      ]
+    },
+    "b": {
+      "journal": "B",
+      "on_enter": [{ "type": "complete_quest" }]
+    }
+  }
+}

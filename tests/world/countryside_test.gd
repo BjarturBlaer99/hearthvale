@@ -32,6 +32,8 @@ func test_the_road_runs_from_the_village_to_the_keep_and_back() -> void:
 	# [area scene, exit to take, where it leads]
 	var north: Array = [[VILLAGE, "NorthRoad", FIELDS], [FIELDS, "NorthRoad", WOOD], [WOOD, "KeepGate", KEEP]]
 	var south: Array = [[KEEP, "Gate", WOOD], [WOOD, "SouthRoad", FIELDS], [FIELDS, "SouthRoad", VILLAGE]]
+	# With Elder Bram's word: the keep's gate is unchained (P4a; tests/world/story_days_test.gd).
+	GameState.set_flag(StoryGates.KEEP_GATE, true)
 	var area: AreaController = _load(VILLAGE)
 	for leg: Array in north + south:
 		assert_str(area.scene_file_path).is_equal(leg[0])

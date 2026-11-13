@@ -9,6 +9,7 @@ extends RefCounted
 ## - a quest that has reached a stage gets that stage's `on_enter` effects, once (the
 ##   `complete_quest` effect finishes the quest)
 ## - an active quest moves on by the first of its stage's `transitions` whose condition is met
+## - a quest marked `auto_start` that hasn't started is started (the main story)
 ## It repeats until nothing changes. Quests start with start(), or when anything sets their
 ## stage (a dialogue's set_quest_stage effect).
 
@@ -41,6 +42,12 @@ func quest_ids() -> Array[StringName]:
 
 func has_quest(quest_id: StringName) -> bool:
 	return _quests.has(quest_id)
+
+
+## Whether `quest_id` begins by itself (its `auto_start`): nobody gives it.
+func starts_itself(quest_id: StringName) -> bool:
+	var marked: Variant = (_quests.get(quest_id, {}) as Dictionary).get("auto_start", false)
+	return typeof(marked) == TYPE_BOOL and marked
 
 
 func title(quest_id: StringName) -> String:
@@ -132,6 +139,9 @@ func _step() -> bool:
 	var evaluator: ConditionEvaluator = null
 	for quest_id: StringName in _quests:
 		var stage_id: StringName = stage(quest_id)
+		if stage_id == &"" and starts_itself(quest_id) and status(quest_id) == QuestState.NOT_STARTED:
+			_state.call(&"set_quest_stage", quest_id, StringName(str(_quests[quest_id].get("start_stage", ""))))
+			return true
 		if stage_id == &"" or status(quest_id) == QuestState.COMPLETE:
 			continue
 		var stage_data: Dictionary = _stage_data(quest_id, stage_id)

@@ -72,6 +72,11 @@ Beaten enemies sometimes drop hearts or coins.
 - **The hero** (hero pass): a leather vest, wrist guards, a belt pouch and tall boots over the blue tunic, the
   sword on his back until he swings it, and a small pack. He breathes when he stands, leans into a sprint,
   winds up before a swing, flinches when hit and bends his knees landing from a ledge.
+- **The story over days** (the pivot, step 4a): a new game begins with a quest, "A Place of Your Own", in the
+  quest log (Esc, Quests). It says where your cottage is, how to till and plant, and what comes next. Elder
+  Bram welcomes a newcomer and speaks of the old keep only once a first seed is in the ground. Until he gives
+  his word the keep's gate in the Old Wood is chained. The bars under the chapel lift at dawn on the day after
+  the Warden falls, so there is a night at home between the two dungeons.
 - **A still world, and the mouse** (asked for on 2026-11-13): nothing in the scenery moves but the water.
   The left mouse button uses what is in hand: the sword, or a tool where there is work for it (the hoe, the
   can and seeds on the plot; the sword everywhere else), and answers in a conversation. The right button

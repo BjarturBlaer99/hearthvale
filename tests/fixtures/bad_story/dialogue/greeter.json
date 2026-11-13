@@ -1,0 +1,12 @@
+{
+  "id": "greeter",
+  "start": "hello",
+  "openings": [
+    { "conditions": [{ "type": "flag", "flag": "x", "value": true }], "node": "nowhere" },
+    { "node": "hello" },
+    { "conditions": [{ "type": "mood", "is": "glad" }], "node": "hello" }
+  ],
+  "nodes": {
+    "hello": { "speaker": "", "text": "Hello.", "options": [] }
+  }
+}

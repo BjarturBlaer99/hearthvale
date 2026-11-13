@@ -9,6 +9,7 @@
     "id": { "type": "string", "minLength": 1 },
     "title": { "type": "string" },
     "giver": { "type": "string", "description": "Who gives it (the giver's dialogue id). For authors; not cross-checked." },
+    "auto_start": { "type": "boolean", "default": false, "description": "The quest starts by itself when a game begins: nobody gives it (the main story)." },
     "start_stage": { "type": "string", "description": "A key of 'stages'." },
     "stages": {
       "type": "object",

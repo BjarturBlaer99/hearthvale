@@ -1,0 +1,8 @@
+{
+  "id": "mumbler",
+  "start": "hello",
+  "openings": "hello",
+  "nodes": {
+    "hello": { "speaker": "", "text": "Hm.", "options": [] }
+  }
+}

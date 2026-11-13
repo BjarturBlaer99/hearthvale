@@ -15,7 +15,14 @@ const BOSS: StringName = &"boss"
 const SHUTTER: StringName = &"shutter"
 ## A cracked wall: a bomb's blast opens it for good.
 const CRACKED: StringName = &"cracked"
-const KINDS: Array[StringName] = [OPEN, LOCKED, BOSS, SHUTTER, CRACKED]
+## A gate chained shut until its flag is set: no key opens it, somebody's word does.
+const CHAINED: StringName = &"chained"
+const KINDS: Array[StringName] = [OPEN, LOCKED, BOSS, SHUTTER, CRACKED, CHAINED]
+
+
+## Whether a door of `kind` opens when its flags say so, and by nothing the hero does to it.
+static func opens_on_flags(kind: StringName) -> bool:
+	return kind == SHUTTER or kind == CHAINED
 
 
 static func keys_flag(dungeon: StringName) -> StringName:

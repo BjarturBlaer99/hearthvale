@@ -134,3 +134,45 @@ func _start() -> DialogueRunner:
 	var runner: DialogueRunner = DialogueRunner.new(TALK, _state)
 	runner.start()
 	return runner
+
+
+## TALK with two other places to begin: a stranger is thanked at once, and a hero who has
+## promised and has a coin is too. The first whose conditions are met is used.
+func _talk_with_openings() -> Dictionary:
+	var talk: Dictionary = TALK.duplicate(true)
+	talk["nodes"]["stranger"] = {"speaker": "bram", "text": "Who are you?", "options": []}
+	talk["openings"] = [
+		{"conditions": [{"type": "flag", "flag": "met", "value": false}], "node": "stranger"},
+		{"conditions": [{"type": "flag", "flag": "promised", "value": true}, {"type": "has_item", "item": "coin", "count": 1}], "node": "thanks"},
+	]
+	return talk
+
+
+func test_a_conversation_begins_at_the_first_opening_whose_conditions_are_met() -> void:
+	var talk: Dictionary = _talk_with_openings()
+	var runner: DialogueRunner = DialogueRunner.new(talk, _state)
+	assert_str(str(runner.opening())).is_equal("stranger")
+	runner.start()
+	assert_str(runner.text()).is_equal("Who are you?")
+	# Met, but with no promise: neither opening fits, so it begins where it always did.
+	_state.set_flag(&"met", true)
+	runner = DialogueRunner.new(talk, _state)
+	runner.start()
+	assert_str(runner.node_id).is_equal("greet")
+	# Both of the second opening's conditions are needed.
+	_state.set_flag(&"promised", true)
+	runner = DialogueRunner.new(talk, _state)
+	assert_str(str(runner.opening())).override_failure_message("promised, but no coin").is_equal("greet")
+	_state.add_item(&"coin", 1)
+	runner = DialogueRunner.new(talk, _state)
+	runner.start()
+	assert_str(runner.node_id).is_equal("thanks")
+	assert_int(int(_state.items.get("coin", 0))).override_failure_message("an opening's node applies its on_enter like any other").is_equal(6)
+
+
+func test_a_conversation_without_openings_begins_at_its_start() -> void:
+	var runner: DialogueRunner = DialogueRunner.new(TALK, _state)
+	assert_str(str(runner.opening())).is_equal("greet")
+	var odd: Dictionary = TALK.duplicate(true)
+	odd["openings"] = "greet"
+	assert_str(str(DialogueRunner.new(odd, _state).opening())).override_failure_message("garbled openings are passed over").is_equal("greet")

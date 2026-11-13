@@ -95,7 +95,7 @@ func test_the_farms_crops_survive_a_save() -> void:
 	GameState.update_player(&"village", Vector2i(14, 19))
 	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
 	var on_disk: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveSystem.slot_path(TEST_SLOT)))
-	assert_int(int(on_disk["version"])).override_failure_message("still version 3").is_equal(3)
+	assert_int(int(on_disk["version"])).is_equal(GameState.SAVE_VERSION)
 	assert_dict(on_disk["farm"]).is_equal({"cells": {
 		"0,1": {"watered": false, "crop": "carrot", "stage": 1.0, "dry": 1.0, "withered": false},
 		"1,1": {"watered": true, "crop": "potato", "stage": 0.0, "dry": 2.0, "withered": true},

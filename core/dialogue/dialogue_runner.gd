@@ -6,6 +6,8 @@ extends RefCounted
 ## options(), then answer with choose(index), or advance() on a node with no options (a sign,
 ## a remark). Choosing applies the option's effects and moves to its `next`; null ends it.
 ## A node's `on_enter` effects apply when the conversation reaches it.
+## It begins at `start`, unless one of the dialogue's optional `openings` has its conditions
+## met: the first that has is where it begins instead (Elder Bram greets a newcomer otherwise).
 
 ## The conversation is over (or never started: a bad start node).
 signal ended
@@ -34,7 +36,19 @@ static func speaker_name_of(dialogue_data: Dictionary, speaker: String) -> Strin
 
 
 func start() -> void:
-	_go(dialogue.get("start"))
+	_go(opening())
+
+
+## The node the conversation begins at now: the first of `openings` whose conditions are met,
+## else `start`.
+func opening() -> Variant:
+	var openings: Variant = dialogue.get("openings", [])
+	if typeof(openings) == TYPE_ARRAY and not (openings as Array).is_empty():
+		var evaluator: ConditionEvaluator = ConditionEvaluator.new(_state.call(&"to_dict"))
+		for entry: Variant in openings:
+			if typeof(entry) == TYPE_DICTIONARY and evaluator.all_met((entry as Dictionary).get("conditions", [])):
+				return (entry as Dictionary).get("node")
+	return dialogue.get("start")
 
 
 func is_running() -> bool:

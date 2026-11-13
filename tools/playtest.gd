@@ -28,7 +28,35 @@ const KEYS: String = "keys"
 ## Each scenario: the area and cell to start in, items to hold, and flags to set. An hour
 ## after the scenario's name starts it at that time of day, and energy=<n> with that much
 ## energy: -- village 19:30 energy=12
+## A scenario's "flags" came true long ago (no day is kept for them); its "today" flags came
+## true this very day, for what waits a day on them (the crypt's bars).
 const SCENARIOS: Dictionary = {
+	# In Elder Bram's house with the tools taken and a first seed counted as planted: his quest
+	# opens. The promise takes the chain off the keep's gate.
+	"bram": {
+		"area": &"elder_house",
+		"cell": Vector2i(5, 6),
+		"items": [[&"hoe", 1], [&"watering_can", 1], [&"turnip_seeds", 4]],
+		"flags": [&"took_hoe", &"took_watering_can", &"took_first_seeds", &"planted_first_crop"],
+	},
+	# In the Old Wood below the keep's gate, with a sword but without Elder Bram's word: the
+	# gate is chained.
+	"gate": {
+		"area": &"old_wood",
+		"cell": Vector2i(19, 7),
+		"items": [[&"wooden_sword", 1]],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"planted_first_crop"],
+	},
+	# By the chapel's door on the day the Warden fell: the bars are down until he has slept (his
+	# cottage is the thatched house at the west end of the lane).
+	"rest": {
+		"area": &"village",
+		"cell": Vector2i(23, 8),
+		"items": [[&"wooden_sword", 1], [&"bow", 1], [&"arrow", 20], [&"bomb", 5]],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"planted_first_crop",
+			&"promised_elder_keep", &"keep_gate_open"],
+		"today": [&"keep_warden_beaten"],
+	},
 	# At home by the hearth, a little tired, with bread, berries and the makings of tea: for
 	# trying food and cooking.
 	"kitchen": {
@@ -75,28 +103,31 @@ const SCENARIOS: Dictionary = {
 		"area": &"keep",
 		"cell": Vector2i(22, 24),
 		"items": [[&"wooden_sword", 1], [&"bow", 1], [&"arrow", 20]],
-		"flags": [&"took_wooden_sword", &"dungeon/keep/big_key", &"dungeon/keep/door/boss_door"],
+		"flags": [&"took_wooden_sword", &"planted_first_crop", &"promised_elder_keep", &"keep_gate_open",
+			&"dungeon/keep/big_key", &"dungeon/keep/door/boss_door"],
 	},
 	# At the top of the crypt's stairs, as after the keep: sword, bow, arrows and bombs.
 	"crypt": {
 		"area": &"crypt",
 		"cell": Vector2i(22, 42),
 		"items": [[&"wooden_sword", 1], [&"bow", 1], [&"arrow", 20], [&"bomb", 5]],
-		"flags": [&"took_wooden_sword", &"keep_warden_beaten"],
+		"flags": [&"took_wooden_sword", &"planted_first_crop", &"promised_elder_keep", &"keep_gate_open", &"keep_warden_beaten"],
 	},
 	# In the Shade's hall with the Shade beaten: step up to the heart container for the ending.
 	"ending": {
 		"area": &"crypt",
 		"cell": Vector2i(22, 16),
 		"items": [[&"wooden_sword", 1], [&"iron_sword", 1], [&"bow", 1], [&"arrow", 20], [&"lantern", 1]],
-		"flags": [&"took_wooden_sword", &"keep_warden_beaten", &"crypt_shade_beaten", &"dungeon/crypt/big_key", &"dungeon/crypt/door/boss_door"],
+		"flags": [&"took_wooden_sword", &"planted_first_crop", &"promised_elder_keep", &"keep_gate_open", &"keep_warden_beaten",
+			&"crypt_shade_beaten", &"dungeon/crypt/big_key", &"dungeon/crypt/door/boss_door"],
 	},
 	# Outside the Crypt Shade's hall: the Lantern and the Iron Sword, the boss door already open.
 	"shade": {
 		"area": &"crypt",
 		"cell": Vector2i(22, 24),
 		"items": [[&"wooden_sword", 1], [&"iron_sword", 1], [&"bow", 1], [&"arrow", 20], [&"lantern", 1]],
-		"flags": [&"took_wooden_sword", &"keep_warden_beaten", &"dungeon/crypt/big_key", &"dungeon/crypt/door/boss_door"],
+		"flags": [&"took_wooden_sword", &"planted_first_crop", &"promised_elder_keep", &"keep_gate_open", &"keep_warden_beaten",
+			&"dungeon/crypt/big_key", &"dungeon/crypt/door/boss_door"],
 	},
 }
 
@@ -139,6 +170,10 @@ func _start() -> void:
 	for item: Array in scenario["items"]:
 		game_state.call(&"add_item", item[0], item[1])
 	for flag: StringName in scenario["flags"]:
+		game_state.call(&"set_flag", flag, true)
+	# Those came true long ago: no day is kept for them, so nothing waits a day on them.
+	(game_state.get(&"flag_days") as Dictionary).clear()
+	for flag: StringName in scenario.get("today", []):
 		game_state.call(&"set_flag", flag, true)
 	for arg: String in args.slice(1):
 		if DayClock.parse(arg) >= 0:

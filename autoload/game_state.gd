@@ -5,7 +5,7 @@ extends Node
 ## methods, which emit the matching EventBus signal. `to_dict()` / `from_dict()` use the
 ## save format from TECH_DESIGN §9; SaveSystem handles files and version migration.
 
-const SAVE_VERSION: int = 3
+const SAVE_VERSION: int = 4
 const HALVES_PER_HEART: int = 2
 const START_HEARTS: int = 3
 const MAX_HEARTS: int = 20
@@ -13,6 +13,8 @@ const MAX_HEARTS: int = 20
 const PIECES_PER_HEART: int = 4
 ## The item that is money.
 const COIN: StringName = &"coin"
+## What the tally counts: every crop picked from the plot.
+const CROPS_PICKED: StringName = &"crops_picked"
 
 ## Heart containers the hero has (0 until a game starts).
 var hearts_max: int = 0
@@ -22,6 +24,16 @@ var health: int = 0
 var heart_pieces: int = 0
 ## flag -> value. A missing flag reads as false.
 var flags: Dictionary[StringName, Variant] = {}
+## flag -> the day it came true (P4a), for what waits a day on it (the `days_since` condition).
+## A flag that came true before days were kept (an older save) has none, and counts as long ago.
+var flag_days: Dictionary[StringName, int] = {}
+## skill id -> points earned. Saved since version 4; nothing earns them until P4b.
+var skill_points: Dictionary[StringName, int] = {}
+## villager id -> { "points", "talked", "gift" }: friendship, and the days he last talked to
+## them and gave them something. Saved since version 4; nothing changes them until P4c.
+var friends: Dictionary[StringName, Dictionary] = {}
+## What the game has counted over all its days: what -> how many (CROPS_PICKED).
+var tally: Dictionary[StringName, int] = {}
 ## quest id -> current stage id
 var quests: Dictionary[StringName, StringName] = {}
 ## Stacks of { "id": StringName, "count": int }, in pickup order. Capped by Inventory rules.
@@ -226,6 +238,8 @@ func water_soil(cell: Vector2i) -> bool:
 func plant_crop(cell: Vector2i, crop_id: StringName) -> bool:
 	if DataRegistry.get_crop(crop_id).is_empty() or not farm().plant(cell, String(crop_id)):
 		return false
+	# The first seed in the ground: he has settled in, and the story may begin (P4a).
+	set_flag(StoryGates.FIRST_CROP, true)
 	EventBus.farm_changed.emit()
 	return true
 
@@ -252,6 +266,7 @@ func harvest(cell: Vector2i) -> Dictionary:
 		return {}
 	farm().harvest(cell, Crops.days_of(crop))
 	add_item(item_id, int(given["count"]))
+	add_tally(CROPS_PICKED, int(given["count"]))
 	EventBus.farm_changed.emit()
 	return given
 
@@ -312,11 +327,29 @@ func set_flag(flag: StringName, value: Variant) -> void:
 	if flags.has(flag) and flags[flag] == value:
 		return
 	flags[flag] = value
+	# The day a flag came true is kept: the crypt's bars wait for the dawn after the Warden falls.
+	if typeof(value) == TYPE_BOOL and value:
+		flag_days[flag] = day
+	else:
+		flag_days.erase(flag)
 	EventBus.flag_set.emit(flag, value)
 
 
 func get_flag(flag: StringName, default: Variant = false) -> Variant:
 	return flags.get(flag, default)
+
+
+# --- Tally -----------------------------------------------------------------
+
+## How many of `what` the game has counted (CROPS_PICKED).
+func tally_of(what: StringName) -> int:
+	return int(tally.get(what, 0))
+
+
+## Counts `count` more of `what`.
+func add_tally(what: StringName, count: int = 1) -> void:
+	if count > 0:
+		tally[what] = tally_of(what) + count
 
 
 # --- Player ----------------------------------------------------------------
@@ -437,6 +470,10 @@ func clear() -> void:
 	arrival_notice = ""
 	_farm = null
 	flags.clear()
+	flag_days.clear()
+	skill_points.clear()
+	friends.clear()
+	tally.clear()
 	quests.clear()
 	inventory.clear()
 	equipped = &""
@@ -458,11 +495,15 @@ func to_dict() -> Dictionary:
 		"minute": snappedf(minute, 0.01),
 		"energy": snappedf(energy, 0.01),
 		"flags": _json_safe(flags),
+		"flag_days": _json_safe(flag_days),
 		"quests": _json_safe(quests),
 		"inventory": stacks,
 		"equipped": String(equipped),
 		"player": _json_safe(player),
 		"farm": farm().to_dict(),
+		"skills": _json_safe(skill_points),
+		"friends": _json_safe(friends),
+		"tally": _json_safe(tally),
 	}
 
 
@@ -480,6 +521,23 @@ func from_dict(data: Dictionary) -> void:
 	var src_flags: Dictionary = data.get("flags", {})
 	for key: Variant in src_flags:
 		flags[StringName(str(key))] = src_flags[key]
+	var src_days: Dictionary = _dictionary(data.get("flag_days"))
+	for key: Variant in src_days:
+		flag_days[StringName(str(key))] = maxi(int(src_days[key]), 1)
+	var src_skills: Dictionary = _dictionary(data.get("skills"))
+	for key: Variant in src_skills:
+		skill_points[StringName(str(key))] = maxi(int(src_skills[key]), 0)
+	var src_friends: Dictionary = _dictionary(data.get("friends"))
+	for key: Variant in src_friends:
+		var friend: Dictionary = _dictionary(src_friends[key])
+		friends[StringName(str(key))] = {
+			"points": maxi(int(friend.get("points", 0)), 0),
+			"talked": maxi(int(friend.get("talked", 0)), 0),
+			"gift": maxi(int(friend.get("gift", 0)), 0),
+		}
+	var src_tally: Dictionary = _dictionary(data.get("tally"))
+	for key: Variant in src_tally:
+		tally[StringName(str(key))] = maxi(int(src_tally[key]), 0)
 	var src_quests: Dictionary = data.get("quests", {})
 	for key: Variant in src_quests:
 		quests[StringName(str(key))] = StringName(str(src_quests[key]))
@@ -490,6 +548,11 @@ func from_dict(data: Dictionary) -> void:
 	equipped = StringName(str(data.get("equipped", "")))
 	player = _whole_numbers_as_int(data.get("player", {}))
 	farm().load_saved(data.get("farm", {}), DataRegistry.ids(&"crops"))
+
+
+## `value` if it is a Dictionary, else an empty one (a section missing from a save).
+static func _dictionary(value: Variant) -> Dictionary:
+	return value if typeof(value) == TYPE_DICTIONARY else {}
 
 
 ## JSON may return 12 as 12.0. Cells and counts are ints, so turn whole floats back into

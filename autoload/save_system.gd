@@ -91,6 +91,8 @@ func migrate(data: Dictionary, from_version: int) -> Dictionary:
 		migrated = _v1_to_v2(migrated)
 	if from_version < 3:
 		migrated = _v2_to_v3(migrated)
+	if from_version < 4:
+		migrated = _v3_to_v4(migrated)
 	migrated["version"] = GameState.SAVE_VERSION
 	return migrated
 
@@ -108,3 +110,19 @@ func _v1_to_v2(data: Dictionary) -> Dictionary:
 func _v2_to_v3(data: Dictionary) -> Dictionary:
 	data["farm"] = {"cells": {}}
 	return data
+
+
+## Version 4 (P4a) added the day each flag came true, skill points, friendship and a tally, and
+## it is the version the story's gates came with: the keep's gate waits for Elder Bram's word,
+## his word for a first crop, and the crypt's bars for the dawn after the Warden falls. A game
+## saved before them has none of the new things and is past the gates: its hero may be standing
+## inside the keep.
+func _v3_to_v4(data: Dictionary) -> Dictionary:
+	data["flag_days"] = {}
+	data["skills"] = {}
+	data["friends"] = {}
+	data["tally"] = {}
+	var saved_flags: Variant = data.get("flags", {})
+	data["flags"] = StoryGates.past_the_gates(saved_flags if typeof(saved_flags) == TYPE_DICTIONARY else {})
+	return data
+

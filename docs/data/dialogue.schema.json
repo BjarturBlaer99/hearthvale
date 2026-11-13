@@ -8,6 +8,18 @@
   "properties": {
     "id": { "type": "string", "minLength": 1 },
     "start": { "type": "string", "description": "A key of 'nodes'." },
+    "openings": {
+      "type": "array",
+      "description": "Optional: other nodes to begin at. The first whose conditions are all met is used in place of 'start'.",
+      "items": {
+        "type": "object",
+        "required": ["conditions", "node"],
+        "properties": {
+          "conditions": { "$ref": "conditions_and_effects.schema.json#/$defs/conditions" },
+          "node": { "type": "string", "description": "A key of 'nodes'." }
+        }
+      }
+    },
     "speakers": {
       "type": "object",
       "description": "Optional: speaker id -> display name. A speaker missing here shows its id capitalised; an empty speaker (a sign) shows no name.",

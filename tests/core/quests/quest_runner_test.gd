@@ -175,3 +175,61 @@ func test_quest_data_that_goes_round_in_a_loop_is_stopped() -> void:
 
 func _runner_for(state: Node) -> QuestRunner:
 	return QuestRunner.new({&"lost_key": LOST_KEY, &"errand": ERRAND, &"loop": LOOP}, state)
+
+
+## The main story, in small: it begins by itself, and one of its stages waits for a dawn.
+const STORY: Dictionary = {
+	"id": "story", "title": "The Story", "auto_start": true, "start_stage": "first",
+	"stages": {
+		"first": {"journal": "Begin.", "transitions": [{"when": {"type": "flag", "flag": "deed_done", "value": true}, "to": "wait"}]},
+		"wait": {"journal": "Sleep on it.", "transitions": [{"when": {"type": "days_since", "flag": "deed_done", "days": 1}, "to": "end"}]},
+		"end": {"journal": "Done.", "on_enter": [{"type": "set_flag", "flag": "door_open", "value": true}, {"type": "complete_quest"}]},
+	},
+}
+
+
+func test_a_quest_marked_auto_start_begins_by_itself_once() -> void:
+	var runner: QuestRunner = QuestRunner.new({&"story": STORY, &"lost_key": LOST_KEY}, _state)
+	var news: Array = []
+	runner.stage_entered.connect(func(quest_id: StringName, stage_id: StringName, first: bool, completed: bool) -> void:
+		news.append([quest_id, stage_id, first, completed]))
+	assert_bool(runner.starts_itself(&"story")).is_true()
+	assert_bool(runner.starts_itself(&"lost_key")).is_false()
+	assert_bool(runner.starts_itself(&"no_such_quest")).is_false()
+	assert_that(runner.status(&"story")).override_failure_message("not before anything asks").is_equal(QuestState.NOT_STARTED)
+	assert_int(runner.update()).override_failure_message("begun, and its first stage entered").is_equal(2)
+	assert_that(runner.status(&"story")).is_equal(QuestState.ACTIVE)
+	assert_that(runner.stage(&"story")).is_equal(&"first")
+	assert_that(runner.status(&"lost_key")).override_failure_message("other quests wait to be given").is_equal(QuestState.NOT_STARTED)
+	assert_array(news).is_equal([[&"story", &"first", true, false]])
+	assert_bool(runner.start(&"story")).override_failure_message("already begun").is_false()
+	assert_int(runner.update()).is_equal(0)
+	assert_array(news).override_failure_message("announced once").has_size(1)
+
+
+func test_a_stage_can_wait_for_the_next_dawn() -> void:
+	var runner: QuestRunner = QuestRunner.new({&"story": STORY}, _state)
+	runner.update()
+	_state.set_flag(&"deed_done", true)
+	runner.update()
+	assert_that(runner.stage(&"story")).is_equal(&"wait")
+	assert_int(runner.update()).override_failure_message("the same day: it waits").is_equal(0)
+	assert_bool(_state.get_flag(&"door_open") == true).is_false()
+	_state.day += 1
+	runner.update()
+	assert_that(runner.status(&"story")).is_equal(QuestState.COMPLETE)
+	assert_bool(_state.get_flag(&"door_open") == true).override_failure_message("its last stage opened the door").is_true()
+	# Finished, it does not begin again.
+	assert_int(runner.update()).is_equal(0)
+	assert_that(runner.stage(&"story")).is_equal(&"end")
+
+
+func test_a_quest_with_auto_start_false_or_garbled_waits_to_be_given() -> void:
+	var plain: Dictionary = STORY.duplicate(true)
+	plain["auto_start"] = false
+	var garbled: Dictionary = STORY.duplicate(true)
+	garbled["auto_start"] = "yes"
+	var runner: QuestRunner = QuestRunner.new({&"plain": plain, &"garbled": garbled}, _state)
+	assert_int(runner.update()).is_equal(0)
+	assert_that(runner.status(&"plain")).is_equal(QuestState.NOT_STARTED)
+	assert_that(runner.status(&"garbled")).is_equal(QuestState.NOT_STARTED)

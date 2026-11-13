@@ -43,9 +43,10 @@ func test_every_quest_in_data_is_run_and_can_be_finished_from_its_data_alone() -
 	in_data.sort()
 	run.sort()
 	assert_array(run).override_failure_message("every file in data/quests is run").is_equal(in_data)
-	assert_array(run).is_equal(["eggs_for_tilda", "lost_shuttle", "slime_bounty"])
+	assert_array(run).is_equal(["a_place_of_your_own", "eggs_for_tilda", "lost_shuttle", "slime_bounty"])
 	for quest_id: StringName in runner.quest_ids():
-		assert_bool(runner.start(quest_id)).override_failure_message("%s starts" % quest_id).is_true()
+		# The main quest may have begun by itself already.
+		assert_bool(runner.start(quest_id) or runner.starts_itself(quest_id)).override_failure_message("%s starts" % quest_id).is_true()
 		var stages: Dictionary = DataRegistry.get_quest(quest_id)["stages"]
 		for step: int in stages.size():
 			if runner.status(quest_id) == QuestState.COMPLETE:
@@ -161,8 +162,9 @@ func test_the_quest_log_shows_where_each_quest_stands() -> void:
 	var menu: PauseMenu = village.hud.pause_menu
 	menu.choose(PauseMenu.QUESTS)
 	var quest_log: QuestLog = menu.quest_log
-	assert_array(Array(quest_log.shown_lines())).is_equal(["> Back"])
-	assert_str(quest_log.shown_detail()).is_equal(QuestLog.NO_QUESTS)
+	# A game just begun has the main quest, and nothing else (P4a).
+	assert_array(Array(quest_log.shown_lines())).is_equal(["> A Place of Your Own", "  Back"])
+	assert_str(quest_log.shown_detail()).contains("Your cottage").contains("[ ] Take the hoe")
 	quest_log.close()
 	menu.resume()
 
@@ -176,8 +178,9 @@ func test_the_quest_log_shows_where_each_quest_stands() -> void:
 	menu.choose(PauseMenu.QUESTS)
 	assert_bool(quest_log.is_open()).is_true()
 	assert_array(Array(quest_log.shown_lines())).override_failure_message("active first, then finished").is_equal([
-		"> Slimes in the South Field", "  The Lost Shuttle", "  Eggs for Tilda (done)", "  Back",
+		"> A Place of Your Own", "  Slimes in the South Field", "  The Lost Shuttle", "  Eggs for Tilda (done)", "  Back",
 	])
+	quest_log.move_cursor(1)
 	assert_str(quest_log.shown_detail()).contains("[ ] Beat all three slimes in the South Field")
 	quest_log.move_cursor(1)
 	assert_str(quest_log.shown_detail()).contains("You have the shuttle").contains("[ ] Bring the shuttle to Wenna")
@@ -252,6 +255,12 @@ func _satisfy(condition: Dictionary) -> void:
 		"all":
 			for inner: Dictionary in condition["of"]:
 				_satisfy(inner)
+		"any":
+			_satisfy(condition["of"][0])
+		"days_since":
+			GameState.set_flag(StringName(str(condition["flag"])), true)
+			for day: int in int(condition["days"]):
+				GameState.start_next_day()
 		_:
 			fail("the test can't satisfy a '%s' condition yet" % condition.get("type", ""))
 

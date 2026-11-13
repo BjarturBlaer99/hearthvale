@@ -15,8 +15,10 @@ pixel-art look are added in phases. Read these before writing any code:
 **The pivot** in `docs/ROADMAP.md` (P1–P4), in order: **P1** the visual overhaul (six steps, 1a–1f), **P2**
 energy, food and time, **P3** farming, **P4** RPG and story. Do not build anything outside the current step, and
 ask the user before adding anything the roadmap doesn't list. Scope creep is the main risk on this project.
-**P1, P2 and P3 are built** (P3 finished on 2026-11-13). **P4 is next, and is proposed to the user before any
-of it is built** (`docs/progress/pivot-plan.md` §7 has its outline).
+**P1, P2 and P3 are built** (P3 finished on 2026-11-13). **P4 is under way:** the user approved its proposal as
+written on 2026-11-13 (`docs/progress/P4-plan.md`: ten decisions, four steps, each with its own list). **4a
+(the story over days) is built;** 4b (skills), 4c (friendship and gifts) and 4d (side quests, recipes, the
+ending) follow, each started by the user.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -99,8 +101,8 @@ godot --headless --path . --quit-after 30
 godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
-# Start partway through to try one part by hand (scenarios in the script: farm, market, kitchen, home, village, warden, crypt, shade,
-# ending). An hour after the name starts at that time of day, and energy=<n> with that much energy.
+# Start partway through to try one part by hand (scenarios in the script: bram, gate, rest, farm, market, kitchen, home, village,
+# warden, crypt, shade, ending). An hour after the name starts at that time of day, and energy=<n> with that much energy.
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
 godot --path . -s res://tools/playtest.gd -- warden
 godot --path . -s res://tools/playtest.gd -- village 19:30 energy=12
@@ -242,3 +244,16 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   is the counter. A conversation opens it with the effect `shop`, when its words are done. Seeds and crop
   prices come from `data/crops`, so **a new crop needs no change to the shop.** The meals are recipes and food
   items only. Long lists scroll through `MenuCursor.window_top()`: use it, don't grow a box.
+- **The story over days (P4a; `docs/progress/P4-plan.md` has P4's four steps):** the main quest
+  (`data/quests/a_place_of_your_own.json`) begins by itself (a quest's `auto_start`) and its journal is the
+  new player's guide. Four flags gate the story (`StoryGates`, `core/story/`): `planted_first_crop` (set by
+  `GameState.plant_crop()`), `keep_gate_open` (Elder Bram's promise), `keep_warden_beaten`, and `crypt_open`
+  (set by the quest at the dawn after the Warden falls: the condition `days_since`, from
+  `GameState.flag_days`). The keep's gate is `KeepChain` in the Old Wood, a `chained` `DungeonDoor`; the
+  chapel's `CryptBars` open on `crypt_open`. A conversation's `openings` give it other places to begin (Bram
+  welcomes a newcomer). **A test that walks into the keep, or wants Bram to speak of it, sets the flag
+  itself** (`StoryGates.KEEP_GATE`, `StoryGates.FIRST_CROP`); one that listens for every sound or flag calls
+  `Quests.refresh()` first, since the main quest begins with a chime. **Save version 4** (one change for all
+  of P4: `flag_days`, `tally`, and `skills` and `friends`, which nothing changes until 4b and 4c); an older
+  save loads past the gates.
+

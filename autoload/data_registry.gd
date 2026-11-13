@@ -74,6 +74,7 @@ const CONDITION_FIELDS: Dictionary = {
 	"has_item": ["item", "count"],
 	"quest_stage": ["quest", "stage"],
 	"quest_status": ["quest", "status"],
+	"days_since": ["flag", "days"],
 	"all": ["of"],
 	"any": ["of"],
 	"not": ["condition"],
@@ -325,6 +326,8 @@ func _check_quest(quest: Dictionary) -> void:
 		return
 	var stages: Dictionary = quest["stages"]
 	var completes: bool = false
+	if quest.has("auto_start") and typeof(quest["auto_start"]) != TYPE_BOOL:
+		errors.append("%s: %s 'auto_start' must be true or false." % [path, label])
 	if not stages.has(str(quest["start_stage"])):
 		errors.append("%s: %s start_stage '%s' is not a stage." % [path, label, quest["start_stage"]])
 	for stage_id: Variant in stages:
@@ -368,6 +371,16 @@ func _check_dialogue(dialogue: Dictionary) -> void:
 		errors.append("%s: %s 'speakers' must be an object (speaker id -> display name)." % [path, label])
 	if not nodes.has(str(dialogue["start"])):
 		errors.append("%s: %s start '%s' is not a node." % [path, label, dialogue["start"]])
+	var openings: Array = _array_field(path, label, dialogue, "openings")
+	for i: int in openings.size():
+		var where_open: String = "%s opening %d" % [label, i]
+		var opening: Dictionary = openings[i] if typeof(openings[i]) == TYPE_DICTIONARY else {}
+		if not opening.has("node") or not nodes.has(str(opening["node"])):
+			errors.append("%s: %s needs 'node', one of the dialogue's nodes (got '%s')." % [path, where_open, opening.get("node", "")])
+		if not opening.has("conditions"):
+			errors.append("%s: %s needs 'conditions' (without any it would always be used: change 'start' instead)." % [path, where_open])
+		else:
+			_check_condition_list(path, where_open + " conditions", opening["conditions"])
 	for node_id: Variant in nodes:
 		var where: String = "%s node '%s'" % [label, node_id]
 		var node: Dictionary = nodes[node_id] if typeof(nodes[node_id]) == TYPE_DICTIONARY else {}
@@ -496,6 +509,11 @@ func _check_condition(path: String, where: String, raw: Variant) -> void:
 		"quest_status":
 			if not QuestState.STATUSES.has(StringName(str(condition["status"]))):
 				errors.append("%s: %s: unknown quest status '%s'. Known: %s." % [path, where, condition["status"], ", ".join(QuestState.STATUSES)])
+		"days_since":
+			var days: Variant = condition["days"]
+			var whole: bool = typeof(days) == TYPE_INT or (typeof(days) == TYPE_FLOAT and float(days) == roundf(float(days)))
+			if not whole or int(days) < 1:
+				errors.append("%s: %s: 'days' must be a whole number, 1 or more, not '%s'." % [path, where, days])
 
 
 func _check_effect_list(path: String, where: String, list: Variant) -> void:
