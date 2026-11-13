@@ -1471,7 +1471,7 @@ Plan: `docs/progress/P2-plan.md` (the last of P2's five steps).
 - The night tune is short (27 seconds) and loops.
 - Still open from earlier steps: Elder Bram's fire shows above his head; the hero's head hides whoever he talks to from the south; the heading face has no small letters.
 
-## 2026-11-13 — P3a: the plot and the tools (built; not yet tried in play)
+## 2026-11-13 — P3a: the plot and the tools (built; tried in play by the user: "feels right")
 
 Plan: `docs/progress/P3-plan.md` (the first of P3's three steps: 3a the plot and the tools, 3b seeds and crops, 3c the shop's list and the meals).
 
@@ -1501,7 +1501,7 @@ Plan: `docs/progress/P3-plan.md` (the first of P3's three steps: 3a the plot and
 - Screenshots: all 115 taken. Looked at closely: the bare plot; rows tilled and watered; the hoe at work; the tools on the cottage floor; the item menu; the can filling at the well.
 
 **Known issues and limits**
-- Not tried in play. **Whether eighteen cells feel like work or like a chore is for a playtest:** tilling them all is 18 strokes and 36 energy; watering them all is 18 pours, so two trips to the well, and 18 energy.
+- **Tried by the user on 2026-11-13** (the `farm` scenario): hoeing and watering "feel right", so the numbers stand. Tilling all eighteen cells is 18 strokes and 36 energy; watering them all is 18 pours, so two trips to the well, and 18 energy. Finding the tools at home and a whole day with the farm in it were not part of that try.
 - **Nothing grows yet.** For this one step the plot can only be dug and wetted (3b brings seeds).
 - **The plot is not straight across from the hero's door** but one house east, in front of the weaver's (the reason is above).
 - **The bed of soil has a hard, square edge.** It reads as dug, but it is plainer than the paths' soft edges.

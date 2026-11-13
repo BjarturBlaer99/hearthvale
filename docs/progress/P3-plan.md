@@ -76,7 +76,8 @@ Nothing is built ahead of its step. Each later step gets its own "done when" lis
 - [x] watered soil is dry the next morning, and tilled soil is still tilled
 - [x] a version 2 save loads with an untouched plot; a version 1 save still loads; the farm survives a save
 - [x] all earlier tests pass
-- [ ] (yours) hoeing and watering eighteen cells feels like work, not a chore
+- [x] (yours) hoeing and watering eighteen cells feels like work, not a chore (tried on 2026-11-13: "feels
+  right")
 
 ### Not in this step
 - Seeds, crops, growth, withering, harvest (3b). Buying and selling, meals (3c).
