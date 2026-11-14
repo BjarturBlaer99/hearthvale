@@ -16,6 +16,36 @@
         }
       ],
       "node": "welcome"
+    },
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "elder_bram",
+          "marks": 4
+        },
+        {
+          "type": "flag",
+          "flag": "present/elder_bram",
+          "value": false
+        }
+      ],
+      "node": "present"
+    },
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "elder_bram",
+          "marks": 2
+        },
+        {
+          "type": "quest_status",
+          "quest": "elders_supper",
+          "status": "not_started"
+        }
+      ],
+      "node": "favour"
     }
   ],
   "speakers": {
@@ -50,6 +80,45 @@
       "speaker": "bram",
       "text": "Ah, come in, come in. Have you seen the lights over the old keep at night?",
       "options": [
+        {
+          "text": "Your supper, Elder.",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "elders_supper",
+              "stage": "cook"
+            },
+            {
+              "type": "has_item",
+              "item": "vegetable_stew",
+              "count": 1
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "vegetable_stew",
+              "count": 1
+            },
+            {
+              "type": "set_flag",
+              "flag": "elders_supper_given",
+              "value": true
+            }
+          ],
+          "next": "favour_done"
+        },
+        {
+          "text": "About that stew...",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "elders_supper",
+              "stage": "cook"
+            }
+          ],
+          "next": "favour_hint"
+        },
         {
           "text": "What lights?",
           "conditions": [
@@ -194,6 +263,89 @@
     "ended": {
       "speaker": "bram",
       "text": "Gone? Then Hearthvale can sleep, and there will be no more lights over the keep. You have done what Aldric could not. We will not forget it.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "present": {
+      "speaker": "bram",
+      "text": "The village keeps a little by for those who look after it. Forty coins, and my thanks with them.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "coin",
+          "count": 40
+        },
+        {
+          "type": "set_flag",
+          "flag": "present/elder_bram",
+          "value": true
+        }
+      ],
+      "options": [
+        {
+          "text": "Thank you, Elder.",
+          "next": null
+        }
+      ]
+    },
+    "favour": {
+      "speaker": "bram",
+      "text": "You have been kind to an old man. One thing more: my own cooking is poor, and I miss a proper vegetable stew. Bring me one, and I'll tell you what I know of Sir Aldric.",
+      "options": [
+        {
+          "text": "I'll cook you one.",
+          "effects": [
+            {
+              "type": "set_quest_stage",
+              "quest": "elders_supper",
+              "stage": "cook"
+            }
+          ],
+          "next": "favour_go"
+        },
+        {
+          "text": "Not just now.",
+          "next": "greet"
+        }
+      ]
+    },
+    "favour_go": {
+      "speaker": "bram",
+      "text": "A potato, a carrot and a turnip, as my mother made it.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_hint": {
+      "speaker": "bram",
+      "text": "A vegetable stew: a potato, a carrot and a turnip, cooked at your hearth.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_done": {
+      "speaker": "bram",
+      "text": "Ah, that is the taste. Sit. Sir Aldric was no lord's son. He was born in this valley, and before he took up the sword he farmed, as you do.",
+      "options": [
+        {
+          "text": "Go on.",
+          "next": "favour_tale"
+        }
+      ]
+    },
+    "favour_tale": {
+      "speaker": "bram",
+      "text": "They say the cottage you sleep in was his. He left it for whoever would look after the valley. I think it has found its keeper.",
       "options": [
         {
           "text": "Goodbye.",

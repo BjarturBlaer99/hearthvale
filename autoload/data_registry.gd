@@ -80,6 +80,7 @@ const CONDITION_FIELDS: Dictionary = {
 	"quest_stage": ["quest", "stage"],
 	"quest_status": ["quest", "status"],
 	"days_since": ["flag", "days"],
+	"friendship": ["villager", "marks"],
 	"all": ["of"],
 	"any": ["of"],
 	"not": ["condition"],
@@ -96,6 +97,7 @@ const EFFECT_FIELDS: Dictionary = {
 	"shop": ["shop", "mode"],
 	"practise": ["skill", "deed"],
 	"gift": ["villager"],
+	"teach_recipe": ["recipe"],
 }
 
 ## A field with one of these names, inside a condition or effect, must name an id
@@ -105,6 +107,7 @@ const REFERENCE_FIELDS: Dictionary = {
 	"quest": &"quests",
 	"shop": &"shops",
 	"villager": &"villagers",
+	"recipe": &"recipes",
 }
 
 ## Problems found by the last load_all(), as "file: what is wrong" lines.
@@ -543,6 +546,12 @@ func _check_condition(path: String, where: String, raw: Variant) -> void:
 		"quest_status":
 			if not QuestState.STATUSES.has(StringName(str(condition["status"]))):
 				errors.append("%s: %s: unknown quest status '%s'. Known: %s." % [path, where, condition["status"], ", ".join(QuestState.STATUSES)])
+		"friendship":
+			var marks: Variant = condition["marks"]
+			var most: int = Friendship.new(get_rules(RULES_FRIENDSHIP)).marks
+			var counted: bool = typeof(marks) == TYPE_INT or (typeof(marks) == TYPE_FLOAT and float(marks) == roundf(float(marks)))
+			if not counted or int(marks) < 1 or int(marks) > most:
+				errors.append("%s: %s: 'marks' must be a whole number from 1 to %d, not '%s'." % [path, where, most, marks])
 		"days_since":
 			var days: Variant = condition["days"]
 			var whole: bool = typeof(days) == TYPE_INT or (typeof(days) == TYPE_FLOAT and float(days) == roundf(float(days)))
@@ -571,6 +580,10 @@ func _check_effect_list(path: String, where: String, list: Variant) -> void:
 			_check_stage(path, w, str(effect["quest"]), str(effect["stage"]))
 		if type_name == "practise" and not Skills.new(get_rules(RULES_SKILLS)).has_deed(StringName(str(effect["skill"])), StringName(str(effect["deed"]))):
 			errors.append("%s: %s: no skill '%s' grows by a deed '%s' (data/rules/skills.json)." % [path, w, effect["skill"], effect["deed"]])
+		if type_name == "teach_recipe":
+			var recipe: Dictionary = get_recipe(StringName(str(effect["recipe"])))
+			if not recipe.is_empty() and not Cooking.is_taught(recipe):
+				errors.append("%s: %s: the recipe '%s' is known from the start: there is nothing to teach (mark it \"taught\": true)." % [path, w, effect["recipe"]])
 		if type_name == "shop" and not Shop.MODES.has(StringName(str(effect["mode"]))):
 			errors.append("%s: %s: a shop's 'mode' must be 'buy' or 'sell', not '%s'." % [path, w, effect["mode"]])
 

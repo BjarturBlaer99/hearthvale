@@ -1815,3 +1815,50 @@ Plan: `docs/progress/P4-plan.md`, section 12 (the third of P4's four steps).
 - **The pause menu's list is full** at six lines. Its note sits five pixels lower to leave a gap under them.
 - **A mark and a quest's news share the line at the top,** so the later of two at once is the one shown.
 
+## 2026-11-14 — P4d: side quests, recipes and the ending (built; not yet tried in play). P4's four steps are built.
+
+Plan: `docs/progress/P4-plan.md`, section 13 (the last of P4's four steps).
+
+**Built**
+- **At two marks four villagers ask a favour,** each a quest in the quest format, offered in their conversation:
+
+| Quest | From | Wants | Gives |
+|---|---|---|---|
+| A Pie for Pip | Pip | 1 pumpkin pie | 15 coins, and where a bomb opens the Old Wood's shrine |
+| Rations for the Watch | Guard Rolf | 3 bread | 10 arrows and 20 coins |
+| Seed Stock | Farmer Oda | 5 wheat | 3 pumpkin seeds |
+| The Elder's Supper | Elder Bram | 1 vegetable stew | 30 coins, and more of Sir Aldric's tale |
+
+  A favour can be put off ("Not just now.") and is asked again at the next talk. Each has an answer that reminds him what was asked, and one that hands it over.
+- **At two marks three villagers teach a recipe:** Wenna berry jam (3 wild berries: 30 energy), Tilda carrot cake (2 carrots, 1 wheat: 50, half a heart), Shepherd Edda shepherd's pie (potato, turnip, mushroom: 70, one heart). The hearth lists them once they are taught; the six from before are known from the start. Three new dishes, with pictures.
+- **At four marks each villager gives a present, once:** Elder Bram 40 coins, Wenna 25 coins, Tilda 3 potato seeds, Farmer Oda 3 carrot seeds, Pip 10 coins, Guard Rolf 30 coins, Shepherd Edda 4 wheat seeds.
+- **Two new things data may say,** checked on load and in the schemas: the condition `friendship` (a villager, so many marks) and the effect `teach_recipe`; and a recipe may be marked `"taught": true`.
+- **The quest log scrolls:** five quests at a time, with the corner saying where he is ("^ 6/9 v"). There can be eight quests now.
+- **The ending has three more lines:** "Days 7", "Crops grown 31", "Friends 3 of 7". A friend is a villager at three marks or more (a number in the friendship rules).
+- **Tools:** a playtest scenario on a late day (`-- late`: the sixth morning, the crypt open, every villager a gift short of two marks); five new screenshots (140 in all).
+
+**Checked**
+- 655 tests in 89 suites pass (+17: `tests/world/friends_open_test.gd`, `tests/world/whole_story_test.gd`, and more in the condition, cooking, friendship and ending suites). Import and boot clean.
+- **Each favour, as a player meets it:** not asked at one mark; asked at two; put off, and the villager talks as ever; asked again; taken; the reminder; handed over; the plan's reward; and never asked again. All four.
+- **Each recipe:** not known and not on the hearth's list before; taught once at two marks, with its notice; then listed, cooked from the plan's makings, and worth what the table says.
+- **Each present:** nothing at three marks, the present at four, and nothing more at the next two talks. All seven.
+- **The whole story in one test:** a new game through the chained gate, Bram's welcome and promise, the first crop, the harvest, the Warden's fall, the night the bars wait, Wenna's jam, Pip's pie and present, the Shade's fall, to the ending's lines ("Days 6", "Crops grown 5", "Friends 1 of 7", "Quests finished 2 of 8"). The two boss fights are stood in for by their flags; the rest is done as a player does it. What is said on the way (four marks for Pip, two for Wenna, farming's second level, the recipe) is said once each, in order.
+- **Five older tests needed updating,** all lists by count: the game's items (three more), its recipes, its quests, and Elder Bram's openings.
+- **Mutation checks:** five deliberate bugs in runtime code, each caught, files restored: a favour asked a mark late, the hearth listing what he was never taught, a recipe taught and not remembered, anyone with a mark counting as a friend, the quest log not scrolling.
+- **Frame cost:** draw calls as before (the village 312, Elder Bram's house 45, the keep 382, the cistern 231).
+- **The save format is unchanged:** a recipe known and a present given are flags.
+- Screenshots: all 140 taken. Looked at closely: Pip's favour, Wenna's lesson with its notice, Tilda's present, the quest log with eight quests scrolled, the ending's six lines, the three new dish pictures enlarged.
+
+**Known issues and limits**
+- Not tried in play. **P4's "done when" is still open, and only a player can close it:** a whole game from the title to the ending, in six to eight days, with no help. The test above runs the story in six days, but a test knows where everything is.
+- **Berry jam gives 30 energy where the plan's table says 20:** at 20 it was worth less than its three berries raw (24), against the rule since 3c that a dish beats its makings.
+- **More of Sir Aldric's tale is new lore that the plan did not spell out:** he was a farmer of the valley, and the hero's cottage was his. Two lines of Elder Bram's, easily changed.
+- **The effect that adds friendship was not built:** the plan lists it, and nothing in the plan's content gives friendship as a reward.
+- **What friendship opens is in the conversations, not the villagers' data files,** where the plan's sketch had it.
+- **A favour that is put off is the first thing the villager says at every talk** until it is taken. "Not just now." leads to their usual words.
+- **At four marks the present comes before a favour not yet asked,** so a player who reaches four marks in one go meets the present first and the favour at the next talk.
+- **Nothing on the Friends page says a villager has something to ask or to teach:** he finds out by talking to them.
+- **The favours' makings are named in the words** ("a pumpkin and some wheat"), not read from the recipes: a recipe changed in data would need the words changed too.
+- **The quest log's finished quests stay in the list,** so late in a game it holds eight lines and scrolls.
+- **The main quest counts among "Quests finished"** on the ending screen, as before.
+

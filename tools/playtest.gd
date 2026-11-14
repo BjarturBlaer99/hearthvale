@@ -29,8 +29,24 @@ const KEYS: String = "keys"
 ## after the scenario's name starts it at that time of day, energy=<n> with that much energy,
 ## and skills=<level> with every skill at that level: -- village 19:30 energy=12 skills=3
 ## A scenario's "flags" came true long ago (no day is kept for them); its "today" flags came
-## true this very day, for what waits a day on them (the crypt's bars).
+## true this very day, for what waits a day on them (the crypt's bars). "day" is the day it is
+## (the plot wakes that many mornings), and "friends" the points of friendship with villagers.
 const SCENARIOS: Dictionary = {
+	# A late day: the sixth morning at home, the keep quiet and the crypt open, every villager
+	# one liked gift short of two marks (when four ask a favour and three teach a recipe), and a
+	# pack to give, cook and fight with. Add skills=3 for skills to match.
+	"late": {
+		"area": &"home",
+		"cell": Vector2i(5, 5),
+		"day": 6,
+		"items": [[&"wooden_sword", 1], [&"bow", 1], [&"arrow", 20], [&"bomb", 5], [&"lantern", 1], [&"hoe", 1], [&"watering_can", 1],
+			[&"coin", 60], [&"wild_berries", 6], [&"bread", 4], [&"pumpkin_pie", 2], [&"vegetable_stew", 2], [&"blossom_tea", 2],
+			[&"cherry_blossom", 4], [&"mushroom_soup", 2], [&"carrot", 4], [&"wheat", 6], [&"pumpkin", 2], [&"potato", 2],
+			[&"turnip", 3], [&"mushroom", 2]],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"planted_first_crop",
+			&"promised_elder_keep", &"keep_gate_open", &"keep_warden_beaten"],
+		"friends": {&"elder_bram": 5, &"wenna": 5, &"tilda": 5, &"farmer_oda": 5, &"pip": 5, &"guard_rolf": 5, &"shepherd_edda": 5},
+	},
 	# In Hearthvale beside Pip, with a pack of things to give: something each villager likes and
 	# plenty they don't. Elder Bram, Wenna and Tilda are indoors; Oda and Rolf stand in the
 	# village; Edda is in the North Fields. One gift a villager a day: the bed at home ends one.
@@ -180,6 +196,11 @@ func _start() -> void:
 	game_state.call(&"new_game")
 	for item: Array in scenario["items"]:
 		game_state.call(&"add_item", item[0], item[1])
+	for day: int in int(scenario.get("day", 1)) - 1:
+		game_state.call(&"start_next_day")
+	var friends: Dictionary = scenario.get("friends", {})
+	for villager: StringName in friends:
+		game_state.call(&"add_friendship", villager, friends[villager])
 	for flag: StringName in scenario["flags"]:
 		game_state.call(&"set_flag", flag, true)
 	# Those came true long ago: no day is kept for them, so nothing waits a day on them.

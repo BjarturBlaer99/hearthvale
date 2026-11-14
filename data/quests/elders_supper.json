@@ -1,0 +1,64 @@
+{
+  "id": "elders_supper",
+  "title": "The Elder's Supper",
+  "giver": "elder_bram",
+  "start_stage": "cook",
+  "stages": {
+    "cook": {
+      "journal": "Elder Bram misses a proper vegetable stew, and will tell what he knows of Sir Aldric for one. A stew takes a potato, a carrot and a turnip.",
+      "objectives": [
+        {
+          "id": "have",
+          "text": "Cook a vegetable stew",
+          "complete_when": {
+            "type": "any",
+            "of": [
+              {
+                "type": "has_item",
+                "item": "vegetable_stew",
+                "count": 1
+              },
+              {
+                "type": "flag",
+                "flag": "elders_supper_given",
+                "value": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "bring",
+          "text": "Bring it to Elder Bram",
+          "complete_when": {
+            "type": "flag",
+            "flag": "elders_supper_given",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "elders_supper_given",
+            "value": true
+          },
+          "to": "done"
+        }
+      ]
+    },
+    "done": {
+      "journal": "Elder Bram had his supper. He told you that Sir Aldric was a farmer of this valley, and that your cottage was his. He gave you thirty coins.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "coin",
+          "count": 30
+        },
+        {
+          "type": "complete_quest"
+        }
+      ]
+    }
+  }
+}

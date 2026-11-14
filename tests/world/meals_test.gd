@@ -55,7 +55,8 @@ func test_the_five_meals_are_recipes_that_give_what_the_gdd_says() -> void:
 		assert_int(Food.halves_of(dish)).override_failure_message("%s's hearts" % id).is_equal(int(meal["halves"]))
 		assert_float(Food.energy_of(dish)).override_failure_message("%s is worth more cooked than its makings raw (%s)" % [id, raw]).is_greater(raw)
 		assert_bool(ItemIcons.FRAMES.has(ItemIcons.name_for(meal["dish"])) and ItemIcons.name_for(meal["dish"]) != &"gem").override_failure_message("%s has a picture of its own" % meal["dish"]).is_true()
-	assert_array(DataRegistry.ids(&"recipes").map(func(id: StringName) -> String: return String(id))).is_equal(["blossom_tea", "bread", "mushroom_soup", "pumpkin_pie", "roast_turnip", "vegetable_stew"])
+	# These, with the tea, are what he knows from the start; three more are taught (P4d).
+	assert_array(GameState.known_recipes().map(func(recipe: Dictionary) -> String: return str(recipe["id"]))).is_equal(["blossom_tea", "bread", "mushroom_soup", "pumpkin_pie", "roast_turnip", "vegetable_stew"])
 	assert_str(Food.gives_text(DataRegistry.get_item(&"vegetable_stew"))).is_equal("+60 energy, +1 heart")
 	assert_str(Food.gives_text(DataRegistry.get_item(&"mushroom_soup"))).is_equal("+35 energy, +half a heart")
 	assert_str(Food.gives_text(DataRegistry.get_item(&"pumpkin_pie"))).is_equal("+80 energy, +2 hearts")

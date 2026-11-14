@@ -72,3 +72,6 @@ signal friend_mark_gained(villager: StringName, marks: int)
 ## whoever runs the area opens it when the conversation is over.
 signal gift_requested(villager: StringName)
 
+## The hero learned the recipe `recipe_id` (P4d; the `teach_recipe` effect): said once.
+signal recipe_learned(recipe_id: StringName)
+

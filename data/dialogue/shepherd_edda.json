@@ -1,6 +1,38 @@
 {
   "id": "shepherd_edda",
   "start": "hello",
+  "openings": [
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "shepherd_edda",
+          "marks": 4
+        },
+        {
+          "type": "flag",
+          "flag": "present/shepherd_edda",
+          "value": false
+        }
+      ],
+      "node": "present"
+    },
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "shepherd_edda",
+          "marks": 2
+        },
+        {
+          "type": "flag",
+          "flag": "recipe/shepherds_pie",
+          "value": false
+        }
+      ],
+      "node": "teach"
+    }
+  ],
   "speakers": {
     "edda": "Shepherd Edda"
   },
@@ -25,6 +57,44 @@
       "options": [
         {
           "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "present": {
+      "speaker": "edda",
+      "text": "I've no coin to give, but I've seed wheat from the top field. Four pinches, the best I have.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "wheat_seeds",
+          "count": 4
+        },
+        {
+          "type": "set_flag",
+          "flag": "present/shepherd_edda",
+          "value": true
+        }
+      ],
+      "options": [
+        {
+          "text": "Thank you.",
+          "next": null
+        }
+      ]
+    },
+    "teach": {
+      "speaker": "edda",
+      "text": "You've warmed many a cold watch for me. Here's what keeps a shepherd on the hill: a potato, a turnip and a mushroom, baked under a crust. Shepherd's pie.",
+      "on_enter": [
+        {
+          "type": "teach_recipe",
+          "recipe": "shepherds_pie"
+        }
+      ],
+      "options": [
+        {
+          "text": "Thank you.",
           "next": null
         }
       ]

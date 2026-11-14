@@ -2,11 +2,12 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "recipe.schema.json",
   "title": "Recipe file (data/recipes/<id>.json, one recipe per file)",
-  "description": "Something cooked at the hearth at the hero's home (GDD §6, TECH_DESIGN §18): what it needs and what it makes. Every item id must be in data/items. The hearth lists every recipe; adding one needs no code.",
+  "description": "Something cooked at the hearth at the hero's home (GDD §6, TECH_DESIGN §18): what it needs and what it makes. Every item id must be in data/items. The hearth lists every recipe the hero knows; adding one needs no code.",
   "type": "object",
   "required": ["id", "makes", "needs"],
   "properties": {
     "id": { "type": "string", "minLength": 1 },
+    "taught": { "type": "boolean", "default": false, "description": "Not known from the start: the hearth lists it only once the effect teach_recipe has taught it (a villager's conversation)." },
     "makes": {
       "type": "object",
       "required": ["item"],

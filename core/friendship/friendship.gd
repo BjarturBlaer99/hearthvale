@@ -4,7 +4,7 @@ extends RefCounted
 ## many marks points make, what can be given, and who likes what. The numbers are data
 ## (data/rules/friendship.json):
 ##   { "marks": 5, "points_per_mark": 4, "talk": 1, "liked_gift": 3, "other_gift": 1,
-##     "gift_types": ["food", "ingredient"] }
+##     "gift_types": ["food", "ingredient"], "friend_marks": 3 }
 ## and so are the villagers (data/villagers/<id>.json):
 ##   { "id": "pip", "name": "Pip", "dialogue": "pip", "likes": ["wild_berries", "pumpkin_pie"],
 ##     "thanks": { "liked": "...", "other": "..." } }
@@ -30,6 +30,8 @@ var liked_gift: int = 0
 var other_gift: int = 0
 ## The item types that can be given.
 var gift_types: Array[String] = []
+## The marks at which a villager counts as a friend (the ending's count).
+var friend_marks: int = 1
 
 
 func _init(rules: Dictionary = {}) -> void:
@@ -42,6 +44,7 @@ func _init(rules: Dictionary = {}) -> void:
 	if typeof(types) == TYPE_ARRAY:
 		for type: Variant in types:
 			gift_types.append(str(type))
+	friend_marks = clampi(_whole(rules.get("friend_marks"), marks), 1, marks)
 
 
 ## The most points a friendship holds.
@@ -86,6 +89,17 @@ func giftable_held(stacks: Array, items: Array) -> Array[Dictionary]:
 	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return int(order.get(str(a.get("id", "")), 0)) < int(order.get(str(b.get("id", "")), 0)))
 	return out
+
+
+## How many of `villager_ids` are friends: at `friend_marks` or more, by `friends` (villager id
+## -> { "points", ... }, as GameState keeps them).
+func friends_among(friends: Dictionary, villager_ids: Array) -> int:
+	var count: int = 0
+	for id: Variant in villager_ids:
+		var friend: Variant = friends.get(id, friends.get(StringName(str(id)), friends.get(str(id))))
+		if typeof(friend) == TYPE_DICTIONARY and marks_at(int((friend as Dictionary).get("points", 0))) >= friend_marks:
+			count += 1
+	return count
 
 
 ## "Pip: friendship 2 of 5."
@@ -159,6 +173,9 @@ static func problems(rules: Dictionary, item_types: Array) -> PackedStringArray:
 			out.append("'%s' must be a whole number of 0 or more." % key)
 	if out.is_empty() and float(rules["liked_gift"]) < float(rules["other_gift"]):
 		out.append("'liked_gift' must be at least 'other_gift': a gift they like is worth no less.")
+	if rules.has("friend_marks") and (not _is_whole(rules["friend_marks"]) or float(rules["friend_marks"]) < 1.0
+			or (_is_whole(rules.get("marks")) and float(rules["friend_marks"]) > float(rules["marks"]))):
+		out.append("'friend_marks' must be a whole number from 1 to 'marks': the marks that make a friend.")
 	var types: Variant = rules.get("gift_types")
 	if typeof(types) != TYPE_ARRAY or (types as Array).is_empty():
 		out.append("'gift_types' must list the item types that can be given.")

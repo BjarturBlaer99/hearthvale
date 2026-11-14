@@ -1,6 +1,38 @@
 {
   "id": "guard_rolf",
   "start": "hello",
+  "openings": [
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "guard_rolf",
+          "marks": 4
+        },
+        {
+          "type": "flag",
+          "flag": "present/guard_rolf",
+          "value": false
+        }
+      ],
+      "node": "present"
+    },
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "guard_rolf",
+          "marks": 2
+        },
+        {
+          "type": "quest_status",
+          "quest": "rations_for_the_watch",
+          "status": "not_started"
+        }
+      ],
+      "node": "favour"
+    }
+  ],
   "speakers": {
     "rolf": "Guard Rolf"
   },
@@ -9,6 +41,45 @@
       "speaker": "rolf",
       "text": "The road runs north through the fields and the Old Wood, all the way to the keep.",
       "options": [
+        {
+          "text": "Three loaves, as promised.",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "rations_for_the_watch",
+              "stage": "bring"
+            },
+            {
+              "type": "has_item",
+              "item": "bread",
+              "count": 3
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "bread",
+              "count": 3
+            },
+            {
+              "type": "set_flag",
+              "flag": "rations_given",
+              "value": true
+            }
+          ],
+          "next": "favour_done"
+        },
+        {
+          "text": "About those rations...",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "rations_for_the_watch",
+              "stage": "bring"
+            }
+          ],
+          "next": "favour_hint"
+        },
         {
           "text": "Any work for a sword?",
           "conditions": [
@@ -199,6 +270,79 @@
     "crypt_quiet": {
       "speaker": "rolf",
       "text": "Then it's a dull watch for me at last. Never thought I'd be glad of one.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "present": {
+      "speaker": "rolf",
+      "text": "A watchman doesn't forget a friend. Thirty coins from the watch's purse, and well spent.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "coin",
+          "count": 30
+        },
+        {
+          "type": "set_flag",
+          "flag": "present/guard_rolf",
+          "value": true
+        }
+      ],
+      "options": [
+        {
+          "text": "Thank you.",
+          "next": null
+        }
+      ]
+    },
+    "favour": {
+      "speaker": "rolf",
+      "text": "You've been good to the watch. It runs on bread, and the night watch on more of it. Could you bring three loaves?",
+      "options": [
+        {
+          "text": "I'll bring them.",
+          "effects": [
+            {
+              "type": "set_quest_stage",
+              "quest": "rations_for_the_watch",
+              "stage": "bring"
+            }
+          ],
+          "next": "favour_go"
+        },
+        {
+          "text": "Not just now.",
+          "next": "hello"
+        }
+      ]
+    },
+    "favour_go": {
+      "speaker": "rolf",
+      "text": "Three loaves. Baked or bought, the watch isn't proud.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_hint": {
+      "speaker": "rolf",
+      "text": "Three loaves of bread. Tilda sells them, and two sheaves of wheat bake one at a hearth.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_done": {
+      "speaker": "rolf",
+      "text": "That'll see the watch through the week. Arrows from the guard store, and coin for your trouble.",
       "options": [
         {
           "text": "Goodbye.",

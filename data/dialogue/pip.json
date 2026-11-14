@@ -1,6 +1,38 @@
 {
   "id": "pip",
   "start": "hello",
+  "openings": [
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "pip",
+          "marks": 4
+        },
+        {
+          "type": "flag",
+          "flag": "present/pip",
+          "value": false
+        }
+      ],
+      "node": "present"
+    },
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "pip",
+          "marks": 2
+        },
+        {
+          "type": "quest_status",
+          "quest": "pie_for_pip",
+          "status": "not_started"
+        }
+      ],
+      "node": "favour"
+    }
+  ],
   "speakers": {
     "pip": "Pip"
   },
@@ -9,6 +41,45 @@
       "speaker": "pip",
       "text": "You can smash pots, you know. Mum says not to. Tilda's always got coins in hers, though.",
       "options": [
+        {
+          "text": "Here's your pie.",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "pie_for_pip",
+              "stage": "bake"
+            },
+            {
+              "type": "has_item",
+              "item": "pumpkin_pie",
+              "count": 1
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "pumpkin_pie",
+              "count": 1
+            },
+            {
+              "type": "set_flag",
+              "flag": "pie_for_pip_given",
+              "value": true
+            }
+          ],
+          "next": "favour_done"
+        },
+        {
+          "text": "About that pie...",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "pie_for_pip",
+              "stage": "bake"
+            }
+          ],
+          "next": "favour_hint"
+        },
         {
           "text": "Anything else?",
           "next": "more"
@@ -22,6 +93,79 @@
     "more": {
       "speaker": "pip",
       "text": "My brother went all the way down under the old ruin in the South Field. He says one wall down there sounds hollow.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "present": {
+      "speaker": "pip",
+      "text": "I've been saving these for someone nice. Ten whole coins! Don't tell Mum.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "coin",
+          "count": 10
+        },
+        {
+          "type": "set_flag",
+          "flag": "present/pip",
+          "value": true
+        }
+      ],
+      "options": [
+        {
+          "text": "Thank you, Pip.",
+          "next": null
+        }
+      ]
+    },
+    "favour": {
+      "speaker": "pip",
+      "text": "You're nice. I know a secret about the Old Wood, and I'll trade it for a pumpkin pie. A whole one!",
+      "options": [
+        {
+          "text": "I'll bake you one.",
+          "effects": [
+            {
+              "type": "set_quest_stage",
+              "quest": "pie_for_pip",
+              "stage": "bake"
+            }
+          ],
+          "next": "favour_go"
+        },
+        {
+          "text": "Not just now.",
+          "next": "hello"
+        }
+      ]
+    },
+    "favour_go": {
+      "speaker": "pip",
+      "text": "A whole pie! It takes a pumpkin and some wheat. I'll be right here.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_hint": {
+      "speaker": "pip",
+      "text": "A pumpkin pie! A pumpkin and some wheat, baked at a hearth. A whole one, mind.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_done": {
+      "speaker": "pip",
+      "text": "It's still warm! All right, the secret: the old shrine in the Old Wood has a crack in its west wall. Something that goes bang would open it. And here, my pot money.",
       "options": [
         {
           "text": "Goodbye.",

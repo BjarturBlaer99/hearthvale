@@ -182,3 +182,27 @@ func test_bad_friendship_data_is_refused_on_load() -> void:
 	assert_bool(DataRegistry.RULE_SETS.has(DataRegistry.RULES_FRIENDSHIP)).is_true()
 	assert_dict(DataRegistry.get_villager(&"pip")).is_not_empty()
 	assert_array(Array(DataRegistry.errors)).is_empty()
+
+
+func test_three_marks_make_a_friend() -> void:
+	assert_int(_rules.friend_marks).is_equal(3)
+	var friends: Dictionary = {
+		&"pip": {"points": 12, "talked": 1, "gift": 1}, &"wenna": {"points": 20}, &"tilda": {"points": 11},
+		&"guard_rolf": {"points": 0}, &"someone_else": {"points": 20},
+	}
+	var villagers: Array = [&"pip", &"wenna", &"tilda", &"guard_rolf", &"elder_bram"]
+	assert_int(_rules.friends_among(friends, villagers)).override_failure_message("twelve points and twenty; eleven is one short").is_equal(2)
+	assert_int(_rules.friends_among({}, villagers)).is_equal(0)
+	assert_int(_rules.friends_among(friends, [])).is_equal(0)
+	# A save's friends are keyed by text, the game's by name: both are counted.
+	assert_int(_rules.friends_among({"pip": {"points": 12.0}}, ["pip"])).is_equal(1)
+	assert_int(_rules.friends_among({"pip": {"points": 12}}, [&"pip"])).is_equal(1)
+	# The rule is data, and must be a number of marks there can be.
+	assert_int(Friendship.new({"marks": 5, "points_per_mark": 4, "friend_marks": 5}).friends_among(friends, villagers)).is_equal(1)
+	assert_int(Friendship.new({"marks": 5, "points_per_mark": 4}).friend_marks).override_failure_message("left out: only a full friendship counts").is_equal(5)
+	var good: Dictionary = {"marks": 5, "points_per_mark": 4, "talk": 1, "liked_gift": 3, "other_gift": 1, "gift_types": ["food"], "friend_marks": 3}
+	assert_array(Array(Friendship.problems(good, ["food"]))).is_empty()
+	for bad: Variant in [0, 6, 2.5, "three"]:
+		var rules: Dictionary = good.duplicate(true)
+		rules["friend_marks"] = bad
+		assert_array(Array(Friendship.problems(rules, ["food"]))).override_failure_message(str(bad)).contains(["'friend_marks' must be a whole number from 1 to 'marks': the marks that make a friend."])

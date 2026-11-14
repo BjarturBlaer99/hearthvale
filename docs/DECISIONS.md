@@ -517,6 +517,37 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the hero and the trees, not villagers or enemies.
 - 2026-11-12 — **P1c: the ground tiles were not repainted.** They change through the softer palette and the
   outline rule only. The closed canopy inside thick woods is still a flat tile. No normal maps: tried none.
+- 2026-11-14 — **P4d: what friendship opens is in the villager's conversation, not their data file.** The
+  plan had the villager's file say it. But quests have always been offered in conversations, step 4a's
+  `openings` already let one begin elsewhere on a condition, and this way a favour is words and answers like
+  any other. The villager's file stays who they are and what they like.
+- 2026-11-14 — **P4d: the present comes before the favour.** At four marks the present's opening is tried
+  first, since it is given once and done; a favour that is put off is asked at every talk, and would stand in
+  the present's way for good.
+- 2026-11-14 — **P4d: a favour put off leads to the villager's usual talk** ("Not just now."), so the story's
+  own answers (Elder Bram's) are never out of reach behind it.
+- 2026-11-14 — **P4d: berry jam gives 30 energy, not the plan's 20.** Three wild berries eaten raw give 24,
+  and since 3c a dish is worth more than its makings (a test holds every recipe to it). The number is data.
+- 2026-11-14 — **P4d: the condition takes the rules of friendship.** Points are saved; how many make a mark
+  is a rule. An evaluator built from a bare snapshot meets no friendship condition, so a mistake shows as an
+  answer missing, never as one that should not be there. — Alternative: the condition in points, which would
+  put a rule's number into every conversation.
+- 2026-11-14 — **P4d: a recipe known is a flag** (`recipe/<id>`), so teaching needed no change to a save.
+  The effect `teach_recipe` is its own type, so the load check can refuse a recipe that isn't there or one
+  that needs no teaching.
+- 2026-11-14 — **P4d: the effect that adds friendship was not built.** The plan lists it among P4's new
+  effects, but none of the plan's quests or presents gives friendship. `GameState.add_friendship()` is there
+  when content wants it.
+- 2026-11-14 — **P4d: more of Sir Aldric's tale is two lines:** he was a farmer of the valley, and the hero's
+  cottage was his. The plan asked for "more of the tale" and no more; this ties the story's two halves, the
+  keep and the plot. It is new lore, and the user may want other words.
+- 2026-11-14 — **P4d: Pip's secret is where a bomb opens the Old Wood's shrine,** which holds a piece of heart.
+  The wall was there to find since H13; this is a second way to learn of it.
+- 2026-11-14 — **P4d: the ending's three lines follow the old three.** Six lines in one column fit above the
+  menu. A friend is three marks or more: the number is in the friendship rules.
+- 2026-11-14 — **P4d: the whole-story test stands in for the bosses with their flags.** The fights are tested
+  where they are (the keep's and the crypt's suites); played again here they would make one test of two
+  minutes that fails for reasons not its own.
 - 2026-11-13 — **P4c: a villager is known by their conversation.** Their data names it, and the area looks a
   `Villager` up by the conversation it has. No scene was touched and no node got a new property. Two villagers
   may not share one, which the load check refuses.

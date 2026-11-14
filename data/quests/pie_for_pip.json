@@ -1,0 +1,64 @@
+{
+  "id": "pie_for_pip",
+  "title": "A Pie for Pip",
+  "giver": "pip",
+  "start_stage": "bake",
+  "stages": {
+    "bake": {
+      "journal": "Pip will trade a secret about the Old Wood for a whole pumpkin pie. A pie takes a pumpkin and wheat, at the hearth.",
+      "objectives": [
+        {
+          "id": "have",
+          "text": "Bake a pumpkin pie",
+          "complete_when": {
+            "type": "any",
+            "of": [
+              {
+                "type": "has_item",
+                "item": "pumpkin_pie",
+                "count": 1
+              },
+              {
+                "type": "flag",
+                "flag": "pie_for_pip_given",
+                "value": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "bring",
+          "text": "Give it to Pip",
+          "complete_when": {
+            "type": "flag",
+            "flag": "pie_for_pip_given",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "pie_for_pip_given",
+            "value": true
+          },
+          "to": "done"
+        }
+      ]
+    },
+    "done": {
+      "journal": "Pip had his pie and told his secret: the old shrine in the Old Wood has a crack in its west wall, and a bomb would open it. He gave you his pot money, fifteen coins.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "coin",
+          "count": 15
+        },
+        {
+          "type": "complete_quest"
+        }
+      ]
+    }
+  }
+}

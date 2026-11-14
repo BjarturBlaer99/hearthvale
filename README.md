@@ -72,6 +72,11 @@ Beaten enemies sometimes drop hearts or coins.
 - **The hero** (hero pass): a leather vest, wrist guards, a belt pouch and tall boots over the blue tunic, the
   sword on his back until he swings it, and a small pack. He breathes when he stands, leans into a sprint,
   winds up before a swing, flinches when hit and bends his knees landing from a ledge.
+- **What friendship opens** (the pivot, step 4d): at two marks a villager asks a favour or teaches a recipe.
+  Pip wants a pumpkin pie and trades a secret for it; Guard Rolf wants three loaves for the watch; Farmer Oda
+  wants five sheaves of wheat; Elder Bram wants a stew and tells more of Sir Aldric. Wenna teaches berry jam,
+  Tilda carrot cake and Shepherd Edda shepherd's pie. At four marks each gives a present, once. The quest log
+  scrolls now, and the ending counts the days it took, the crops grown and the friends made.
 - **Friendship and gifts** (the pivot, step 4c): talk to a villager and the first talk of the day is worth a
   little friendship. Carry food and their conversation offers "I brought you something.", which opens a list
   of what you carry: one gift a villager a day, and one they like is worth three times another. Four points

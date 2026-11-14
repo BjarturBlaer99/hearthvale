@@ -26,6 +26,10 @@
           "required": ["quest", "status"]
         },
         {
+          "properties": { "type": { "const": "friendship" }, "villager": { "$ref": "#/$defs/id" }, "marks": { "type": "integer", "minimum": 1 } },
+          "required": ["villager", "marks"]
+        },
+        {
           "properties": { "type": { "const": "days_since" }, "flag": { "type": "string", "minLength": 1 }, "days": { "type": "integer", "minimum": 1 } },
           "required": ["flag", "days"]
         },
@@ -65,6 +69,10 @@
         {
           "properties": { "type": { "const": "gift" }, "villager": { "$ref": "#/$defs/id" } },
           "required": ["villager"]
+        },
+        {
+          "properties": { "type": { "const": "teach_recipe" }, "recipe": { "$ref": "#/$defs/id" } },
+          "required": ["recipe"]
         },
         {
           "properties": { "type": { "const": "practise" }, "skill": { "type": "string", "minLength": 1 }, "deed": { "type": "string", "minLength": 1 } },

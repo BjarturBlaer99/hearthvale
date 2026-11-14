@@ -336,6 +336,10 @@ res://
   - The Lost Shuttle: fetch an item lying in the world.
   - Eggs for Tilda: carry an item from one villager to another, then report back.
   - Slimes in the South Field: a bounty. The slimes share a `clear_flag` that the quest waits on.
+  - A Pie for Pip, Rations for the Watch, Seed Stock, The Elder's Supper (P4d): bring a thing to a villager
+    who asked for it as a friend (section 25).
+- **The quest log** shows five quests at a time (`QuestLog.ROWS`): a longer list scrolls with the cursor
+  (`MenuCursor.window_top()`), and the corner says where in it he is.
 - **Quest items** are items of type `quest`. An item's `icon` names its picture (`ItemIcons`); without one, its
   type decides.
 - Dialogue is a JSON node graph (`docs/data/dialogue.example.json`): nodes with speaker, text and options;
@@ -459,7 +463,9 @@ run headless; see CLAUDE.md for the command and gotchas.
     `set_flag` effect. When that conversation closes, the area leaves for the ending screen. The flag is saved,
     so the ending plays once.
   - The screen shows "The End" over the title's picture (the keep's window dark), then `EndingSummary`'s lines
-    (pure): time played, hearts, and quests finished out of those in `data/quests`.
+    (pure): time played, hearts, and quests finished out of those in `data/quests`; and since P4d the days it
+    took, the crops grown (`GameState.tally`) and the friends made out of the villagers in `data/villagers`
+    (`Friendship.friends_among()`: a friend has `friend_marks` marks or more, three in the rules).
   - **Keep exploring** goes back to the area and cell the hero stood on. **Save and go to the title** saves first.
 - **The story** is data only: conversations whose options are gated on the flags `keep_warden_beaten` and
   `crypt_shade_beaten`, and `Signpost` inscriptions in the keep, by the chapel and in the crypt. They are
@@ -987,4 +993,34 @@ P4c (`docs/progress/P4-plan.md` section 12). Talking and gifts make friends of t
   blossoms drawn in code like the hearts.
 - **Tools:** `tools/playtest.gd -- gifts` starts beside Pip with a pack of food; `tools/capture.gd` has the
   actions `gift_talk`, `gift_list`, `gift_given` and `friends_page`.
+
+## 25. What friendship opens
+P4d (`docs/progress/P4-plan.md` section 13). All of it is data; the code is one condition, one effect and a
+field on recipes.
+- **The condition `friendship`** (a villager and so many marks) is met when the hero has that many marks with
+  them. Points are in the snapshot, but how many make a mark is a rule, so a `ConditionEvaluator` is given the
+  rules of friendship: `ConditionEvaluator.for_state(state)` builds one from a state's snapshot and its
+  `friendship()`. `DialogueRunner` and `QuestRunner` use it. Without the rules (a stand-in state) no such
+  condition is met.
+- **Recipes that are taught:** a recipe may say `"taught": true`. `Cooking.known(recipes, flags)` is those
+  known from the start and those whose flag `recipe/<id>` is set; the hearth lists
+  `GameState.known_recipes()`. The effect `teach_recipe` calls `GameState.learn_recipe()`, which sets the flag
+  and emits `EventBus.recipe_learned`; the area shows "New recipe: Berry Jam." as a notice.
+- **A villager's conversation holds what their friendship opens,** as `openings` (section 22) on the
+  condition, in this order after anything of their own (Elder Bram's welcome):
+  - four marks, and the flag `present/<villager>` not set: a node whose `on_enter` gives the present and sets
+    the flag
+  - two marks, and the favour's quest not started: a node that asks it ("Not just now." goes to their usual
+    start); or two marks and the recipe's flag not set: a node whose `on_enter` teaches it
+- **The four favours** are quests of one shape: a first stage with two objectives (have the thing; bring it)
+  that moves on by a flag, and a `done` stage whose `on_enter` gives the reward. The villager's start node has
+  the answer that hands the thing over (it takes it and sets the flag) and one that reminds him what was
+  asked.
+- **Nothing is saved that wasn't before:** a recipe known and a present given are flags, quests are quests.
+- **Tools:** `tools/playtest.gd -- late` is the sixth morning with every villager a gift short of two marks;
+  a scenario may give a `day` and `friends`. `tools/capture.gd` has `friend:<villager>:<points>` (talk to the
+  villager faced with that friendship), `long_log` and `new_dishes`.
+- **The whole story in one test** (`tests/world/whole_story_test.gd`): a new game through every gate to the
+  ending's lines in six days, with a friend made, a favour done and a recipe learned. The two boss fights are
+  stood in for by their flags.
 

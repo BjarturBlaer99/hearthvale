@@ -58,5 +58,5 @@ func test_bad_story_data_is_refused_on_load() -> void:
 	assert_str(errors).contains("dialogue 'mumbler' 'openings' must be an array.")
 	# The game's own data says all three new things, and loads clean.
 	assert_bool(DataRegistry.get_quest(&"a_place_of_your_own").get("auto_start", false)).is_true()
-	assert_int((DataRegistry.get_dialogue(&"elder_bram")["openings"] as Array).size()).is_equal(1)
+	assert_str(str(DataRegistry.get_dialogue(&"elder_bram")["openings"][0]["node"])).override_failure_message("his welcome is the first of his openings").is_equal("welcome")
 	assert_array(Array(DataRegistry.errors)).is_empty()

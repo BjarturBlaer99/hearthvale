@@ -335,3 +335,49 @@ anything but food and crops, more than one gift a day, a calendar or seasons, cr
 - Birthdays, villagers who walk about, gifts of anything but food, more than one gift a day (section 9).
 - Showing on the Friends page what each villager likes: it is found by giving.
 
+## 13. Step 4d — Side quests, recipes and the ending
+
+### What changes
+- **What friendship opens is in each villager's conversation,** as data: an opening (step 4a's `openings`)
+  on a new condition, `friendship` (a villager and so many marks).
+  - **At two marks** four villagers ask a favour and three teach a recipe (the tables in section 5).
+  - **At four marks** each gives a present, once: Elder Bram 40 coins, Wenna 25 coins, Tilda 3 potato seeds,
+    Farmer Oda 3 carrot seeds, Pip 10 coins, Guard Rolf 30 coins, Shepherd Edda 4 wheat seeds.
+- **Four side quests** in the quest format, each "bring this": A Pie for Pip, Rations for the Watch, Seed
+  Stock, The Elder's Supper. A favour can be put off ("Not just now.") and is asked again at the next talk.
+- **Three recipes that are taught:** berry jam (Wenna), carrot cake (Tilda), shepherd's pie (Shepherd Edda). A
+  recipe may now say `"taught": true`; the hearth lists the recipes he knows, and a new effect,
+  `teach_recipe`, teaches one. The six from before are known from the start. Three new dishes, with pictures.
+- **Berry jam gives 30 energy, not the table's 20.** Three wild berries eaten raw give 24, and step 3c's rule
+  (and its test) is that a dish is worth more than its makings.
+- **The quest log scrolls:** five quests show at a time, and with these there can be eight.
+- **The ending screen has three more lines:** the days it took, the crops grown, and friends out of seven (a
+  friend is a villager at three marks or more: a number in the friendship rules).
+- **The whole story in one test,** from the first morning to the ending's lines, through every gate and with
+  a friend made, a favour done and a recipe learned on the way.
+- **Tools:** a playtest scenario on a late day (`-- late`: the sixth morning, the crypt open, every villager
+  one gift short of two marks); new screenshots.
+
+### What does not change
+- The save format: a recipe known and a present given are flags, and quests are saved as quests.
+- The main quest, the three older side quests, and what each villager already says.
+- The rules of friendship from 4c: what a talk and a gift are worth, and one gift a day.
+
+### Done when
+- [x] `friendship`, `teach_recipe` and a recipe's `taught` are checked on load, in the schemas, and unit-tested
+- [x] at two marks each of the four asks their favour, and the quest can be taken, put off, and finished for
+      the reward in section 5's table
+- [x] at two marks each of the three teaches their recipe once, and the hearth then lists it and cooks it
+- [x] at four marks each of the seven gives their present, once
+- [x] the quest log shows more quests than its box holds, five at a time
+- [x] the ending shows the days, the crops grown and the friends made
+- [x] one test carries a new game through the story's gates to the ending's lines
+- [x] all earlier tests pass
+- [ ] (yours) a whole game, played from the title to the ending, in six to eight days with no help
+
+### Not in this step
+- The effect that adds friendship: the plan lists it, but nothing in the plan's content would use it.
+- Friendship written into the villagers' data files as "what it opens": it is in their conversations, where
+  quests have always been offered.
+- More quests, recipes or villagers than section 5's tables; anything in section 9.
+

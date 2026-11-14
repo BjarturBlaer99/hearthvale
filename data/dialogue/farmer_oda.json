@@ -1,6 +1,38 @@
 {
   "id": "farmer_oda",
   "start": "hello",
+  "openings": [
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "farmer_oda",
+          "marks": 4
+        },
+        {
+          "type": "flag",
+          "flag": "present/farmer_oda",
+          "value": false
+        }
+      ],
+      "node": "present"
+    },
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "farmer_oda",
+          "marks": 2
+        },
+        {
+          "type": "quest_status",
+          "quest": "seed_stock",
+          "status": "not_started"
+        }
+      ],
+      "node": "favour"
+    }
+  ],
   "speakers": {
     "oda": "Farmer Oda"
   },
@@ -9,6 +41,45 @@
       "speaker": "oda",
       "text": "My chickens won't keep to the field, and the tall grass by the woods grows back faster than I can cut it.",
       "options": [
+        {
+          "text": "Five sheaves of wheat.",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "seed_stock",
+              "stage": "bring"
+            },
+            {
+              "type": "has_item",
+              "item": "wheat",
+              "count": 5
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "wheat",
+              "count": 5
+            },
+            {
+              "type": "set_flag",
+              "flag": "seed_wheat_given",
+              "value": true
+            }
+          ],
+          "next": "favour_done"
+        },
+        {
+          "text": "About that wheat...",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "seed_stock",
+              "stage": "bring"
+            }
+          ],
+          "next": "favour_hint"
+        },
         {
           "text": "Need a hand with anything?",
           "conditions": [
@@ -113,6 +184,79 @@
     "eggs_done": {
       "speaker": "oda",
       "text": "Good, good. Here: I keep these for tree stumps, but you'll find better use for them. Mind the fuse.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "present": {
+      "speaker": "oda",
+      "text": "You've been a good neighbour. Take these carrot seeds: they came up sweet last year.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "carrot_seeds",
+          "count": 3
+        },
+        {
+          "type": "set_flag",
+          "flag": "present/farmer_oda",
+          "value": true
+        }
+      ],
+      "options": [
+        {
+          "text": "Thank you.",
+          "next": null
+        }
+      ]
+    },
+    "favour": {
+      "speaker": "oda",
+      "text": "I'm short of seed wheat for the next sowing. If you've five sheaves to spare from that plot of yours, I've pumpkin seed I'd trade for them.",
+      "options": [
+        {
+          "text": "I'll bring five.",
+          "effects": [
+            {
+              "type": "set_quest_stage",
+              "quest": "seed_stock",
+              "stage": "bring"
+            }
+          ],
+          "next": "favour_go"
+        },
+        {
+          "text": "Not just now.",
+          "next": "hello"
+        }
+      ]
+    },
+    "favour_go": {
+      "speaker": "oda",
+      "text": "Five sheaves. Any you've grown will do.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_hint": {
+      "speaker": "oda",
+      "text": "Five sheaves of wheat. Tilda sells the seed, and it's five days in the ground.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_done": {
+      "speaker": "oda",
+      "text": "Good heavy heads, these. Here's the pumpkin seed. Give them eight days and plenty of water.",
       "options": [
         {
           "text": "Goodbye.",

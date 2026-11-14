@@ -236,7 +236,11 @@ The proposal (`docs/progress/P4-plan.md`) was approved as written on 2026-11-13.
   (cooking: dishes richer). Shown in the pause menu.
 - **4c — Friendship and gifts.** *Built 2026-11-13.* Villagers as data, a point for the day's first talk,
   one gift a villager a day, five marks, and a Friends page in the pause menu.
-- **4d — Side quests, recipes and the ending.**
+- **4d — Side quests, recipes and the ending.** *Built 2026-11-14.* Four favours and three recipes at two
+  marks, a present at four, a quest log that scrolls, and the ending's three new lines.
+
+All four steps are built. What is left of P4 is its "done when", which only a player can meet: a whole game
+played from the title to the ending.
 
 ---
 

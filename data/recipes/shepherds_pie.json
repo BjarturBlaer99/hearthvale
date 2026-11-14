@@ -1,0 +1,10 @@
+{
+	"id": "shepherds_pie",
+	"taught": true,
+	"makes": { "item": "shepherds_pie", "count": 1 },
+	"needs": [
+		{ "item": "potato", "count": 1 },
+		{ "item": "turnip", "count": 1 },
+		{ "item": "mushroom", "count": 1 }
+	]
+}

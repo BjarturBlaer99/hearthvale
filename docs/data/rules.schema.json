@@ -182,7 +182,8 @@
             "type": "array", "minItems": 1,
             "items": { "type": "string" },
             "description": "The item types that can be given (types that items in data/items have)."
-          }
+          },
+          "friend_marks": { "type": "integer", "minimum": 1, "description": "The marks at which a villager counts as a friend on the ending screen. At most marks; left out, only a full friendship counts." }
         }
       }
     }

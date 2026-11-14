@@ -1,0 +1,6 @@
+{
+  "items": [
+    { "id": "loaf", "name": "Loaf", "type": "food", "stats": { "energy": 10 } },
+    { "id": "flour", "name": "Flour", "type": "food", "stats": { "energy": 1 } }
+  ]
+}

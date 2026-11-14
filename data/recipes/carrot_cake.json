@@ -1,0 +1,9 @@
+{
+	"id": "carrot_cake",
+	"taught": true,
+	"makes": { "item": "carrot_cake", "count": 1 },
+	"needs": [
+		{ "item": "carrot", "count": 2 },
+		{ "item": "wheat", "count": 1 }
+	]
+}

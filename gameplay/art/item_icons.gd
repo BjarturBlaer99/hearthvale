@@ -15,6 +15,7 @@ const FRAMES: Dictionary = {
 	&"turnip": 22, &"carrot": 23, &"wheat": 24, &"potato": 25, &"pumpkin": 26,
 	&"turnip_seeds": 27, &"carrot_seeds": 28, &"wheat_seeds": 29, &"potato_seeds": 30, &"pumpkin_seeds": 31,
 	&"roast_turnip": 32, &"soup": 33, &"stew": 34, &"pie": 35,
+	&"jam": 36, &"cake": 37, &"shepherds_pie": 38,
 }
 
 

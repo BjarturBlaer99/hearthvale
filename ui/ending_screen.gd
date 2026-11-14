@@ -36,11 +36,18 @@ func _ready() -> void:
 	_note.text = ""
 
 
-## The game just finished, in lines: time played, hearts, quests finished.
+## The game just finished, in lines: time played, hearts, quests finished, and the days it
+## took, the crops grown and the friends made.
 static func summary_lines() -> PackedStringArray:
 	var quest_ids: Array[StringName] = DataRegistry.ids(&"quests")
+	var villager_ids: Array[StringName] = DataRegistry.ids(&"villagers")
 	return EndingSummary.lines(GameState.format_play_time(GameState.play_time), GameState.hearts_max,
-		EndingSummary.quests_done(quest_ids, GameState.quests, GameState.flags), quest_ids.size())
+		EndingSummary.quests_done(quest_ids, GameState.quests, GameState.flags), quest_ids.size(), {
+			"days": GameState.day,
+			"crops": GameState.tally_of(GameState.CROPS_PICKED),
+			"friends": GameState.friendship().friends_among(GameState.friends, villager_ids),
+			"villagers": villager_ids.size(),
+		})
 
 
 func shown_stats() -> String:

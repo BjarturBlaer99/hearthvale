@@ -111,3 +111,29 @@ func test_a_recipes_problems_are_named() -> void:
 	assert_str("\n".join(Cooking.problems({"id": "x", "makes": {"item": "tea"}, "needs": [{"item": "dew", "count": 2}]}, known))).contains("unknown item id 'dew'")
 	assert_str("\n".join(Cooking.problems({"id": "x", "makes": {"item": "tea"}, "needs": [{"item": "blossom", "count": 0}]}, known))).contains("1 or more of 'blossom'")
 	assert_str("\n".join(Cooking.problems({"id": "x", "makes": {"item": "tea"}, "needs": [{"item": "blossom"}]}, known))).contains("an 'item' and a 'count'")
+
+
+func test_a_recipe_that_is_taught_is_known_only_once_its_flag_is_set() -> void:
+	var tea: Dictionary = {"id": "tea", "makes": {"item": "blossom_tea"}, "needs": [{"item": "cherry_blossom", "count": 3}]}
+	var jam: Dictionary = {"id": "jam", "taught": true, "makes": {"item": "berry_jam"}, "needs": [{"item": "wild_berries", "count": 3}]}
+	var cake: Dictionary = {"id": "cake", "taught": true, "makes": {"item": "carrot_cake"}, "needs": [{"item": "carrot", "count": 2}]}
+	assert_bool(Cooking.is_taught(tea)).is_false()
+	assert_bool(Cooking.is_taught(jam)).is_true()
+	assert_bool(Cooking.is_taught({"id": "odd", "taught": "yes"})).override_failure_message("only a plain yes").is_false()
+	assert_that(Cooking.known_flag(&"jam")).is_equal(&"recipe/jam")
+	var recipes: Array = [tea, jam, cake, "not a recipe"]
+	assert_array(Cooking.known(recipes, {})).override_failure_message("from the start: only what needs no teaching").is_equal([tea])
+	assert_array(Cooking.known(recipes, {&"recipe/cake": true})).override_failure_message("in the data's order").is_equal([tea, cake])
+	assert_array(Cooking.known(recipes, {"recipe/jam": true, "recipe/cake": true})).override_failure_message("a save's flags, keyed by text").is_equal([tea, jam, cake])
+	assert_array(Cooking.known(recipes, {&"recipe/jam": false, &"recipe/cake": "soon"})).is_equal([tea])
+	# The hearth's list is built from what he knows.
+	var names: Dictionary = {"blossom_tea": {"name": "Tea"}, "berry_jam": {"name": "Jam"}, "cherry_blossom": {"name": "Blossoms"}, "wild_berries": {"name": "Berries"}}
+	var answers: Array = Cooking.dialogue(Cooking.known(recipes, {&"recipe/jam": true}), names)["nodes"][Cooking.ASK]["options"]
+	assert_bool(answers.any(func(answer: Dictionary) -> bool: return str(answer["text"]).begins_with("Jam"))).is_true()
+	assert_bool(answers.any(func(answer: Dictionary) -> bool: return str(answer["text"]).begins_with("carrot_cake"))).is_false()
+	# 'taught' must be a yes or a no.
+	var known: Callable = func(_id: String) -> bool: return true
+	assert_array(Array(Cooking.problems(jam, known))).is_empty()
+	var odd: Dictionary = jam.duplicate(true)
+	odd["taught"] = "yes"
+	assert_array(Array(Cooking.problems(odd, known))).contains(["'taught' must be true or false."])

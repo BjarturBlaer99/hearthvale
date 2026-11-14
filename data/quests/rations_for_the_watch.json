@@ -1,0 +1,69 @@
+{
+  "id": "rations_for_the_watch",
+  "title": "Rations for the Watch",
+  "giver": "guard_rolf",
+  "start_stage": "bring",
+  "stages": {
+    "bring": {
+      "journal": "Guard Rolf asked for three loaves of bread for the watch. Tilda sells bread, and two wheat bake a loaf at the hearth.",
+      "objectives": [
+        {
+          "id": "have",
+          "text": "Have three loaves of bread",
+          "complete_when": {
+            "type": "any",
+            "of": [
+              {
+                "type": "has_item",
+                "item": "bread",
+                "count": 3
+              },
+              {
+                "type": "flag",
+                "flag": "rations_given",
+                "value": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "bring",
+          "text": "Bring them to Guard Rolf",
+          "complete_when": {
+            "type": "flag",
+            "flag": "rations_given",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "rations_given",
+            "value": true
+          },
+          "to": "done"
+        }
+      ]
+    },
+    "done": {
+      "journal": "The watch has its rations. Guard Rolf gave you ten arrows and twenty coins.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "arrow",
+          "count": 10
+        },
+        {
+          "type": "give_item",
+          "item": "coin",
+          "count": 20
+        },
+        {
+          "type": "complete_quest"
+        }
+      ]
+    }
+  }
+}

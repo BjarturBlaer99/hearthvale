@@ -1,37 +1,152 @@
 {
   "id": "shop_tilda",
   "start": "greet",
-  "speakers": { "tilda": "Tilda" },
+  "openings": [
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "tilda",
+          "marks": 4
+        },
+        {
+          "type": "flag",
+          "flag": "present/tilda",
+          "value": false
+        }
+      ],
+      "node": "present"
+    },
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "tilda",
+          "marks": 2
+        },
+        {
+          "type": "flag",
+          "flag": "recipe/carrot_cake",
+          "value": false
+        }
+      ],
+      "node": "teach"
+    }
+  ],
+  "speakers": {
+    "tilda": "Tilda"
+  },
   "nodes": {
     "greet": {
       "speaker": "tilda",
       "text": "Seeds, bread, arrows and bombs, the best in Hearthvale. Well, the only ones. And I'll buy what you grow.",
       "options": [
-        { "text": "Eggs from Farmer Oda.",
+        {
+          "text": "Eggs from Farmer Oda.",
           "conditions": [
-            { "type": "quest_stage", "quest": "eggs_for_tilda", "stage": "deliver" },
-            { "type": "has_item", "item": "egg_basket", "count": 1 }
+            {
+              "type": "quest_stage",
+              "quest": "eggs_for_tilda",
+              "stage": "deliver"
+            },
+            {
+              "type": "has_item",
+              "item": "egg_basket",
+              "count": 1
+            }
           ],
           "effects": [
-            { "type": "take_item", "item": "egg_basket", "count": 1 },
-            { "type": "set_flag", "flag": "eggs_delivered", "value": true }
+            {
+              "type": "take_item",
+              "item": "egg_basket",
+              "count": 1
+            },
+            {
+              "type": "set_flag",
+              "flag": "eggs_delivered",
+              "value": true
+            }
           ],
-          "next": "eggs" },
-        { "text": "Let me see what you sell.",
-          "effects": [ { "type": "shop", "shop": "tilda", "mode": "buy" } ],
-          "next": null },
-        { "text": "I have crops to sell.",
-          "effects": [ { "type": "shop", "shop": "tilda", "mode": "sell" } ],
-          "next": null },
-        { "text": "Just looking.", "next": null }
+          "next": "eggs"
+        },
+        {
+          "text": "Let me see what you sell.",
+          "effects": [
+            {
+              "type": "shop",
+              "shop": "tilda",
+              "mode": "buy"
+            }
+          ],
+          "next": null
+        },
+        {
+          "text": "I have crops to sell.",
+          "effects": [
+            {
+              "type": "shop",
+              "shop": "tilda",
+              "mode": "sell"
+            }
+          ],
+          "next": null
+        },
+        {
+          "text": "Just looking.",
+          "next": null
+        }
       ]
     },
     "eggs": {
       "speaker": "tilda",
       "text": "Oh, lovely, and not one cracked! Tell Oda I'll settle up on market day.",
       "options": [
-        { "text": "Something else.", "next": "greet" },
-        { "text": "Goodbye.", "next": null }
+        {
+          "text": "Something else.",
+          "next": "greet"
+        },
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "present": {
+      "speaker": "tilda",
+      "text": "Don't tell the others I give anything away. Three seed potatoes, my best.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "potato_seeds",
+          "count": 3
+        },
+        {
+          "type": "set_flag",
+          "flag": "present/tilda",
+          "value": true
+        }
+      ],
+      "options": [
+        {
+          "text": "Thank you, Tilda.",
+          "next": null
+        }
+      ]
+    },
+    "teach": {
+      "speaker": "tilda",
+      "text": "A good customer and a good friend. I'll tell you what I sell out of first on market day: carrot cake. Two carrots and a sheaf of wheat. Bake one yourself.",
+      "on_enter": [
+        {
+          "type": "teach_recipe",
+          "recipe": "carrot_cake"
+        }
+      ],
+      "options": [
+        {
+          "text": "Thank you.",
+          "next": null
+        }
       ]
     }
   }

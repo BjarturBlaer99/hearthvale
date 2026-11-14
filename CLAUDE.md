@@ -15,10 +15,11 @@ pixel-art look are added in phases. Read these before writing any code:
 **The pivot** in `docs/ROADMAP.md` (P1–P4), in order: **P1** the visual overhaul (six steps, 1a–1f), **P2**
 energy, food and time, **P3** farming, **P4** RPG and story. Do not build anything outside the current step, and
 ask the user before adding anything the roadmap doesn't list. Scope creep is the main risk on this project.
-**P1, P2 and P3 are built** (P3 finished on 2026-11-13). **P4 is under way:** the user approved its proposal as
-written on 2026-11-13 (`docs/progress/P4-plan.md`: ten decisions, four steps, each with its own list). **4a
-(the story over days), 4b (skills) and 4c (friendship and gifts) are built;** 4d (side quests, recipes, the
-ending) is the last, started by the user.
+**P1, P2 and P3 are built** (P3 finished on 2026-11-13). **P4's four steps are built** (2026-11-14; the user approved its
+proposal as written, `docs/progress/P4-plan.md`: ten decisions, four steps, each with its own list): 4a the
+story over days, 4b skills, 4c friendship and gifts, 4d side quests, recipes and the ending. **What is left is
+P4's "done when", which is the user's: a whole game played from the title to the ending.** Nothing further is
+planned: ask before building anything more.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -101,7 +102,7 @@ godot --headless --path . --quit-after 30
 godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
-# Start partway through to try one part by hand (scenarios in the script: gifts, bram, gate, rest, farm, market, kitchen, home, village,
+# Start partway through to try one part by hand (scenarios in the script: late, gifts, bram, gate, rest, farm, market, kitchen, home, village,
 # warden, crypt, shade, ending). An hour after the name starts at that time of day, energy=<n> with that much energy,
 # and skills=<level> with every skill at that level.
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
@@ -272,4 +273,12 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   `AreaController.talk_to()` to a copy of the conversation: **never write it into a dialogue file.** It shows
   only when a gift can be given today and he carries food or an ingredient, so **a test that lists a
   villager's answers with food in the pack sees it.** The pause menu has six lines now (Friends).
+- **What friendship opens (P4d):** it is in each villager's conversation, as `openings` on the condition
+  `friendship` (a villager, so many marks): a present at four marks (the flag `present/<villager>`), and at
+  two a favour (a quest) or a recipe. **A new favour, recipe or present is data only.** A recipe marked
+  `"taught": true` is not known until the effect `teach_recipe` sets its flag (`recipe/<id>`); the hearth
+  lists `GameState.known_recipes()`. Build a `ConditionEvaluator` with `ConditionEvaluator.for_state(state)`,
+  or friendship conditions are never met. The quest log shows five quests at a time (`shown_lines()`; all of
+  them are `all_lines()`). **A test that talks to a villager at two or four marks gets their favour, lesson
+  or present first:** end it, or set the quest, the recipe's flag or the present's flag beforehand.
 

@@ -201,6 +201,30 @@ func collapse() -> int:
 	return lost
 
 
+# --- Recipes ---------------------------------------------------------------
+
+## Whether the hero knows the recipe `recipe_id`: one known from the start, or one he was taught.
+func knows_recipe(recipe_id: StringName) -> bool:
+	var recipe: Dictionary = DataRegistry.get_recipe(recipe_id)
+	return not recipe.is_empty() and (not Cooking.is_taught(recipe) or get_flag(Cooking.known_flag(recipe_id)) == true)
+
+
+## The recipes the hero knows (data entries), in the data's order: what the hearth lists.
+func known_recipes() -> Array[Dictionary]:
+	return Cooking.known(DataRegistry.entries(&"recipes"), flags)
+
+
+## The hero is taught the recipe `recipe_id` (the `teach_recipe` effect). Returns whether he
+## learned it: false for no such recipe, or one he knows already. Learning is said
+## (EventBus.recipe_learned).
+func learn_recipe(recipe_id: StringName) -> bool:
+	if DataRegistry.get_recipe(recipe_id).is_empty() or knows_recipe(recipe_id):
+		return false
+	set_flag(Cooking.known_flag(recipe_id), true)
+	EventBus.recipe_learned.emit(recipe_id)
+	return true
+
+
 # --- Skills ----------------------------------------------------------------
 
 ## The rules of the hero's skills, from data (data/rules/skills.json).

@@ -95,3 +95,25 @@ func test_days_since_needs_the_flag_to_be_true_and_takes_an_undated_one_as_long_
 	# A state that keeps no days at all (a stand-in) is on day 1.
 	var bare: ConditionEvaluator = ConditionEvaluator.new({"flags": {"done": true}})
 	assert_bool(bare.is_met({"type": "days_since", "flag": "done", "days": 1})).is_true()
+
+
+func test_friendship_asks_for_so_many_marks() -> void:
+	var rules: Friendship = Friendship.new({"marks": 5, "points_per_mark": 4})
+	var state: Dictionary = {"friends": {"pip": {"points": 9, "talked": 2, "gift": 2}, "wenna": {"points": 3}, "odd": "a friend"}}
+	var check: ConditionEvaluator = ConditionEvaluator.new(state, rules)
+	assert_int(check.friend_marks("pip")).is_equal(2)
+	assert_bool(check.is_met({"type": "friendship", "villager": "pip", "marks": 1})).is_true()
+	assert_bool(check.is_met({"type": "friendship", "villager": "pip", "marks": 2})).is_true()
+	assert_bool(check.is_met({"type": "friendship", "villager": "pip", "marks": 3})).override_failure_message("nine points are two marks").is_false()
+	assert_bool(check.is_met({"type": "friendship", "villager": "wenna", "marks": 1})).override_failure_message("three points are no mark yet").is_false()
+	assert_bool(check.is_met({"type": "friendship", "villager": "stranger", "marks": 1})).is_false()
+	assert_int(check.friend_marks("odd")).override_failure_message("a garbled record is no friend").is_equal(0)
+	# It can be turned round, as any condition can: "not yet two marks".
+	assert_bool(check.is_met({"type": "not", "condition": {"type": "friendship", "villager": "wenna", "marks": 2}})).is_true()
+
+
+func test_without_the_rules_of_friendship_no_marks_are_counted() -> void:
+	var state: Dictionary = {"friends": {"pip": {"points": 20}}}
+	assert_bool(ConditionEvaluator.new(state).is_met({"type": "friendship", "villager": "pip", "marks": 1})).override_failure_message("unmet, not wrongly met").is_false()
+	assert_int(ConditionEvaluator.new(state).friend_marks("pip")).is_equal(0)
+	assert_bool(ConditionEvaluator.new({}, Friendship.new({"marks": 5, "points_per_mark": 4})).is_met({"type": "friendship", "villager": "pip", "marks": 1})).override_failure_message("a state with no friends at all").is_false()

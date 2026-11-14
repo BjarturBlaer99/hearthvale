@@ -1,0 +1,1 @@
+{ "id": "roll", "taught": true, "makes": { "item": "loaf", "count": 1 }, "needs": [{ "item": "flour", "count": 1 }] }

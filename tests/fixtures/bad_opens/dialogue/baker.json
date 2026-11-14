@@ -1,0 +1,25 @@
+{
+  "id": "baker",
+  "start": "hello",
+  "openings": [
+    { "conditions": [{ "type": "friendship", "villager": "baker", "marks": 2 }], "node": "lesson" },
+    { "conditions": [{ "type": "friendship", "villager": "miller", "marks": 2 }], "node": "hello" },
+    { "conditions": [{ "type": "friendship", "villager": "baker", "marks": 6 }], "node": "hello" },
+    { "conditions": [{ "type": "friendship", "villager": "baker", "marks": "many" }], "node": "hello" },
+    { "conditions": [{ "type": "friendship", "villager": "baker" }], "node": "hello" }
+  ],
+  "nodes": {
+    "hello": { "speaker": "", "text": "Hello.", "options": [] },
+    "lesson": {
+      "speaker": "",
+      "text": "A lesson.",
+      "on_enter": [
+        { "type": "teach_recipe", "recipe": "roll" },
+        { "type": "teach_recipe", "recipe": "loaf" },
+        { "type": "teach_recipe", "recipe": "cake" },
+        { "type": "teach_recipe" }
+      ],
+      "options": []
+    }
+  }
+}

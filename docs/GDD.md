@@ -127,6 +127,11 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 | Mushroom soup | 2 mushrooms, 1 potato | 35 | half |
 | Vegetable stew | potato, carrot, turnip | 60 | one |
 | Pumpkin pie | 1 pumpkin, 1 wheat | 80 | two |
+| Berry jam *(taught by Wenna)* | 3 wild berries | 30 | |
+| Carrot cake *(taught by Tilda)* | 2 carrots, 1 wheat | 50 | half |
+| Shepherd's pie *(taught by Shepherd Edda)* | potato, turnip, mushroom | 70 | one |
+
+The last three are not known from the start: a villager teaches each as a friend (§10).
 
 ## 7. Farming *(P3)*
 *(Built: the plot, the hoe and the watering can in step 3a; seeds and crops in 3b; buying, selling and the
@@ -193,7 +198,21 @@ Enemies sometimes drop hearts or coins.
   - Food and what is cooked with can be given, and nothing else. With something to give, a villager's
     conversation offers "I brought you something.", which opens a list of what he carries.
   - A mark gained is said once; the pause menu's Friends page shows every villager's marks.
-  - What friendship opens (small quests, recipes, a present) is step 4d.
+  - **At two marks** a villager asks a favour or teaches a recipe *(P4d)*:
+
+| Villager | At two marks | Gives |
+|---|---|---|
+| Pip | A Pie for Pip: 1 pumpkin pie | 15 coins, and a secret about the Old Wood's shrine |
+| Guard Rolf | Rations for the Watch: 3 bread | 10 arrows and 20 coins |
+| Farmer Oda | Seed Stock: 5 wheat | 3 pumpkin seeds |
+| Elder Bram | The Elder's Supper: 1 vegetable stew | 30 coins, and more of Sir Aldric's tale |
+| Wenna | teaches berry jam | |
+| Tilda | teaches carrot cake | |
+| Shepherd Edda | teaches shepherd's pie | |
+
+  - **At four marks** each gives a present, once: Elder Bram 40 coins, Wenna 25 coins, Tilda 3 potato seeds,
+    Farmer Oda 3 carrot seeds, Pip 10 coins, Guard Rolf 30 coins, Shepherd Edda 4 wheat seeds. No hearts.
+  - A favour can be put off and is asked again at the next talk.
 
 | Villager | Likes |
 |---|---|
@@ -227,6 +246,12 @@ is in the quest log from the first morning. Its words say where to go at each st
 6. Go down into the crypt.
 
 The aim is the main story in six to eight in-game days. Whether it runs to that is for a playtest.
+
+**The ending** *(P4d)* says how long the game took, the hearts won and the quests finished, and then the days
+it took, the crops grown, and how many of the seven villagers are friends (three marks or more).
+
+**More of Sir Aldric** *(P4d)*: for his supper Elder Bram tells that Aldric was a farmer of the valley before
+he took up the sword, and that the hero's cottage was his.
 
 ## 12. Tone & look
 Warm and cosy: a storybook countryside in modern pixel art. Green meadows, cherry blossom, half-timbered houses

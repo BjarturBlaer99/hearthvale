@@ -1,0 +1,64 @@
+{
+  "id": "seed_stock",
+  "title": "Seed Stock",
+  "giver": "farmer_oda",
+  "start_stage": "bring",
+  "stages": {
+    "bring": {
+      "journal": "Farmer Oda needs five sheaves of wheat for seed, and will trade pumpkin seeds for them. Wheat takes five days to grow.",
+      "objectives": [
+        {
+          "id": "have",
+          "text": "Have five wheat",
+          "complete_when": {
+            "type": "any",
+            "of": [
+              {
+                "type": "has_item",
+                "item": "wheat",
+                "count": 5
+              },
+              {
+                "type": "flag",
+                "flag": "seed_wheat_given",
+                "value": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "bring",
+          "text": "Bring it to Farmer Oda",
+          "complete_when": {
+            "type": "flag",
+            "flag": "seed_wheat_given",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "seed_wheat_given",
+            "value": true
+          },
+          "to": "done"
+        }
+      ]
+    },
+    "done": {
+      "journal": "Farmer Oda has his seed wheat. He gave you three pumpkin seeds.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "pumpkin_seeds",
+          "count": 3
+        },
+        {
+          "type": "complete_quest"
+        }
+      ]
+    }
+  }
+}

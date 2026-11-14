@@ -225,6 +225,7 @@ func _ready() -> void:
 	EventBus.hit_stop.connect(hit_stop)
 	EventBus.quest_announced.connect(_on_quest_announced)
 	EventBus.skill_rose.connect(_on_skill_rose)
+	EventBus.recipe_learned.connect(_on_recipe_learned)
 	for boss: Enemy in enemies():
 		if boss is ArenaBoss:
 			(boss as ArenaBoss).calm_music = music
@@ -1409,6 +1410,13 @@ func _exit_tree() -> void:
 
 func _on_quest_announced(quest_id: StringName, what: StringName) -> void:
 	hud.show_notice(Quests.announcement(quest_id, what))
+
+
+## A recipe learned: it is said at the top of the screen, with the chime of a quest's news.
+func _on_recipe_learned(recipe_id: StringName) -> void:
+	var makes: Dictionary = DataRegistry.get_recipe(recipe_id).get("makes", {})
+	EventBus.sound.emit(&"quest")
+	hud.show_notice(Cooking.LEARNED_WORDS % str(DataRegistry.get_item(StringName(str(makes.get("item", "")))).get("name", recipe_id)))
 
 
 ## A skill rose: it is said at the top of the screen, with a chime.

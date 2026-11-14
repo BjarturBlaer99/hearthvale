@@ -8,6 +8,8 @@ extends RefCounted
 ## ones in data/dialogue, so the dialogue box and the shared conditions and effects do the rest:
 ## an answer for each dish, which cooks it if the hero has the makings and room for it, and
 ## says so if he hasn't. Cooking a dish is practice at cooking (P4b: the `practise` effect).
+## A recipe marked `"taught": true` is not known from the start: someone teaches it (P4d: the
+## `teach_recipe` effect), which sets its flag, and the hearth lists only what he knows.
 
 const ASK: String = "ask"
 const LACKING: String = "lacking"
@@ -18,6 +20,8 @@ const COOKED_WORDS: String = "You make %s."
 const MORE_WORDS: String = "Cook something else."
 const DONE_WORDS: String = "That will do."
 const LEAVE_WORDS: String = "Nothing now."
+## What learning a recipe is announced with: the dish's name.
+const LEARNED_WORDS: String = "New recipe: %s."
 
 
 ## Whether `recipe` can be cooked with what `held` says the hero has (item id -> count).
@@ -26,6 +30,31 @@ static func can_cook(recipe: Dictionary, held: Dictionary) -> bool:
 		if int(held.get(str(need["item"]), 0)) < int(need["count"]):
 			return false
 	return not (recipe.get("needs", []) as Array).is_empty()
+
+
+## Whether `recipe` has to be taught before the hearth lists it.
+static func is_taught(recipe: Dictionary) -> bool:
+	var marked: Variant = recipe.get("taught", false)
+	return typeof(marked) == TYPE_BOOL and marked
+
+
+## The flag that says the hero knows the recipe `recipe_id`.
+static func known_flag(recipe_id: StringName) -> StringName:
+	return StringName("recipe/%s" % recipe_id)
+
+
+## Those of `recipes` the hero knows, in the order given: the ones known from the start, and
+## the taught ones whose flag `flags` (name -> value) has set.
+static func known(recipes: Array, flags: Dictionary) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for recipe: Variant in recipes:
+		if typeof(recipe) != TYPE_DICTIONARY:
+			continue
+		var flag: StringName = known_flag(StringName(str((recipe as Dictionary).get("id", ""))))
+		var learned: Variant = flags.get(flag, flags.get(String(flag), false))
+		if not is_taught(recipe) or (typeof(learned) == TYPE_BOOL and learned):
+			out.append(recipe)
+	return out
 
 
 ## Whether `item_id` is a dish: something one of `recipes` makes.
@@ -91,6 +120,8 @@ static func problems(recipe: Dictionary, known: Callable) -> PackedStringArray:
 			out.append("'makes' names an unknown item id '%s'." % makes["item"])
 		if int((makes as Dictionary).get("count", 1)) < 1:
 			out.append("'makes' 'count' must be 1 or more.")
+	if recipe.has("taught") and typeof(recipe["taught"]) != TYPE_BOOL:
+		out.append("'taught' must be true or false.")
 	var needs: Variant = recipe.get("needs")
 	if typeof(needs) != TYPE_ARRAY or (needs as Array).is_empty():
 		out.append("'needs' must list one thing or more that the recipe uses.")

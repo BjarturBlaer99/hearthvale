@@ -32,6 +32,9 @@
     { "id": "roast_turnip", "name": "Roast Turnip", "type": "food", "icon": "roast_turnip", "stackable": true, "max_stack": 10, "stats": { "energy": 22 } },
     { "id": "mushroom_soup", "name": "Mushroom Soup", "type": "food", "icon": "soup", "stackable": true, "max_stack": 10, "stats": { "energy": 35, "hearts": 0.5 } },
     { "id": "vegetable_stew", "name": "Vegetable Stew", "type": "food", "icon": "stew", "stackable": true, "max_stack": 10, "stats": { "energy": 60, "hearts": 1 } },
-    { "id": "pumpkin_pie", "name": "Pumpkin Pie", "type": "food", "icon": "pie", "stackable": true, "max_stack": 10, "stats": { "energy": 80, "hearts": 2 } }
+    { "id": "pumpkin_pie", "name": "Pumpkin Pie", "type": "food", "icon": "pie", "stackable": true, "max_stack": 10, "stats": { "energy": 80, "hearts": 2 } },
+    { "id": "berry_jam", "name": "Berry Jam", "type": "food", "icon": "jam", "stackable": true, "max_stack": 10, "stats": { "energy": 30 } },
+    { "id": "carrot_cake", "name": "Carrot Cake", "type": "food", "icon": "cake", "stackable": true, "max_stack": 10, "stats": { "energy": 50, "hearts": 0.5 } },
+    { "id": "shepherds_pie", "name": "Shepherd's Pie", "type": "food", "icon": "shepherds_pie", "stackable": true, "max_stack": 10, "stats": { "energy": 70, "hearts": 1 } }
   ]
 }

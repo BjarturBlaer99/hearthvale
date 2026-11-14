@@ -85,7 +85,7 @@ func objectives(quest_id: StringName) -> Array[Dictionary]:
 	var listed: Variant = _stage_data(quest_id, stage(quest_id)).get("objectives", [])
 	if typeof(listed) != TYPE_ARRAY:
 		return out
-	var evaluator: ConditionEvaluator = ConditionEvaluator.new(_state.call(&"to_dict"))
+	var evaluator: ConditionEvaluator = ConditionEvaluator.for_state(_state)
 	for objective: Variant in listed:
 		if typeof(objective) != TYPE_DICTIONARY:
 			continue
@@ -154,7 +154,7 @@ func _step() -> bool:
 		if typeof(transitions) != TYPE_ARRAY or (transitions as Array).is_empty():
 			continue
 		if evaluator == null:
-			evaluator = ConditionEvaluator.new(_state.call(&"to_dict"))
+			evaluator = ConditionEvaluator.for_state(_state)
 		for transition: Variant in transitions:
 			if typeof(transition) == TYPE_DICTIONARY and evaluator.is_met((transition as Dictionary).get("when", {})):
 				_state.call(&"set_quest_stage", quest_id, StringName(str((transition as Dictionary).get("to", ""))))

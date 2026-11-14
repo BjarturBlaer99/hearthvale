@@ -28,7 +28,10 @@ extends SceneTree
 ## item menu of a hero at the top level of cooking, with dishes and plain food. With food in
 ## his pack before Pip: "gift_talk" shows the answer that gives, "gift_list" the list it
 ## opens, and "gift_given" a gift Pip likes, which makes a first mark. "friends_page" opens the
-## pause menu's Friends page with friendships at different marks.
+## pause menu's Friends page with friendships at different marks. "friend:<villager>:<points>"
+## talks to whoever the hero faces with that much friendship behind him (a favour asked, a
+## recipe taught, a present); "long_log" opens the quest log with eight quests, scrolled;
+## "new_dishes" opens the item menu with the three dishes that are taught.
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -165,6 +168,11 @@ const SHOTS: Array = [
 	["133_the_gift_list", &"village", Vector2i(27, 25), Vector2.UP, 0, "gift_list"],
 	["134_a_gift_pip_likes", &"village", Vector2i(27, 25), Vector2.UP, 0, "gift_given"],
 	["135_the_friends_page", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "friends_page"],
+	["136_pip_asks_a_favour", &"village", Vector2i(27, 25), Vector2.UP, 0, "friend:pip:8"],
+	["137_wenna_teaches_a_recipe", &"weaver_house", Vector2i(7, 4), Vector2.UP, 0, "friend:wenna:8"],
+	["138_a_present_from_tilda", &"shop", Vector2i(5, 4), Vector2.UP, 0, "friend:tilda:16"],
+	["139_eight_quests_in_the_log", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "long_log"],
+	["140_the_dishes_that_are_taught", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "new_dishes"],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -204,6 +212,12 @@ func _capture() -> void:
 		if shot[5] == "tale":
 			game_state.call(&"set_flag", &"keep_warden_beaten", true)
 		if shot[1] == &"ending":
+			# A game of seven days: thirty-one crops picked, three friends made.
+			for day: int in 6:
+				game_state.call(&"start_next_day")
+			game_state.call(&"add_tally", &"crops_picked", 31)
+			for friend: Array in [[&"pip", 14], [&"wenna", 20], [&"elder_bram", 12], [&"tilda", 7]]:
+				game_state.call(&"add_friendship", friend[0], friend[1])
 			game_state.call(&"add_play_time", 4031.0)
 			game_state.call(&"add_heart_container")
 			game_state.call(&"add_heart_container")
@@ -291,6 +305,13 @@ func _capture() -> void:
 		if shot[5] in ["gift_talk", "gift_list", "gift_given"]:
 			for item: Array in [[&"wild_berries", 4], [&"bread", 2], [&"cherry_blossom", 3], [&"turnip", 2], [&"pumpkin_pie", 1], [&"carrot", 2]]:
 				game_state.call(&"add_item", item[0], item[1])
+		if str(shot[5]).begins_with("friend:"):
+			var parts: PackedStringArray = str(shot[5]).split(":")
+			game_state.call(&"add_friendship", StringName(parts[1]), int(parts[2]))
+		if shot[5] == "new_dishes":
+			for item: Array in [[&"berry_jam", 2], [&"carrot_cake", 1], [&"shepherds_pie", 1], [&"bread", 1]]:
+				game_state.call(&"add_item", item[0], item[1])
+			game_state.call(&"set_energy", 30.0)
 		if shot[5] == "friends_page":
 			# Friendships at every stage: none, a first point, and so on up to a full one.
 			var points: Dictionary = {&"elder_bram": 9, &"farmer_oda": 4, &"guard_rolf": 1, &"pip": 20, &"tilda": 13, &"wenna": 17}
@@ -311,7 +332,7 @@ func _capture() -> void:
 			# An hour after closing: the hero tries the shop's door.
 			game_state.call(&"set_time", float(clock.call(&"in_day", "19:00")))
 			scene.call(&"interact")
-		if shot[5] in ["talk", "accept", "tale", "lantern_talk", "cook", "lights", "try", "gift_talk", "gift_list", "gift_given"]:
+		if shot[5] in ["talk", "accept", "tale", "lantern_talk", "cook", "lights", "try", "gift_talk", "gift_list", "gift_given"] or str(shot[5]).begins_with("friend:"):
 			scene.call(&"interact")
 		if shot[5] in ["gift_talk", "gift_list", "gift_given"]:
 			# The answer that gives is the second of Pip's three.
@@ -387,7 +408,7 @@ func _capture() -> void:
 			scene.call(&"interact")
 			scene.get(&"hud").get(&"dialogue").call(&"move_cursor", 4)
 			await _frames(2)
-		elif shot[5] in ["tools_menu", "seeds_menu", "cook_menu"]:
+		elif shot[5] in ["tools_menu", "seeds_menu", "cook_menu", "new_dishes"]:
 			scene.call(&"open_item_menu")
 			await _frames(2)
 		elif shot[5] in ["hoe", "fill", "plant"]:
@@ -418,6 +439,17 @@ func _capture() -> void:
 			scene.call(&"open_pause_menu")
 			scene.get(&"hud").get(&"pause_menu").call(&"choose", &"quests")
 			scene.get(&"hud").get(&"pause_menu").get(&"quest_log").call(&"move_cursor", 1)
+			await _frames(2)
+		elif shot[5] == "long_log":
+			# Every quest begun, two of them done: eight lines and "Back", the cursor well down.
+			var runner: RefCounted = root.get_node("Quests").get(&"runner")
+			for quest_id: StringName in [&"lost_shuttle", &"slime_bounty", &"eggs_for_tilda", &"pie_for_pip", &"rations_for_the_watch", &"seed_stock", &"elders_supper"]:
+				runner.call(&"start", quest_id)
+			for flag: StringName in [&"eggs_delivered", &"told_oda_eggs", &"seed_wheat_given"]:
+				game_state.call(&"set_flag", flag, true)
+			scene.call(&"open_pause_menu")
+			scene.get(&"hud").get(&"pause_menu").call(&"choose", &"quests")
+			scene.get(&"hud").get(&"pause_menu").get(&"quest_log").call(&"move_cursor", 5)
 			await _frames(2)
 		elif shot[5] == "friends_page":
 			scene.call(&"open_pause_menu")

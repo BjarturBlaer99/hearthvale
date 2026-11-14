@@ -9,10 +9,21 @@ extends RefCounted
 const LONG_AGO: int = 1000000
 
 var _state: Dictionary
+## The rules of friendship, for the `friendship` condition: points are in the snapshot, but how
+## many make a mark is a rule. Without them no friendship condition is met.
+var _friendship: Friendship
 
 
-func _init(state: Dictionary) -> void:
+func _init(state: Dictionary, friendship: Friendship = null) -> void:
 	_state = state
+	_friendship = friendship
+
+
+## An evaluator for `state` as it stands (GameState, or a stand-in with to_dict()): its
+## snapshot, and its rules of friendship if it has any.
+static func for_state(state: Object) -> ConditionEvaluator:
+	var rules: Friendship = state.call(&"friendship") as Friendship if state.has_method(&"friendship") else null
+	return ConditionEvaluator.new(state.call(&"to_dict"), rules)
 
 
 func is_met(condition: Dictionary) -> bool:
@@ -27,6 +38,8 @@ func is_met(condition: Dictionary) -> bool:
 			return String(QuestState.status_in(_section("quests"), _section("flags"), str(condition["quest"]))) == str(condition["status"])
 		"days_since":
 			return days_since(str(condition["flag"])) >= int(condition["days"])
+		"friendship":
+			return friend_marks(str(condition["villager"])) >= int(condition["marks"])
 		"all":
 			return all_met(condition["of"])
 		"any":
@@ -62,6 +75,15 @@ func days_since(flag: String) -> int:
 	if not days.has(flag):
 		return LONG_AGO
 	return maxi(int(_state.get("day", 1)) - int(days[flag]), 0)
+
+
+## The marks of friendship with `villager` (a villager id): 0 for a stranger, or with no rules
+## of friendship to count by.
+func friend_marks(villager: String) -> int:
+	var friend: Variant = _section("friends").get(villager)
+	if _friendship == null or typeof(friend) != TYPE_DICTIONARY:
+		return 0
+	return _friendship.marks_at(int((friend as Dictionary).get("points", 0)))
 
 
 func item_count(item_id: String) -> int:

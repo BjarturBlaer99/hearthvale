@@ -44,7 +44,7 @@ func start() -> void:
 func opening() -> Variant:
 	var openings: Variant = dialogue.get("openings", [])
 	if typeof(openings) == TYPE_ARRAY and not (openings as Array).is_empty():
-		var evaluator: ConditionEvaluator = ConditionEvaluator.new(_state.call(&"to_dict"))
+		var evaluator: ConditionEvaluator = ConditionEvaluator.for_state(_state)
 		for entry: Variant in openings:
 			if typeof(entry) == TYPE_DICTIONARY and evaluator.all_met((entry as Dictionary).get("conditions", [])):
 				return (entry as Dictionary).get("node")
@@ -80,7 +80,7 @@ func options() -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	if not is_running():
 		return out
-	var evaluator: ConditionEvaluator = ConditionEvaluator.new(_state.call(&"to_dict"))
+	var evaluator: ConditionEvaluator = ConditionEvaluator.for_state(_state)
 	var all_options: Variant = current_node().get("options", [])
 	if typeof(all_options) != TYPE_ARRAY:
 		return out

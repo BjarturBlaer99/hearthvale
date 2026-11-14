@@ -35,3 +35,16 @@ func test_only_finished_quests_count() -> void:
 	assert_int(EndingSummary.quests_done(["fetch", "bounty", "errand", "never_started"], quests, flags)).is_equal(2)
 	assert_int(EndingSummary.quests_done([], quests, flags)).is_equal(0)
 	assert_int(EndingSummary.quests_done(["fetch"], {}, {})).is_equal(0)
+
+
+func test_the_summary_adds_the_days_the_crops_and_the_friends() -> void:
+	var lines: PackedStringArray = EndingSummary.lines("1:07:11", 5, 2, 8, {"days": 7, "crops": 31, "friends": 3, "villagers": 7})
+	assert_array(Array(lines)).is_equal([
+		"Time played   1:07:11", "Hearts   5", "Quests finished   2 of 8", "Days   7", "Crops grown   31", "Friends   3 of 7",
+	])
+	# What is left out is not shown, and a game with no villagers has no friends line.
+	assert_array(Array(EndingSummary.lines("0:10", 3, 0, 0, {"days": 2}))).is_equal(["Time played   0:10", "Hearts   3", "Days   2"])
+	assert_array(Array(EndingSummary.lines("0:10", 3, 0, 0, {"crops": 4, "friends": 2, "villagers": 0}))).is_equal(["Time played   0:10", "Hearts   3", "Crops grown   4"])
+	# Odd numbers are kept in bounds.
+	var odd: PackedStringArray = EndingSummary.lines("0:10", 3, 0, 0, {"days": 0, "crops": -5, "friends": 12, "villagers": 7})
+	assert_array(Array(odd).slice(2)).is_equal(["Days   1", "Crops grown   0", "Friends   7 of 7"])

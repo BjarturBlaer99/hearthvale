@@ -1,0 +1,8 @@
+{
+	"id": "berry_jam",
+	"taught": true,
+	"makes": { "item": "berry_jam", "count": 1 },
+	"needs": [
+		{ "item": "wild_berries", "count": 3 }
+	]
+}
