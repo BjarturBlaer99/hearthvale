@@ -236,7 +236,9 @@ anything but food and crops, more than one gift a day, a calendar or seasons, cr
 - [x] a version 3 save loads as version 4, past the gates, with nothing lost; versions 1 and 2 still load
 - [x] the title shows the new line
 - [x] all earlier tests pass
-- [ ] (yours) the first day reads clearly to someone who has never played: where to go, and why the keep waits
+- [x] (yours) the first day reads clearly to someone who has never played: where to go, and why the keep waits
+      (tried on 2026-11-14 in the whole-game playtest, the first four minutes of a new game: "feels right".
+      The run reached the cottage, the tools and the first crop; it did not reach Elder Bram or the gate)
 
 ### Not in this step
 - Skills (4b), friendship and gifts (4c), the new side quests, recipes and the ending's lines (4d).

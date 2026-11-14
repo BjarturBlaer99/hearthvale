@@ -1862,3 +1862,21 @@ Plan: `docs/progress/P4-plan.md`, section 13 (the last of P4's four steps).
 - **The quest log's finished quests stay in the list,** so late in a game it holds eight lines and scrolls.
 - **The main quest counts among "Quests finished"** on the ending screen, as before.
 
+## 2026-11-14 — Playtest: the new first day (the user: "Feels right")
+
+The user ran the whole-game playtest (`tools/playtest.gd -- full`) and, asked how the new first day felt, said it feels right. The run's log is `user://playtests/playtest_2026-11-14T00-28-26.log`; about four minutes of game time.
+
+**What the run covered**
+- **Continue, on the playtest slot's old save** (from before the pivot): it loaded as a version 4 save, standing in the crypt, and the main quest ran straight through its stages to the crypt. That is the migration on a real save.
+- **Then a new game:** the cottage in 7 seconds, the hoe, the can and the seeds by 17, the first seed planted at 56. The main quest moved on at each.
+- **After that:** the can filled, Farmer Oda's eggs carried to Tilda, the wooden sword, a piece of heart, Wenna's shuttle quest begun.
+- No errors in the game's output.
+
+**What it did not cover**
+- Elder Bram after the first crop (where the quest pointed), the chained gate, the keep, a night's sleep, a gift, a skill rising, the ending.
+- About nine minutes of real time passed while the game's clock moved 19 seconds, between planting and filling the can: paused, or a menu open.
+
+**Ticked, on the user's word:** step 4a's line (the first day reads clearly), with a note of what was and was not reached.
+
+**Still open, and the user's:** step 4b's line (a level is felt), 4c's (giving feels worth the food), 4d's (a whole game in six to eight days with no help), and step 3c's (a week of farming pays for itself).
+
