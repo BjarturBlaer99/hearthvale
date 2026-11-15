@@ -119,7 +119,8 @@ res://
   point. Stepping onto it calls `GameState.go_to(area, entry)` and changes scene through the area's `travel`
   callable (tests replace it). Each area's `Entries` holds a `Marker2D` per entry point, named by id, at a cell
   centre and rotated to the arrival facing; the arriving area places the hero there (else at the saved cell, else
-  `PlayerSpawn`) and flashes the screen. A house's doormat leads to the entry just outside its own door.
+  `PlayerSpawn`) and flashes the screen. A saved cell that is solid now (the map changed after the save) is
+  nowhere to stand: he starts at `PlayerSpawn`. A house's doormat leads to the entry just outside its own door.
 - An area smaller than the screen (a house) is centred on it, on the dark clear colour.
 
 ## 4. Hero, items & combat
@@ -174,6 +175,10 @@ res://
     `HeartsBar` shows the pieces as a gold heart filling a quarter at a time.
 - **Items:** the inventory lives in GameState. `Inventory` (pure) sets the rules:
   - stack capacity (`max_stack`, or 1), so `GameState.add_item` adds only what fits
+  - **nothing is lost to a full pack** (`Inventory.fits()`, `GameState.has_room_for()`): what can't be carried
+    whole is left where it is and the hero is told. An `ItemPickup`, a `ForageSpot` and a `Chest` each have
+    `has_room()` and refuse (the chest stays shut); a ripe crop, a dish and a shop's ware were so already. Only
+    what is given in a conversation or by a quest, and what monsters drop, is still cut to what fits
   - which items go on the item button (`weapon_ranged`, `bomb`)
   - what each item uses up (a bow's `ammo`; bombs themselves)
 
@@ -478,11 +483,14 @@ run headless; see CLAUDE.md for the command and gotchas.
   unchanged; E no longer does anything. The buttons are buttons, not a pointer: where a click lands doesn't
   matter, and the hero acts on what he faces.
   - **What is in hand** is `AreaController.use_hand()`'s to say. With nothing on the item button: the sword.
-    A weapon there (the bow, bombs): that weapon. A farm tool or a seed: the tool when he faces what it is for
+    A weapon there (the bow, bombs): that weapon, until it has nothing left to shoot or set down
+    (`GameState.is_out_of_ammo()`); then the click is the sword's again, so running out is no dead end (Q
+    still says "Out of arrows."). A farm tool or a seed: the tool when he faces what it is for
     (`faces_farm_work()`: a cell of his plot, or water), where it works or says why not; anywhere else the
     sword, so a hoe in hand doesn't leave him unarmed. With no sword at all the tool says what it is for.
   - **The sword can be taken in hand again** from the item menu: when he holds something for the item button,
-    the menu lists his best sword first, and choosing it empties the item button (`GameState.equip(&"")`).
+    or something used up is still on it (the last bomb gone), the menu lists his best sword first, and
+    choosing it empties the item button (`GameState.equip(&"")`). Tab or Esc leaves the menu, as any list.
   - Every menu takes either click as its yes (`MenuInput.is_confirm()`: interact, use_hand or Enter).
   - **A conversation is answered with the left click** (`MenuInput.is_answer()`: use_hand, Enter, or A on a
     pad; the user's request). The right click starts a conversation and doesn't answer one; Space never did.

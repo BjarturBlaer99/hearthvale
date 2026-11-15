@@ -8,6 +8,8 @@ extends Node2D
 const OUTLINE: Color = PixelGrade.INK
 const WOOD: Color = Color(0.55, 0.34, 0.16)
 const GOLD: Color = Color(0.95, 0.78, 0.28)
+## What is said when the hero can't carry what it holds (the thing's name).
+const NO_ROOM_WORDS: String = "You have no room for the %s in this chest."
 
 @export var chest_id: StringName
 @export var item_id: StringName = &"small_key"
@@ -42,10 +44,20 @@ func prompt() -> String:
 	return "" if opened() else "Open the chest"
 
 
+## Whether the hero can carry all of what is inside. Keys always fit: they are the dungeon's
+## count, not in the pack.
+func has_room() -> bool:
+	return item_id == &"small_key" or item_id == &"big_key" or GameState.has_room_for(item_id, count)
+
+
 ## Opens it and hands over what's inside. Returns a message for the HUD (empty if already open).
+## With no room for what it holds it stays shut and says so: nothing is lost to a full pack.
 func use() -> String:
 	if opened():
 		return ""
+	if not has_room():
+		EventBus.sound.emit(&"nope")
+		return NO_ROOM_WORDS % str(DataRegistry.get_item(item_id).get("name", item_id))
 	GameState.set_flag(DungeonState.chest_flag(dungeon_id, chest_id), true)
 	EventBus.sound.emit(&"item_get")
 	Burst.spawn(get_parent(), position + Vector2(8, 4), &"sparkle", 1.3)

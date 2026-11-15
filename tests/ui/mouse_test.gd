@@ -181,6 +181,62 @@ func test_a_left_click_uses_the_bow_or_the_bombs_in_hand() -> void:
 	assert_int(GameState.item_count(&"bomb")).is_equal(0)
 
 
+func test_a_weapon_with_nothing_left_gives_way_to_the_sword() -> void:
+	GameState.add_item(&"wooden_sword")
+	GameState.add_item(&"bomb", 1)
+	assert_that(GameState.equipped).is_equal(&"bomb")
+	var field: AreaController = _load(FIELD)
+	field.player.motor.place(Vector2i(12, 12))
+	field.player.face(Vector2.LEFT)
+	# The last bomb is set down with a left click...
+	assert_bool(field.use_hand()).is_true()
+	assert_int(GameState.item_count(&"bomb")).is_equal(0)
+	assert_that(GameState.equipped).override_failure_message("the item button keeps its place").is_equal(&"bomb")
+	_heard.clear()
+	# ...and the next one swings the sword: an empty hand is no dead end.
+	assert_bool(field.use_hand()).override_failure_message("out of bombs, the left click swings the sword").is_true()
+	assert_bool(field.player.motor.is_attacking()).is_true()
+	assert_array(_heard).contains([&"sword"])
+	assert_array(_heard).not_contains([&"nope"])
+	# The item button's own key still says there are none.
+	_rest(field)
+	assert_bool(field.use_item()).is_false()
+	assert_str(field.hud.message_text()).is_equal("Out of bombs.")
+	# The menu offers the sword, though nothing else could be in hand: choosing it clears the
+	# button of what ran out.
+	assert_bool(field.open_item_menu()).override_failure_message("something spent is on the button: the sword is offered").is_true()
+	var menu: ItemMenu = field.hud.item_menu
+	assert_array(Array(menu.shown_lines())).is_equal(["> Wooden Sword"])
+	menu.confirm()
+	assert_that(GameState.equipped).is_equal(&"")
+	field._update_hud()
+	assert_bool("\n".join(field.hud.shown_lines()).contains("Item:")).override_failure_message("no item line on the HUD").is_false()
+
+	# A bow with no arrows is the same: the left click is the sword's until there are arrows.
+	GameState.add_item(&"bow")
+	assert_that(GameState.equipped).is_equal(&"bow")
+	_heard.clear()
+	assert_bool(field.use_hand()).is_true()
+	assert_bool(field.player.motor.is_attacking()).is_true()
+	assert_array(_heard).contains([&"sword"])
+	assert_object(field.last_projectile).override_failure_message("no arrow flew").is_not_instanceof(Arrow)
+	_rest(field)
+	GameState.add_item(&"arrow", 1)
+	_heard.clear()
+	assert_bool(field.use_hand()).is_true()
+	assert_object(field.last_projectile).is_instanceof(Arrow)
+	assert_int(GameState.item_count(&"arrow")).is_equal(0)
+	assert_array(_heard).not_contains([&"sword"])
+
+	# With no sword to fall back on, the empty bow says so, as before.
+	_rest(field)
+	GameState.add_item(&"wooden_sword", -1)
+	_heard.clear()
+	assert_bool(field.use_hand()).is_false()
+	assert_str(field.hud.message_text()).is_equal("Out of arrows.")
+	assert_array(_heard).contains_exactly([&"nope"])
+
+
 func test_a_left_click_works_the_plot_with_a_tool_and_swings_the_sword_elsewhere() -> void:
 	for item: Array in [[&"wooden_sword", 1], [&"hoe", 1], [&"watering_can", 1], [&"turnip_seeds", 2]]:
 		GameState.add_item(item[0], item[1])

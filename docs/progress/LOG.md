@@ -1880,3 +1880,38 @@ The user ran the whole-game playtest (`tools/playtest.gd -- full`) and, asked ho
 
 **Still open, and the user's:** step 4b's line (a level is felt), 4c's (giving feels worth the food), 4d's (a whole game in six to eight days with no help), and step 3c's (a week of farming pays for itself).
 
+## 2026-11-15 — Bug hunt (the user: "fix bugs you can find")
+
+No roadmap step: a search for bugs across the finished game, and a fix with a test for each one found.
+
+**How it was searched**
+- **The tests as they stood:** 655 passed before anything was touched.
+- **By reading:** the game's state, saving, the area's logic, conversations, quests, the shop, the farm, the menus, the pickups and the villagers' conversations, each looked at for what is lost, what can't be undone and what leaves the player with nothing to do.
+- **By a monkey:** a scratch script that plays all twelve areas with random moves, clicks, menus, conversations, sleeps, saves and jumps to random places, in a late game with a full pack and in a new one. Three sessions of 144,000 frames each (about two hours of play in all), headless, at sixty frames a second of game time. It watched for script errors, a hero who can't move with nothing to explain it, empty stacks, and energy or hearts out of range. **It found nothing:** no errors, no stuck states.
+- **The player's own save** (version 1, from 2026-11-09, in the Old Wood): a copy, loaded in a scratch slot. It loads, the main quest catches up to "keep", the gate is unchained, and he can walk in all four directions. The save itself was only read.
+
+**Fixed**
+- **A full pack swallowed things.** Gathering berries with twenty in the pack, picking up something lying in the world, or opening a chest whose arrows or bombs didn't fit: the thing was used up (the bush bare until morning, the chest open for good), nothing came of it, and the game said "You pick up the Wild Berries." Now each is left where it is until he can carry all of it, and he is told: "You have no room for the Wild Berries.", "You have no room for the Arrows in this chest." It is the rule a ripe crop, a dish at the hearth and Tilda's wares already had.
+- **Running out of bombs or arrows left the left click dead.** With the last bomb set down, every left click said "Out of bombs." and the item menu would not open to put the sword back in hand ("No items yet."), so the left click could not attack again: only Space could. The player's own save has bombs on the item button and two bombs. Now a bow or bombs with nothing left give the click back to the sword, and the item menu offers the sword whenever something is on the item button, so it can be cleared. Q still says "Out of bombs."; with no sword at all the left click says so too, as before.
+- **A save could put the hero inside a wall.** Loading put him on the cell he was saved on even if that cell had since become solid (the maps have been re-baked many times: trees planted, his cottage built). Now a saved cell that can't be stood on is passed over for the area's own start.
+- **Esc did nothing in the item menu.** It leaves the shop's list, the gifts and every other menu; in the item menu only Tab did. Now Esc leaves it too.
+
+**Checked**
+- 666 tests in 90 suites pass. Eleven are new: four in `tests/world/full_pack_test.gd`, and others in the mouse, item, village, inventory and game-state suites. Each of the four world tests was seen failing before its fix. Import and boot clean.
+- **Deliberate bugs:** five planted in runtime code, one at a time, each caught, files restored: the area taking a pickup that doesn't fit, a bush giving to a full pack, a chest opening into one, a spent weapon keeping the left click, a save putting the hero in a wall.
+- **Not re-captured:** nothing drawn changed, so no screenshots were taken.
+
+**Found and left, for the user to decide** (none is new; each is in an earlier entry's known issues)
+- **News at the top of the screen replaces news:** a skill rising as a quest moves on, or a mark gained as a recipe is taught, shows only the later line. Beating the Warden is likely to do it. Showing both needs about ten tests changed.
+- **A reward that doesn't fit is cut to what fits:** Guard Rolf's ten arrows to a hero with more than twenty, a present of seeds to one with twenty-seven. Conversations and quests give without asking for room.
+- **A gift to a villager at five marks is taken for no gain.**
+- **A save is written straight over the old one,** not to a second file first: a crash in the instant of writing could spoil it.
+- **Continue does nothing, and says nothing, if the save can't be read** (a newer version, a damaged file).
+
+**Known issues and limits**
+- Not tried in play.
+- **"No room" means no room for all of it:** a chest of fifteen arrows stays shut to a hero with twenty of thirty. He must use five and come back; nothing is ever lost in part.
+- **A single thing he already has can't be taken again** (a second hoe): it stays where it lies. Nothing in the game gives one twice.
+- **An empty bow still shows on the HUD** ("Item: Bow (Arrows x0)") while the left click swings the sword.
+- **The monkey is a scratch script,** not part of the project: it lives outside the repository and was not kept.
+

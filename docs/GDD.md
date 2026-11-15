@@ -82,8 +82,11 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 - The sword is always on the attack button (Space); one item is equipped on the item button (Q). The Lantern
   needs no button: it works while it's carried. Food is eaten from the item menu *(P2)*.
 - **In hand** (the left mouse button): with nothing on the item button, the sword. The bow or bombs on it:
-  those. A farm tool or seeds on it: the tool where there is work for it (facing the plot, or water for the
-  can), and the sword everywhere else. Choosing the sword in the item menu empties the item button.
+  those, until the arrows or the bombs run out; then the sword again. A farm tool or seeds on it: the tool
+  where there is work for it (facing the plot, or water for the can), and the sword everywhere else. Choosing
+  the sword in the item menu empties the item button.
+- **A full pack loses nothing:** what lies in the world, what grows to be gathered, what a chest holds and a
+  ripe crop stay where they are until he can carry all of it, and he is told why.
 - **Growth** *(P4b)*: three skills that rise with use, five levels each, at 0, 10, 25, 50 and 90 points.
 
 | Skill | Raised by | Each level above the first |

@@ -44,6 +44,8 @@ const CLEAR_PROMPT: String = "Clear the withered %s"
 const PICKED_WORDS: String = "Picked: %s."
 const CLEARED_WORDS: String = "You clear away the withered %s."
 const NO_ROOM_WORDS: String = "Your pack holds no more %s."
+## What is said when something lying in the world can't be carried (its name).
+const NO_ROOM_FOR_WORDS: String = "You have no room for the %s."
 ## What is said when the watering can has been filled.
 const CAN_FILLED_WORDS: String = "The watering can is full."
 ## The well's four tiles (GreyboxTiles kinds, on the Decor layer): the can fills at any of them.
@@ -396,7 +398,8 @@ func interact() -> bool:
 		var message: String = usable.call(&"use")
 		if not message.is_empty():
 			hud.show_message(message)
-			if usable is Chest:
+			# A chest that opened (not one too full to empty): what was in it is held up.
+			if usable is Chest and (usable as Chest).opened():
 				player.hold_up(ItemIcons.name_for((usable as Chest).item_id))
 			return true
 	if _tend_crop():
@@ -490,6 +493,11 @@ func talkables() -> Array[Talkable]:
 
 
 func pick_up(pickup: ItemPickup) -> bool:
+	# A full pack: it is left where it lies, and he is told why.
+	if not pickup.taken() and not pickup.has_room():
+		EventBus.sound.emit(&"nope")
+		hud.show_message(NO_ROOM_FOR_WORDS % pickup.item_name())
+		return true
 	if not pickup.take():
 		return false
 	hud.show_message("You pick up the %s." % pickup.item_name())
@@ -597,17 +605,22 @@ func use_item() -> bool:
 
 
 ## Uses what the hero has in hand (the left mouse button; GDD §5): his sword, unless something
-## on the item button comes first. A weapon there (the bow, bombs) is used. A farm tool or a
-## seed is used when he faces what it is for (his plot, or water), and anywhere else he swings
-## his sword, so a hoe in hand doesn't leave him unarmed; with no sword, the tool says what it
-## is for. The sword and the item keep their own buttons too. Returns whether anything was done.
+## on the item button comes first. A weapon there (the bow, bombs) is used, until it has
+## nothing left to shoot or set down: then the click is the sword's again, so running out is
+## no dead end. A farm tool or a seed is used when he faces what it is for (his plot, or
+## water), and anywhere else he swings his sword, so a hoe in hand doesn't leave him unarmed.
+## With no sword, what is on the button says why it does nothing. The sword and the item keep
+## their own buttons too. Returns whether anything was done.
 func use_hand() -> bool:
 	if _busy() or not player.controls_enabled:
 		return false
 	var item: Dictionary = DataRegistry.get_item(GameState.equipped)
 	if item.is_empty():
 		return player.swing()
-	if ToolUse.kind_of(item).is_empty() or faces_farm_work() or PlayerController.best_sword().is_empty():
+	var armed: bool = not PlayerController.best_sword().is_empty()
+	if ToolUse.kind_of(item).is_empty():
+		return player.swing() if armed and GameState.is_out_of_ammo(GameState.equipped) else use_item()
+	if faces_farm_work() or not armed:
 		return use_item()
 	return player.swing()
 
@@ -625,8 +638,11 @@ func open_item_menu() -> bool:
 		return false
 	var held: Array[Dictionary] = []
 	var for_button: Array[Dictionary] = Inventory.equippable_held(GameState.inventory, DataRegistry.entries(&"items"))
-	# Choosing the sword empties the item button, so the left click swings it again.
-	if not for_button.is_empty() and not PlayerController.best_sword().is_empty():
+	# Choosing the sword empties the item button, so the left click swings it again. It is
+	# listed when anything else could be in hand, or still is (the last bomb gone, the button
+	# would otherwise keep its empty stack for good).
+	var in_hand: bool = not for_button.is_empty() or not DataRegistry.get_item(GameState.equipped).is_empty()
+	if in_hand and not PlayerController.best_sword().is_empty():
 		held.append(PlayerController.best_sword())
 	held.append_array(for_button)
 	held.append_array(Food.edible_held(GameState.inventory, DataRegistry.entries(&"items")))
@@ -1304,7 +1320,8 @@ static func carrying_text() -> String:
 
 
 ## Where the hero starts: the entry point they came through, else where they were (a loaded
-## game), else PlayerSpawn. { "cell": Vector2i, "facing": Vector2, "through_entry": bool }
+## game, if that cell can still be stood on), else PlayerSpawn.
+## { "cell": Vector2i, "facing": Vector2, "through_entry": bool }
 func _arrival() -> Dictionary:
 	var saved: Dictionary = GameState.player
 	var spawn: Dictionary = {
@@ -1323,7 +1340,9 @@ func _arrival() -> Dictionary:
 	if saved.has("cell"):
 		var cell: Array = saved["cell"]
 		var at: Vector2i = Vector2i(int(cell[0]), int(cell[1]))
-		if grid.in_bounds(at):
+		# A cell that is solid now (the map changed after the save: a tree planted, a house
+		# built) is nowhere to stand: he would be shut inside it.
+		if grid.in_bounds(at) and not grid.is_solid(at):
 			return {"cell": at, "facing": Vector2.DOWN, "through_entry": false}
 	return spawn
 

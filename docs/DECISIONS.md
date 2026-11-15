@@ -850,3 +850,18 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   switching it on and off in turn within one run.
 - 2026-11-11 — **Animation never changes play.** The wind-up and the settle are pictures chosen by how far
   through the swing the motor is. The blade is live from the first frame and the swing is as long as it was.
+- 2026-11-15 — **Bug hunt: a full pack refuses, it never takes part.** A pickup, a forage spot and a chest stay
+  as they are unless all of what they hold fits (`GameState.has_room_for()`), as a ripe crop, a dish and a
+  shop's ware already did. Taking what fits and losing the rest would lose things for good; taking part and
+  keeping the rest would need a count saved for every pickup.
+- 2026-11-15 — **Bug hunt: a weapon with nothing left gives the left click back to the sword.** The user asked
+  for attacking on the left click; with the last bomb gone it only said "Out of bombs." and the menu would not
+  put the sword back. Emptying the item button when a stack runs out was the other way: it would have changed
+  what Q says and hidden that the bow is still his.
+- 2026-11-15 — **Bug hunt: a saved cell that is solid now is passed over for the area's start.** Maps are
+  re-baked often, and a save names a cell. Only solid cells are refused: a cell that someone stands on by day
+  can still be walked out of.
+- 2026-11-15 — **Bug hunt: what was found and not fixed is listed, not changed.** Notices that replace each
+  other, rewards cut to what fits and a gift to a full friendship are how the plans left them; changing them is
+  the user's call, not a bug fix.
+

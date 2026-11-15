@@ -84,6 +84,33 @@ func test_the_welcome_sign_reads_from_data_and_stands_in_its_cell() -> void:
 	assert_str(area.terrain.check_move(sign.cell() + Vector2i.DOWN, sign.cell()).reason).is_equal("occupied")
 
 
+func test_a_save_that_left_the_hero_in_a_wall_starts_him_at_the_areas_start() -> void:
+	# A map that changed after a save (a tree planted, a house built) can leave the saved cell
+	# solid: he would stand inside it. He starts at the area's own start instead.
+	var plan: Node = (load(SCENE) as PackedScene).instantiate()
+	var grid: HeightGrid = HeightGridBuilder.from_layer(plan.get_node(^"Height") as TileMapLayer)
+	plan.free()
+	var wall: Vector2i = Vector2i(-1, -1)
+	for x: int in grid.size.x:
+		if grid.is_solid(Vector2i(x, 0)):
+			wall = Vector2i(x, 0)
+			break
+	assert_that(wall).override_failure_message("the village's north edge has something solid in it").is_not_equal(Vector2i(-1, -1))
+	GameState.new_game()
+	GameState.update_player(&"village", wall)
+	var area: AreaController = await _village()
+	assert_that(area.player.motor.cell).is_equal(SPAWN)
+	assert_bool(area.grid.is_solid(area.player.motor.cell)).is_false()
+
+
+func test_a_save_on_open_ground_starts_him_where_he_stood() -> void:
+	GameState.new_game()
+	GameState.update_player(&"village", SPAWN + Vector2i(2, 1))
+	var area: AreaController = await _village()
+	assert_bool(area.grid.is_solid(SPAWN + Vector2i(2, 1))).is_false()
+	assert_that(area.player.motor.cell).is_equal(SPAWN + Vector2i(2, 1))
+
+
 func _village() -> AreaController:
 	var runner: GdUnitSceneRunner = scene_runner(SCENE)
 	await runner.simulate_frames(1)

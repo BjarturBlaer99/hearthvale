@@ -411,7 +411,7 @@ func harvest(cell: Vector2i) -> Dictionary:
 	var crop: Dictionary = DataRegistry.get_crop(StringName(farm().crop_at(cell)))
 	var given: Dictionary = Crops.gives(crop)
 	var item_id: StringName = StringName(str(given["item"]))
-	if Inventory.room_for(item_count(item_id), DataRegistry.get_item(item_id)) < int(given["count"]):
+	if not has_room_for(item_id, int(given["count"])):
 		return {}
 	farm().harvest(cell, Crops.days_of(crop))
 	add_item(item_id, int(given["count"]))
@@ -594,9 +594,22 @@ func equip(item_id: StringName) -> void:
 	EventBus.equipped_changed.emit(item_id)
 
 
+## Whether `item_id` uses something up and there is none left: a bow with no arrows, the last
+## bomb or seed gone, an empty watering can. False for what uses nothing up.
+func is_out_of_ammo(item_id: StringName) -> bool:
+	var ammo: String = Inventory.ammo_for(DataRegistry.get_item(item_id))
+	return not ammo.is_empty() and item_count(StringName(ammo)) <= 0
+
+
 func item_count(item_id: StringName) -> int:
 	var index: int = _find_stack(item_id)
 	return 0 if index == -1 else int(inventory[index]["count"])
+
+
+## Whether the pack has room for `count` more of `item_id`: all of them. What doesn't fit whole
+## is left where it lies (a pickup, a chest, a crop) so nothing is lost to a full pack.
+func has_room_for(item_id: StringName, count: int = 1) -> bool:
+	return Inventory.fits(item_count(item_id), DataRegistry.get_item(item_id), count)
 
 
 func _find_stack(item_id: StringName) -> int:

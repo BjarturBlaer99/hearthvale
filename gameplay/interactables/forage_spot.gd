@@ -26,9 +26,10 @@ func taken() -> bool:
 	return int(GameState.get_flag(taken_flag, 0)) >= GameState.day
 
 
-## Gathers it. Returns false if it was already gathered today.
+## Gathers it. Returns false if it was already gathered today, or there is no room for it (it
+## stays on the bush).
 func take() -> bool:
-	if taken():
+	if taken() or not has_room():
 		return false
 	GameState.add_item(item_id, count)
 	GameState.set_flag(taken_flag, GameState.day)

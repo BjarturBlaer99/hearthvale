@@ -112,6 +112,39 @@ func test_stacks_stop_at_their_limit() -> void:
 	assert_int(_state.item_count(&"not_in_data")).override_failure_message("no data, no limit").is_equal(5000)
 
 
+func test_there_is_room_only_for_what_fits_whole() -> void:
+	assert_bool(_state.has_room_for(&"arrow", 30)).is_true()
+	assert_bool(_state.has_room_for(&"arrow", 31)).is_false()
+	_state.add_item(&"arrow", 25)
+	assert_bool(_state.has_room_for(&"arrow", 5)).is_true()
+	assert_bool(_state.has_room_for(&"arrow", 6)).override_failure_message("room for five of the six is not room").is_false()
+	assert_bool(_state.has_room_for(&"arrow")).is_true()
+	_state.add_item(&"arrow", 5)
+	assert_bool(_state.has_room_for(&"arrow")).is_false()
+	assert_bool(_state.has_room_for(&"wooden_sword")).is_true()
+	_state.add_item(&"wooden_sword")
+	assert_bool(_state.has_room_for(&"wooden_sword")).override_failure_message("one of a single item").is_false()
+	assert_bool(_state.has_room_for(&"not_in_data", 5000)).override_failure_message("no data, no limit").is_true()
+	assert_int(_state.item_count(&"arrow")).override_failure_message("asking changes nothing").is_equal(30)
+
+
+func test_what_uses_something_up_can_run_out() -> void:
+	_state.add_item(&"bow")
+	assert_bool(_state.is_out_of_ammo(&"bow")).override_failure_message("a bow with no arrows").is_true()
+	_state.add_item(&"arrow", 1)
+	assert_bool(_state.is_out_of_ammo(&"bow")).is_false()
+	assert_bool(_state.is_out_of_ammo(&"bomb")).override_failure_message("no bombs: bombs use themselves up").is_true()
+	_state.add_item(&"bomb", 1)
+	assert_bool(_state.is_out_of_ammo(&"bomb")).is_false()
+	_state.add_item(&"bomb", -1)
+	assert_bool(_state.is_out_of_ammo(&"bomb")).is_true()
+	assert_bool(_state.is_out_of_ammo(&"turnip_seeds")).override_failure_message("the last seed planted").is_true()
+	assert_bool(_state.is_out_of_ammo(&"watering_can")).override_failure_message("an empty can").is_true()
+	# What uses nothing up never runs out: a sword, a hoe, something the data doesn't know.
+	for item: StringName in [&"wooden_sword", &"hoe", &"lantern", &"not_in_data", &""]:
+		assert_bool(_state.is_out_of_ammo(item)).override_failure_message("'%s'" % item).is_false()
+
+
 func test_the_first_item_for_the_item_button_is_equipped() -> void:
 	_state.add_item(&"wooden_sword")
 	assert_that(_state.equipped).override_failure_message("a sword isn't for the item button").is_equal(&"")

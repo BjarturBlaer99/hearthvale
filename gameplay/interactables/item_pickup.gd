@@ -25,9 +25,16 @@ func item_name() -> String:
 	return str(DataRegistry.get_item(item_id).get("name", item_id))
 
 
-## Puts the item in the inventory. Returns false if it was already taken.
+## Whether the pack has room for all of it. If not it is left lying: nothing is lost to a full
+## pack.
+func has_room() -> bool:
+	return GameState.has_room_for(item_id, count)
+
+
+## Puts the item in the inventory. Returns false if it was already taken, or there is no room
+## for it.
 func take() -> bool:
-	if taken():
+	if taken() or not has_room():
 		return false
 	GameState.add_item(item_id, count)
 	GameState.set_flag(taken_flag, true)

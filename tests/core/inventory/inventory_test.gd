@@ -17,6 +17,16 @@ func test_capacity_is_the_max_stack_or_one() -> void:
 	assert_int(Inventory.room_for(1, SWORD)).is_equal(0)
 
 
+func test_only_what_fits_whole_fits() -> void:
+	assert_bool(Inventory.fits(25, ARROW, 5)).is_true()
+	assert_bool(Inventory.fits(25, ARROW, 6)).override_failure_message("five of six fit: that is not fitting").is_false()
+	assert_bool(Inventory.fits(30, ARROW, 1)).is_false()
+	assert_bool(Inventory.fits(30, ARROW, 0)).override_failure_message("nothing always fits").is_true()
+	assert_bool(Inventory.fits(0, SWORD, 1)).is_true()
+	assert_bool(Inventory.fits(1, SWORD, 1)).is_false()
+	assert_bool(Inventory.fits(5000, {}, 5000)).override_failure_message("no data: no limit").is_true()
+
+
 func test_only_the_bow_and_bombs_go_on_the_item_button() -> void:
 	assert_bool(Inventory.is_equippable(BOW)).is_true()
 	assert_bool(Inventory.is_equippable(BOMB)).is_true()

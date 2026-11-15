@@ -198,7 +198,11 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
 - Do not make the mouse a pointer, and keep its two buttons as the user set them on 2026-11-13, as in
   farming games: **left click uses what is in hand** (`AreaController.use_hand()`: the sword, or the tool or
   item on the item button) and answers in a conversation; **right click interacts** with people and things.
-  Moving stays on the keys; Space and Q still do the sword and the item.
+  Moving stays on the keys; Space and Q still do the sword and the item. A bow or bombs with nothing left
+  give the left click back to the sword (`GameState.is_out_of_ammo()`), so running out is no dead end.
+- Do not let a full pack lose things: what can't be carried whole stays where it is and the hero is told
+  (`GameState.has_room_for()`; a pickup, a forage spot and a chest each have `has_room()`). **A test that
+  fills a stack and then takes more of it sees a refusal,** not a silent loss.
 - Do not add areas beyond the hero's home and plot unless the user asks.
 - Do not add a dependency/addon without noting why in `docs/DECISIONS.md`. Allowed now: gdUnit4.
 - Do not write story, dialogue or quest content beyond what the current milestone needs.

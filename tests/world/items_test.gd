@@ -147,6 +147,34 @@ func test_the_item_menu_needs_something_to_equip() -> void:
 	assert_bool(village.use_item()).override_failure_message("nothing on the button").is_false()
 
 
+func test_tab_or_esc_leaves_the_item_menu_and_changes_nothing() -> void:
+	GameState.add_item(&"bow")
+	GameState.add_item(&"arrow", 5)
+	GameState.add_item(&"bomb", 2)
+	var village: AreaController = _load(VILLAGE)
+	var menu: ItemMenu = village.hud.item_menu
+	# Esc backs out of it, as it does out of the shop's list and the gifts: it is every menu's
+	# way back, and it doesn't open the pause menu on its way.
+	for back: StringName in [&"item_menu", &"pause"]:
+		assert_bool(village.open_item_menu()).is_true()
+		menu.move_cursor(1)
+		menu._unhandled_input(_action(back))
+		assert_bool(menu.is_open()).override_failure_message("'%s' leaves the item menu" % back).is_false()
+		assert_that(GameState.equipped).override_failure_message("and changes nothing").is_equal(&"bow")
+		assert_bool(village.player.controls_enabled).is_true()
+		assert_bool(village.is_paused()).is_false()
+	# Closed, it hears nothing.
+	menu._unhandled_input(_action(&"pause"))
+	assert_bool(menu.is_open()).is_false()
+
+
+func _action(action: StringName) -> InputEventAction:
+	var event: InputEventAction = InputEventAction.new()
+	event.action = action
+	event.pressed = true
+	return event
+
+
 func _load(path: String) -> AreaController:
 	_area = Steps.load_area(path, _area)
 	return _area

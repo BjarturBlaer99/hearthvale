@@ -24,6 +24,12 @@ static func room_for(held: int, item: Dictionary) -> int:
 	return maxi(capacity(item) - held, 0)
 
 
+## Whether `count` more of `item` fit on top of `held`: all of them, or it doesn't fit. What
+## can't be carried whole is left where it is (a chest, a bush, a crop), never taken in part.
+static func fits(held: int, item: Dictionary, count: int) -> bool:
+	return room_for(held, item) >= count
+
+
 static func is_equippable(item: Dictionary) -> bool:
 	return EQUIPPABLE_TYPES.has(str(item.get("type", "")))
 
