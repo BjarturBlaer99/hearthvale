@@ -335,6 +335,11 @@ res://
     starts (a stage may wait for a dawn: the `days_since` condition) and when an area loads. With no game
     started it does nothing. It announces "New quest", "Quest updated" and "Quest complete" with a sound. The area shows the
     announcement as a notice at the top of the screen, clear of the dialogue box.
+  - **News joins news** (`AreaHud.show_notice()`, `NoticeLines` in `core/menus/`, pure): a notice that comes
+    while another is still up is shown on a line of its own under it, so a skill rising as a quest moves on
+    are both read. News already showing isn't said twice, three lines show at most (the oldest gives way), and
+    each new line gives all of it its full time again. `notice_lines()` has them a line each; `notice_text()`
+    is the whole of it. The same holds for a skill's rise, a mark of friendship and a recipe learned.
   - DataRegistry rejects a quest no stage of which completes it.
 - **The quests so far** (each a different shape):
   - A Place of Your Own: the main story, in six stages (section 22). It starts by itself.

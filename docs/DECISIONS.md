@@ -864,4 +864,7 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
 - 2026-11-15 — **Bug hunt: what was found and not fixed is listed, not changed.** Notices that replace each
   other, rewards cut to what fits and a gift to a full friendship are how the plans left them; changing them is
   the user's call, not a bug fix.
+- 2026-11-15 — **Bug hunt: news is stacked, not queued.** Two pieces of news at once show together, a line
+  each. A queue would show them one after the other and keep the second back for three and a half seconds,
+  by when the moment it belongs to is over; and tests, in which no time passes, would never see it.
 

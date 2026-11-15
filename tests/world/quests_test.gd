@@ -65,7 +65,8 @@ func test_the_lost_shuttle_from_wenna_to_the_stream_and_back() -> void:
 	_say(weaver, "You look troubled.")
 	_say(weaver, "I'll look for it.")
 	assert_that(Quests.runner.stage(&"lost_shuttle")).is_equal(&"find")
-	assert_str(weaver.hud.notice_text()).is_equal("New quest: The Lost Shuttle")
+	# The game has only just begun: its own quest's news is still up, and this joins it.
+	assert_array(Array(weaver.hud.notice_lines())).is_equal(["New quest: A Place of Your Own", "New quest: The Lost Shuttle"])
 	_say(weaver, "Goodbye.")
 	_talk(weaver, "Wenna")
 	assert_array(Array(weaver.hud.dialogue.shown_options())).override_failure_message("offered once").is_equal(["About your shuttle...", "Goodbye."])
@@ -110,7 +111,7 @@ func test_eggs_for_tilda_from_oda_to_the_shop_and_back() -> void:
 	_say(village, "Need a hand with anything?")
 	_say(village, "I'll take it.")
 	assert_int(GameState.item_count(&"egg_basket")).override_failure_message("Oda hands over the basket").is_equal(1)
-	assert_str(village.hud.notice_text()).is_equal("New quest: Eggs for Tilda")
+	assert_str(str(Array(village.hud.notice_lines()).back())).override_failure_message("the latest news is the last line").is_equal("New quest: Eggs for Tilda")
 
 	var shop: AreaController = _load(SHOP)
 	_talk(shop, "Tilda")

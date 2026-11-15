@@ -163,6 +163,11 @@ removes the shim, so recreate it after upgrading.
   `AreaController.use_hand()` / `interact()`. Every screen calls `MenuInput.let_clicks_through(self)` as it
   starts, or a Control would swallow the click; write a prompt with `MenuInput.prompt()`, never with a key's
   name.
+- **News at the top of the screen joins, it doesn't replace** (`AreaHud.show_notice()`, `NoticeLines`): a
+  quest's, a skill's, a friendship's and a recipe's news each take a line while earlier news is still up.
+  In a test no time passes, so earlier news is still up: check `hud.notice_lines()` (the latest is the last
+  line), not that `notice_text()` equals one line. A new game's first area says "New quest: A Place of Your
+  Own" unless the test calls `Quests.refresh()` before loading it.
 
 **Shader gotcha:** in a canvas shader `COLOR` already holds the texture's colour when `fragment()` starts. To
 sample the texture again, pass the tint from `vertex()` in a varying; multiplying by `COLOR` squares the picture.

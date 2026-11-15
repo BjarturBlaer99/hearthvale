@@ -1915,3 +1915,27 @@ No roadmap step: a search for bugs across the finished game, and a fix with a te
 - **An empty bow still shows on the HUD** ("Item: Bow (Arrows x0)") while the left click swings the sword.
 - **The monkey is a scratch script,** not part of the project: it lives outside the repository and was not kept.
 
+## 2026-11-15 — Bug hunt, continued: news no longer replaces news (the user: "Yes, fix it")
+
+The first of the things the bug hunt found and left: at the top of the screen the later of two pieces of news took the earlier one's place.
+
+**Fixed**
+- **News joins news.** A notice that comes while another is still up is shown on a line of its own under it. The Warden's fall now reads "Combat rose to level 2." and, under it, "Quest updated: A Place of Your Own"; a talk that gains a mark and a lesson reads "Wenna: friendship 2 of 5." and "New recipe: Berry Jam."
+- **The same news isn't said twice,** so an old save's quest catching up through several stages is still one line.
+- **Three lines at most:** a fourth pushes the oldest off.
+- **Each new line gives all of it its full time again** (three and a half seconds), and then all of it fades together.
+- The rule is `NoticeLines` (`core/menus/`, pure); the HUD keeps the lines and their time.
+
+**Checked**
+- 673 tests in 92 suites pass. Seven are new: four of the rule alone, and three on the HUD (news joining and going, the Warden's fall, a mark with a lesson), each of those three seen failing first. Import and boot clean.
+- **Two older tests needed updating,** both in the quests suite: they start a new game and take a quest at once, so the game's own "New quest: A Place of Your Own" is still up and the quest's news is the line under it. They now say so.
+- **Deliberate bugs:** four planted in runtime code, one at a time, each caught, files restored: news taking the place of news, the same news said twice, the oldest line never giving way, news whose time is up coming back with the next.
+- **Two screenshots,** looked at closely: two lines in the keep's hall, three in Hearthvale at dusk. They sit under one another in the middle of the top of the screen, clear of the corner's box and the keys.
+
+**Known issues and limits**
+- Not tried in play.
+- **Old news stays up longer when more comes:** a line three seconds old shows for three and a half more once a second line joins it.
+- **The lines fade together,** not one by one.
+- **Still hard to read over a thatched roof** (pale yellow on straw), as before: three lines cover more of one.
+- **Still found and left,** from the entry above: a reward cut to what fits, a gift to a villager at five marks, a save written straight over the old one, and Continue saying nothing when a save can't be read.
+

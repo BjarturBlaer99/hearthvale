@@ -195,15 +195,22 @@ func show_message(text: String) -> void:
 	_message_left = MESSAGE_TIME
 
 
-## News at the top of the screen (a quest started, moved on or finished): it stays clear of
-## the dialogue box, which covers the message line.
+## News at the top of the screen (a quest started, moved on or finished, a skill risen, a mark
+## gained, a recipe learned): it stays clear of the dialogue box, which covers the message
+## line. News that comes while other news is still up joins it on a line of its own
+## (NoticeLines), so neither takes the other's place, and all of it has its full time again.
 func show_notice(text: String) -> void:
-	_notice.text = text
+	_notice.text = "\n".join(NoticeLines.joined(notice_lines(), text))
 	_notice_left = NOTICE_TIME
 
 
 func notice_text() -> String:
 	return _notice.text if _notice_left > 0.0 else ""
+
+
+## The news showing now, a line each, the oldest first; none once its time is up.
+func notice_lines() -> PackedStringArray:
+	return _notice.text.split("\n", false) if _notice_left > 0.0 else PackedStringArray()
 
 
 ## Briefly darkens the screen so a scene change (or a new room) doesn't pop.
