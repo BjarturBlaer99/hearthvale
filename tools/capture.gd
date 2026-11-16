@@ -6,7 +6,7 @@ extends SceneTree
 
 ## [file name, area id, hero cell, facing, damage in half hearts, action]. Actions: "" (none),
 ## "talk" (to what is in front), "swing" (the sword, caught mid-swing), and with the bow, arrows
-## and bombs in hand: "menu" (the item menu open), "shoot" (an arrow in flight), "bomb" (lit);
+## and bombs in hand: "bar" (the item bar, the bow's slot lit), "shoot" (an arrow in flight), "bomb" (lit);
 ## "flag:<name>" sets that flag first (a door already opened); "gaze" waits for a boss's eye to
 ## open; "pause" opens the pause menu and "settings" the settings from it; "accept" talks and
 ## takes the first answer twice (accepting a quest); "questlog" starts the quests, moves them on
@@ -18,8 +18,8 @@ extends SceneTree
 ## slot of its own), and "ending" the ending screen (after two quests and an hour and a bit of
 ## play). Every shot is taken at noon (NOON), unless its action is "time:<HH:MM>".
 ## "energy:<n>" leaves the hero with that much energy; "collapse" takes it all (he is caught
-## lying where he fell, and never gets home: nothing is saved). "food_menu" opens the item menu
-## with food in hand and a bar half spent; "cook" faces the hearth with the makings of tea.
+## lying where he fell, and never gets home: nothing is saved). "food_menu" opens the food menu (Tab)
+## with food in the pack and the energy bar half spent; "cook" faces the hearth with the makings of tea.
 ## "lights" talks to Elder Bram once a first crop is in; "story_log" opens the quest log of a
 ## game just begun; "try" tries what the hero faces (the keep's chained gate). The main quest
 ## has begun before every shot, so its notice is not in each of them, except "begin": a game's
@@ -48,7 +48,7 @@ const SHOTS: Array = [
 	["13_goblin_on_the_plateau", &"south_field", Vector2i(31, 13), Vector2.UP, 0, ""],
 	["14_bats_by_the_ruin", &"south_field", Vector2i(24, 22), Vector2.RIGHT, 0, ""],
 	["15_tildas_shop", &"shop", Vector2i(5, 4), Vector2.UP, 0, "talk"],
-	["16_item_menu", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "menu"],
+	["16_the_item_bar", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "bar"],
 	["17_shooting_the_bow", &"south_field", Vector2i(20, 12), Vector2.RIGHT, 0, "shoot"],
 	["18_a_lit_bomb", &"south_field", Vector2i(20, 12), Vector2.DOWN, 0, "bomb"],
 	["19_stairway_in_the_ruin", &"south_field", Vector2i(31, 21), Vector2.UP, 0, ""],
@@ -146,12 +146,12 @@ const SHOTS: Array = [
 	["111_soil_tilled_and_watered", &"village", Vector2i(14, 20), Vector2.RIGHT, 0, "farm"],
 	["112_the_hoe_at_work", &"village", Vector2i(14, 19), Vector2.RIGHT, 0, "hoe"],
 	["113_the_tools_at_home", &"home", Vector2i(6, 6), Vector2.DOWN, 0, ""],
-	["114_tools_in_the_item_menu", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "tools_menu"],
+	["114_tools_on_the_item_bar", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "tools_bar"],
 	["115_filling_the_can_at_the_well", &"village", Vector2i(17, 19), Vector2.RIGHT, 0, "fill"],
 	["116_crops_growing_and_ripe", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "crops"],
 	["117_a_ripe_turnip_to_pick", &"village", Vector2i(12, 20), Vector2.UP, 0, "crops"],
 	["118_planting_a_seed", &"village", Vector2i(17, 20), Vector2.UP, 0, "plant"],
-	["119_seeds_and_crops_in_the_item_menu", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "seeds_menu"],
+	["119_seeds_on_the_item_bar", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "seeds_bar"],
 	["120_tildas_list_to_buy_from", &"shop", Vector2i(5, 4), Vector2.UP, 0, "shop_buy"],
 	["121_selling_the_harvest", &"shop", Vector2i(5, 4), Vector2.UP, 0, "shop_sell"],
 	["122_meals_at_the_hearth", &"home", Vector2i(5, 2), Vector2.UP, 0, "meals"],
@@ -260,9 +260,12 @@ func _capture() -> void:
 		if shot[5] == "swing":
 			game_state.call(&"add_item", &"wooden_sword", 1)
 			game_state.call(&"set_flag", &"took_wooden_sword", true)
-		if shot[5] in ["menu", "shoot", "bomb"]:
+		if shot[5] in ["bar", "shoot", "bomb"]:
 			for item: Array in [[&"bow", 1], [&"arrow", 10], [&"bomb", 3]]:
 				game_state.call(&"add_item", item[0], item[1])
+			if shot[5] == "bar":
+				game_state.call(&"add_item", &"wooden_sword", 1)
+				game_state.call(&"set_flag", &"took_wooden_sword", true)
 			game_state.call(&"equip", &"bomb" if shot[5] == "bomb" else &"bow")
 		if shot[5] == "cook":
 			game_state.call(&"add_item", &"cherry_blossom", 4)
@@ -270,7 +273,7 @@ func _capture() -> void:
 			# A purse and a harvest: enough to buy seeds, to sell, and to cook every dish.
 			for item: Array in [[&"coin", 34], [&"turnip", 4], [&"carrot", 2], [&"wheat", 6], [&"potato", 2], [&"pumpkin", 1], [&"mushroom", 3]]:
 				game_state.call(&"add_item", item[0], item[1])
-		if shot[5] in ["crops", "plant", "seeds_menu"]:
+		if shot[5] in ["crops", "plant", "seeds_bar"]:
 			# The plot in the middle of a season: the top row growing, the middle row ripe (a column
 			# a crop: turnip, carrot, wheat, potato, pumpkin), and along the bottom a seed just
 			# planted, a sprout and a withered crop. The last column is tilled and empty.
@@ -317,7 +320,7 @@ func _capture() -> void:
 			var points: Dictionary = {&"elder_bram": 9, &"farmer_oda": 4, &"guard_rolf": 1, &"pip": 20, &"tilda": 13, &"wenna": 17}
 			for villager: StringName in points:
 				game_state.call(&"add_friendship", villager, points[villager])
-		if shot[5] in ["farm", "hoe", "tools_menu", "fill"]:
+		if shot[5] in ["farm", "hoe", "tools_bar", "fill"]:
 			# The farm's tools in hand, the can half full; and for "farm" a morning's work done:
 			# two rows tilled, the first of them watered.
 			for item: Array in [[&"hoe", 1], [&"watering_can", 1], [&"water", 5]]:
@@ -394,8 +397,8 @@ func _capture() -> void:
 				if String(child.name).begins_with("ShadeBrazier"):
 					child.call(&"light")
 			await create_timer(0.5).timeout
-		elif shot[5] == "menu":
-			scene.call(&"open_item_menu")
+		elif shot[5] in ["bar", "tools_bar", "seeds_bar"]:
+			# What can be in hand is on the bar at the bottom: nothing to open.
 			await _frames(2)
 		elif shot[5] in ["shop_buy", "shop_sell"]:
 			scene.call(&"open_shop", &"tilda", &"sell" if shot[5] == "shop_sell" else &"buy")
@@ -408,7 +411,7 @@ func _capture() -> void:
 			scene.call(&"interact")
 			scene.get(&"hud").get(&"dialogue").call(&"move_cursor", 4)
 			await _frames(2)
-		elif shot[5] in ["tools_menu", "seeds_menu", "cook_menu", "new_dishes"]:
+		elif shot[5] in ["cook_menu", "new_dishes"]:
 			scene.call(&"open_item_menu")
 			await _frames(2)
 		elif shot[5] in ["hoe", "fill", "plant"]:
