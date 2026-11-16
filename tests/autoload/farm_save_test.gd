@@ -19,8 +19,7 @@ func after_test() -> void:
 	EventBus.farm_changed.disconnect(_on_farm_changed)
 	GameState.clear()
 	SaveSystem.current_slot = SaveSystem.GAME_SLOT
-	if SaveSystem.has_slot(TEST_SLOT):
-		DirAccess.remove_absolute(SaveSystem.slot_path(TEST_SLOT))
+	SaveSystem.erase_slot(TEST_SLOT)
 
 
 func test_a_new_game_has_an_untouched_plot() -> void:

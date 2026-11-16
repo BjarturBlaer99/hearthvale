@@ -8,8 +8,7 @@ const TEST_SLOT: int = 990
 func after_test() -> void:
 	GameState.clear()
 	SaveSystem.current_slot = SaveSystem.GAME_SLOT
-	if SaveSystem.has_slot(TEST_SLOT):
-		DirAccess.remove_absolute(SaveSystem.slot_path(TEST_SLOT))
+	SaveSystem.erase_slot(TEST_SLOT)
 
 
 func test_slot_round_trip_keeps_hearts_items_and_place() -> void:

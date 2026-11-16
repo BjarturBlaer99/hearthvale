@@ -26,8 +26,7 @@ func after_test() -> void:
 	EventBus.day_started.disconnect(_on_day)
 	GameState.clear()
 	SaveSystem.current_slot = SaveSystem.GAME_SLOT
-	if SaveSystem.has_slot(TEST_SLOT):
-		DirAccess.remove_absolute(SaveSystem.slot_path(TEST_SLOT))
+	SaveSystem.erase_slot(TEST_SLOT)
 
 
 func test_a_new_game_starts_on_the_first_morning_rested() -> void:

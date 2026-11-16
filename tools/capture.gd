@@ -246,7 +246,7 @@ func _capture() -> void:
 			title.queue_free()
 			await _frames(2)
 			if shot[5] == "finished":
-				DirAccess.remove_absolute(str(saves.call(&"slot_path", CAPTURE_SLOT)))
+				saves.call(&"erase_slot", CAPTURE_SLOT)
 				saves.set(&"current_slot", own_slot)
 			continue
 		var scene: Node = (load(WorldPaths.scene_for(shot[1])) as PackedScene).instantiate()
@@ -351,7 +351,7 @@ func _capture() -> void:
 			var own_slot: int = saves.get(&"current_slot")
 			saves.set(&"current_slot", CAPTURE_SLOT)
 			game_state.call(&"sleep")
-			DirAccess.remove_absolute(str(saves.call(&"slot_path", CAPTURE_SLOT)))
+			saves.call(&"erase_slot", CAPTURE_SLOT)
 			saves.set(&"current_slot", own_slot)
 			await _frames(110)
 		if shot[5] == "tale":

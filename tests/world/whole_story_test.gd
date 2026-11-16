@@ -46,8 +46,7 @@ func after_test() -> void:
 		_area.free()
 	_area = null
 	get_tree().paused = false
-	if SaveSystem.has_slot(TEST_SLOT):
-		DirAccess.remove_absolute(SaveSystem.slot_path(TEST_SLOT))
+	SaveSystem.erase_slot(TEST_SLOT)
 	SaveSystem.current_slot = SaveSystem.GAME_SLOT
 	GameState.clear()
 

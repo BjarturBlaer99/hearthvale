@@ -15,8 +15,7 @@ func before_test() -> void:
 func after_test() -> void:
 	GameState.clear()
 	SaveSystem.current_slot = SaveSystem.GAME_SLOT
-	if SaveSystem.has_slot(TEST_SLOT):
-		DirAccess.remove_absolute(SaveSystem.slot_path(TEST_SLOT))
+	SaveSystem.erase_slot(TEST_SLOT)
 
 
 func test_the_day_a_flag_came_true_is_kept() -> void:

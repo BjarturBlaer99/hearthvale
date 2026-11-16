@@ -25,8 +25,7 @@ func after_test() -> void:
 		_area.free()
 	_area = null
 	GameState.clear()
-	if SaveSystem.has_slot(TEST_SLOT):
-		DirAccess.remove_absolute(SaveSystem.slot_path(TEST_SLOT))
+	SaveSystem.erase_slot(TEST_SLOT)
 
 
 func test_the_bow_waits_in_the_keep_and_goes_on_the_item_button() -> void:

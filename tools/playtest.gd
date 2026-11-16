@@ -188,9 +188,8 @@ func _start() -> void:
 	var scenario: Dictionary = SCENARIOS[scenario_name]
 	var saves: Node = root.get_node("SaveSystem")
 	saves.set(&"current_slot", PLAYTEST_SLOT)
-	var old_save: String = str(saves.call(&"slot_path", PLAYTEST_SLOT))
-	if FileAccess.file_exists(old_save):
-		DirAccess.remove_absolute(old_save)
+	# The save, its backup and anything half written: a scenario starts with none of them.
+	saves.call(&"erase_slot", PLAYTEST_SLOT)
 	print("tools/playtest: '%s'. Saving here goes to slot %d, not your own game." % [scenario_name, PLAYTEST_SLOT])
 	var game_state: Node = root.get_node("GameState")
 	game_state.call(&"new_game")
@@ -230,8 +229,8 @@ func _start_full(fresh: bool) -> void:
 	var saves: Node = root.get_node("SaveSystem")
 	saves.set(&"current_slot", FULL_SLOT)
 	var save_path: String = str(saves.call(&"slot_path", FULL_SLOT))
-	if fresh and FileAccess.file_exists(save_path):
-		DirAccess.remove_absolute(save_path)
+	if fresh:
+		saves.call(&"erase_slot", FULL_SLOT)
 	_game_state = root.get_node("GameState")
 	_game_state.call(&"clear")
 	_started_msec = Time.get_ticks_msec()
