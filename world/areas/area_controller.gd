@@ -131,6 +131,10 @@ var reflections: Reflections
 var mist: Mist
 
 var _travelling: bool = false
+## The game is saved and leaving (save_and_leave), and whether he has been told once that it
+## couldn't be saved: asked again, it leaves all the same.
+var _leaving: bool = false
+var _told_unsaved: bool = false
 ## The ending flag was just set: the ending screen comes when the conversation closes.
 var _ending_due: bool = false
 ## When the current hit-stop ends (real milliseconds; 0: none).
@@ -1477,10 +1481,53 @@ func _on_skill_rose(skill: StringName, level: int) -> void:
 	hud.show_notice(GameState.skills().risen_words(skill, level))
 
 
+## "Quit to title" in the pause menu: the game is saved first.
 func _on_quit_to_title() -> void:
+	save_and_leave(func() -> void: travel.call(TITLE_SCENE))
+
+
+## Saves the game where the hero stands, says so, and leaves by `then` a moment later: to the
+## title, or out of the game when the window is closed (SaveSystem.close_requested). If the save
+## can't be written he is told and the game goes on; asked again, it leaves without saving.
+func save_and_leave(then: Callable) -> void:
+	if _leaving:
+		return
+	var error: Error = save_here()
+	if error != OK and not _told_unsaved:
+		_told_unsaved = true
+		EventBus.sound.emit(&"nope")
+		_say_leaving(SaveSystem.NOT_SAVED_WORDS % error_string(error))
+		return
+	_leaving = true
 	_travelling = true
 	player.controls_enabled = false
-	travel.call(TITLE_SCENE)
+	if error == OK:
+		_say_leaving(SaveSystem.SAVING_WORDS)
+	SaveSystem.after_notice(then)
+
+
+## Writes the save with the hero where he stands. One lying fallen is saved as he would wake,
+## at the entrance and whole; one down a pit, on the ground he fell from; one on his way through
+## a door, on his way.
+func save_here() -> Error:
+	if _dying:
+		respawn()
+	if not _travelling:
+		GameState.update_player(area_id, _safe_cell if is_in_pit() else player.motor.cell)
+	return SaveSystem.save_game()
+
+
+## Whether the game is saved and on its way out (to the title, or closing).
+func is_leaving() -> bool:
+	return _leaving
+
+
+## Words about the save as the game leaves: at the top of the screen, and in the pause menu if
+## it is open over it.
+func _say_leaving(words: String) -> void:
+	hud.show_notice(words)
+	if hud.pause_menu.is_open():
+		hud.pause_menu.say(words)
 
 
 ## The food menu's choice: it is eaten, if it would do him any good.

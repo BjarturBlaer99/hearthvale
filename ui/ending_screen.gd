@@ -4,7 +4,8 @@ extends Control
 ## (the area comes here when the flag AreaController.ENDING_FLAG is set). "The End" over the
 ## title's picture with the keep's window dark, what the game took (EndingSummary), and two
 ## choices: keep exploring (back to where the hero stood) or save and go to the title. Up and
-## down pick, and so does pointing with the mouse; a click or Enter chooses.
+## down pick, and so does pointing with the mouse; a click or Enter chooses. Closing the window
+## here saves first (SaveSystem.close_requested), or the last fight would be lost.
 
 const KEEP_EXPLORING: StringName = &"explore"
 const SAVE_AND_QUIT: StringName = &"save_quit"
@@ -13,6 +14,10 @@ const TITLE_SCENE: String = "res://ui/title_screen.tscn"
 var cursor: MenuCursor = MenuCursor.new()
 ## Changes the scene (gets its path). Tests replace it.
 var travel: Callable
+
+## The game is saved and closing, and whether it has been said once that it couldn't be saved.
+var _leaving: bool = false
+var _told_unsaved: bool = false
 
 @onready var _stats: Label = $Stats
 @onready var _list: Label = $Menu/List
@@ -83,6 +88,23 @@ func choose(id: StringName = &"") -> void:
 				_note.text = "Couldn't save (%s)." % error_string(error)
 				return
 			travel.call(TITLE_SCENE)
+
+
+## The window is closing: the finished game is saved, the screen says so, and `then` is called
+## a moment later. If the save can't be written the screen says that and stays; asked again,
+## it leaves without saving.
+func save_and_leave(then: Callable) -> void:
+	if _leaving:
+		return
+	var error: Error = SaveSystem.save_game()
+	if error != OK and not _told_unsaved:
+		_told_unsaved = true
+		_note.text = SaveSystem.NOT_SAVED_WORDS % error_string(error)
+		return
+	_leaving = true
+	if error == OK:
+		_note.text = SaveSystem.SAVING_WORDS
+	SaveSystem.after_notice(then)
 
 
 ## Puts the cursor on the line the mouse is on in `event`, if that line can be chosen.

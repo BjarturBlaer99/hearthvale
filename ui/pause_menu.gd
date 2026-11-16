@@ -2,8 +2,9 @@ class_name PauseMenu
 extends Control
 ## The pause menu (Esc or Start, docs/TECH_DESIGN.md §12): the game stops behind it. It shows
 ## the hero's hearts, heart pieces, keys and play time, and offers Resume, Save, Quests (the
-## quest log), Friends (the villagers and their marks), Settings and Quit to title. Save writes the save slot (SaveSystem); quitting to the title loses anything
-## not saved, and the menu says so. Esc resumes. The mouse points: the line under it is
+## quest log), Friends (the villagers and their marks), Settings and Quit to title. Save writes
+## the save slot (SaveSystem); quitting to the title saves first (the area does it), and the
+## menu says so. Esc resumes. The mouse points: the line under it is
 ## highlighted, and a click chooses it.
 
 signal resumed
@@ -15,6 +16,8 @@ const QUESTS: StringName = &"quests"
 const FRIENDS: StringName = &"friends"
 const SETTINGS: StringName = &"settings"
 const QUIT: StringName = &"quit"
+## What the menu says under its list as it opens.
+const QUIT_NOTE: String = "Quitting to the title saves your game first."
 
 var cursor: MenuCursor = MenuCursor.new()
 
@@ -37,7 +40,7 @@ func _ready() -> void:
 ## Pauses the game and shows the menu with `status` (hearts, keys, time) at the top.
 func open(status: String) -> void:
 	_status.text = status
-	_note.text = "Quitting to the title loses anything you haven't saved."
+	_note.text = QUIT_NOTE
 	_show_panel(true)
 	cursor.set_options([
 		MenuCursor.option(RESUME, "Resume"),
@@ -59,6 +62,11 @@ func is_open() -> bool:
 
 func note() -> String:
 	return _note.text
+
+
+## Says `words` under the list (the area, about a save as the window closes).
+func say(words: String) -> void:
+	_note.text = words
 
 
 func shown_lines() -> PackedStringArray:

@@ -7,6 +7,10 @@ extends Node
 ## A save is never written over the one before it (SaveFiles): it is written beside it, read
 ## back to see that it is whole, and only then put in its place, and the save that was there is
 ## kept as a backup. A write that fails leaves the old save as it was.
+##
+## Leaving saves first: the window closing is not taken as a yes (auto_accept_quit is off). The
+## game's scene is asked to save and say so (`save_and_leave(then)`: an area, the ending screen),
+## and the game quits a moment later. A scene with nothing to save (the title) quits at once.
 
 const SAVE_DIR: String = "user://saves"
 ## The slot the title screen and the pause menu use (the slice has one).
@@ -15,12 +19,52 @@ const GAME_SLOT: int = 1
 ## can be held for a moment by whatever watches the disk), and how long between tries.
 const TRIES: int = 5
 const TRY_AGAIN_MSEC: int = 20
+## What the screen says while the game is saved on its way out, what it says when that save
+## can't be written (the game stays, the first time), and how long the first stays up.
+const SAVING_WORDS: String = "Saving..."
+const NOT_SAVED_WORDS: String = "Couldn't save (%s). Quit again to leave without saving."
+const LEAVE_DELAY: float = 0.5
 
 ## The slot save_game() and load_game() use. Tests point it elsewhere.
 var current_slot: int = GAME_SLOT
 ## Writes `text` to the file at `path` and returns what went wrong, if anything. Tests replace
 ## it to cut a save short.
 var write_file: Callable = _write_text
+## How long "Saving..." is up before the game leaves. Tests set it to nothing.
+var leave_delay: float = LEAVE_DELAY
+## Quits the game. Tests replace it.
+var quit: Callable = func() -> void: get_tree().quit()
+
+
+func _ready() -> void:
+	# The game decides when a closing window may close: a game in play is saved first.
+	get_tree().auto_accept_quit = false
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		close_requested()
+
+
+## The window was asked to close. The game's scene saves first and says so, if it has a game to
+## save (it has `save_and_leave(then)`), and the game quits when it is done; any other scene
+## (the title) quits at once. Only the scene the game is showing is asked: an area a test or a
+## tool has put in the tree beside it is not.
+func close_requested() -> void:
+	var scene: Node = get_tree().current_scene
+	if scene != null and scene.has_method(&"save_and_leave"):
+		scene.call(&"save_and_leave", quit)
+	else:
+		quit.call()
+
+
+## Calls `then` when "Saving..." has been up for `leave_delay` (at once, with none). It counts
+## real time, behind the pause menu too.
+func after_notice(then: Callable) -> void:
+	if leave_delay <= 0.0:
+		then.call()
+	else:
+		get_tree().create_timer(leave_delay, true, false, true).timeout.connect(then)
 
 
 func slot_path(slot: int) -> String:

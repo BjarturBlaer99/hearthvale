@@ -22,6 +22,8 @@ func before_test() -> void:
 	GameState.clear()
 	GameState.new_game()
 	SaveSystem.current_slot = TEST_SLOT
+	# Quitting to the title saves first and waits a moment (tests/ui/quit_save_test.gd): not here.
+	SaveSystem.leave_delay = 0.0
 	Settings.path = TEST_SETTINGS
 	Settings.load_settings()
 
@@ -33,6 +35,7 @@ func after_test() -> void:
 	get_tree().paused = false
 	SaveSystem.erase_slot(TEST_SLOT)
 	SaveSystem.current_slot = SaveSystem.GAME_SLOT
+	SaveSystem.leave_delay = SaveSystem.LEAVE_DELAY
 	if FileAccess.file_exists(TEST_SETTINGS):
 		DirAccess.remove_absolute(TEST_SETTINGS)
 	Settings.path = Settings.PATH
@@ -107,14 +110,15 @@ func test_the_pause_menu_stops_the_game_and_saves() -> void:
 	assert_bool(village.open_pause_menu()).override_failure_message("not mid-conversation").is_false()
 
 
-func test_quitting_to_the_title_warns_about_unsaved_progress() -> void:
+func test_quitting_to_the_title_says_it_saves_first_and_does() -> void:
 	var village: AreaController = _load(VILLAGE)
 	var travelled: Array[String] = []
 	village.travel = func(path: String) -> void: travelled.append(path)
 	village.open_pause_menu()
-	assert_str(village.hud.pause_menu.note()).contains("haven't saved")
+	assert_str(village.hud.pause_menu.note()).contains("saves your game first")
 	village.hud.pause_menu.choose(PauseMenu.QUIT)
 	assert_array(travelled).is_equal([TITLE])
+	assert_str(str(SaveSystem.summary()["area"])).is_equal("village")
 	assert_bool(get_tree().paused).is_false()
 
 
