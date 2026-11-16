@@ -1,7 +1,8 @@
 class_name DialogueBox
 extends Control
 ## The text box at the bottom of the screen (docs/TECH_DESIGN.md §7): who is speaking, what
-## they say, and the answers to pick from (up/down to move, a left click or Enter to choose).
+## they say, and the answers to pick from (up/down, the wheel or the pointer to move; a left
+## click or Enter to choose: the answer the click is on, or the highlighted one).
 ## It shows a DialogueRunner, which holds the conversation; the area keeps the hero still
 ## while it's open. On a node with no answers (a sign), the same keys close it.
 
@@ -101,17 +102,34 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	# Held from before: the last answer can end the game's scene, and the box leaves the tree.
 	var viewport: Viewport = get_viewport()
+	if MenuInput.is_pointing(event):
+		point_at(event)
+		return
 	if MenuInput.is_answer(event):
 		# A left click in the first moment is taken for a swing of the sword, and goes nowhere.
 		if not (event.is_action_pressed(&"use_hand") and open_for < SWING_GRACE):
+			# A click on an answer picks that answer; anywhere else, the highlighted one.
+			point_at(event)
 			confirm()
-	elif event.is_action_pressed(&"move_up"):
+	elif MenuInput.is_up(event):
 		move_cursor(-1)
-	elif event.is_action_pressed(&"move_down"):
+	elif MenuInput.is_down(event):
 		move_cursor(1)
 	else:
 		return
 	viewport.set_input_as_handled()
+
+
+## Puts the cursor on the answer the mouse is on in `event`, if it is on one.
+func point_at(event: InputEvent) -> void:
+	if not is_open():
+		return
+	var line: int = MenuInput.line_under(_options, event, mini(OPTION_ROWS, runner.options().size() - top))
+	if line == MenuPointer.NONE or top + line == selected:
+		return
+	selected = top + line
+	EventBus.sound.emit(&"menu_move")
+	_refresh()
 
 
 func _on_ended() -> void:

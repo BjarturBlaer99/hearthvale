@@ -1939,3 +1939,42 @@ The first of the things the bug hunt found and left: at the top of the screen th
 - **Still hard to read over a thatched roof** (pale yellow on straw), as before: three lines cover more of one.
 - **Still found and left,** from the entry above: a reward cut to what fits, a gift to a villager at five marks, a save written straight over the old one, and Continue saying nothing when a save can't be read.
 
+## 2026-11-16 — The mouse in menus, and an item bar (the user's request of 2026-11-15; built, not yet tried in play)
+
+Plan: `docs/progress/mouse-and-bar-plan.md`. The user's words, after playing: "the mouse should be the select on the pause menu and main menu and bombs and lets add a items menu at the bottom of the screen where the player scrolls or uses 123456789 buttons to select the item they want to use". Three things were asked back and answered: bombs are only picked in the bar; the pointer works in every menu; the bar holds what goes in hand, and food stays in the Tab menu.
+
+**Built: the mouse points in menus**
+- In every menu and list the line under the pointer is highlighted as the mouse moves, and a click chooses the line it is on: the title, the pause menu and its pages, settings, the food menu, Tilda's lists, the gifts, the answers in a conversation, the ending.
+- **A click on no line does what it always did:** the highlighted line, or reading on in a conversation. A click on a line that can't be chosen (Continue with no save) does nothing.
+- **The wheel is up and down in every menu,** which scrolls a list longer than its box.
+- **At Tilda's a click on "Buy" or "Sell" turns to that list.** A click between the two names does nothing.
+- In play nothing changed: the mouse is two buttons and the hero works the cell he faces.
+
+**Built: the item bar**
+- **A bar along the bottom of the screen** with a slot for each thing that can be in hand: his best sword, then the bow, bombs, hoe, watering can and seeds in the order he picked them up. The slot in hand is lit. A slot shows how many it has left: arrows for the bow, bombs, seeds, pours in the can.
+- **The wheel steps through the slots,** round and round, **and the keys 1 to 9 choose one.** A gamepad's shoulder buttons step.
+- **With more than nine things** (there can be ten) the bar shows nine and moves with the choice, with a small arrow at an end where it goes on. The number keys are for the slots showing.
+- **The Tab menu is the food menu:** it lists only food. Its heading says so.
+- **The last bomb or seed leaves the sword in hand:** the slot goes, and the item button is empty. An old save with bombs on the button and none left loads the same way (the player's own save was one).
+- **Only his first thing for the item button goes into his hand as it is picked up.** With the sword in hand by choice, a thing bought or found waits in the bar.
+- The prompt and the message line moved up to clear the bar; the keys in the corner have a third line ("Wheel or 1-9: choose what is in hand") and say "Tab: food"; the news at the top sits six pixels lower to clear them; the first quest's journal says to choose the hoe "with the wheel or a number key".
+
+**Checked**
+- 702 tests in 96 suites pass. Twenty-nine are new: the pointer in each menu (`tests/ui/pointer_test.gd`), the bar (`tests/ui/item_bar_test.gd`), the two pure rules (`MenuPointer`, `HandBar`) and the input map. Import and boot clean.
+- **Twelve older tests needed updating:** they chose a tool or the sword in the Tab menu, expected "Items" as its heading, or quoted the journal's "Tab".
+- **Deliberate bugs:** ten planted in runtime code, one at a time, each caught, files restored: the pointer a line off, a click choosing a line that can't be chosen, a click on an answer giving the highlighted one, the wheel stopping at the ends of the bar, the last bomb staying on the item button, the number keys ignoring where the bar stands, an old save keeping bombs he hasn't got, a thing picked up taking the sword out of his hand, a click on "Sell" not turning the list, the wheel changing hands while he talks. **Real mouse events through a real window** (window pixels, at three times the size): the wheel, two number keys, the pointer on four lines of the pause menu, clicks on Quests, Back, Resume and a food, all as expected.
+- **Six screenshots,** looked at closely: the bar by the plot with the hoe in hand, the bombs in hand, ten things with the bar moved along, the pause menu with the pointer on "Friends", the food menu, the title with the pointer on "Settings".
+- **The save format is unchanged.**
+
+**Known issues and limits**
+- Not tried in play. **Whether pointing feels natural, and whether the wheel and the numbers feel right in a fight and on the plot,** are the plan's two lines for the user.
+- **The bar's slots can't be clicked:** the pointer is for menus, and a left click in play always uses what is in hand, wherever it lands.
+- **The slots have no numbers on them.** They count from the left; with ten things the first showing is not always the sword.
+- **The corner still says "Item: Hoe" and lists everything carried,** though the bar now shows what is in hand. The "Carrying" line is cut short with a full pack.
+- **The keys box in the top right is a line taller.**
+- **Tab no longer chooses a tool,** and nothing in the game says so but the keys box and the first quest's journal.
+- **The wheel in a conversation moves the highlight;** it does not scroll a long line of words.
+- **Hovering makes the cursor's tick** each time the pointer crosses onto another line.
+- **A click on the tab row at Tilda's that misses both names does nothing,** by design; a click anywhere else off the list still makes the highlighted deal.
+- **A bow with no arrows stays in hand** (it is still his), and the left click swings the sword; only bombs and seeds leave the bar when they run out.
+

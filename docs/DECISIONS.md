@@ -867,4 +867,22 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
 - 2026-11-15 — **Bug hunt: news is stacked, not queued.** Two pieces of news at once show together, a line
   each. A queue would show them one after the other and keep the second back for three and a half seconds,
   by when the moment it belongs to is over; and tests, in which no time passes, would never see it.
+- 2026-11-15 — **The mouse: a pointer in menus, two buttons in play.** The user asked for the mouse to select
+  in menus, which changes their rule of 2026-11-13 for menus only. In play the hero still works the cell he
+  faces: pointing at the world would be a different game, and was not asked for.
+- 2026-11-15 — **A click on no line still chooses the highlighted one.** The keys and a click anywhere worked
+  together before the pointer, and a conversation is read on with a click anywhere. Only a click on a line
+  that can't be chosen, or between Tilda's two tabs, does nothing: it was aimed.
+- 2026-11-15 — **The bar is a view of the item button, not a second inventory.** The lit slot is
+  `GameState.equipped` (empty for the sword), so the save format, the left click's rules and Q are as they
+  were. Slots are in pickup order and can't be rearranged: the user asked for a bar to choose from, not one to
+  arrange.
+- 2026-11-15 — **The last bomb or seed empties the item button.** A bar can't light a slot that isn't there.
+  This replaces the bug hunt's choice to leave "Bombs x0" on the button: Q now says nothing is on it. A bow
+  with no arrows stays, since the bow is still carried.
+- 2026-11-15 — **Only the first thing for the item button jumps into his hand.** With a bar the sword is
+  often in hand by choice, and buying bombs must not swap it out. With nothing else for the button (a new
+  game's hoe, bombs after the last ran out) it still does.
+- 2026-11-15 — **No numbers are drawn on the slots.** The font's smallest size is eight pixels, a third of a
+  slot. The keys box says "1-9", and the slots count from the left.
 

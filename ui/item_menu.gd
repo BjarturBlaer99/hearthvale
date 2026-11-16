@@ -97,18 +97,33 @@ func shown_lines() -> PackedStringArray:
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
+	if MenuInput.is_pointing(event):
+		point_at(event)
+		return
 	if event.is_action_pressed(&"interact") or event.is_action_pressed(&"use_item") or event.is_action_pressed(&"use_hand"):
+		# A click on a line picks that line; on no line, the highlighted one.
+		point_at(event)
 		confirm()
 	elif MenuInput.is_back(event):
 		# Tab or Esc, as in every other list: out, and nothing changed.
 		close()
-	elif event.is_action_pressed(&"move_up") or event.is_action_pressed(&"move_left"):
+	elif MenuInput.is_up(event) or event.is_action_pressed(&"move_left"):
 		move_cursor(-1)
-	elif event.is_action_pressed(&"move_down") or event.is_action_pressed(&"move_right"):
+	elif MenuInput.is_down(event) or event.is_action_pressed(&"move_right"):
 		move_cursor(1)
 	else:
 		return
 	get_viewport().set_input_as_handled()
+
+
+## Puts the cursor on the line the mouse is on in `event`, if it is on one.
+func point_at(event: InputEvent) -> void:
+	var line: int = MenuInput.line_under(_list, event, mini(ROWS, items.size() - top))
+	if line == MenuPointer.NONE or top + line == selected:
+		return
+	selected = top + line
+	EventBus.sound.emit(&"menu_move")
+	_refresh()
 
 
 func _refresh() -> void:

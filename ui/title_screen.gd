@@ -1,8 +1,9 @@
 class_name TitleScreen
 extends Control
 ## The title screen, the game's first scene (docs/TECH_DESIGN.md §12): Continue (when there's
-## a save, saying where and how long), New game, Settings and Quit. Up and down pick, a click
-## or Enter chooses. Its picture follows the save: the keep's window is dark once the game is
+## a save, saying where and how long), New game, Settings and Quit. Up and down (or the wheel)
+## pick, and so does pointing with the mouse; a click or Enter chooses: the line the click is
+## on, or the highlighted one if it is on none. Its picture follows the save: the keep's window is dark once the game is
 ## finished.
 
 const CONTINUE: StringName = &"continue"
@@ -84,17 +85,30 @@ func choose(id: StringName = &"") -> void:
 			quit.call()
 
 
+## Puts the cursor on the line the mouse is on in `event`, if that line can be chosen.
+func point_at(event: InputEvent) -> void:
+	if cursor.select(MenuInput.line_under(_list, event, cursor.options.size())):
+		EventBus.sound.emit(&"menu_move")
+		_list.text = "\n".join(cursor.lines())
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	# Take the viewport now: a choice can change the scene, which takes this menu out of the tree.
 	var viewport: Viewport = get_viewport()
 	if settings_menu.is_open():
+		return
+	if MenuInput.is_pointing(event):
+		point_at(event)
 		return
 	if MenuInput.is_up(event):
 		move_cursor(-1)
 	elif MenuInput.is_down(event):
 		move_cursor(1)
 	elif MenuInput.is_confirm(event):
-		choose()
+		# A click on a line chooses that line; on one that can't be chosen, nothing.
+		if cursor.take_click(MenuInput.line_under(_list, event, cursor.options.size())):
+			_list.text = "\n".join(cursor.lines())
+			choose()
 	else:
 		return
 	viewport.set_input_as_handled()

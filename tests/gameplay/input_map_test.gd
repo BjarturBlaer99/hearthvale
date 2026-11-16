@@ -59,6 +59,31 @@ func test_the_left_button_uses_the_hand_and_the_right_button_interacts() -> void
 	assert_array(_physical_keys(&"use_item")).contains(KEY_Q)
 
 
+func test_the_wheel_steps_through_the_bar_and_the_numbers_choose_a_slot() -> void:
+	# The item bar (the user's request, 2026-11-15).
+	assert_bool(_mouse(MOUSE_BUTTON_WHEEL_DOWN, true).is_action_pressed(&"slot_next")).is_true()
+	assert_bool(_mouse(MOUSE_BUTTON_WHEEL_UP, true).is_action_pressed(&"slot_previous")).is_true()
+	assert_bool(_mouse(MOUSE_BUTTON_WHEEL_UP, true).is_action_pressed(&"slot_next")).is_false()
+	assert_bool(_mouse(MOUSE_BUTTON_LEFT, true).is_action_pressed(&"slot_next") or _mouse(MOUSE_BUTTON_RIGHT, true).is_action_pressed(&"slot_next")).is_false()
+	for action: StringName in [&"slot_next", &"slot_previous"]:
+		assert_array(_physical_keys(action)).override_failure_message("%s is on no key" % action).is_empty()
+		var on_a_pad: bool = false
+		for event: InputEvent in InputMap.action_get_events(action):
+			on_a_pad = on_a_pad or event is InputEventJoypadButton
+		assert_bool(on_a_pad).override_failure_message("%s is on a gamepad's shoulder" % action).is_true()
+	for slot: int in 9:
+		var action: StringName = StringName("slot_%d" % (slot + 1))
+		assert_bool(InputMap.has_action(action)).override_failure_message("missing action %s" % action).is_true()
+		assert_array(_physical_keys(action)).override_failure_message(String(action)).contains_exactly([KEY_1 + slot])
+		for event: InputEvent in InputMap.action_get_events(action):
+			assert_bool(event is InputEventKey).override_failure_message("%s is on its number key alone" % action).is_true()
+	assert_bool(InputMap.has_action(&"slot_10")).is_false()
+	# No number key does anything else.
+	for action: StringName in ACTIONS:
+		for key: Variant in _physical_keys(action):
+			assert_bool(int(key) >= KEY_1 and int(key) <= KEY_9).override_failure_message("%s is not on a number key" % action).is_false()
+
+
 func test_retired_actions_are_gone() -> void:
 	for action: StringName in RETIRED:
 		assert_bool(InputMap.has_action(action)).override_failure_message("%s should be gone" % action).is_false()

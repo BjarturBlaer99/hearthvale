@@ -2,7 +2,7 @@ class_name GiftMenu
 extends Control
 ## What the hero carries that can be given (P4c, GDD §10), in the shape of Tilda's list: a
 ## villager's conversation opens it (the answer "I brought you something."). Up and down move
-## the cursor; a click or Enter gives the thing under it, and the list closes: one gift a
+## the cursor, and so does pointing with the mouse; a click or Enter gives the thing under it, and the list closes: one gift a
 ## villager a day. Tab or Esc keeps everything. Friendship (pure) says what can be given;
 ## GameState gives it. The area opens it and keeps the hero still while it is open.
 
@@ -92,7 +92,12 @@ func title_text() -> String:
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
+	if MenuInput.is_pointing(event):
+		point_at(event)
+		return
 	if MenuInput.is_confirm(event):
+		# A click on a line gives that thing; on no line, the highlighted one.
+		point_at(event)
 		confirm()
 	elif MenuInput.is_back(event):
 		close()
@@ -103,6 +108,16 @@ func _unhandled_input(event: InputEvent) -> void:
 	else:
 		return
 	get_viewport().set_input_as_handled()
+
+
+## Puts the cursor on the line the mouse is on in `event`, if it is on one.
+func point_at(event: InputEvent) -> void:
+	var line: int = MenuInput.line_under(_list, event, mini(ROWS, entries().size() - top))
+	if line == MenuPointer.NONE or top + line == selected:
+		return
+	selected = top + line
+	EventBus.sound.emit(&"menu_move")
+	_refresh()
 
 
 func _refresh() -> void:

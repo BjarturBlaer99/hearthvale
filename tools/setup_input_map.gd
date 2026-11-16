@@ -7,10 +7,13 @@ extends SceneTree
 ## The mouse (the user's requests, 2026-11-13), as in farming games: the left button uses what
 ## the hero has in hand (his sword, or the tool or item on the item button: `use_hand`), and
 ## the right button interacts with people and things (`interact`). The hero is moved with the
-## keys. The buttons are buttons, not a pointer: where a click lands doesn't matter. The sword
-## and the item keep their own keys as well (Space, Q).
+## keys. In play the buttons are buttons, not a pointer: where a click lands doesn't matter. The
+## sword and the item keep their own keys as well (Space, Q). In menus the mouse points (the
+## user's request, 2026-11-15): the line under it is highlighted and a click chooses it.
 
 const DEADZONE: float = 0.25
+## How many slots of the item bar have a number key (1 to 9).
+const SLOTS: int = 9
 ## Actions from earlier designs, cleared if present.
 const RETIRED: Array[String] = ["debug_cycle_water"]
 
@@ -27,6 +30,13 @@ func _initialize() -> void:
 	_action("use_item", [_key(KEY_Q), _key(KEY_K), _button(JOY_BUTTON_Y)])
 	_action("item_menu", [_key(KEY_TAB), _key(KEY_I), _button(JOY_BUTTON_BACK)])
 	_action("pause", [_key(KEY_ESCAPE), _key(KEY_P), _button(JOY_BUTTON_START)])
+	# The item bar (the user's request, 2026-11-15): the wheel steps through what can be in hand
+	# (a gamepad's shoulders too), and the keys 1 to 9 choose a slot. In a menu the wheel moves
+	# the highlight up and down.
+	_action("slot_next", [_mouse(MOUSE_BUTTON_WHEEL_DOWN), _button(JOY_BUTTON_RIGHT_SHOULDER)])
+	_action("slot_previous", [_mouse(MOUSE_BUTTON_WHEEL_UP), _button(JOY_BUTTON_LEFT_SHOULDER)])
+	for slot: int in SLOTS:
+		_action("slot_%d" % (slot + 1), [_key((KEY_1 + slot) as Key)])
 	for action_name: String in RETIRED:
 		if ProjectSettings.has_setting("input/" + action_name):
 			ProjectSettings.clear("input/" + action_name)

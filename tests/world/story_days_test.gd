@@ -84,7 +84,7 @@ func test_the_quest_follows_the_hero_through_his_first_day() -> void:
 	home.player.motor.place((home.interactables.get_node(^"TurnipSeeds") as ItemPickup).cell())
 	assert_bool(home.interact()).is_true()
 	assert_that(Quests.runner.stage(QUEST)).is_equal(&"plant")
-	assert_str(Quests.runner.journal(QUEST)).contains("by the well").contains("hoe").contains("Tab")
+	assert_str(Quests.runner.journal(QUEST)).contains("by the well").contains("hoe").contains("wheel").contains("number key")
 
 	# The plot: tilling is not yet planting.
 	GameState.till_soil(Vector2i(0, 0))

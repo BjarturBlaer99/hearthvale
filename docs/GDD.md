@@ -47,9 +47,10 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 ## 5. The hero
 - Moves in 8 directions and faces 4, on the keys. The mouse is as in farming games: **the left button uses
   what is in hand** (the sword, or the tool or item on the item button) and **the right button / A
-  interacts** with people and things. In a conversation the left button answers and reads on. They are buttons:
-  where a click lands doesn't matter, and he acts on what he faces. Hold **Shift / B** to sprint. **Esc / Start** pauses:
-  save, quests, settings, quit to the title.
+  interacts** with people and things. In a conversation the left button answers and reads on. In play they
+  are buttons: where a click lands doesn't matter, and he acts on what he faces. **In a menu the mouse
+  points:** the line under it is highlighted, a click chooses it, and the wheel moves up and down a list.
+  Hold **Shift / B** to sprint. **Esc / Start** pauses: save, quests, settings, quit to the title.
 - **Life: hearts**, for combat only. Start with **3**. Most hits cost **half a heart**. A **heart container**
   (from a boss) adds a heart and refills you; four **heart pieces** make a container. Hearts drop from enemies,
   grass and pots. At zero hearts you return to the area's entrance with full hearts.
@@ -80,11 +81,16 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 | **Seeds** *(3b)* | Home (a first pouch), Tilda's shop *(3c)* | Planted from the item button |
 
 - The sword is always on the attack button (Space); one item is equipped on the item button (Q). The Lantern
-  needs no button: it works while it's carried. Food is eaten from the item menu *(P2)*.
-- **In hand** (the left mouse button): with nothing on the item button, the sword. The bow or bombs on it:
-  those, until the arrows or the bombs run out; then the sword again. A farm tool or seeds on it: the tool
-  where there is work for it (facing the plot, or water for the can), and the sword everywhere else. Choosing
-  the sword in the item menu empties the item button.
+  needs no button: it works while it's carried. Food is eaten from the food menu (Tab) *(P2)*.
+- **The item bar:** along the bottom of the screen, a slot for each thing that can be in hand: his best
+  sword, then the bow, bombs, hoe, watering can and seeds in the order he found them. **The mouse wheel
+  steps through the slots, and the keys 1 to 9 choose one** (a gamepad's shoulders step). The lit slot is in
+  hand. A slot shows how many it has left: arrows, bombs, seeds, pours of water. With more than nine things
+  the bar shows nine and moves with the choice.
+- **In hand** (the left mouse button): with the sword's slot lit, the sword. The bow or bombs: those, until
+  the arrows run out (then the sword, though the bow stays in hand) or the last bomb is gone (its slot goes,
+  and the sword is in hand). A farm tool or seeds: the tool where there is work for it (facing the plot, or
+  water for the can), and the sword everywhere else.
 - **A full pack loses nothing:** what lies in the world, what grows to be gathered, what a chest holds and a
   ripe crop stay where they are until he can carry all of it, and he is told why.
 - **Growth** *(P4b)*: three skills that rise with use, five levels each, at 0, 10, 25, 50 and 90 points.

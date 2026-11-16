@@ -19,12 +19,14 @@ volume, fullscreen, window size, the controls hint), or quit to the title. The g
 |---|---|---|
 | Move (8 directions) | WASD / arrow keys | Left stick / d-pad |
 | Sprint (hold) | Shift | B |
-| Use what is in hand: the sword, or the tool or item on the item button | Left mouse button (a click anywhere) | X (sword), Y (item) |
+| Use what is in hand: the lit slot of the bar at the bottom | Left mouse button (a click anywhere) | X (sword), Y (item) |
+| Choose what is in hand: sword, bow, bombs, hoe, can, seeds | Mouse wheel, or 1 to 9 | Shoulder buttons |
 | Talk / read / pick up / harvest | Right mouse button | A |
-| Choose an answer, or read on | W / S or arrows, then a left click or Enter | d-pad, then A |
+| Choose an answer, or read on | Point and left click; or W / S, the wheel or arrows, then a left click or Enter | d-pad, then A |
+| Choose in a menu | Point and click; or W / S, the wheel or arrows, then a click or Enter | d-pad, then A |
 | Swing the sword whatever is in hand | Space / J | X |
 | Use the item on the item button (bow, bombs, hoe, can, seeds) | Q / K | Y |
-| Item menu (choose what's equipped) | Tab / I | Back |
+| Food menu (eat something) | Tab / I | Back |
 | Pause menu (save, settings, quit) | Esc / P | Start |
 
 Read the sign in the square, then walk into a door: Elder Bram lives in the blue-roofed house, Wenna the weaver
@@ -92,6 +94,9 @@ Beaten enemies sometimes drop hearts or coins.
   Bram welcomes a newcomer and speaks of the old keep only once a first seed is in the ground. Until he gives
   his word the keep's gate in the Old Wood is chained. The bars under the chapel lift at dawn on the day after
   the Warden falls, so there is a night at home between the two dungeons.
+- **The mouse in menus, and an item bar** (asked for on 2026-11-15): in every menu the mouse points, and a
+  click chooses the line it is on. A bar along the bottom of the screen has a slot for each thing that can be
+  in hand; the wheel steps through it and the keys 1 to 9 choose a slot. The Tab menu is for food.
 - **A still world, and the mouse** (asked for on 2026-11-13): nothing in the scenery moves but the water.
   The left mouse button uses what is in hand: the sword, or a tool where there is work for it (the hoe, the
   can and seeds on the plot; the sword everywhere else), and answers in a conversation. The right button
@@ -113,7 +118,7 @@ Beaten enemies sometimes drop hearts or coins.
   outdoors go home at 20:00 and are back at 06:00; house windows are lit from dusk to dawn; monsters met in the
   fields and the wood at night are tougher and drop coins more often; and the night has a tune of its own.
 - **Food and cooking** (the pivot, step 2d): berries, mushrooms and fallen cherry blossom to gather, back each
-  morning; bread at Tilda's; food is eaten from the item menu for energy; and the hearth at home cooks from
+  morning; bread at Tilda's; food is eaten from the food menu (Tab) for energy; and the hearth at home cooks from
   recipes (cherry blossom tea, for a start).
 - **Energy** (the pivot, step 2c): a bar under the hearts. Sprinting, swinging the sword and shooting the bow
   spend it. Low on energy the hero slows; out of it he collapses and wakes at home, a little poorer. Sleep

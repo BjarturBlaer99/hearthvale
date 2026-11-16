@@ -4,7 +4,7 @@ extends Control
 ## (the area comes here when the flag AreaController.ENDING_FLAG is set). "The End" over the
 ## title's picture with the keep's window dark, what the game took (EndingSummary), and two
 ## choices: keep exploring (back to where the hero stood) or save and go to the title. Up and
-## down pick, a click or Enter chooses.
+## down pick, and so does pointing with the mouse; a click or Enter chooses.
 
 const KEEP_EXPLORING: StringName = &"explore"
 const SAVE_AND_QUIT: StringName = &"save_quit"
@@ -85,15 +85,27 @@ func choose(id: StringName = &"") -> void:
 			travel.call(TITLE_SCENE)
 
 
+## Puts the cursor on the line the mouse is on in `event`, if that line can be chosen.
+func point_at(event: InputEvent) -> void:
+	if cursor.select(MenuInput.line_under(_list, event, cursor.options.size())):
+		EventBus.sound.emit(&"menu_move")
+		_list.text = "\n".join(cursor.lines())
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	# Take the viewport now: a choice changes the scene, which takes this screen out of the tree.
 	var viewport: Viewport = get_viewport()
+	if MenuInput.is_pointing(event):
+		point_at(event)
+		return
 	if MenuInput.is_up(event):
 		move_cursor(-1)
 	elif MenuInput.is_down(event):
 		move_cursor(1)
 	elif MenuInput.is_confirm(event):
-		choose()
+		if cursor.take_click(MenuInput.line_under(_list, event, cursor.options.size())):
+			_list.text = "\n".join(cursor.lines())
+			choose()
 	else:
 		return
 	viewport.set_input_as_handled()

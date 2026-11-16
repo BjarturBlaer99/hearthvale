@@ -63,7 +63,7 @@ func test_every_heading_is_set_in_the_heading_face() -> void:
 	var village: AreaController = _load(VILLAGE)
 	var pause: PauseMenu = village.hud.pause_menu
 	var boxes: Dictionary = {
-		"Paused": pause.get_node(^"Panel"), "Items": village.hud.item_menu.get_node(^"Panel"),
+		"Paused": pause.get_node(^"Panel"), "Food": village.hud.item_menu.get_node(^"Panel"),
 		"Settings": pause.get_node(^"SettingsMenu/Panel"), "Quests": pause.get_node(^"QuestLog/Panel"),
 	}
 	for words: String in boxes:

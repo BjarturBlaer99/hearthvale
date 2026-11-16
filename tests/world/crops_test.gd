@@ -88,7 +88,7 @@ func test_a_seed_is_planted_from_the_item_button_in_tilled_soil() -> void:
 	assert_str(village.hud.message_text()).is_equal(ToolUse.SEED_NOT_HERE)
 	assert_int(GameState.item_count(&"turnip_seeds")).is_equal(1)
 	assert_int(GameState.farm().crop_count()).is_equal(1)
-	# The last seed goes in; then there are none, and he is told.
+	# The last seed goes in; then there are none: their slot is gone and the item button is empty.
 	GameState.till_soil(CELL + Vector2i(1, 0))
 	_face(village, CELL + Vector2i(1, 0))
 	assert_bool(village.use_item()).is_true()
@@ -96,8 +96,9 @@ func test_a_seed_is_planted_from_the_item_button_in_tilled_soil() -> void:
 	GameState.till_soil(CELL + Vector2i(2, 0))
 	_face(village, CELL + Vector2i(2, 0))
 	_rest(village)
+	assert_that(GameState.equipped).override_failure_message("nothing he no longer has is on the button").is_equal(&"")
 	assert_bool(village.use_item()).is_false()
-	assert_str(village.hud.message_text()).is_equal(ToolUse.SEED_NONE)
+	assert_str(village.hud.message_text()).is_equal("Nothing on the item button yet.")
 	assert_int(GameState.farm().crop_count()).is_equal(2)
 
 
@@ -301,26 +302,28 @@ func test_a_long_item_list_scrolls_to_keep_the_cursor_in_view() -> void:
 	assert_str(MenuCursor.count_text(0, 2, 9, 5)).is_equal("  3/9 v")
 	assert_str(MenuCursor.count_text(2, 4, 9, 5)).is_equal("^ 5/9 v")
 	assert_str(MenuCursor.count_text(4, 8, 9, 5)).is_equal("^ 9/9  ")
-	# In the game: tools, five kinds of seed and a harvest are twelve lines in a box of five.
+	# In the game: a harvest and what was gathered are eight lines of food in a box of five.
+	# (The tools and the seeds are on the bar at the bottom, seven slots of it.)
 	for item: Array in [[&"hoe", 1], [&"watering_can", 1], [&"turnip_seeds", 5], [&"carrot_seeds", 3], [&"wheat_seeds", 3], [&"potato_seeds", 3], [&"pumpkin_seeds", 2],
-			[&"turnip", 4], [&"carrot", 2], [&"wheat", 6], [&"potato", 1], [&"pumpkin", 1]]:
+			[&"turnip", 4], [&"carrot", 2], [&"wheat", 6], [&"potato", 1], [&"pumpkin", 1], [&"bread", 2], [&"wild_berries", 3], [&"mushroom", 1]]:
 		GameState.add_item(item[0], item[1])
-	GameState.equip(&"pumpkin_seeds")
+	assert_int(GameState.hand_entries().size()).is_equal(7)
 	var village: AreaController = _load(VILLAGE)
 	assert_bool(village.open_item_menu()).is_true()
 	var menu: ItemMenu = village.hud.item_menu
-	assert_int(menu.items.size()).is_equal(12)
+	assert_int(menu.items.size()).is_equal(8)
 	assert_int(menu.shown_lines().size()).override_failure_message("five lines, never more").is_equal(ItemMenu.ROWS)
-	assert_array(Array(menu.shown_lines())).override_failure_message("opened on what is on the button").is_equal(["  Turnip Seeds x5", "  Carrot Seeds x3", "  Wheat Seeds x3", "  Seed Potatoes x3", "> Pumpkin Seeds x2"])
-	menu.move_cursor(1)
-	assert_str(menu.shown_lines()[4]).is_equal("> Turnip x4 (+7 energy)")
-	for i: int in 4:
+	assert_array(Array(menu.shown_lines())).is_equal(["> Turnip x4 (+7 energy)", "  Carrot x2 (+7 energy)", "  Wheat x6 (+5 energy)", "  Potato x1 (+8 energy)", "  Pumpkin x1 (+22 energy)"])
+	for i: int in 5:
 		menu.move_cursor(1)
-	assert_str(menu.shown_lines()[4]).is_equal("> Pumpkin x1 (+22 energy)")
+	assert_str(menu.shown_lines()[4]).is_equal("> Bread x2 (+30 energy)")
+	for i: int in 2:
+		menu.move_cursor(1)
+	assert_str(menu.shown_lines()[4]).is_equal("> Mushrooms x1 (+6 energy)")
 	menu.move_cursor(1)
-	assert_array(Array(menu.shown_lines())).override_failure_message("past the end it wraps to the top").is_equal(["> Hoe", "  Watering Can (Water x0)", "  Turnip Seeds x5", "  Carrot Seeds x3", "  Wheat Seeds x3"])
+	assert_array(Array(menu.shown_lines())).override_failure_message("past the end it wraps to the top").is_equal(["> Turnip x4 (+7 energy)", "  Carrot x2 (+7 energy)", "  Wheat x6 (+5 energy)", "  Potato x1 (+8 energy)", "  Pumpkin x1 (+22 energy)"])
 	menu.move_cursor(-1)
-	assert_str(menu.shown_lines()[4]).is_equal("> Pumpkin x1 (+22 energy)")
+	assert_str(menu.shown_lines()[4]).is_equal("> Mushrooms x1 (+6 energy)")
 
 
 ## Puts the hero in the cell below the plot's own cell `cell`, facing up at it.

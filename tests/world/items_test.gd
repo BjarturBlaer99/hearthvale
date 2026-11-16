@@ -114,20 +114,20 @@ func test_the_shop_sells_arrows_and_bombs_for_coins() -> void:
 	assert_bool(shop.player.controls_enabled).is_true()
 
 
-func test_the_item_menu_equips_and_the_choice_survives_a_save() -> void:
+func test_what_is_in_hand_is_chosen_on_the_bar_and_survives_a_save() -> void:
 	GameState.add_item(&"bow")
 	GameState.add_item(&"arrow", 5)
 	GameState.add_item(&"bomb", 2)
 	var village: AreaController = _load(VILLAGE)
-	assert_bool(village.open_item_menu()).is_true()
-	var menu: ItemMenu = village.hud.item_menu
-	assert_array(Array(menu.shown_lines())).is_equal(["> Bow (Arrows x5)", "  Bombs x2"])
-	assert_bool(village.player.controls_enabled).override_failure_message("the hero stands still in the menu").is_false()
-	menu.move_cursor(1)
-	menu.confirm()
+	village._update_hud()
+	var bar: ItemBar = village.hud.item_bar
+	assert_array(bar.shown_ids()).is_equal([&"bow", &"bomb"])
+	assert_array(Array(bar.shown_counts())).is_equal(["5", "2"])
+	assert_int(bar.lit_slot()).override_failure_message("his first thing for the button is in hand").is_equal(0)
+	assert_bool(village.choose_slot(1)).is_true()
 	assert_that(GameState.equipped).is_equal(&"bomb")
-	assert_bool(menu.is_open()).is_false()
-	assert_bool(village.player.controls_enabled).is_true()
+	assert_int(bar.lit_slot()).is_equal(1)
+	assert_bool(village.player.controls_enabled).override_failure_message("choosing doesn't stop him").is_true()
 
 	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
 	GameState.new_game()
@@ -147,10 +147,11 @@ func test_the_item_menu_needs_something_to_equip() -> void:
 	assert_bool(village.use_item()).override_failure_message("nothing on the button").is_false()
 
 
-func test_tab_or_esc_leaves_the_item_menu_and_changes_nothing() -> void:
+func test_tab_or_esc_leaves_the_food_menu_and_changes_nothing() -> void:
 	GameState.add_item(&"bow")
-	GameState.add_item(&"arrow", 5)
-	GameState.add_item(&"bomb", 2)
+	GameState.add_item(&"bread", 2)
+	GameState.add_item(&"wild_berries", 3)
+	GameState.set_energy(40.0)
 	var village: AreaController = _load(VILLAGE)
 	var menu: ItemMenu = village.hud.item_menu
 	# Esc backs out of it, as it does out of the shop's list and the gifts: it is every menu's
@@ -159,8 +160,9 @@ func test_tab_or_esc_leaves_the_item_menu_and_changes_nothing() -> void:
 		assert_bool(village.open_item_menu()).is_true()
 		menu.move_cursor(1)
 		menu._unhandled_input(_action(back))
-		assert_bool(menu.is_open()).override_failure_message("'%s' leaves the item menu" % back).is_false()
-		assert_that(GameState.equipped).override_failure_message("and changes nothing").is_equal(&"bow")
+		assert_bool(menu.is_open()).override_failure_message("'%s' leaves the food menu" % back).is_false()
+		assert_float(GameState.energy).override_failure_message("and nothing was eaten").is_equal(40.0)
+		assert_that(GameState.equipped).is_equal(&"bow")
 		assert_bool(village.player.controls_enabled).is_true()
 		assert_bool(village.is_paused()).is_false()
 	# Closed, it hears nothing.

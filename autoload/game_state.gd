@@ -539,7 +539,10 @@ func add_item(item_id: StringName, count: int = 1) -> int:
 		count = mini(count, Inventory.room_for(item_count(item_id), item))
 	if count == 0:
 		return 0
-	if count > 0 and equipped == &"" and Inventory.is_equippable(item):
+	# His first thing for the item button goes on it. Later ones wait in the bar: with the sword
+	# in hand by choice, a thing picked up doesn't take its place.
+	if count > 0 and equipped == &"" and Inventory.is_equippable(item) \
+			and Inventory.equippable_held(inventory, DataRegistry.entries(&"items")).is_empty():
 		equip(item_id)
 	var index: int = _find_stack(item_id)
 	if index == -1:
@@ -552,6 +555,10 @@ func add_item(item_id: StringName, count: int = 1) -> int:
 	var applied: int = maxi(count, -held)
 	if held + applied == 0:
 		inventory.remove_at(index)
+		# The last of what was on the item button (a bomb, a seed): the button is empty, and the
+		# sword is in hand again. It never holds what he no longer has.
+		if equipped == item_id:
+			equip(&"")
 	else:
 		inventory[index]["count"] = held + applied
 	EventBus.item_added.emit(item_id, applied)
@@ -592,6 +599,36 @@ func equip(item_id: StringName) -> void:
 		return
 	equipped = item_id
 	EventBus.equipped_changed.emit(item_id)
+
+
+# --- In hand ---------------------------------------------------------------
+
+## What can be in the hero's hand, in the order of the bar at the bottom of the screen
+## (HandBar): his best sword, then what he holds for the item button.
+func hand_entries() -> Array[Dictionary]:
+	return HandBar.entries(inventory, DataRegistry.entries(&"items"))
+
+
+## Which of hand_entries() is in hand: the sword with nothing on the item button, else what
+## is on it. HandBar.NONE if he has neither.
+func hand_index() -> int:
+	return HandBar.index_of(hand_entries(), equipped)
+
+
+## Puts entry `index` of hand_entries() in hand (a number key of the bar). Returns whether
+## that changed what is in hand: false for no such entry, or the one in hand already.
+func take_in_hand(index: int) -> bool:
+	var held: Array[Dictionary] = hand_entries()
+	if index < 0 or index >= held.size() or index == HandBar.index_of(held, equipped):
+		return false
+	equip(HandBar.equipped_for(held, index))
+	return true
+
+
+## Puts the thing `step` slots on in hand, round and round (the mouse wheel). Returns whether
+## that changed what is in hand.
+func step_hand(step: int) -> bool:
+	return take_in_hand(HandBar.stepped(hand_entries(), equipped, step))
 
 
 ## Whether `item_id` uses something up and there is none left: a bow with no arrows, the last
@@ -709,6 +746,9 @@ func from_dict(data: Dictionary) -> void:
 		var entry: Dictionary = stack
 		inventory.append({"id": StringName(str(entry["id"])), "count": int(entry["count"])})
 	equipped = StringName(str(data.get("equipped", "")))
+	# A save from before the bar could keep bombs on the button with none left.
+	if equipped != &"" and item_count(equipped) <= 0:
+		equipped = &""
 	player = _whole_numbers_as_int(data.get("player", {}))
 	farm().load_saved(data.get("farm", {}), DataRegistry.ids(&"crops"))
 

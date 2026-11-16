@@ -1,10 +1,14 @@
 class_name MenuInput
 extends RefCounted
 ## Which menu key an input event is (docs/TECH_DESIGN.md §12), shared by every menu: the
-## movement keys go up and down, a click / Enter / A picks, Esc / Start / Tab backs out.
-## The mouse (since 2026-11-13): the right button is interact, the left uses what is in hand.
-## They are buttons, not a pointer: no part of the screen is clicked on, so nothing on screen
-## may take a click for itself (let_clicks_through).
+## movement keys and the mouse wheel go up and down, a click / Enter / A picks, Esc / Start /
+## Tab backs out.
+## The mouse in play (since 2026-11-13): the right button is interact, the left uses what is in
+## hand. There they are buttons, not a pointer: the hero works what he faces.
+## The mouse in menus (since 2026-11-15): it points. The line under it is highlighted
+## (line_under, MenuPointer) and a click on a line chooses that line; a click on no line does
+## what it always did, choosing the highlighted one. Menus read input in _unhandled_input, so
+## nothing on screen may take a click for itself (let_clicks_through).
 
 ## What the interact button is called on screen: "[Right click] Pick up the Hoe".
 const INTERACT_KEY: String = "Right click"
@@ -25,12 +29,39 @@ static func let_clicks_through(root: Node) -> void:
 		let_clicks_through(child)
 
 
+## Up a line: the movement keys, or the mouse wheel rolled up.
 static func is_up(event: InputEvent) -> bool:
-	return event.is_action_pressed(&"move_up")
+	return event.is_action_pressed(&"move_up") or event.is_action_pressed(&"slot_previous")
 
 
+## Down a line: the movement keys, or the mouse wheel rolled down.
 static func is_down(event: InputEvent) -> bool:
-	return event.is_action_pressed(&"move_down")
+	return event.is_action_pressed(&"move_down") or event.is_action_pressed(&"slot_next")
+
+
+## Whether `event` is the mouse moving: it may point at another line now.
+static func is_pointing(event: InputEvent) -> bool:
+	return event is InputEventMouseMotion
+
+
+## The height of one line of `label`'s words (px).
+static func line_height(label: Label) -> float:
+	return float(label.get_line_height() + label.get_theme_constant(&"line_spacing"))
+
+
+## Which line of `label` the mouse is on in `event` (the mouse moving, or one of its buttons):
+## 0 for the first of the `lines` it shows, or MenuPointer.NONE if it is on none of them, the
+## list isn't showing, or `event` isn't the mouse's.
+static func line_under(label: Label, event: InputEvent, lines: int) -> int:
+	if not event is InputEventMouse or label == null or not label.is_visible_in_tree():
+		return MenuPointer.NONE
+	var local: Vector2 = (label.make_input_local(event) as InputEventMouse).position
+	return MenuPointer.line_at(local, label.size.x, line_height(label), lines)
+
+
+## How wide `words` are in `label`'s own face (px).
+static func width_of(label: Label, words: String) -> float:
+	return label.get_theme_font(&"font").get_string_size(words, HORIZONTAL_ALIGNMENT_LEFT, -1.0, label.get_theme_font_size(&"font_size")).x
 
 
 ## A menu's yes: either mouse button, Enter, or A on a pad.

@@ -71,6 +71,27 @@ func move(step: int) -> void:
 				break
 
 
+## Puts the cursor on option `index` (where the mouse points). Returns whether it moved:
+## false for no such option, one that can't be chosen, or the one it is on already.
+func select(index: int) -> bool:
+	if index < 0 or index >= options.size() or index == selected or not _enabled(index):
+		return false
+	selected = index
+	return true
+
+
+## A click on option `line` (MenuPointer.NONE: on no line of the list). Returns whether it
+## chooses something: on no line, the highlighted option, as a click always did; on an option
+## that can be chosen, that one (the cursor goes there); on one that can't, nothing.
+func take_click(line: int) -> bool:
+	if line == MenuPointer.NONE:
+		return selected >= 0
+	if line < 0 or line >= options.size() or not _enabled(line):
+		return false
+	selected = line
+	return true
+
+
 ## The id under the cursor, or empty when nothing can be chosen.
 func selected_id() -> StringName:
 	return options[selected]["id"] if selected >= 0 and selected < options.size() else &""

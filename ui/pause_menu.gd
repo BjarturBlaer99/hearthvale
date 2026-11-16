@@ -3,7 +3,8 @@ extends Control
 ## The pause menu (Esc or Start, docs/TECH_DESIGN.md §12): the game stops behind it. It shows
 ## the hero's hearts, heart pieces, keys and play time, and offers Resume, Save, Quests (the
 ## quest log), Friends (the villagers and their marks), Settings and Quit to title. Save writes the save slot (SaveSystem); quitting to the title loses anything
-## not saved, and the menu says so. Esc resumes.
+## not saved, and the menu says so. Esc resumes. The mouse points: the line under it is
+## highlighted, and a click chooses it.
 
 signal resumed
 signal quit_to_title
@@ -112,17 +113,30 @@ func _unhandled_input(event: InputEvent) -> void:
 	var viewport: Viewport = get_viewport()
 	if not visible or settings_menu.is_open() or quest_log.is_open() or friends_page.is_open():
 		return
+	if MenuInput.is_pointing(event):
+		point_at(event)
+		return
 	if MenuInput.is_up(event):
 		move_cursor(-1)
 	elif MenuInput.is_down(event):
 		move_cursor(1)
 	elif MenuInput.is_confirm(event):
-		choose()
+		# A click on a line chooses that line; on no line, the highlighted one.
+		if cursor.take_click(MenuInput.line_under(_list, event, cursor.options.size())):
+			_refresh()
+			choose()
 	elif MenuInput.is_back(event):
 		resume()
 	else:
 		return
 	viewport.set_input_as_handled()
+
+
+## Puts the cursor on the line the mouse is on in `event`, if it is on one.
+func point_at(event: InputEvent) -> void:
+	if cursor.select(MenuInput.line_under(_list, event, cursor.options.size())):
+		EventBus.sound.emit(&"menu_move")
+		_refresh()
 
 
 ## The pause panel steps aside while the settings menu, the quest log or the Friends page is

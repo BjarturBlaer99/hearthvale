@@ -188,8 +188,10 @@ func test_the_can_waters_a_tilled_cell_for_one_energy_and_a_pour() -> void:
 	# The can says what it holds wherever it is named; the pack doesn't list the water.
 	assert_str(AreaController.equipped_text()).is_equal("Item: Watering Can (Water x2)")
 	assert_str(AreaController.carrying_text()).is_equal("Carrying: Hoe, Watering Can")
-	assert_bool(village.open_item_menu()).is_true()
-	assert_array(Array(village.hud.item_menu.shown_lines())).is_equal(["  Hoe", "> Watering Can (Water x2)"])
+	village._update_hud()
+	assert_array(village.hud.item_bar.shown_ids()).is_equal([&"hoe", &"watering_can"])
+	assert_array(Array(village.hud.item_bar.shown_counts())).override_failure_message("the can's slot says its pours").is_equal(["", "2"])
+	assert_int(village.hud.item_bar.lit_slot()).is_equal(1)
 
 
 func test_the_can_fills_at_the_well_and_at_the_pond() -> void:

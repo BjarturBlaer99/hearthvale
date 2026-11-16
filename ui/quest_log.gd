@@ -5,7 +5,7 @@ extends Control
 ## below, each objective ticked when done. Esc (or Back) returns to the pause menu. It reads
 ## the quests as they stand when opened, and works while the game is paused. Five lines show
 ## at a time: a longer list scrolls to keep the cursor in view, and the corner says where in it
-## he is (P4d).
+## he is (P4d). The mouse points at a quest to read it, and a click on "Back" goes back.
 
 signal closed
 
@@ -99,15 +99,39 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
 	var viewport: Viewport = get_viewport()
+	if MenuInput.is_pointing(event):
+		point_at(event)
+		return
 	if MenuInput.is_up(event):
 		move_cursor(-1)
 	elif MenuInput.is_down(event):
 		move_cursor(1)
-	elif MenuInput.is_back(event) or (MenuInput.is_confirm(event) and cursor.selected_id() == BACK):
+	elif MenuInput.is_back(event):
 		close()
+	elif MenuInput.is_confirm(event):
+		# A click on a quest reads it; a click on "Back", or off the list with "Back"
+		# highlighted, goes back.
+		if cursor.take_click(line_under(event)):
+			_refresh()
+			if cursor.selected_id() == BACK:
+				close()
 	else:
 		return
 	viewport.set_input_as_handled()
+
+
+## Which line of the whole list the mouse is on in `event` (the list shows ROWS of them from
+## `top`), or MenuPointer.NONE.
+func line_under(event: InputEvent) -> int:
+	var line: int = MenuInput.line_under(_list, event, mini(ROWS, cursor.options.size() - top))
+	return line if line == MenuPointer.NONE else top + line
+
+
+## Puts the cursor on the line the mouse is on in `event`, if it is on one.
+func point_at(event: InputEvent) -> void:
+	if cursor.select(line_under(event)):
+		EventBus.sound.emit(&"menu_move")
+		_refresh()
 
 
 func _refresh() -> void:

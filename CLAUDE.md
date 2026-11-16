@@ -20,6 +20,8 @@ proposal as written, `docs/progress/P4-plan.md`: ten decisions, four steps, each
 story over days, 4b skills, 4c friendship and gifts, 4d side quests, recipes and the ending. **What is left is
 P4's "done when", which is the user's: a whole game played from the title to the ending.** Nothing further is
 planned: ask before building anything more.
+**Since P4 (the user's requests, 2026-11-15):** a bug hunt (five fixes), the mouse pointing in menus and the
+item bar (`docs/progress/mouse-and-bar-plan.md`). None of it is a roadmap step.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -163,6 +165,12 @@ removes the shim, so recreate it after upgrading.
   `AreaController.use_hand()` / `interact()`. Every screen calls `MenuInput.let_clicks_through(self)` as it
   starts, or a Control would swallow the click; write a prompt with `MenuInput.prompt()`, never with a key's
   name.
+- **The pointer and the bar in tests:** point with an `InputEventMouseMotion` whose `position` is on a line of
+  the menu's list (`label.get_global_transform_with_canvas() * Vector2(4, line_height * (line + 0.5))`), and
+  click with an `InputEventMouseButton` at such a point; a list inside a container needs a frame first
+  (`await await_idle_frame()`). Put a thing in hand with `AreaController.choose_slot()` / `step_hand()` or
+  `GameState.equip()`, never through the Tab menu, which lists food. After the last bomb or seed
+  `GameState.equipped` is empty.
 - **News at the top of the screen joins, it doesn't replace** (`AreaHud.show_notice()`, `NoticeLines`): a
   quest's, a skill's, a friendship's and a recipe's news each take a line while earlier news is still up.
   In a test no time passes, so earlier news is still up: check `hud.notice_lines()` (the latest is the last
@@ -200,11 +208,20 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
 - Do not let art or animation change gameplay timing, hit detection or collisions, unless a step says so.
 - Do not add motion to the scenery (wind, drifting petals or mist, smoke, specks): only the water moves, at
   the user's request of 2026-11-13.
-- Do not make the mouse a pointer, and keep its two buttons as the user set them on 2026-11-13, as in
-  farming games: **left click uses what is in hand** (`AreaController.use_hand()`: the sword, or the tool or
-  item on the item button) and answers in a conversation; **right click interacts** with people and things.
-  Moving stays on the keys; Space and Q still do the sword and the item. A bow or bombs with nothing left
-  give the left click back to the sword (`GameState.is_out_of_ammo()`), so running out is no dead end.
+- Do not make the mouse a pointer **in play**, and keep its two buttons as the user set them on 2026-11-13,
+  as in farming games: **left click uses what is in hand** (`AreaController.use_hand()`: the lit slot of the
+  item bar) and answers in a conversation; **right click interacts** with people and things. Moving stays on
+  the keys; Space and Q still do the sword and the item. A bow with no arrows gives the left click back to
+  the sword (`GameState.is_out_of_ammo()`), so running out is no dead end.
+- **In menus the mouse points** (the user's request, 2026-11-15): the line under it is highlighted and a
+  click chooses that line; a click on no line chooses the highlighted one, as before. Every new menu or list
+  does the same (`MenuInput.line_under()`, `MenuPointer`, and `MenuCursor.select()` / `take_click()`), takes
+  the wheel as up and down (`MenuInput.is_up()` / `is_down()`), and leaves on Tab or Esc (`is_back()`).
+- **What is in hand is chosen on the item bar** (the user's request, 2026-11-15), not in a menu: the wheel
+  steps through it, the keys 1 to 9 choose a slot (`HandBar`, pure; `GameState.take_in_hand()`,
+  `step_hand()`; `ItemBar` draws it). The Tab menu lists food only. `GameState.equipped` is always something
+  he carries: the last bomb or seed empties the item button. Do not put food, or anything that isn't held in
+  the hand, in the bar without asking.
 - Do not let a full pack lose things: what can't be carried whole stays where it is and the hero is told
   (`GameState.has_room_for()`; a pickup, a forage spot and a chest each have `has_room()`). **A test that
   fills a stack and then takes more of it sees a refusal,** not a silent loss.

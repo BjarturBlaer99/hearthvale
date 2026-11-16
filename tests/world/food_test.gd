@@ -58,8 +58,7 @@ func test_eating_from_the_item_menu_gives_energy_and_uses_the_food() -> void:
 	var village: AreaController = _load(VILLAGE)
 	assert_bool(village.open_item_menu()).is_true()
 	var menu: ItemMenu = village.hud.item_menu
-	assert_array(Array(menu.shown_lines())).override_failure_message("the bow, then the food; an ingredient isn't listed").is_equal(["> Bow (Arrows x5)", "  Bread x2 (+30 energy)", "  Wild Berries x3 (+8 energy)"])
-	menu.move_cursor(1)
+	assert_array(Array(menu.shown_lines())).override_failure_message("the food; the bow is on the bar, and an ingredient isn't listed").is_equal(["> Bread x2 (+30 energy)", "  Wild Berries x3 (+8 energy)"])
 	menu.confirm()
 	assert_float(GameState.energy).is_equal(70.0)
 	assert_int(GameState.item_count(&"bread")).is_equal(1)

@@ -1,8 +1,8 @@
 class_name AreaHud
 extends CanvasLayer
-## The HUD: hearts, where you are, what you're carrying, the prompt for whatever the hero
-## can use, short messages, the dialogue box, the item and pause menus, and a screen flash for
-## scene changes. The controls hint shows or hides with the player's setting.
+## The HUD: hearts, where you are, what you're carrying, the bar of what can be in hand, the
+## prompt for whatever the hero can use, short messages, the dialogue box, the food and pause
+## menus, and a screen flash for scene changes. The controls hint shows or hides with the player's setting.
 
 const MESSAGE_TIME: float = 3.0
 ## How long a notice (quest news) stays at the top of the screen.
@@ -35,6 +35,8 @@ var _flash_time: float = FLASH_TIME
 @onready var shop_menu: ShopMenu = $ShopMenu
 @onready var gift_menu: GiftMenu = $GiftMenu
 @onready var pause_menu: PauseMenu = $PauseMenu
+## What can be in the hero's hand, along the bottom of the screen.
+@onready var item_bar: ItemBar = $ItemBar
 @onready var _hint: Label = $Hint
 @onready var _hint_panel: ColorRect = $HintPanel
 @onready var _equipped: Label = $Panel/Box/Equipped

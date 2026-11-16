@@ -3,7 +3,8 @@ extends Control
 ## A shop's counter (P3c, GDD §9): two lists, what the shop sells and what it buys of what the
 ## hero carries, with his coins beside them. Up and down move the cursor; left and right turn
 ## from one list to the other; a click or Enter makes the deal under the cursor; Tab or Esc
-## leaves. It stays open for as many deals as he likes, and a line says what the last one was,
+## leaves. The mouse points: at a line to put the cursor there, and a click on "Buy" or "Sell"
+## turns to that list. It stays open for as many deals as he likes, and a line says what the last one was,
 ## or why it couldn't be made. Shop (pure) says what is on the lists and what a deal needs;
 ## GameState makes it. The area opens it (a conversation's `shop` effect) and keeps the hero
 ## still while it is open.
@@ -19,6 +20,8 @@ const BOUGHT_WORDS: String = "Bought: %s."
 const SOLD_WORDS: String = "Sold: %s, for %s."
 ## The two lists as their tabs name them.
 const TAB_NAMES: Dictionary = {Shop.BUY: "Buy", Shop.SELL: "Sell"}
+## What stands between the two names.
+const TAB_GAP: String = "  "
 
 var shop: Dictionary = {}
 var mode: StringName = Shop.BUY
@@ -119,17 +122,34 @@ func note_text() -> String:
 
 ## "[Buy]   Sell": the two lists, the one shown in brackets.
 func tabs_text() -> String:
+	return TAB_GAP.join(tab_parts())
+
+
+## The two lists' names as they are written, the one shown in brackets.
+func tab_parts() -> PackedStringArray:
 	var parts: PackedStringArray = []
 	for tab: StringName in Shop.MODES:
 		parts.append("[%s]" % TAB_NAMES[tab] if tab == mode else " %s " % TAB_NAMES[tab])
-	return "  ".join(parts)
+	return parts
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
+	if MenuInput.is_pointing(event):
+		point_at(event)
+		return
 	if MenuInput.is_confirm(event):
-		confirm()
+		# A click on "Buy" or "Sell" turns to that list; a click on a line makes that deal; on
+		# neither, the deal under the cursor.
+		# (A click beside the two names does nothing: it was aimed at them.)
+		if MenuInput.line_under(_tabs, event, 1) != MenuPointer.NONE:
+			var tab: StringName = tab_under(event)
+			if tab != &"" and tab != mode:
+				switch_mode()
+		else:
+			point_at(event)
+			confirm()
 	elif MenuInput.is_back(event):
 		close()
 	elif MenuInput.is_up(event):
@@ -141,6 +161,29 @@ func _unhandled_input(event: InputEvent) -> void:
 	else:
 		return
 	get_viewport().set_input_as_handled()
+
+
+## Puts the cursor on the line the mouse is on in `event`, if it is on one.
+func point_at(event: InputEvent) -> void:
+	var line: int = MenuInput.line_under(_list, event, mini(ROWS, entries().size() - top))
+	if line == MenuPointer.NONE or top + line == selected:
+		return
+	selected = top + line
+	EventBus.sound.emit(&"menu_move")
+	_refresh()
+
+
+## The list whose name the mouse is on in `event` (Shop.BUY or Shop.SELL), or "" if it is on
+## neither.
+func tab_under(event: InputEvent) -> StringName:
+	if MenuInput.line_under(_tabs, event, 1) == MenuPointer.NONE:
+		return &""
+	var widths: PackedFloat32Array = []
+	for part_words: String in tab_parts():
+		widths.append(MenuInput.width_of(_tabs, part_words))
+	var x: float = (_tabs.make_input_local(event) as InputEventMouse).position.x
+	var part: int = MenuPointer.part_at(x, widths, MenuInput.width_of(_tabs, TAB_GAP))
+	return Shop.MODES[part] if part != MenuPointer.NONE else &""
 
 
 func _name_of(entry: Dictionary) -> String:

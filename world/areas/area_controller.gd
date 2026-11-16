@@ -34,9 +34,10 @@ const SLEPT_WORDS: String = "You wake rested. The game is saved."
 const WOKE_LATE_WORDS: String = "You stayed up too late, and woke in your own bed."
 const COLLAPSED_WORDS: String = "You collapsed, and woke in your own bed."
 const COINS_LOST_WORDS: String = " You lost %d coins on the way."
-## The item type of a sword: chosen in the item menu, it is taken in hand (the item button is
-## emptied).
-const SWORD_TYPE: String = "weapon_melee"
+## The bar's number keys, in the order of its slots.
+const SLOT_ACTIONS: Array[StringName] = [&"slot_1", &"slot_2", &"slot_3", &"slot_4", &"slot_5", &"slot_6", &"slot_7", &"slot_8", &"slot_9"]
+## What is said when the food menu is asked for and he carries nothing to eat.
+const NO_FOOD_WORDS: String = "You carry nothing to eat."
 ## The prompts for a crop the hero faces, and what is said when he has picked one, cleared a
 ## withered one, or has no room for another.
 const PICK_PROMPT: String = "Pick the %s"
@@ -378,8 +379,45 @@ func _unhandled_input(event: InputEvent) -> void:
 		used = open_item_menu()
 	elif event.is_action_pressed(&"pause"):
 		used = open_pause_menu()
+	elif event.is_action_pressed(&"slot_next"):
+		used = step_hand(1)
+	elif event.is_action_pressed(&"slot_previous"):
+		used = step_hand(-1)
+	else:
+		for slot: int in SLOT_ACTIONS.size():
+			if event.is_action_pressed(SLOT_ACTIONS[slot]):
+				used = choose_slot(slot)
+				break
 	if used:
 		get_viewport().set_input_as_handled()
+
+
+## The mouse wheel (the user's request, 2026-11-15): puts the next thing of the bar in hand
+## (`step` 1) or the one before (-1), round and round. Not while talking, in a menu or down.
+## Returns whether what is in hand changed.
+func step_hand(step: int) -> bool:
+	return not _busy() and _took_in_hand(GameState.step_hand(step))
+
+
+## A number key: puts the thing in slot `slot` of the bar in hand (0 is the leftmost slot
+## showing). Returns whether what is in hand changed.
+func choose_slot(slot: int) -> bool:
+	return not _busy() and slot < hud.item_bar.shown_count() and _took_in_hand(GameState.take_in_hand(hud.item_bar.top + slot))
+
+
+## What is in hand has changed (or not): it is heard, and the bar shows it at once.
+func _took_in_hand(changed: bool) -> bool:
+	if changed:
+		EventBus.sound.emit(&"menu_move")
+		_show_bar()
+	return changed
+
+
+## The bar at the bottom: what can be in hand and which of it is. Out of sight while he
+## talks and behind the lists.
+func _show_bar() -> void:
+	hud.item_bar.visible = not (is_talking() or is_in_menu())
+	hud.item_bar.show_hand(GameState.hand_entries(), GameState.hand_index())
 
 
 ## Picks up what's underfoot, else talks to whoever the hero faces. Returns true if
@@ -604,8 +642,8 @@ func use_item() -> bool:
 	return false
 
 
-## Uses what the hero has in hand (the left mouse button; GDD §5): his sword, unless something
-## on the item button comes first. A weapon there (the bow, bombs) is used, until it has
+## Uses what the hero has in hand (the left mouse button; GDD §5): the lit slot of the bar at
+## the bottom of the screen. That is his sword, unless something on the item button comes first. A weapon there (the bow, bombs) is used, until it has
 ## nothing left to shoot or set down: then the click is the sword's again, so running out is
 ## no dead end. A farm tool or a seed is used when he faces what it is for (his plot, or
 ## water), and anywhere else he swings his sword, so a hoe in hand doesn't leave him unarmed.
@@ -631,27 +669,20 @@ func faces_farm_work() -> bool:
 	return (plot != null and plot.covers(front)) or is_water_source(front)
 
 
-## Opens the item menu: the sword (when there is something else it could give way to), the
-## equippable items held, then the food. Returns whether it opened.
+## Opens the food menu (Tab): what he carries that can be eaten, with what each gives. What
+## goes in hand is chosen on the bar (the wheel, the keys 1 to 9), not here. Returns whether
+## it opened.
 func open_item_menu() -> bool:
 	if _busy() or not player.controls_enabled:
 		return false
-	var held: Array[Dictionary] = []
-	var for_button: Array[Dictionary] = Inventory.equippable_held(GameState.inventory, DataRegistry.entries(&"items"))
-	# Choosing the sword empties the item button, so the left click swings it again. It is
-	# listed when anything else could be in hand, or still is (the last bomb gone, the button
-	# would otherwise keep its empty stack for good).
-	var in_hand: bool = not for_button.is_empty() or not DataRegistry.get_item(GameState.equipped).is_empty()
-	if in_hand and not PlayerController.best_sword().is_empty():
-		held.append(PlayerController.best_sword())
-	held.append_array(for_button)
-	held.append_array(Food.edible_held(GameState.inventory, DataRegistry.entries(&"items")))
+	var held: Array[Dictionary] = Food.edible_held(GameState.inventory, DataRegistry.entries(&"items"))
 	if held.is_empty():
-		hud.show_message("No items yet.")
+		hud.show_message(NO_FOOD_WORDS)
 		return false
 	player.controls_enabled = false
 	hud.set_prompt("")
-	hud.item_menu.open(held, GameState.equipped)
+	hud.item_menu.open(held, &"")
+	_show_bar()
 	return true
 
 
@@ -1450,15 +1481,10 @@ func _on_quit_to_title() -> void:
 	travel.call(TITLE_SCENE)
 
 
-## The item menu's choice: something for the item button is put on it; food is eaten.
+## The food menu's choice: it is eaten, if it would do him any good.
 func _on_item_chosen(item_id: StringName) -> void:
 	var item: Dictionary = DataRegistry.get_item(item_id)
-	if str(item.get("type", "")) == SWORD_TYPE:
-		# The sword in hand: nothing on the item button.
-		GameState.equip(&"")
-	elif not Food.is_food(item):
-		GameState.equip(item_id)
-	elif GameState.eat(item_id):
+	if GameState.eat(item_id):
 		EventBus.sound.emit(&"eat")
 		hud.show_message(ATE_WORDS % [str(item.get("name", item_id)), Food.gives_text(item, GameState.food_energy(item_id))])
 	else:
@@ -1525,6 +1551,7 @@ func _update_hud() -> void:
 	# The corner says only what there is to say: nothing carried, no line.
 	hud.set_items(carrying_text() if not GameState.inventory.is_empty() else "")
 	hud.set_equipped(equipped_text() if not DataRegistry.get_item(GameState.equipped).is_empty() else "")
+	_show_bar()
 	if is_talking() or is_in_menu():
 		hud.set_prompt("")
 		return

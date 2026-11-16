@@ -72,7 +72,7 @@
       ]
     },
     "plant": {
-      "journal": "Your plot is across the lane from your door, by the well. Choose the hoe with Tab and left click to till a patch. Plant a seed in it the same way.",
+      "journal": "Your plot is across the lane, by the well. Choose the hoe with the wheel or a number key, and left click to till. Plant a seed the same way.",
       "objectives": [
         {
           "id": "plant_seed",

@@ -187,7 +187,11 @@ res://
   - The bow stands the hero still for its cooldown and shoots a hero-team `Arrow`.
   - Bombs set down a `Bomb`: a fuse, then a blast HitBox that hits each enemy once and spares the hero.
 
-  `ItemMenu` (Tab / I / Back) lists the equippable items held, in pickup order, and equips the chosen one.
+  What is on the button is chosen on **the item bar** (below, with the mouse). `GameState.equipped` is always
+  something he carries: when the last bomb or seed goes, `add_item()` empties the button, and `from_dict()`
+  does the same for an older save. Only his first thing for the button is put on it as it is picked up; with
+  the sword in hand by choice, later ones wait in the bar.
+  `ItemMenu` (Tab / I / Back) is the food menu: it lists the food he carries and eats the chosen one.
 - **The Lantern** (type `lantern`) is carried, not put on the item button. Its `radius` is how far the hero's
   light reaches in a dark area (`Inventory.light_radius`), and carrying one lets E light torches.
 - **The sword's blade** takes the colour of the weapon's picture: wood for the Wooden Sword, steel for the Iron
@@ -485,18 +489,36 @@ run headless; see CLAUDE.md for the command and gotchas.
 - **The mouse** (the user's requests, 2026-11-13; `tools/setup_input_map.gd`), as in farming games: the left
   button uses what the hero has in hand (the action `use_hand`), the right button interacts (`interact`).
   Moving is on the keys as it was; the sword (Space) and the item (Q) keep their own keys too; a gamepad is
-  unchanged; E no longer does anything. The buttons are buttons, not a pointer: where a click lands doesn't
-  matter, and the hero acts on what he faces.
+  unchanged; E no longer does anything. In play the buttons are buttons, not a pointer: where a click lands
+  doesn't matter, and the hero acts on what he faces. In menus the mouse points (2026-11-15, below).
   - **What is in hand** is `AreaController.use_hand()`'s to say. With nothing on the item button: the sword.
-    A weapon there (the bow, bombs): that weapon, until it has nothing left to shoot or set down
-    (`GameState.is_out_of_ammo()`); then the click is the sword's again, so running out is no dead end (Q
-    still says "Out of arrows."). A farm tool or a seed: the tool when he faces what it is for
+    A weapon there (the bow, bombs): that weapon. A bow with no arrows gives the click to the sword
+    (`GameState.is_out_of_ammo()`; Q still says "Out of arrows."), and the last bomb empties the button, so
+    running out is no dead end. A farm tool or a seed: the tool when he faces what it is for
     (`faces_farm_work()`: a cell of his plot, or water), where it works or says why not; anywhere else the
     sword, so a hoe in hand doesn't leave him unarmed. With no sword at all the tool says what it is for.
-  - **The sword can be taken in hand again** from the item menu: when he holds something for the item button,
-    or something used up is still on it (the last bomb gone), the menu lists his best sword first, and
-    choosing it empties the item button (`GameState.equip(&"")`). Tab or Esc leaves the menu, as any list.
-  - Every menu takes either click as its yes (`MenuInput.is_confirm()`: interact, use_hand or Enter).
+  - **The item bar** (the user's request, 2026-11-15; `docs/progress/mouse-and-bar-plan.md`): `HandBar`
+    (`core/inventory/`, pure) says what can be in hand and in what order (the best sword, then
+    `Inventory.equippable_held()`), which entry is in hand for a given `equipped` (the sword's when the
+    button is empty), the entry a step on (round and round), the first slot showing when there are more than
+    `SLOTS` (9), and the number a slot has (`Inventory.ammo_for()`). `GameState.hand_entries()`,
+    `hand_index()`, `take_in_hand(index)` and `step_hand(step)` apply it by setting `equipped`. The area
+    reads the actions `slot_next` / `slot_previous` (the wheel, a pad's shoulders) and `slot_1`..`slot_9`
+    (`step_hand()`, `choose_slot()`; nothing while he is busy), and `ItemBar` (`ui/item_bar.gd`, on the HUD)
+    draws it in code: slots of 20 px in the middle of the bottom of the screen, the one in hand lit, a mark
+    at an end where the bar goes on. It is hidden during a conversation and behind the lists, and takes no
+    clicks. The prompt and the message line sit above it.
+  - **The mouse points in menus** (the user's request, 2026-11-15). `MenuPointer` (`core/menus/`, pure) says
+    which line of a list a point is on; `MenuInput.line_under(label, event, lines)` asks it about a menu's
+    own list (the event made local to the label, lines `MenuInput.line_height()` high). Each menu, on the
+    mouse moving, puts its cursor on the line under it (`point_at()`), and on a click chooses the line the
+    click is on. A click on no line does what it always did: the highlighted line, or reading on in a
+    conversation. A `MenuCursor` list uses `select()` and `take_click()`, so a click on a line that can't be
+    chosen does nothing. The wheel is up and down in every menu (`MenuInput.is_up()` / `is_down()`), which
+    scrolls a list longer than its box. At Tilda's a click on "Buy" or "Sell" turns to that list
+    (`ShopMenu.tab_under()`), and a click between them does nothing.
+  - Every menu takes either click as its yes (`MenuInput.is_confirm()`: interact, use_hand or Enter). Tab or
+    Esc leaves any list (`MenuInput.is_back()`).
   - **A conversation is answered with the left click** (`MenuInput.is_answer()`: use_hand, Enter, or A on a
     pad; the user's request). The right click starts a conversation and doesn't answer one; Space never did.
     The left click is also the sword's button, so `DialogueBox` takes no left click as an answer for its

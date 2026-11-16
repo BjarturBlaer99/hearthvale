@@ -2,8 +2,8 @@ class_name SettingsMenu
 extends Control
 ## The settings menu (docs/TECH_DESIGN.md §12): fullscreen, window size, the controls hint,
 ## and Back. Up and down pick a line; E, Enter or right moves the setting on, left moves it
-## back; Esc (or Start, or Tab) closes. Changes apply and are kept at once (Settings). It works
-## while the game is paused.
+## back; Esc (or Start, or Tab) closes. The mouse points at a line, and a click moves that
+## setting on. Changes apply and are kept at once (Settings). It works while the game is paused.
 
 signal closed
 
@@ -61,11 +61,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	var viewport: Viewport = get_viewport()
 	if not visible:
 		return
+	if MenuInput.is_pointing(event):
+		point_at(event)
+		return
 	if MenuInput.is_up(event):
 		move_cursor(-1)
 	elif MenuInput.is_down(event):
 		move_cursor(1)
-	elif MenuInput.is_confirm(event) or event.is_action_pressed(&"move_right"):
+	elif MenuInput.is_confirm(event):
+		if cursor.take_click(MenuInput.line_under(_list, event, cursor.options.size())):
+			change(1)
+	elif event.is_action_pressed(&"move_right"):
 		change(1)
 	elif event.is_action_pressed(&"move_left"):
 		change(-1)
@@ -74,6 +80,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	else:
 		return
 	viewport.set_input_as_handled()
+
+
+## Puts the cursor on the line the mouse is on in `event`, if it is on one.
+func point_at(event: InputEvent) -> void:
+	if cursor.select(MenuInput.line_under(_list, event, cursor.options.size())):
+		EventBus.sound.emit(&"menu_move")
+		_list.text = "\n".join(cursor.lines())
 
 
 func _rebuild(keep: StringName) -> void:

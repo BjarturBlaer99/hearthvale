@@ -181,54 +181,34 @@ func test_a_left_click_uses_the_bow_or_the_bombs_in_hand() -> void:
 	assert_int(GameState.item_count(&"bomb")).is_equal(0)
 
 
-func test_a_weapon_with_nothing_left_gives_way_to_the_sword() -> void:
+func test_a_bow_with_no_arrows_gives_the_left_click_to_the_sword() -> void:
+	# (The last bomb leaves the bar altogether: tests/ui/item_bar_test.gd.)
 	GameState.add_item(&"wooden_sword")
-	GameState.add_item(&"bomb", 1)
-	assert_that(GameState.equipped).is_equal(&"bomb")
+	GameState.add_item(&"bow")
+	assert_that(GameState.equipped).is_equal(&"bow")
 	var field: AreaController = _load(FIELD)
 	field.player.motor.place(Vector2i(12, 12))
 	field.player.face(Vector2.LEFT)
-	# The last bomb is set down with a left click...
-	assert_bool(field.use_hand()).is_true()
-	assert_int(GameState.item_count(&"bomb")).is_equal(0)
-	assert_that(GameState.equipped).override_failure_message("the item button keeps its place").is_equal(&"bomb")
 	_heard.clear()
-	# ...and the next one swings the sword: an empty hand is no dead end.
-	assert_bool(field.use_hand()).override_failure_message("out of bombs, the left click swings the sword").is_true()
+	# With nothing to shoot the click is the sword's: running out is no dead end.
+	assert_bool(field.use_hand()).is_true()
 	assert_bool(field.player.motor.is_attacking()).is_true()
 	assert_array(_heard).contains([&"sword"])
 	assert_array(_heard).not_contains([&"nope"])
+	assert_object(field.last_projectile).override_failure_message("no arrow flew").is_null()
+	assert_that(GameState.equipped).override_failure_message("the bow is still his, and still in hand").is_equal(&"bow")
 	# The item button's own key still says there are none.
 	_rest(field)
 	assert_bool(field.use_item()).is_false()
-	assert_str(field.hud.message_text()).is_equal("Out of bombs.")
-	# The menu offers the sword, though nothing else could be in hand: choosing it clears the
-	# button of what ran out.
-	assert_bool(field.open_item_menu()).override_failure_message("something spent is on the button: the sword is offered").is_true()
-	var menu: ItemMenu = field.hud.item_menu
-	assert_array(Array(menu.shown_lines())).is_equal(["> Wooden Sword"])
-	menu.confirm()
-	assert_that(GameState.equipped).is_equal(&"")
-	field._update_hud()
-	assert_bool("\n".join(field.hud.shown_lines()).contains("Item:")).override_failure_message("no item line on the HUD").is_false()
-
-	# A bow with no arrows is the same: the left click is the sword's until there are arrows.
-	GameState.add_item(&"bow")
-	assert_that(GameState.equipped).is_equal(&"bow")
-	_heard.clear()
-	assert_bool(field.use_hand()).is_true()
-	assert_bool(field.player.motor.is_attacking()).is_true()
-	assert_array(_heard).contains([&"sword"])
-	assert_object(field.last_projectile).override_failure_message("no arrow flew").is_not_instanceof(Arrow)
-	_rest(field)
+	assert_str(field.hud.message_text()).is_equal("Out of arrows.")
+	# With arrows it shoots again.
 	GameState.add_item(&"arrow", 1)
 	_heard.clear()
 	assert_bool(field.use_hand()).is_true()
 	assert_object(field.last_projectile).is_instanceof(Arrow)
 	assert_int(GameState.item_count(&"arrow")).is_equal(0)
 	assert_array(_heard).not_contains([&"sword"])
-
-	# With no sword to fall back on, the empty bow says so, as before.
+	# With no sword to fall back on, the empty bow says so.
 	_rest(field)
 	GameState.add_item(&"wooden_sword", -1)
 	_heard.clear()
@@ -316,24 +296,25 @@ func test_a_tool_in_hand_doesnt_leave_him_unarmed_among_monsters() -> void:
 	assert_array(_heard).contains([&"sword"])
 
 
-func test_the_sword_can_be_taken_in_hand_again_from_the_item_menu() -> void:
+func test_the_sword_can_be_taken_in_hand_again_on_the_bar() -> void:
 	GameState.add_item(&"wooden_sword")
 	GameState.add_item(&"bread")
 	GameState.set_energy(50.0)
 	var village: AreaController = _load(VILLAGE)
 	village.player.motor.place(GRASS)
-	# With nothing that could be in hand in its place, the sword isn't listed.
-	assert_bool(village.open_item_menu()).is_true()
-	assert_array(Array(village.hud.item_menu.shown_lines())).is_equal(["> Bread x1 (+30 energy)"])
-	village.hud.item_menu.close()
+	village._update_hud()
+	var bar: ItemBar = village.hud.item_bar
+	# With only a sword, it is the bar's one slot, and in hand.
+	assert_array(bar.shown_ids()).is_equal([&"wooden_sword"])
+	assert_int(bar.lit_slot()).is_equal(0)
 	GameState.add_item(&"bow")
 	GameState.add_item(&"arrow", 4)
 	assert_that(GameState.equipped).is_equal(&"bow")
-	assert_bool(village.open_item_menu()).is_true()
-	var menu: ItemMenu = village.hud.item_menu
-	assert_array(Array(menu.shown_lines())).is_equal(["  Wooden Sword", "> Bow (Arrows x4)", "  Bread x1 (+30 energy)"])
-	menu.move_cursor(-1)
-	menu.confirm()
+	village._update_hud()
+	assert_array(bar.shown_ids()).is_equal([&"wooden_sword", &"bow"])
+	assert_int(bar.lit_slot()).is_equal(1)
+	# The sword's slot: nothing on the item button.
+	assert_bool(village.choose_slot(0)).is_true()
 	assert_that(GameState.equipped).override_failure_message("the sword in hand: nothing on the item button").is_equal(&"")
 	assert_int(GameState.item_count(&"wooden_sword")).is_equal(1)
 	village._update_hud()
@@ -341,23 +322,21 @@ func test_the_sword_can_be_taken_in_hand_again_from_the_item_menu() -> void:
 	assert_bool(village.use_hand()).is_true()
 	assert_array(_heard).contains([&"sword"])
 	assert_int(GameState.item_count(&"arrow")).override_failure_message("the bow stays in the pack").is_equal(4)
-	# Opened again, the cursor is on the sword; the bow can be taken up again.
+	# The bow can be taken up again.
 	_rest(village)
-	assert_bool(village.open_item_menu()).is_true()
-	assert_array(Array(menu.shown_lines())).is_equal(["> Wooden Sword", "  Bow (Arrows x4)", "  Bread x1 (+30 energy)"])
-	menu.move_cursor(1)
-	menu.confirm()
+	assert_bool(village.choose_slot(1)).is_true()
 	assert_that(GameState.equipped).is_equal(&"bow")
-	# It is his best sword that is listed.
+	# It is his best sword that has the slot.
 	GameState.add_item(&"iron_sword")
-	assert_bool(village.open_item_menu()).is_true()
-	assert_str(menu.shown_lines()[0]).is_equal("  Iron Sword")
-	# With no sword at all there is none to list.
-	menu.close()
+	village._update_hud()
+	assert_array(bar.shown_ids()).is_equal([&"iron_sword", &"bow"])
+	# With no sword at all the bar begins with the bow, and the Tab menu is the food's alone.
 	GameState.add_item(&"wooden_sword", -1)
 	GameState.add_item(&"iron_sword", -1)
+	village._update_hud()
+	assert_array(bar.shown_ids()).is_equal([&"bow"])
 	assert_bool(village.open_item_menu()).is_true()
-	assert_array(Array(menu.shown_lines())).is_equal(["> Bow (Arrows x4)", "  Bread x1 (+30 energy)"])
+	assert_array(Array(village.hud.item_menu.shown_lines())).is_equal(["> Bread x1 (+30 energy)"])
 
 
 func test_nothing_on_any_screen_takes_a_click_for_itself() -> void:
