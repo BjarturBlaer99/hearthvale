@@ -489,6 +489,16 @@ func get_flag(flag: StringName, default: Variant = false) -> Variant:
 	return flags.get(flag, default)
 
 
+## Forgets `flag` altogether (what lay on the ground under it was picked up): it reads as its
+## default again, and a save no longer carries it.
+func erase_flag(flag: StringName) -> void:
+	if not flags.has(flag):
+		return
+	flags.erase(flag)
+	flag_days.erase(flag)
+	EventBus.flag_set.emit(flag, false)
+
+
 # --- Tally -----------------------------------------------------------------
 
 ## How many of `what` the game has counted (CROPS_PICKED).
@@ -647,6 +657,32 @@ func item_count(item_id: StringName) -> int:
 ## is left where it lies (a pickup, a chest, a crop) so nothing is lost to a full pack.
 func has_room_for(item_id: StringName, count: int = 1) -> bool:
 	return Inventory.fits(item_count(item_id), DataRegistry.get_item(item_id), count)
+
+
+## Hands the hero `count` of an item (the `give_item` effect: a quest's reward, a present, a
+## thing given in a conversation). What fits goes in the pack. The rest is not lost: it is owed
+## (LeftItems, in the flags), and whoever runs the area lays it at his feet when told
+## (EventBus.items_owed), or as the next area loads. Returns how many went in the pack.
+func give_item(item_id: StringName, count: int = 1) -> int:
+	var taken: int = add_item(item_id, count)
+	if count > taken and count > 0:
+		var flag: StringName = LeftItems.owed_flag(item_id)
+		set_flag(flag, LeftItems.count_of(get_flag(flag, 0)) + count - taken)
+		EventBus.items_owed.emit()
+	return taken
+
+
+## Lays everything owed in `cell` of `area` (where the hero stands): it lies there until it is
+## picked up (LeftItems; a LeftItem in the area). Returns what was laid down: [{ "item",
+## "count" }].
+func lay_down_owed(area: StringName, cell: Vector2i) -> Array[Dictionary]:
+	var laid: Array[Dictionary] = []
+	for due: Dictionary in LeftItems.owed(flags):
+		var lying: StringName = LeftItems.lying_flag(area, cell, due["item"])
+		set_flag(lying, LeftItems.count_of(get_flag(lying, 0)) + int(due["count"]))
+		erase_flag(due["flag"])
+		laid.append({"item": due["item"], "count": int(due["count"])})
+	return laid
 
 
 func _find_stack(item_id: StringName) -> int:

@@ -2,7 +2,8 @@ class_name EffectApplier
 extends RefCounted
 ## Applies the shared effect vocabulary (docs/data/CONDITIONS_AND_EFFECTS.md) to a game state:
 ## GameState, or any object with the same methods (tests use a stand-in):
-##   set_flag(flag, value), add_item(item_id, count), set_quest_stage(quest_id, stage_id),
+##   set_flag(flag, value), add_item(item_id, count), give_item(item_id, count),
+##   set_quest_stage(quest_id, stage_id),
 ##   sleep(), request_shop(shop_id, mode), practise(skill, deed), request_gift(villager),
 ##   learn_recipe(recipe_id).
 ## Pure apart from those calls. DataRegistry has already validated the effects' shape and ids.
@@ -21,7 +22,8 @@ func apply(effect: Dictionary) -> bool:
 		"set_flag":
 			_state.call(&"set_flag", StringName(str(effect["flag"])), effect["value"])
 		"give_item":
-			_state.call(&"add_item", StringName(str(effect["item"])), int(effect["count"]))
+			# Given, not just added: what a full pack can't take is laid at his feet, never lost.
+			_state.call(&"give_item", StringName(str(effect["item"])), int(effect["count"]))
 		"take_item":
 			_state.call(&"add_item", StringName(str(effect["item"])), -int(effect["count"]))
 		"set_quest_stage":

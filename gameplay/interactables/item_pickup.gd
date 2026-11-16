@@ -37,11 +37,16 @@ func take() -> bool:
 	if taken() or not has_room():
 		return false
 	GameState.add_item(item_id, count)
-	GameState.set_flag(taken_flag, true)
+	_mark_taken()
 	EventBus.sound.emit(&"item_get")
 	Burst.spawn(get_parent(), position + Vector2(8, 8), &"sparkle")
 	queue_redraw()
 	return true
+
+
+## Remembers that it is gone (a LeftItem remembers another way).
+func _mark_taken() -> void:
+	GameState.set_flag(taken_flag, true)
 
 
 func _draw() -> void:

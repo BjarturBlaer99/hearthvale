@@ -229,6 +229,7 @@ func _ready() -> void:
 	hud.gift_menu.closed.connect(_on_item_menu_closed)
 	hud.gift_menu.given.connect(_on_gift_given)
 	EventBus.gift_requested.connect(_on_gift_requested)
+	EventBus.items_owed.connect(_lay_down_owed)
 	EventBus.friend_mark_gained.connect(_on_friend_mark_gained)
 	hud.pause_menu.quit_to_title.connect(_on_quit_to_title)
 	EventBus.hit_stop.connect(hit_stop)
@@ -261,6 +262,10 @@ func _ready() -> void:
 	if arrival["through_entry"]:
 		hud.flash()
 	GameState.update_player(area_id, player.motor.cell)
+	# What a full pack couldn't take of something he was given lies where it was laid, and
+	# anything owed from outside an area is laid where he arrives.
+	_show_left_items()
+	_lay_down_owed()
 	_update_hud()
 	# A loaded game, or anything changed outside an area: let the quests catch up.
 	Quests.refresh()
@@ -431,7 +436,7 @@ func _show_bar() -> void:
 func interact() -> bool:
 	if _busy():
 		return false
-	var pickup: ItemPickup = pickup_under_player()
+	var pickup: ItemPickup = pickup_to_take()
 	if pickup != null:
 		return pick_up(pickup)
 	var talkable: Talkable = talkable_in_front()
@@ -534,6 +539,47 @@ func talkables() -> Array[Talkable]:
 		if child is Talkable:
 			out.append(child as Talkable)
 	return out
+
+
+## The pickup interact acts on: the one underfoot, unless he has no room for it and someone or
+## something is before him. What lies at his feet because his pack was full must not come
+## between him and whoever gave it.
+func pickup_to_take() -> ItemPickup:
+	var pickup: ItemPickup = pickup_under_player()
+	if pickup != null and not pickup.has_room() and (talkable_in_front() != null or usable_in_front() != null):
+		return null
+	return pickup
+
+
+## Lays what the hero is owed (something given that didn't fit: LeftItems) where he stands, and
+## tells him. On his way through a door it waits for where he arrives.
+func _lay_down_owed() -> void:
+	if _travelling or LeftItems.owed(GameState.flags).is_empty():
+		return
+	for laid: Dictionary in GameState.lay_down_owed(area_id, _safe_cell if is_in_pit() else player.motor.cell):
+		hud.show_notice(LeftItems.words(str(DataRegistry.get_item(laid["item"]).get("name", laid["item"])), int(laid["count"])))
+	_show_left_items()
+
+
+## A LeftItem for everything that lies in this area by the flags: made if there is none yet,
+## and told how many it is now.
+func _show_left_items() -> void:
+	for lying: Dictionary in LeftItems.lying_in(GameState.flags, area_id):
+		var item: LeftItem = interactables.get_node_or_null(NodePath(_left_item_name(lying["flag"]))) as LeftItem
+		if item == null:
+			item = LeftItem.new()
+			item.name = _left_item_name(lying["flag"])
+			item.item_id = lying["item"]
+			item.taken_flag = lying["flag"]
+			item.position = Vector2(lying["cell"] as Vector2i) * GreyboxTiles.TILE_SIZE
+			interactables.add_child(item)
+		item.count = int(lying["count"])
+		item.queue_redraw()
+
+
+## A node name for the LeftItem of `flag` (a flag's name has slashes and commas; a node's can't).
+static func _left_item_name(flag: StringName) -> String:
+	return "Left_" + String(flag).validate_node_name().replace(",", "_")
 
 
 func pick_up(pickup: ItemPickup) -> bool:
@@ -1604,7 +1650,7 @@ func _update_hud() -> void:
 	if is_talking() or is_in_menu():
 		hud.set_prompt("")
 		return
-	var pickup: ItemPickup = pickup_under_player()
+	var pickup: ItemPickup = pickup_to_take()
 	if pickup != null:
 		hud.set_prompt(MenuInput.prompt("Pick up the %s" % pickup.item_name()))
 		return

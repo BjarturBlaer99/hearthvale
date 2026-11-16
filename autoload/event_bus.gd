@@ -75,3 +75,7 @@ signal gift_requested(villager: StringName)
 ## The hero learned the recipe `recipe_id` (P4d; the `teach_recipe` effect): said once.
 signal recipe_learned(recipe_id: StringName)
 
+## Something given to the hero didn't all fit in his pack (GameState.give_item): what is owed
+## is in the flags (LeftItems), and whoever runs the area lays it at his feet.
+signal items_owed
+

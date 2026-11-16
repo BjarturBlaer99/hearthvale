@@ -17,6 +17,11 @@ func add_item(item_id: StringName, count: int) -> void:
 	items[String(item_id)] = maxi(int(items.get(String(item_id), 0)) + count, 0)
 
 
+## A pack with no limits: everything given fits.
+func give_item(item_id: StringName, count: int) -> void:
+	add_item(item_id, count)
+
+
 func set_quest_stage(quest_id: StringName, stage_id: StringName) -> void:
 	quests[String(quest_id)] = String(stage_id)
 
