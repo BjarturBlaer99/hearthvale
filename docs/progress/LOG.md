@@ -2034,3 +2034,77 @@ the same key is obeyed, and a loaded game or a fall holds nothing back.
 - It changes how one moment feels at every door that turns the hero round: only the keep's way out does
   today. Walking on through an ordinary door with the key held is as it was.
 - Quitting still does not save (seen in the same log; not looked into).
+
+## 2026-11-16 — A fix round: saves, quitting, rewards, gifts
+
+The user's request (`docs/progress/fix-round-plan.md`): five fixes in order, each with tests, no new content.
+One commit a fix. The save format is unchanged (version 4).
+
+**1. Safe saving**
+- A save is written to `slot_1.json.tmp`, read back, and only a whole one is moved into the save's place; the
+  save that was there is kept as `slot_1.backup.json`. A write that fails or is cut short leaves the old save
+  as it was (`SaveFiles`, pure; `SaveSystem.save_to_slot()`).
+- `SaveSystem.erase_slot()` removes a slot's three files. The tests' cleanup (26 files) and the two tools
+  that empty slots use it.
+
+**2. Save on quit**
+- "Quit to title" saves first, and so does closing the window in an area or on the ending screen.
+  "Saving..." is up for half a second, then the game leaves. The pause menu's note says so.
+- A save that can't be written keeps the game open once and says why; asked again, it leaves unsaved.
+- A hero lying fallen is saved awake at the entrance; one down a pit, on the ground he fell from.
+
+**3. A save that can't be read**
+- Continue says so in a box under the title's menu and offers the backup, with where and how long it was.
+  If the backup can't be read either, or there is none, it says that and the title stays. A save that is
+  gone while its backup is there, and one from a version this game doesn't know, are treated the same way.
+
+**4. A reward too big for the pack**
+- The `give_item` effect goes through `GameState.give_item()`: what fits goes in, and the rest is laid at
+  his feet (a `LeftItem`) with a line at the top of the screen. It lies there through leaving the area and
+  through a save, and is picked up whole when there is room.
+- A right click passes over what he has no room for when someone or something is before him.
+
+**5. A gift to a full friendship**
+- Still taken, as it was. The villager now answers with a line of their own (`thanks.full`), and the seven
+  villagers each have one.
+
+**Checked**
+- **766 tests in 103 suites pass.** Fifty-six are new: `safe_save_test` (11), `save_files_test` (4),
+  `quit_save_test` (12), `unreadable_save_test` (11), `reward_overflow_test` (9), `left_items_test` (6), and
+  three for the gift. Seven older tests were changed to fit: two that quit to the title, three that named
+  what a gift returns, and two about a villager's file.
+- **Nineteen deliberate bugs,** planted one at a time in runtime code and each caught by the new tests,
+  files restored: a half-written save passing for a save, the old save not kept, the save written straight
+  over the old one, a fallen hero saved fallen, a failed save leaving at once, a closing window never
+  saving, quitting without saving, leaving before the notice, Continue greyed out for a broken save, the
+  offer loading the broken save, nothing said with no backup, a second thing owed replacing the first, a
+  picked-up thing lying there still, a full pack standing between him and a villager, the effect losing the
+  rest as before, another area's things showing here, the ordinary thanks at five marks, a gift never saying
+  the friendship was full, a villager's file without the line let through.
+- **A real window, closed as the X button closes it** (a close message from the system, not a call): in the
+  village scenario the save was written at the moment of closing and the game was gone 0.8 seconds later;
+  at the title the game was gone in 0.2 seconds and no save was touched.
+- **Renaming over a file** replaces it on this machine (checked by itself); the code also covers a system
+  where it doesn't.
+- **Five screenshots,** looked at: the title offering the earlier save, the title with neither readable, the
+  arrows at his feet with the line at the top, "Saving...", and Pip's line.
+- **The player's own save was read-only throughout:** the same checksum before and after every run.
+- **Old saves:** the suite's saves from versions 1 to 3 load as before, and a version 4 save with nothing
+  beside it loads and becomes the first backup.
+
+**Known issues and limits**
+- Not tried in play.
+- **The window's close button now takes half a second** in an area: the price of the notice.
+- **A crash or a power cut still loses what was done since the last save.** Only leaving by the pause menu
+  or the window saves; there is no autosave on a timer or on entering an area.
+- **The backup is the save before the last, and is offered only when the save can't be read.** A save that
+  reads but holds a game he didn't want (a new game saved over an old one) is not undone by it.
+- **A save that fails on quit is told at the top of the screen,** where it can be missed over a pale wall;
+  the second quit then leaves unsaved.
+- **What lies at his feet is taken whole or not at all,** like every pickup: six arrows wait until there is
+  room for six.
+- **A thing given while he is on his way through a door** is laid where he arrives.
+- **The gift at five marks still costs the food** and still uses the day's gift; only the words changed.
+- **The ending's "Save and go to the title"** shows no "Saving..." and, if it can't save, stays on the
+  ending for good, as before.
+- **News at the top of the screen is hard to read over a pale house wall** (as it always was).

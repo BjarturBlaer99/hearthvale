@@ -21,7 +21,7 @@ effects (`complete_quest` only means something in a quest stage's `on_enter`, wh
 | type | fields |
 |---|---|
 | `set_flag` | `flag`, `value` |
-| `give_item` / `take_item` | `item`, `count` |
+| `give_item` / `take_item` | `item`, `count` (what a full pack can't take of a `give_item` is laid at the hero's feet, never lost) |
 | `set_quest_stage` | `quest`, `stage` |
 | `complete_quest` | — (the quest whose stage it's in; finishes it) |
 | `sleep` | — (the hero sleeps until morning: the next day begins, hearts and energy are full; the area saves the game) |

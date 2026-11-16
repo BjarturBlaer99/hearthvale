@@ -62,5 +62,5 @@ func test_a_flag_made_for_a_place_is_read_back_as_that_place() -> void:
 
 
 func test_he_is_told_what_lies_at_his_feet() -> void:
-	assert_str(LeftItems.words("Arrows", 6)).is_equal("No room in your pack. At your feet: Arrows x6.")
-	assert_str(LeftItems.words("Bow", 1)).is_equal("No room in your pack. At your feet: Bow.")
+	assert_str(LeftItems.words("Arrows", 6)).is_equal("Pack full. At your feet: Arrows x6.")
+	assert_str(LeftItems.words("Bow", 1)).is_equal("Pack full. At your feet: Bow.")

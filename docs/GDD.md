@@ -92,7 +92,9 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
   and the sword is in hand). A farm tool or seeds: the tool where there is work for it (facing the plot, or
   water for the can), and the sword everywhere else.
 - **A full pack loses nothing:** what lies in the world, what grows to be gathered, what a chest holds and a
-  ripe crop stay where they are until he can carry all of it, and he is told why.
+  ripe crop stay where they are until he can carry all of it, and he is told why. What he is given (a quest's
+  reward, a present) goes in as far as it fits; the rest is laid at his feet and lies there until he picks it
+  up.
 - **Growth** *(P4b)*: three skills that rise with use, five levels each, at 0, 10, 25, 50 and 90 points.
 
 | Skill | Raised by | Each level above the first |
@@ -203,7 +205,8 @@ Enemies sometimes drop hearts or coins.
 - Villagers give hints and small quests (data-driven).
 - **Friendship** *(P4c)* is twenty points a villager, a mark for every four: five marks.
   - The first talk of a day is worth 1 point.
-  - A gift is worth 3 if they like it and 1 if not. One gift a villager a day.
+  - A gift is worth 3 if they like it and 1 if not. One gift a villager a day. At five marks a gift is still
+    taken and adds nothing, and the villager has words of their own for it.
   - Food and what is cooked with can be given, and nothing else. With something to give, a villager's
     conversation offers "I brought you something.", which opens a list of what he carries.
   - A mark gained is said once; the pause menu's Friends page shows every villager's marks.

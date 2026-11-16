@@ -12,7 +12,9 @@ into a hero.
 ## Playing the current build
 Run `godot --path .` to reach the title screen. Choose **New game** to start in Hearthvale, or **Continue** to pick
 up a save. Press **Esc** (gamepad Start) to pause: from there you can save, change the settings (music and sound
-volume, fullscreen, window size, the controls hint), or quit to the title. The game has sound effects and music
+volume, fullscreen, window size, the controls hint), or quit to the title. Quitting to the title saves first,
+and so does closing the window. The save before the last is kept as a backup: if a save can't be read,
+Continue says so and offers it. The game has sound effects and music
 (made in code). The pause menu also shows your play time.
 
 | Action | Keyboard | Gamepad |

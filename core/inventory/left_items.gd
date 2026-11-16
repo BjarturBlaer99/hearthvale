@@ -12,7 +12,7 @@ extends RefCounted
 const OWED: String = "owed/"
 const LYING: String = "left/"
 ## What he is told as something is laid at his feet: "Arrows x10", or "Bow" for one.
-const WORDS: String = "No room in your pack. At your feet: %s."
+const WORDS: String = "Pack full. At your feet: %s."
 
 
 static func owed_flag(item_id: StringName) -> StringName:
@@ -64,6 +64,6 @@ static func lying_in(flags: Dictionary, area: StringName) -> Array[Dictionary]:
 	return out
 
 
-## "No room in your pack. At your feet: Arrows x10."
+## "Pack full. At your feet: Arrows x10."
 static func words(item_name: String, count: int) -> String:
 	return WORDS % (item_name if count == 1 else "%s x%d" % [item_name, count])

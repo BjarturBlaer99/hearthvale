@@ -17,9 +17,9 @@ The save format does not change: no new version.
 - `SaveSystem.erase_slot()` removes a slot's three files; the tests and the playtest tool use it.
 
 **Done when**
-- [ ] A save that fails partway leaves the save before it readable
-- [ ] After two saves the backup holds the first
-- [ ] A save written by the game as it was (no backup beside it) loads as before
+- [x] A save that fails partway leaves the save before it readable
+- [x] After two saves the backup holds the first
+- [x] A save written by the game as it was (no backup beside it) loads as before
 
 ## 2. Save on quit
 
@@ -31,9 +31,9 @@ The save format does not change: no new version.
   has nothing to save, a test's area is not the game's scene, and the screenshot tool uses a slot of its own.
 
 **Done when**
-- [ ] Quitting to the title writes the save, shows the notice, then leaves
-- [ ] A close request in an area and on the ending screen does the same, then quits
-- [ ] A save that fails keeps him in the game the first time and lets him go the second
+- [x] Quitting to the title writes the save, shows the notice, then leaves
+- [x] A close request in an area and on the ending screen does the same, then quits
+- [x] A save that fails keeps him in the game the first time and lets him go the second
 
 ## 3. A save that can't be read
 
@@ -42,21 +42,22 @@ The save format does not change: no new version.
   there is none, it says so and the title stays.
 
 **Done when**
-- [ ] A broken save with a good backup: the message, the offer, and the backup loads
-- [ ] A broken save with a broken backup, and one with none: the message, and the title stays
-- [ ] A good save loads as before, with nothing said
+- [x] A broken save with a good backup: the message, the offer, and the backup loads
+- [x] A broken save with a broken backup, and one with none: the message, and the title stays
+- [x] A good save loads as before, with nothing said
 
 ## 4. A reward too big for the pack
 
 - What is given by a quest or in a conversation (the `give_item` effect) goes in the pack as far as it fits.
-  The rest is laid at the hero's feet and a line at the top of the screen says so. It lies there until it is
+  The rest is laid at the hero's feet and a line at the top of the screen says so ("Pack full. At your feet:
+  Arrows x6."). It lies there until it is
   picked up, through leaving the area and through a save (kept in the flags, so the save format is as it was).
 - It is picked up like any item on the ground: whole, when there is room.
 
 **Done when**
-- [ ] A reward that doesn't fit: the pack is full, the rest is at his feet, and he is told
-- [ ] What lies there is still there after the area is left and after a save and a load
-- [ ] With room made, it can be picked up, and then it is gone for good
+- [x] A reward that doesn't fit: the pack is full, the rest is at his feet, and he is told
+- [x] What lies there is still there after the area is left and after a save and a load
+- [x] With room made, it can be picked up, and then it is gone for good
 
 ## 5. A gift to a full friendship
 
@@ -64,8 +65,8 @@ The save format does not change: no new version.
   their file in `data/villagers/`. Seven short lines are the only new words.
 
 **Done when**
-- [ ] At five marks the gift is taken and their own line is said; below five, the lines are as they were
-- [ ] A villager's file without the line is refused when the data is checked
+- [x] At five marks the gift is taken and their own line is said; below five, the lines are as they were
+- [x] A villager's file without the line is refused when the data is checked
 
 ## Not in this
 

@@ -47,7 +47,7 @@ res://
 | `EventBus` | Global signals only, no state: `health_changed`, `item_added`, `flag_set`, `quest_updated`, … |
 | `DataRegistry` | Loads and validates all JSON in `res://data` at startup (directory = kind of content); read-only lookups by id. Fails loudly on invalid data. |
 | `GameState` | Owns all persistent state: hearts and health, flags, quests, inventory, where the hero is, the day and the time of day, the hero's energy. `to_dict()` / `from_dict()`. Mutates only through methods that emit `EventBus` signals. |
-| `SaveSystem` | Writes `GameState.to_dict()` as JSON to `user://saves/slot_<n>.json` with a `version`; loads and migrates. The menus use one slot (`current_slot`, `save_game()`, `load_game()`, `summary()`). |
+| `SaveSystem` | Writes `GameState.to_dict()` as JSON to `user://saves/slot_<n>.json` with a `version`; loads and migrates. The menus use one slot (`current_slot`, `save_game()`, `load_game()`, `summary()`). A save is written beside the old one and the old one kept as a backup (§9); a closing window is routed here, so a game in play is saved first (§12). |
 | `Settings` | The player's settings (`SettingsData`), apart from any save: loaded from `user://settings.cfg` at start, applied to the window, saved on every change, announced by `EventBus.settings_changed`. |
 | `Quests` | Runs every quest in `data/quests` (a `QuestRunner` over GameState) whenever a flag, an item or a quest's stage changes, and announces quest news (`EventBus.quest_announced`). Holds no state. |
 | `Audio` | Plays sound effects (`EventBus.sound`) on a pool of players on the `SFX` bus, and loops music (`EventBus.music_requested`) on the `Music` bus; volumes from Settings. |
@@ -398,6 +398,24 @@ checked by `ToolUse.problems()`.
 While the hero is on the way into an area, `player` is `{"area": "elder_house", "entry": "door"}` instead of
 a cell, until the area places them. Bump `version` on breaking changes and add a migration step in
 `SaveSystem`.
+- **A save is never written over the one before it** (the fix round of 2026-11-16; `SaveFiles`, pure, in
+  `core/save/`, names the files and says whether a file's text is a save this game can load):
+  - `slot_1.json.tmp` is written first and read back. Only a whole one is moved into the save's place
+    (`slot_1.json`); the save that was there is copied to `slot_1.backup.json` beforehand.
+  - A write that fails, or comes back different from what was written (`ERR_FILE_CORRUPT`), leaves the old
+    save as it was and removes the temporary file. A file the system holds for a moment is tried five times.
+  - If the backup can't be made the save still goes ahead, since the new save has been read back whole; the
+    old save is then replaced only by a move that takes its place, never removed first.
+  - `load_backup()` and `backup_summary()` read the backup; `erase_slot()` removes all three files (tests and
+    the playtest tool use it, so a slot is truly empty).
+  - A save made before this is one file with nothing beside it: it loads as it did, and becomes the first
+    backup at the next save. The format is unchanged.
+- **What a full pack couldn't take of something given** is kept in the flags (`LeftItems`, pure, in
+  `core/inventory/`), so it needs no new field: `owed/<item>` counts what is given and not yet laid down, and
+  `left/<area>/<x>,<y>/<item>` what lies in a cell. `GameState.give_item()` (the `give_item` effect) adds what
+  fits and records the rest as owed; the area lays it where the hero stands (`EventBus.items_owed`, or as it
+  loads) and stands a `LeftItem` there (an `ItemPickup` whose flag is a count). Picked up, the flag is erased
+  (`GameState.erase_flag()`). An older build would load such a save and simply not show what lies there.
 - **Version 2** (P2a) added `day` (1 is the first), `minute` (the time of day, in minutes since the midnight
   the day began on: 360 is 06:00) and `energy`. `SaveSystem._v1_to_v2()` gives a version 1 save the first day,
   the hour days start and a full bar; a finished game stays finished. Tests load two real version 1 saves
@@ -431,10 +449,16 @@ run headless; see CLAUDE.md for the command and gotchas.
 
 ## 12. Menus, saving & settings
 - **The title screen** (`ui/title_screen.tscn`) is the main scene. It offers:
-  - **Continue**, which can be chosen only when there's a save, and names where and how long (`SaveSystem.summary()`)
+  - **Continue**, which can be chosen when there's a save or the backup of one, and names where and how long
+    if the save can be read (`SaveSystem.summary()`)
   - **New game**, **Settings** and **Quit**
 
   Continue loads the save and opens the area it names, with the hero on the saved cell.
+
+  **A save that can't be read is never passed over in silence.** Continue says so in a box under the menu and
+  offers the backup in the menu's place, with where and how long it was ("Load the earlier save", "Back"; Esc
+  goes back). If the backup can't be read either, or there is none, it says that and the menu stays. A save
+  that is missing while its backup is there (the game closed between the two moves) is treated the same way.
 
   The title's picture follows the save: `summary()` also says whether the saved game was finished
   (`EndingSummary.is_finished`), and then the keep's window is dark.
@@ -461,8 +485,19 @@ run headless; see CLAUDE.md for the command and gotchas.
     stop.
   - It shows hearts, heart pieces, keys in a dungeon and the play time.
   - It offers Resume, Save (the menus' slot), Quests, Settings, and Quit to title. Quests opens the
-    `QuestLog`: started quests, active first, each with its journal line and objectives ticked when done. Anything not saved is lost on quitting,
+    `QuestLog`: started quests, active first, each with its journal line and objectives ticked when done. **Quitting to the title saves first,**
     and the menu says so.
+- **Leaving saves** (the fix round of 2026-11-16). `SaveSystem` turns `auto_accept_quit` off and takes the
+  window's close request itself: the scene the game is showing is asked to `save_and_leave(then)` if it has
+  that method (an area, the ending screen), and anything else (the title) quits at once.
+  - `AreaController.save_and_leave()` saves where the hero stands (`save_here()`), says "Saving..." at the top
+    of the screen and in the pause menu if it is open, and calls `then` after `SaveSystem.leave_delay` (half a
+    second of real time): the title for "Quit to title", the end of the game for a closing window.
+  - A hero lying fallen is saved as he would wake (at the entrance, whole); one down a pit, on the ground he
+    fell from.
+  - If the save can't be written he is told and the game goes on. Asked a second time, it leaves unsaved.
+  - Only `get_tree().current_scene` is asked, so an area that a test or the screenshot tool has put in the
+    tree beside its own scene is never saved by a closing window.
 - **Play time:** `GameState.play_time` counts in the area's `_process`, which a paused tree skips. It's saved.
 - **Settings** (`SettingsMenu` over the `Settings` autoload):
   - fullscreen
@@ -1028,6 +1063,11 @@ P4c (`docs/progress/P4-plan.md` section 12). Talking and gifts make friends of t
   blossoms drawn in code like the hearts.
 - **Tools:** `tools/playtest.gd -- gifts` starts beside Pip with a pack of food; `tools/capture.gd` has the
   actions `gift_talk`, `gift_list`, `gift_given` and `friends_page`.
+
+- **A gift to a full friendship** (the fix round of 2026-11-16) is still taken and adds nothing.
+  `GameState.give_gift()` says so (`"full"` in what it returns: the friendship was full already), and the
+  villager answers with `thanks.full` from their file in place of the other two lines. A villager's file
+  without that line is refused when the data is checked.
 
 ## 25. What friendship opens
 P4d (`docs/progress/P4-plan.md` section 13). All of it is data; the code is one condition, one effect and a

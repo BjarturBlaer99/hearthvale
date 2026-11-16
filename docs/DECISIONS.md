@@ -891,3 +891,42 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   gate, so the held key walked him straight back in. Chosen over moving the entry point (a map change, and
   any later door that turns him round would have the same fault) and over ignoring every held key on
   arrival (walking on through a door with the key down is how every other door feels, and stays).
+- 2026-11-16 — **A save is written beside the old one, read back, and moved into place; the old one is
+  copied to a backup first.** Copying keeps the save in its place the whole time: moving it aside instead
+  would leave a moment with no save at all. Reading the new file back is what catches a disk that filled up.
+- 2026-11-16 — **One backup, the save before the last.** The user asked for the previous save to be kept, not
+  a history, and one file is enough to survive a save that goes wrong. Whatever was in the save's place
+  becomes the backup, readable or not: the game does not judge it.
+- 2026-11-16 — **If the backup can't be made, the save still goes ahead.** The new save has been read back
+  whole by then, and a player who can't save at all loses more than one who saves without a backup. The old
+  save is then only ever replaced by a move, never removed first.
+- 2026-11-16 — **Leaving saves, and a save that fails keeps the game open once.** Thrown out unsaved, the
+  player loses the session without being asked; held for ever, he can't leave a game on a full disk. So he is
+  told, and the second time it leaves.
+- 2026-11-16 — **"Saving..." stays up for half a second.** The save takes no time to speak of; words that are
+  gone in a frame are not a notice. It counts real time, so it works behind the pause menu.
+- 2026-11-16 — **`SaveSystem` takes the window's close request and asks only the scene the game is showing.**
+  One place decides, and an area that a test or the screenshot tool has put in the tree beside its own scene
+  can never be saved over the player's game by a window closed by hand. The title has nothing to save.
+- 2026-11-16 — **The ending screen saves on a closing window too.** The Shade's fall is not saved until then:
+  closing the window on "The End" would have cost the last fight. Its own "Save and go to the title" is as it
+  was.
+- 2026-11-16 — **A hero lying fallen is saved awake at the entrance.** A save with no hearts loads a hero who
+  walks about dead. He was a second from waking there anyway.
+- 2026-11-16 — **A save that can't be read is found out when Continue is chosen, and the backup is offered,
+  never loaded unasked.** It is his game: he is told what happened and what the earlier save holds (where,
+  and how long played) before anything is loaded. Continue is no longer greyed out for a broken save, which
+  looked like no save at all.
+- 2026-11-16 — **What doesn't fit is laid down by the `give_item` effect, not by quests alone.** A quest's
+  reward is that effect, and so are a present and a thing handed over in a conversation (Oda's basket of
+  eggs): the loss was the same, and one place fixes all of it. Cooking already checks for room.
+- 2026-11-16 — **What lies at his feet is kept in the flags.** `owed/<item>` and `left/<area>/<x>,<y>/<item>`
+  hold counts, as the forage spots and the pushed blocks already keep theirs. No new field, so no new save
+  version, and an older build loads such a save.
+- 2026-11-16 — **It is picked up whole, like everything else on the ground,** and what he has no room for is
+  passed over by the right click when someone or something is before him. Without that, a reward laid at his
+  feet stood between him and the villager who gave it.
+- 2026-11-16 — **A gift to a full friendship has a third line of thanks, `thanks.full`, and every villager
+  must have one.** "From dialogue data" was read as the villager's own file, where their words of thanks
+  already are. The gift was always taken at five marks (a test said "a gift is still a gift"); what was
+  missing was any sign that it changed nothing. Seven short lines are the only new words.

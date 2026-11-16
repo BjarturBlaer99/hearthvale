@@ -21,7 +21,11 @@ story over days, 4b skills, 4c friendship and gifts, 4d side quests, recipes and
 on 2026-11-16: the user played a whole game from the title to the ending. The roadmap is finished.** Nothing
 further is planned: ask before building anything more.
 **Since P4 (the user's requests, 2026-11-15):** a bug hunt (five fixes), the mouse pointing in menus and the
-item bar (`docs/progress/mouse-and-bar-plan.md`). None of it is a roadmap step.
+item bar (`docs/progress/mouse-and-bar-plan.md`). **P4's "done when" was met on 2026-11-16** (the user played
+the game to its ending), and a **fix round** followed the same day (`docs/progress/fix-round-plan.md`): safe
+saving with a backup, saving on quit, a title that says when a save can't be read, rewards laid at his feet
+when the pack is full, and a villager's own thanks for a gift to a full friendship. None of it is a roadmap
+step.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -224,7 +228,18 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   the hand, in the bar without asking.
 - Do not let a full pack lose things: what can't be carried whole stays where it is and the hero is told
   (`GameState.has_room_for()`; a pickup, a forage spot and a chest each have `has_room()`). **A test that
-  fills a stack and then takes more of it sees a refusal,** not a silent loss.
+  fills a stack and then takes more of it sees a refusal,** not a silent loss. What is *given* (the
+  `give_item` effect: a reward, a present) goes through `GameState.give_item()`, never `add_item()`: what
+  doesn't fit is laid at his feet as a `LeftItem` and kept in the flags (`LeftItems`).
+- Do not write a save any way but `SaveSystem.save_game()` / `save_to_slot()`: it writes beside the old save,
+  reads it back, and keeps the old one as a backup (`SaveFiles`). **Empty a slot with
+  `SaveSystem.erase_slot()`,** which removes its three files; removing only `slot_path()` leaves a backup
+  that the title would offer.
+- Do not let the game leave without saving: "Quit to title" and a closing window go through
+  `save_and_leave()` (an area, the ending screen). **A test that quits to the title has saved to
+  `SaveSystem.current_slot`,** so it points that at a slot of its own, and sets `SaveSystem.leave_delay` to
+  0 or the area leaves half a second later. A closing window saves only `get_tree().current_scene`: call
+  `SaveSystem.close_requested()` with the area made the current scene to test it.
 - Do not add areas beyond the hero's home and plot unless the user asks.
 - Do not add a dependency/addon without noting why in `docs/DECISIONS.md`. Allowed now: gdUnit4.
 - Do not write story, dialogue or quest content beyond what the current milestone needs.
@@ -293,7 +308,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   dish. **A test that tills ten cells, or beats ten monsters, has raised a level:** work is cheaper after it.
 - **Friendship (P4c):** the numbers are in `data/rules/friendship.json`, read by `Friendship`
   (`core/friendship/`, pure); a villager is a file in `data/villagers/` naming their conversation, what they
-  like and their words of thanks, so **a new villager to befriend is data only** (and a `Villager` node with
+  like and their words of thanks (three lines: `liked`, `other`, and `full` for a gift to a friendship
+  that is full already), so **a new villager to befriend is data only** (and a `Villager` node with
   that conversation). `GameState.friends` holds the points and the days of the last talk and gift: go through
   `greet()`, `give_gift()` and `add_friendship()`. The answer "I brought you something." is added by
   `AreaController.talk_to()` to a copy of the conversation: **never write it into a dialogue file.** It shows
