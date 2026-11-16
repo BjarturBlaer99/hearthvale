@@ -1983,3 +1983,27 @@ Plan: `docs/progress/mouse-and-bar-plan.md`. The user's words, after playing: "t
 minutes: the sword, the tools, Tilda's eggs, the first crop watered, Bram's promise) with no errors, and said
 "everything feels good". The plan's two lines for the user are ticked. The run's log shows no fight, so the bar
 in a fight was judged on the user's word.
+
+## 2026-11-16 — The whole game played: P4's "done when"
+
+The user played the whole game in the playtest mode (`-- full`, slot 901) in two sittings, from a new game to
+the ending. From the run's log and its save:
+
+- **The ending was reached on day 5,** in 63 minutes of play: the first crop and Bram's promise on day 2, the
+  keep's bow on day 3 and its Warden on day 4, the crypt open at the next dawn and the Shade beaten on day 5.
+  That is a day sooner than the six to eight the roadmap aimed at.
+- **Beside the story:** three favours done (the eggs, the shuttle, the slimes), the ruin cellar and the
+  cistern, four heart pieces, five crops picked, one dish cooked, gifts given to three villagers (Pip at
+  five marks, Oda at four).
+- **He fell seven times:** three in the keep (once to the Warden) and four in the crypt (twice to the Shade).
+- **No script errors.** Three audio driver messages came from Windows changing the sound output.
+
+**Limits of this as a test**
+- The player was the user, who knows the game: "a new player, with no help" is still untried.
+- The log has no record of how it felt; the user has been asked.
+
+**Seen in the log, not looked into**
+- After the Warden, the keep's door was passed six times in half a minute, several times within one second.
+  It may be the player looking about, or the door sending him back.
+- The second sitting began about a minute and a half before the first ended (the crop was planted and Bram
+  spoken to twice): quitting does not save.

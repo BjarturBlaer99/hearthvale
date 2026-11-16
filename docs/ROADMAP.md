@@ -239,8 +239,9 @@ The proposal (`docs/progress/P4-plan.md`) was approved as written on 2026-11-13.
 - **4d — Side quests, recipes and the ending.** *Built 2026-11-14.* Four favours and three recipes at two
   marks, a present at four, a quest log that scrolls, and the ending's three new lines.
 
-All four steps are built. What is left of P4 is its "done when", which only a player can meet: a whole game
-played from the title to the ending.
+All four steps are built, and **P4's "done when" was met on 2026-11-16:** the user played a whole game from
+the title to the ending (on day 5, a day sooner than the six to eight aimed at; the user knows the game, so
+a player new to it is still untried). The roadmap is finished.
 
 ---
 

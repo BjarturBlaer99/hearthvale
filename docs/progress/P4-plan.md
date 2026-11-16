@@ -375,7 +375,8 @@ anything but food and crops, more than one gift a day, a calendar or seasons, cr
 - [x] the ending shows the days, the crops grown and the friends made
 - [x] one test carries a new game through the story's gates to the ending's lines
 - [x] all earlier tests pass
-- [ ] (yours) a whole game, played from the title to the ending, in six to eight days with no help
+- [x] (yours) a whole game, played from the title to the ending, in six to eight days with no help
+  (played by the user on 2026-11-16: the ending on day 5, in 63 minutes of play; see the log)
 
 ### Not in this step
 - The effect that adds friendship: the plan lists it, but nothing in the plan's content would use it.

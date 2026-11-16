@@ -17,9 +17,9 @@ energy, food and time, **P3** farming, **P4** RPG and story. Do not build anythi
 ask the user before adding anything the roadmap doesn't list. Scope creep is the main risk on this project.
 **P1, P2 and P3 are built** (P3 finished on 2026-11-13). **P4's four steps are built** (2026-11-14; the user approved its
 proposal as written, `docs/progress/P4-plan.md`: ten decisions, four steps, each with its own list): 4a the
-story over days, 4b skills, 4c friendship and gifts, 4d side quests, recipes and the ending. **What is left is
-P4's "done when", which is the user's: a whole game played from the title to the ending.** Nothing further is
-planned: ask before building anything more.
+story over days, 4b skills, 4c friendship and gifts, 4d side quests, recipes and the ending. **P4's "done when" was met
+on 2026-11-16: the user played a whole game from the title to the ending. The roadmap is finished.** Nothing
+further is planned: ask before building anything more.
 **Since P4 (the user's requests, 2026-11-15):** a bug hunt (five fixes), the mouse pointing in menus and the
 item bar (`docs/progress/mouse-and-bar-plan.md`). None of it is a roadmap step.
 
