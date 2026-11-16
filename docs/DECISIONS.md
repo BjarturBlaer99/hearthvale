@@ -886,3 +886,8 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
 - 2026-11-15 — **No numbers are drawn on the slots.** The font's smallest size is eight pixels, a third of a
   slot. The keys box says "1-9", and the slots count from the left.
 
+- 2026-11-16 — **A key held against the way he comes out of a door is not obeyed until it is let go**
+  (`ArrivalHold`). The keep's way out is taken going north and sets him down a step south of the keep's
+  gate, so the held key walked him straight back in. Chosen over moving the entry point (a map change, and
+  any later door that turns him round would have the same fault) and over ignoring every held key on
+  arrival (walking on through a door with the key down is how every other door feels, and stays).

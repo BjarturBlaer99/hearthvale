@@ -202,6 +202,8 @@ func _ready() -> void:
 	_entrance_facing = arrival["facing"]
 	player.setup(terrain, _entrance_cell, Rect2i(Vector2i.ZERO, grid.size * GreyboxTiles.TILE_SIZE))
 	player.face(_entrance_facing)
+	# A key held from the other side of the door must not walk him back through it.
+	player.held_back = -_entrance_facing if arrival["through_entry"] else Vector2.ZERO
 	_safe_cell = _entrance_cell
 	player.motor.cell_changed.connect(_on_cell_changed)
 	rng.randomize()

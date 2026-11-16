@@ -52,6 +52,50 @@ func test_the_keeps_gate_is_at_the_top_of_the_old_wood() -> void:
 	assert_that(wood.player.motor.cell).is_equal(gate)
 
 
+func test_a_key_held_through_the_way_out_does_not_walk_him_back_in() -> void:
+	# The way out behind the Warden's hall is taken going north, and sets him down a step south
+	# of the keep's gate: the key still held would take him straight back in (the playtest of
+	# 2026-11-16). It is not obeyed until it is let go.
+	GameState.set_flag(StoryGates.KEEP_GATE, true)
+	GameState.go_to(&"old_wood", &"keep_gate")
+	var wood: AreaController = _load(WOOD)
+	var travelled: Array[String] = []
+	wood.travel = func(path: String) -> void: travelled.append(path)
+	var gate: Vector2i = wood.player.motor.cell
+	Input.action_press(&"move_up")
+	for i: int in 60:
+		wood.player._physics_process(FRAME)
+	assert_array(travelled).is_empty()
+	assert_that(wood.player.motor.cell).is_equal(gate)
+	# Let go and pressed again, it is a new press: he goes in.
+	Input.action_release(&"move_up")
+	wood.player._physics_process(FRAME)
+	Input.action_press(&"move_up")
+	for i: int in 60:
+		wood.player._physics_process(FRAME)
+	Input.action_release(&"move_up")
+	assert_array(travelled).has_size(1)
+
+
+func test_a_key_held_the_way_he_comes_out_keeps_him_walking() -> void:
+	GameState.set_flag(StoryGates.KEEP_GATE, true)
+	GameState.go_to(&"old_wood", &"keep_gate")
+	var wood: AreaController = _load(WOOD)
+	var gate: Vector2i = wood.player.motor.cell
+	Input.action_press(&"move_down")
+	for i: int in 30:
+		wood.player._physics_process(FRAME)
+	Input.action_release(&"move_down")
+	assert_int(wood.player.motor.cell.y).is_greater(gate.y)
+
+
+func test_a_loaded_game_holds_no_key_back() -> void:
+	GameState.set_flag(StoryGates.KEEP_GATE, true)
+	GameState.update_player(&"old_wood", Vector2i(18, 6))
+	var wood: AreaController = _load(WOOD)
+	assert_that(wood.player.held_back).is_equal(Vector2.ZERO)
+
+
 func test_ten_rooms_all_joined_once_every_door_is_open() -> void:
 	var keep: AreaController = _load(KEEP)
 	var rooms: Array[Vector2i] = []

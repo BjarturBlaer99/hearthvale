@@ -23,6 +23,9 @@ const HOLD_OFFSET: Vector2 = Vector2(-8.0, -47.0)
 var motor: PlayerMotor
 ## Whether input moves the hero (off while talking, going through a door, or down).
 var controls_enabled: bool = true
+## The way a held key is not obeyed, until it is let go (`ArrivalHold`): the area sets it as he
+## comes through a door, to the way back through it. Zero: every key is obeyed.
+var held_back: Vector2 = Vector2.ZERO
 
 var _animator: PlayerAnimator = PlayerAnimator.new()
 var _last_position: Vector2 = Vector2.ZERO
@@ -136,7 +139,9 @@ func _physics_process(delta: float) -> void:
 	if attack_held and not _attack_was_held and controls_enabled:
 		swing()
 	_attack_was_held = attack_held
-	var input: Vector2 = Input.get_vector(&"move_left", &"move_right", &"move_up", &"move_down") if controls_enabled else Vector2.ZERO
+	var keys: Vector2 = Input.get_vector(&"move_left", &"move_right", &"move_up", &"move_down")
+	var input: Vector2 = ArrivalHold.allowed(keys, held_back) if controls_enabled else Vector2.ZERO
+	held_back = ArrivalHold.after(keys, held_back)
 	# The energy rules (GDD §5): sprint needs energy and spends it while he runs; tired, he is
 	# slower.
 	var energy: EnergyRules = GameState.energy_rules()

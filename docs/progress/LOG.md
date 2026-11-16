@@ -2007,3 +2007,30 @@ the ending. From the run's log and its save:
   It may be the player looking about, or the door sending him back.
 - The second sitting began about a minute and a half before the first ended (the crop was planted and Bram
   spoken to twice): quitting does not save.
+
+## 2026-11-16 — The keep's way out walked him back in
+
+Looked into from the playthrough's log, at the user's word ("Yes, check it").
+
+**The bug.** The way out behind the Warden's hall is taken going north, and sets the hero down in the Old
+Wood one step south of the keep's gate, facing south. The W key, still held, walked him north through the
+gate and back to the keep's entrance, within a tenth of a second. A simulation with the key held showed it
+(the Old Wood at frame 20, the keep again at frame 27); the playthrough's log shows it six times.
+
+**The fix.** A key held against the way he comes out of a door is not obeyed until it is let go
+(`ArrivalHold`, pure, in `core/player/`; `PlayerController.held_back`, set by the area as he arrives through
+an entry point). Every other way moves him at once, a slanting push keeps its sideways part, a new press of
+the same key is obeyed, and a loaded game or a fall holds nothing back.
+
+**Checked**
+- 710 tests in 97 suites pass. Eight are new: five for the rule, three in `tests/world/keep_test.gd` (the
+  held key does not take him back in and a new press does; a key held the way he comes out keeps him
+  walking; a loaded game holds nothing back).
+- **A deliberate bug:** with the area's line taken out, two of the new tests fail; restored.
+- The simulation again, with the fix: holding W through the way out leaves him standing under the gate.
+
+**Known issues and limits**
+- Not tried in play.
+- It changes how one moment feels at every door that turns the hero round: only the keep's way out does
+  today. Walking on through an ordinary door with the key held is as it was.
+- Quitting still does not save (seen in the same log; not looked into).
