@@ -73,6 +73,33 @@ theme_override_colors/font_color = Color(0.92, 0.94, 1, 1)
 theme_override_font_sizes/font_size = 8
 text = "> New game"
 
+[node name="Notice" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = 104.0
+offset_right = 150.0
+offset_bottom = 140.0
+script = ExtResource("90_frame")
+mouse_filter = 2
+color = Color(0.05, 0.04, 0.07, 0.78)
+
+[node name="Words" type="Label" parent="Notice"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 6.0
+offset_right = 290.0
+offset_bottom = 30.0
+theme_override_colors/font_color = Color(0.95, 0.75, 0.55, 1)
+theme_override_font_sizes/font_size = 8
+horizontal_alignment = 1
+autowrap_mode = 3
+
 [node name="Help" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = -1
