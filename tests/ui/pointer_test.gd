@@ -279,7 +279,7 @@ func test_a_long_list_of_answers_is_scrolled_by_the_wheel() -> void:
 	await await_idle_frame()
 	var answers: Label = box.get_node(^"Panel/Lines/Options")
 	var count: int = box.shown_options().size()
-	assert_int(count).override_failure_message("six dishes known from the start, and leaving").is_equal(7)
+	assert_int(count).override_failure_message("seven dishes known from the start (Marsh Stew since Willowmere), and leaving").is_equal(8)
 	for notch: int in 5:
 		box._unhandled_input(_wheel(MOUSE_BUTTON_WHEEL_DOWN))
 	assert_int(box.selected).is_equal(5)

@@ -549,6 +549,22 @@ func _initialize() -> void:
 	for index: int in GreyboxTiles.FURNITURE_B_KINDS.size():
 		_floor(Vector2i(index, GreyboxTiles.ROW_FURNITURE_B))
 		_ascii(Vector2i(index, GreyboxTiles.ROW_FURNITURE_B), GreyboxTiles.FURNITURE_B_KINDS[index])
+	# The marsh (Willowmere): its ground, boardwalks, reeds and ruin, then its decorations and props.
+	_marsh(GreyboxTiles.coords("marsh"))
+	_marsh(GreyboxTiles.coords("marsh_solid"))
+	_boardwalk(GreyboxTiles.coords("boardwalk"), true)
+	_boardwalk(GreyboxTiles.coords("boardwalk_ns"), false)
+	_reeds(GreyboxTiles.coords("reeds"), 0)
+	_reeds(GreyboxTiles.coords("reeds_b"), 1)
+	_ruin_wall(GreyboxTiles.coords("ruin_wall"))
+	_ruin_top(GreyboxTiles.coords("ruin_top"))
+	_cattail(GreyboxTiles.coords("cattail"))
+	_moss(GreyboxTiles.coords("moss"))
+	_planks(GreyboxTiles.coords("planks"))
+	_ruin_hole(GreyboxTiles.coords("ruin_hole"))
+	_art(GreyboxTiles.coords("prop_mossy_rock"), MARSH_ROCK_PALETTE, MARSH_ROCK_ART)
+	_art(GreyboxTiles.coords("prop_marsh_lantern"), MARSH_LANTERN_PALETTE, MARSH_LANTERN_ART)
+	_willow_art(GreyboxTiles.coords("prop_willow"))
 	# Art pass 3: warm every colour and soften every outline, tile by tile.
 	PixelGrade.apply(_image, OUTLINE, Rect2i(), Vector2i(T, T))
 	DirAccess.make_dir_recursive_absolute(GreyboxTiles.TEXTURE_PATH.get_base_dir())
@@ -1607,3 +1623,279 @@ func _pit(tile: Vector2i, top: bool) -> void:
 			var joint: bool = y == 3 or (x + (4 if y > 3 else 0)) % 8 == 7
 			_px(tile, x, y, stone.darkened(minf(0.30 + y * 0.085 + (0.14 if joint else 0.0), 0.97)))
 	_rect(tile, Rect2i(0, 0, T, 1), OUTLINE)
+
+
+# --- The marsh (Willowmere, 2026-11-17) --------------------------------------------------
+
+const MARSH_GROUND: Color = Color(0.31, 0.45, 0.29)
+const MARSH_MOSS: Color = Color(0.50, 0.63, 0.28)
+const MARSH_DAMP: Color = Color(0.21, 0.33, 0.27)
+const PLANK: Color = Color(0.57, 0.47, 0.36)
+const REED: Array[Color] = [Color(0.15, 0.29, 0.20), Color(0.23, 0.41, 0.24), Color(0.35, 0.53, 0.27), Color(0.53, 0.65, 0.33)]
+const REED_HEAD: Color = Color(0.42, 0.27, 0.16)
+const WATER_DEEP: Color = Color(0.17, 0.48, 0.72)
+
+
+## The marsh's ground: damp earth under moss, darker and cooler than the meadow, with brighter
+## cushions of moss and a wet glint here and there. Seamless.
+func _marsh(tile: Vector2i) -> void:
+	_fill(tile, MARSH_GROUND)
+	for y: int in T:
+		for x: int in T:
+			var n: int = _hash(x, y, 201) % 100
+			if n < 12:
+				_px(tile, x, y, MARSH_GROUND.lerp(MARSH_DAMP, 0.6))
+			elif n < 19:
+				_px(tile, x, y, MARSH_GROUND.lerp(MARSH_MOSS, 0.45))
+	# Cushions of moss: a few soft blobs, lit from the top left.
+	for i: int in 3:
+		var cx: int = 2 + _hash(i, 3, 203) % (T - 5)
+		var cy: int = 2 + _hash(i, 5, 207) % (T - 5)
+		_px(tile, cx, cy, MARSH_MOSS)
+		_px(tile, cx + 1, cy, MARSH_MOSS.darkened(0.12))
+		_px(tile, cx, cy + 1, MARSH_MOSS.darkened(0.12))
+		_px(tile, cx + 1, cy + 1, MARSH_DAMP)
+	# A wet glint.
+	var gx: int = 1 + _hash(2, 9, 211) % (T - 3)
+	var gy: int = 1 + _hash(7, 4, 213) % (T - 3)
+	_px(tile, gx, gy, Color(0.45, 0.62, 0.66))
+	_px(tile, gx + 1, gy, MARSH_DAMP)
+
+
+## A boardwalk over the water: weathered planks side by side, each its own shade, lit along
+## one edge and dark along the other where the next plank begins, with a nail at each end and a
+## little moss. `across` planks lie north to south (a walk running east to west); otherwise
+## they lie east to west.
+func _boardwalk(tile: Vector2i, across: bool) -> void:
+	for plank: int in 4:
+		var tone: float = float(_hash(plank, 1, 221 if across else 227) % 5) * 0.035 - 0.07
+		var wood: Color = PLANK.lightened(tone) if tone > 0.0 else PLANK.darkened(-tone)
+		for along: int in T:
+			for step: int in 4:
+				var across_at: int = plank * 4 + step
+				var x: int = across_at if across else along
+				var y: int = along if across else across_at
+				var shade: Color = wood
+				if step == 0:
+					shade = wood.lightened(0.10)
+				elif step == 3:
+					shade = wood.darkened(0.42)
+				elif _hash(x, y, 229) % 11 == 0:
+					shade = shade.darkened(0.10)
+				_px(tile, x, y, shade)
+		# Nails near each end of the plank, and a tuft of moss on some.
+		for end: int in [1, T - 2]:
+			var nx: int = plank * 4 + 1 if across else end
+			var ny: int = end if across else plank * 4 + 1
+			_px(tile, nx, ny, Color(0.26, 0.22, 0.22))
+		if _hash(plank, 4, 233) % 3 == 0:
+			var along_at: int = 4 + _hash(plank, 6, 239) % 8
+			var mx: int = plank * 4 + 1 if across else along_at
+			var my: int = along_at if across else plank * 4 + 1
+			_px(tile, mx, my, MARSH_MOSS.darkened(0.1))
+
+
+## Planks laid on the ground (a decoration, for the Decor layer: it covers the grass under it
+## and nothing reads it for movement): the boardwalk's planks, on land.
+func _planks(tile: Vector2i) -> void:
+	_boardwalk(tile, true)
+
+
+## Deep reeds standing in the water, too thick to push through: a dark stand behind and a
+## brighter one in front, every blade its own height, with brown heads on a few. `variant`
+## picks another stand.
+func _reeds(tile: Vector2i, variant: int) -> void:
+	_fill(tile, WATER_DEEP.darkened(0.55))
+	for x: int in T:
+		var roll: int = _hash(x, 3, 251 + variant * 7)
+		# The stand behind: nearly every column, from the top of the cell.
+		var back_top: int = 0 if roll % 3 != 0 else 1 + (roll >> 2) % 3
+		for y: int in range(back_top, T):
+			_px(tile, x, y, REED[0] if (x + y + variant) % 5 != 0 else REED[1])
+		# The stand in front: most columns, shorter, brighter, darker at the foot.
+		if (roll >> 5) % 4 == 0:
+			continue
+		var top: int = 4 + (roll >> 7) % 7
+		var shade: int = 1 + (roll >> 10) % 2
+		for y: int in range(top, T):
+			var blade: Color = REED[shade]
+			if y == top:
+				blade = REED[3]
+			elif y >= T - 2:
+				blade = REED[shade - 1]
+			_px(tile, x, y, blade)
+		# A cattail's brown head on a few.
+		if (roll >> 12) % 5 == 0:
+			for y: int in range(top - 3, top):
+				_px(tile, x, maxi(y, 0), REED_HEAD if y > top - 3 else REED_HEAD.lightened(0.15))
+
+
+## The ruined hut's front wall: grey planks standing on end, weathered, the tops broken off at
+## different heights with the dark of the inside behind them, and moss creeping up from the ground.
+func _ruin_wall(tile: Vector2i) -> void:
+	var dark: Color = Color(0.13, 0.11, 0.13)
+	var board: Color = Color(0.46, 0.42, 0.38)
+	_fill(tile, dark)
+	for plank: int in 4:
+		var top: int = _hash(plank, 2, 261) % 6
+		var tone: float = float(_hash(plank, 3, 263) % 4) * 0.04
+		for y: int in range(top, T):
+			for step: int in 4:
+				var x: int = plank * 4 + step
+				var shade: Color = board.darkened(tone)
+				if step == 0:
+					shade = shade.lightened(0.12)
+				elif step == 3:
+					shade = dark.lerp(board, 0.25)
+				if y == top:
+					shade = shade.lightened(0.18)
+				if _hash(x, y, 267) % 9 == 0:
+					shade = shade.darkened(0.14)
+				_px(tile, x, y, shade)
+	# A gap where a board has gone, and moss along the foot.
+	_rect(tile, Rect2i(8, 6, 3, 7), dark)
+	for x: int in T:
+		var up: int = _hash(x, 1, 269) % 3
+		for y: int in range(T - 1 - up, T):
+			_px(tile, x, y, MARSH_MOSS.darkened(0.15 if y == T - 1 else 0.0))
+
+
+## The ruined hut from above: what is left of a thatched roof, fallen in. Grey old thatch, a
+## rafter lying across, and moss. Seamless enough to stand in a block; the holes through it are
+## a decoration laid over a cell or two (_ruin_hole), so a roof isn't the same hole repeated.
+func _ruin_top(tile: Vector2i) -> void:
+	var thatch: Color = Color(0.52, 0.47, 0.34)
+	_fill(tile, thatch)
+	for y: int in T:
+		for x: int in T:
+			var n: int = _hash(x, y, 271) % 100
+			if n < 16:
+				_px(tile, x, y, thatch.darkened(0.20))
+			elif n < 24:
+				_px(tile, x, y, thatch.lightened(0.12))
+			elif n < 30:
+				_px(tile, x, y, MARSH_MOSS.darkened(0.2))
+	# Straw lies in short strokes down the slope.
+	for i: int in 9:
+		var sx: int = _hash(i, 1, 273) % T
+		var sy: int = _hash(i, 2, 277) % (T - 3)
+		for d: int in 3:
+			_px(tile, sx, sy + d, thatch.darkened(0.30))
+	# A rafter lying across.
+	for x: int in T:
+		var ry: int = 13 + (1 if x > 9 else 0)
+		_px(tile, x, ry, Color(0.34, 0.25, 0.18))
+		_px(tile, x, ry + 1, Color(0.22, 0.16, 0.13))
+
+
+## A hole through the hut's fallen roof (a decoration over "ruin_top"): the dark of the inside,
+## a lit lip of thatch below it, and the broken end of a rafter poking out.
+func _ruin_hole(tile: Vector2i) -> void:
+	var dark: Color = Color(0.13, 0.11, 0.13)
+	var thatch: Color = Color(0.52, 0.47, 0.34)
+	_ellipse(tile, Vector2(8, 7.5), Vector2(5.6, 4.2), dark)
+	_ellipse(tile, Vector2(4, 5), Vector2(2.2, 1.8), dark)
+	for x: int in range(4, 13):
+		_px(tile, x, 12 if x > 5 and x < 11 else 11, thatch.lightened(0.22))
+	for step: int in 5:
+		_px(tile, 9 + step, 4 + step, Color(0.34, 0.25, 0.18))
+		_px(tile, 9 + step, 5 + step, Color(0.22, 0.16, 0.13))
+
+
+## Cattails at the water's edge (a decoration): three stalks, two with their brown heads, and a
+## blade leaning out.
+func _cattail(tile: Vector2i) -> void:
+	for stalk: Vector3i in [Vector3i(4, 3, 1), Vector3i(8, 1, 1), Vector3i(12, 5, 0)]:
+		for y: int in range(stalk.y, T - 1):
+			_px(tile, stalk.x, y, REED[1] if y % 3 != 0 else REED[2])
+		_px(tile, stalk.x, T - 1, REED[0])
+		if stalk.z == 1:
+			for y: int in range(stalk.y + 1, stalk.y + 5):
+				_px(tile, stalk.x, y, REED_HEAD)
+				_px(tile, stalk.x + 1, y, REED_HEAD.darkened(0.2))
+			_px(tile, stalk.x, stalk.y, REED[3])
+	# A blade leaning to the right.
+	for step: int in 6:
+		_px(tile, 9 + step, 13 - step, REED[2] if step < 4 else REED[3])
+	for step: int in 4:
+		_px(tile, 3 - mini(step, 2), 12 - step, REED[1])
+
+
+## A patch of moss on the ground (a decoration): two bright cushions with a dark underside.
+func _moss(tile: Vector2i) -> void:
+	for pad: Vector3 in [Vector3(5, 9, 3.4), Vector3(11, 6, 2.6)]:
+		_ellipse(tile, Vector2(pad.x, pad.y + 0.8), Vector2(pad.z, pad.z * 0.7), MARSH_DAMP)
+		_ellipse(tile, Vector2(pad.x, pad.y), Vector2(pad.z, pad.z * 0.7), MARSH_MOSS.darkened(0.08))
+		_ellipse(tile, Vector2(pad.x - 0.8, pad.y - 0.6), Vector2(pad.z * 0.55, pad.z * 0.4), MARSH_MOSS.lightened(0.14))
+
+
+## A weeping willow, small, for the Decor layer's tile (Scenery stands the tall one up in its
+## place when the area loads).
+func _willow_art(tile: Vector2i) -> void:
+	var leaf: Array[Color] = [Color(0.17, 0.33, 0.22), Color(0.30, 0.48, 0.26), Color(0.48, 0.62, 0.30), Color(0.66, 0.74, 0.40)]
+	_ellipse(tile, Vector2(8, 15), Vector2(6, 1.6), SHADOW)
+	_rect(tile, Rect2i(7, 9, 2, 6), Color(0.30, 0.22, 0.17))
+	_ellipse(tile, Vector2(8, 5), Vector2(7, 4.5), leaf[1])
+	_ellipse(tile, Vector2(7, 4), Vector2(5, 3), leaf[2])
+	for x: int in range(1, T - 1):
+		var drop: int = 7 + _hash(x, 1, 281) % 6
+		for y: int in range(5, drop):
+			_px(tile, x, y, leaf[(x + y) % 3])
+		_px(tile, x, drop, leaf[0])
+	_px(tile, 6, 3, leaf[3])
+	_px(tile, 5, 4, leaf[3])
+
+
+## The marsh's two props, as PROP_ART is written: "." clear, "o" outline, the rest from the
+## palette beside it.
+const MARSH_ROCK_PALETTE: Dictionary = {"g": Color(0.50, 0.53, 0.52), "G": Color(0.34, 0.37, 0.40), "l": Color(0.68, 0.71, 0.68), "m": Color(0.42, 0.58, 0.28), "M": Color(0.58, 0.70, 0.32), "s": Color(0.00, 0.00, 0.00, 0.25)}
+const MARSH_ROCK_ART: Array[String] = [
+	"................",
+	"................",
+	"................",
+	"................",
+	".....ooooo......",
+	"....oMMmmmo.....",
+	"...oMmmlggGo....",
+	"..oMmlggggGGo...",
+	"..omlgggggmGo...",
+	".olggggmgggGGo..",
+	".olgggggggmGGo..",
+	".olGgggmggGGGo..",
+	".oGGGGmmGGGGGo..",
+	"..ooooooooooo...",
+	"...sssssssss....",
+	"................",
+]
+## A lantern on a crooked post, its glass dark: Henrik's favour lights them (step 3).
+const MARSH_LANTERN_PALETTE: Dictionary = {"w": Color(0.48, 0.38, 0.28), "W": Color(0.32, 0.24, 0.18), "i": Color(0.30, 0.30, 0.36), "d": Color(0.16, 0.20, 0.28), "D": Color(0.34, 0.42, 0.52), "s": Color(0.00, 0.00, 0.00, 0.25)}
+const MARSH_LANTERN_ART: Array[String] = [
+	"................",
+	"....ooooooo.....",
+	"...owwwwwwWo....",
+	"...owWoooiio....",
+	"...owo..oiio....",
+	"...owo.oiiiio...",
+	"...owo.oiDdio...",
+	"...owo.oiddio...",
+	"...owo.oiiiio...",
+	"...owo..oooo....",
+	"...owo..........",
+	"...owo..........",
+	"...owo..........",
+	"..owWwo.........",
+	"..oooooo........",
+	"...ssss.........",
+]
+
+
+## Paints `rows` onto `tile` from `palette`, as _ascii() does for PROP_ART.
+func _art(tile: Vector2i, palette: Dictionary, rows: Array[String]) -> void:
+	for y: int in T:
+		for x: int in T:
+			var key: String = rows[y][x]
+			if key == ".":
+				continue
+			var color: Color = OUTLINE if key == "o" else palette[key]
+			var at: Vector2i = Vector2i(tile.x * T + x, tile.y * T + y)
+			_image.set_pixelv(at, _image.get_pixelv(at).blend(color) if color.a < 1.0 else color)

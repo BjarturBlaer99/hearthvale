@@ -1099,3 +1099,27 @@ field on recipes.
   ending's lines in six days, with a friend made, a favour done and a recipe learned. The two boss fights are
   stood in for by their flags.
 
+
+## 26. Willowmere
+The marsh east of Hearthvale (the user's request, 2026-11-17; `docs/progress/willowmere-plan.md`). Step 1,
+the marsh by day, is built; the Bogwisp (step 2) and Old Henrik (step 3) are not.
+- **The map** is baked like the others (`build_maps.gd`, `"willowmere"`): its base is water, and blocks lay
+  reeds, land, boardwalks, the hut and the woods over it. Three things are new in the baker, all small:
+  - a map may name its `"prop_ground"`, the solid ground its props stand on (the marsh's is `marsh_solid`);
+  - block kinds that pick one of several tiles: `boardwalk` lays its planks across the way it runs, `reeds`
+    mixes two pictures, `ruin` is fallen roof with the front wall along its bottom row;
+  - the scatter of decorations covers the marsh's ground as well as grass.
+- **The tiles** are two rows at the end of the atlas (`GreyboxTiles.ROW_MARSH`, `ROW_MARSH_DECOR`), painted by
+  `make_tile_texture.gd`: no older tile changed place. `MARSH_KINDS` go on the Height layer (with
+  `MARSH_SOLID` and `MARSH_HEIGHTS` for the tileset), `MARSH_DECOR_KINDS` on the Decor layer.
+- **The willow** is a tall picture (`SceneryAtlas`, two of them, painted by `make_scenery.gd`): `"willow"`
+  blocks in a map become `prop_willow` tiles, which `Scenery` stands up like the cherry trees.
+- **The way from Hearthvale:** `MarshWalk` (an `AreaExit`, two cells) in the village's east tree line, and
+  `WestWalk` in the marsh; the planks on the east meadow are the Decor layer's `planks`, laid over the
+  meadow's own ground, so they need no height of their own.
+- **Forage and food** are data: six `ForageSpot` nodes (three new pictures in `forage.png`), three food
+  items, one recipe. The heart piece is a `HeartPiece` like the other four.
+- **Mist and fireflies:** `Ambience.MISTY` has the marsh; `Ambience.DUSK_FIREFLIES` names the areas whose
+  fireflies keep out of sight until the lamps are lit (`Critter.from_dusk`, `is_out()`).
+- **The tune** is `marsh` in `make_audio.gd`; `Audio.MUSIC` lists it.
+- **Nothing is saved that wasn't before:** the heart piece and the forage are flags.

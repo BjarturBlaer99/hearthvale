@@ -35,14 +35,22 @@ extends RefCounted
 ##     stands still since 2026-11-13)
 ##  22 more trees for the Decor layer: a pine, a broad oak, a closed canopy for thick woods, and
 ##     a cherry in blossom. Scenery stands every tree but the canopy up as a tall picture (P1c),
-##     so these tiles only mark where they grow
+##     so these tiles only mark where they grow; and a weeping willow (Willowmere)
+##  23 the marsh (Willowmere, 2026-11-17), all on the Height layer: mossy ground to walk on, the
+##     same ground solid (the marsh's trees, stones and lanterns stand on it), a boardwalk whose
+##     planks lie north to south (for a walk running east to west) and one whose planks lie east
+##     to west, deep reeds (two pictures, solid), and the ruined hut's front wall and fallen roof
+##  24 the marsh's decorations and props, for the Decor layer: cattails and a patch of moss
+##     (walkable looks), planks laid on the ground (the way to the marsh across Hearthvale's
+##     east meadow, at any height), a mossy stone and a marsh lantern post (props), and a hole
+##     through the ruined hut's roof (a decoration over it)
 
 const TEXTURE_PATH: String = "res://world/tiles/greybox_tiles.png"
 const TILESET_PATH: String = "res://world/tiles/greybox_tiles.tres"
 const SOURCE_ID: int = 0
 const TILE_SIZE: int = 16
 const COLUMNS: int = 8
-const ROWS: int = 23
+const ROWS: int = 25
 
 const ROW_GROUND: int = 0
 const ROW_STAIRS: int = 1
@@ -64,9 +72,23 @@ const ROW_HOUSE: int = 16
 const ROW_HOUSE_DECOR: int = 20
 const ROW_SMOKE: int = 21
 const ROW_TREES: int = 22
+const ROW_MARSH: int = 23
+const ROW_MARSH_DECOR: int = 24
 ## More trees, all props like "prop_tree". The baker mixes the first three kinds by cell and
 ## uses the canopy where trees stand on all four sides; a "cherry" block is always a cherry.
-const TREE_KINDS: Array[String] = ["prop_tree_b", "prop_tree_c", "prop_canopy", "prop_cherry"]
+const TREE_KINDS: Array[String] = ["prop_tree_b", "prop_tree_c", "prop_canopy", "prop_cherry", "prop_willow"]
+## The marsh's ground kinds (Willowmere), in atlas order, with whether each is solid and the
+## height it counts as for shading. "marsh" is its ground and "marsh_solid" the same ground under
+## a prop; a "boardwalk" block picks its planks by which way it runs, and a "reeds" block mixes
+## its two pictures by cell; a "ruin" block is fallen roof with the front wall along its bottom.
+const MARSH_KINDS: Array[String] = ["marsh", "marsh_solid", "boardwalk", "boardwalk_ns", "reeds", "reeds_b", "ruin_wall", "ruin_top"]
+const MARSH_SOLID: Array[bool] = [false, true, false, false, true, true, true, true]
+const MARSH_HEIGHTS: Array[int] = [0, 0, 0, 0, 1, 1, 2, 2]
+## The marsh's decorations (walkable looks) and its props, in atlas order.
+const MARSH_DECOR_KINDS: Array[String] = ["cattail", "moss", "planks", "prop_mossy_rock", "prop_marsh_lantern", "ruin_hole"]
+const MARSH_PROP_KINDS: Array[String] = ["prop_mossy_rock", "prop_marsh_lantern"]
+## Block kinds that stand for one of several marsh tiles (build_maps.gd picks): never tiles.
+const MARSH_BLOCKS: Array[String] = ["ruin"]
 ## House fronts, in atlas order from ROW_HOUSE (eight to a row), all solid at height 3 but for
 ## HOUSE_DOOR_KINDS.
 ## A roof kind is its style ("roof" clay tiles, "roof_blue" slate, "roof_thatch"), then "_top"
@@ -138,6 +160,7 @@ const PROP_BLOCKS: Dictionary = {
 	"tree": "prop_tree", "cherry": "prop_cherry", "rock": "prop_rock", "fence": "prop_fence", "well": "well",
 	"crate": "prop_crate", "keg": "prop_keg", "hay": "prop_hay", "logs": "prop_logs", "stump": "prop_stump",
 	"lamp": "prop_lamp", "standing_stone": "prop_stone", "post": "prop_post", "stall": "stall",
+	"willow": "prop_willow", "mossy_rock": "prop_mossy_rock", "marsh_lantern": "prop_marsh_lantern",
 }
 
 ## Custom data layers on the TileSet (TECH_DESIGN §3).
@@ -201,6 +224,10 @@ static func coords(kind: String, height: int = 0) -> Vector2i:
 		return Vector2i(0, ROW_SMOKE)
 	if TREE_KINDS.has(kind):
 		return Vector2i(TREE_KINDS.find(kind), ROW_TREES)
+	if MARSH_KINDS.has(kind):
+		return Vector2i(MARSH_KINDS.find(kind), ROW_MARSH)
+	if MARSH_DECOR_KINDS.has(kind):
+		return Vector2i(MARSH_DECOR_KINDS.find(kind), ROW_MARSH_DECOR)
 	return Vector2i(0, ROW_GROUND)
 
 
@@ -220,13 +247,15 @@ static func is_known_kind(kind: String) -> bool:
 	return LAYERED_KINDS.has(kind) or SOLID_KINDS.has(kind) or FLOOR_KINDS.has(kind) or FURNITURE_KINDS.has(kind) \
 		or DECOR_KINDS.has(kind) or DETAIL_KINDS.has(kind) or PROP_KINDS.has(kind) or PROP_BLOCKS.has(kind) \
 		or PROPS_B_KINDS.has(kind) or PROPS_C_KINDS.has(kind) or FURNITURE_B_KINDS.has(kind) \
-		or HOUSE_KINDS.has(kind) or HOUSE_DECOR_KINDS.has(kind) or kind == "smoke" or TREE_KINDS.has(kind)
+		or HOUSE_KINDS.has(kind) or HOUSE_DECOR_KINDS.has(kind) or kind == "smoke" or TREE_KINDS.has(kind) \
+		or MARSH_KINDS.has(kind) or MARSH_DECOR_KINDS.has(kind) or MARSH_BLOCKS.has(kind)
 
 
 static func is_decor(kind: String) -> bool:
-	return DECOR_KINDS.has(kind) or PROP_DECOR_KINDS.has(kind) or HOUSE_DECOR_KINDS.has(kind) or kind == "smoke"
+	return DECOR_KINDS.has(kind) or PROP_DECOR_KINDS.has(kind) or HOUSE_DECOR_KINDS.has(kind) or kind == "smoke" \
+		or (MARSH_DECOR_KINDS.has(kind) and not MARSH_PROP_KINDS.has(kind))
 
 
 static func is_prop(kind: String) -> bool:
-	return PROP_KINDS.has(kind) or TREE_KINDS.has(kind) \
+	return PROP_KINDS.has(kind) or TREE_KINDS.has(kind) or MARSH_PROP_KINDS.has(kind) \
 		or (PROPS_B_KINDS.has(kind) or PROPS_C_KINDS.has(kind)) and not PROP_DECOR_KINDS.has(kind)

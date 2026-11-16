@@ -179,9 +179,9 @@ func test_the_hearth_at_home_cooks_from_the_recipes() -> void:
 	assert_bool(home.is_talking()).is_true()
 	assert_str(home.hud.dialogue.shown_text()).is_equal(Cooking.ASK_WORDS)
 	assert_array(Array(home.hud.dialogue.shown_options())).override_failure_message("every recipe in data, then the way out").is_equal([
-		"Cherry Blossom Tea (3 Cherry Blossoms)", "Bread (2 Wheat)", "Mushroom Soup (2 Mushrooms, 1 Potato)",
+		"Cherry Blossom Tea (3 Cherry Blossoms)", "Bread (2 Wheat)", "Marsh Stew (2 Bog Mushrooms, 1 Cattail Root)", "Mushroom Soup (2 Mushrooms, 1 Potato)",
 		"Pumpkin Pie (1 Pumpkin, 1 Wheat)", "Roast Turnip (1 Turnip)", "Vegetable Stew (1 Potato, 1 Carrot, 1 Turnip)", Cooking.LEAVE_WORDS])
-	assert_int(GameState.known_recipes().size()).override_failure_message("tea, and the five meals of P3c (tests/world/meals_test.gd): what he knows from the start").is_equal(6)
+	assert_int(GameState.known_recipes().size()).override_failure_message("tea, the five meals of P3c (tests/world/meals_test.gd) and Marsh Stew (Willowmere): what he knows from the start").is_equal(7)
 	home._process(2.0)
 	assert_float(GameState.minute).override_failure_message("the clock stands still while he cooks").is_equal(minute)
 	_say(home, "Cherry Blossom Tea (3 Cherry Blossoms)")

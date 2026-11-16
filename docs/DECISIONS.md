@@ -930,3 +930,22 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   must have one.** "From dialogue data" was read as the villager's own file, where their words of thanks
   already are. The gift was always taken at five marks (a test said "a gift is still a gift"); what was
   missing was any sign that it changed nothing. Seven short lines are the only new words.
+- 2026-11-17 — **Willowmere and the Bogwisp: the plan's ten decisions,** approved by the user as written
+  (`docs/progress/willowmere-plan.md`): still mist and the game's own fireflies; dawn can't be seen, so the
+  rule is built and the rising at dusk is what shows; the Lantern gates the fight and the favour; a fifth
+  heart piece; lit lanterns count as light; no inside for the hut; two cells of Hearthvale opened; Marsh Stew
+  known and Ember Tea taught; a present at four marks; one stop after step 1.
+- 2026-11-17 — **The marsh has its own ground, and its props stand on it.** A map may name its
+  `prop_ground`; without that every willow, stone and lantern post would stand on a square of meadow grass.
+  The scatter of decorations covers the marsh's ground as it does grass.
+- 2026-11-17 — **The planks across Hearthvale's east meadow are a decoration, not a tile of the Height
+  layer.** The meadow is a level above the road, and a boardwalk tile is at ground level: laid as a picture
+  over the meadow's own ground, the planks need no tile for every height.
+- 2026-11-17 — **The way east is at rows 17 and 18,** not half-way down as the plan said: the meadow's own
+  trees stand at rows 22 and 23, and their crowns would have hidden planks laid at 20 and 21.
+- 2026-11-17 — **Only the marsh's fireflies wait for dusk.** The request was fireflies at dusk in
+  Willowmere; the Old Wood's are out at every hour and stay so (`Ambience.DUSK_FIREFLIES`).
+- 2026-11-17 — **The hut moved two cells west of the plan's sketch.** A test that walks to every patch of
+  land found the north boardwalk landing on the hut.
+- 2026-11-17 — **After nightfall the marsh plays the night's tune,** like every place out of doors. Its
+  own tune is for the day and the dusk; no rule was bent for it.

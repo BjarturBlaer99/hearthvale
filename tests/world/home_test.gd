@@ -48,7 +48,8 @@ func test_the_cottage_has_a_door_and_the_doorway_is_the_one_new_cell() -> void:
 	assert_that(AreaController.entry_facing(out)).is_equal(Vector2.DOWN)
 	var reachable: Dictionary = _reachable(TerrainQuery.new(village.grid), SQUARE)
 	assert_bool(reachable.has(DOORWAY)).is_true()
-	assert_int(reachable.size()).override_failure_message("one more cell to walk to than before, the doorway").is_equal(REACHABLE_BEFORE + 1)
+	# (And two more since Willowmere: the way out through the east tree line, tests/world/willowmere_test.gd.)
+	assert_int(reachable.size()).override_failure_message("one more cell to walk to than before, the doorway").is_equal(REACHABLE_BEFORE + 1 + 2)
 
 
 func test_home_is_one_room_with_a_bed_a_hearth_and_a_candle() -> void:

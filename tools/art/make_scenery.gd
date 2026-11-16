@@ -17,6 +17,7 @@ const LEAF: Array[Color] = [Color(0.09, 0.27, 0.22), Color(0.14, 0.39, 0.24), Co
 const OAK: Array[Color] = [Color(0.13, 0.28, 0.17), Color(0.21, 0.40, 0.18), Color(0.33, 0.53, 0.20), Color(0.49, 0.65, 0.24), Color(0.68, 0.77, 0.34)]
 const PINE: Array[Color] = [Color(0.05, 0.20, 0.22), Color(0.08, 0.30, 0.26), Color(0.13, 0.40, 0.28), Color(0.22, 0.51, 0.31), Color(0.36, 0.62, 0.36)]
 const BLOSSOM: Array[Color] = [Color(0.56, 0.22, 0.38), Color(0.76, 0.35, 0.52), Color(0.91, 0.53, 0.67), Color(0.98, 0.72, 0.80), Color(1.0, 0.88, 0.91)]
+const WILLOW: Array[Color] = [Color(0.13, 0.27, 0.20), Color(0.22, 0.39, 0.24), Color(0.36, 0.52, 0.28), Color(0.53, 0.65, 0.34), Color(0.70, 0.77, 0.44)]
 const BARK: Array[Color] = [Color(0.25, 0.15, 0.10), Color(0.40, 0.25, 0.14), Color(0.55, 0.36, 0.20)]
 const DARK_BARK: Array[Color] = [Color(0.17, 0.10, 0.11), Color(0.28, 0.17, 0.16), Color(0.41, 0.27, 0.23)]
 const SPARKLE: Color = Color(1.0, 0.97, 0.97)
@@ -41,6 +42,10 @@ func _initialize() -> void:
 				_cherry(image, origin, false)
 			"cherry_b":
 				_cherry(image, origin, true)
+			"willow":
+				_willow(image, origin, false)
+			"willow_b":
+				_willow(image, origin, true)
 	PixelGrade.apply(image, NO_OUTLINE)
 	DirAccess.make_dir_recursive_absolute(OUT_PATH.get_base_dir())
 	var error: Error = image.save_png(OUT_PATH)
@@ -129,6 +134,50 @@ func _cherry(image: Image, origin: Vector2i, mirrored: bool) -> void:
 			_dot(image, origin, cell.x, cell.y, SPARKLE)
 		elif roll > 96 and cell.y > 14 and int(crown[cell]) <= 2:
 			_dot(image, origin, cell.x, cell.y, DARK_BARK[1])
+
+
+## A weeping willow (Willowmere, 2026-11-17): a low dome of crown on a dark trunk, and from it
+## long strands hanging nearly to the ground, longest at the sides, each its own length and
+## shade, with gaps between where the trunk and the dark under the tree show through.
+func _willow(image: Image, origin: Vector2i, mirrored: bool) -> void:
+	_foot_shadow(image, origin, 12.0)
+	_trunk(image, origin, 14, 4, 15, DARK_BARK)
+	# A bough leaning out each way under the crown.
+	for step: int in 5:
+		_dot(image, origin, 13 - step, 19 - step, DARK_BARK[1])
+		_dot(image, origin, 18 + step, 19 - step, DARK_BARK[0])
+	var clumps: Array = [
+		Vector3(7, 14, 5.5), Vector3(25, 14, 5.5), Vector3(16, 13, 8),
+		Vector3(11, 9, 6.5), Vector3(21, 9, 6.5), Vector3(16, 6, 6),
+	]
+	if mirrored:
+		for i: int in clumps.size():
+			clumps[i] = Vector3(32.0 - (clumps[i] as Vector3).x, (clumps[i] as Vector3).y + (1.0 if i % 2 == 0 else 0.0), (clumps[i] as Vector3).z)
+	var crown: Dictionary = _crown(image, origin, clumps, WILLOW, 97 if mirrored else 91)
+	# The hanging strands, one or two pixels wide, from the crown's underside down.
+	var seed_value: int = 113 if mirrored else 101
+	for x: int in range(1, SIZE.x - 1):
+		var roll: int = _hash(x, 7, seed_value)
+		if roll % 7 == 0:
+			continue
+		var from: int = 12
+		for y: int in range(SIZE.y - 1, 0, -1):
+			if crown.has(Vector2i(x, y)):
+				from = y
+				break
+		var out: float = absf(float(x) - 15.5)
+		# Long at the sides, short over the trunk so it shows.
+		var reach: int = 30 + (roll >> 3) % 5 if out > 5.0 else 21 + (roll >> 3) % 5
+		if out > 12.0:
+			reach -= 3
+		var shade: int = 1 + (roll >> 7) % 3
+		for y: int in range(from, reach + 1):
+			var leaf: int = shade
+			if y > reach - 2:
+				leaf = 0
+			elif y > from + 8:
+				leaf = maxi(shade - 1, 1)
+			_dot(image, origin, x, y, WILLOW[leaf])
 
 
 ## A crown of round `clumps` (x, y, radius; drawn in order, so list the lowest first), shaded

@@ -243,6 +243,14 @@ All four steps are built, and **P4's "done when" was met on 2026-11-16:** the us
 the title to the ending (on day 5, a day sooner than the six to eight aimed at; the user knows the game, so
 a player new to it is still untried). The roadmap is finished.
 
+## After the roadmap: Willowmere
+One new area and one new enemy, at the user's request of 2026-11-17 (`docs/progress/willowmere-plan.md`,
+approved as written). Three steps:
+- **W1 — The marsh by day.** *Built 2026-11-17.* The map and its tiles, the way from Hearthvale, forage,
+  Marsh Stew, a heart piece, mist, fireflies and a tune.
+- **W2 — The marsh by night.** The Bogwisp: it drains energy, and only light makes it solid.
+- **W3 — Old Henrik.** An eighth villager, his favour, the marsh lanterns and Ember Tea.
+
 ---
 
 ## Later (not in phase 2)

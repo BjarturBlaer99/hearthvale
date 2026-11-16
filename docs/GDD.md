@@ -40,6 +40,12 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 - **The hero's home:** the thatched cottage west of the weaver's, with a bed and a hearth, and a plot of soil
   across the road, between the shop and the well.
 - **The countryside:** the South Field, the North Fields and the Old Wood.
+- **Willowmere** *(2026-11-17)*: a misty marsh east of the village, reached by planks across the east
+  meadow. Open from the first day and never needed for the story. Shallow pools and deep reeds block, and
+  boardwalks are the paths between its banks and islets. Cattail root, marsh berries and bog mushrooms grow
+  there (two of them make Marsh Stew), a ruined fisher's hut stands in the middle, and a heart piece lies
+  behind the willows. *(Not built yet: the Bogwisps that rise there at night, and Old Henrik and his
+  favour.)*
 - **The dungeons:** the Old Keep, north of the village, and the Chapel Crypt under the chapel. The crypt is
   barred until the keep is quiet. It's dark, and its floor has fallen in. A ruin in the South Field leads down
   to a small cellar and cistern.

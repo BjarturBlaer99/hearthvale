@@ -347,6 +347,7 @@ func _spawned(kind: String) -> Node2D:
 	if Critter.KINDS.has(StringName(kind)):
 		var critter: Critter = Critter.new()
 		critter.kind = StringName(kind)
+		critter.from_dusk = kind == "firefly" and Ambience.fireflies_wait_for_dusk(area_id)
 		return critter
 	return null
 

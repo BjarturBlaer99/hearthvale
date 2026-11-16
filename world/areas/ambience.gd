@@ -29,7 +29,10 @@ const TILE_LIGHTS: Dictionary = {
 const LIT_AT_DUSK: Array[String] = ["prop_lamp"]
 const ZOOM: Dictionary = {OUTDOOR: 1, INTERIOR: 2, DUNGEON: 2}
 ## Areas with mist among the trees (P1c).
-const MISTY: Array[StringName] = [&"old_wood"]
+const MISTY: Array[StringName] = [&"old_wood", &"willowmere"]
+## Areas whose fireflies keep out of sight until the lamps are lit (Willowmere: "fireflies at
+## dusk"). The Old Wood's are out at every hour, as they always were.
+const DUSK_FIREFLIES: Array[StringName] = [&"willowmere"]
 ## The hero is always seen: how far the pool of light around them reaches where it is dim (px).
 const HERO_POOL: float = 88.0
 ## Where it is dim, a glow's pool reaches this much further than the glow itself.
@@ -47,6 +50,10 @@ static func kind_of(height_layer: TileMapLayer, dungeon_id: StringName) -> Strin
 
 static func has_mist(area_id: StringName) -> bool:
 	return MISTY.has(area_id)
+
+
+static func fireflies_wait_for_dusk(area_id: StringName) -> bool:
+	return DUSK_FIREFLIES.has(area_id)
 
 
 ## One glow: where (area px), how far, its colour, how strong, whether it flickers, and

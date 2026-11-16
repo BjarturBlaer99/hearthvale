@@ -1,7 +1,7 @@
 class_name ForageSpot
 extends ItemPickup
 ## Something to gather that grows back (P2d, GDD §6): wild berries, mushrooms, fallen cherry
-## blossom. Stand on it and press interact, as for any item lying in the world; it is gone for
+## blossom, and in the marsh cattail roots, marsh berries and bog mushrooms. Stand on it and press interact, as for any item lying in the world; it is gone for
 ## the day and back the next morning. `taken_flag` remembers the day it was last gathered.
 ## It lies on the ground and blocks nothing. Position = the cell's top-left corner.
 
@@ -10,10 +10,13 @@ const SHEET: Texture2D = preload("res://gameplay/art/forage.png")
 const FRAMES: Dictionary = {
 	&"berries": 0, &"berries_picked": 1, &"mushrooms": 2, &"mushrooms_picked": 3,
 	&"blossoms": 4, &"blossoms_picked": 5,
+	&"cattails": 6, &"cattails_picked": 7, &"marsh_berries": 8, &"marsh_berries_picked": 9,
+	&"bog_mushrooms": 10, &"bog_mushrooms_picked": 11,
 }
 const SIZE: Vector2i = Vector2i(16, 16)
 
-## Which picture it shows: &"berries", &"mushrooms" or &"blossoms".
+## Which picture it shows: &"berries", &"mushrooms", &"blossoms", or the marsh's &"cattails",
+## &"marsh_berries" and &"bog_mushrooms".
 @export var kind: StringName = &"berries"
 
 

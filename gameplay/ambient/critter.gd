@@ -26,6 +26,9 @@ const SIZE: Vector2i = Vector2i(16, 16)
 const GLOW: Color = Color(0.85, 1.0, 0.45)
 
 @export var kind: StringName = &"chicken"
+## Whether it keeps out of sight until the lamps are lit (the marsh's fireflies come out at
+## dusk). The area says so as it spawns it.
+var from_dusk: bool = false
 
 var motion: CritterMotion
 
@@ -48,7 +51,13 @@ func _process(delta: float) -> void:
 	_clock += delta
 	motion.step(delta)
 	position = motion.position
+	visible = is_out()
 	queue_redraw()
+
+
+## Whether it is to be seen now: always, but for one that waits for dusk by day.
+func is_out() -> bool:
+	return not from_dusk or GameState.day_clock().lamps_lit(GameState.minute)
 
 
 func _draw() -> void:

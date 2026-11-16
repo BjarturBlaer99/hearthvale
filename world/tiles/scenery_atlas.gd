@@ -7,7 +7,7 @@ extends RefCounted
 
 const TEXTURE_PATH: String = "res://world/tiles/scenery.png"
 ## The pictures, in atlas order.
-const KINDS: Array[String] = ["broadleaf", "oak", "pine", "cherry", "cherry_b"]
+const KINDS: Array[String] = ["broadleaf", "oak", "pine", "cherry", "cherry_b", "willow", "willow_b"]
 ## An atlas cell, the padding round the picture in it, and the picture's size.
 const CELL: Vector2i = Vector2i(40, 48)
 const PAD: Vector2i = Vector2i(4, 4)
@@ -21,9 +21,10 @@ const FROM_DECOR: Dictionary = {
 	"prop_tree_b": "pine",
 	"prop_tree_c": "oak",
 	"prop_cherry": "cherry",
+	"prop_willow": "willow",
 }
 ## Pictures of the same tree, picked by cell so a grove isn't one tree repeated.
-const VARIANTS: Dictionary = {"cherry": ["cherry", "cherry_b"]}
+const VARIANTS: Dictionary = {"cherry": ["cherry", "cherry_b"], "willow": ["willow", "willow_b"]}
 
 
 ## Where `kind`'s picture is in the atlas.

@@ -1,0 +1,8 @@
+{
+	"id": "marsh_stew",
+	"makes": { "item": "marsh_stew", "count": 1 },
+	"needs": [
+		{ "item": "bog_mushroom", "count": 2 },
+		{ "item": "cattail_root", "count": 1 }
+	]
+}

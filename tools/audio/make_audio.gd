@@ -56,6 +56,18 @@ const SONGS: Dictionary = {
 			"R:4 E6:1 R:3 R:4 A5:1 R:3 R:4 G5:1 R:3 R:4 D6:1 R:3 " +
 			"R:4 E6:1 R:3 R:4 F5:1 R:3 R:4 C6:1 R:3 R:4 E5:1 R:3"},
 	]},
+	# Slow and misty, D minor, for Willowmere: | Dm | Dm | Bb | F | Gm | Dm | A | Dm |
+	# A soft tune in long notes over a low drone, with a far-off chime off the beat.
+	"marsh": {"bpm": 66, "bars": 8, "tracks": [
+		{"wave": "triangle", "volume": 0.21, "notes":
+			"D5:4 F5:4 A5:6 R:2 G5:2 F5:2 D5:4 C5:6 R:2 " +
+			"A#4:4 D5:4 F5:3 E5:1 D5:4 C#5:4 E5:4 D5:6 R:2"},
+		{"wave": "triangle", "volume": 0.27, "notes":
+			"D2:8 D2:8 A#1:8 F2:8 G2:8 D2:8 A1:8 D2:8"},
+		{"wave": "square", "duty": 0.125, "volume": 0.035, "notes":
+			"R:3 A5:1 R:4 R:5 F5:1 R:2 R:3 D6:1 R:4 R:5 C6:1 R:2 " +
+			"R:3 A#5:1 R:4 R:5 A5:1 R:2 R:3 E6:1 R:4 R:5 D6:1 R:2"},
+	]},
 	# Sparse and watchful, A minor: | Am | F | G | Em | Am | F | Dm E | Am |
 	"dungeon": {"bpm": 84, "bars": 8, "tracks": [
 		{"wave": "triangle", "volume": 0.24, "notes":

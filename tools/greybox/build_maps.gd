@@ -33,6 +33,8 @@ extends SceneTree
 ## North Fields (a stream and its bridge, a plateau, a farm plot, a hidden meadow behind a gap in
 ## the tree line), then the Old Wood (clearings off a winding road, the keep's front and gate,
 ## and a walled shrine with a cracked wall and a heart piece).
+## Willowmere (2026-11-17, tests/world/willowmere_test.gd): a marsh reached from the village's
+## east meadow; water and reeds block, boardwalks are the paths, a nook behind the willows.
 
 ## Each area: scene, size in cells, blocks, and optionally the base kind (default grass).
 ## Block = [x, y, width, height, terrain height, kind]; kind is "ground", "stairs", "path" (at
@@ -44,6 +46,8 @@ extends SceneTree
 ## any height) with their picture on the Decor layer.
 ## Grass, pots and critters: "spawns" blocks [x, y, width, height, kind] paint markers on a hidden
 ## Spawns layer, and the area turns each into its node on load (GreyboxTiles.MARKER_KINDS).
+## A map may name its "prop_ground": the solid ground its props stand on (default the grass's
+## "solid_ground"; the marsh's is "marsh_solid").
 ## Optional looks, on the Decor layer (never read for movement):
 ## - "decor": blocks [x, y, width, height, kind] of GreyboxTiles.DECOR_KINDS;
 ## - "scatter": { "seed", "kinds": [[kind, percent], ...] } sprinkled over open ground,
@@ -144,6 +148,9 @@ const MAPS: Dictionary = {
 			[33, 3, 1, 1, 2, "stump"],
 			# A nook in the woods by the field, behind tall grass, with a heart piece.
 			[0, 30, 2, 1, 0, "ground"],
+			# The way east to Willowmere (2026-11-17): two cells of the east tree line opened,
+			# level with the east meadow, approved by the user (tests/world/willowmere_test.gd).
+			[47, 17, 1, 2, 1, "ground"],
 		],
 		"spawns": [
 			# Tall grass (one tuft hides the heart piece's nook), pots, chickens in and by the field, butterflies over flowers.
@@ -187,6 +194,8 @@ const MAPS: Dictionary = {
 			[23, 2, 1, 1, "cross_l"], [24, 2, 1, 1, "cross_r"],
 			[20, 20, 1, 1, "bucket"],
 			[3, 19, 2, 1, "laundry"],
+			# Planks across the east meadow to the gap in the trees: the walk to the marsh.
+			[44, 17, 4, 2, "planks"],
 		],
 		"scatter": {"seed": 7, "kinds": [["tuft", 6], ["flowers_red", 1], ["flowers_yellow", 1], ["flowers_blue", 1], ["pebbles", 1]]},
 	},
@@ -641,6 +650,110 @@ const MAPS: Dictionary = {
 		],
 		"scatter": {"seed": 17, "kinds": [["tuft", 10], ["mushroom", 4], ["pebbles", 2], ["flowers_blue", 1]]},
 	},
+	# Willowmere (2026-11-17, tests/world/willowmere_test.gd): a marsh east of Hearthvale, the
+	# size of the North Fields. Water is the base and blocks, and so do the deep reeds; the
+	# boardwalks are the paths between four patches of land: the west bank where the walk from
+	# Hearthvale comes in, the island with the ruined fisher's hut, an islet to its north
+	# (cattails) and one to its south (bog mushrooms), and the east bank (marsh berries). Behind
+	# two rows of willows in the north-east, one cell of ground between them and the woods
+	# leads to a nook with a heart piece. Props stand on the marsh's own ground.
+	"willowmere": {
+		"scene": "res://world/areas/willowmere/willowmere.tscn",
+		"size": Vector2i(40, 30),
+		"base": "water",
+		"prop_ground": "marsh_solid",
+		"blocks": [
+			# Reed beds, laid first: land and boards go over them and leave a ring of reeds.
+			[15, 2, 11, 5, 0, "reeds"],
+			[14, 9, 13, 11, 0, "reeds"],
+			[13, 22, 15, 6, 0, "reeds"],
+			[29, 7, 9, 15, 0, "reeds"],
+			[2, 9, 6, 12, 0, "reeds"],
+			[2, 3, 5, 3, 0, "reeds"],
+			[8, 23, 4, 3, 0, "reeds"],
+			[30, 23, 6, 3, 0, "reeds"],
+			# Land: the west bank, the hut's island, the north islet, the south islet, the east bank.
+			[2, 10, 5, 10, 0, "marsh"],
+			[16, 10, 9, 8, 0, "marsh"],
+			[17, 3, 7, 3, 0, "marsh"],
+			[15, 23, 11, 4, 0, "marsh"],
+			[31, 9, 7, 12, 0, "marsh"],
+			# The nook behind the willows, and the one cell of ground that leads round them.
+			[31, 2, 7, 3, 0, "marsh"],
+			[30, 5, 7, 2, 0, "willow"],
+			[31, 7, 6, 2, 0, "willow"],
+			[37, 5, 1, 4, 0, "marsh"],
+			# Boardwalks: west bank to the island, island to the east bank, and north and south.
+			[7, 14, 9, 2, 0, "boardwalk"],
+			[25, 14, 6, 2, 0, "boardwalk"],
+			[20, 6, 2, 4, 0, "boardwalk"],
+			[20, 18, 2, 5, 0, "boardwalk"],
+			# Woods round the edges; the walk from Hearthvale comes in through a gap in the west.
+			[0, 0, 40, 2, 0, "tree"],
+			[0, 28, 40, 2, 0, "tree"],
+			[0, 2, 2, 26, 0, "tree"],
+			[38, 2, 2, 26, 0, "tree"],
+			[0, 14, 2, 2, 0, "marsh"],
+			# The ruined fisher's hut, in the island's north-west corner (clear of where the north
+			# walk lands): a fallen roof over its front wall.
+			[16, 10, 4, 3, 0, "ruin"],
+			# Marsh lantern posts where the boards meet land (dark until Henrik's favour).
+			[6, 13, 1, 1, 0, "marsh_lantern"],
+			[16, 13, 1, 1, 0, "marsh_lantern"],
+			[24, 13, 1, 1, 0, "marsh_lantern"],
+			[31, 13, 1, 1, 0, "marsh_lantern"],
+			[22, 10, 1, 1, 0, "marsh_lantern"],
+			[19, 17, 1, 1, 0, "marsh_lantern"],
+			# Willows and mossy stones about the land.
+			[3, 11, 1, 1, 0, "willow"],
+			[4, 18, 1, 1, 0, "willow"],
+			[23, 16, 1, 1, 0, "willow"],
+			[33, 19, 1, 1, 0, "willow"],
+			[36, 12, 1, 1, 0, "willow"],
+			[16, 25, 1, 1, 0, "willow"],
+			[24, 24, 1, 1, 0, "willow"],
+			[5, 16, 1, 1, 0, "mossy_rock"],
+			[17, 16, 1, 1, 0, "mossy_rock"],
+			[35, 17, 1, 1, 0, "mossy_rock"],
+			[20, 26, 1, 1, 0, "mossy_rock"],
+			[36, 3, 1, 1, 0, "mossy_rock"],
+		],
+		"spawns": [
+			# Fireflies over the land and the water (out from dusk).
+			[4, 13, 1, 1, "firefly"],
+			[18, 15, 1, 1, "firefly"],
+			[23, 12, 1, 1, "firefly"],
+			[33, 12, 1, 1, "firefly"],
+			[20, 24, 1, 1, "firefly"],
+			[34, 4, 1, 1, "firefly"],
+			[11, 13, 1, 1, "firefly"],
+			[27, 16, 1, 1, "firefly"],
+		],
+		"decor": [
+			# Cattails at the water's edge, lily pads on the open pools.
+			[2, 10, 1, 1, "cattail"],
+			[6, 19, 1, 1, "cattail"],
+			[16, 17, 1, 1, "cattail"],
+			[24, 10, 1, 1, "cattail"],
+			[31, 20, 1, 1, "cattail"],
+			[17, 5, 1, 1, "cattail"],
+			[23, 3, 1, 1, "cattail"],
+			[15, 26, 1, 1, "cattail"],
+			[25, 23, 1, 1, "cattail"],
+			[37, 20, 1, 1, "cattail"],
+			[10, 7, 1, 1, "lily"],
+			[11, 18, 1, 1, "lily"],
+			[27, 5, 1, 1, "lily"],
+			[9, 22, 1, 1, "lily"],
+			[34, 26, 1, 1, "lily"],
+			[5, 7, 1, 1, "lily"],
+			[28, 18, 1, 1, "lily"],
+			# Two holes through the hut's fallen roof.
+			[17, 10, 1, 1, "ruin_hole"],
+			[19, 11, 1, 1, "ruin_hole"],
+		],
+		"scatter": {"seed": 23, "kinds": [["moss", 9], ["tuft", 4], ["pebbles", 2], ["mushroom", 1], ["flowers_blue", 1]]},
+	},
 	"south_field": {
 		"scene": "res://world/areas/south_field/south_field.tscn",
 		"size": Vector2i(40, 28),
@@ -738,7 +851,7 @@ func _bake(map: Dictionary) -> Error:
 				var cell: Vector2i = Vector2i(x, y)
 				props.erase(cell)
 				if GreyboxTiles.PROP_BLOCKS.has(kind):
-					layer.set_cell(cell, GreyboxTiles.SOURCE_ID, GreyboxTiles.coords("solid_ground", block[4]))
+					layer.set_cell(cell, GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(str(map.get("prop_ground", "solid_ground")), block[4]))
 					props[cell] = _prop(kind, x - int(block[0]), y - int(block[1]))
 					continue
 				var detail: String = _detail(kind, x - int(block[0]), y - int(block[1]), block[2], block[3])
@@ -774,6 +887,8 @@ func _prop(kind: String, dx: int, dy: int) -> String:
 ## - walls get a window every third cell; an upper floor's other cells alternate their braces
 ## - "chapel_window" alternates stone and lancet windows; "chapel_door_l" is a pair of leaves
 ## - a "pit" shows its far wall along its top row
+## - a "boardwalk" lays its planks across the way it runs; "reeds" mix their two pictures; a
+##   "ruin" is fallen roof with the front wall along its bottom row (Willowmere)
 func _detail(kind: String, dx: int, dy: int, width: int, height: int) -> String:
 	match kind:
 		"roof", "roof_blue", "roof_thatch":
@@ -801,6 +916,13 @@ func _detail(kind: String, dx: int, dy: int, width: int, height: int) -> String:
 			return "chapel_door_l" if dx % 2 == 0 else "chapel_door_r"
 		"pit":
 			return "pit_top" if dy == 0 else "pit"
+		"boardwalk":
+			# Planks lie across the way it runs.
+			return "boardwalk" if width >= height else "boardwalk_ns"
+		"reeds":
+			return "reeds" if _cell_hash(Vector2i(dx, dy), 31) % 3 != 0 else "reeds_b"
+		"ruin":
+			return "ruin_wall" if dy == height - 1 else "ruin_top"
 	return kind
 
 
@@ -835,7 +957,8 @@ func _decorate(root: Node, height_layer: TileMapLayer, map: Dictionary, props: D
 	var avoid: Dictionary = _busy_cells(root)
 	var seed_value: int = int(scatter.get("seed", 1))
 	for cell: Vector2i in height_layer.get_used_cells():
-		if height_layer.get_cell_atlas_coords(cell).y != GreyboxTiles.ROW_GROUND or avoid.has(cell):
+		var under: Vector2i = height_layer.get_cell_atlas_coords(cell)
+		if (under.y != GreyboxTiles.ROW_GROUND and under != GreyboxTiles.coords("marsh")) or avoid.has(cell):
 			continue
 		if decor.get_cell_source_id(cell) != -1:
 			continue

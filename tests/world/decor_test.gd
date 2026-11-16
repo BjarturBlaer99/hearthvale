@@ -5,8 +5,10 @@ extends GdUnitTestSuite
 ## stand only on solid ground; nothing on the Decor layer blocks. Houses are two storeys under a
 ## roof with gable ends (thatch, clay tiles or slate), carry chimneys that smoke, and stay exactly
 ## as solid as before. Woods mix three kinds of tree and close into a canopy where they are thick.
+## In the marsh (Willowmere) the open ground is its own mossy ground and the solid ground under a
+## prop its own too; planks laid on the ground are a way to walk, so they may lie under an exit.
 
-const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"south_field", &"shop", &"ruin_cellar", &"cistern", &"keep", &"north_fields", &"old_wood", &"crypt"]
+const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"south_field", &"shop", &"ruin_cellar", &"cistern", &"keep", &"north_fields", &"old_wood", &"crypt", &"willowmere"]
 
 
 func test_every_area_has_a_decor_layer_just_above_its_height_layer() -> void:
@@ -20,6 +22,8 @@ func test_every_area_has_a_decor_layer_just_above_its_height_layer() -> void:
 func test_decorations_never_hide_the_way() -> void:
 	var lily: Vector2i = GreyboxTiles.coords("lily")
 	var water: Vector2i = GreyboxTiles.coords("water")
+	var marsh: Vector2i = GreyboxTiles.coords("marsh")
+	var marsh_solid: Vector2i = GreyboxTiles.coords("marsh_solid")
 	var decorations: Dictionary = {}
 	for area_id: StringName in AREAS:
 		var scene: Node = _scene(area_id)
@@ -46,7 +50,20 @@ func test_decorations_never_hide_the_way() -> void:
 				GreyboxTiles.ROW_PROPS_B, GreyboxTiles.ROW_PROPS_C:
 					pass
 				GreyboxTiles.ROW_PROPS, GreyboxTiles.ROW_TREES:
-					assert_int(under.y).override_failure_message(where + ": props stand on solid ground").is_equal(GreyboxTiles.ROW_SOLID_GROUND)
+					assert_bool(under.y == GreyboxTiles.ROW_SOLID_GROUND or under == marsh_solid).override_failure_message(where + ": props stand on solid ground").is_true()
+				GreyboxTiles.ROW_MARSH_DECOR:
+					var marsh_kind: String = GreyboxTiles.MARSH_DECOR_KINDS[tile.x]
+					if GreyboxTiles.MARSH_PROP_KINDS.has(marsh_kind):
+						assert_that(under).override_failure_message(where + ": the marsh's props stand on its solid ground").is_equal(marsh_solid)
+					elif marsh_kind == "ruin_hole":
+						assert_that(under).override_failure_message(where + ": a hole is in the hut's roof").is_equal(GreyboxTiles.coords("ruin_top"))
+					elif marsh_kind == "planks":
+						# A way to walk: on open ground, and it may lead under an exit.
+						assert_int(under.y).override_failure_message(where + ": planks lie on open ground").is_equal(GreyboxTiles.ROW_GROUND)
+					else:
+						decorations[area_id] = int(decorations.get(area_id, 0)) + 1
+						assert_that(under).override_failure_message(where + ": %s sits on the marsh's open ground" % marsh_kind).is_equal(marsh)
+						assert_bool(busy.has(cell)).override_failure_message(where + ": nothing on what the hero uses or arrives at").is_false()
 				GreyboxTiles.ROW_HOUSE_DECOR:
 					# A chimney, the chapel's cross or the shop's sign.
 					assert_bool(grid.is_solid(cell) and grid.height_at(cell) == 3).override_failure_message(where + ": a house's overlay sits on the house").is_true()
@@ -58,7 +75,7 @@ func test_decorations_never_hide_the_way() -> void:
 					if tile == lily:
 						assert_that(under).override_failure_message(where + ": lily pads float on water").is_equal(water)
 					else:
-						assert_int(under.y).override_failure_message(where + ": decorations sit on open ground").is_equal(GreyboxTiles.ROW_GROUND)
+						assert_bool(under.y == GreyboxTiles.ROW_GROUND or under == marsh).override_failure_message(where + ": decorations sit on open ground").is_true()
 					assert_bool(busy.has(cell)).override_failure_message(where + ": nothing on what the hero uses or arrives at").is_false()
 				_:
 					fail(where + ": the Decor layer holds only decorations and props")
@@ -66,6 +83,7 @@ func test_decorations_never_hide_the_way() -> void:
 			assert_bool(bool(data.get_custom_data(GreyboxTiles.DATA_SOLID))).override_failure_message(where + ": decor never blocks").is_false()
 	assert_int(int(decorations.get(&"village", 0))).override_failure_message("the village is decorated").is_greater(60)
 	assert_int(int(decorations.get(&"south_field", 0))).override_failure_message("the field is decorated").is_greater(60)
+	assert_int(int(decorations.get(&"willowmere", 0))).override_failure_message("the marsh is decorated").is_greater(30)
 
 
 func test_houses_have_two_storeys_under_a_gabled_roof_and_stay_solid() -> void:

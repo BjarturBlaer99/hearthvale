@@ -125,6 +125,14 @@ const SCENARIOS: Dictionary = {
 		"items": [],
 		"flags": [],
 	},
+	# In Willowmere, just off the walk from Hearthvale, with a sword and the Lantern, a bowl of
+	# stew, and room for what grows there. Add an hour for the marsh after dark: -- marsh 19:30
+	"marsh": {
+		"area": &"willowmere",
+		"cell": Vector2i(3, 14),
+		"items": [[&"wooden_sword", 1], [&"lantern", 1], [&"marsh_stew", 1], [&"bread", 2]],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"planted_first_crop"],
+	},
 	# Outside the Iron Warden's hall: sword, bow, 20 arrows, the boss door already open.
 	"warden": {
 		"area": &"keep",

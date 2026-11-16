@@ -26,6 +26,10 @@ the game to its ending), and a **fix round** followed the same day (`docs/progre
 saving with a backup, saving on quit, a title that says when a save can't be read, rewards laid at his feet
 when the pack is full, and a villager's own thanks for a gift to a full friendship. None of it is a roadmap
 step.
+**Willowmere (the user's request, 2026-11-17; `docs/progress/willowmere-plan.md`, approved as written):** one
+new area, a marsh east of the village, and one new enemy, the Bogwisp, in three steps. **W1, the marsh by
+day, is built.** W2 (the Bogwisp and the night) and W3 (Old Henrik, his favour and the lanterns) are next,
+in that order. Build nothing beyond the plan's list.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -87,6 +91,10 @@ in `docs/DECISIONS.md` are superseded.
   surface, its reflections). Grass, flowers, washing and trees stand still, fallen petals lie where they are,
   the mist doesn't drift, chimney smoke is one picture, and there are no specks in the air (`SwayLayer` and
   `Motes` are gone). Creatures, people, pickups and the flicker of fires were left as they were.
+  **The marsh (Willowmere, 2026-11-17):** its tiles are two rows at the end of the atlas, painted by
+  `make_tile_texture.gd` (ground, boardwalk, reeds, the ruined hut, cattails, a lantern post), and its
+  willows are tall pictures from `make_scenery.gd`. A map names the ground its props stand on
+  (`"prop_ground"`). New tiles go at the end of the atlas: an older tile never changes place.
   **Buildings (P1d, 2026-11-12):** walls show a lit front face where the floor lies south of them and a flat top
   elsewhere (`WallRelief`), pillars stand taller than their cells and roofs have a ridge (`Scenery`), all painted
   by `tools/art/make_relief.gd` and drawn over the map at load. The Height layer is untouched: no map is re-baked
@@ -108,7 +116,7 @@ godot --headless --path . --quit-after 30
 godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
-# Start partway through to try one part by hand (scenarios in the script: late, gifts, bram, gate, rest, farm, market, kitchen, home, village,
+# Start partway through to try one part by hand (scenarios in the script: late, gifts, bram, gate, rest, farm, market, kitchen, home, village, marsh,
 # warden, crypt, shade, ending). An hour after the name starts at that time of day, energy=<n> with that much energy,
 # and skills=<level> with every skill at that level.
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.

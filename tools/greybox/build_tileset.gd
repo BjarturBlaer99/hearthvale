@@ -72,6 +72,12 @@ func _initialize() -> void:
 	_fixed(source, GreyboxTiles.coords("smoke"), 0, false)
 	for kind: String in GreyboxTiles.TREE_KINDS:
 		_fixed(source, GreyboxTiles.coords(kind), 0, false)
+	# The marsh (Willowmere): its ground and boardwalks are walked on, its reeds and the ruin
+	# aren't; its decorations and props are for the Decor layer.
+	for index: int in GreyboxTiles.MARSH_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_MARSH), GreyboxTiles.MARSH_HEIGHTS[index], GreyboxTiles.MARSH_SOLID[index])
+	for index: int in GreyboxTiles.MARSH_DECOR_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_MARSH_DECOR), 0, false)
 	# Spawn markers: never walked on (the area clears them), open ground in the editor.
 	for index: int in GreyboxTiles.MARKER_KINDS.size():
 		_fixed(source, Vector2i(index, GreyboxTiles.ROW_MARKERS), 0, false)

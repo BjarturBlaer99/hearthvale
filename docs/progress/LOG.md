@@ -2108,3 +2108,61 @@ One commit a fix. The save format is unchanged (version 4).
 - **The ending's "Save and go to the title"** shows no "Saving..." and, if it can't save, stays on the
   ending for good, as before.
 - **News at the top of the screen is hard to read over a pale house wall** (as it always was).
+
+## 2026-11-17 — Willowmere, step 1: the marsh by day
+
+The user's request: one new area and one new enemy (`docs/progress/willowmere-plan.md`, approved as written:
+ten decisions, three steps). This is step 1, and the one stop asked for before the end.
+
+**Built**
+- **Willowmere,** a marsh 40 by 30 cells east of Hearthvale, baked by `build_maps.gd`. Water and deep reeds
+  block; four boardwalks join the west bank, the island with the ruined fisher's hut, an islet north and one
+  south, and the east bank. Six marsh lantern posts stand dark where the boards meet land.
+- **The way there:** two cells of Hearthvale's east tree line are open (rows 17 and 18), with planks laid
+  across the east meadow to them. Nothing else in the village moved.
+- **A heart piece** in a nook in the north-east, reached only by one cell of ground between two rows of
+  willows and the east woods. The willows' crowns hang over that way.
+- **Three things to gather,** two spots of each, back each morning: cattail root (north islet), marsh
+  berries (east bank), bog mushrooms (south islet). All three can be eaten raw.
+- **Marsh Stew:** two bog mushrooms and a cattail root at the hearth, known from the start. 45 energy and
+  half a heart.
+- **The look:** two new rows of tiles (mossy ground, boardwalk planks two ways, reeds, the hut's fallen roof
+  and front wall, cattails, moss, a mossy stone, a lantern post) and a weeping willow that stands tall like
+  the other trees. Mist lies still over it, as over the Old Wood. Eight fireflies come out when the lamps
+  are lit (18:30); the Old Wood's are out at every hour, as before.
+- **A tune of its own,** `marsh`: slow, D minor, 29 seconds. After nightfall the night's tune plays, as
+  everywhere out of doors.
+- **A scenario to try it:** `tools/playtest.gd -- marsh` (add an hour for dusk: `-- marsh 18:30`).
+
+**Checked**
+- **777 tests in 104 suites pass.** Eleven are new (`tests/world/willowmere_test.gd`): the walk there and
+  back, only two village cells changed, water and reeds block and boards don't, every patch of land is
+  joined, the heart piece's one way in, each forage spot and its morning, the foods, Marsh Stew at the
+  hearth, the tune and mist and fireflies, the tiles, and a save from version 3 loaded into the marsh.
+- **Ten older tests changed** to the new facts: the list of items, the hearth's seven dishes (four tests),
+  the village's count of cells that can be walked to (two tests), the list of areas and their sizes, the
+  count of exits, and the Decor layer's rules (the marsh's own ground counts as open ground).
+- **The tests found a fault in the plan's sketch:** the hut stood on the cells where the north boardwalk
+  lands, so the north islet could not be reached. It was moved two cells west.
+- **No older tile moved:** the new tiles are two rows at the end of the atlas, and the old rows are the same
+  pixel for pixel (compared with the atlas in git).
+- **Eleven deliberate bugs,** planted one at a time in the code and the data and each caught by the new
+  tests, files restored: fireflies out at noon, none waiting for dusk, the Old Wood losing its mist, no mist
+  over the marsh, no tune of its own, a cattail spot with no picture once picked, a stew of mushrooms only,
+  a stew that must be taught, a willow that is no tall tree, the way in arriving on the exit, and marsh
+  berries that are not food.
+- **Screenshots,** looked at: the marsh from five places by day and at dusk, and the village's east meadow.
+- **The player's own save was read-only throughout** (the same checksum before and after).
+
+**Known issues and limits**
+- Not tried in play.
+- **Steps 2 and 3 are not built:** there are no Bogwisps, the marsh is as calm at night as by day, Old
+  Henrik is not there, and the lantern posts never light.
+- **The way out of Hearthvale runs under the crown of the tree south of it,** as the plan could not avoid:
+  the whole east edge is trees. The crown fades when the hero is behind it.
+- **The numbers are first guesses:** 6, 9 and 7 energy for the three raw foods, 45 and half a heart for
+  the stew.
+- **The water is the game's one water tile,** bright and clear: a marsh pool is no murkier than the
+  village pond.
+- **The fifth heart piece is always left over** once four have made a heart (decision 4 of the plan).
+- **The hut is a block of roof and wall,** four cells by three, with no way in (decision 6).

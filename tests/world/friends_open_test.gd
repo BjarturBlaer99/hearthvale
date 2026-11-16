@@ -187,7 +187,7 @@ func test_before_he_is_taught_the_hearth_lists_only_what_he_knew() -> void:
 	home.player.motor.place(hearth.cell() + Vector2i.DOWN)
 	home.player.face(Vector2.UP)
 	home.interact()
-	assert_int(home.hud.dialogue.shown_options().size()).override_failure_message("six dishes and the way out").is_equal(7)
+	assert_int(home.hud.dialogue.shown_options().size()).override_failure_message("seven dishes and the way out").is_equal(8)
 	for taught: String in ["Berry Jam", "Carrot Cake", "Shepherd's Pie"]:
 		assert_bool(Array(home.hud.dialogue.shown_options()).any(func(answer: String) -> bool: return answer.begins_with(taught))).override_failure_message(taught).is_false()
 	_end(home)
@@ -201,7 +201,7 @@ func test_before_he_is_taught_the_hearth_lists_only_what_he_knew() -> void:
 	GameState.from_dict(saved)
 	assert_bool(GameState.knows_recipe(&"berry_jam")).is_true()
 	assert_bool(GameState.knows_recipe(&"carrot_cake")).is_false()
-	assert_int(GameState.known_recipes().size()).is_equal(7)
+	assert_int(GameState.known_recipes().size()).override_failure_message("the seven he knew and the one he learned").is_equal(8)
 
 
 func test_at_four_marks_each_villager_gives_a_present_once() -> void:

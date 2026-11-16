@@ -35,6 +35,10 @@
     { "id": "pumpkin_pie", "name": "Pumpkin Pie", "type": "food", "icon": "pie", "stackable": true, "max_stack": 10, "stats": { "energy": 80, "hearts": 2 } },
     { "id": "berry_jam", "name": "Berry Jam", "type": "food", "icon": "jam", "stackable": true, "max_stack": 10, "stats": { "energy": 30 } },
     { "id": "carrot_cake", "name": "Carrot Cake", "type": "food", "icon": "cake", "stackable": true, "max_stack": 10, "stats": { "energy": 50, "hearts": 0.5 } },
-    { "id": "shepherds_pie", "name": "Shepherd's Pie", "type": "food", "icon": "shepherds_pie", "stackable": true, "max_stack": 10, "stats": { "energy": 70, "hearts": 1 } }
+    { "id": "shepherds_pie", "name": "Shepherd's Pie", "type": "food", "icon": "shepherds_pie", "stackable": true, "max_stack": 10, "stats": { "energy": 70, "hearts": 1 } },
+    { "id": "cattail_root", "name": "Cattail Root", "type": "food", "icon": "cattail_root", "stackable": true, "max_stack": 20, "stats": { "energy": 6 } },
+    { "id": "marsh_berries", "name": "Marsh Berries", "type": "food", "icon": "marsh_berries", "stackable": true, "max_stack": 20, "stats": { "energy": 9 } },
+    { "id": "bog_mushroom", "name": "Bog Mushrooms", "type": "food", "icon": "bog_mushroom", "stackable": true, "max_stack": 20, "stats": { "energy": 7 } },
+    { "id": "marsh_stew", "name": "Marsh Stew", "type": "food", "icon": "marsh_stew", "stackable": true, "max_stack": 10, "stats": { "energy": 45, "hearts": 0.5 } }
   ]
 }
