@@ -1978,3 +1978,8 @@ Plan: `docs/progress/mouse-and-bar-plan.md`. The user's words, after playing: "t
 - **A click on the tab row at Tilda's that misses both names does nothing,** by design; a click anywhere else off the list still makes the highlighted deal.
 - **A bow with no arrows stays in hand** (it is still his), and the left click swings the sword; only bombs and seeds leave the bar when they run out.
 
+
+**Played (2026-11-16):** the user played the whole-game playtest from the title (a new game, about five
+minutes: the sword, the tools, Tilda's eggs, the first crop watered, Bram's promise) with no errors, and said
+"everything feels good". The plan's two lines for the user are ticked. The run's log shows no fight, so the bar
+in a fight was judged on the user's word.

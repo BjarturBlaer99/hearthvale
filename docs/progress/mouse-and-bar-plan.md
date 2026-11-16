@@ -37,7 +37,7 @@ pointer in menus, two buttons in play.**
 - [x] Each menu has a test in which moving the pointer onto a line highlights it and a click chooses it
 - [x] A click off the list still chooses the highlighted line, and a left click still reads a conversation on
 - [x] The wheel moves the highlight in a long list
-- [ ] *(yours)* choosing with the mouse feels natural in the pause menu and the title
+- [x] *(yours)* choosing with the mouse feels natural in the pause menu and the title
 
 ## Step B: the item bar
 
@@ -67,7 +67,7 @@ pointer in menus, two buttons in play.**
 - [x] With ten things, the tenth can be reached and seen
 - [x] The Tab menu lists food only, and eating from it works as before
 - [x] The last bomb leaves the sword in hand, in a new game and in an old save
-- [ ] *(yours)* choosing with the wheel and the numbers feels right in a fight and on the plot
+- [x] *(yours)* choosing with the wheel and the numbers feels right in a fight and on the plot
 
 ## Not in this
 
