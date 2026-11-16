@@ -774,10 +774,11 @@ func _on_gift_requested(villager_id: StringName) -> void:
 	_gift_due = villager_id
 
 
-## A gift was given: the villager says their words.
-func _on_gift_given(villager_id: StringName, _item_id: StringName, liked: bool) -> void:
+## A gift was given: the villager says their words, and their own for one given when the
+## friendship was `full` already.
+func _on_gift_given(villager_id: StringName, _item_id: StringName, liked: bool, full: bool) -> void:
 	EventBus.sound.emit(&"item_get" if liked else &"menu_select")
-	hud.show_message(Friendship.thanks(DataRegistry.get_villager(villager_id), liked))
+	hud.show_message(Friendship.thanks(DataRegistry.get_villager(villager_id), liked, full))
 
 
 ## A friendship reached another mark: it is said at the top of the screen, with a chime.

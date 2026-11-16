@@ -1,1 +1,1 @@
-{ "id": "baker", "name": "Baker", "dialogue": "baker", "likes": ["loaf"], "thanks": { "liked": "Lovely.", "other": "Thanks." } }
+{ "id": "baker", "name": "Baker", "dialogue": "baker", "likes": ["loaf"], "thanks": { "liked": "Lovely.", "other": "Thanks.", "full": "Again?" } }

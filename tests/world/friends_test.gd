@@ -147,6 +147,32 @@ func test_a_gift_is_given_and_a_mark_gained_is_said_once() -> void:
 	assert_int(GameState.friend_points(&"pip")).is_equal(4 + 1 + 1)
 
 
+func test_a_gift_to_a_full_friendship_is_taken_and_thanked_in_their_own_words() -> void:
+	# The fix round of 2026-11-16. One point short of five marks; the day's talk fills it.
+	GameState.add_friendship(&"pip", GameState.friendship().max_points() - 1)
+	GameState.set_flag(&"present/pip", true)
+	GameState.add_item(&"wild_berries", 2)
+	GameState.add_item(&"bread", 1)
+	var village: AreaController = _load(VILLAGE)
+	_talk(village, "Pip")
+	assert_int(GameState.friend_marks(&"pip")).is_equal(5)
+	_say(village, Friendship.GIVE_WORDS)
+	var list: GiftMenu = village.hud.gift_menu
+	assert_bool(list.confirm()).override_failure_message("the gift is still taken").is_true()
+	assert_int(GameState.item_count(&"wild_berries")).is_equal(1)
+	assert_str(village.hud.message_text()).is_equal("Pip: Another one? You're my best friend already!")
+	assert_int(GameState.friend_points(&"pip")).is_equal(GameState.friendship().max_points())
+	# Liked or not, it is the same line: the next day, bread.
+	GameState.start_next_day()
+	GameState.set_time(float(GameState.day_clock().in_day("12:00")))
+	_talk(village, "Pip")
+	_say(village, Friendship.GIVE_WORDS)
+	list.move_cursor(1)
+	assert_bool(list.confirm()).is_true()
+	assert_int(GameState.item_count(&"bread")).is_equal(0)
+	assert_str(village.hud.message_text()).is_equal("Pip: Another one? You're my best friend already!")
+
+
 func test_the_answer_is_added_where_each_conversation_begins() -> void:
 	GameState.add_item(&"blossom_tea", 2)
 	# Elder Bram greets a newcomer with other words: the answer is there too.

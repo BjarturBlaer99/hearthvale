@@ -90,9 +90,25 @@ func test_the_seven_villagers_like_what_the_plan_says() -> void:
 			assert_str(words).override_failure_message("%s says something of their own" % id).starts_with(str(villager["name"]) + ": ")
 			assert_int(words.length()).override_failure_message("'%s' fits the message line" % words).is_less_equal(64)
 		assert_str(Friendship.thanks(villager, true)).is_not_equal(Friendship.thanks(villager, false))
+		# A full friendship has a line of its own, the same whether they like the gift or not.
+		var full: String = Friendship.thanks(villager, true, true)
+		assert_str(full).override_failure_message("%s says something of their own to a full friendship" % id).starts_with(str(villager["name"]) + ": ")
+		assert_str(full).is_equal(Friendship.thanks(villager, false, true))
+		assert_str(full).is_not_equal(Friendship.thanks(villager, true)).is_not_equal(Friendship.thanks(villager, false))
+		assert_str(full).override_failure_message("%s's own words, not the plain ones" % id).is_not_equal("%s: Thank you." % villager["name"])
+		assert_int(full.length()).override_failure_message("'%s' fits the message line" % full).is_less_equal(64)
 	assert_dict(Friendship.villager_of(villagers, "sign_welcome")).is_empty()
 	assert_dict(Friendship.villager_of(villagers, "")).is_empty()
 	assert_str(Friendship.thanks({"name": "Someone"}, true)).override_failure_message("words missing: plain thanks").is_equal("Someone: Thank you.")
+	assert_str(Friendship.thanks({"name": "Someone", "thanks": {"liked": "Yes!", "other": "Thanks."}}, true, true)).override_failure_message("no line for a full friendship: plain thanks").is_equal("Someone: Thank you.")
+
+
+func test_a_friendship_is_full_at_its_last_mark() -> void:
+	assert_bool(_rules.is_full(_rules.max_points())).is_true()
+	assert_bool(_rules.is_full(_rules.max_points() + 3)).is_true()
+	assert_bool(_rules.is_full(_rules.max_points() - 1)).override_failure_message("five marks need every point").is_false()
+	assert_bool(_rules.is_full(0)).is_false()
+	assert_int(_rules.marks_at(_rules.max_points())).is_equal(_rules.marks)
 
 
 func test_a_day_is_remembered_for_the_talk_and_for_the_gift() -> void:
@@ -147,7 +163,7 @@ func test_rules_that_cant_be_used_say_why() -> void:
 func test_a_villager_that_cant_be_used_says_why() -> void:
 	var item_of: Callable = func(id: String) -> Dictionary: return DataRegistry.get_item(StringName(id))
 	var has_dialogue: Callable = func(id: String) -> bool: return id == "pip"
-	var good: Dictionary = {"id": "pip", "name": "Pip", "dialogue": "pip", "likes": ["wild_berries"], "thanks": {"liked": "Yes!", "other": "Thanks."}}
+	var good: Dictionary = {"id": "pip", "name": "Pip", "dialogue": "pip", "likes": ["wild_berries"], "thanks": {"liked": "Yes!", "other": "Thanks.", "full": "Again?"}}
 	assert_array(Array(_rules.villager_problems(good, item_of, has_dialogue))).is_empty()
 	var cases: Array = [
 		[{"name": ""}, "'name' must be the villager's name."],
@@ -155,8 +171,10 @@ func test_a_villager_that_cant_be_used_says_why() -> void:
 		[{"likes": "berries"}, "'likes' must list the items they like (it may be empty)."],
 		[{"likes": ["moonbeams"]}, "'likes' names an unknown item id 'moonbeams'."],
 		[{"likes": ["hoe"]}, "'likes' names 'hoe', which can't be given (its type is 'tool')."],
-		[{"thanks": "Thanks."}, "'thanks' must be an object: what they say to a gift they 'liked' and to any 'other'."],
-		[{"thanks": {"liked": "Yes!"}}, "'thanks' needs 'other': what they say to such a gift."],
+		[{"thanks": "Thanks."}, "'thanks' must be an object: what they say to a gift they 'liked', to any 'other', and once the friendship is 'full'."],
+		[{"thanks": {"liked": "Yes!", "full": "Again?"}}, "'thanks' needs 'other': what they say to such a gift."],
+		[{"thanks": {"liked": "Yes!", "other": "Thanks."}}, "'thanks' needs 'full': what they say to such a gift."],
+		[{"thanks": {"liked": "Yes!", "other": "Thanks.", "full": ""}}, "'thanks' needs 'full': what they say to such a gift."],
 	]
 	for case: Array in cases:
 		var villager: Dictionary = good.duplicate(true)
@@ -175,6 +193,7 @@ func test_bad_friendship_data_is_refused_on_load() -> void:
 	assert_str(errors).contains("villager 'miller': 'dialogue' names an unknown conversation 'nobody'.")
 	assert_str(errors).contains("villager 'miller': 'likes' names an unknown item id 'moonbeams'.")
 	assert_str(errors).contains("villager 'twin' has the conversation 'baker', which villager 'baker' has already.")
+	assert_str(errors).contains("villager 'forgetful': 'thanks' needs 'full': what they say to such a gift.")
 	assert_str(errors).contains("effect 'gift' is missing 'villager'.")
 	assert_str(errors).contains("refers to unknown villager id 'nobody'.")
 	assert_bool(errors.contains("villager 'baker':")).override_failure_message("a good villager is let through").is_false()

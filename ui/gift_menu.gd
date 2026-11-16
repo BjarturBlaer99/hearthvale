@@ -7,7 +7,7 @@ extends Control
 ## GameState gives it. The area opens it and keeps the hero still while it is open.
 
 ## Something was given: the area has the villager say their words.
-signal given(villager: StringName, item_id: StringName, liked: bool)
+signal given(villager: StringName, item_id: StringName, liked: bool, full: bool)
 signal closed
 
 const CURSOR: String = "> "
@@ -69,7 +69,7 @@ func confirm() -> bool:
 	if result.is_empty():
 		EventBus.sound.emit(&"nope")
 		return false
-	given.emit(who, item_id, bool(result["liked"]))
+	given.emit(who, item_id, bool(result["liked"]), bool(result["full"]))
 	close()
 	return true
 

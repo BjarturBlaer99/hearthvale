@@ -7,7 +7,7 @@ extends RefCounted
 ##     "gift_types": ["food", "ingredient"], "friend_marks": 3 }
 ## and so are the villagers (data/villagers/<id>.json):
 ##   { "id": "pip", "name": "Pip", "dialogue": "pip", "likes": ["wild_berries", "pumpkin_pie"],
-##     "thanks": { "liked": "...", "other": "..." } }
+##     "thanks": { "liked": "...", "other": "...", "full": "..." } }
 ## A villager is known by their conversation: no scene names them. It keeps no points itself:
 ## GameState holds each friend's points and the days he last talked to them and gave them
 ## something ({ "points", "talked", "gift" }), and asks this.
@@ -133,10 +133,18 @@ static func given_on(friend: Dictionary, day: int) -> bool:
 	return int(friend.get("gift", 0)) == day
 
 
-## "Pip: For me? This is the best thing ever!": what `villager` says to a gift.
-static func thanks(villager: Dictionary, liked: bool) -> String:
+## Whether a friendship with `points` is full: a gift is still taken, and adds nothing.
+func is_full(points: int) -> bool:
+	return points >= max_points()
+
+
+## "Pip: For me? This is the best thing ever!": what `villager` says to a gift. Once the
+## friendship is `full` they have a line of their own for it, liked or not: the gift adds
+## nothing then, and the words say why it is welcome all the same.
+static func thanks(villager: Dictionary, liked: bool, full: bool = false) -> String:
 	var words: Variant = villager.get("thanks")
-	var said: String = str((words as Dictionary).get("liked" if liked else "other", "")) if typeof(words) == TYPE_DICTIONARY else ""
+	var which: String = "full" if full else ("liked" if liked else "other")
+	var said: String = str((words as Dictionary).get(which, "")) if typeof(words) == TYPE_DICTIONARY else ""
 	return THANKS_WORDS % [str(villager.get("name", "")), said if not said.is_empty() else "Thank you."]
 
 
@@ -207,9 +215,9 @@ func villager_problems(villager: Dictionary, item_of: Callable, has_dialogue: Ca
 				out.append("'likes' names '%s', which can't be given (its type is '%s')." % [id, item.get("type", "")])
 	var words: Variant = villager.get("thanks")
 	if typeof(words) != TYPE_DICTIONARY:
-		out.append("'thanks' must be an object: what they say to a gift they 'liked' and to any 'other'.")
+		out.append("'thanks' must be an object: what they say to a gift they 'liked', to any 'other', and once the friendship is 'full'.")
 	else:
-		for key: String in ["liked", "other"]:
+		for key: String in ["liked", "other", "full"]:
 			if typeof((words as Dictionary).get(key)) != TYPE_STRING or str(words[key]).is_empty():
 				out.append("'thanks' needs '%s': what they say to such a gift." % key)
 	return out

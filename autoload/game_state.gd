@@ -292,16 +292,18 @@ func gifts_held() -> Array[Dictionary]:
 
 
 ## Gives `villager` one `item_id`: it leaves the pack, and the friendship grows, more if they
-## like it. Returns { "liked", "points" }, or {} if nothing was given: no such villager, a
-## gift already given today, none of that item, or a thing that can't be given.
+## like it. A full friendship still takes a gift, which adds nothing to it. Returns { "liked",
+## "points", "full" } (`full`: it was full already), or {} if nothing was given: no such
+## villager, a gift already given today, none of that item, or a thing that can't be given.
 func give_gift(villager: StringName, item_id: StringName) -> Dictionary:
 	var who: Dictionary = DataRegistry.get_villager(villager)
 	if not can_give(villager) or item_count(item_id) <= 0 or not friendship().is_giftable(DataRegistry.get_item(item_id)):
 		return {}
+	var full: bool = friendship().is_full(int(_friend(villager)["points"]))
 	add_item(item_id, -1)
 	_friend(villager)["gift"] = day
 	var liked: bool = Friendship.likes(who, String(item_id))
-	return {"liked": liked, "points": add_friendship(villager, friendship().gift_points(liked))}
+	return {"liked": liked, "points": add_friendship(villager, friendship().gift_points(liked)), "full": full}
 
 
 ## Adds `points` to the friendship with `villager`, up to a full one. A mark gained is said

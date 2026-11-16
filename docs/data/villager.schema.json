@@ -38,7 +38,8 @@
       "type": "object",
       "required": [
         "liked",
-        "other"
+        "other",
+        "full"
       ],
       "description": "What they say to a gift, shown after their name.",
       "properties": {
@@ -51,6 +52,11 @@
           "type": "string",
           "minLength": 1,
           "description": "To any other gift."
+        },
+        "full": {
+          "type": "string",
+          "minLength": 1,
+          "description": "To any gift once the friendship is full (five marks): it is still taken, and this is said in place of the other two."
         }
       }
     }

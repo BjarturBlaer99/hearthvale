@@ -59,15 +59,32 @@ func test_only_a_villager_can_be_a_friend() -> void:
 func test_a_gift_they_like_is_worth_three_and_any_other_one() -> void:
 	GameState.add_item(&"wild_berries", 2)
 	GameState.add_item(&"turnip", 2)
-	assert_dict(GameState.give_gift(&"pip", &"wild_berries")).is_equal({"liked": true, "points": 3})
+	assert_dict(GameState.give_gift(&"pip", &"wild_berries")).is_equal({"liked": true, "points": 3, "full": false})
 	assert_int(GameState.item_count(&"wild_berries")).override_failure_message("it has left his pack").is_equal(1)
 	assert_int(GameState.friend_points(&"pip")).is_equal(3)
-	assert_dict(GameState.give_gift(&"farmer_oda", &"turnip")).is_equal({"liked": false, "points": 1})
+	assert_dict(GameState.give_gift(&"farmer_oda", &"turnip")).is_equal({"liked": false, "points": 1, "full": false})
 	assert_int(GameState.item_count(&"turnip")).is_equal(1)
 	assert_int(GameState.friend_points(&"farmer_oda")).is_equal(1)
 	# The same thing is liked by one and not by another.
 	GameState.start_next_day()
-	assert_dict(GameState.give_gift(&"farmer_oda", &"wild_berries")).is_equal({"liked": false, "points": 1})
+	assert_dict(GameState.give_gift(&"farmer_oda", &"wild_berries")).is_equal({"liked": false, "points": 1, "full": false})
+
+
+func test_a_full_friendship_still_takes_a_gift_and_says_it_was_full() -> void:
+	# The fix round of 2026-11-16: at five marks a gift was taken and nothing said of it.
+	var most: int = GameState.friendship().max_points()
+	GameState.add_friendship(&"pip", most - 1)
+	GameState.add_item(&"wild_berries", 3)
+	# One short of full: the gift fills it, and it was not full when it was given.
+	assert_dict(GameState.give_gift(&"pip", &"wild_berries")).is_equal({"liked": true, "points": 1, "full": false})
+	assert_int(GameState.friend_points(&"pip")).is_equal(most)
+	# Full: the next day's gift is taken all the same, adds nothing, and says so.
+	GameState.start_next_day()
+	assert_bool(GameState.can_give(&"pip")).override_failure_message("a full friendship can still be given to").is_true()
+	assert_dict(GameState.give_gift(&"pip", &"wild_berries")).is_equal({"liked": true, "points": 0, "full": true})
+	assert_int(GameState.item_count(&"wild_berries")).override_failure_message("it has left his pack").is_equal(1)
+	assert_int(GameState.friend_points(&"pip")).is_equal(most)
+	assert_bool(GameState.can_give(&"pip")).override_failure_message("and it was the day's gift").is_false()
 
 
 func test_one_gift_a_villager_a_day() -> void:
@@ -121,7 +138,7 @@ func test_a_mark_gained_is_said_once_and_five_marks_are_a_full_friendship() -> v
 	GameState.start_next_day()
 	assert_int(GameState.greet(&"wenna")).override_failure_message("a full friendship gains nothing more").is_equal(0)
 	GameState.add_item(&"blossom_tea")
-	assert_dict(GameState.give_gift(&"wenna", &"blossom_tea")).override_failure_message("but a gift is still a gift").is_equal({"liked": true, "points": 0})
+	assert_dict(GameState.give_gift(&"wenna", &"blossom_tea")).override_failure_message("but a gift is still a gift").is_equal({"liked": true, "points": 0, "full": true})
 	assert_int(GameState.item_count(&"blossom_tea")).is_equal(0)
 	assert_array(_marks).has_size(said)
 
