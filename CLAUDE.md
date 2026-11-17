@@ -29,7 +29,8 @@ step.
 **Willowmere (the user's request, 2026-11-17; `docs/progress/willowmere-plan.md`, approved as written):** one
 new area, a marsh east of the village, and one new enemy, the Bogwisp, in three steps. **All three steps are
 built (2026-11-17):** W1 the marsh by day, W2 the Bogwisp and the night, W3 Old Henrik, his favour and the
-lanterns. What is left is the user's: to play it. Nothing further is planned: ask before building more. Build nothing beyond the plan's list.
+lanterns. The user played it by day on 2026-11-17 ("feels right"); the night (the Bogwisps, the embers, the
+lanterns) has not been played by a person yet. Nothing further is planned: ask before building more. Build nothing beyond the plan's list.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 

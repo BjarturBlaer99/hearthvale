@@ -139,7 +139,9 @@ stranger, it is committed, and the user has screenshots of the marsh by day and 
 the Bogwisp fight and the favour as played.
 
 All of that is done but the last word, which is the user's:
-- [ ] *(yours)* the marsh feels worth the walk by day, and worth the risk by night
+- [x] *(yours)* the marsh feels worth the walk by day (the user, 2026-11-17: "Feels right")
+- [ ] *(yours)* the marsh feels worth the risk by night (the run that was judged ended at 18:01, two hours
+  before a Bogwisp rises)
 
 ## Saves
 

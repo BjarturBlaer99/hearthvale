@@ -2285,3 +2285,21 @@ The user looked at step 1 and said to go on ("Looks right, go on").
   picture by day as well.
 - **Ember Tea's 90 energy is a first guess,** and is the most any dish gives.
 - **The quest's journal says nothing of where the Lantern is.** Henrik's own words say to carry one.
+
+## 2026-11-17 — Playtest: Willowmere by day (the user: "Feels right")
+
+The user started the `marsh` scenario at 16:00 (`tools/playtest.gd -- marsh 16:00`), played for about a hundred seconds, closed the window and, asked how Willowmere felt, said it feels right.
+
+**What the run covered** (read from the scenario's own save, slot 900, written as the window closed)
+- **Old Henrik was given the Marsh Stew** and stands at nine points, two marks, and **he asked his favour** (the quest is at its `bring` stage).
+- **Three forage spots were gathered:** four cattail roots and two bog mushrooms are in the pack.
+- **The hidden heart piece was taken,** by the side path behind the willows.
+- **The window was closed at 18:01** and the game saved as it left: the fix round's saving on quit, in a person's hands, to the scenario's slot.
+- No errors in the game's output. The player's own save has the same checksum as before.
+
+**What it did not cover**
+- **The night.** The run ended two hours before the Bogwisps rise: no wisp was met, no ember was won, the favour was not finished, and the lanterns and Ember Tea were not seen. So the plan's last line was split in two: the day is ticked, the night is still open.
+- Cooking Marsh Stew, and the walk to the marsh from the village.
+
+**Changed for the run**
+- **The `marsh` scenario starts with Old Henrik at five points,** one liked gift short of two marks, as the `late` scenario does for the other villagers, so his favour can be asked on the first day. A tool only; committed on its own.

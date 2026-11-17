@@ -251,7 +251,8 @@ approved as written). Three steps:
 - **W2 — The marsh by night.** *Built 2026-11-17.* The Bogwisp: it drains energy, and only light makes it
   solid. Thicker mist after dark.
 - **W3 — Old Henrik.** *Built 2026-11-17.* An eighth villager, his favour, the marsh lanterns and Ember
-  Tea. The fight and the favour were played through in a real window by a script; a person has yet to.
+  Tea. The fight and the favour were played through in a real window by a script. The user played the marsh
+  by day on 2026-11-17 ("feels right"); the night is still to be played by a person.
 
 ---
 
