@@ -2558,3 +2558,38 @@ Shown the report and its three proposals, the user took all three. Each is a cha
 - **The eight days were not played again with the new numbers.** By the report's own ore the days would have paid 53, 69 and 173 coins where they paid 83, 109 and 261. What the slower skill and the scarcer coal do to a week is worked out, not played.
 - **With 2 coal a floor a day on floors 4 to 6 gives 6 or 7,** against 5 a night in the furnace: enough, with little to spare for Wenna's five.
 - **Not asked for and unchanged:** the Iron Pickaxe's gate (Mining 3) and the furnace's five bars a night.
+
+## 2026-11-17 — The Homestead, phase 0: the plan (no code)
+
+The user asked for a farm of the hero's own outside the village: a new area where he lives, clears and shapes the land, raises buildings and keeps animals, in five phases with a stop after each (`docs/progress/homestead-request.md`). Phase 0 is a written plan only: `docs/progress/homestead-plan.md`. **It is a proposal and waits for the user's approval. Nothing is built.**
+
+**What it proposes**
+- **Where:** the lane through Hearthvale runs on west, through two cells of the tree line, to a new map of 40 by 30 cells. From the village's edge to the farmhouse door is 12 cells: 2.7 seconds at a walk, where the request allows 20.
+- **The home:** the area `home` stays the same room and becomes the farmhouse's inside; only its door moves. Sleeping, 02:00 and a collapse wake him there, as they do now. The old cottage stands empty and locked.
+- **The field:** 12 by 6, four times the old plot, which is its north-west corner. That corner is clear. The rest of it and the land around carry 145 weeds, bushes, logs, stumps, rocks and boulders, which the sword and the pickaxe clear for good. A small pond fills the can.
+- **The story:** seven lines of the main quest, of Elder Bram and of his supper's journal change, and the title's line. The farm was Sir Aldric's, where the tale said his cottage.
+- **Phase 2:** build mode, a screen in which the mouse points at a cell, and fifteen things to set down.
+- **Phase 3:** a Well, a Silo, a Coop, a Barn and a Shed, bought as plans at the workbench and standing the next morning; a bigger Coop and Barn.
+- **Phase 4:** chickens, sheep and cows from Farmer Oda, fed by pasture or by hay.
+- **Phase 5:** two favours, ten days played by the script, and the numbers settled.
+- **The save:** version 6, once. Nothing in an older save needs moving: the home, the furnishings, the chest, the furnace, the soil and the crops are where the farmhouse and the field now are.
+- **Thirty decisions** are numbered for the user to approve or change one by one, and each phase is broken into steps with its tests and its screenshots.
+
+**Where it meets the rules**
+- **Eighteen places in CLAUDE.md are listed, each quoted:** where the home is, where the plot lies, no new areas, a furnishing's fixed place, one furnace and one chest, the mouse in play, what comes back each morning, the night's tune, the count of quests, and the tests and tools that take the old home for granted.
+- **The words CLAUDE.md would carry instead are written out,** nineteen passages, each with the phase after which it takes effect. CLAUDE.md itself is not changed.
+- **The request tells each phase to read `docs/HOMESTEAD-NOTES.md`, which doesn't exist.** The plan proposes that its own decision list, with `docs/DECISIONS.md`, takes its place.
+
+**Checked**
+- **The plan's facts against the code:** the village's map and scene, the home's scene, the plot and its rules, sleeping and waking, doors that keep hours, the hero's speeds, the save and its migrations, furnishings, the chest and the furnace, breakables and rocks, the shop, the input map, and the tools and tests that use the old home. The plan ends with the list.
+- **Six before-pictures,** taken with `tools/capture.gd` (shots 54, 96, 97, 110, 116 and 151; five seconds) and looked at: the cottage's door with the lane's west end and the plot; the plot bare and with crops; the west side of the village with Farmer Oda by her field; the home's inside, bare and with every furnishing. They are in `reports/homestead/before/`, which git ignores.
+- **935 tests in 123 suites pass,** as before: nothing in the game changed.
+- **The player's own save has the same checksum as before.**
+
+**Known issues and limits**
+- **Nothing is approved.** No decision is in `docs/DECISIONS.md`, and CLAUDE.md, the GDD, TECH_DESIGN and the roadmap are as they were.
+- **Every number is a first guess:** the costs, the day on which each building comes within reach, what an animal pays. Phase 5 measures them.
+- **A field four times the size could pay four times the crops** (168 coins a day in turnips, where the old plot paid 42). The plan says what holds it back and that phase 5 must watch it.
+- **Not tried:** how build mode would read the mouse against the camera, whether a tall picture set down at run time sorts as the baked trees do, how the baker lays a house front outside the village, and what three more rooms and 145 things on the land cost a frame.
+- **The map's sketch is a first drawing.** Its counts are what is proposed; a cell may shift when it is baked.
+- **`docs/HOMESTEAD.md`,** an untracked copy of the request, was left as it is.
