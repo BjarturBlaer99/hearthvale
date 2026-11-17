@@ -1,0 +1,22 @@
+{
+	"id": "chest",
+	"name": "Storage Chest",
+	"station": "workbench",
+	"order": 2,
+	"needs": [
+		{
+			"item": "wood",
+			"count": 10
+		},
+		{
+			"item": "copper_bar",
+			"count": 1
+		}
+	],
+	"makes": {
+		"furnishing": "chest"
+	},
+	"unlock": {
+		"found": "wood"
+	}
+}

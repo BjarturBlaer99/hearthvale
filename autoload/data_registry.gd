@@ -535,6 +535,11 @@ func _check_breakable(breakable: Dictionary) -> void:
 			errors.append("%s: %s 'breaks_on' has unknown '%s'. Known: %s." % [path, label, kind, ", ".join(WEAK_POINTS)])
 	if breakable.has("burst") and not BREAK_BURSTS.has(str(breakable["burst"])):
 		errors.append("%s: %s has unknown burst '%s'. Known: %s." % [path, label, breakable["burst"], ", ".join(BREAK_BURSTS)])
+	var hits: Variant = breakable.get("hits", 1)
+	if (typeof(hits) != TYPE_INT and typeof(hits) != TYPE_FLOAT) or float(hits) != floorf(float(hits)) or int(hits) < 1:
+		errors.append("%s: %s 'hits' must be a whole number of 1 or more." % [path, label])
+	if breakable.has("returns") and str(breakable["returns"]) != "daily":
+		errors.append("%s: %s 'returns' must be 'daily' (left out, it is back on every visit)." % [path, label])
 	_check_drops(path, label, breakable)
 
 

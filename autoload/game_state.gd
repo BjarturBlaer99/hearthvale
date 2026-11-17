@@ -70,6 +70,8 @@ var _mine_rules: MineRules
 var found: Dictionary[StringName, bool] = {}
 ## The furnace in his home: what it holds and the day it was lit. Saved.
 var _furnace: Furnace
+## The storage chest in his home: its stacks. Saved.
+var _store: Store
 ## Where the hero is: { "area", "cell": [x, y] }, or { "area", "entry" } on the way into an
 ## area through one of its entry points (go_to), until the area places them.
 var player: Dictionary = {}
@@ -542,6 +544,55 @@ func furnace_dialogue() -> Dictionary:
 		int(crafting_rules().get("furnace_most", 1)), names)
 
 
+## The storage chest in his home: its stacks (it is there to open once it has been made).
+func store() -> Store:
+	if _store == null:
+		_store = Store.new(int(crafting_rules().get("chest_slots", 24)))
+	return _store
+
+
+## What he carries that the chest keeps, in the pack's order: [{ "id", "count" }]. What a
+## tool holds (the can's water) is in the tool, not the pack.
+func storable_stacks() -> Array[Dictionary]:
+	var in_tools: Array[String] = Inventory.held_in_tools(DataRegistry.entries(&"items"))
+	var out: Array[Dictionary] = []
+	for stack: Dictionary in inventory:
+		if Store.can_hold(DataRegistry.get_item(stack["id"])) and not in_tools.has(String(stack["id"])):
+			out.append({"id": String(stack["id"]), "count": int(stack["count"])})
+	return out
+
+
+## Puts his stack of `item_id` in the chest: as much of it as goes in. Returns "" if any of it
+## moved, or why not in Store's words; then nothing changed.
+func store_put(item_id: StringName) -> String:
+	var item: Dictionary = DataRegistry.get_item(item_id)
+	var held: int = item_count(item_id)
+	if held <= 0:
+		return Store.NOTHING_WORDS
+	if not Store.can_hold(item) or Inventory.held_in_tools(DataRegistry.entries(&"items")).has(String(item_id)):
+		return Store.NOT_KEPT_WORDS
+	var moved: int = store().put(String(item_id), held, Inventory.capacity(item))
+	if moved <= 0:
+		return Store.FULL_WORDS
+	add_item(item_id, -moved)
+	return ""
+
+
+## Takes stack `index` out of the chest: as much of it as he has room for. Returns "" if any of
+## it moved, or why not in Store's words; then nothing changed.
+func store_take(index: int) -> String:
+	var stacks: Array[Dictionary] = store().stacks()
+	if index < 0 or index >= stacks.size():
+		return Store.NOTHING_WORDS
+	var item_id: StringName = StringName(str(stacks[index]["id"]))
+	var room: int = Inventory.room_for(item_count(item_id), DataRegistry.get_item(item_id))
+	if room <= 0:
+		return Store.NO_ROOM_WORDS
+	add_item(item_id, store().take(index, mini(room, int(stacks[index]["count"]))))
+	return ""
+
+
+# --- The mine (2026-11-17) ---------------------------------------------------
 # --- The mine (2026-11-17) ---------------------------------------------------
 
 ## The Old Quarry's rules (data/rules/mine.json).
@@ -865,6 +916,7 @@ func clear() -> void:
 	_farm = null
 	_mine = null
 	_furnace = null
+	_store = null
 	found.clear()
 	flags.clear()
 	flag_days.clear()
@@ -899,7 +951,7 @@ func to_dict() -> Dictionary:
 		"player": _json_safe(player),
 		"farm": farm().to_dict(),
 		"mine": mine().to_dict(),
-		"home": {"furnace": furnace().to_dict()},
+		"home": {"furnace": furnace().to_dict(), "chest": store().to_list()},
 		"found": _found_list(),
 		"skills": _json_safe(skill_points),
 		"friends": _json_safe(friends),
@@ -956,6 +1008,8 @@ func from_dict(data: Dictionary) -> void:
 	var home: Dictionary = _dictionary(data.get("home"))
 	_furnace = Furnace.new()
 	_furnace.load_saved(home.get("furnace"))
+	_store = null
+	store().load_saved(home.get("chest"), func(item_id: String) -> int: return Inventory.capacity(DataRegistry.get_item(StringName(item_id))))
 	var src_found: Variant = data.get("found")
 	if typeof(src_found) == TYPE_ARRAY:
 		for id: Variant in src_found:

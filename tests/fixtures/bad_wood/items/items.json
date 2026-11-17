@@ -1,0 +1,5 @@
+{
+  "items": [
+    { "id": "wood", "name": "Wood", "type": "material", "stackable": true, "max_stack": 30 }
+  ]
+}

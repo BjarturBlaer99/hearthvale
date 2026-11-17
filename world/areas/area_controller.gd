@@ -267,6 +267,7 @@ func _ready() -> void:
 	EventBus.shop_requested.connect(_on_shop_requested)
 	hud.gift_menu.closed.connect(_on_item_menu_closed)
 	hud.craft_menu.closed.connect(_on_item_menu_closed)
+	hud.store_menu.closed.connect(_on_item_menu_closed)
 	hud.gift_menu.given.connect(_on_gift_given)
 	EventBus.gift_requested.connect(_on_gift_requested)
 	EventBus.travel_requested.connect(_on_travel_requested)
@@ -396,6 +397,7 @@ func _spawned(kind: String) -> Node2D:
 	if GreyboxTiles.BREAKABLE_MARKERS.has(kind):
 		var breakable: Breakable = Breakable.new()
 		breakable.breakable_id = StringName(kind)
+		breakable.area_id = area_id
 		return breakable
 	if Critter.KINDS.has(StringName(kind)):
 		var critter: Critter = Critter.new()
@@ -778,9 +780,11 @@ func pick_up(pickup: ItemPickup) -> bool:
 ## conversation begins it gains the answer that gives them a gift, if there is one to give
 ## and none was given today (P4c).
 func talk_to(talkable: Talkable) -> bool:
-	# The workbench has a list of its own, not words.
+	# The workbench and the chest have lists of their own, not words.
 	if talkable is Furnishing and (talkable as Furnishing).opens() == Furnishing.CRAFT:
 		return open_craft()
+	if talkable is Furnishing and (talkable as Furnishing).opens() == Furnishing.STORE:
+		return open_store()
 	var data: Dictionary = talkable.dialogue()
 	var villager: Dictionary = villager_of(talkable)
 	if not villager.is_empty() and not data.is_empty():
@@ -928,7 +932,19 @@ func open_item_menu() -> bool:
 
 
 func is_in_menu() -> bool:
-	return hud.item_menu.is_open() or hud.shop_menu.is_open() or hud.gift_menu.is_open() or hud.craft_menu.is_open()
+	return hud.item_menu.is_open() or hud.shop_menu.is_open() or hud.gift_menu.is_open() or hud.craft_menu.is_open() \
+		or hud.store_menu.is_open()
+
+
+## Opens the storage chest's two lists (crafting, GDD §14). The hero stands still while they
+## are open, and the clock with him. Returns whether they opened.
+func open_store() -> bool:
+	if _busy():
+		return false
+	player.controls_enabled = false
+	hud.set_prompt("")
+	hud.store_menu.open()
+	return true
 
 
 ## Opens the workbench's list (crafting, GDD §14). The hero stands still while it is open, and

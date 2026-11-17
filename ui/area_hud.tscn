@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://ui/shop_menu.tscn" id="p3c_shop"]
 [ext_resource type="PackedScene" path="res://ui/gift_menu.tscn" id="p4c_gifts"]
 [ext_resource type="PackedScene" path="res://ui/craft_menu.tscn" id="m2_craft"]
+[ext_resource type="PackedScene" path="res://ui/store_menu.tscn" id="m2_store"]
 [ext_resource type="Script" path="res://ui/panel_frame.gd" id="90_frame"]
 [ext_resource type="Script" path="res://ui/energy_bar.gd" id="91_energy"]
 [ext_resource type="Script" path="res://ui/item_bar.gd" id="92_bar"]
@@ -145,6 +146,8 @@ script = ExtResource("92_bar")
 [node name="GiftMenu" parent="." instance=ExtResource("p4c_gifts")]
 
 [node name="CraftMenu" parent="." instance=ExtResource("m2_craft")]
+
+[node name="StoreMenu" parent="." instance=ExtResource("m2_store")]
 
 [node name="Fade" type="ColorRect" parent="."]
 anchors_preset = 15

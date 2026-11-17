@@ -51,6 +51,7 @@
     { "id": "crystal", "name": "Crystal", "type": "material", "icon": "crystal", "stackable": true, "max_stack": 10 },
     { "id": "copper_bar", "name": "Copper Bar", "type": "material", "icon": "copper_bar", "stackable": true, "max_stack": 20 },
     { "id": "iron_bar", "name": "Iron Bar", "type": "material", "icon": "iron_bar", "stackable": true, "max_stack": 20 },
-    { "id": "gold_bar", "name": "Gold Bar", "type": "material", "icon": "gold_bar", "stackable": true, "max_stack": 20 }
+    { "id": "gold_bar", "name": "Gold Bar", "type": "material", "icon": "gold_bar", "stackable": true, "max_stack": 20 },
+    { "id": "wood", "name": "Wood", "type": "material", "icon": "wood", "stackable": true, "max_stack": 30 }
   ]
 }

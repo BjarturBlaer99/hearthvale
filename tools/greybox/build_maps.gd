@@ -582,6 +582,14 @@ const MAPS: Dictionary = {
 			[38, 6, 2, 1, 0, "mine_mouth"],
 		],
 		"spawns": [
+			# Wood (2026-11-17): four fallen branches and two old stumps, off the road and clear of
+			# the crowns. They are back each morning.
+			[23, 15, 1, 1, "branch"],
+			[36, 3, 1, 1, "branch"],
+			[14, 25, 1, 1, "branch"],
+			[17, 7, 1, 1, "branch"],
+			[3, 17, 1, 1, "stump"],
+			[31, 24, 1, 1, "stump"],
 			# Tall grass round the plateau's far corner hides a heart piece.
 			[35, 21, 1, 1, "grass"],
 			[36, 20, 1, 1, "grass"],
@@ -645,6 +653,11 @@ const MAPS: Dictionary = {
 			[26, 11, 1, 1, 0, "standing_stone"],
 		],
 		"spawns": [
+			# Wood (2026-11-17): three fallen branches and an old stump in the clearings.
+			[22, 7, 1, 1, "branch"],
+			[15, 7, 1, 1, "branch"],
+			[26, 9, 1, 1, "branch"],
+			[30, 5, 1, 1, "stump"],
 			[4, 16, 1, 1, "firefly"],
 			[7, 19, 1, 1, "firefly"],
 			[23, 21, 1, 1, "firefly"],
@@ -803,6 +816,12 @@ const MAPS: Dictionary = {
 			[12, 13, 1, 1, 0, "standing_stone"],
 		],
 		"spawns": [
+			# Wood (2026-11-17): three fallen branches and two old stumps about the field.
+			[24, 10, 1, 1, "branch"],
+			[7, 3, 1, 1, "branch"],
+			[17, 19, 1, 1, "branch"],
+			[3, 21, 1, 1, "stump"],
+			[36, 17, 1, 1, "stump"],
 			[2, 10, 2, 1, "grass"],
 			[3, 14, 1, 1, "grass"],
 			[13, 23, 2, 1, "grass"],

@@ -26,7 +26,7 @@ tile_map_data = PackedByteArray("AAAAAAAAAAACABYAAAABAAAAAAACABYAAAACAAAAAAACABY
 tile_set = ExtResource("2_tiles")
 
 [node name="Spawns" type="TileMapLayer" parent="." unique_id=2117404596]
-tile_map_data = PackedByteArray("AAAEABAAAAAEAAwAAAAHABMAAAAEAAwAAAAXABUAAAAEAAwAAAAcABQAAAAEAAwAAAAMAAgAAAAEAAwAAAAVABMAAAAAAAwAAAAWABMAAAAAAAwAAAAJAA8AAAAAAAwAAAAQAAQAAAABAAwAAAAVAAQAAAABAAwAAAA=")
+tile_map_data = PackedByteArray("AAAEABAAAAAEAAwAAAAHABMAAAAEAAwAAAAXABUAAAAEAAwAAAAcABQAAAAEAAwAAAAMAAgAAAAEAAwAAAAVABMAAAAAAAwAAAAWABMAAAAAAAwAAAAJAA8AAAAAAAwAAAAQAAQAAAABAAwAAAAVAAQAAAABAAwAAAAWAAcAAAAGAAwAAAAPAAcAAAAGAAwAAAAaAAkAAAAGAAwAAAAeAAUAAAAHAAwAAAA=")
 tile_set = ExtResource("2_tiles")
 
 [node name="HeightShading" type="Node2D" parent="." unique_id=1580946854]
@@ -76,7 +76,7 @@ target_area = &"keep"
 target_entry = &"entrance"
 size = Vector2i(2, 1)
 
-[node name="KeepChain" type="Node2D" parent="Interactables"]
+[node name="KeepChain" type="Node2D" parent="Interactables" unique_id=448067273]
 position = Vector2(288, 48)
 script = ExtResource("10_door")
 door_id = &"keep_chain"

@@ -1,0 +1,26 @@
+{
+	"id": "lamp",
+	"name": "Standing Lamp",
+	"station": "workbench",
+	"order": 13,
+	"needs": [
+		{
+			"item": "copper_bar",
+			"count": 1
+		},
+		{
+			"item": "wood",
+			"count": 2
+		},
+		{
+			"item": "coal",
+			"count": 1
+		}
+	],
+	"makes": {
+		"furnishing": "lamp"
+	},
+	"unlock": {
+		"found": "copper_bar"
+	}
+}

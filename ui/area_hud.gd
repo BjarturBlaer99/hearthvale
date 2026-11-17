@@ -35,6 +35,7 @@ var _flash_time: float = FLASH_TIME
 @onready var shop_menu: ShopMenu = $ShopMenu
 @onready var gift_menu: GiftMenu = $GiftMenu
 @onready var craft_menu: CraftMenu = $CraftMenu
+@onready var store_menu: StoreMenu = $StoreMenu
 @onready var pause_menu: PauseMenu = $PauseMenu
 ## What can be in the hero's hand, along the bottom of the screen.
 @onready var item_bar: ItemBar = $ItemBar

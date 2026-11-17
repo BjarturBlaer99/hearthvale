@@ -1,0 +1,8 @@
+{
+	"id": "log",
+	"name": "A log that can't be used",
+	"breaks_on": ["sword"],
+	"hits": 0,
+	"returns": "weekly",
+	"drops": [ { "type": "item", "item": "wood", "count": 1, "weight": 1 } ]
+}

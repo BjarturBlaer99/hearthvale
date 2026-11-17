@@ -952,7 +952,7 @@ func _ascii(tile: Vector2i, art: String) -> void:
 ## A spawn marker (only ever seen in the editor): a bright square with a dot per index, so
 ## the kinds tell apart.
 func _marker(tile: Vector2i, index: int) -> void:
-	var color: Color = [Color(0.3, 0.9, 0.3), Color(0.85, 0.5, 0.25), Color(1, 1, 1), Color(1, 0.85, 0.2), Color(0.9, 1, 0.4), Color(0.6, 0.6, 0.65)][index]
+	var color: Color = [Color(0.3, 0.9, 0.3), Color(0.85, 0.5, 0.25), Color(1, 1, 1), Color(1, 0.85, 0.2), Color(0.9, 1, 0.4), Color(0.6, 0.6, 0.65), Color(0.7, 0.5, 0.3), Color(0.5, 0.35, 0.2)][index]
 	_rect(tile, Rect2i(2, 2, T - 4, T - 4), Color(color, 0.55))
 	_rect(tile, Rect2i(2, 2, T - 4, 1), OUTLINE)
 	for dot: int in index + 1:

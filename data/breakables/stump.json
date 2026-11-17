@@ -1,0 +1,24 @@
+{
+	"id": "stump",
+	"name": "Old stump",
+	"breaks_on": [
+		"sword",
+		"bomb"
+	],
+	"hits": 3,
+	"returns": "daily",
+	"sound": "cut",
+	"burst": "dust",
+	"frames": {
+		"whole": "stump",
+		"broken": ""
+	},
+	"drops": [
+		{
+			"type": "item",
+			"item": "wood",
+			"count": 2,
+			"weight": 1
+		}
+	]
+}

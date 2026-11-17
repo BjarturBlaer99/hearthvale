@@ -77,6 +77,21 @@ position = Vector2(96, 32)
 script = ExtResource("m2_furnishing")
 furnishing_id = &"furnace"
 
+[node name="Chest" type="Node2D" parent="Interactables"]
+position = Vector2(32, 32)
+script = ExtResource("m2_furnishing")
+furnishing_id = &"chest"
+
+[node name="Lamp" type="Node2D" parent="Interactables"]
+position = Vector2(64, 32)
+script = ExtResource("m2_furnishing")
+furnishing_id = &"lamp"
+
+[node name="Rug" type="Node2D" parent="Interactables"]
+position = Vector2(32, 64)
+script = ExtResource("m2_furnishing")
+furnishing_id = &"rug"
+
 [node name="Entries" type="Node2D" parent="." unique_id=99726273]
 
 [node name="door" type="Marker2D" parent="Entries" unique_id=2049002410]

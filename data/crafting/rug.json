@@ -1,0 +1,19 @@
+{
+	"id": "rug",
+	"name": "Woven Rug",
+	"station": "workbench",
+	"order": 12,
+	"needs": [
+		{
+			"item": "wheat",
+			"count": 8
+		},
+		{
+			"item": "cherry_blossom",
+			"count": 3
+		}
+	],
+	"makes": {
+		"furnishing": "rug"
+	}
+}

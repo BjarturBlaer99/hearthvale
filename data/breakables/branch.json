@@ -1,0 +1,23 @@
+{
+	"id": "branch",
+	"name": "Fallen branch",
+	"breaks_on": [
+		"sword",
+		"bomb"
+	],
+	"returns": "daily",
+	"sound": "cut",
+	"burst": "leaves",
+	"frames": {
+		"whole": "branch",
+		"broken": ""
+	},
+	"drops": [
+		{
+			"type": "item",
+			"item": "wood",
+			"count": 1,
+			"weight": 1
+		}
+	]
+}

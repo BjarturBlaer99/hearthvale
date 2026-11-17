@@ -21,8 +21,9 @@ extends RefCounted
 ##   9 props for the Decor layer (see-through): tree, rock, fence, and the well's four quarters
 ##  10 raised dungeon floor ("ledge") by height 0-7: flagstones for platforms and walkways
 ##  11 water, animated: WATER_FRAMES frames side by side, the first being the tile maps use
-##  12 spawn markers for the hidden Spawns layer: grass, pot, chicken, butterfly, firefly (the
-##     area turns each into its node on load; never seen in the game)
+##  12 spawn markers for the hidden Spawns layer: grass, pot, chicken, butterfly, firefly, and
+##     since 2026-11-17 a rock of the quarry, a fallen branch and an old stump (the area turns
+##     each into its node on load; never seen in the game)
 ##  13 more props for the Decor layer: crate, keg, hay, logs, stump, lamp post, standing stone,
 ##     and a well bucket (decoration, walkable)
 ##  14 the market stall's six quarters, a washing line (decoration) and its post
@@ -144,11 +145,11 @@ const FURNITURE_B_HEIGHTS: Array[int] = [1, 2, 2, 1, 1, 1, 1, 2]
 ## Decorations among the H12 props: see-through and walkable, like DECOR_KINDS.
 const PROP_DECOR_KINDS: Array[String] = ["bucket", "laundry"]
 ## What the Spawns layer's markers stand for, in atlas order.
-const MARKER_KINDS: Array[String] = ["grass", "pot", "chicken", "butterfly", "firefly", "rock"]
+const MARKER_KINDS: Array[String] = ["grass", "pot", "chicken", "butterfly", "firefly", "rock", "branch", "stump"]
 ## The marker a rock of the quarry grows from (the area makes a Rock of it).
 const ROCK_MARKER: String = "rock"
 ## Markers that become breakables (the rest become critters).
-const BREAKABLE_MARKERS: Array[String] = ["grass", "pot"]
+const BREAKABLE_MARKERS: Array[String] = ["grass", "pot", "branch", "stump"]
 ## Water's animation: frames, and how long each shows (seconds).
 const WATER_FRAMES: int = 4
 const WATER_FRAME_TIME: float = 0.4

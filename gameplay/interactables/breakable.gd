@@ -7,6 +7,9 @@ extends Node2D
 ## frame); a pot is just gone. It's back on the next visit (not saved). The area spawns
 ## breakables from the map's Spawns markers and calls set_terrain(). Position = the cell's
 ## top-left corner.
+## Two things its data may also say (crafting, 2026-11-17: a fallen branch, an old stump):
+## "hits", the blows it takes (one unless said), and "returns": "daily", which keeps it broken
+## until the next morning instead of the next visit (a flag remembers the day: `cut_flag()`).
 
 const SHEET: Texture2D = preload("res://gameplay/art/breakables.png")
 ## Frames in the order tools/art/make_sprites.gd paints them (a test checks).
@@ -15,8 +18,12 @@ const SIZE: Vector2i = Vector2i(16, 16)
 
 @export var breakable_id: StringName = &"grass"
 
+## The area it stands in: with its cell, that names the flag a daily one is remembered by.
+var area_id: StringName = &""
 var data: Dictionary = {}
 var broken: bool = false
+## How many more blows it takes.
+var hits_left: int = 1
 ## What it dropped (null if nothing, or not broken yet).
 var dropped: Node2D
 ## Gives the drop roll (0 to 1). Tests replace it to choose a drop.
@@ -31,10 +38,14 @@ func _ready() -> void:
 	if data.is_empty():
 		push_warning("%s: no breakable '%s' in data/breakables." % [name, breakable_id])
 	roll_drop = func() -> float: return randf()
+	hits_left = maxi(int(data.get("hits", 1)), 1)
+	# One that comes back only in the morning, and was broken today, is gone already.
+	broken = is_daily() and cut_today()
 	hurt_box = HurtBox.new()
 	hurt_box.team = &"enemy"
 	hurt_box.radius = 6.0
 	hurt_box.position = Vector2(8, 8)
+	hurt_box.enabled = not broken
 	add_child(hurt_box)
 	hurt_box.hit_taken.connect(_on_hit)
 
@@ -63,9 +74,36 @@ func breaks_on(kind: StringName) -> bool:
 	return (data.get("breaks_on", []) as Array).has(String(kind))
 
 
+## Whether it stays broken until the next morning (its data's "returns": "daily").
+func is_daily() -> bool:
+	return str(data.get("returns", "")) == "daily"
+
+
+## The flag a daily one keeps the day it was broken in: "cut/<area>/<x>,<y>".
+func cut_flag() -> StringName:
+	return StringName("cut/%s/%d,%d" % [area_id, cell().x, cell().y])
+
+
+## Broken today: there is nothing here until tomorrow.
+func cut_today() -> bool:
+	return int(GameState.get_flag(cut_flag(), 0)) >= GameState.day
+
+
 func _on_hit(hit: Hit) -> void:
-	if not broken and breaks_on(hit.kind):
+	if broken or not breaks_on(hit.kind):
+		return
+	hits_left -= 1
+	if hits_left <= 0:
 		smash()
+	else:
+		chip()
+
+
+## A blow that doesn't break it yet: its sound, and a little of what it throws up.
+func chip() -> void:
+	EventBus.sound.emit(StringName(str(data.get("sound", "cut"))))
+	if get_parent() != null:
+		Burst.spawn(get_parent(), position + Vector2(8, 8), StringName(str(data.get("burst", "leaves"))), 0.5)
 
 
 ## Cuts or breaks it now. Returns its drop (null for nothing).
@@ -74,6 +112,8 @@ func smash() -> Node2D:
 		return null
 	broken = true
 	hurt_box.enabled = false
+	if is_daily():
+		GameState.set_flag(cut_flag(), GameState.day)
 	if _terrain != null:
 		_terrain.set_occupied(cell(), false)
 	EventBus.sound.emit(StringName(str(data.get("sound", "cut"))))
