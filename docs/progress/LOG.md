@@ -2303,3 +2303,21 @@ The user started the `marsh` scenario at 16:00 (`tools/playtest.gd -- marsh 16:0
 
 **Changed for the run**
 - **The `marsh` scenario starts with Old Henrik at five points,** one liked gift short of two marks, as the `late` scenario does for the other villagers, so his favour can be asked on the first day. A tool only; committed on its own.
+
+## 2026-11-17 — Playtest: Willowmere by night (the user: "Feels right")
+
+The user started the `marsh` scenario at 19:00 (`tools/playtest.gd -- marsh 19:00`), played for seventy seconds, about twenty-seven of them after the Bogwisps rise, closed the window and, asked how the marsh felt by night, said it feels right. Both of the plan's last lines are ticked.
+
+**What the run covered** (worked out from the scenario's own save, slot 900, written as the window closed at 20:38; not watched)
+- **Two Bogwisps were beaten:** two points of Combat.
+- **He ran out of hearts once.** The save has him at the marsh's entrance with full hearts and 5 energy of 100. That is six touches (three hearts and 90 energy) and about ten swings, and then waking at the entrance whole. A fall gives the hearts back and none of the energy.
+- No errors in the game's output. The player's own save has the same checksum as before.
+
+**What it did not cover**
+- **No ember was carried at the end:** the two that were dropped were not walked onto.
+- **Old Henrik was not spoken to.** His favour has still been finished only by the script, and the lit lanterns and Ember Tea have not been seen by a person.
+- A collapse in the marsh, the walk home and the night's sleep.
+
+**Worth knowing**
+- **A person is touched far more often than the script was:** six touches in under half a minute of night, against the script's two in a minute. The user judged it right as it is. Five wisps, 15 energy a touch and half a second of warning are all data, should that change.
+- **After the fall he stood at the entrance with 5 energy and three wisps still out:** one more touch would have been a collapse (waking at home with half a bar, a tenth of his coins gone).

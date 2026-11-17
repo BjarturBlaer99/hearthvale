@@ -140,8 +140,8 @@ the Bogwisp fight and the favour as played.
 
 All of that is done but the last word, which is the user's:
 - [x] *(yours)* the marsh feels worth the walk by day (the user, 2026-11-17: "Feels right")
-- [ ] *(yours)* the marsh feels worth the risk by night (the run that was judged ended at 18:01, two hours
-  before a Bogwisp rises)
+- [x] *(yours)* the marsh feels worth the risk by night (the user, 2026-11-17: "Feels right", after a second
+  run that began at 19:00)
 
 ## Saves
 

@@ -252,7 +252,7 @@ approved as written). Three steps:
   solid. Thicker mist after dark.
 - **W3 — Old Henrik.** *Built 2026-11-17.* An eighth villager, his favour, the marsh lanterns and Ember
   Tea. The fight and the favour were played through in a real window by a script. The user played the marsh
-  by day on 2026-11-17 ("feels right"); the night is still to be played by a person.
+  by day and by night on 2026-11-17 ("feels right" both times); the favour has been finished only by the script.
 
 ---
 
