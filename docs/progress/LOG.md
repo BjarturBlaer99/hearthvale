@@ -2483,3 +2483,60 @@ The user started the `craft` scenario (`tools/playtest.gd -- craft`), played for
 - **The rest of the list:** the lamp (no copper bar was left for it), the rug, the copper pickaxe, the iron tools and the Miner's Lantern. No wood was cut.
 
 The plan's last lines say so: the workbench is ticked; the lower floors and the comparison with farming are open.
+
+## 2026-11-17 — Balance, phase 3: Tilda buys, two favours, and eight days played
+
+The third of three phases of mining and crafting (`docs/progress/mining-crafting-plan.md`, approved as written). Built in two commits, a step each (3a, 3b), and a third for this write-up. **No price or count was changed:** the report proposes numbers, and the tuning waits for the user's word.
+
+**Built**
+- **Tilda buys what the quarry gives:** copper ore for 3 coins, iron ore 5, gold ore 10, a crystal 15, a copper bar 12, an iron bar 20, a gold bar 36. Stone, wood and coal are not bought.
+  - A shop's data may list what it buys besides crops (`buys`). Her list shows the harvest first, then these. A new thing to buy is a line of data.
+  - Her answer reads "I have things to sell.", and her greeting says she buys what he digs out of the quarry.
+- **Two favours, asked at three marks** by the two villagers who teach a recipe at two:
+  - **Wenna, "Black for the Loom":** five coal, for dye. 30 coins and two Cherry Blossom Tea.
+  - **Shepherd Edda, "New Shears":** two iron bars. 50 coins and a Shepherd's Pie.
+  - Both are data: a quest of the favours' shape, and an opening and four nodes in the villager's conversation. The rewards are given, so a full pack finds them at his feet.
+- **A script that plays the game** (`tools/play_days.gd`): eight days of a new game in a real window, by pressing real keys and mouse buttons. The plot, Tilda's counter, the quarry, the furnace and the workbench.
+- **The report** (`docs/progress/mining-balance-report.md`): each day's energy, coins, ore, crops, bars and things made; every floor; what the script set up or left out; a day in the quarry beside a day on the plot against the plan's first guesses; and the numbers it would change.
+- **Three capture shots** (156 to 158): Tilda's list with ore and bars on it, and each favour being asked.
+
+**What differs from the plan**
+- **Tilda says "things", not "crops".** With only ore in his pack a player would not have looked under "I have crops to sell."
+- **Each favour is asked after the lesson.** A hero who reaches three marks untaught is taught first and asked at the next talk.
+- **The script is a tool in the repository,** not a scratch file as Willowmere's was: tuning will want it run again.
+- **One thing was handed to it:** the Lantern, on day 7. Everything else was come by in play, from the title's "New game".
+- **It did not play the two favours:** three marks take about a week of gifts.
+- **The tuning is not done.** The plan's step 3b ends with it; it waits for the user.
+
+**Verified**
+- **935 tests in 123 suites, all passing.** Ten are new: the shop's `buys` list in the pure class and at the counter (four), and the two favours (six). Three older tests carried counts that changed (eleven quests, the quest log's twelve lines, the ending's "of 11"), and three carried Tilda's old words.
+- **80 bugs planted on purpose** in the new code and data, one at a time, each file put back. **78 were caught at once.** One was not: a favour's hand-over answer shown to a hero who carried the coal but had never been asked. A test was added, and that bug and its twin for Edda were both caught.
+- **The eight days, played at life's own speed** (1813 seconds, thirty minutes; `Input.parse_input_event`; slot 956, emptied before and after):
+  - **Day 1:** the tools by the door, five turnips sown and watered, the wooden sword, Wenna's shuttle for 30 coins, the Pickaxe for 25, and floors 1 and 2 until he was spent. In bed at 10:40.
+  - **Day 2:** three loaves, floors 1 to 5 with the plain Pickaxe (182 energy), the furnace built and lit. Mining at its top level by 11:20.
+  - **Day 3:** five copper bars, the Copper Pickaxe, floors 4 to 6 by the lift. On floor 7, without a light, a Bogwisp threw him back up the ladder; he went down again and left after one more touch.
+  - **Day 4:** five iron bars, the Iron Pickaxe, five turnips picked and sold, two sprinklers made and one set, seventeen turnips sown.
+  - **Day 5:** floors 1 to 6 with the Iron Pickaxe: 109 coins of ore for 85 energy.
+  - **Day 6:** the Copper Watering Can and the Copper Hoe; the plot watered.
+  - **Day 7** *(the Lantern put in his pack)*: all nine floors: 261 coins of ore for 115 energy, nine Bogwisps beaten, no touch in the dark.
+  - **Day 8:** seventeen turnips picked, everything sold for 571 coins, the second sprinkler set, sixteen turnips sown. 494 coins in the purse.
+- **Three full trial runs at four times speed** came before it, to try the script out. They found its faults, not the game's.
+- **Screenshots,** looked at: Tilda's list with ore and bars, each favour asked, and fifty-odd from the played days (the plot sown, the furnace and the workbench, a floor of each band, a Bogwisp struck in the Lantern's light).
+- **The player's own save was read-only throughout** (the same checksum before and after every run).
+
+**What the days showed** (the report has the tables)
+- **The plan's first guesses fit a new miner, and he is a seasoned one by day 4:** Mining at its top on the second morning, the Iron Pickaxe on the fourth.
+- **From then floors 1 to 6 cost less than a bar of energy and pay about 110 coins a day.** A plot of turnips pays 40.
+- **With the Lantern all nine floors pay 261 coins for 115 energy.** Without it the dark floors can't be worked.
+- **The two don't compete for the day:** the plot takes a few minutes and a tenth of the bar.
+- **Coal and stone pile up,** and the furnace's five bars a night is the narrow place.
+- **Proposed, not done:** a third off what Tilda pays for ore, bars and crystals; a rock of ore 1 point of Mining and a plain rock none; two coal rocks a floor on floors 4 to 6, not four.
+
+**Known issues and limits**
+- **Not played by a person.** The script shows what the numbers do, not how a day in the quarry feels.
+- **The script is quicker than a hand at a Bogwisp's flare,** and it sees rocks in the dark. A person will do worse on floors 7 to 9.
+- **A Bogwisp's touch at the foot of floor 7's ladder throws the hero back up it.** He arrives one cell below the way up. Seen on day 3 and in three trial runs; not touched.
+- **One run is one run.** In the trials the safe floors were steady (96 to 129 coins) and the dark floors were not (55 coins and a fall in one).
+- **The script's first run at life's speed was thrown away:** a change to day 4 had him count the plot's empty cells from his cottage, and he bought no seed. Found in the log, fixed, and played again from the start.
+- **`tools/play_days.gd` is long** (two thousand lines), and has no tests of its own: its test is that it plays.
+- **Two warts met on the way, not touched:** the HUD's "Carrying" line is cut off all week, and the engine's time scale is set back to 1 after every hit's freeze, which a tool that runs the game faster has to undo each step.

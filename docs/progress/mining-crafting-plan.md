@@ -4,7 +4,7 @@ The user's request, 2026-11-17: the Old Quarry (a mine of nine floors), a Pickax
 crafting at home (a furnace, a workbench, a chest, sprinklers, tool upgrades), in phases with a stop after
 each. This is phase 0: the plan, and no code.
 
-**Status: approved as written on 2026-11-17. Phase 1 (mining) and phase 2 (crafting) are built (2026-11-17). Phase 3 is not.**
+**Status: approved as written on 2026-11-17. Phase 1 (mining), phase 2 (crafting) and phase 3 (balance) are built (2026-11-17). Phase 3's numbers are not settled: the report proposes them (`mining-balance-report.md`), and nothing is tuned until the user says which.**
 
 ## Sixteen things to decide
 
@@ -314,6 +314,9 @@ ladder is under one of them):
 - **Time is not the limit.** The mine is twenty seconds from home and a floor is about forty seconds: all
   nine fit in a day. Energy, food and hearts are the limits.
 
+*These are the first guesses. What eight played days measured is in `mining-balance-report.md`, set beside
+this table.*
+
 ## Phase 3
 
 - **Tilda buys** copper, iron and gold ore, the three bars and crystals, at the prices above.
@@ -323,6 +326,22 @@ ladder is under one of them):
 - **Eight days played** by a script that presses real keys in a real window, as Willowmere was, with a
   report of energy spent, coins earned and items crafted each day, and a plain list of what the script set
   up or skipped. Prices and counts are then tuned in data.
+
+**As built, what the plan didn't say or said otherwise:**
+- **Tilda says "things", not "crops":** her answer reads "I have things to sell.", and her greeting says
+  she buys what he digs out of the quarry. With only ore in his pack a player would not have looked.
+- **What she buys is listed after the harvest,** in the order ore, crystal, bars. A bar always sells for
+  more than its three ore.
+- **Each favour is asked after the lesson.** A hero who reaches three marks untaught is taught first, and
+  asked at the next talk.
+- **The script is a tool in the repository** (`tools/play_days.gd`), not a scratch file: tuning will want
+  it run again. It can run faster than life for a trial; the report's run was at life's speed.
+- **It plays from the title's "New game", and one thing was handed to it:** the Lantern, on day 7. The
+  story gives it in the crypt, which eight days of plot and quarry don't reach.
+- **It did not play the two favours.** Three marks take about a week of gifts, and it gave none. They
+  are covered by tests and shown in two pictures.
+- **Nothing has been tuned.** The report says what the days measured and which numbers it would change;
+  the tuning waits for the user's word.
 
 ## The save
 
@@ -386,10 +405,12 @@ and the write-up)*
   turns ore to bars overnight, the chest keeps its stacks through a save, and a sprinkler waters its four
   cells each morning; all tests pass.
 
-**Phase 3: balance**
-- 3a. Tilda buys; the two favours.
-- 3b. The eight days played, the report, and the tuning.
-- **Done when** the report is in hand, the numbers are settled with the user, and all tests pass.
+**Phase 3: balance** *(built 2026-11-17, in two commits and a third for the write-up; the tuning waits)*
+- [x] 3a. Tilda buys; the two favours.
+- [x] 3b. The eight days played, and the report.
+- [ ] 3b. The tuning: in data, on the user's word, with the tests that carry the numbers.
+- **Done when** the report is in hand, the numbers are settled with the user, and all tests pass. *The
+  report is in hand and all tests pass; the numbers are not settled yet.*
 
 **The last word is the user's:**
 - [x] *(yours)* the Pickaxe and a floor of rocks feel right (the user, 2026-11-17: "Feels right", after a

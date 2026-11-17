@@ -1054,3 +1054,27 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   a "ladder" sound; the ladder uses the `secret` chime that was there already.
 - 2026-11-17 — **Step 2b's commit was amended once,** before anything was pushed, to bring one test up
   to date with it. Nothing else in the history was rewritten.
+- 2026-11-17 — **What a shop buys besides crops is a list of its own in the shop's data** (`buys`: an
+  item and what is paid for one), not a price on the item. The price is the shop's to set, as a crop's
+  is the crop's; a second shop could pay otherwise. Her list shows the harvest first, then `buys` in its
+  own order. A thing is offered once: if a crop's harvest were also named in `buys`, the crop's price
+  stands.
+- 2026-11-17 — **Tilda's answer reads "I have things to sell."** It read "I have crops to sell.", which
+  would have hidden the ore from a player who had only ore. Her greeting says she buys what he digs out
+  of the quarry. Three older tests carried the old words.
+- 2026-11-17 — **A favour at three marks stands after the lesson in a villager's `openings`.** Wenna and
+  Shepherd Edda teach at two marks and ask at three. A hero who comes to three marks untaught (gifts on
+  one day) is taught first and asked at the next talk; the present at four marks still comes before
+  both.
+- 2026-11-17 — **The eight days are played by a tool in the repository** (`tools/play_days.gd`), not a
+  scratch script as Willowmere's was: phase 3's tuning will want it run again. It presses keys and mouse
+  buttons through `Input.parse_input_event`, finds its way with the game's own rule for a step
+  (`TerrainQuery.check_move`), reads what a player can see (rocks and what shows in them, monsters, a
+  list's lines) and never what he can't (where the ladder is hidden). Where it changes the game's state
+  it logs SETUP. Its save is slot 956.
+- 2026-11-17 — **A trial run of that tool may go faster than life by taking more steps a second, each as
+  long as ever** (`Engine.physics_ticks_per_second` with `Engine.time_scale`), so what happens in a step
+  is what happens at life's speed. The game sets the time scale back to 1 after every hit's freeze, so
+  the tool says its speed again each step. The report's run is at life's own speed.
+- 2026-11-17 — **No price and no count was changed in phase 3.** The report proposes numbers; they are
+  changed only on the user's word, in data, with the tests that carry them.

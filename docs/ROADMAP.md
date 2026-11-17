@@ -264,7 +264,12 @@ three phases with a stop after each:
   stumps, copper and iron hoes, cans and pickaxes, the sprinkler, the Miner's Lantern. The user tried
   the workbench the same day ("feels right"); the chest in use, a night of the furnace and the plot
   with the new tools have been played only by the tests.
-- **Phase 3 — Balance.** *Not built.* Tilda buys ore and bars, two favours, and eight days played.
+- **Phase 3 — Balance.** *Built 2026-11-17; the numbers wait for the user.* Tilda buys ore, bars and
+  crystals. Wenna and Shepherd Edda each ask a favour at three marks (five coal; two iron bars). A script
+  that presses real keys played eight days from a new game (`tools/play_days.gd`), and its report
+  (`docs/progress/mining-balance-report.md`) sets a day in the quarry beside a day on the plot, early and
+  late, and proposes which numbers to change. No price or count has been changed yet: that is done on the
+  user's word, in data.
 
 ---
 

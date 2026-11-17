@@ -1182,7 +1182,7 @@ the marsh by day, step 2, the Bogwisp, and step 3, Old Henrik, are all built.
 
 ## 27. The Old Quarry
 Mining (the user's request, 2026-11-17; `docs/progress/mining-crafting-plan.md`, phase 1). Crafting
-(phase 2) is §28; the balance pass (phase 3) is not built yet.
+(phase 2) is §28; the balance pass (phase 3) is §29.
 - **Eleven places.** The mouth is six cells of the North Fields' east tree line (`quarry_rock` and
   `mine_mouth` tiles; `QuarryMouth`, an `AreaExit`). The entrance hall is the area `quarry`; the nine floors
   are the areas `quarry_1` to `quarry_9`, each one screen (20 by 11 cells).
@@ -1234,7 +1234,7 @@ Mining (the user's request, 2026-11-17; `docs/progress/mining-crafting-plan.md`,
 
 ## 28. Crafting
 Crafting (the user's request, 2026-11-17; `docs/progress/mining-crafting-plan.md`, phase 2). The balance
-pass (phase 3: Tilda buys ore and bars, two favours, eight days played) is not built yet.
+pass (phase 3: Tilda buys ore and bars, two favours, eight days played) is §29.
 - **Recipes are data.** A crafting recipe is a file in `data/crafting/` (cooking keeps `data/recipes/`):
   its `station` (`workbench` or `furnace`), its `order` on that station's list, what it `needs`, what it
   `makes` (an item and a count, or a `furnishing` of the hero's home) and an optional `unlock` (an item
@@ -1309,3 +1309,39 @@ pass (phase 3: Tilda buys ore and bars, two favours, eight days played) is not b
   rug's two halves, the sprinkler), a branch and a stump in `breakables.png` and twelve item icons, all
   from `make_sprites.gd`; the sounds `craft` and `furnace` from `make_audio.gd`. The plan's "ladder" sound
   was not made: the ladder uses the `secret` chime.
+
+## 29. The balance pass
+Phase 3 of mining and crafting (`docs/progress/mining-crafting-plan.md`). It added little code: one list
+in a shop's data, two favours as data, and a tool that plays the game.
+- **Tilda buys ore, bars and crystals:** a shop's `buys` list (§21).
+- **Two favours at three marks:** Wenna's and Shepherd Edda's (§25).
+- **`tools/play_days.gd` plays eight days in a real window** with real input, from the title screen's
+  "New game", on save slot 956 (emptied before and after):
+  `godot --path . -s res://tools/play_days.gd -- <output dir> [days=8] [speed=1] [deep] [verbose]`.
+  - **It presses, it doesn't call:** keys and mouse buttons go through `Input.parse_input_event` (flushed
+    at once, so a key is down in the very step it is pressed). Moving is on the keys, a left click uses
+    what is in hand, a right click interacts, the number keys and the wheel choose on the item bar,
+    Enter answers, Tab opens the food menu and leaves a list.
+  - **It looks at what a player can see:** which cells can be walked (`TerrainQuery.check_move`, a
+    breadth-first search over them), where rocks stand and what shows in them, where monsters are and
+    what a Bogwisp is doing, what a conversation or a list offers. It never reads where the day's ladder
+    is hidden: it breaks plain rocks, the nearest first, until the ladder shows.
+  - **What it does in a day:** the plot (till, sow, water at the well, harvest, set sprinklers), Tilda's
+    counter (sell, buy bread and seed), the quarry (every rock of ore on a floor, then plain rocks until
+    the ladder; the lift; eating when it tires; home when it is spent, late, or has fallen twice), the
+    furnace (one load a night) and the workbench (the furnace, the better pickaxes, sprinklers, a copper
+    can and hoe).
+  - **Monsters:** it swings at what comes into the sword's reach, hunts what it can get to on arriving at
+    a floor, steps out of a Bogwisp's line, and with a light runs at a wisp that flares and strikes it
+    before it darts.
+  - **Where it changes the game's state it logs SETUP** (the Lantern on day 7, which the story gives in
+    the crypt), and both lists are in its output.
+  - **What it writes:** `days.json` (for each day: energy spent and by what, energy eaten, every item
+    and coin that came or went and in what work, rocks broken, each floor visited with what it took and
+    gave, skills, touches and falls), `play_log.txt`, and pictures.
+  - **`speed=4` is for trying the script out:** more steps a second, each as long as ever. The area sets
+    `Engine.time_scale` back to 1 after a hit's freeze, so the tool says its speed again each step.
+    `deep` is a trial of the dark floors alone, with a kit handed over.
+- **The report** is `docs/progress/mining-balance-report.md`: the eight days, the floors, what the script
+  set up or left out, a day in the quarry beside a day on the plot against the plan's first guesses, and
+  the numbers it proposes to change. **No price or count was changed by the pass.**

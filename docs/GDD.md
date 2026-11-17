@@ -221,10 +221,12 @@ Enemies sometimes drop hearts or coins.
 - Each mechanic is introduced on its own, then combined.
 
 ## 10. Village & economy
-- **Coins** drop from enemies, grass and pots, and come from selling crops.
+- **Coins** drop from enemies, grass and pots, and come from selling crops and what the quarry gives.
 - **Tilda's shop** has a list to buy from and a list to sell on, opened from her conversation. She sells ten
   arrows (5 coins), three bombs (8), a loaf of bread (6), and a seed of each crop at its price (§7). She buys
-  what the crops give, one at a time, at each crop's price, and nothing else. The list stays open for as many
+  what the crops give, one at a time, at each crop's price, and what the quarry gives (§14): copper ore (3
+  coins), iron ore (5), gold ore (10), a crystal (15), and a copper, iron or gold bar (12, 20, 36). Nothing
+  else: not stone, wood or coal. The list stays open for as many
   deals as he likes and says why one can't be made: not enough coins, no room to carry it, a full purse. She
   is open from 08:00 to 18:00 (§6).
 - Villagers give hints and small quests (data-driven).
@@ -247,6 +249,14 @@ Enemies sometimes drop hearts or coins.
 | Tilda | teaches carrot cake | |
 | Shepherd Edda | teaches shepherd's pie | |
 | Old Henrik | Lights on the Marsh: 3 wisp embers | the marsh lanterns lit, and ember tea |
+
+  - **At three marks** the two who taught a recipe at two ask a favour that wants something from the
+    quarry *(2026-11-17)*:
+
+| Villager | At three marks | Gives |
+|---|---|---|
+| Wenna | Black for the Loom: 5 coal, for dye | 30 coins and 2 cherry blossom tea |
+| Shepherd Edda | New Shears: 2 iron bars | 50 coins and a shepherd's pie |
 
   - **At four marks** each gives a present, once: Elder Bram 40 coins, Wenna 25 coins, Tilda 3 potato seeds,
     Farmer Oda 3 carrot seeds, Pip 10 coins, Guard Rolf 30 coins, Shepherd Edda 4 wheat seeds, Old Henrik
@@ -333,7 +343,7 @@ beyond the hero's home and plot.
   off the energy of a blow, and adds a twentieth to the chance that a rock of ore leaves one more.
 - **What he can't carry stays lying:** stone stacks to 50, ores and coal to 30, crystals to 10.
 
-**Crafting** *(built 2026-11-17; Tilda does not buy ore or bars yet: that is the balance pass)*
+**Crafting** *(built 2026-11-17)*
 - **The workbench** stands in the cottage from the first day. Its list shows what he knows how to make,
   what the thing under the cursor needs beside what he has ("Stone 12 of 20"), and greys out what he
   can't make now. A recipe is known once the thing it waits on has been found (held even once), or once
@@ -367,3 +377,12 @@ beyond the hero's home and plot.
 - **The Miner's Lantern** (the Lantern, 1 gold bar, 1 crystal) lights 80 pixels round the hero, where the
   Lantern lights 56.
 - **Materials** (stone, wood, ore, coal, bars, crystals) can't be eaten or given as gifts.
+
+**Balance** *(2026-11-17; the numbers are first guesses until the user settles them)*
+- **Tilda buys** ore, bars and crystals at the prices in §10. Three ore and a coal make a bar, and a bar
+  sells for more than its three ore. Stone, wood and coal are not bought.
+- **Two favours** want what the quarry gives: Wenna's five coal and Shepherd Edda's two iron bars (§10).
+- **Eight days were played** by a script that presses real keys, from a new game, with days on the plot
+  and days in the quarry. What each day cost and paid, set beside the plan's first guesses, and the
+  numbers proposed for changing are in `docs/progress/mining-balance-report.md`. No price or count has
+  been changed.

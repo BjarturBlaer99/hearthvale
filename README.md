@@ -79,8 +79,10 @@ Beaten enemies sometimes drop hearts or coins.
 - **What friendship opens** (the pivot, step 4d): at two marks a villager asks a favour or teaches a recipe.
   Pip wants a pumpkin pie and trades a secret for it; Guard Rolf wants three loaves for the watch; Farmer Oda
   wants five sheaves of wheat; Elder Bram wants a stew and tells more of Sir Aldric. Wenna teaches berry jam,
-  Tilda carrot cake and Shepherd Edda shepherd's pie. At four marks each gives a present, once. The quest log
-  scrolls now, and the ending counts the days it took, the crops grown and the friends made.
+  Tilda carrot cake and Shepherd Edda shepherd's pie. At three marks Wenna and Shepherd Edda each ask a
+  favour that wants something from the quarry: five coal for dye, two iron bars for new shears. At four marks
+  each gives a present, once. The quest log scrolls now, and the ending counts the days it took, the crops
+  grown and the friends made.
 - **Friendship and gifts** (the pivot, step 4c): talk to a villager and the first talk of the day is worth a
   little friendship. Carry food and their conversation offers "I brought you something.", which opens a list
   of what you carry: one gift a villager a day, and one they like is worth three times another. Four points
@@ -157,7 +159,8 @@ Beaten enemies sometimes drop hearts or coins.
   the rocks. Ore shows in the rock: copper on the first three floors, iron and coal on the next three,
   gold and crystals on the last three, which are dark. A ladder down is under one of each floor's plain
   rocks; reaching floors 4 and 7 opens the lift in the entrance hall. The rocks are back each morning, in
-  the same places with other things in them. Mining takes energy, so bring food.
+  the same places with other things in them. Mining takes energy, so bring food. Tilda buys the ore, the
+  bars a furnace makes of it, and crystals; she has no use for stone, coal or wood.
 - **Crafting at home:** the workbench stands by the east wall of your cottage. Face it and right-click for
   its list: what you know how to make, what the thing under the cursor needs beside what you have, and
   greyed out what you can't make yet. New things appear on the list as you find what they are made of.
@@ -205,6 +208,10 @@ To try one part without playing up to it: `godot --path . -s res://tools/playtes
 crypt's stairs, equipped as after the keep), `-- shade` (outside the Shade's hall), `-- ending` (one step from
 the ending), `-- warden`, `-- quarry` (the mine's entrance hall with a Pickaxe) or `-- craft` (at home by the
 workbench, with ore, bars and wood for most of its list). Saving in a scenario goes to a slot of its own, so it never replaces your own game.
+
+To have a script play eight days by pressing real keys (the balance pass's run: the plot, Tilda's counter,
+the quarry, the furnace and the workbench): `godot --path . -s res://tools/play_days.gd -- <folder>`. It
+takes about 35 minutes, uses a save slot of its own, and writes what each day cost and paid to the folder.
 
 Running a playtest with someone new? `docs/progress/H15-playtest.md` says how, and what to write down.
 `godot --path . -s res://tools/playtest.gd -- full` runs the whole game for it, on a save slot of its own, and

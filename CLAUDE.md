@@ -40,8 +40,12 @@ thirteen recipes, the furnace, the storage chest, the lamp and the rug, wood, co
 sprinkler, the Miner's Lantern. The user tried the workbench the same day ("feels right": six things
 made, the furnace lit); the chest in use, a night of the furnace, and the better tools and the
 sprinkler on the plot have been played only by the tests (`tools/playtest.gd -- craft`).
-**Phase 3 (balance) is not built:** start it only on the user's word, and build nothing beyond the
-plan's list.
+**Phase 3, balance, is built (2026-11-17):** Tilda buys ore, bars and crystals; Wenna and Shepherd
+Edda each ask a favour at three marks; and a script played eight days by pressing real keys
+(`tools/play_days.gd`), with a report of what each day cost and paid
+(`docs/progress/mining-balance-report.md`). **No price or count has been tuned:** the report proposes
+numbers, and they are changed only on the user's word, in data, with the tests that carry them. The
+plan's "done when" waits on that word. Nothing further is planned: ask before building more.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -137,6 +141,12 @@ godot --path . -s res://tools/playtest.gd -- village 19:30 energy=12
 # The whole game for a playtest: from the title, on its own save slot (901, kept between runs; "fresh" empties
 # it), with a log of what happens in user://playtests
 godot --path . -s res://tools/playtest.gd -- full
+# Eight days played by a script that presses real keys and mouse buttons, from the title's "New game"
+# (about 35 minutes; needs a window). Its save is slot 956, emptied before and after. It writes days.json,
+# play_log.txt and pictures to the folder. speed=4 is a quick trial of the script; "deep" tries the dark
+# floors alone.
+godot --path . -s res://tools/play_days.gd -- <output_dir>
+godot --path . -s res://tools/play_days.gd -- <output_dir> speed=4
 # Repaint the hero's sprite sheet after editing its ASCII art (optional 8x preview), then re-import
 godot --headless --path . -s res://tools/art/make_player_sprite.gd -- <preview.png>
 godot --headless --path . --import
@@ -436,3 +446,25 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **Do not** bump the save's version for crafting's fields (`home`, `found`, a cell's `sprinkler`:
     each is read with a default), let the furnace hold two loads, let the chest take coins, keys or
     quest things, or put a furnishing anywhere but its own place: each was decided with the plan.
+
+- **The balance pass (2026-11-17; `docs/progress/mining-crafting-plan.md` phase 3, TECH_DESIGN §21, §25, §29):**
+  - **A shop's data may list what it buys besides crops** (`buys`: an item and what is paid for one).
+    `Shop.offers()` lists the harvest first, then `buys` in its own order; `Shop.bought_things()` is the
+    list as read. Tilda pays 3, 5 and 10 for copper, iron and gold ore, 15 for a crystal, and 12, 20 and
+    36 for the bars; stone, wood and coal are not bought. **A new thing to buy is a line of data.**
+  - **Tilda's answer reads "I have things to sell."** (not "crops"), and a test that sells ore opens
+    her list with `open_shop(&"tilda", Shop.SELL)`: the lines are "Copper Ore x2: 3 coins each".
+  - **There are eleven quests.** A test that lists them, counts the quest log's lines, or reads the
+    ending's "of 11" carries that number.
+  - **Wenna and Shepherd Edda ask a favour at three marks** ("Black for the Loom": 5 coal; "New
+    Shears": 2 iron bars), after the recipe each teaches at two. **A test that talks to either at three
+    marks gets her lesson first if the recipe isn't known, then her favour at the next talk:** set
+    `recipe/berry_jam` or `recipe/shepherds_pie` (or call `GameState.learn_recipe()`), or the quest's
+    stage, beforehand. Their rewards are `give_item`: a full pack finds them at his feet.
+  - **`tools/play_days.gd` presses real keys** (`Input.parse_input_event`, then
+    `Input.flush_buffered_events()`: an event is otherwise handed on only at the next picture). The area
+    sets `Engine.time_scale` back to 1 after every hit's freeze, so a tool that runs the game faster
+    says its speed again each step, and takes more steps a second (`Engine.physics_ticks_per_second`)
+    rather than longer ones.
+  - **Do not** change a price, a count or a skill's numbers for balance without the user's word: the
+    report lists what is proposed.
