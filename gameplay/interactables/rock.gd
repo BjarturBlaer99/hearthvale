@@ -60,12 +60,14 @@ func be_gone() -> void:
 	visible = false
 
 
-## One blow of the pickaxe. Returns whether that broke it.
-func strike() -> bool:
+## One blow of the pickaxe. Returns whether that broke it. A better pickaxe needs `fewer`
+## blows than the plain one (ToolUse.fewer_blows): it is the pickaxe that strikes that counts,
+## whichever was in hand when he came in.
+func strike(fewer: int = 0) -> bool:
 	if broken:
 		return false
 	blows_left -= 1
-	if blows_left > 0:
+	if blows_left - maxi(fewer, 0) > 0:
 		_shake = SHAKE_TIME
 		if get_parent() != null:
 			Burst.spawn(get_parent(), position + Vector2(8, 8), &"dust", 0.5)

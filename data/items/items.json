@@ -52,6 +52,14 @@
     { "id": "copper_bar", "name": "Copper Bar", "type": "material", "icon": "copper_bar", "stackable": true, "max_stack": 20 },
     { "id": "iron_bar", "name": "Iron Bar", "type": "material", "icon": "iron_bar", "stackable": true, "max_stack": 20 },
     { "id": "gold_bar", "name": "Gold Bar", "type": "material", "icon": "gold_bar", "stackable": true, "max_stack": 20 },
-    { "id": "wood", "name": "Wood", "type": "material", "icon": "wood", "stackable": true, "max_stack": 30 }
+    { "id": "wood", "name": "Wood", "type": "material", "icon": "wood", "stackable": true, "max_stack": 30 },
+    { "id": "copper_hoe", "name": "Copper Hoe", "type": "tool", "icon": "copper_hoe", "stats": { "tool": "hoe", "cooldown": 0.4, "reach": 2 } },
+    { "id": "iron_hoe", "name": "Iron Hoe", "type": "tool", "icon": "iron_hoe", "stats": { "tool": "hoe", "cooldown": 0.4, "reach": 3 } },
+    { "id": "copper_watering_can", "name": "Copper Watering Can", "type": "tool", "icon": "copper_watering_can", "stats": { "tool": "water", "ammo": "water", "cooldown": 0.4, "reach": 2 } },
+    { "id": "iron_watering_can", "name": "Iron Watering Can", "type": "tool", "icon": "iron_watering_can", "stats": { "tool": "water", "ammo": "water", "cooldown": 0.4, "reach": 3 } },
+    { "id": "copper_pickaxe", "name": "Copper Pickaxe", "type": "tool", "icon": "copper_pickaxe", "stats": { "tool": "pick", "cooldown": 0.4, "fewer_blows": 1 } },
+    { "id": "iron_pickaxe", "name": "Iron Pickaxe", "type": "tool", "icon": "iron_pickaxe", "stats": { "tool": "pick", "cooldown": 0.4, "fewer_blows": 2 } },
+    { "id": "sprinkler", "name": "Sprinkler", "type": "sprinkler", "icon": "sprinkler", "stackable": true, "max_stack": 10 },
+    { "id": "miners_lantern", "name": "Miner's Lantern", "type": "lantern", "icon": "miners_lantern", "stats": { "radius": 80 } }
   ]
 }

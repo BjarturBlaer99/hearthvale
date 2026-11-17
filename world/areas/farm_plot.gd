@@ -112,3 +112,5 @@ func _draw() -> void:
 			var cell: Vector2i = Vector2i(x, y)
 			if farm.has_crop(cell):
 				SpriteSheet.draw(self, CROPS, CROP_FRAMES[crop_frame(farm.crop_at(cell), GameState.crop_phase(cell))], CELL, Vector2(cell * CELL))
+			elif farm.has_sprinkler(cell):
+				SpriteSheet.draw(self, Furnishing.SHEET, int(Furnishing.FRAMES[&"sprinkler"]), CELL, Vector2(cell * CELL))

@@ -1,0 +1,23 @@
+{
+	"id": "iron_pickaxe",
+	"station": "workbench",
+	"order": 10,
+	"needs": [
+		{
+			"item": "copper_pickaxe",
+			"count": 1
+		},
+		{
+			"item": "iron_bar",
+			"count": 3
+		}
+	],
+	"makes": {
+		"item": "iron_pickaxe",
+		"count": 1
+	},
+	"unlock": {
+		"skill": "mining",
+		"level": 3
+	}
+}

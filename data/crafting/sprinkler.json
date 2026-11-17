@@ -1,0 +1,23 @@
+{
+	"id": "sprinkler",
+	"station": "workbench",
+	"order": 4,
+	"needs": [
+		{
+			"item": "copper_bar",
+			"count": 1
+		},
+		{
+			"item": "iron_bar",
+			"count": 1
+		}
+	],
+	"makes": {
+		"item": "sprinkler",
+		"count": 1
+	},
+	"unlock": {
+		"skill": "farming",
+		"level": 2
+	}
+}

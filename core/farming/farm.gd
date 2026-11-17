@@ -19,6 +19,8 @@ const SPROUT: StringName = &"sprout"
 const GROWING: StringName = &"growing"
 const RIPE: StringName = &"ripe"
 const WITHERED: StringName = &"withered"
+## The cells a sprinkler waters, from its own: the four beside it.
+const SPRINKLER_SIDES: Array[Vector2i] = [Vector2i.UP, Vector2i.LEFT, Vector2i.RIGHT, Vector2i.DOWN]
 
 ## The plot's size in cells.
 var size: Vector2i
@@ -136,7 +138,7 @@ func phase_of(cell: Vector2i, days: int) -> StringName:
 ## Plants `crop` (a crop id) in `cell`. Returns whether it did: false unless the cell is tilled
 ## and nothing is planted there.
 func plant(cell: Vector2i, crop: String) -> bool:
-	if crop.is_empty() or not is_tilled(cell) or has_crop(cell):
+	if crop.is_empty() or not is_tilled(cell) or has_crop(cell) or has_sprinkler(cell):
 		return false
 	_cells[key(cell)]["crop"] = crop
 	return true
@@ -176,6 +178,53 @@ func new_day(days_by_crop: Dictionary = {}) -> void:
 				soil["dry"] = int(soil["dry"]) + 1
 				soil["withered"] = int(soil["dry"]) >= wither_after
 		soil["watered"] = false
+	# Then the sprinklers run: the morning's water, for what grows today.
+	for cell_key: String in _cells:
+		if bool(_cells[cell_key].get("sprinkler", false)):
+			for cell: Vector2i in watered_by(cell_of(cell_key)):
+				_cells[key(cell)]["watered"] = true
+
+
+# --- Sprinklers (crafting, 2026-11-17) ---------------------------------------------
+
+## Whether a sprinkler stands in `cell`.
+func has_sprinkler(cell: Vector2i) -> bool:
+	return has(cell) and is_tilled(cell) and bool(_cells[key(cell)].get("sprinkler", false))
+
+
+## Sets a sprinkler in `cell`. Returns whether it did: false unless the cell is tilled soil
+## with nothing growing in it and no sprinkler. Nothing can be planted where one stands.
+func place_sprinkler(cell: Vector2i) -> bool:
+	if not has(cell) or not is_tilled(cell) or has_crop(cell) or has_sprinkler(cell):
+		return false
+	_cells[key(cell)]["sprinkler"] = true
+	return true
+
+
+## Takes up the sprinkler in `cell`. Returns whether there was one.
+func take_sprinkler(cell: Vector2i) -> bool:
+	if not has_sprinkler(cell):
+		return false
+	_cells[key(cell)]["sprinkler"] = false
+	return true
+
+
+## The cells a sprinkler in `cell` waters each morning: of the four beside it (not the
+## corners), those that are tilled soil of the plot.
+func watered_by(cell: Vector2i) -> Array[Vector2i]:
+	var out: Array[Vector2i] = []
+	for side: Vector2i in SPRINKLER_SIDES:
+		if has(cell + side) and is_tilled(cell + side):
+			out.append(cell + side)
+	return out
+
+
+func sprinkler_count() -> int:
+	var count: int = 0
+	for cell_key: String in _cells:
+		if bool(_cells[cell_key].get("sprinkler", false)):
+			count += 1
+	return count
 
 
 ## How many cells are in `state` (TILLED counts the dry ones only).
@@ -209,6 +258,8 @@ func to_dict() -> Dictionary:
 			saved["stage"] = int(soil["stage"])
 			saved["dry"] = int(soil["dry"])
 			saved["withered"] = bool(soil["withered"])
+		if bool(soil.get("sprinkler", false)):
+			saved["sprinkler"] = true
 		cells[cell_key] = saved
 	return {"cells": cells}
 
@@ -233,6 +284,8 @@ func load_saved(saved: Variant, known_crops: Array = []) -> void:
 			soil["stage"] = maxi(int(from.get("stage", 0)), 0)
 			soil["dry"] = maxi(int(from.get("dry", 0)), 0)
 			soil["withered"] = bool(from.get("withered", false))
+		# A sprinkler stands only where nothing grows.
+		soil["sprinkler"] = typeof(from.get("sprinkler")) == TYPE_BOOL and bool(from["sprinkler"]) and str(soil["crop"]).is_empty()
 		_cells[key(cell_of(str(cell_key)))] = soil
 
 
@@ -249,7 +302,7 @@ static func problems(rules: Dictionary) -> PackedStringArray:
 
 ## Tilled, dry soil with nothing in it.
 static func _tilled() -> Dictionary:
-	return {"watered": false, "crop": "", "stage": 0, "dry": 0, "withered": false}
+	return {"watered": false, "crop": "", "stage": 0, "dry": 0, "withered": false, "sprinkler": false}
 
 
 ## Takes whatever grows in `cell` out of it; the soil stays as it is.

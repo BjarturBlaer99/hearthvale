@@ -5,7 +5,7 @@ extends RefCounted
 ## in GameState.inventory's shape ({ "id", "count" }). GameState applies them.
 
 ## Item types that can sit on the item button.
-const EQUIPPABLE_TYPES: Array[String] = ["weapon_ranged", "bomb", "tool", "seed"]
+const EQUIPPABLE_TYPES: Array[String] = ["weapon_ranged", "bomb", "tool", "seed", "sprinkler"]
 ## No data means no limit (tests and items not in data yet).
 const UNLIMITED: int = 1 << 30
 
@@ -41,7 +41,7 @@ static func ammo_for(item: Dictionary) -> String:
 		"weapon_ranged", "tool":
 			var stats: Variant = item.get("stats", {})
 			return str((stats as Dictionary).get("ammo", "")) if typeof(stats) == TYPE_DICTIONARY else ""
-		"bomb", "seed":
+		"bomb", "seed", "sprinkler":
 			return str(item.get("id", ""))
 	return ""
 
@@ -51,7 +51,9 @@ static func ammo_for(item: Dictionary) -> String:
 static func held_in_tools(items: Array) -> Array[String]:
 	var out: Array[String] = []
 	for item: Variant in items:
-		if typeof(item) == TYPE_DICTIONARY and str((item as Dictionary).get("type", "")) == "tool" and not ammo_for(item).is_empty():
+		# Named once, however many tools hold it (every watering can holds the same water).
+		var holds: String = ammo_for(item) if typeof(item) == TYPE_DICTIONARY and str((item as Dictionary).get("type", "")) == "tool" else ""
+		if not holds.is_empty() and not out.has(holds):
 			out.append(ammo_for(item))
 	return out
 

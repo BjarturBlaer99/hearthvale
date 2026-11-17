@@ -1,0 +1,26 @@
+{
+	"id": "miners_lantern",
+	"station": "workbench",
+	"order": 11,
+	"needs": [
+		{
+			"item": "lantern",
+			"count": 1
+		},
+		{
+			"item": "gold_bar",
+			"count": 1
+		},
+		{
+			"item": "crystal",
+			"count": 1
+		}
+	],
+	"makes": {
+		"item": "miners_lantern",
+		"count": 1
+	},
+	"unlock": {
+		"found": "crystal"
+	}
+}

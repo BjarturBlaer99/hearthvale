@@ -12,6 +12,8 @@ const HOE: String = "hoe"
 const CAN: String = "water"
 const SEED: String = "seed"
 const PICK: String = "pick"
+## A sprinkler (an item of type "sprinkler"): set on tilled soil of the plot like a seed.
+const SPRINKLER: String = "sprinkler"
 ## The tools an item of type "tool" can be.
 const KINDS: Array[String] = [HOE, CAN, PICK]
 ## What a use can do.
@@ -20,6 +22,7 @@ const WATER: StringName = &"water"
 const FILL: StringName = &"fill"
 const PLANT: StringName = &"plant"
 const MINE: StringName = &"mine"
+const PLACE: StringName = &"place"
 const NOTHING: StringName = &""
 ## What is said when a use does nothing.
 const HOE_NOT_HERE: String = "The hoe is for the soil of your plot."
@@ -34,6 +37,12 @@ const SEED_NOT_HERE: String = "Seeds are for the tilled soil of your plot."
 const SEED_BARE: String = "Till the soil with the hoe first."
 const SEED_TAKEN: String = "Something is growing here already."
 const SEED_NONE: String = "You have no more of these seeds."
+const SEED_SPRINKLER: String = "A sprinkler stands here."
+const SPRINKLER_NOT_HERE: String = "A sprinkler is for the tilled soil of your plot."
+const SPRINKLER_BARE: String = "Till the soil with the hoe first."
+const SPRINKLER_GROWING: String = "Something is growing here."
+const SPRINKLER_TAKEN: String = "A sprinkler stands here already."
+const SPRINKLER_NONE: String = "You have no more sprinklers."
 
 
 static func is_farm_tool(item: Dictionary) -> bool:
@@ -44,6 +53,8 @@ static func is_farm_tool(item: Dictionary) -> bool:
 static func kind_of(item: Dictionary) -> String:
 	if Crops.is_seed(item):
 		return SEED
+	if str(item.get("type", "")) == SPRINKLER:
+		return SPRINKLER
 	var stats: Variant = item.get("stats", {})
 	if not is_farm_tool(item) or typeof(stats) != TYPE_DICTIONARY:
 		return ""
@@ -61,7 +72,8 @@ static func time_of(item: Dictionary) -> float:
 ## `at_water` whether he faces the well or the pond; `held` how much he has of what the use
 ## takes (the can's pours, the seeds of this kind) and `holds` how much of it fits; `growing`
 ## whether something is planted in the cell, alive or withered.
-static func decide(kind: String, soil: StringName, at_water: bool, held: int, holds: int, growing: bool = false) -> Dictionary:
+## `sprinkler` is whether a sprinkler stands in the cell.
+static func decide(kind: String, soil: StringName, at_water: bool, held: int, holds: int, growing: bool = false, sprinkler: bool = false) -> Dictionary:
 	match kind:
 		HOE:
 			if soil == &"":
@@ -87,8 +99,38 @@ static func decide(kind: String, soil: StringName, at_water: bool, held: int, ho
 				return _no(SEED_BARE)
 			if growing:
 				return _no(SEED_TAKEN)
+			if sprinkler:
+				return _no(SEED_SPRINKLER)
 			return _do(PLANT) if held > 0 else _no(SEED_NONE)
+		SPRINKLER:
+			if soil == &"":
+				return _no(SPRINKLER_NOT_HERE)
+			if soil == Farm.BARE:
+				return _no(SPRINKLER_BARE)
+			if growing:
+				return _no(SPRINKLER_GROWING)
+			if sprinkler:
+				return _no(SPRINKLER_TAKEN)
+			return _do(PLACE) if held > 0 else _no(SPRINKLER_NONE)
 	return _no("")
+
+
+## How many cells in a line one use of `item` works: 1 unless a better tool's stats say more
+## ("reach": the copper hoe and can 2, the iron ones 3).
+static func reach(item: Dictionary) -> int:
+	var stats: Variant = item.get("stats", {})
+	if typeof(stats) != TYPE_DICTIONARY:
+		return 1
+	return maxi(int((stats as Dictionary).get("reach", 1)), 1)
+
+
+## The cells one use works: the cell he faces (`front`) and those beyond it the way he faces
+## (`facing`, a step of one cell), `cells` of them in all.
+static func line(front: Vector2i, facing: Vector2i, cells: int) -> Array[Vector2i]:
+	var out: Array[Vector2i] = []
+	for step: int in maxi(cells, 1):
+		out.append(front + facing * step)
+	return out
 
 
 ## What swinging the pickaxe does: { "does": MINE or NOTHING, "says": words }. `at_rock` is

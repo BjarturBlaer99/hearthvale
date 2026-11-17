@@ -47,6 +47,9 @@ const CLEARED_WORDS: String = "You clear away the withered %s."
 const NO_ROOM_WORDS: String = "Your pack holds no more %s."
 ## What is said when something lying in the world can't be carried (its name).
 const NO_ROOM_FOR_WORDS: String = "You have no room for the %s."
+## The sprinkler as an item, and what facing one on the plot offers.
+const SPRINKLER_ITEM: StringName = &"sprinkler"
+const SPRINKLER_PROMPT: String = "Take up the sprinkler"
 ## Said the first time the lift can reach the floor he has come to.
 const LIFT_OPEN_WORDS: String = "The lift can reach this floor now."
 ## Said when a rock gives way to the ladder down.
@@ -430,11 +433,10 @@ func roll_rocks() -> int:
 	var today: Dictionary = GameState.mine_roll(area_id, cells)
 	var kinds: Dictionary = today["kinds"]
 	_ladder_cell = today["ladder"]
-	var fewer: int = ToolUse.fewer_blows(DataRegistry.get_item(GameState.equipped))
 	var whole: int = 0
 	for rock: Rock in standing:
 		var kind: StringName = kinds.get(rock.cell(), MineRules.STONE)
-		rock.hold(kind, rules.blows(kind, fewer))
+		rock.hold(kind, rules.blows(kind))
 		if GameState.is_rock_broken(area_id, rock.cell()):
 			rock.be_gone()
 			if rock.cell() == _ladder_cell:
@@ -460,9 +462,8 @@ func ladder() -> LadderHole:
 
 
 ## Swings the pickaxe on the item button at the rock the hero faces: a blow costs energy and
-## takes one off what the rock still stands (fewer are needed with a better pickaxe: the
-## blows a rock has left are counted from the one that strikes it first). Says so and costs
-## nothing with no rock there. Returns whether a blow fell.
+## takes one off what the rock still stands, and a better pickaxe breaks it with fewer. Says
+## so and costs nothing with no rock there. Returns whether a blow fell.
 func _swing_pick(item: Dictionary) -> bool:
 	var rock: Rock = rock_in_front()
 	var use: Dictionary = ToolUse.decide_pick(rock != null)
@@ -474,7 +475,7 @@ func _swing_pick(item: Dictionary) -> bool:
 		return false
 	GameState.spend_energy(GameState.energy_cost(EnergyRules.MINE))
 	ToolFlash.spawn(interactables, rock.position, ItemIcons.name_for(StringName(str(item.get("id", "")))), ToolUse.time_of(item))
-	if rock.strike():
+	if rock.strike(ToolUse.fewer_blows(item)):
 		_on_rock_broken(rock)
 	else:
 		EventBus.sound.emit(&"pick")
@@ -631,6 +632,8 @@ func interact() -> bool:
 			if usable is Chest and (usable as Chest).opened():
 				player.hold_up(ItemIcons.name_for((usable as Chest).item_id))
 			return true
+	if _take_up_sprinkler():
+		return true
 	if _tend_crop():
 		return true
 	if shut_door_in_front() != null:
@@ -1038,8 +1041,9 @@ func _use_tool(item: Dictionary) -> bool:
 	var holds: Dictionary = DataRegistry.get_item(StringName(Inventory.ammo_for(item)))
 	var held: StringName = StringName(str(holds.get("id", "")))
 	var growing: bool = plot != null and plot.covers(front) and GameState.farm().has_crop(plot.plot_cell(front))
+	var sprinkler: bool = plot != null and plot.covers(front) and GameState.farm().has_sprinkler(plot.plot_cell(front))
 	var use: Dictionary = ToolUse.decide(ToolUse.kind_of(item), plot.soil_at(front) if plot != null else &"",
-		is_water_source(front), GameState.item_count(held), Inventory.capacity(holds) if not holds.is_empty() else 0, growing)
+		is_water_source(front), GameState.item_count(held), Inventory.capacity(holds) if not holds.is_empty() else 0, growing, sprinkler)
 	if use["does"] == ToolUse.NOTHING:
 		EventBus.sound.emit(&"nope")
 		hud.show_message(str(use["says"]))
@@ -1050,15 +1054,19 @@ func _use_tool(item: Dictionary) -> bool:
 		ToolUse.TILL:
 			# Paid before the cell is tilled: the stroke that raises his farming costs the old price.
 			GameState.spend_energy(GameState.energy_cost(EnergyRules.HOE))
-			GameState.till_soil(plot.plot_cell(front))
+			# A better hoe tills the cells beyond it in the same stroke, for the same energy.
+			for cell: Vector2i in _cells_worked(item, front, ToolUse.TILL):
+				GameState.till_soil(plot.plot_cell(cell))
+				Burst.spawn(interactables, GridBody.cell_center(cell), &"dust")
 			EventBus.sound.emit(&"hoe")
-			Burst.spawn(interactables, GridBody.cell_center(front), &"dust")
 		ToolUse.WATER:
-			GameState.water_soil(plot.plot_cell(front))
+			# A better can waters the cells beyond it with the same pour, for the same energy.
+			for cell: Vector2i in _cells_worked(item, front, ToolUse.WATER):
+				GameState.water_soil(plot.plot_cell(cell))
+				Burst.spawn(interactables, GridBody.cell_center(cell), &"drops")
 			GameState.add_item(held, -1)
 			GameState.spend_energy(GameState.energy_cost(EnergyRules.WATER))
 			EventBus.sound.emit(&"pour")
-			Burst.spawn(interactables, GridBody.cell_center(front), &"drops")
 		ToolUse.FILL:
 			GameState.add_item(held, Inventory.room_for(GameState.item_count(held), holds))
 			EventBus.sound.emit(&"fill")
@@ -1068,8 +1076,53 @@ func _use_tool(item: Dictionary) -> bool:
 			GameState.add_item(held, -1)
 			EventBus.sound.emit(&"plant")
 			Burst.spawn(interactables, GridBody.cell_center(front), &"dust", 0.6)
+		ToolUse.PLACE:
+			GameState.place_sprinkler(plot.plot_cell(front))
+			GameState.add_item(held, -1)
+			EventBus.sound.emit(&"plant")
+			Burst.spawn(interactables, GridBody.cell_center(front), &"dust", 0.6)
 	ToolFlash.spawn(interactables, Vector2(front) * GridBody.TILE, ItemIcons.name_for(StringName(str(item.get("id", "")))), ToolUse.time_of(item))
 	player.sync_from_motor()
+	return true
+
+
+## The cells one use of the hoe or the can `item` works for `what` (ToolUse.TILL or WATER):
+## the cell he faces, which ToolUse has already said yes to, and of the cells beyond it within
+## the tool's reach, those of the plot that it can be done to as well.
+func _cells_worked(item: Dictionary, front: Vector2i, what: StringName) -> Array[Vector2i]:
+	var out: Array[Vector2i] = [front]
+	var cells: Array[Vector2i] = ToolUse.line(front, player.facing_direction(), ToolUse.reach(item))
+	for index: int in range(1, cells.size()):
+		var cell: Vector2i = cells[index]
+		if plot == null or not plot.covers(cell):
+			continue
+		var growing: bool = GameState.farm().has_crop(plot.plot_cell(cell))
+		if ToolUse.decide(ToolUse.kind_of(item), plot.soil_at(cell), false, 1, 1, growing)["does"] == what:
+			out.append(cell)
+	return out
+
+
+## The plot's own cell of the sprinkler the hero faces, or Vector2i(-1, -1) if he faces none.
+func sprinkler_in_front() -> Vector2i:
+	var front: Vector2i = player.front_cell()
+	if plot == null or not plot.covers(front) or not GameState.farm().has_sprinkler(plot.plot_cell(front)):
+		return Vector2i(-1, -1)
+	return plot.plot_cell(front)
+
+
+## Takes up the sprinkler the hero faces and puts it in his pack (if there is room for it).
+## Returns whether he faced one.
+func _take_up_sprinkler() -> bool:
+	var cell: Vector2i = sprinkler_in_front()
+	if cell == Vector2i(-1, -1):
+		return false
+	if not GameState.has_room_for(SPRINKLER_ITEM):
+		EventBus.sound.emit(&"nope")
+		hud.show_message(NO_ROOM_WORDS % "sprinklers")
+		return true
+	GameState.take_sprinkler(cell)
+	GameState.add_item(SPRINKLER_ITEM, 1)
+	EventBus.sound.emit(&"item_get")
 	return true
 
 
@@ -1995,6 +2048,8 @@ func _update_hud() -> void:
 		return
 	var usable: Node2D = usable_in_front()
 	var text: String = str(usable.call(&"prompt")) if usable != null else ""
+	if text.is_empty() and sprinkler_in_front() != Vector2i(-1, -1):
+		text = SPRINKLER_PROMPT
 	if text.is_empty():
 		text = crop_prompt()
 	hud.set_prompt(MenuInput.prompt(text) if not text.is_empty() else "")

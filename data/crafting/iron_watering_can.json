@@ -1,0 +1,22 @@
+{
+	"id": "iron_watering_can",
+	"station": "workbench",
+	"order": 9,
+	"needs": [
+		{
+			"item": "copper_watering_can",
+			"count": 1
+		},
+		{
+			"item": "iron_bar",
+			"count": 2
+		}
+	],
+	"makes": {
+		"item": "iron_watering_can",
+		"count": 1
+	},
+	"unlock": {
+		"found": "iron_bar"
+	}
+}

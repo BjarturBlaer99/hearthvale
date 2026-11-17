@@ -386,6 +386,22 @@ func farm() -> Farm:
 	return _farm
 
 
+## Sets a sprinkler in a cell of the plot (tilled, with nothing in it). Returns whether it did.
+func place_sprinkler(cell: Vector2i) -> bool:
+	if not farm().place_sprinkler(cell):
+		return false
+	EventBus.farm_changed.emit()
+	return true
+
+
+## Takes up the sprinkler in a cell of the plot. Returns whether there was one.
+func take_sprinkler(cell: Vector2i) -> bool:
+	if not farm().take_sprinkler(cell):
+		return false
+	EventBus.farm_changed.emit()
+	return true
+
+
 ## Tills a cell of the plot (the plot's own cell). Returns whether it did.
 func till_soil(cell: Vector2i) -> bool:
 	if not farm().till(cell):
