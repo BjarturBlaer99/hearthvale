@@ -39,7 +39,7 @@
   "nodes": {
     "greet": {
       "speaker": "tilda",
-      "text": "Seeds, bread, arrows and bombs, the best in Hearthvale. Well, the only ones. And I'll buy what you grow.",
+      "text": "Seeds, bread, arrows and bombs, the best in Hearthvale. Well, the only ones. And I'll buy what you grow, and what you dig out of the quarry.",
       "options": [
         {
           "text": "Eggs from Farmer Oda.",
@@ -81,7 +81,7 @@
           "next": null
         },
         {
-          "text": "I have crops to sell.",
+          "text": "I have things to sell.",
           "effects": [
             {
               "type": "shop",

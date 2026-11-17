@@ -31,6 +31,21 @@
         }
       ],
       "node": "teach"
+    },
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "wenna",
+          "marks": 3
+        },
+        {
+          "type": "quest_status",
+          "quest": "black_for_the_loom",
+          "status": "not_started"
+        }
+      ],
+      "node": "favour"
     }
   ],
   "speakers": {
@@ -41,6 +56,45 @@
       "speaker": "wenna",
       "text": "Mind the loom! This cloth is for the chapel.",
       "options": [
+        {
+          "text": "Five lumps of coal, Wenna.",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "black_for_the_loom",
+              "stage": "bring"
+            },
+            {
+              "type": "has_item",
+              "item": "coal",
+              "count": 5
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "coal",
+              "count": 5
+            },
+            {
+              "type": "set_flag",
+              "flag": "dye_coal_given",
+              "value": true
+            }
+          ],
+          "next": "favour_done"
+        },
+        {
+          "text": "About that coal...",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "black_for_the_loom",
+              "stage": "bring"
+            }
+          ],
+          "next": "favour_hint"
+        },
         {
           "text": "Bram asked me to keep watch.",
           "conditions": [
@@ -211,6 +265,57 @@
       "options": [
         {
           "text": "Thank you.",
+          "next": null
+        }
+      ]
+    },
+    "favour": {
+      "speaker": "wenna",
+      "text": "The chapel wants its cloth edged in black, and a good black dye starts with coal. Could you bring me five lumps from the Old Quarry?",
+      "options": [
+        {
+          "text": "I'll bring it.",
+          "effects": [
+            {
+              "type": "set_quest_stage",
+              "quest": "black_for_the_loom",
+              "stage": "bring"
+            }
+          ],
+          "next": "favour_go"
+        },
+        {
+          "text": "Not just now.",
+          "next": "greet"
+        }
+      ]
+    },
+    "favour_go": {
+      "speaker": "wenna",
+      "text": "Bless you. They say the seam lies deep, below the copper. Mind yourself down there.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_hint": {
+      "speaker": "wenna",
+      "text": "Five lumps of coal, for the black dye. The seam lies below the copper in the Old Quarry.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_done": {
+      "speaker": "wenna",
+      "text": "Black as a crow's wing, it'll be. Here: thirty coins, and two cups of my blossom tea.",
+      "options": [
+        {
+          "text": "Goodbye.",
           "next": null
         }
       ]

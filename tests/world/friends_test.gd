@@ -186,7 +186,7 @@ func test_the_answer_is_added_where_each_conversation_begins() -> void:
 	# Tilda's has four answers of its own and scrolls; her list still opens from it.
 	var shop: AreaController = _load(SHOP)
 	_talk(shop, "Tilda")
-	assert_array(Array(shop.hud.dialogue.shown_options())).is_equal(["Let me see what you sell.", "I have crops to sell.", Friendship.GIVE_WORDS, "Just looking."])
+	assert_array(Array(shop.hud.dialogue.shown_options())).is_equal(["Let me see what you sell.", "I have things to sell.", Friendship.GIVE_WORDS, "Just looking."])
 	_say(shop, "Let me see what you sell.")
 	assert_bool(shop.hud.shop_menu.is_open()).is_true()
 	assert_bool(shop.hud.gift_menu.is_open()).is_false()

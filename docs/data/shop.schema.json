@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "shop.schema.json",
   "title": "Shop file (data/shops/<id>.json, one shop per file)",
-  "description": "A shop's buy-and-sell list (GDD §10, TECH_DESIGN §21): its own wares with their prices, whether it sells seeds, and whether it buys crops. Seed prices and what a crop sells for are the crop's own (data/crops), so a new crop is on the lists without touching the shop. A conversation opens the list with the `shop` effect.",
+  "description": "A shop's buy-and-sell list (GDD §10, TECH_DESIGN §21): its own wares with their prices, whether it sells seeds, whether it buys crops, and what else it buys. Seed prices and what a crop sells for are the crop's own (data/crops), so a new crop is on the lists without touching the shop. A conversation opens the list with the `shop` effect.",
   "type": "object",
   "required": [
     "id",
@@ -57,6 +57,30 @@
       "type": "boolean",
       "default": false,
       "description": "Buys what every crop gives, one at a time, at the crop's sells_for."
+    },
+    "buys": {
+      "type": "array",
+      "default": [],
+      "description": "The other things it pays for (ore, bars, crystals), one at a time, listed after the crops in this order. An item is named once. What is not named here, and is no crop's harvest, is not bought.",
+      "items": {
+        "type": "object",
+        "required": [
+          "item",
+          "price"
+        ],
+        "properties": {
+          "item": {
+            "type": "string",
+            "minLength": 1,
+            "description": "An item id from data/items."
+          },
+          "price": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "What is paid for one, in coins."
+          }
+        }
+      }
     }
   }
 }

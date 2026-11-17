@@ -42,7 +42,7 @@ func test_every_quest_in_data_is_run_and_can_be_finished_from_its_data_alone() -
 	in_data.sort()
 	run.sort()
 	assert_array(run).override_failure_message("every file in data/quests is run").is_equal(in_data)
-	assert_array(run).is_equal(["a_place_of_your_own", "eggs_for_tilda", "elders_supper", "lights_on_the_marsh", "lost_shuttle", "pie_for_pip", "rations_for_the_watch", "seed_stock", "slime_bounty"])
+	assert_array(run).is_equal(["a_place_of_your_own", "black_for_the_loom", "eggs_for_tilda", "elders_supper", "lights_on_the_marsh", "lost_shuttle", "new_shears", "pie_for_pip", "rations_for_the_watch", "seed_stock", "slime_bounty"])
 	for quest_id: StringName in runner.quest_ids():
 		# The main quest may have begun by itself already.
 		assert_bool(runner.start(quest_id) or runner.starts_itself(quest_id)).override_failure_message("%s starts" % quest_id).is_true()

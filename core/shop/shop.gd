@@ -3,11 +3,14 @@ extends RefCounted
 ## A shop's buy-and-sell list (P3c, GDD §9), pure. A shop is data (data/shops/<id>.json):
 ##   { "id": "tilda", "name": "Tilda's Shop",
 ##     "sells": [ { "item": "arrow", "count": 10, "price": 5 } ],
-##     "sells_seeds": true, "buys_crops": true }
+##     "sells_seeds": true, "buys_crops": true,
+##     "buys": [ { "item": "copper_ore", "price": 3 } ] }
 ## `sells` are its own wares. With `sells_seeds` it also sells a seed of every crop at the
 ## crop's seed price, and with `buys_crops` it buys what every crop gives at the crop's sale
-## price (data/crops), so a new crop is on both lists without touching the shop. This says what
-## is on each list, what a deal costs and gives, and why one can't be made; GameState makes it.
+## price (data/crops), so a new crop is on both lists without touching the shop. `buys` are the
+## other things it pays for (ore, bars, crystals), each at its own price, so a new thing to buy
+## is a line of data. This says what is on each list, what a deal costs and gives, and why one
+## can't be made; GameState makes it.
 
 ## The two lists.
 const BUY: StringName = &"buy"
@@ -34,20 +37,40 @@ static func wares(shop: Dictionary, crops: Array) -> Array[Dictionary]:
 
 
 ## What the shop would buy of what `stacks` hold (GameState.inventory's shape): the harvest of
-## every crop he carries some of, in the order of the seeds. Each is { "item": id, "count":
-## how many he has, "price": coins for one }.
+## every crop he carries some of, in the order of the seeds, then what its `buys` list names
+## and he carries, in that list's order. Each is { "item": id, "count": how many he has,
+## "price": coins for one }. A thing is on the list once: a crop's own price comes first.
 static func offers(shop: Dictionary, crops: Array, stacks: Array) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
-	if not bool(shop.get("buys_crops", false)):
-		return out
 	var held: Dictionary = {}
 	for stack: Variant in stacks:
 		if typeof(stack) == TYPE_DICTIONARY:
 			held[str((stack as Dictionary).get("id", ""))] = int((stack as Dictionary).get("count", 0))
-	for crop: Dictionary in _by_seed_price(crops):
-		var given: String = str(Crops.gives(crop)["item"])
-		if int(held.get(given, 0)) > 0:
-			out.append({"item": given, "count": int(held[given]), "price": maxi(int(crop.get("sells_for", 0)), 0)})
+	var listed: Dictionary = {}
+	if bool(shop.get("buys_crops", false)):
+		for crop: Dictionary in _by_seed_price(crops):
+			var given: String = str(Crops.gives(crop)["item"])
+			if int(held.get(given, 0)) > 0 and not listed.has(given):
+				listed[given] = true
+				out.append({"item": given, "count": int(held[given]), "price": maxi(int(crop.get("sells_for", 0)), 0)})
+	for bought: Dictionary in bought_things(shop):
+		var item: String = str(bought["item"])
+		if int(held.get(item, 0)) > 0 and not listed.has(item):
+			listed[item] = true
+			out.append({"item": item, "count": int(held[item]), "price": int(bought["price"])})
+	return out
+
+
+## The shop's own `buys` list, in its order: each { "item": id, "price": coins for one }.
+## Empty for a shop that buys nothing but crops.
+static func bought_things(shop: Dictionary) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	var buys: Variant = shop.get("buys", [])
+	if typeof(buys) != TYPE_ARRAY:
+		return out
+	for bought: Variant in buys:
+		if typeof(bought) == TYPE_DICTIONARY and (bought as Dictionary).has("item"):
+			out.append({"item": str(bought["item"]), "price": maxi(int((bought as Dictionary).get("price", 0)), 0)})
 	return out
 
 
@@ -105,6 +128,25 @@ static func problems(shop: Dictionary, item_of: Callable) -> PackedStringArray:
 			out.append("the price of '%s' must be a whole number of coins, 0 or more." % ware["item"])
 		if not _is_whole((ware as Dictionary).get("count", 1), 1):
 			out.append("the 'count' of '%s' must be a whole number of 1 or more." % ware["item"])
+	if not shop.has("buys"):
+		return out
+	var buys: Variant = shop["buys"]
+	if typeof(buys) != TYPE_ARRAY:
+		out.append("'buys' must list what the shop pays for (it may be left out).")
+		return out
+	var named: Dictionary = {}
+	for bought: Variant in buys:
+		if typeof(bought) != TYPE_DICTIONARY or not (bought as Dictionary).has("item") or not (bought as Dictionary).has("price"):
+			out.append("every entry in 'buys' has an 'item' and a 'price'.")
+			continue
+		var id: String = str(bought["item"])
+		if (item_of.call(id) as Dictionary).is_empty():
+			out.append("'buys' names an unknown item id '%s'." % id)
+		if named.has(id):
+			out.append("'buys' names '%s' twice." % id)
+		named[id] = true
+		if not _is_whole(bought["price"], 1):
+			out.append("what is paid for '%s' must be a whole number of coins, 1 or more." % id)
 	return out
 
 

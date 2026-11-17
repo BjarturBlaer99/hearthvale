@@ -83,7 +83,7 @@ func test_the_shop_sells_arrows_and_bombs_for_coins() -> void:
 	Steps.stand_before(shop, "Tilda")
 	assert_bool(shop.interact()).is_true()
 	var box: DialogueBox = shop.hud.dialogue
-	assert_array(Array(box.shown_options())).override_failure_message("her wares are a list since P3c (tests/world/shop_test.gd)").is_equal(["Let me see what you sell.", "I have crops to sell.", "Just looking."])
+	assert_array(Array(box.shown_options())).override_failure_message("her wares are a list since P3c (tests/world/shop_test.gd)").is_equal(["Let me see what you sell.", "I have things to sell.", "Just looking."])
 	box.confirm()
 	assert_bool(box.is_open()).is_false()
 	var counter: ShopMenu = shop.hud.shop_menu

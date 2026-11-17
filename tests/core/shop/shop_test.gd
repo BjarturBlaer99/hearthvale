@@ -53,6 +53,59 @@ func test_tilda_buys_what_the_crops_give_and_nothing_else() -> void:
 		assert_int(int(crop["sells_for"])).override_failure_message(str(crop["id"])).is_greater(int(crop["seed_price"]))
 
 
+func test_tilda_buys_ore_bars_and_crystals_at_her_own_prices_after_the_crops() -> void:
+	# The plan's prices (docs/progress/mining-crafting-plan.md, "Items"), in her data's order.
+	assert_array(Shop.bought_things(_tilda)).is_equal([
+		{"item": "copper_ore", "price": 3},
+		{"item": "iron_ore", "price": 5},
+		{"item": "gold_ore", "price": 10},
+		{"item": "crystal", "price": 15},
+		{"item": "copper_bar", "price": 12},
+		{"item": "iron_bar", "price": 20},
+		{"item": "gold_bar", "price": 36},
+	])
+	var pack: Array = [{"id": &"gold_bar", "count": 1}, {"id": &"coal", "count": 9}, {"id": &"copper_ore", "count": 12}, {"id": &"stone", "count": 30},
+		{"id": &"wood", "count": 4}, {"id": &"turnip", "count": 2}, {"id": &"crystal", "count": 3}, {"id": &"iron_bar", "count": 2},
+		{"id": &"iron_ore", "count": 5}, {"id": &"gold_ore", "count": 1}, {"id": &"copper_bar", "count": 4}, {"id": &"pickaxe", "count": 1}]
+	assert_array(Shop.offers(_tilda, _crops, pack)).override_failure_message("the harvest first, then her own list in its order: no stone, wood or coal").is_equal([
+		{"item": "turnip", "count": 2, "price": 12},
+		{"item": "copper_ore", "count": 12, "price": 3},
+		{"item": "iron_ore", "count": 5, "price": 5},
+		{"item": "gold_ore", "count": 1, "price": 10},
+		{"item": "crystal", "count": 3, "price": 15},
+		{"item": "copper_bar", "count": 4, "price": 12},
+		{"item": "iron_bar", "count": 2, "price": 20},
+		{"item": "gold_bar", "count": 1, "price": 36},
+	])
+	assert_array(Shop.offers(_tilda, _crops, [{"id": &"stone", "count": 50}, {"id": &"wood", "count": 30}, {"id": &"coal", "count": 30}])).override_failure_message("stone, wood and coal are not bought").is_empty()
+	assert_array(Shop.offers(_tilda, _crops, [{"id": &"iron_ore", "count": 0}])).override_failure_message("no ore he hasn't got").is_empty()
+	# Everything she buys is a material.
+	for bought: Dictionary in Shop.bought_things(_tilda):
+		assert_str(str(DataRegistry.get_item(StringName(str(bought["item"])))["type"])).override_failure_message(str(bought["item"])).is_equal("material")
+	# Three ore and a coal make a bar: smelting never loses coins.
+	var price: Dictionary = {}
+	for bought: Dictionary in Shop.bought_things(_tilda):
+		price[bought["item"]] = bought["price"]
+	for metal: String in ["copper", "iron", "gold"]:
+		assert_int(int(price[metal + "_bar"])).override_failure_message("a %s bar is worth more than its three ore" % metal).is_greater(3 * int(price[metal + "_ore"]))
+
+
+func test_a_new_thing_to_buy_is_a_line_of_data() -> void:
+	var ore: Array = [{"id": &"stone", "count": 7}, {"id": &"turnip", "count": 1}, {"id": &"copper_ore", "count": 2}]
+	var with_stone: Dictionary = _tilda.duplicate(true)
+	(with_stone["buys"] as Array).push_front({"item": "stone", "price": 1})
+	assert_array(Shop.offers(with_stone, _crops, ore)).is_equal([
+		{"item": "turnip", "count": 1, "price": 12}, {"item": "stone", "count": 7, "price": 1}, {"item": "copper_ore", "count": 2, "price": 3}])
+	# A shop may buy only what it lists, only crops, or nothing.
+	assert_array(Shop.offers({"sells": [], "buys": [{"item": "stone", "price": 2}]}, _crops, ore)).override_failure_message("no crops at this one").is_equal([{"item": "stone", "count": 7, "price": 2}])
+	assert_array(Shop.offers({"sells": [], "buys_crops": true}, _crops, ore)).is_equal([{"item": "turnip", "count": 1, "price": 12}])
+	assert_array(Shop.offers({"sells": []}, _crops, ore)).is_empty()
+	assert_array(Shop.bought_things({"sells": []})).is_empty()
+	# A crop's harvest that is also on the list is offered once, at the crop's own price.
+	var twice: Dictionary = {"sells": [], "buys_crops": true, "buys": [{"item": "turnip", "price": 99}]}
+	assert_array(Shop.offers(twice, _crops, ore)).is_equal([{"item": "turnip", "count": 1, "price": 12}])
+
+
 func test_a_deal_needs_the_coins_and_the_room() -> void:
 	var arrows: Dictionary = {"item": "arrow", "count": 10, "price": 5}
 	var quiver: Dictionary = DataRegistry.get_item(&"arrow")
@@ -97,11 +150,27 @@ func test_the_games_shop_is_sound_and_bad_ones_are_named() -> void:
 	])
 	assert_array(Array(Shop.problems({"id": "stall", "name": "Stall", "sells": "apples"}, item_of))).contains_exactly(["'sells' must list the shop's wares (it may be empty)."])
 	assert_array(Array(Shop.problems({"id": "stall", "name": "Stall", "sells": []}, item_of))).override_failure_message("a shop may sell only seeds").is_empty()
+	# What it buys is checked the same way.
+	assert_array(Array(Shop.problems({"id": "stall", "name": "Stall", "sells": [], "buys": []}, item_of))).override_failure_message("it may buy nothing of its own").is_empty()
+	assert_array(Array(Shop.problems({"id": "stall", "name": "Stall", "sells": [], "buys": "ore"}, item_of))).contains_exactly(["'buys' must list what the shop pays for (it may be left out)."])
+	assert_array(Array(Shop.problems({"id": "stall", "name": "Stall", "sells": [], "buys": [
+		{"item": "ingot", "price": 3}, {"item": "coal", "price": 0}, {"item": "stone"}, "wood", {"item": "coal", "price": 2.5}, {"item": "wood", "price": 1},
+	]}, item_of))).contains_exactly([
+		"'buys' names an unknown item id 'ingot'.",
+		"what is paid for 'coal' must be a whole number of coins, 1 or more.",
+		"every entry in 'buys' has an 'item' and a 'price'.",
+		"every entry in 'buys' has an 'item' and a 'price'.",
+		"'buys' names 'coal' twice.",
+		"what is paid for 'coal' must be a whole number of coins, 1 or more.",
+	])
 	# The registry runs them on every shop, and checks every conversation that opens one.
 	var registry: Node = auto_free(DataRegistryScript.new())
 	var errors: String = "\n".join(registry.load_all("res://tests/fixtures/bad_shops"))
 	assert_str(errors).contains("shop 'kiosk': 'sells' names an unknown item id 'gem'.")
 	assert_str(errors).contains("shop 'kiosk': the price of 'bread' must be a whole number of coins, 0 or more.")
 	assert_str(errors).contains("shop 'cart' is missing required field 'sells'.")
+	assert_str(errors).contains("shop 'smelter': 'buys' names an unknown item id 'ingot'.")
+	assert_str(errors).contains("shop 'smelter': what is paid for 'bread' must be a whole number of coins, 1 or more.")
+	assert_str(errors).contains("shop 'smelter': 'buys' names 'bread' twice.")
 	assert_str(errors).contains("a shop's 'mode' must be 'buy' or 'sell', not 'barter'.")
 	assert_str(errors).contains("unknown shop id 'nowhere'")

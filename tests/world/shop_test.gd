@@ -43,8 +43,8 @@ func test_tildas_conversation_opens_her_list() -> void:
 	Steps.stand_before(shop, "Tilda")
 	assert_bool(shop.interact()).is_true()
 	var box: DialogueBox = shop.hud.dialogue
-	assert_array(Array(box.shown_options())).is_equal(["Let me see what you sell.", "I have crops to sell.", "Just looking."])
-	assert_str(box.shown_text()).override_failure_message("she says what she has, and that she buys").contains("Seeds").contains("buy what you grow")
+	assert_array(Array(box.shown_options())).is_equal(["Let me see what you sell.", "I have things to sell.", "Just looking."])
+	assert_str(box.shown_text()).override_failure_message("she says what she has, and that she buys").contains("Seeds").contains("buy what you grow").contains("dig out of the quarry")
 	assert_bool(counter.is_open()).override_failure_message("not while she is still talking").is_false()
 	box.confirm()
 	assert_bool(shop.is_talking()).is_false()
@@ -62,7 +62,7 @@ func test_tildas_conversation_opens_her_list() -> void:
 	assert_bool(shop.is_in_menu()).is_false()
 	assert_bool(shop.player.controls_enabled).is_true()
 	assert_bool(shop.clock_runs()).is_true()
-	# "I have crops to sell" opens it on the other list; "Just looking" opens nothing.
+	# "I have things to sell" opens it on the other list; "Just looking" opens nothing.
 	assert_bool(shop.interact()).is_true()
 	box.move_cursor(1)
 	box.confirm()
@@ -183,6 +183,65 @@ func test_the_harvest_is_sold_one_at_a_time_for_each_crops_price() -> void:
 	assert_int(GameState.item_count(&"bread")).is_equal(1)
 	for crop: StringName in SELLS_FOR:
 		assert_int(int(DataRegistry.get_crop(crop)["sells_for"])).override_failure_message("%s's price is its data's" % crop).is_equal(int(SELLS_FOR[crop]))
+
+
+func test_ore_bars_and_crystals_are_sold_beside_the_crops() -> void:
+	for item: Array in [[&"gold_bar", 1], [&"coal", 2], [&"copper_ore", 2], [&"stone", 3], [&"wood", 2], [&"turnip", 1], [&"crystal", 1],
+			[&"iron_bar", 1], [&"iron_ore", 1], [&"gold_ore", 1], [&"copper_bar", 1]]:
+		GameState.add_item(item[0], item[1])
+	var shop: AreaController = _load(SHOP)
+	shop.open_shop(&"tilda", Shop.SELL)
+	var counter: ShopMenu = shop.hud.shop_menu
+	var lines: Array[String] = [
+		"Turnip x1: 12 coins each", "Copper Ore x2: 3 coins each", "Iron Ore x1: 5 coins each", "Gold Ore x1: 10 coins each",
+		"Crystal x1: 15 coins each", "Copper Bar x1: 12 coins each", "Iron Bar x1: 20 coins each", "Gold Bar x1: 36 coins each"]
+	assert_int(counter.entries().size()).override_failure_message("the turnip and seven things from the quarry: no stone, coal or wood").is_equal(lines.size())
+	assert_array(Array(counter.shown_lines())).is_equal(["> " + lines[0], "  " + lines[1], "  " + lines[2], "  " + lines[3], "  " + lines[4]])
+	assert_str((counter.get_node(^"Panel/Count") as Label).text).is_equal("  1/8 v")
+	# The rest is a scroll away.
+	for i: int in range(1, lines.size()):
+		counter.move_cursor(1)
+		assert_bool(Array(counter.shown_lines()).has("> " + lines[i])).override_failure_message("the cursor on '%s' is in view" % lines[i]).is_true()
+	counter.move_cursor(2)
+	assert_bool(Array(counter.shown_lines()).has("> Copper Ore x2: 3 coins each")).override_failure_message("past the end and round to the second line").is_true()
+	# One ore: three coins, and one fewer on its line.
+	assert_bool(counter.confirm()).is_true()
+	assert_int(GameState.item_count(&"copper_ore")).is_equal(1)
+	assert_int(GameState.item_count(&"coin")).is_equal(3)
+	assert_str(counter.note_text()).is_equal("Sold: Copper Ore, for 3 coins.")
+	assert_bool(Array(counter.shown_lines()).has("> Copper Ore x1: 3 coins each")).is_true()
+	# Everything she buys, sold: the plan's prices.
+	counter.move_cursor(-1)
+	var sold: int = 1
+	while not counter.entries().is_empty() and sold < 20:
+		assert_bool(counter.confirm()).is_true()
+		sold += 1
+	assert_int(sold).override_failure_message("nine things, one at a time").is_equal(9)
+	assert_int(GameState.item_count(&"coin")).override_failure_message("12 + 3 + 3 + 5 + 10 + 15 + 12 + 20 + 36").is_equal(116)
+	assert_array(Array(counter.shown_lines())).is_equal([ShopMenu.NOTHING_TO_SELL])
+	for kept: Array in [[&"stone", 3], [&"coal", 2], [&"wood", 2]]:
+		assert_int(GameState.item_count(kept[0])).override_failure_message("she bought no %s" % kept[0]).is_equal(kept[1])
+	for gone: StringName in [&"turnip", &"copper_ore", &"iron_ore", &"gold_ore", &"crystal", &"copper_bar", &"iron_bar", &"gold_bar"]:
+		assert_int(GameState.item_count(gone)).is_equal(0)
+	# What has been sold is still found: a recipe that waited on it stays known.
+	assert_bool(GameState.has_found(&"copper_bar")).is_true()
+
+
+func test_a_full_purse_keeps_the_ore_too() -> void:
+	GameState.add_item(&"coin", 990)
+	GameState.add_item(&"gold_bar", 1)
+	GameState.add_item(&"copper_ore", 4)
+	var shop: AreaController = _load(SHOP)
+	shop.open_shop(&"tilda", Shop.SELL)
+	var counter: ShopMenu = shop.hud.shop_menu
+	assert_array(Array(counter.shown_lines())).is_equal(["> Copper Ore x4: 3 coins each", "  Gold Bar x1: 36 coins each"])
+	counter.move_cursor(1)
+	assert_bool(counter.confirm()).override_failure_message("990 and 36 are more than a purse holds").is_false()
+	assert_str(counter.note_text()).is_equal(Shop.FULL_PURSE)
+	assert_int(GameState.item_count(&"gold_bar")).is_equal(1)
+	counter.move_cursor(-1)
+	assert_bool(counter.confirm()).override_failure_message("three coins still fit").is_true()
+	assert_int(GameState.item_count(&"coin")).is_equal(993)
 
 
 func test_a_full_purse_keeps_the_crop() -> void:

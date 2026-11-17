@@ -31,6 +31,21 @@
         }
       ],
       "node": "teach"
+    },
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "shepherd_edda",
+          "marks": 3
+        },
+        {
+          "type": "quest_status",
+          "quest": "new_shears",
+          "status": "not_started"
+        }
+      ],
+      "node": "favour"
     }
   ],
   "speakers": {
@@ -41,6 +56,45 @@
       "speaker": "edda",
       "text": "Lost a lamb up on that plateau once. Found it in the long grass in the far corner, by a bright red something.",
       "options": [
+        {
+          "text": "Two iron bars, Edda.",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "new_shears",
+              "stage": "bring"
+            },
+            {
+              "type": "has_item",
+              "item": "iron_bar",
+              "count": 2
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "iron_bar",
+              "count": 2
+            },
+            {
+              "type": "set_flag",
+              "flag": "shears_iron_given",
+              "value": true
+            }
+          ],
+          "next": "favour_done"
+        },
+        {
+          "text": "About those shears...",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "new_shears",
+              "stage": "bring"
+            }
+          ],
+          "next": "favour_hint"
+        },
         {
           "text": "Anything else?",
           "next": "more"
@@ -95,6 +149,57 @@
       "options": [
         {
           "text": "Thank you.",
+          "next": null
+        }
+      ]
+    },
+    "favour": {
+      "speaker": "edda",
+      "text": "My shears are worn to nothing, and shearing won't wait. With two bars of iron I could have new ones made. Could you bring them?",
+      "options": [
+        {
+          "text": "I'll bring them.",
+          "effects": [
+            {
+              "type": "set_quest_stage",
+              "quest": "new_shears",
+              "stage": "bring"
+            }
+          ],
+          "next": "favour_go"
+        },
+        {
+          "text": "Not just now.",
+          "next": "hello"
+        }
+      ]
+    },
+    "favour_go": {
+      "speaker": "edda",
+      "text": "There's iron ore deep in the Old Quarry, I'm told, and a furnace turns it to bars overnight.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_hint": {
+      "speaker": "edda",
+      "text": "Two iron bars, for new shears. Ore from the Old Quarry, and a night in a furnace.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_done": {
+      "speaker": "edda",
+      "text": "Good iron, this. The flock will thank you. Here: fifty coins, and a pie from my own oven.",
+      "options": [
+        {
+          "text": "Goodbye.",
           "next": null
         }
       ]

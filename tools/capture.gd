@@ -35,7 +35,9 @@ extends SceneTree
 ## opens the workbench's list with some things within reach and some not; "furnished" shows the
 ## cottage with every furnishing made and the furnace burning; "chest" opens the chest's two
 ## lists; "furnace_talk" asks the cold furnace what to smelt; "sprinkler" shows the plot the
-## morning after two sprinklers were set.
+## morning after two sprinklers were set. "shop_ore" opens Tilda's list of what she buys with
+## a turnip and a pack from the quarry; "favour:<villager>:<points>" talks to a villager who
+## has taught her recipe already, so that at three marks she asks her favour.
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -198,6 +200,11 @@ const SHOTS: Array = [
 	["153_sprinklers_on_the_plot", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "sprinkler"],
 	["154_the_furnace_asks", &"home", Vector2i(6, 3), Vector2.UP, 0, "furnace_talk"],
 	["155_fallen_wood", &"old_wood", Vector2i(24, 8), Vector2.DOWN, 0, ""],
+	# The balance pass (mining and crafting, phase 3): what Tilda buys, and the two favours
+	# asked at three marks.
+	["156_tilda_buys_ore_and_bars", &"shop", Vector2i(5, 4), Vector2.UP, 0, "shop_ore"],
+	["157_wenna_asks_for_coal", &"weaver_house", Vector2i(7, 4), Vector2.UP, 0, "favour:wenna:12"],
+	["158_edda_asks_for_iron", &"north_fields", Vector2i(25, 22), Vector2.UP, 0, "favour:shepherd_edda:12"],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -341,9 +348,20 @@ func _capture() -> void:
 		if shot[5] in ["gift_talk", "gift_list", "gift_given"]:
 			for item: Array in [[&"wild_berries", 4], [&"bread", 2], [&"cherry_blossom", 3], [&"turnip", 2], [&"pumpkin_pie", 1], [&"carrot", 2]]:
 				game_state.call(&"add_item", item[0], item[1])
-		if str(shot[5]).begins_with("friend:"):
+		if str(shot[5]).begins_with("friend:") or str(shot[5]).begins_with("favour:"):
 			var parts: PackedStringArray = str(shot[5]).split(":")
 			game_state.call(&"add_friendship", StringName(parts[1]), int(parts[2]))
+		if str(shot[5]).begins_with("favour:"):
+			# The two who teach at two marks and ask at three have taught already (the flags, so
+			# that no news of a recipe stands over the picture).
+			for recipe: StringName in [&"recipe/berry_jam", &"recipe/shepherds_pie"]:
+				game_state.call(&"set_flag", recipe, true)
+		if shot[5] == "shop_ore":
+			# A turnip, and what a few days in the quarry leave in the pack: she buys the ore, the
+			# bars and the crystal, and not the stone, the coal or the wood.
+			for item: Array in [[&"coin", 34], [&"turnip", 2], [&"stone", 30], [&"copper_ore", 12], [&"coal", 6], [&"iron_ore", 5],
+					[&"gold_ore", 2], [&"crystal", 1], [&"copper_bar", 4], [&"iron_bar", 2], [&"gold_bar", 1], [&"wood", 4]]:
+				game_state.call(&"add_item", item[0], item[1])
 		if shot[5] == "new_dishes":
 			for item: Array in [[&"berry_jam", 2], [&"carrot_cake", 1], [&"shepherds_pie", 1], [&"bread", 1]]:
 				game_state.call(&"add_item", item[0], item[1])
@@ -406,7 +424,7 @@ func _capture() -> void:
 			# An hour after closing: the hero tries the shop's door.
 			game_state.call(&"set_time", float(clock.call(&"in_day", "19:00")))
 			scene.call(&"interact")
-		if shot[5] in ["talk", "accept", "tale", "lantern_talk", "cook", "lights", "try", "gift_talk", "gift_list", "gift_given", "furnace_talk"] or str(shot[5]).begins_with("friend:"):
+		if shot[5] in ["talk", "accept", "tale", "lantern_talk", "cook", "lights", "try", "gift_talk", "gift_list", "gift_given", "furnace_talk"] or str(shot[5]).begins_with("friend:") or str(shot[5]).begins_with("favour:"):
 			scene.call(&"interact")
 		if shot[5] in ["gift_talk", "gift_list", "gift_given"]:
 			# The answer that gives is the second of Pip's three.
@@ -477,6 +495,13 @@ func _capture() -> void:
 			# One deal made, so the line that says so shows; and the cursor moved down the list.
 			counter.call(&"move_cursor", 3 if shot[5] == "shop_buy" else 1)
 			counter.call(&"confirm")
+			await _frames(2)
+		elif shot[5] == "shop_ore":
+			scene.call(&"open_shop", &"tilda", &"sell")
+			var ore_counter: Node = scene.get(&"hud").get(&"shop_menu")
+			# A bar of copper sold, so the line that says so shows; the cursor on the bars.
+			ore_counter.call(&"move_cursor", 5)
+			ore_counter.call(&"confirm")
 			await _frames(2)
 		elif shot[5] == "meals":
 			scene.call(&"interact")

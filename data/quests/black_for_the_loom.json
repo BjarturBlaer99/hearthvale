@@ -1,0 +1,69 @@
+{
+  "id": "black_for_the_loom",
+  "title": "Black for the Loom",
+  "giver": "wenna_weaver",
+  "start_stage": "bring",
+  "stages": {
+    "bring": {
+      "journal": "Wenna the weaver asked for five lumps of coal, to boil down for black dye. Coal lies in the Old Quarry, from the fourth floor down.",
+      "objectives": [
+        {
+          "id": "have",
+          "text": "Have five coal",
+          "complete_when": {
+            "type": "any",
+            "of": [
+              {
+                "type": "has_item",
+                "item": "coal",
+                "count": 5
+              },
+              {
+                "type": "flag",
+                "flag": "dye_coal_given",
+                "value": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "bring",
+          "text": "Bring it to Wenna",
+          "complete_when": {
+            "type": "flag",
+            "flag": "dye_coal_given",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "dye_coal_given",
+            "value": true
+          },
+          "to": "done"
+        }
+      ]
+    },
+    "done": {
+      "journal": "Wenna has her black dye. She gave you thirty coins and two cups of cherry blossom tea.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "coin",
+          "count": 30
+        },
+        {
+          "type": "give_item",
+          "item": "blossom_tea",
+          "count": 2
+        },
+        {
+          "type": "complete_quest"
+        }
+      ]
+    }
+  }
+}

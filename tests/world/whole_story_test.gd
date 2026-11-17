@@ -182,7 +182,7 @@ func test_a_new_game_runs_through_every_gate_to_the_endings_lines() -> void:
 	assert_that(Quests.runner.status(QUEST)).is_equal(QuestState.COMPLETE)
 	GameState.set_flag(EndingSummary.FINISHED_FLAG, true)
 	assert_array(Array(EndingScreen.summary_lines()).slice(1)).is_equal([
-		"Hearts   3", "Quests finished   2 of 9", "Days   6", "Crops grown   5", "Friends   1 of 8",
+		"Hearts   3", "Quests finished   2 of 11", "Days   6", "Crops grown   5", "Friends   1 of 8",
 	])
 	# What was said on the way, each once.
 	assert_array(_notices).is_equal([

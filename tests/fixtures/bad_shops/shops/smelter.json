@@ -1,0 +1,10 @@
+{
+	"id": "smelter",
+	"name": "Smelter",
+	"sells": [],
+	"buys": [
+		{ "item": "ingot", "price": 3 },
+		{ "item": "bread", "price": 0 },
+		{ "item": "bread", "price": 4 }
+	]
+}

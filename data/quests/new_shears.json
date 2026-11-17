@@ -1,0 +1,69 @@
+{
+  "id": "new_shears",
+  "title": "New Shears",
+  "giver": "shepherd_edda",
+  "start_stage": "bring",
+  "stages": {
+    "bring": {
+      "journal": "Shepherd Edda's shears are worn out, and she asked for two iron bars to have new ones made. A furnace smelts iron ore into bars overnight.",
+      "objectives": [
+        {
+          "id": "have",
+          "text": "Have two iron bars",
+          "complete_when": {
+            "type": "any",
+            "of": [
+              {
+                "type": "has_item",
+                "item": "iron_bar",
+                "count": 2
+              },
+              {
+                "type": "flag",
+                "flag": "shears_iron_given",
+                "value": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "bring",
+          "text": "Bring them to Shepherd Edda",
+          "complete_when": {
+            "type": "flag",
+            "flag": "shears_iron_given",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "shears_iron_given",
+            "value": true
+          },
+          "to": "done"
+        }
+      ]
+    },
+    "done": {
+      "journal": "Shepherd Edda has the iron for her new shears. She gave you fifty coins and a shepherd's pie.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "coin",
+          "count": 50
+        },
+        {
+          "type": "give_item",
+          "item": "shepherds_pie",
+          "count": 1
+        },
+        {
+          "type": "complete_quest"
+        }
+      ]
+    }
+  }
+}

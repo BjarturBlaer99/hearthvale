@@ -954,13 +954,20 @@ run headless; see CLAUDE.md for the command and gotchas.
 
 ## 21. The shop
 - **A shop is data** (P3c; `data/shops/<id>.json`, schema `docs/data/shop.schema.json`): `name`, `sells` (its
-  own wares: an item, how many a deal gives, the price), `sells_seeds` and `buys_crops`. Seed prices and what
-  a crop sells for are in `data/crops`, so a new crop is on both lists without touching the shop. There is
-  one shop, `tilda`.
+  own wares: an item, how many a deal gives, the price), `sells_seeds`, `buys_crops`, and `buys` (the other
+  things it pays for: an item and the price of one). Seed prices and what a crop sells for are in
+  `data/crops`, so a new crop is on both lists without touching the shop. There is one shop, `tilda`.
+- **What Tilda buys from the quarry** (mining and crafting, phase 3a) is her `buys` list: copper ore 3,
+  iron ore 5, gold ore 10, a crystal 15, a copper bar 12, an iron bar 20, a gold bar 36. Stone, wood and
+  coal are not on it, so they are not bought. **A new thing to buy is a line of data.**
 - **`Shop`** (`core/shop/`, pure) says what is on each list: `wares(shop, crops)` (her own wares in order,
-  then a seed of every crop, cheapest first) and `offers(shop, crops, stacks)` (the harvest he carries, with
-  how many and the price of one). `why_not_buy()` and `why_not_sell()` say why a deal can't be made: not
-  enough coins, no room for all a deal gives, a full purse. `problems()` is run by the registry on every shop.
+  then a seed of every crop, cheapest first) and `offers(shop, crops, stacks)` (the harvest he carries, in
+  the order of the seeds, then what `buys` names and he carries, in that list's order: each with how many
+  and the price of one; a thing is offered once, a crop's own price first). `bought_things(shop)` is the
+  `buys` list as read. `why_not_buy()` and `why_not_sell()` say why a deal can't be made: not enough coins,
+  no room for all a deal gives, a full purse. `problems()` is run by the registry on every shop, and checks
+  `buys` as it checks `sells`: a list, each entry an item that exists and a whole price of 1 or more, no
+  item twice.
 - **`GameState.buy(ware)` and `sell(offer)`** make a deal or return why not (Shop's words), and then nothing
   has changed. Selling is one at a time. Coins and items are already saved: the save format is as it was.
 - **`ShopMenu`** (`ui/`, a child of the HUD) is the counter: the two lists as tabs ("[Buy]  Sell"), the purse
@@ -973,9 +980,10 @@ run headless; see CLAUDE.md for the command and gotchas.
   mode is `buy` or `sell`. While the list is open `is_in_menu()` is true: the hero stands still and the clock
   with him.
 - **Tilda's conversation** (`data/dialogue/shop_tilda.json`) has the eggs she is owed, "Let me see what you
-  sell.", "I have crops to sell." and "Just looking."
+  sell.", "I have things to sell." (it read "crops" until she bought ore) and "Just looking." Her greeting
+  says she buys what he grows and what he digs out of the quarry.
 - **Tools:** `tools/playtest.gd -- market` starts at her counter with coins and a harvest; `tools/capture.gd`
-  has the actions `shop_buy`, `shop_sell` and `meals`.
+  has the actions `shop_buy`, `shop_sell`, `shop_ore` (her list with a pack from the quarry) and `meals`.
 
 ## 22. The story over days
 P4a (`docs/progress/P4-plan.md`). The story is still data; what is new is three small things data may say, a
@@ -1094,14 +1102,21 @@ field on recipes.
     the flag
   - two marks, and the favour's quest not started: a node that asks it ("Not just now." goes to their usual
     start); or two marks and the recipe's flag not set: a node whose `on_enter` teaches it
-- **The four favours** are quests of one shape: a first stage with two objectives (have the thing; bring it)
+  - three marks, and the favour's quest not started, for the two who teach at two marks (Wenna, Shepherd
+    Edda): a node that asks it. It stands after the lesson in `openings`, so a hero who comes to three
+    marks untaught is taught first and asked at the next talk.
+- **The favours** are quests of one shape: a first stage with two objectives (have the thing; bring it)
   that moves on by a flag, and a `done` stage whose `on_enter` gives the reward. The villager's start node has
   the answer that hands the thing over (it takes it and sets the flag) and one that reminds him what was
-  asked.
+  asked. There are seven: Pip's, Guard Rolf's, Farmer Oda's and Elder Bram's (P4d), Old Henrik's
+  (Willowmere), and two that want what the quarry gives (mining and crafting, phase 3a): Wenna's "Black
+  for the Loom" (five coal; 30 coins and two Cherry Blossom Tea) and Shepherd Edda's "New Shears" (two
+  iron bars; 50 coins and a Shepherd's Pie). Rewards are `give_item`, so a full pack loses none of them.
 - **Nothing is saved that wasn't before:** a recipe known and a present given are flags, quests are quests.
 - **Tools:** `tools/playtest.gd -- late` is the sixth morning with every villager a gift short of two marks;
   a scenario may give a `day` and `friends`. `tools/capture.gd` has `friend:<villager>:<points>` (talk to the
-  villager faced with that friendship), `long_log` and `new_dishes`.
+  villager faced with that friendship), `favour:<villager>:<points>` (the same, with the recipes that are
+  taught at two marks known already), `long_log` and `new_dishes`.
 - **The whole story in one test** (`tests/world/whole_story_test.gd`): a new game through every gate to the
   ending's lines in six days, with a friend made, a favour done and a recipe learned. The two boss fights are
   stood in for by their flags.

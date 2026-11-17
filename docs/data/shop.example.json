@@ -7,5 +7,9 @@
 		{ "item": "bread", "count": 1, "price": 6 }
 	],
 	"sells_seeds": true,
-	"buys_crops": true
+	"buys_crops": true,
+	"buys": [
+		{ "item": "copper_ore", "price": 3 },
+		{ "item": "copper_bar", "price": 12 }
+	]
 }
