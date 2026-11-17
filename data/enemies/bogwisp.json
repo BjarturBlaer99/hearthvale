@@ -1,0 +1,16 @@
+{
+  "id": "bogwisp",
+  "name": "Bogwisp",
+  "behaviour": "wisp",
+  "appears": "night",
+  "health": 4,
+  "speed": 22,
+  "sight": 96,
+  "contact_damage": 1,
+  "energy_drain": 15,
+  "knockback": 20,
+  "wisp": { "reach": 52, "flare": 0.5, "dart_speed": 150, "dart_time": 0.5, "rest": 1.3 },
+  "drops": [
+    { "type": "item", "item": "wisp_ember", "count": 1, "weight": 1 }
+  ]
+}

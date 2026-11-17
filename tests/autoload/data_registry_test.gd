@@ -24,12 +24,12 @@ func test_starting_items_are_registered_in_id_order() -> void:
 	# and a seed for each. P3c added four dishes: mushroom_soup, pumpkin_pie, roast_turnip,
 	# vegetable_stew.)
 	_registry.load_all()
-	assert_array(_registry.ids(&"items")).is_equal([&"arrow", &"berry_jam", &"big_key", &"blossom_tea", &"bog_mushroom", &"bomb", &"bow", &"bread", &"carrot", &"carrot_cake", &"carrot_seeds", &"cattail_root", &"cherry_blossom", &"coin", &"egg_basket", &"hoe", &"iron_sword", &"lantern", &"marsh_berries", &"marsh_stew", &"mushroom", &"mushroom_soup", &"potato", &"potato_seeds", &"pumpkin", &"pumpkin_pie", &"pumpkin_seeds", &"roast_turnip", &"shepherds_pie", &"small_key", &"turnip", &"turnip_seeds", &"vegetable_stew", &"water", &"watering_can", &"weavers_shuttle", &"wheat", &"wheat_seeds", &"wild_berries", &"wooden_sword"])
+	assert_array(_registry.ids(&"items")).is_equal([&"arrow", &"berry_jam", &"big_key", &"blossom_tea", &"bog_mushroom", &"bomb", &"bow", &"bread", &"carrot", &"carrot_cake", &"carrot_seeds", &"cattail_root", &"cherry_blossom", &"coin", &"egg_basket", &"hoe", &"iron_sword", &"lantern", &"marsh_berries", &"marsh_stew", &"mushroom", &"mushroom_soup", &"potato", &"potato_seeds", &"pumpkin", &"pumpkin_pie", &"pumpkin_seeds", &"roast_turnip", &"shepherds_pie", &"small_key", &"turnip", &"turnip_seeds", &"vegetable_stew", &"water", &"watering_can", &"weavers_shuttle", &"wheat", &"wheat_seeds", &"wild_berries", &"wisp_ember", &"wooden_sword"])
 	assert_str(_registry.get_item(&"wooden_sword").get("name", "")).is_equal("Wooden Sword")
 	var found: Array = []
 	for entry: Dictionary in _registry.entries(&"items"):
 		found.append(entry["id"])
-	assert_array(found).is_equal(["arrow", "berry_jam", "big_key", "blossom_tea", "bog_mushroom", "bomb", "bow", "bread", "carrot", "carrot_cake", "carrot_seeds", "cattail_root", "cherry_blossom", "coin", "egg_basket", "hoe", "iron_sword", "lantern", "marsh_berries", "marsh_stew", "mushroom", "mushroom_soup", "potato", "potato_seeds", "pumpkin", "pumpkin_pie", "pumpkin_seeds", "roast_turnip", "shepherds_pie", "small_key", "turnip", "turnip_seeds", "vegetable_stew", "water", "watering_can", "weavers_shuttle", "wheat", "wheat_seeds", "wild_berries", "wooden_sword"])
+	assert_array(found).is_equal(["arrow", "berry_jam", "big_key", "blossom_tea", "bog_mushroom", "bomb", "bow", "bread", "carrot", "carrot_cake", "carrot_seeds", "cattail_root", "cherry_blossom", "coin", "egg_basket", "hoe", "iron_sword", "lantern", "marsh_berries", "marsh_stew", "mushroom", "mushroom_soup", "potato", "potato_seeds", "pumpkin", "pumpkin_pie", "pumpkin_seeds", "roast_turnip", "shepherds_pie", "small_key", "turnip", "turnip_seeds", "vegetable_stew", "water", "watering_can", "weavers_shuttle", "wheat", "wheat_seeds", "wild_berries", "wisp_ember", "wooden_sword"])
 
 
 func test_missing_required_field_is_reported_and_not_loaded() -> void:
@@ -59,7 +59,7 @@ func test_villagers_and_signs_have_their_conversations() -> void:
 
 func test_enemies_are_registered() -> void:
 	_registry.load_all()
-	assert_array(Array(_registry.ids(&"enemies")).map(func(id: StringName) -> String: return String(id))).is_equal(["bat", "crypt_shade", "goblin_archer", "iron_warden", "slime"])
+	assert_array(Array(_registry.ids(&"enemies")).map(func(id: StringName) -> String: return String(id))).is_equal(["bat", "bogwisp", "crypt_shade", "goblin_archer", "iron_warden", "slime"])
 	assert_str(str(_registry.get_enemy(&"slime").get("behaviour", ""))).is_equal("hopper")
 	assert_str(str(_registry.get_enemy(&"iron_warden")["boss"]["weak_point"])).override_failure_message("the keep's boss needs the bow").is_equal("arrow")
 

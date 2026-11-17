@@ -28,8 +28,7 @@ when the pack is full, and a villager's own thanks for a gift to a full friendsh
 step.
 **Willowmere (the user's request, 2026-11-17; `docs/progress/willowmere-plan.md`, approved as written):** one
 new area, a marsh east of the village, and one new enemy, the Bogwisp, in three steps. **W1, the marsh by
-day, is built.** W2 (the Bogwisp and the night) and W3 (Old Henrik, his favour and the lanterns) are next,
-in that order. Build nothing beyond the plan's list.
+day, and W2, the Bogwisp and the night, are built.** W3 (Old Henrik, his favour and the lanterns) is next. Build nothing beyond the plan's list.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 

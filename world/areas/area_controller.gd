@@ -131,6 +131,9 @@ var reflections: Reflections
 var mist: Mist
 
 var _travelling: bool = false
+## Whether it was night out of doors here at the last look: when that turns, those that are
+## only there by night rise or fade.
+var _night_was: bool = false
 ## The game is saved and leaving (save_and_leave), and whether he has been told once that it
 ## couldn't be saved: asked again, it leaves all the same.
 var _leaving: bool = false
@@ -215,8 +218,15 @@ func _ready() -> void:
 	for enemy: Enemy in enemies():
 		# Met outdoors at night, a monster is tougher (P2e). It is decided here, as the area loads.
 		enemy.night = is_night_outdoors()
-		enemy.setup(terrain, player, rng)
+		enemy.is_lit_at = holds_at
 		enemy.died.connect(_on_enemy_died)
+		# One that is only there by night (a Bogwisp) lies low by day, and rises if night falls
+		# while he is here.
+		if enemy.waits_for_night() and not enemy.night:
+			enemy.lie_low()
+			continue
+		enemy.setup(terrain, player, rng)
+	_night_was = is_night_outdoors()
 	player.set_camera_zoom(Ambience.ZOOM[ambience])
 	update_room(true)
 	_add_ambience()
@@ -300,6 +310,11 @@ func _process(delta: float) -> void:
 		_pit_left -= delta
 		if _pit_left <= 0.0:
 			_climb_out()
+	if is_night_outdoors() != _night_was:
+		_night_was = not _night_was
+		_on_night_turned(_night_was)
+	if mist != null:
+		mist.thicken_toward(Ambience.mist_thickness(area_id, _night_was), delta)
 	_update_light()
 	scenery.fade_for(standing_points(), delta)
 	if reflections != null:
@@ -1029,6 +1044,34 @@ func is_night_outdoors() -> bool:
 	return has_daylight() and GameState.day_clock().is_night(GameState.minute)
 
 
+## Night fell, or ended, while the hero was here: those that are only there by night rise where
+## they lie, or fade where they hang (the Bogwisps of Willowmere).
+func _on_night_turned(night: bool) -> void:
+	for enemy: Enemy in enemies():
+		if not enemy.waits_for_night():
+			continue
+		if night:
+			enemy.night = true
+			enemy.rise(terrain, player, rng)
+		else:
+			enemy.fade()
+
+
+## The lights that give a Bogwisp a body (LightRules lights, the rule the crypt's dark uses):
+## the Lantern the hero carries, at its own radius. The dim glow he has without one is no
+## light to speak of.
+func holding_lights() -> Array:
+	var out: Array = []
+	if hero_light_radius() > DIM_RADIUS:
+		out.append(LightRules.light(player.position + Vector2(0, -8), hero_light_radius()))
+	return out
+
+
+## Whether one of those lights reaches `point` (area px): there a Bogwisp can be struck.
+func holds_at(point: Vector2) -> bool:
+	return LightRules.is_lit(point, holding_lights())
+
+
 ## Who keeps what hours (data/rules/hours.json).
 func hours() -> Hours:
 	if _hours == null:
@@ -1177,6 +1220,7 @@ func _add_ambience() -> void:
 	if Ambience.has_mist(area_id):
 		mist = Mist.new()
 		add_child(mist)
+		mist.set_thickness(Ambience.mist_thickness(area_id, is_night_outdoors()))
 
 
 ## What `cell` is to something light landing on it: "open" ground, "water", or "" (a wall, a
@@ -1241,6 +1285,11 @@ func glows_now() -> Array:
 		elif child is CrystalSwitch:
 			var crystal: CrystalSwitch = child
 			out.append(Ambience.glow(crystal.position + Vector2(8, 6), 18.0, CrystalSwitch.BLUE if crystal.is_on() else CrystalSwitch.RED, 0.30, false))
+		elif child is Enemy:
+			# A Bogwisp is a light itself.
+			var wisp_glow: Dictionary = (child as Enemy).glow_now()
+			if not wisp_glow.is_empty():
+				out.append(wisp_glow)
 	if hero_light_radius() > DIM_RADIUS:
 		out.append(Ambience.glow(player.position + Vector2(0, -8), hero_light_radius() * 0.5, Ambience.LAMP, 0.16, true))
 	return out

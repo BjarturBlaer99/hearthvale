@@ -4,8 +4,8 @@ extends RefCounted
 ## attack, hurt, dead) moving a GridBody, set up from the enemy's data (health, speed, sight).
 ## Pure: call step() every frame with the hero's position, and take_hit() when a blow lands.
 ## Randomness comes from the RandomNumberGenerator given, so tests can seed it. One subclass
-## per behaviour id (EnemyBrains): HopperBrain, ArcherBrain, FlierBrain, and the bosses,
-## WardenBrain (the keep) and ShadeBrain (the crypt). Subclasses fill in _enter_state() and
+## per behaviour id (EnemyBrains): HopperBrain, ArcherBrain, FlierBrain, WispBrain (the marsh's
+## Bogwisp), and the bosses, WardenBrain (the keep) and ShadeBrain (the crypt). Subclasses fill in _enter_state() and
 ## _think(); hurt and dead work the same for every enemy.
 
 signal state_changed(state: StringName)

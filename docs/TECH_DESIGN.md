@@ -1102,7 +1102,7 @@ field on recipes.
 
 ## 26. Willowmere
 The marsh east of Hearthvale (the user's request, 2026-11-17; `docs/progress/willowmere-plan.md`). Step 1,
-the marsh by day, is built; the Bogwisp (step 2) and Old Henrik (step 3) are not.
+the marsh by day, and step 2, the Bogwisp, are built; Old Henrik (step 3) is not.
 - **The map** is baked like the others (`build_maps.gd`, `"willowmere"`): its base is water, and blocks lay
   reeds, land, boardwalks, the hut and the woods over it. Three things are new in the baker, all small:
   - a map may name its `"prop_ground"`, the solid ground its props stand on (the marsh's is `marsh_solid`);
@@ -1123,3 +1123,23 @@ the marsh by day, is built; the Bogwisp (step 2) and Old Henrik (step 3) are not
   fireflies keep out of sight until the lamps are lit (`Critter.from_dusk`, `is_out()`).
 - **The tune** is `marsh` in `make_audio.gd`; `Audio.MUSIC` lists it.
 - **Nothing is saved that wasn't before:** the heart piece and the forage are flags.
+- **The Bogwisp (step 2)** is an `Enemy` like the others, with three things an enemy's data may now say:
+  - `"behaviour": "wisp"` gives it a `WispBrain` (`core/enemies/`, pure): idle, chase, then `flare`
+    (still, for the data's half second, with its `aim` fixed as the flare begins), `dart` (along the aim),
+    `rest`, and `gone` once `fade()` is called. `take_hit()` refuses unless the brain is `lit`. Its
+    `GridBody` is `drifting`: it enters any cell inside the map.
+  - `"energy_drain"`: the enemy's `HitBox` carries it (`HitBox.energy`, `Hit.energy`) and the hero spends
+    it when a hit lands (`PlayerController._on_hit_taken`), after the hearts.
+  - `"appears": "night"`: the area lets it `lie_low()` as it loads by day, calls `rise()` when
+    `is_night_outdoors()` turns true while the hero is there (`_on_night_turned`), and `fade()` when it
+    turns false. `NightRules.strengthen()` leaves such an enemy alone.
+- **Whether light reaches it** is the area's to say: `Enemy.is_lit_at` is `AreaController.holds_at`, which
+  asks `LightRules.is_lit()` about `holding_lights()`: the Lantern the hero carries (only if he carries
+  one), at `Inventory.light_radius()`. The enemy sets `WispBrain.lit` each frame before the brain thinks.
+- **Its light** is drawn like a torch's: `Enemy.glow_now()` is an `Ambience.glow`, stronger and wider
+  while it flares, and `glows_now()` adds it. Its picture is three frames in `wisp.png`; with no body it
+  is drawn see-through and without a shadow.
+- **Its drop** lands where it can be reached: `Enemy.drop_cell()` treats a solid cell (water, reeds) like
+  a pit and looks for open floor beside it, else takes the hero's cell.
+- **The mist** has a thickness (`Mist.thickness`, eased by `thicken_toward()`); `Ambience.NIGHT_MIST` says
+  where the night's is thicker.

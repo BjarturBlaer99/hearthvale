@@ -16,6 +16,7 @@ const SFX: Array[String] = [
 	"boss_die", "menu_move", "menu_select", "pause", "nope", "cut", "pot", "quest",
 	"torch", "snuff", "fall", "sink", "whiff", "eat", "morning", "collapse",
 	"hoe", "pour", "fill", "plant", "harvest", "skill", "friend",
+	"wisp_flare", "wisp_dart",
 ]
 
 ## Each song: tempo, bars (4/4; every track must last bars x 8 eighths), and its tracks.
@@ -185,6 +186,12 @@ static func effect(id: String) -> PackedFloat32Array:
 		"sink":
 			# A block dropping into a pit: a deep thud.
 			return Synth.mix(Synth.tone(&"square", 150, 45, 0.32, 0.42, 0.002, 0.22, 0.5), Synth.tone(&"noise", 1600, 250, 0.26, 0.3, 0.002, 0.2, 0.5, 34))
+		"wisp_flare":
+			# A Bogwisp gathering itself: a thin glassy note swelling upward for half a second.
+			return Synth.mix(Synth.tone(&"sine", 880, 1760, 0.5, 0.22, 0.3, 0.1), Synth.tone(&"triangle", 1320, 2640, 0.5, 0.08, 0.3, 0.1))
+		"wisp_dart":
+			# And letting go: a quick falling rush.
+			return Synth.mix(Synth.tone(&"sine", 1900, 500, 0.22, 0.24, 0.002, 0.14), Synth.tone(&"noise", 7000, 1800, 0.2, 0.10, 0.002, 0.12, 0.5, 41))
 		"whiff":
 			# A blow passing through the Shade: thin air.
 			return Synth.tone(&"noise", 9000, 2500, 0.12, 0.16, 0.02, 0.08, 0.5, 33)

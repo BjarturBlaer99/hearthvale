@@ -949,3 +949,19 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   land found the north boardwalk landing on the hut.
 - 2026-11-17 — **After nightfall the marsh plays the night's tune,** like every place out of doors. Its
   own tune is for the day and the dusk; no rule was bent for it.
+- 2026-11-17 — **A Bogwisp has health 4, not a count of blows.** The wooden sword deals 2 and the iron
+  sword 3, so both take two blows, as asked, without a rule of its own. Bombs and arrows count as they do
+  anywhere, where light reaches.
+- 2026-11-17 — **Its dart is aimed as the flare begins, not as it ends.** The half second is then a real
+  warning: a step aside is enough. Aimed at the end it would follow him.
+- 2026-11-17 — **"Only by night" is a word in an enemy's data** (`"appears": "night"`), not a rule about
+  Bogwisps. Such an enemy is not made tougher by the night's rules: its numbers are its night's.
+- 2026-11-17 — **The light that gives a Bogwisp a body is the Lantern's own,** at the radius its item
+  names, through `LightRules`. The dim glow the hero has without one (so he is never lost in the crypt) is
+  left out, or the Lantern would not matter.
+- 2026-11-17 — **Its touch hurts whether it has a body or not.** Otherwise the dark would be the safe
+  place to stand.
+- 2026-11-17 — **Its ember never falls in the water.** It is beaten over a pool as often as not; the drop
+  lands on the nearest open cell, or where the hero stands.
+- 2026-11-17 — **The mist thickens, it doesn't move.** More of it at night is a change like the light's;
+  the rule against scenery moving stands.

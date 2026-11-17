@@ -248,7 +248,8 @@ One new area and one new enemy, at the user's request of 2026-11-17 (`docs/progr
 approved as written). Three steps:
 - **W1 — The marsh by day.** *Built 2026-11-17.* The map and its tiles, the way from Hearthvale, forage,
   Marsh Stew, a heart piece, mist, fireflies and a tune.
-- **W2 — The marsh by night.** The Bogwisp: it drains energy, and only light makes it solid.
+- **W2 — The marsh by night.** *Built 2026-11-17.* The Bogwisp: it drains energy, and only light makes it
+  solid. Thicker mist after dark.
 - **W3 — Old Henrik.** An eighth villager, his favour, the marsh lanterns and Ember Tea.
 
 ---

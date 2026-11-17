@@ -65,7 +65,9 @@ const RULES_FRIENDSHIP: StringName = &"friendship"
 const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM, RULES_SKILLS, RULES_FRIENDSHIP]
 
 ## Enemy behaviour ids (EnemyBrains makes one brain per id) and drop-table entry types.
-const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden", "shade"]
+const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden", "shade", "wisp"]
+## When an enemy may be there at all, if its data says ("appears"): only by night.
+const ENEMY_APPEARS: Array[String] = ["night"]
 const DROP_TYPES: Array[String] = ["heart", "item", "nothing"]
 ## What a boss's weak point can take (Hit kinds dealt by the hero's weapons). Also what can
 ## cut or break a breakable.
@@ -445,6 +447,22 @@ func _check_enemy(enemy: Dictionary) -> void:
 			errors.append("%s: %s 'boss' must be an object." % [path, label])
 		elif not WEAK_POINTS.has(str((boss as Dictionary).get("weak_point", "arrow"))):
 			errors.append("%s: %s has unknown weak_point '%s'. Known: %s." % [path, label, boss["weak_point"], ", ".join(WEAK_POINTS)])
+	# What its touch takes from the hero's energy, and when it is there at all (the Bogwisp).
+	if enemy.has("energy_drain"):
+		var drain: Variant = enemy["energy_drain"]
+		if (typeof(drain) != TYPE_INT and typeof(drain) != TYPE_FLOAT) or float(drain) < 0.0:
+			errors.append("%s: %s 'energy_drain' must be a number of 0 or more." % [path, label])
+	if enemy.has("appears") and not ENEMY_APPEARS.has(str(enemy["appears"])):
+		errors.append("%s: %s has unknown 'appears' '%s'. Known: %s." % [path, label, enemy["appears"], ", ".join(ENEMY_APPEARS)])
+	if enemy.has("wisp"):
+		var wisp: Variant = enemy["wisp"]
+		if typeof(wisp) != TYPE_DICTIONARY:
+			errors.append("%s: %s 'wisp' must be an object." % [path, label])
+		else:
+			for number: String in WispBrain.DEFAULTS:
+				var value: Variant = (wisp as Dictionary).get(number, WispBrain.DEFAULTS[number])
+				if (typeof(value) != TYPE_INT and typeof(value) != TYPE_FLOAT) or float(value) <= 0.0:
+					errors.append("%s: %s 'wisp' needs '%s' to be a number above 0." % [path, label, number])
 	_check_drops(path, label, enemy)
 
 

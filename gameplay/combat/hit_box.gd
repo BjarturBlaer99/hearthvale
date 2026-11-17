@@ -23,6 +23,8 @@ const GROUP: StringName = &"hit_boxes"
 @export var once_per_activation: bool = false
 ## What its hits are: &"sword", &"arrow", &"bomb" or &"contact".
 @export var kind: StringName = &"contact"
+## Energy a hit takes from the hero, as well as its damage (a Bogwisp's touch).
+@export var energy: float = 0.0
 
 ## The way an arc points.
 var facing: Vector2 = Vector2.DOWN
@@ -62,6 +64,8 @@ func try_hit(hurt_box: HurtBox) -> bool:
 			return false
 		_already_hit[id] = true
 	var push: Vector2 = CombatRules.push(global_position, hurt_box.global_position, knockback, facing)
-	hurt_box.receive(Hit.new(damage, push, global_position, kind))
+	var hit: Hit = Hit.new(damage, push, global_position, kind)
+	hit.energy = energy
+	hurt_box.receive(hit)
 	landed.emit(hurt_box)
 	return true

@@ -11,6 +11,8 @@ var push: Vector2 = Vector2.ZERO
 var source: Vector2 = Vector2.ZERO
 ## What dealt it: &"sword", &"arrow", &"bomb" or &"contact" (switches and cracked walls care).
 var kind: StringName = &"contact"
+## Energy it takes from the hero as well (a Bogwisp's touch); nothing against anything else.
+var energy: float = 0.0
 
 
 func _init(hit_damage: int = 0, hit_push: Vector2 = Vector2.ZERO, hit_source: Vector2 = Vector2.ZERO, hit_kind: StringName = &"contact") -> void:

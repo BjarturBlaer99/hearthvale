@@ -33,6 +33,9 @@ const MISTY: Array[StringName] = [&"old_wood", &"willowmere"]
 ## Areas whose fireflies keep out of sight until the lamps are lit (Willowmere: "fireflies at
 ## dusk"). The Old Wood's are out at every hour, as they always were.
 const DUSK_FIREFLIES: Array[StringName] = [&"willowmere"]
+## How thick an area's mist gets at night, where that is thicker than by day (Willowmere: "the
+## mist thickens"). The mist still lies where it lies: it thickens, it doesn't drift.
+const NIGHT_MIST: Dictionary = {&"willowmere": 0.36}
 ## The hero is always seen: how far the pool of light around them reaches where it is dim (px).
 const HERO_POOL: float = 88.0
 ## Where it is dim, a glow's pool reaches this much further than the glow itself.
@@ -54,6 +57,11 @@ static func has_mist(area_id: StringName) -> bool:
 
 static func fireflies_wait_for_dusk(area_id: StringName) -> bool:
 	return DUSK_FIREFLIES.has(area_id)
+
+
+## How thick the mist of `area_id` is at most, by day or by `night`.
+static func mist_thickness(area_id: StringName, night: bool) -> float:
+	return float(NIGHT_MIST.get(area_id, Mist.THICKEST)) if night else Mist.THICKEST
 
 
 ## One glow: where (area px), how far, its colour, how strong, whether it flickers, and

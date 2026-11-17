@@ -17,6 +17,7 @@ const FRAMES: Dictionary = {
 	&"roast_turnip": 32, &"soup": 33, &"stew": 34, &"pie": 35,
 	&"jam": 36, &"cake": 37, &"shepherds_pie": 38,
 	&"cattail_root": 39, &"marsh_berries": 40, &"bog_mushroom": 41, &"marsh_stew": 42,
+	&"wisp_ember": 43,
 }
 
 

@@ -44,8 +44,8 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
   meadow. Open from the first day and never needed for the story. Shallow pools and deep reeds block, and
   boardwalks are the paths between its banks and islets. Cattail root, marsh berries and bog mushrooms grow
   there (two of them make Marsh Stew), a ruined fisher's hut stands in the middle, and a heart piece lies
-  behind the willows. *(Not built yet: the Bogwisps that rise there at night, and Old Henrik and his
-  favour.)*
+  behind the willows. After dark the mist thickens and **Bogwisps** rise over the pools (§8). *(Not
+  built yet: Old Henrik and his favour.)*
 - **The dungeons:** the Old Keep, north of the village, and the Chapel Crypt under the chapel. The crypt is
   barred until the keep is quiet. It's dark, and its floor has fallen in. A ruin in the South Field leads down
   to a small cellar and cistern.
@@ -189,6 +189,15 @@ meals in 3c.)*
 | **Crypt Shade** (crypt boss) | The crypt | Drifts after you; blows pass through it. Light all four braziers in its hall and the light binds it for a few seconds: now the sword hurts it. Then it snuffs them. Rages at half health: faster, with bolts |
 
 Enemies sometimes drop hearts or coins.
+- **Bogwisp** *(Willowmere, 2026-11-17)*: a pale blue-green light over the marsh's pools, there only from
+  20:00 until the night ends.
+  - It drifts slowly at the hero, flares brighter for half a second, then darts in a straight line the
+    way it was aimed when the flare began. A step aside is enough.
+  - Its touch takes half a heart **and 15 energy**: the marsh at night wears him down as well as hurting
+    him, and at no energy he collapses.
+  - **It has no body in the dark:** a blow passes through. Inside the light of the Lantern he carries it
+    turns solid, and two blows of a sword beat it. It always leaves a Wisp Ember.
+  - The night's rules don't make it tougher, and it floats over water and reeds.
 
 ## 9. Dungeons & puzzles
 - Rooms on a grid; the camera shows one room at a time; doors between rooms.

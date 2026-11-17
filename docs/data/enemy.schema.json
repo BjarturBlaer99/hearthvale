@@ -8,12 +8,25 @@
   "properties": {
     "id": { "type": "string", "minLength": 1 },
     "name": { "type": "string" },
-    "behaviour": { "enum": ["hopper", "archer", "flier", "warden", "shade"], "description": "hopper: hops after you (slime); archer: keeps its distance and shoots (goblin archer); flier: erratic flight over heights (bat); warden: the keep's boss (stomps, gazes, a weak point stuns it); shade: the crypt's boss (blows pass through it until its hall is lit)." },
+    "behaviour": { "enum": ["hopper", "archer", "flier", "warden", "shade", "wisp"], "description": "hopper: hops after you (slime); archer: keeps its distance and shoots (goblin archer); flier: erratic flight over heights (bat); warden: the keep's boss (stomps, gazes, a weak point stuns it); shade: the crypt's boss (blows pass through it until its hall is lit); wisp: a floating light that drifts, flares and darts, and can only be hit where light reaches it (bogwisp)." },
     "health": { "type": "integer", "minimum": 1, "description": "In weapon damage points; the Wooden Sword does 2." },
     "speed": { "type": "number", "minimum": 0, "description": "px/s" },
     "sight": { "type": "number", "minimum": 0, "default": 64, "description": "How near (px) the hero must come to be noticed." },
     "contact_damage": { "type": "integer", "minimum": 0, "description": "Half hearts lost on touching it." },
     "knockback": { "type": "number", "minimum": 0, "default": 24, "description": "How far (px) touching it pushes the hero." },
+    "energy_drain": { "type": "number", "minimum": 0, "default": 0, "description": "Energy its touch takes from the hero, as well as contact_damage (the Bogwisp)." },
+    "appears": { "enum": ["night"], "description": "When it is there at all. night: it lies low by day, rises as night falls, fades when the night ends, and the night's rules don't make it tougher (its numbers are its night's)." },
+    "wisp": {
+      "type": "object",
+      "description": "Wisps only: their numbers (WispBrain has a default for each).",
+      "properties": {
+        "reach": { "type": "number", "exclusiveMinimum": 0, "description": "How near (px) the hero must be for it to stop and flare." },
+        "flare": { "type": "number", "exclusiveMinimum": 0, "description": "Seconds it flares before darting: the tell." },
+        "dart_speed": { "type": "number", "exclusiveMinimum": 0, "description": "px/s while it darts." },
+        "dart_time": { "type": "number", "exclusiveMinimum": 0, "description": "Seconds a dart lasts." },
+        "rest": { "type": "number", "exclusiveMinimum": 0, "description": "Seconds it hangs still after a dart." }
+      }
+    },
     "shot": {
       "type": "object",
       "description": "Archers' arrows, or a boss's bolts.",

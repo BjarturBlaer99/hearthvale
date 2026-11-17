@@ -5,7 +5,8 @@ extends RefCounted
 ## its leading edge enters a new cell, stops short of cells it can't enter and slides along
 ## walls. Walkers follow the land rules, hopping down ledges only with `allow_drops` (the hero;
 ## enemies keep to their level). Bodies with `flying` cross heights and ledges, but not solid
-## tiles or the map edge. Call place() before moving.
+## tiles or the map edge. Bodies that are `drifting` (a Bogwisp, a light with nothing to it)
+## cross solid tiles too, and stop only at the map edge. Call place() before moving.
 
 signal cell_changed(cell: Vector2i)
 ## Hopped down a ledge `levels` levels.
@@ -30,6 +31,8 @@ var cell: Vector2i = Vector2i.ZERO
 var level: int = 0
 var allow_drops: bool = true
 var flying: bool = false
+## Nothing in the map stops it: water, reeds, walls. Only the map's edge does.
+var drifting: bool = false
 
 
 func _init(terrain_query: TerrainQuery = null) -> void:
@@ -60,6 +63,8 @@ func place(at_cell: Vector2i) -> void:
 
 ## Whether it may move from its cell into the neighbouring `to_cell`.
 func can_enter(to_cell: Vector2i) -> bool:
+	if drifting:
+		return terrain.grid.in_bounds(to_cell)
 	if flying:
 		return terrain.check_flight(cell, to_cell).is_allowed()
 	var move: MoveResult = terrain.check_move(cell, to_cell)

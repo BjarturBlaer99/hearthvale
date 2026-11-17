@@ -7,6 +7,11 @@ extends Node2D
 
 ## How thick it gets at most, and the patch it covers round the camera (px).
 const THICKEST: float = 0.20
+## How fast it thickens or thins toward what the hour asks (per second): slowly, like the light.
+const EASE: float = 0.08
+
+## How thick it is at most right now (the shader's `thickest`).
+var thickness: float = THICKEST
 const COVER: Vector2 = Vector2(704, 424)
 const CODE: String = """
 shader_type canvas_item;
@@ -49,6 +54,21 @@ func _init() -> void:
 	look.set_shader_parameter(&"cloud", cloud)
 	look.set_shader_parameter(&"thickest", THICKEST)
 	material = look
+
+
+## Thickens or thins toward `target` (Ambience.mist_thickness: thicker over the marsh at
+## night). It changes how much of it there is, never where it lies.
+func thicken_toward(target: float, delta: float) -> void:
+	if is_equal_approx(thickness, target):
+		return
+	thickness = move_toward(thickness, target, EASE * delta)
+	(material as ShaderMaterial).set_shader_parameter(&"thickest", thickness)
+
+
+## Sets the thickness at once (an area loading at night starts thick).
+func set_thickness(value: float) -> void:
+	thickness = value
+	(material as ShaderMaterial).set_shader_parameter(&"thickest", thickness)
 
 
 func _process(_delta: float) -> void:

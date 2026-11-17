@@ -3,7 +3,7 @@
 The user's request, 2026-11-17: one new area (Willowmere, a misty marsh east of the village) and one new
 enemy (the Bogwisp), with an eighth villager, a favour, forage, two recipes and a tune. No new mechanics.
 
-**Status: approved as written on 2026-11-17. Step 1 is built; steps 2 and 3 are not.**
+**Status: approved as written on 2026-11-17. Steps 1 and 2 are built; step 3 is not.**
 
 ## Ten things to decide
 
@@ -124,10 +124,10 @@ screenshots.*
 
 **Step 2: the marsh by night.** The Bogwisp's brain, picture and sounds, the drain, the light rule, the thicker
 mist.
-- [ ] `WispBrain` is unit-tested: drift, the half-second flare, the straight dart, a blow passing through
+- [x] `WispBrain` is unit-tested: drift, the half-second flare, the straight dart, a blow passing through
       unlit, two blows lit, fading when the night ends
-- [ ] By day there are none; at 20:00 they rise; one that touches him takes half a heart and 15 energy
-- [ ] Without the Lantern the sword passes through; with it, two blows and a Wisp Ember
+- [x] By day there are none; at 20:00 they rise; one that touches him takes half a heart and 15 energy
+- [x] Without the Lantern the sword passes through; with it, two blows and a Wisp Ember
 
 **Step 3: Old Henrik.** The villager, his conversation and present, the favour, the lanterns, Ember Tea.
 - [ ] Henrik can be befriended and given gifts like the other seven; his data is unit-tested

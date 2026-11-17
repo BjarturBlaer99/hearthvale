@@ -2166,3 +2166,52 @@ ten decisions, three steps). This is step 1, and the one stop asked for before t
   village pond.
 - **The fifth heart piece is always left over** once four have made a heart (decision 4 of the plan).
 - **The hut is a block of roof and wall,** four cells by three, with no way in (decision 6).
+
+## 2026-11-17 — Willowmere, step 2: the marsh by night
+
+The user looked at step 1 and said to go on ("Looks right, go on").
+
+**Built**
+- **The Bogwisp,** a pale blue-green light that is only there in Willowmere at night. Five of them, over the
+  pools beside the boardwalks. Data: `data/enemies/bogwisp.json`.
+- **Its brain** (`WispBrain`, pure): it hangs where it rose until the hero comes within six cells, drifts
+  toward him at 22 px a second, and within 52 px stops and flares for half a second, aiming where he stands
+  as the flare begins. Then it darts 75 px along that aim and rests 1.3 seconds. A step aside during the
+  flare takes him out of the dart's way. It floats over water, reeds and walls (`GridBody.drifting`).
+- **Its touch** takes half a heart and 15 energy (a hit can now carry energy: `Hit.energy`, from an enemy's
+  `energy_drain`). At no energy he collapses and wakes at home, by the rule that was there.
+- **No body without light.** Unlit, a blow passes through it with the Shade's thin-air sound. Inside the
+  light of the Lantern the hero carries (its own radius, 56 px, as in the crypt) it has a body: health 4,
+  which is two blows of either sword. His dim glow without a Lantern doesn't count.
+- **A Wisp Ember** every time one is beaten: an ingredient, not food. One beaten over water leaves its ember
+  on the nearest open cell, or where the hero stands.
+- **Only by night** (`"appears": "night"` in an enemy's data): by day they lie low, out of sight and
+  touching nothing. If the hero is there at 20:00 they rise, fading in. When the night ends they fade and
+  leave nothing. The night's rules, which make other monsters tougher, leave them as they are.
+- **Thicker mist at night** over the marsh: it thickens slowly where it lies, and does not drift.
+- **Two sounds:** a rising note for the flare, a falling rush for the dart.
+
+**Checked**
+- **801 tests in 106 suites pass.** Twenty-four are new: twelve for the brain
+  (`tests/core/enemies/wisp_brain_test.gd`) and twelve in the marsh (`tests/world/bogwisp_test.gd`).
+- **Three older tests changed:** the lists of items and of enemies, and one lily pad moved off a cell
+  where a wisp rises.
+- **Twenty-six deliberate bugs,** planted one at a time in the code and the data, each caught, files
+  restored. Among them: a blow landing on a wisp with no body, no half second of warning, a dart that homes
+  in, fading counted as a death, drifting off the map, water stopping it, no energy taken, wisps out by day,
+  never rising, never fading, the dim glow counted as light, the ember falling in the water, one blow
+  enough, an ember that can be eaten.
+- **Screenshots,** looked at: the marsh at 22:00 with and without the Lantern, two wisps flaring at the
+  hero on the boards and three hanging over the pools.
+
+**Known issues and limits**
+- Not tried in play by a person. The fight is played through in a real window at the end of step 3.
+- **The night ending can't be seen:** a day ends at 02:00 and the hero wakes at home, so the fading is a
+  rule with tests and nothing more (decision 2 of the plan).
+- **Without the Lantern there is no fighting them,** and the Lantern is in the crypt (decision 3).
+- **The west boardwalk is the only way home, and two wisps hang beside it.** A hero who keeps moving is
+  missed by their darts; one who stands is not.
+- **They are back on every visit,** like every enemy: walking out of the marsh and in again brings back
+  those beaten.
+- **The numbers are first guesses:** 15 energy, 22 and 150 px a second, 1.3 seconds of rest.
+- **An ember is an ingredient, so it can be given as a gift,** like cherry blossom. Nobody likes it.

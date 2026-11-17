@@ -239,6 +239,9 @@ func _draw() -> void:
 func _on_hit_taken(hit: Hit) -> void:
 	if motor != null and motor.take_hit(hit.push):
 		GameState.damage(hit.damage)
+		# A Bogwisp's touch drains him too: energy as well as hearts, never energy for hearts.
+		if hit.energy > 0.0:
+			GameState.spend_energy(hit.energy)
 		EventBus.sound.emit(&"hurt")
 		EventBus.hit_stop.emit(0.08)
 		EventBus.shake.emit(2.0, 0.18)
