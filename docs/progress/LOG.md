@@ -2368,3 +2368,22 @@ The first of three phases of mining and crafting (`docs/progress/mining-crafting
 - **Without the Lantern the deep floors can be mined but not fought in:** a Bogwisp has no body there, as in the marsh. The Lantern is in the crypt.
 - **Enemies are back on every visit,** as everywhere: taking the ladder up and coming down again brings them back.
 - **Headless, a villager's colours depend on which suite ran first** (the sheet is painted on in place). The whole suite's order passes. Not new, and not touched.
+
+## 2026-11-17 — Playtest: the quarry's hall and first floor (the user: "Feels right")
+
+The user started the `quarry` scenario (`tools/playtest.gd -- quarry`), played for seventy-five seconds, closed the window and, asked how the quarry felt, said it feels right.
+
+**What the run covered** (worked out from the scenario's own save, slot 900, written as the window closed at 07:37; not watched)
+- **Both of the hall's rocks were broken,** and the two stones picked up.
+- **Four rocks of copper were broken on floor 1,** and all four ores picked up. With the two plain rocks that is ten points of Mining: the second level, reached in the first minute.
+- **Two slimes were beaten,** and two touches taken (two hearts of three left).
+- **About a third of his energy was spent** (65 of 100 left): twelve blows, a few swings and some running.
+- **He climbed out and walked back into the North Fields** before closing the window, which saved as it left.
+- No errors in the game's output. The player's own save has the same checksum as before.
+
+**What it did not cover**
+- **The ladder on floor 1 was not found:** it was under one of the plain rocks left standing. So nobody has yet been below floor 1: floors 2 to 9, the lift, iron and coal, the dark floors and their Bogwisps, a fall, and the heart piece are all still played only by the tests.
+- A second day, with the rocks back and rolled anew.
+- A full stack, and the Pickaxe bought at Tilda's (the scenario hands him one).
+
+The plan's last lines say so: the first floor is ticked, the floors below and the comparison with farming are open.

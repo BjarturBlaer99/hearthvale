@@ -34,7 +34,8 @@ embers and the lit lanterns have been played only by a script. Nothing further i
 **Mining and crafting (the user's request, 2026-11-17; `docs/progress/mining-crafting-plan.md`, approved as
 written):** three phases, with a stop after each for the user to review. **Phase 1, mining, is built
 (2026-11-17):** the Old Quarry (an entrance hall and nine floors), the Pickaxe, rocks and ore rolled anew
-each day, the lift, the Mining skill. **Phase 2 (crafting) and phase 3 (balance) are not built:** start each
+each day, the lift, the Mining skill. The user tried the hall and floor 1 the same day ("feels right"); no
+person has been below floor 1. **Phase 2 (crafting) and phase 3 (balance) are not built:** start each
 only on the user's word, and build nothing beyond the plan's list.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.

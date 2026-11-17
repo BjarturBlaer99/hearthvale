@@ -366,6 +366,9 @@ that the tests catch them.
 - **Done when** the report is in hand, the numbers are settled with the user, and all tests pass.
 
 **The last word is the user's:**
+- [x] *(yours)* the Pickaxe and a floor of rocks feel right (the user, 2026-11-17: "Feels right", after a
+  run in the hall and on floor 1)
+- [ ] *(yours)* the lower floors, the lift and the dark feel right (no person has been below floor 1)
 - [ ] *(yours)* a day in the mine feels worth it beside a day on the plot
 - [ ] *(yours)* the workbench is easy to read, and what to make next is clear
 
