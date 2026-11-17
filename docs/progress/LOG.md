@@ -2465,3 +2465,21 @@ The second of three phases of mining and crafting (`docs/progress/mining-craftin
 - **Wood is the tight material early:** fifteen spots give up to 20 a day, and the chest and the lamp take 12.
 - **Making the Miner's Lantern uses up the Lantern.** It lights the crypt's torches and gives a Bogwisp a body as the Lantern did, from further off.
 - **Two older warts, not new and not touched:** entering a boss's room prints "signal already connected" (since the Bogwisp), and headless a villager's colours depend on which suite ran first.
+
+## 2026-11-17 — Playtest: the workbench (the user: "Feels right")
+
+The user started the `craft` scenario (`tools/playtest.gd -- craft`), played for about eighty-six seconds, closed the window and, asked how the workbench and its list felt, said it feels right.
+
+**What the run covered** (worked out from the scenario's own save, slot 900, written as the window closed at 07:35; not watched)
+- **Six things were made at the workbench:** the furnace, the storage chest, bombs, the copper hoe, the copper watering can and a sprinkler. Every copper bar he began with went into them.
+- **The furnace was loaded and lit** with what makes three copper bars: nine ore and three coal.
+- **The copper hoe was in his hand** when the window closed.
+- No errors in the game's output. The player's own save has the same checksum as before.
+
+**What it did not cover**
+- **A night:** he did not sleep, so the furnace was still burning and no bar was taken out.
+- **The chest in use:** it was made, and holds nothing.
+- **The plot:** he never left the cottage. The reach of the copper hoe and can, and a sprinkler on the soil, are still played only by the tests.
+- **The rest of the list:** the lamp (no copper bar was left for it), the rug, the copper pickaxe, the iron tools and the Miner's Lantern. No wood was cut.
+
+The plan's last lines say so: the workbench is ticked; the lower floors and the comparison with farming are open.

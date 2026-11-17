@@ -37,7 +37,9 @@ written):** three phases, with a stop after each for the user to review. **Phase
 each day, the lift, the Mining skill. The user tried the hall and floor 1 the same day ("feels right"); no
 person has been below floor 1. **Phase 2, crafting, is built (2026-11-17):** the workbench and its
 thirteen recipes, the furnace, the storage chest, the lamp and the rug, wood, copper and iron tools, the
-sprinkler, the Miner's Lantern. No person has played any of it (`tools/playtest.gd -- craft`).
+sprinkler, the Miner's Lantern. The user tried the workbench the same day ("feels right": six things
+made, the furnace lit); the chest in use, a night of the furnace, and the better tools and the
+sprinkler on the plot have been played only by the tests (`tools/playtest.gd -- craft`).
 **Phase 3 (balance) is not built:** start it only on the user's word, and build nothing beyond the
 plan's list.
 

@@ -261,8 +261,9 @@ three phases with a stop after each:
   bands), the Pickaxe, rocks and ore rolled anew each day, the lift, the Mining skill, a tune.
 - **Phase 2 — Crafting.** *Built 2026-11-17.* The workbench and its list of thirteen recipes, the furnace
   (ore to bars overnight), the storage chest, a standing lamp and a woven rug, wood from branches and
-  stumps, copper and iron hoes, cans and pickaxes, the sprinkler, the Miner's Lantern. No person has
-  played it yet.
+  stumps, copper and iron hoes, cans and pickaxes, the sprinkler, the Miner's Lantern. The user tried
+  the workbench the same day ("feels right"); the chest in use, a night of the furnace and the plot
+  with the new tools have been played only by the tests.
 - **Phase 3 — Balance.** *Not built.* Tilda buys ore and bars, two favours, and eight days played.
 
 ---

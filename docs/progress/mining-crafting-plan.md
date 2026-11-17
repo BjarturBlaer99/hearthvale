@@ -396,8 +396,10 @@ and the write-up)*
   run in the hall and on floor 1)
 - [ ] *(yours)* the lower floors, the lift and the dark feel right (no person has been below floor 1)
 - [ ] *(yours)* a day in the mine feels worth it beside a day on the plot
-- [ ] *(yours)* the workbench is easy to read, and what to make next is clear (no person has opened it:
-  `tools/playtest.gd -- craft` starts at home beside it, with materials for most of its list)
+- [x] *(yours)* the workbench is easy to read, and what to make next is clear (the user, 2026-11-17:
+  "Feels right", after making six things at it and lighting the furnace in the `craft` scenario. The
+  chest in use, a night of the furnace, and the better tools and the sprinkler on the plot have been
+  played only by the tests)
 
 ## Not in this plan
 
