@@ -46,7 +46,20 @@ Edda each ask a favour at three marks; and a script played eight days by pressin
 (`docs/progress/mining-balance-report.md`). **The numbers were settled the same day** (the user:
 "All three"): a third off what Tilda pays for ore, bars and crystals; a rock of ore is 1 point of
 Mining and a plain rock none; two coal rocks a floor on floors 4 to 6. The eight days have not been
-played again with them. The plan is finished. Nothing further is planned: ask before building more.
+played again with them. The plan is finished.
+**The Homestead (the user's request, 2026-11-17; `docs/progress/homestead-request.md`; the plan,
+`docs/progress/homestead-plan.md`, approved as written on 2026-11-17):** a farm of the hero's own west
+of the village, in five phases with a stop after each for the user to review: 1 the homestead and the
+home's move, 2 placing things, 3 buildings, 4 animals, 5 balance. **No phase is built yet.** The plan's
+thirty numbered decisions are the approved ones: they are at the head of the plan ("What the user has
+decided", which stands in for the `docs/HOMESTEAD-NOTES.md` the request names) and in
+`docs/DECISIONS.md`. Each phase is built by a subagent with a fresh context; **CLAUDE.md is the
+coordinator's to edit, not a phase's** (a phase says in its report what should change here). The rules
+below describe the game as it stands, before the Homestead: where the plan changes one (the home's
+place, the plot in Hearthvale, no new areas, the mouse in build mode, a second furnace), **the plan's
+approved decision is the rule for the phase that builds it,** and the words here follow once that phase
+is reviewed (the plan's R2 to R19). Build nothing beyond the plan's list, and nothing of a later phase
+early. Nothing beyond it is planned: ask before building more.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 

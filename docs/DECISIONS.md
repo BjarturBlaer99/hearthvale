@@ -1084,3 +1084,66 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   of the skill's `gains`, since a deed there must be worth a whole point or more. Floors 4, 5 and 6 have
   2 coal rocks each. The Iron Pickaxe's gate and the furnace's five bars were raised in the report as
   the user's to call, were not asked for, and are unchanged.
+- 2026-11-17 — **The Homestead: thirty decisions were approved with the plan, as written**
+  (`docs/progress/homestead-plan.md`; the user: "Approve as written"). The plan's own list, with this
+  entry, stands in for the `docs/HOMESTEAD-NOTES.md` the request names, which does not exist. By number:
+  - **D1.** The way there is the lane's west end: two cells of Hearthvale's west tree line open (rows 16
+    and 17) and the lane runs on to the edge. One re-bake of the village.
+  - **D2.** The map is 40 by 30 cells.
+  - **D3.** "About 4x the old plot" is the field: 12 by 6, 72 cells in one bed, with the old plot as its
+    north-west corner. No tilling outside it.
+  - **D4.** The field's 18 cells nearest the house are clear; the other 54 and about 90 places round the
+    land carry debris, 145 in all. What is cleared is gone for good.
+  - **D5.** The sword clears weeds, bushes, logs and stumps; the Pickaxe clears rocks; eight boulders
+    want the Copper Pickaxe and three great boulders the Iron. Nothing on the field needs a better tool.
+  - **D6.** A small pond in the south-west corner fills the can; there is no well until one is built.
+  - **D7.** No monsters, villagers or forage on the homestead.
+  - **D8.** The area `home` keeps its room and becomes the farmhouse's inside, cell for cell; only its
+    doormat changes.
+  - **D9.** The old cottage stands empty and locked: "The cottage stands empty, and its door is locked."
+  - **D10.** A new game still begins in Hearthvale's square.
+  - **D11.** The farm was Sir Aldric's. Seven lines of the quests and of Elder Bram change, and the
+    title's line; nothing else in the story.
+  - **D12 (bends the mouse rule).** Build mode is a screen, like a menu: B opens it, on the homestead
+    only; the hero stands still and the clock stops; the mouse points at a cell; a left click sets down
+    and a right click takes up; the wheel and 1 to 9 choose; Tab, Esc or B leave. In play the mouse is
+    still no pointer.
+  - **D13.** Only what is on screen can be built on.
+  - **D14.** Two things to a cell at most: one lying and one standing.
+  - **D15.** Never on trees, water or the house; the road and the path to the door; the way out; a
+    doorstep; the field; debris or tall grass; the cell the hero or an animal is in.
+  - **D16.** Taking up gives the item back if there is room; a grown tree gives back its sapling. Moving
+    is taking up and setting down in one go.
+  - **D17.** Fifteen placeables: nine made at the workbench, six bought from Tilda, who also sells fibre.
+  - **D18.** A gate lets the hero through and keeps animals in; it is never opened or shut.
+  - **D19.** The sprinkler stays on the item bar and on the field.
+  - **D20.** One of each building.
+  - **D21.** A plan is bought on a "Build" tab at the workbench, becomes a kit in the pack, is set down
+    in build mode as a building site, and stands the next morning.
+  - **D22.** The costs and footprints in the plan's table; an upgrade keeps the building's place and
+    size.
+  - **D23 (bends one furnace and one chest).** The Shed is a room with fixed places for two more chests
+    and a second furnace, each made at the workbench. Each furnace still takes one load a night.
+  - **D24.** Moving a building is free and at once. Demolishing gives back half of each material and no
+    coins, and only an empty building can go.
+  - **D25.** An animal is fed each morning by fenced pasture first, else by one hay from the silo, else
+    it goes hungry.
+  - **D26.** One right click pets an animal and takes what it has ready. No shears, no pail.
+  - **D27.** Fed and petted, an animal gives at full pace; fed only, at half; unfed, nothing that
+    morning. Nothing dies or runs off.
+  - **D28.** Animals are indoors from 20:00 to 06:00 and simply are where they belong; they never use a
+    door.
+  - **D29.** Hay is tall grass from a meadow on the farm, back each morning. Farmer Oda sells animals
+    from her conversation; an animal bought is in its building.
+  - **D30.** Save version 6, once, for all five phases. The plot's size (6 by 3 to 12 by 6) and
+    Farming's points (a point for a product taken) are the two existing numbers changed, with the
+    user's word.
+- 2026-11-17 — **What the Homestead's approval left as written:** the clock stops in build mode; no hay
+  is for sale; the welcome sign in the square is not changed. `docs/HOMESTEAD.md`, an untracked copy of
+  the request, was not spoken of and is left as it is. Whether to stop for a look after step 3a is not
+  decided: the stops are after each phase, and the coordinator asks before phase 3.
+- 2026-11-17 — **The Homestead is built by a coordinator and one subagent a phase** (the user's
+  instruction). Each phase runs in a fresh context, commits and writes the log; the coordinator runs the
+  full tests again, confirms the commit, and records what the user approves here, in the plan and, where
+  a phase changes how something works, in CLAUDE.md. CLAUDE.md is the coordinator's to edit, not a
+  phase's.

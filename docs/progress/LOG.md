@@ -2593,3 +2593,5 @@ The user asked for a farm of the hero's own outside the village: a new area wher
 - **Not tried:** how build mode would read the mouse against the camera, whether a tall picture set down at run time sorts as the baked trees do, how the baker lays a house front outside the village, and what three more rooms and 145 things on the land cost a frame.
 - **The map's sketch is a first drawing.** Its counts are what is proposed; a cell may shift when it is baked.
 - **`docs/HOMESTEAD.md`,** an untracked copy of the request, was left as it is.
+
+**Approved.** Shown the plan, the user approved it as written the same day ("Approve as written"). The thirty decisions are recorded in `docs/DECISIONS.md` and at the head of the plan, and CLAUDE.md has the Homestead's paragraph under "Current goal". No phase is built yet; phase 1 is next.

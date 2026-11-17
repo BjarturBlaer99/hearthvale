@@ -4,8 +4,32 @@ The user's request, 2026-11-17 (`docs/progress/homestead-request.md`): a farm of
 west of Hearthvale, where he now lives, clears and shapes the land, raises buildings and keeps animals, in
 five phases with a stop after each. This is phase 0: the plan, and no code.
 
-**Status: a proposal, awaiting the user's approval. Nothing is built, and nothing below is decided until
-the user says so.** Every number is a first guess, kept in data, to be measured in phase 5.
+**Status: approved as written by the user on 2026-11-17 ("Approve as written"). All thirty decisions
+below (D1 to D30) stand as proposed, and each is recorded in `docs/DECISIONS.md`. No phase is built
+yet.** Every number is a first guess, kept in data, to be measured in phase 5. The tables below are as
+approved; where a phase builds something differently, it says so under "What the user has decided" and
+in the log.
+
+## What the user has decided
+
+Each phase reads this section first. It stands in for the `docs/HOMESTEAD-NOTES.md` the request names,
+which does not exist. The coordinator adds to it after each review.
+
+- **2026-11-17, phase 0: the plan is approved as written.** D1 to D30 stand as proposed. The two that
+  bend a standing rule were approved with the rest: build mode is a screen in which the mouse points
+  (D12), and the Shed has fixed places for two more chests and a second furnace (D23). The two existing
+  numbers the plan changes have the user's word: the plot is 12 by 6, and Farming gains a point for a
+  product taken (D30).
+- **The open questions, as the approval leaves them:**
+  1. This plan's decisions, with `docs/DECISIONS.md`, take the place of `docs/HOMESTEAD-NOTES.md`.
+  2. `docs/HOMESTEAD.md` (an untracked copy of the request) was not spoken of: it is left as it is.
+  3. The clock stops in build mode (D12, as written).
+  4. No hay for sale (as written: it is under "Not in this plan").
+  5. The welcome sign in the square is left alone (as written).
+- **The stops are after each phase,** as the user's instructions say. The plan's suggestion of a look
+  after step 3a is not decided: the coordinator asks before phase 3 begins.
+- **CLAUDE.md:** the paragraph R1 was added under "Current goal" on approval. R2 to R19 are added by the
+  coordinator as each phase is built and reviewed, in the words below unless the phase built otherwise.
 
 ## The short of it
 
@@ -32,7 +56,7 @@ the user says so.** Every number is a first guess, kept in data, to be measured 
 ## Thirty things to decide
 
 Each is a concrete proposal, the simplest I found that fits the game as it is. Approving the plan approves
-these; any one can be changed by its number. The two marked **(rule)** are where the choice itself decides
+these; any one can be changed by its number. **All thirty were approved as written on 2026-11-17.** The two marked **(rule)** are where the choice itself decides
 how a standing rule bends; every rule the request touches is under "Where the request meets the rules".
 
 **Where it is, and how big**
