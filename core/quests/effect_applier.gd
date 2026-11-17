@@ -5,7 +5,8 @@ extends RefCounted
 ##   set_flag(flag, value), add_item(item_id, count), give_item(item_id, count),
 ##   set_quest_stage(quest_id, stage_id),
 ##   sleep(), request_shop(shop_id, mode), practise(skill, deed), request_gift(villager),
-##   learn_recipe(recipe_id), request_travel(area_id, entry).
+##   learn_recipe(recipe_id), request_travel(area_id, entry), light_furnace(item_id, count),
+##   empty_furnace().
 ## Pure apart from those calls. DataRegistry has already validated the effects' shape and ids.
 
 var _state: Object
@@ -40,6 +41,10 @@ func apply(effect: Dictionary) -> bool:
 			_state.call(&"learn_recipe", StringName(str(effect["recipe"])))
 		"travel":
 			_state.call(&"request_travel", StringName(str(effect["area"])), StringName(str(effect["entry"])))
+		"light_furnace":
+			_state.call(&"light_furnace", StringName(str(effect["item"])), int(effect["count"]))
+		"empty_furnace":
+			_state.call(&"empty_furnace")
 		_:
 			return false
 	return true

@@ -1,0 +1,22 @@
+{
+	"id": "bombs",
+	"station": "workbench",
+	"order": 3,
+	"needs": [
+		{
+			"item": "coal",
+			"count": 1
+		},
+		{
+			"item": "stone",
+			"count": 3
+		}
+	],
+	"makes": {
+		"item": "bomb",
+		"count": 3
+	},
+	"unlock": {
+		"found": "coal"
+	}
+}

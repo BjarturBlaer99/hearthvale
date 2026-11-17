@@ -65,6 +65,11 @@ var _farm: Farm
 ## rocks. Saved.
 var _mine: MineState
 var _mine_rules: MineRules
+## Every item he has ever held (crafting, 2026-11-17): a recipe that waits on a thing being
+## found stays known when the last of it is gone. Saved.
+var found: Dictionary[StringName, bool] = {}
+## The furnace in his home: what it holds and the day it was lit. Saved.
+var _furnace: Furnace
 ## Where the hero is: { "area", "cell": [x, y] }, or { "area", "entry" } on the way into an
 ## area through one of its entry points (go_to), until the area places them.
 var player: Dictionary = {}
@@ -442,6 +447,101 @@ func clear_crop(cell: Vector2i) -> bool:
 	return true
 
 
+# --- Crafting (2026-11-17) ---------------------------------------------------
+
+## Whether he has ever held `item_id` (he may have none now).
+func has_found(item_id: StringName) -> bool:
+	return found.has(item_id) or item_count(item_id) > 0
+
+
+## The numbers crafting runs on (data/rules/crafting.json).
+func crafting_rules() -> Dictionary:
+	return DataRegistry.get_rules(DataRegistry.RULES_CRAFTING)
+
+
+## Whether his home has the furnishing `furnishing` (made at the workbench).
+func is_furnished(furnishing: StringName) -> bool:
+	return get_flag(Crafting.furnished_flag(furnishing)) == true
+
+
+## The recipes of `station` (Crafting.WORKBENCH or FURNACE) that he knows, in their order.
+func known_crafts(station: String) -> Array[Dictionary]:
+	return Crafting.known(DataRegistry.entries(&"crafting"), station,
+		func(item_id: String) -> bool: return has_found(StringName(item_id)),
+		func(skill: String) -> int: return skill_level(StringName(skill)))
+
+
+## Why `recipe` (a crafting data entry) can't be made now, in Crafting's words; "" if it can.
+func why_not_craft(recipe: Dictionary) -> String:
+	return Crafting.why_not(recipe,
+		func(item_id: String) -> int: return item_count(StringName(item_id)),
+		func(item_id: String, count: int) -> bool: return count <= 0 or has_room_for(StringName(item_id), count),
+		func(furnishing: String) -> bool: return is_furnished(StringName(furnishing)))
+
+
+## Makes `recipe_id` at the workbench: what it needs goes, and what it makes comes, into the
+## pack or (a furnishing) into his home. A tool made from the one in his hand takes its place
+## there. Returns "" if it was made, or why not in Crafting's words; then nothing changed.
+func craft(recipe_id: StringName) -> String:
+	var recipe: Dictionary = DataRegistry.get_crafting(recipe_id)
+	if recipe.is_empty() or Crafting.station_of(recipe) != Crafting.WORKBENCH or not known_crafts(Crafting.WORKBENCH).has(recipe):
+		return Crafting.UNKNOWN_WORDS
+	var why_not: String = why_not_craft(recipe)
+	if not why_not.is_empty():
+		return why_not
+	var in_hand: bool = false
+	for need: Dictionary in Crafting.needs_of(recipe):
+		in_hand = in_hand or equipped == StringName(str(need["item"]))
+		add_item(StringName(str(need["item"])), -int(need["count"]))
+	var made: StringName = StringName(Crafting.item_made(recipe))
+	if made != &"":
+		add_item(made, Crafting.count_made(recipe))
+		if in_hand and equipped == &"" and Inventory.is_equippable(DataRegistry.get_item(made)):
+			equip(made)
+	else:
+		set_flag(Crafting.furnished_flag(StringName(Crafting.furnishing_made(recipe))), true)
+	EventBus.crafted.emit(recipe_id)
+	return ""
+
+
+## The furnace in his home: what it holds, and the day it was lit.
+func furnace() -> Furnace:
+	if _furnace == null:
+		_furnace = Furnace.new()
+	return _furnace
+
+
+## Lights the furnace with what makes `count` of `item_id` (the `light_furnace` effect: the
+## ore and the coal are taken by the conversation's own effects). Returns whether it was lit.
+func light_furnace(item_id: StringName, count: int) -> bool:
+	var lit: bool = furnace().light(item_id, count, day)
+	if lit:
+		EventBus.sound.emit(&"furnace")
+		EventBus.furnace_changed.emit()
+	return lit
+
+
+## Takes out what the furnace made (the `empty_furnace` effect). It is given, not just added:
+## what a full pack can't take is laid at his feet. Returns what came out ({} if nothing).
+func empty_furnace() -> Dictionary:
+	var out: Dictionary = furnace().take()
+	if not out.is_empty():
+		give_item(out["item"], int(out["count"]))
+		EventBus.sound.emit(&"item_get")
+		EventBus.furnace_changed.emit()
+	return out
+
+
+## The furnace's conversation as of now (Furnace.dialogue): what it holds, or what he can smelt.
+func furnace_dialogue() -> Dictionary:
+	var names: Dictionary = {}
+	for item: Dictionary in DataRegistry.entries(&"items"):
+		names[str(item["id"])] = str(item.get("name", item["id"]))
+	return furnace().dialogue(day, known_crafts(Crafting.FURNACE),
+		func(item_id: String) -> int: return item_count(StringName(item_id)),
+		int(crafting_rules().get("furnace_most", 1)), names)
+
+
 # --- The mine (2026-11-17) ---------------------------------------------------
 
 ## The Old Quarry's rules (data/rules/mine.json).
@@ -599,6 +699,8 @@ func add_item(item_id: StringName, count: int = 1) -> int:
 		count = mini(count, Inventory.room_for(item_count(item_id), item))
 	if count == 0:
 		return 0
+	if count > 0:
+		found[item_id] = true
 	# His first thing for the item button goes on it. Later ones wait in the bar: with the sword
 	# in hand by choice, a thing picked up doesn't take its place.
 	if count > 0 and equipped == &"" and Inventory.is_equippable(item) \
@@ -762,6 +864,8 @@ func clear() -> void:
 	arrival_notice = ""
 	_farm = null
 	_mine = null
+	_furnace = null
+	found.clear()
 	flags.clear()
 	flag_days.clear()
 	skill_points.clear()
@@ -795,6 +899,8 @@ func to_dict() -> Dictionary:
 		"player": _json_safe(player),
 		"farm": farm().to_dict(),
 		"mine": mine().to_dict(),
+		"home": {"furnace": furnace().to_dict()},
+		"found": _found_list(),
 		"skills": _json_safe(skill_points),
 		"friends": _json_safe(friends),
 		"tally": _json_safe(tally),
@@ -847,6 +953,26 @@ func from_dict(data: Dictionary) -> void:
 	farm().load_saved(data.get("farm", {}), DataRegistry.ids(&"crops"))
 	_mine = MineState.new()
 	_mine.load_saved(data.get("mine"))
+	var home: Dictionary = _dictionary(data.get("home"))
+	_furnace = Furnace.new()
+	_furnace.load_saved(home.get("furnace"))
+	var src_found: Variant = data.get("found")
+	if typeof(src_found) == TYPE_ARRAY:
+		for id: Variant in src_found:
+			if typeof(id) == TYPE_STRING and not str(id).is_empty():
+				found[StringName(str(id))] = true
+	# What he carries, he has found: a save from before this was kept says nothing of it.
+	for stack: Dictionary in inventory:
+		found[stack["id"]] = true
+
+
+## The ids of what he has found, in order, for a save.
+func _found_list() -> Array:
+	var out: Array = []
+	for id: StringName in found:
+		out.append(String(id))
+	out.sort()
+	return out
 
 
 ## `value` if it is a Dictionary, else an empty one (a section missing from a save).

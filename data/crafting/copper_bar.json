@@ -1,0 +1,19 @@
+{
+	"id": "copper_bar",
+	"station": "furnace",
+	"order": 1,
+	"needs": [
+		{
+			"item": "copper_ore",
+			"count": 3
+		},
+		{
+			"item": "coal",
+			"count": 1
+		}
+	],
+	"makes": {
+		"item": "copper_bar",
+		"count": 1
+	}
+}

@@ -1,0 +1,19 @@
+{
+	"id": "gold_bar",
+	"station": "furnace",
+	"order": 3,
+	"needs": [
+		{
+			"item": "gold_ore",
+			"count": 3
+		},
+		{
+			"item": "coal",
+			"count": 1
+		}
+	],
+	"makes": {
+		"item": "gold_bar",
+		"count": 1
+	}
+}

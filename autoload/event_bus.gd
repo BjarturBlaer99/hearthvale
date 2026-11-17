@@ -83,3 +83,10 @@ signal items_owed
 ## runs the area goes there when the conversation closes.
 signal travel_requested(area_id: StringName, entry: StringName)
 
+## Something was made at the workbench (GameState.craft): a thing for the pack, or a
+## furnishing that now stands in the hero's home.
+signal crafted(recipe_id: StringName)
+
+## The furnace was lit, or what it made was taken out: whoever draws it shows it so.
+signal furnace_changed
+

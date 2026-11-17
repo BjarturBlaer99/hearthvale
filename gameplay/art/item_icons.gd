@@ -19,6 +19,9 @@ const FRAMES: Dictionary = {
 	&"cattail_root": 39, &"marsh_berries": 40, &"bog_mushroom": 41, &"marsh_stew": 42,
 	&"wisp_ember": 43, &"ember_tea": 44,
 	&"pickaxe": 45, &"stone": 46, &"copper_ore": 47, &"coal": 48, &"iron_ore": 49, &"gold_ore": 50, &"crystal": 51,
+	&"wood": 52, &"copper_bar": 53, &"iron_bar": 54, &"gold_bar": 55, &"sprinkler": 56, &"miners_lantern": 57,
+	&"copper_pickaxe": 58, &"iron_pickaxe": 59, &"copper_hoe": 60, &"iron_hoe": 61,
+	&"copper_watering_can": 62, &"iron_watering_can": 63,
 }
 
 

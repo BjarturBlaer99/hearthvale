@@ -91,7 +91,9 @@ func test_every_exit_leads_to_an_entry_point_and_every_talker_has_a_conversation
 		var scene: Node = auto_free((load(WorldPaths.scene_for(area_id)) as PackedScene).instantiate())
 		var grid: HeightGrid = HeightGridBuilder.from_layer(scene.get_node(^"Height"))
 		for child: Node in scene.get_node(^"Interactables").get_children():
-			if child is Talkable:
+			# What furnishes the hero's home has a list of its own (the workbench) or words built
+			# as the hearth's are (the furnace), or says nothing: tests/world/workbench_test.gd.
+			if child is Talkable and not child is Furnishing:
 				var talkable: Talkable = child
 				# A hearth's words are built from the recipes; everyone else names a file in data.
 				assert_bool(not talkable.dialogue().is_empty() and (child is Hearth or child is MineLift or DataRegistry.has_entry(&"dialogues", talkable.dialogue_id))) \

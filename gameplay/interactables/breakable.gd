@@ -10,7 +10,7 @@ extends Node2D
 
 const SHEET: Texture2D = preload("res://gameplay/art/breakables.png")
 ## Frames in the order tools/art/make_sprites.gd paints them (a test checks).
-const FRAMES: Dictionary = {&"grass": 0, &"grass_cut": 1, &"pot": 2}
+const FRAMES: Dictionary = {&"grass": 0, &"grass_cut": 1, &"pot": 2, &"branch": 3, &"stump": 4}
 const SIZE: Vector2i = Vector2i(16, 16)
 
 @export var breakable_id: StringName = &"grass"

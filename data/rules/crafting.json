@@ -1,0 +1,6 @@
+{
+	"id": "crafting",
+	"furnace_most": 5,
+	"chest_slots": 24,
+	"furnishings": ["furnace", "chest", "rug", "lamp"]
+}

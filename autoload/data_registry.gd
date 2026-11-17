@@ -23,6 +23,7 @@ const KIND_RECIPE: StringName = &"recipe"
 const KIND_CROP: StringName = &"crop"
 const KIND_SHOP: StringName = &"shop"
 const KIND_VILLAGER: StringName = &"villager"
+const KIND_CRAFTING: StringName = &"crafting"
 
 ## Directory under DATA_ROOT -> the kind of file it holds.
 const DIRECTORY_KINDS: Dictionary = {
@@ -36,6 +37,7 @@ const DIRECTORY_KINDS: Dictionary = {
 	"crops": KIND_CROP,
 	"shops": KIND_SHOP,
 	"villagers": KIND_VILLAGER,
+	"crafting": KIND_CRAFTING,
 }
 
 const REQUIRED_FIELDS: Dictionary = {
@@ -53,6 +55,7 @@ const REQUIRED_FIELDS: Dictionary = {
 	&"crop": ["id", "name", "days", "seed", "gives", "seed_price", "sells_for"],
 	&"shop": ["id", "name", "sells"],
 	&"villager": ["id", "name", "dialogue", "likes", "thanks"],
+	&"crafting": ["id", "needs", "makes"],
 }
 ## The sets of rules the game knows (data/rules/<id>.json), by id.
 const RULES_TIME: StringName = &"time"
@@ -63,7 +66,8 @@ const RULES_FARM: StringName = &"farm"
 const RULES_SKILLS: StringName = &"skills"
 const RULES_FRIENDSHIP: StringName = &"friendship"
 const RULES_MINE: StringName = &"mine"
-const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM, RULES_SKILLS, RULES_FRIENDSHIP, RULES_MINE]
+const RULES_CRAFTING: StringName = &"crafting"
+const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM, RULES_SKILLS, RULES_FRIENDSHIP, RULES_MINE, RULES_CRAFTING]
 
 ## Enemy behaviour ids (EnemyBrains makes one brain per id) and drop-table entry types.
 const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden", "shade", "wisp"]
@@ -102,6 +106,8 @@ const EFFECT_FIELDS: Dictionary = {
 	"gift": ["villager"],
 	"teach_recipe": ["recipe"],
 	"travel": ["area", "entry"],
+	"light_furnace": ["item", "count"],
+	"empty_furnace": [],
 }
 
 ## A field with one of these names, inside a condition or effect, must name an id
@@ -198,6 +204,11 @@ func get_villager(id: StringName) -> Dictionary:
 	return get_entry(&"villagers", id)
 
 
+## A crafting recipe (data/crafting/<id>.json): what the workbench makes or the furnace smelts.
+func get_crafting(id: StringName) -> Dictionary:
+	return get_entry(&"crafting", id)
+
+
 ## The numbers a system runs on (data/rules/<id>.json), e.g. &"time" for the day's clock.
 func get_rules(id: StringName) -> Dictionary:
 	return get_entry(&"rules", id)
@@ -209,7 +220,7 @@ func get_rules(id: StringName) -> Dictionary:
 ## an empty result means every file is valid and every reference resolves.
 func load_all(root: String = DATA_ROOT) -> PackedStringArray:
 	errors = []
-	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}, &"recipes": {}, &"crops": {}, &"shops": {}, &"villagers": {}}
+	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}, &"recipes": {}, &"crops": {}, &"shops": {}, &"crafting": {}, &"villagers": {}}
 	if not DirAccess.dir_exists_absolute(root):
 		errors.append("%s: data directory does not exist." % root)
 		return errors
@@ -262,6 +273,8 @@ func _load_file(path: String, kind: StringName) -> void:
 			_register(path, data, &"shop", &"shops")
 		KIND_VILLAGER:
 			_register(path, data, &"villager", &"villagers")
+		KIND_CRAFTING:
+			_register(path, data, &"crafting", &"crafting")
 
 
 ## Registers every object in the array `data[key]`.
@@ -325,6 +338,14 @@ func _validate_references() -> void:
 	for shop: Dictionary in _collections[&"shops"].values():
 		for problem: String in Shop.problems(shop, item_of):
 			errors.append("%s: shop '%s': %s" % [shop["_source"], shop["id"], problem])
+	# Crafting recipes: each can be used, and names only furnishings and skills the game has.
+	var furnishings: Variant = get_rules(RULES_CRAFTING).get("furnishings", [])
+	var skill_ids: Array = []
+	for skill: StringName in Skills.new(get_rules(RULES_SKILLS)).ids():
+		skill_ids.append(String(skill))
+	for crafted: Dictionary in _collections[&"crafting"].values():
+		for problem: String in Crafting.problems(crafted, item_of, furnishings if typeof(furnishings) == TYPE_ARRAY else [], skill_ids):
+			errors.append("%s: crafting recipe '%s': %s" % [crafted["_source"], crafted["id"], problem])
 	# Villagers: each can be used, and no two share a conversation (it is how one is known).
 	var friendship: Friendship = Friendship.new(get_rules(RULES_FRIENDSHIP))
 	var has_dialogue: Callable = func(id: String) -> bool: return _collections[&"dialogues"].has(StringName(id))
@@ -497,6 +518,8 @@ func _check_rules(rules: Dictionary) -> void:
 			problems = Friendship.problems(rules, item_types)
 		RULES_MINE:
 			problems = MineRules.problems(rules, func(item_id: String) -> Dictionary: return _collections[&"items"].get(StringName(item_id), {}))
+		RULES_CRAFTING:
+			problems = Crafting.rules_problems(rules)
 	for problem: String in problems:
 		errors.append("%s: rules '%s': %s" % [path, id, problem])
 

@@ -266,6 +266,7 @@ func _ready() -> void:
 	hud.shop_menu.closed.connect(_on_item_menu_closed)
 	EventBus.shop_requested.connect(_on_shop_requested)
 	hud.gift_menu.closed.connect(_on_item_menu_closed)
+	hud.craft_menu.closed.connect(_on_item_menu_closed)
 	hud.gift_menu.given.connect(_on_gift_given)
 	EventBus.gift_requested.connect(_on_gift_requested)
 	EventBus.travel_requested.connect(_on_travel_requested)
@@ -777,6 +778,9 @@ func pick_up(pickup: ItemPickup) -> bool:
 ## conversation begins it gains the answer that gives them a gift, if there is one to give
 ## and none was given today (P4c).
 func talk_to(talkable: Talkable) -> bool:
+	# The workbench has a list of its own, not words.
+	if talkable is Furnishing and (talkable as Furnishing).opens() == Furnishing.CRAFT:
+		return open_craft()
 	var data: Dictionary = talkable.dialogue()
 	var villager: Dictionary = villager_of(talkable)
 	if not villager.is_empty() and not data.is_empty():
@@ -924,7 +928,18 @@ func open_item_menu() -> bool:
 
 
 func is_in_menu() -> bool:
-	return hud.item_menu.is_open() or hud.shop_menu.is_open() or hud.gift_menu.is_open()
+	return hud.item_menu.is_open() or hud.shop_menu.is_open() or hud.gift_menu.is_open() or hud.craft_menu.is_open()
+
+
+## Opens the workbench's list (crafting, GDD §14). The hero stands still while it is open, and
+## the clock with him. Returns whether it opened.
+func open_craft() -> bool:
+	if _busy():
+		return false
+	player.controls_enabled = false
+	hud.set_prompt("")
+	hud.craft_menu.open()
+	return true
 
 
 ## Opens a shop's buy-and-sell list on `mode` (Shop.BUY or Shop.SELL; GDD §9). The hero stands
@@ -1491,6 +1506,11 @@ func glows_now() -> Array:
 			var wisp_glow: Dictionary = (child as Enemy).glow_now()
 			if not wisp_glow.is_empty():
 				out.append(wisp_glow)
+		elif child is Furnishing:
+			# The standing lamp, and the furnace while it burns.
+			var home_glow: Dictionary = (child as Furnishing).glow_now()
+			if not home_glow.is_empty():
+				out.append(home_glow)
 	if hero_light_radius() > DIM_RADIUS:
 		out.append(Ambience.glow(player.position + Vector2(0, -8), hero_light_radius() * 0.5, Ambience.LAMP, 0.16, true))
 	return out
@@ -1907,6 +1927,9 @@ func _on_flag_set(flag: StringName, value: Variant) -> void:
 		_light_the_lanterns()
 	for child: Node in interactables.get_children():
 		(child as Node2D).queue_redraw()
+		# A furnishing just made stands in its place from now on.
+		if child is Furnishing and (child as Furnishing).is_solid():
+			terrain.set_occupied((child as Furnishing).cell(), (child as Furnishing).occupies())
 	_refresh_doors()
 
 

@@ -200,10 +200,15 @@ func _v3_to_v4(data: Dictionary) -> Dictionary:
 
 
 ## Version 5 (2026-11-17) came with mining and crafting: the mine keeps the number its daily
-## rolls come from and the rocks broken today. A game saved before it gets a number of its own,
-## made from the save itself so the same save always rolls the same way, and a whole mine.
+## rolls come from and the rocks broken today; the hero's home keeps what its furnace and its
+## chest hold; and what he has ever held is remembered, for the recipes that wait on it. A game
+## saved before it gets a number of its own, made from the save itself so the same save always
+## rolls the same way, a whole mine, a cold furnace and an empty chest. (What it carries counts
+## as found when it loads.)
 func _v4_to_v5(data: Dictionary) -> Dictionary:
 	data["mine"] = {"number": hash([data.get("play_time", 0.0), data.get("day", 1), data.get("hearts_max", 0)]), "day": 0, "broken": {}}
+	data["home"] = {"furnace": {}, "chest": []}
+	data["found"] = []
 	return data
 
 

@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://gameplay/interactables/bed.gd" id="7_bed"]
 [ext_resource type="Script" path="res://gameplay/interactables/hearth.gd" id="p2d_hearth"]
 [ext_resource type="Script" path="res://gameplay/interactables/item_pickup.gd" id="p3_pickup"]
+[ext_resource type="Script" path="res://gameplay/interactables/furnishing.gd" id="m2_furnishing"]
 
 [node name="Home" type="Node2D" unique_id=909247244]
 script = ExtResource("1_area")
@@ -64,6 +65,17 @@ script = ExtResource("p3_pickup")
 item_id = &"turnip_seeds"
 count = 5
 taken_flag = &"took_first_seeds"
+
+[node name="Workbench" type="Node2D" parent="Interactables"]
+position = Vector2(144, 48)
+script = ExtResource("m2_furnishing")
+furnishing_id = &"workbench"
+always = true
+
+[node name="Furnace" type="Node2D" parent="Interactables"]
+position = Vector2(96, 32)
+script = ExtResource("m2_furnishing")
+furnishing_id = &"furnace"
 
 [node name="Entries" type="Node2D" parent="." unique_id=99726273]
 
