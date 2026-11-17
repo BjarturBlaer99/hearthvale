@@ -2215,3 +2215,73 @@ The user looked at step 1 and said to go on ("Looks right, go on").
   those beaten.
 - **The numbers are first guesses:** 15 energy, 22 and 150 px a second, 1.3 seconds of rest.
 - **An ember is an ingredient, so it can be given as a gift,** like cherry blossom. Nobody likes it.
+
+## 2026-11-17 — Willowmere, step 3: Old Henrik, and the whole of it played
+
+**Built**
+- **Old Henrik,** the eighth villager, by his ruined hut from 06:00 to 20:00. A file in `data/villagers`
+  and a conversation: he likes Marsh Stew and bread, warns of the lights, and says why a sword does nothing
+  to them.
+- **His favour,** "Lights on the Marsh", asked at two marks: bring three Wisp Embers. A quest of the same
+  shape as the other four favours.
+- **The reward:** the flag `marsh_lanterns_lit` and the Ember Tea recipe.
+  - The six posts take their burning picture at once. From dusk to dawn they glow like the village's lamps,
+    and their light gives a Bogwisp a body, 44 px round each, as the hero's Lantern does.
+  - **Ember Tea:** one Wisp Ember and two marsh berries, 90 energy and no hearts. It is not at the hearth
+    until he teaches it.
+- **His present** at four marks: three bog mushrooms, once.
+- **The Friends page has room for eight:** the line under the list moved down a row.
+- **Two shots in the screenshot tool:** `141_willowmere_by_day`, `142_willowmere_by_night`.
+
+**Checked**
+- **811 tests in 107 suites pass.** Ten are new (`tests/world/henrik_test.gd`), and Henrik is in the two
+  tables the older friendship tests run through: his favour is put off, taken, reminded of and finished by
+  the same test as the other four, and his present by the same test as the other seven.
+- **Eight older tests changed** to the new counts: eight villagers, nine quests, the list of items, the
+  quest log's lines, the Friends page, and the ending's "of 9" and "of 8".
+- **Twenty-two deliberate bugs,** planted one at a time in the code and the data, files restored. Twenty-one
+  were caught at once. **One was not:** a lantern whose light reached two pixels passed every test, because
+  the test stood the wisp right under the post. A test of the reach was added (lit six pixels inside it, dark
+  six pixels outside), and then that bug and its opposite were both caught. The others: lanterns that hold
+  nothing, burn by day, are lit before the favour or stay dark after it; a lit post with no glow; the marsh
+  naming no flag; a favour that teaches nothing or lights nothing; Ember Tea known from the start or worth
+  little; Henrik not liking the stew, or with no line for a full friendship; two embers being enough; the
+  embers kept; a present of one; the favour or the present given to a stranger; the eighth name running
+  into the line below.
+- **Played in a real window** by a script that presses the keys and the mouse buttons while the game runs
+  as it does for a player (`Input.parse_input_event`; the script looks at where the wisps are to decide
+  what to press, and changes the game's state only where noted). One run, 66 seconds:
+  - **The favour is asked.** He walks to Henrik and right-clicks. Henrik asks for three embers; Enter takes
+    the first answer; the quest is active and the friendship stands at two marks.
+  - **Night falls.** *(The clock was set to 19:57.)* At 20:00 five Bogwisps rise over the pools.
+  - **Without the Lantern,** on the west boardwalk for thirty seconds: two swings at wisps in reach, both
+    heard as thin air, none landed, none beaten. He stepped out of the way of every dart.
+  - **Standing still,** he let one dart through him: hearts 8 to 7 and energy 99 to 84. Half a heart and
+    fifteen energy.
+  - **With the Lantern** *(put in his pack; in the story it comes from the crypt)*: two wisps beaten on the
+    west boardwalk in four seconds, and a third on the east boardwalk in sixteen, with one more touch taken.
+    Each left an ember, and he walked onto all three.
+  - **The embers are handed over.** *(The clock was set to the next morning: the walk home and the night's
+    sleep were not played.)* The wisps that were left had faded. He walks to Henrik, right-clicks, and Enter
+    takes "Three embers, Henrik.": the quest is complete, the flag is set, Ember Tea is known, no embers are
+    left, six posts on the map burn, and the news reads "New recipe: Ember Tea." and "Quest complete: Lights
+    on the Marsh".
+  - **Dusk.** *(The clock was set to 19:20.)* The lanterns burn, and seven lights give a wisp a body: six
+    lanterns and his own.
+- **Screenshots,** looked at: the marsh by day and by night, Henrik by his hut, the lanterns lit, the
+  Friends page with eight names, and seven from the played run.
+- **The player's own save was read-only throughout** (the same checksum before and after every run).
+
+**Known issues and limits**
+- **Not played by a person.** The scripted play shows that the fight and the favour work from the keys;
+  it says nothing of how they feel, or whether the wisps are too hard or too easy to dodge.
+- **What the script skipped is not shown to work in play:** the walk from the marsh to the bed, sleeping,
+  and coming back the next day. Each is covered by tests of its own from before Willowmere.
+- **The script's hero dodged nearly every dart** by stepping across the line a wisp was aimed along. A
+  player has half a second to do the same.
+- **Henrik's present is food, so it can be given straight back to him** while his favour is still unasked:
+  "I brought you something." is then the last answer he offers.
+- **The lanterns burn only from 18:30,** with the village's lamps; lit, the posts show their burning
+  picture by day as well.
+- **Ember Tea's 90 energy is a first guess,** and is the most any dish gives.
+- **The quest's journal says nothing of where the Lantern is.** Henrik's own words say to carry one.

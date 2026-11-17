@@ -1,0 +1,177 @@
+{
+  "id": "old_henrik",
+  "start": "hello",
+  "openings": [
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "old_henrik",
+          "marks": 4
+        },
+        {
+          "type": "flag",
+          "flag": "present/old_henrik",
+          "value": false
+        }
+      ],
+      "node": "present"
+    },
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "old_henrik",
+          "marks": 2
+        },
+        {
+          "type": "quest_status",
+          "quest": "lights_on_the_marsh",
+          "status": "not_started"
+        }
+      ],
+      "node": "favour"
+    }
+  ],
+  "speakers": {
+    "henrik": "Old Henrik"
+  },
+  "nodes": {
+    "hello": {
+      "speaker": "henrik",
+      "text": "Forty years I fished this water. Keep to the boards after dark: the lights out there drink the strength from you.",
+      "options": [
+        {
+          "text": "Three embers, Henrik.",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "lights_on_the_marsh",
+              "stage": "bring"
+            },
+            {
+              "type": "has_item",
+              "item": "wisp_ember",
+              "count": 3
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "wisp_ember",
+              "count": 3
+            },
+            {
+              "type": "set_flag",
+              "flag": "embers_given",
+              "value": true
+            }
+          ],
+          "next": "favour_done"
+        },
+        {
+          "text": "About those embers...",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "lights_on_the_marsh",
+              "stage": "bring"
+            }
+          ],
+          "next": "favour_hint"
+        },
+        {
+          "text": "Anything else?",
+          "next": "more"
+        },
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "more": {
+      "speaker": "henrik",
+      "text": "Bogwisps, we called them. A blade goes through one like mist. Only in lantern light do they hold still enough to strike.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour": {
+      "speaker": "henrik",
+      "text": "You've been good company. My lanterns kept the wisps off the boards once. Bring me three of their embers and I'll light them again.",
+      "options": [
+        {
+          "text": "I'll bring them.",
+          "effects": [
+            {
+              "type": "set_quest_stage",
+              "quest": "lights_on_the_marsh",
+              "stage": "bring"
+            }
+          ],
+          "next": "favour_go"
+        },
+        {
+          "text": "Not just now.",
+          "next": "hello"
+        }
+      ]
+    },
+    "favour_go": {
+      "speaker": "henrik",
+      "text": "Go after dark, and carry a lantern. Without one you'll only feed them.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_hint": {
+      "speaker": "henrik",
+      "text": "Three embers. The wisps rise over the pools after dark. Strike one inside your lantern's light and it leaves an ember.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_done": {
+      "speaker": "henrik",
+      "text": "That's the flame they need. Come dusk the boards will be lit again. And an ember steeped with marsh berries makes a tea that puts the strength back.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "present": {
+      "speaker": "henrik",
+      "text": "I've little enough, but the bog has been kind this year. Three of its best mushrooms.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "bog_mushroom",
+          "count": 3
+        },
+        {
+          "type": "set_flag",
+          "flag": "present/old_henrik",
+          "value": true
+        }
+      ],
+      "options": [
+        {
+          "text": "Thank you.",
+          "next": null
+        }
+      ]
+    }
+  }
+}

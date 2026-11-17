@@ -149,8 +149,9 @@ Beaten enemies sometimes drop hearts or coins.
   follow the planks through the gap in the trees. Boardwalks cross the water between its banks and islets;
   cattail root, marsh berries and bog mushrooms grow there, and two of them make Marsh Stew at your hearth.
   Look behind the willows in the north-east. After dark, Bogwisps rise over the pools: their touch takes
-  energy as well as hearts, and a sword only bites inside the light of the Lantern. (Its old fisherman
-  isn't built yet.)
+  energy as well as hearts, and a sword only bites inside the light of the Lantern. Old Henrik stands by
+  the hut by day: befriend him, bring him three Wisp Embers, and he lights the marsh lanterns and teaches
+  Ember Tea.
 - **The road north:** from the top of the north rise, through the woods.
   - **The North Fields:** a stream with a bridge, a farm plot, slimes, and a goblin archer on a plateau. Keep an eye
     on the tree line beside the road.

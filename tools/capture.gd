@@ -173,6 +173,9 @@ const SHOTS: Array = [
 	["138_a_present_from_tilda", &"shop", Vector2i(5, 4), Vector2.UP, 0, "friend:tilda:16"],
 	["139_eight_quests_in_the_log", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "long_log"],
 	["140_the_dishes_that_are_taught", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "new_dishes"],
+	# Willowmere (2026-11-17): the marsh by day, and after dark with the Bogwisps over its pools.
+	["141_willowmere_by_day", &"willowmere", Vector2i(21, 14), Vector2.DOWN, 0, "time:12:00"],
+	["142_willowmere_by_night", &"willowmere", Vector2i(21, 14), Vector2.DOWN, 0, "time:22:00"],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0

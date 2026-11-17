@@ -40,6 +40,7 @@
     { "id": "marsh_berries", "name": "Marsh Berries", "type": "food", "icon": "marsh_berries", "stackable": true, "max_stack": 20, "stats": { "energy": 9 } },
     { "id": "bog_mushroom", "name": "Bog Mushrooms", "type": "food", "icon": "bog_mushroom", "stackable": true, "max_stack": 20, "stats": { "energy": 7 } },
     { "id": "marsh_stew", "name": "Marsh Stew", "type": "food", "icon": "marsh_stew", "stackable": true, "max_stack": 10, "stats": { "energy": 45, "hearts": 0.5 } },
-    { "id": "wisp_ember", "name": "Wisp Ember", "type": "ingredient", "icon": "wisp_ember", "stackable": true, "max_stack": 10 }
+    { "id": "wisp_ember", "name": "Wisp Ember", "type": "ingredient", "icon": "wisp_ember", "stackable": true, "max_stack": 10 },
+    { "id": "ember_tea", "name": "Ember Tea", "type": "food", "icon": "ember_tea", "stackable": true, "max_stack": 10, "stats": { "energy": 90 } }
   ]
 }

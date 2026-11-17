@@ -14,6 +14,8 @@ const LIKES: Dictionary = {
 	"pip": ["wild_berries", "pumpkin_pie"],
 	"guard_rolf": ["bread", "mushroom_soup"],
 	"shepherd_edda": ["mushroom_soup", "carrot"],
+	# Willowmere (docs/progress/willowmere-plan.md).
+	"old_henrik": ["marsh_stew", "bread"],
 }
 const TALK: Dictionary = {
 	"id": "pip", "start": "hello",
@@ -71,9 +73,9 @@ func test_what_can_be_given_is_listed_in_the_packs_own_order() -> void:
 	assert_array(Friendship.new().giftable_held(stacks, DataRegistry.entries(&"items"))).override_failure_message("no rules: nothing can be given").is_empty()
 
 
-func test_the_seven_villagers_like_what_the_plan_says() -> void:
+func test_the_eight_villagers_like_what_the_plans_say() -> void:
 	var villagers: Array = DataRegistry.entries(&"villagers")
-	assert_int(villagers.size()).is_equal(7)
+	assert_int(villagers.size()).is_equal(8)
 	var theirs: Array = []
 	for villager: Dictionary in villagers:
 		var id: String = str(villager["id"])

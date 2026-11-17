@@ -564,6 +564,7 @@ func _initialize() -> void:
 	_ruin_hole(GreyboxTiles.coords("ruin_hole"))
 	_art(GreyboxTiles.coords("prop_mossy_rock"), MARSH_ROCK_PALETTE, MARSH_ROCK_ART)
 	_art(GreyboxTiles.coords("prop_marsh_lantern"), MARSH_LANTERN_PALETTE, MARSH_LANTERN_ART)
+	_art(GreyboxTiles.coords("prop_marsh_lantern_lit"), MARSH_LANTERN_LIT_PALETTE, MARSH_LANTERN_ART)
 	_willow_art(GreyboxTiles.coords("prop_willow"))
 	# Art pass 3: warm every colour and soften every outline, tile by tile.
 	PixelGrade.apply(_image, OUTLINE, Rect2i(), Vector2i(T, T))
@@ -1869,6 +1870,8 @@ const MARSH_ROCK_ART: Array[String] = [
 ]
 ## A lantern on a crooked post, its glass dark: Henrik's favour lights them (step 3).
 const MARSH_LANTERN_PALETTE: Dictionary = {"w": Color(0.48, 0.38, 0.28), "W": Color(0.32, 0.24, 0.18), "i": Color(0.30, 0.30, 0.36), "d": Color(0.16, 0.20, 0.28), "D": Color(0.34, 0.42, 0.52), "s": Color(0.00, 0.00, 0.00, 0.25)}
+## The same post with its lantern burning: only the glass differs.
+const MARSH_LANTERN_LIT_PALETTE: Dictionary = {"w": Color(0.48, 0.38, 0.28), "W": Color(0.32, 0.24, 0.18), "i": Color(0.30, 0.30, 0.36), "d": Color(1.00, 0.88, 0.45), "D": Color(1.00, 0.97, 0.75), "s": Color(0.00, 0.00, 0.00, 0.25)}
 const MARSH_LANTERN_ART: Array[String] = [
 	"................",
 	"....ooooooo.....",

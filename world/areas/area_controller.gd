@@ -95,6 +95,10 @@ const NIGHT_POOL: float = 0.78
 @export var music: StringName = &""
 ## A dark area (the crypt): only what lights reach is seen (LightRules, drawn by AreaLighting).
 @export var dark: bool = false
+## The flag that lights this area's marsh lantern posts (Willowmere's: Old Henrik's favour sets
+## it). Lit, they glow from dusk to dawn like the village lamps, and their light gives a
+## Bogwisp a body as the hero's Lantern does. Empty: the area has none to light.
+@export var lanterns_flag: StringName
 
 var grid: HeightGrid
 var terrain: TerrainQuery
@@ -134,6 +138,8 @@ var _travelling: bool = false
 ## Whether it was night out of doors here at the last look: when that turns, those that are
 ## only there by night rise or fade.
 var _night_was: bool = false
+## Where this area's burning marsh lanterns hang (area px): none until their flag is set.
+var _lantern_points: Array[Vector2] = []
 ## The game is saved and leaving (save_and_leave), and whether he has been told once that it
 ## couldn't be saved: asked again, it leaves all the same.
 var _leaving: bool = false
@@ -1058,13 +1064,38 @@ func _on_night_turned(night: bool) -> void:
 
 
 ## The lights that give a Bogwisp a body (LightRules lights, the rule the crypt's dark uses):
-## the Lantern the hero carries, at its own radius. The dim glow he has without one is no
+## the Lantern the hero carries, at its own radius, and every marsh lantern that burns (once
+## Henrik's favour is done, from dusk to dawn). The dim glow he has without a Lantern is no
 ## light to speak of.
 func holding_lights() -> Array:
 	var out: Array = []
 	if hero_light_radius() > DIM_RADIUS:
 		out.append(LightRules.light(player.position + Vector2(0, -8), hero_light_radius()))
+	if lanterns_burn():
+		for point: Vector2 in _lantern_points:
+			out.append(LightRules.light(point, Ambience.LANTERN_HOLD))
 	return out
+
+
+## Whether this area's marsh lanterns have been lit (its `lanterns_flag` is set).
+func lanterns_are_lit() -> bool:
+	return lanterns_flag != &"" and GameState.get_flag(lanterns_flag) == true
+
+
+## Whether they are burning right now: lit, and it is between dusk and dawn.
+func lanterns_burn() -> bool:
+	return lanterns_are_lit() and GameState.day_clock().lamps_lit(GameState.minute)
+
+
+## The flag came true while the hero stood here: every post takes its burning picture, and
+## the area's lights are worked out again.
+func _light_the_lanterns() -> void:
+	var decor: TileMapLayer = get_node_or_null(^"Decor") as TileMapLayer
+	if Ambience.light_lanterns(decor) == 0:
+		return
+	_lantern_points = Ambience.lantern_points(decor)
+	tile_glows = Ambience.tile_glows([height_layer, decor])
+	_update_light()
 
 
 ## Whether one of those lights reaches `point` (area px): there a Bogwisp can be struck.
@@ -1184,6 +1215,10 @@ func _add_ambience() -> void:
 		if child is FarmPlot:
 			plot = child as FarmPlot
 			plot.clear_ground(decor)
+	# Lantern posts whose flag is set burn (Willowmere, once Henrik has his embers).
+	if lanterns_are_lit():
+		Ambience.light_lanterns(decor)
+	_lantern_points = Ambience.lantern_points(decor)
 	tile_glows = Ambience.tile_glows([height_layer, decor])
 	# Nature (P1c): tall trees the hero walks behind, water, petals and mist.
 	scenery = Scenery.new()
@@ -1660,6 +1695,8 @@ func _fall() -> void:
 func _on_flag_set(flag: StringName, value: Variant) -> void:
 	if flag == ENDING_FLAG and value == true:
 		_ending_due = true
+	if lanterns_flag != &"" and flag == lanterns_flag and value == true:
+		_light_the_lanterns()
 	for child: Node in interactables.get_children():
 		(child as Node2D).queue_redraw()
 	_refresh_doors()

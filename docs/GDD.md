@@ -44,8 +44,8 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
   meadow. Open from the first day and never needed for the story. Shallow pools and deep reeds block, and
   boardwalks are the paths between its banks and islets. Cattail root, marsh berries and bog mushrooms grow
   there (two of them make Marsh Stew), a ruined fisher's hut stands in the middle, and a heart piece lies
-  behind the willows. After dark the mist thickens and **Bogwisps** rise over the pools (§8). *(Not
-  built yet: Old Henrik and his favour.)*
+  behind the willows. After dark the mist thickens and **Bogwisps** rise over the pools (§8). **Old
+  Henrik** stands by the hut by day (§10): his favour lights the six lanterns where the boards meet land.
 - **The dungeons:** the Old Keep, north of the village, and the Chapel Crypt under the chapel. The crypt is
   barred until the keep is quiet. It's dark, and its floor has fallen in. A ruin in the South Field leads down
   to a small cellar and cistern.
@@ -147,6 +147,11 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
 | Berry jam *(taught by Wenna)* | 3 wild berries | 30 | |
 | Carrot cake *(taught by Tilda)* | 2 carrots, 1 wheat | 50 | half |
 | Shepherd's pie *(taught by Shepherd Edda)* | potato, turnip, mushroom | 70 | one |
+| Cattail root | foraged in Willowmere | 6 | |
+| Marsh berries | foraged in Willowmere | 9 | |
+| Bog mushrooms | foraged in Willowmere | 7 | |
+| Marsh stew | 2 bog mushrooms, 1 cattail root | 45 | half |
+| Ember tea *(taught by Old Henrik)* | 1 wisp ember, 2 marsh berries | 90 | |
 
 The last three are not known from the start: a villager teaches each as a friend (§10).
 
@@ -198,6 +203,8 @@ Enemies sometimes drop hearts or coins.
   - **It has no body in the dark:** a blow passes through. Inside the light of the Lantern he carries it
     turns solid, and two blows of a sword beat it. It always leaves a Wisp Ember.
   - The night's rules don't make it tougher, and it floats over water and reeds.
+  - **Once Old Henrik's lanterns burn** (his favour, §10), a wisp that drifts into a lantern's light is
+    solid too, Lantern or no Lantern.
 
 ## 9. Dungeons & puzzles
 - Rooms on a grid; the camera shows one room at a time; doors between rooms.
@@ -236,9 +243,11 @@ Enemies sometimes drop hearts or coins.
 | Wenna | teaches berry jam | |
 | Tilda | teaches carrot cake | |
 | Shepherd Edda | teaches shepherd's pie | |
+| Old Henrik | Lights on the Marsh: 3 wisp embers | the marsh lanterns lit, and ember tea |
 
   - **At four marks** each gives a present, once: Elder Bram 40 coins, Wenna 25 coins, Tilda 3 potato seeds,
-    Farmer Oda 3 carrot seeds, Pip 10 coins, Guard Rolf 30 coins, Shepherd Edda 4 wheat seeds. No hearts.
+    Farmer Oda 3 carrot seeds, Pip 10 coins, Guard Rolf 30 coins, Shepherd Edda 4 wheat seeds, Old Henrik
+    3 bog mushrooms. No hearts.
   - A favour can be put off and is asked again at the next talk.
 
 | Villager | Likes |
@@ -248,6 +257,7 @@ Enemies sometimes drop hearts or coins.
 | Tilda | Pumpkin pie, wheat |
 | Farmer Oda | Bread, pumpkin |
 | Pip | Wild berries, pumpkin pie |
+| Old Henrik | Marsh stew, bread |
 | Guard Rolf | Bread, mushroom soup |
 | Shepherd Edda | Mushroom soup, carrots |
 

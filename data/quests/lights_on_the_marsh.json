@@ -1,0 +1,68 @@
+{
+  "id": "lights_on_the_marsh",
+  "title": "Lights on the Marsh",
+  "giver": "old_henrik",
+  "start_stage": "bring",
+  "stages": {
+    "bring": {
+      "journal": "Old Henrik in Willowmere asked for three wisp embers to light the marsh lanterns. Bogwisps rise there after dark; a lantern's light makes them solid.",
+      "objectives": [
+        {
+          "id": "have",
+          "text": "Have three wisp embers",
+          "complete_when": {
+            "type": "any",
+            "of": [
+              {
+                "type": "has_item",
+                "item": "wisp_ember",
+                "count": 3
+              },
+              {
+                "type": "flag",
+                "flag": "embers_given",
+                "value": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "bring",
+          "text": "Bring them to Old Henrik",
+          "complete_when": {
+            "type": "flag",
+            "flag": "embers_given",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "embers_given",
+            "value": true
+          },
+          "to": "done"
+        }
+      ]
+    },
+    "done": {
+      "journal": "The marsh lanterns burn again from dusk to dawn, and a wisp that drifts into their light can be struck. Old Henrik taught you ember tea.",
+      "on_enter": [
+        {
+          "type": "set_flag",
+          "flag": "marsh_lanterns_lit",
+          "value": true
+        },
+        {
+          "type": "teach_recipe",
+          "recipe": "ember_tea"
+        },
+        {
+          "type": "complete_quest"
+        }
+      ]
+    }
+  }
+}

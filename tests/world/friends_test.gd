@@ -213,11 +213,11 @@ func test_the_pause_menu_has_a_friends_page_with_every_villagers_marks() -> void
 	var page: FriendsPage = menu.friends_page
 	assert_bool(page.is_open()).is_true()
 	assert_array(Array(page.shown_lines())).override_failure_message("everyone, by name").is_equal([
-		"Elder Bram 0/5", "Farmer Oda 0/5", "Guard Rolf 0/5", "Pip 2/5", "Shepherd Edda 0/5", "Tilda 0/5", "Wenna 5/5",
+		"Elder Bram 0/5", "Farmer Oda 0/5", "Guard Rolf 0/5", "Old Henrik 0/5", "Pip 2/5", "Shepherd Edda 0/5", "Tilda 0/5", "Wenna 5/5",
 	])
 	var blossoms: Array[FriendMarks] = page.shown_marks()
-	assert_int(blossoms.size()).is_equal(7)
-	assert_array(blossoms.map(func(marks: FriendMarks) -> int: return marks.earned)).is_equal([0, 0, 0, 2, 0, 0, 5])
+	assert_int(blossoms.size()).override_failure_message("eight, with Old Henrik of the marsh").is_equal(8)
+	assert_array(blossoms.map(func(marks: FriendMarks) -> int: return marks.earned)).is_equal([0, 0, 0, 0, 2, 0, 0, 5])
 	for marks: FriendMarks in blossoms:
 		assert_int(marks.out_of).is_equal(5)
 	assert_bool(get_tree().paused).override_failure_message("the game waits behind it").is_true()
@@ -225,7 +225,7 @@ func test_the_pause_menu_has_a_friends_page_with_every_villagers_marks() -> void
 	page.close()
 	assert_bool(menu.is_open()).is_true()
 	menu.choose(PauseMenu.FRIENDS)
-	assert_int(page.shown_marks().size()).is_equal(7)
+	assert_int(page.shown_marks().size()).is_equal(8)
 	menu.resume()
 	assert_bool(page.is_open()).override_failure_message("resuming closes it").is_false()
 	assert_bool(get_tree().paused).is_false()

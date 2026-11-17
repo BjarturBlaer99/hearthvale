@@ -27,8 +27,9 @@ saving with a backup, saving on quit, a title that says when a save can't be rea
 when the pack is full, and a villager's own thanks for a gift to a full friendship. None of it is a roadmap
 step.
 **Willowmere (the user's request, 2026-11-17; `docs/progress/willowmere-plan.md`, approved as written):** one
-new area, a marsh east of the village, and one new enemy, the Bogwisp, in three steps. **W1, the marsh by
-day, and W2, the Bogwisp and the night, are built.** W3 (Old Henrik, his favour and the lanterns) is next. Build nothing beyond the plan's list.
+new area, a marsh east of the village, and one new enemy, the Bogwisp, in three steps. **All three steps are
+built (2026-11-17):** W1 the marsh by day, W2 the Bogwisp and the night, W3 Old Henrik, his favour and the
+lanterns. What is left is the user's: to play it. Nothing further is planned: ask before building more. Build nothing beyond the plan's list.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -330,4 +331,22 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   or friendship conditions are never met. The quest log shows five quests at a time (`shown_lines()`; all of
   them are `all_lines()`). **A test that talks to a villager at two or four marks gets their favour, lesson
   or present first:** end it, or set the quest, the recipe's flag or the present's flag beforehand.
+- **Willowmere (2026-11-17; `docs/progress/willowmere-plan.md`, TECH_DESIGN §26):** the area `willowmere`,
+  east of the village by the planks on its east meadow. Water and reeds are solid; boardwalks are the
+  paths. Its forage, foods, recipes, villager, favour and enemy are all data.
+  - **An enemy's data may say three new things:** `"energy_drain"` (its touch takes energy as well as
+    hearts: `Hit.energy`), `"appears": "night"` (it lies low by day, rises at 20:00 if the hero is there,
+    fades when the night ends, and the night's rules don't strengthen it), and `"behaviour": "wisp"`.
+  - **A Bogwisp has no body unless light reaches it** (`WispBrain.lit`, set each frame from
+    `AreaController.holds_at()`): the Lantern the hero carries, at its own radius, and the marsh lanterns
+    once they burn. **A test that hits a wisp gives the hero a lantern or sets the lanterns' flag, and
+    calls `wisp.step()` once so the brain has been told**; its touch hurts either way.
+  - **By day a test finds no wisps** (they are `lying_low`, with no brain): set the hour to night before
+    loading the marsh, or set it and call `area._process()`.
+  - **The marsh lanterns** light when the area's `lanterns_flag` is set (`marsh_lanterns_lit`, the reward
+    of Henrik's favour) and burn from dusk to dawn.
+  - **Old Henrik** is away after 20:00 like every villager out of doors, and wisps are there only after
+    20:00: the embers are won by night and handed over by day.
+  - **Do not make the mist drift or add specks to the marsh's air:** its mist thickens at night and stays
+    where it lies; its fireflies are creatures, and wait for dusk (`Ambience.DUSK_FIREFLIES`).
 

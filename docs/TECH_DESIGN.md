@@ -1102,7 +1102,7 @@ field on recipes.
 
 ## 26. Willowmere
 The marsh east of Hearthvale (the user's request, 2026-11-17; `docs/progress/willowmere-plan.md`). Step 1,
-the marsh by day, and step 2, the Bogwisp, are built; Old Henrik (step 3) is not.
+the marsh by day, step 2, the Bogwisp, and step 3, Old Henrik, are all built.
 - **The map** is baked like the others (`build_maps.gd`, `"willowmere"`): its base is water, and blocks lay
   reeds, land, boardwalks, the hut and the woods over it. Three things are new in the baker, all small:
   - a map may name its `"prop_ground"`, the solid ground its props stand on (the marsh's is `marsh_solid`);
@@ -1143,3 +1143,17 @@ the marsh by day, and step 2, the Bogwisp, are built; Old Henrik (step 3) is not
   a pit and looks for open floor beside it, else takes the hero's cell.
 - **The mist** has a thickness (`Mist.thickness`, eased by `thicken_toward()`); `Ambience.NIGHT_MIST` says
   where the night's is thicker.
+- **Old Henrik (step 3)** is data: `data/villagers/old_henrik.json`, `data/dialogue/old_henrik.json`,
+  `data/quests/lights_on_the_marsh.json`, `data/recipes/ember_tea.json`, an item, and a `Villager` node in
+  the marsh. No code names him.
+- **The lanterns:** an area's `lanterns_flag` (an export) names the flag that lights its posts.
+  - `lanterns_are_lit()` is that flag; `lanterns_burn()` adds the hours the lamps are lit.
+  - Lit, every `prop_marsh_lantern` tile on the Decor layer becomes `prop_marsh_lantern_lit`
+    (`Ambience.light_lanterns()`): as the area loads, or at once if the flag comes true while the hero is
+    there (`_on_flag_set`).
+  - The burning tile is one of `Ambience.TILE_LIGHTS`, lit at dusk like `prop_lamp`, so it glows through
+    the same code as the village's lamps.
+  - `holding_lights()` adds a `LightRules` light of `Ambience.LANTERN_HOLD` at each `lantern_points()`
+    while they burn: a Bogwisp there has a body.
+- **Played from the keys:** a scratch script (not in the repository) drove the favour and the fight in a
+  real window; `docs/progress/LOG.md` has what it pressed and what happened.

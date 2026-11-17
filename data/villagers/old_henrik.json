@@ -1,0 +1,14 @@
+{
+  "id": "old_henrik",
+  "name": "Old Henrik",
+  "dialogue": "old_henrik",
+  "likes": [
+    "marsh_stew",
+    "bread"
+  ],
+  "thanks": {
+    "liked": "Now that warms old bones. Thank you.",
+    "other": "Kind of you to think of me.",
+    "full": "You've done enough for ten friends. Thank you."
+  }
+}

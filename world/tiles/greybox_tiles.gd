@@ -43,7 +43,7 @@ extends RefCounted
 ##  24 the marsh's decorations and props, for the Decor layer: cattails and a patch of moss
 ##     (walkable looks), planks laid on the ground (the way to the marsh across Hearthvale's
 ##     east meadow, at any height), a mossy stone and a marsh lantern post (props), and a hole
-##     through the ruined hut's roof (a decoration over it)
+##     through the ruined hut's roof (a decoration over it), and the lantern post burning
 
 const TEXTURE_PATH: String = "res://world/tiles/greybox_tiles.png"
 const TILESET_PATH: String = "res://world/tiles/greybox_tiles.tres"
@@ -85,8 +85,12 @@ const MARSH_KINDS: Array[String] = ["marsh", "marsh_solid", "boardwalk", "boardw
 const MARSH_SOLID: Array[bool] = [false, true, false, false, true, true, true, true]
 const MARSH_HEIGHTS: Array[int] = [0, 0, 0, 0, 1, 1, 2, 2]
 ## The marsh's decorations (walkable looks) and its props, in atlas order.
-const MARSH_DECOR_KINDS: Array[String] = ["cattail", "moss", "planks", "prop_mossy_rock", "prop_marsh_lantern", "ruin_hole"]
-const MARSH_PROP_KINDS: Array[String] = ["prop_mossy_rock", "prop_marsh_lantern"]
+const MARSH_DECOR_KINDS: Array[String] = ["cattail", "moss", "planks", "prop_mossy_rock", "prop_marsh_lantern", "ruin_hole", "prop_marsh_lantern_lit"]
+const MARSH_PROP_KINDS: Array[String] = ["prop_mossy_rock", "prop_marsh_lantern", "prop_marsh_lantern_lit"]
+## A marsh lantern post dark, and the same post burning: the area puts the second in the place
+## of the first once the flag it names is set (AreaController.lanterns_flag).
+const LANTERN_DARK: String = "prop_marsh_lantern"
+const LANTERN_LIT: String = "prop_marsh_lantern_lit"
 ## Block kinds that stand for one of several marsh tiles (build_maps.gd picks): never tiles.
 const MARSH_BLOCKS: Array[String] = ["ruin"]
 ## House fronts, in atlas order from ROW_HOUSE (eight to a row), all solid at height 3 but for

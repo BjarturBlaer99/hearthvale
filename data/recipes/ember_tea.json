@@ -1,0 +1,9 @@
+{
+	"id": "ember_tea",
+	"taught": true,
+	"makes": { "item": "ember_tea", "count": 1 },
+	"needs": [
+		{ "item": "wisp_ember", "count": 1 },
+		{ "item": "marsh_berries", "count": 2 }
+	]
+}

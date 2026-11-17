@@ -3,7 +3,7 @@
 The user's request, 2026-11-17: one new area (Willowmere, a misty marsh east of the village) and one new
 enemy (the Bogwisp), with an eighth villager, a favour, forage, two recipes and a tune. No new mechanics.
 
-**Status: approved as written on 2026-11-17. Steps 1 and 2 are built; step 3 is not.**
+**Status: approved as written on 2026-11-17. All three steps are built (2026-11-17). Not yet played by the user.**
 
 ## Ten things to decide
 
@@ -130,13 +130,16 @@ mist.
 - [x] Without the Lantern the sword passes through; with it, two blows and a Wisp Ember
 
 **Step 3: Old Henrik.** The villager, his conversation and present, the favour, the lanterns, Ember Tea.
-- [ ] Henrik can be befriended and given gifts like the other seven; his data is unit-tested
-- [ ] The favour is asked at two marks, finished with three embers, and lights the lanterns from the next dusk
-- [ ] Ember Tea is not at the hearth before the favour and is after it
+- [x] Henrik can be befriended and given gifts like the other seven; his data is unit-tested
+- [x] The favour is asked at two marks, finished with three embers, and lights the lanterns from the next dusk
+- [x] Ember Tea is not at the hearth before the favour and is after it
 
 **Done when** all tests pass, a save from before Willowmere loads with the marsh untouched and Henrik a
 stranger, it is committed, and the user has screenshots of the marsh by day and by night and an account of
 the Bogwisp fight and the favour as played.
+
+All of that is done but the last word, which is the user's:
+- [ ] *(yours)* the marsh feels worth the walk by day, and worth the risk by night
 
 ## Saves
 

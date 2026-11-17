@@ -13,6 +13,10 @@ const DUNGEON: StringName = &"dungeon"
 const FIRE: Color = Color(1.0, 0.62, 0.26)
 const CANDLE: Color = Color(1.0, 0.80, 0.45)
 const LAMP: Color = Color(1.0, 0.88, 0.55)
+## Where a marsh lantern hangs in its cell (px), and how far its light gives a Bogwisp a body
+## (px): a little less than the Lantern the hero carries.
+const LANTERN_AT: Vector2 = Vector2(10, 7)
+const LANTERN_HOLD: float = 44.0
 
 ## Tiles that give light: kind -> [where in the cell (px), how far it glows (px), colour,
 ## how strong the glow is drawn, whether it flickers].
@@ -20,13 +24,14 @@ const TILE_LIGHTS: Dictionary = {
 	"hearth": [Vector2(8, 10), 46.0, FIRE, 0.42, true],
 	"candle": [Vector2(8, 4), 26.0, CANDLE, 0.34, true],
 	"prop_lamp": [Vector2(8, 3), 22.0, LAMP, 0.30, false],
+	"prop_marsh_lantern_lit": [LANTERN_AT, 24.0, LAMP, 0.32, true],
 }
 
 ## How many times bigger than life the camera shows each kind of place (P1a): rooms are small,
 ## so houses and dungeons are shown at twice the size. Whole numbers keep pixels square.
 ## The tile lights that are lit only from dusk to dawn (DayClock.lamps_lit): street lamps.
 ## A fire or a candle burns at any hour.
-const LIT_AT_DUSK: Array[String] = ["prop_lamp"]
+const LIT_AT_DUSK: Array[String] = ["prop_lamp", "prop_marsh_lantern_lit"]
 const ZOOM: Dictionary = {OUTDOOR: 1, INTERIOR: 2, DUNGEON: 2}
 ## Areas with mist among the trees (P1c).
 const MISTY: Array[StringName] = [&"old_wood", &"willowmere"]
@@ -57,6 +62,29 @@ static func has_mist(area_id: StringName) -> bool:
 
 static func fireflies_wait_for_dusk(area_id: StringName) -> bool:
 	return DUSK_FIREFLIES.has(area_id)
+
+
+## Where the burning marsh lanterns on `layer` (the Decor layer) hang, in area px and cell order.
+static func lantern_points(layer: TileMapLayer) -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	if layer == null:
+		return out
+	var cells: Array[Vector2i] = layer.get_used_cells_by_id(GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(GreyboxTiles.LANTERN_LIT))
+	cells.sort()
+	for cell: Vector2i in cells:
+		out.append(Vector2(cell) * float(GreyboxTiles.TILE_SIZE) + LANTERN_AT)
+	return out
+
+
+## Puts a burning lantern in the place of every dark one on `layer` (the Decor layer). Returns
+## how many it lit.
+static func light_lanterns(layer: TileMapLayer) -> int:
+	if layer == null:
+		return 0
+	var cells: Array[Vector2i] = layer.get_used_cells_by_id(GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(GreyboxTiles.LANTERN_DARK))
+	for cell: Vector2i in cells:
+		layer.set_cell(cell, GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(GreyboxTiles.LANTERN_LIT))
+	return cells.size()
 
 
 ## How thick the mist of `area_id` is at most, by day or by `night`.

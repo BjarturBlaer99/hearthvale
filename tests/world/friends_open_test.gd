@@ -16,6 +16,7 @@ const SHOP: String = "res://world/areas/shop/shop.tscn"
 const ELDER_HOUSE: String = "res://world/areas/elder_house/elder_house.tscn"
 const WEAVER: String = "res://world/areas/weaver_house/weaver_house.tscn"
 const FIELDS: String = "res://world/areas/north_fields/north_fields.tscn"
+const MARSH: String = "res://world/areas/willowmere/willowmere.tscn"
 const ENDING: String = "res://ui/ending_screen.tscn"
 const TEST_SLOT: int = 973
 
@@ -26,6 +27,8 @@ const FAVOURS: Array = [
 	[VILLAGE, "GuardRolf", &"guard_rolf", &"rations_for_the_watch", &"bring", &"bread", 3, "I'll bring them.", "Three loaves, as promised.", "About those rations...", {&"arrow": 10, &"coin": 20}],
 	[VILLAGE, "FarmerOda", &"farmer_oda", &"seed_stock", &"bring", &"wheat", 5, "I'll bring five.", "Five sheaves of wheat.", "About that wheat...", {&"pumpkin_seeds": 3}],
 	[ELDER_HOUSE, "Bram", &"elder_bram", &"elders_supper", &"cook", &"vegetable_stew", 1, "I'll cook you one.", "Your supper, Elder.", "About that stew...", {&"coin": 30}],
+	# Old Henrik (Willowmere): his reward is no item but lit lanterns and a recipe (tests/world/henrik_test.gd).
+	[MARSH, "OldHenrik", &"old_henrik", &"lights_on_the_marsh", &"bring", &"wisp_ember", 3, "I'll bring them.", "Three embers, Henrik.", "About those embers...", {}],
 ]
 ## The plan's table of recipes: where the teacher is, their node, their id, the recipe, the
 ## dish's name, its makings and what it gives (energy, half hearts).
@@ -43,6 +46,7 @@ const PRESENTS: Array = [
 	[VILLAGE, "Pip", &"pip", &"coin", 10],
 	[VILLAGE, "GuardRolf", &"guard_rolf", &"coin", 30],
 	[FIELDS, "ShepherdEdda", &"shepherd_edda", &"wheat_seeds", 4],
+	[MARSH, "OldHenrik", &"old_henrik", &"bog_mushroom", 3],
 ]
 
 var _area: Node
@@ -63,7 +67,7 @@ func after_test() -> void:
 	GameState.clear()
 
 
-func test_at_two_marks_four_villagers_ask_a_favour_that_can_be_put_off_taken_and_finished() -> void:
+func test_at_two_marks_five_villagers_ask_a_favour_that_can_be_put_off_taken_and_finished() -> void:
 	for favour: Array in FAVOURS:
 		_fresh()
 		var who: StringName = favour[2]
@@ -295,22 +299,22 @@ func test_the_quest_log_shows_five_quests_at_a_time_and_scrolls() -> void:
 	village.open_pause_menu()
 	village.hud.pause_menu.choose(PauseMenu.QUESTS)
 	var quest_log: QuestLog = village.hud.pause_menu.quest_log
-	assert_int(quest_log.all_lines().size()).override_failure_message("eight quests and Back").is_equal(9)
+	assert_int(quest_log.all_lines().size()).override_failure_message("nine quests (Henrik's since Willowmere) and Back").is_equal(10)
 	assert_array(Array(quest_log.shown_lines())).is_equal([
-		"> A Pie for Pip", "  A Place of Your Own", "  Eggs for Tilda", "  Rations for the Watch", "  Seed Stock",
+		"> A Pie for Pip", "  A Place of Your Own", "  Eggs for Tilda", "  Lights on the Marsh", "  Rations for the Watch",
 	])
-	assert_str(quest_log.corner_text()).is_equal("  1/9 v")
+	assert_str(quest_log.corner_text()).is_equal("  1/10 v")
 	quest_log.move_cursor(4)
-	assert_str(quest_log.shown_lines()[4]).override_failure_message("still in view").is_equal("> Seed Stock")
+	assert_str(quest_log.shown_lines()[4]).override_failure_message("still in view").is_equal("> Rations for the Watch")
 	quest_log.move_cursor(1)
 	assert_array(Array(quest_log.shown_lines())).override_failure_message("the list moves up a line").is_equal([
-		"  A Place of Your Own", "  Eggs for Tilda", "  Rations for the Watch", "  Seed Stock", "> Slimes in the South Field",
+		"  A Place of Your Own", "  Eggs for Tilda", "  Lights on the Marsh", "  Rations for the Watch", "> Seed Stock",
 	])
-	assert_str(quest_log.corner_text()).is_equal("^ 6/9 v")
-	assert_str(quest_log.shown_detail()).contains("slimes")
-	quest_log.move_cursor(3)
+	assert_str(quest_log.corner_text()).is_equal("^ 6/10 v")
+	assert_str(quest_log.shown_detail()).contains("wheat")
+	quest_log.move_cursor(4)
 	assert_str(quest_log.shown_lines()[4]).is_equal("> Back")
-	assert_str(quest_log.corner_text()).is_equal("^ 9/9  ")
+	assert_str(quest_log.corner_text()).is_equal("^ 10/10  ")
 	quest_log.move_cursor(1)
 	assert_str(quest_log.shown_lines()[0]).override_failure_message("round to the top").is_equal("> A Pie for Pip")
 	quest_log.close()
@@ -323,13 +327,13 @@ func test_the_ending_counts_the_days_the_crops_and_the_friends() -> void:
 	GameState.add_tally(GameState.CROPS_PICKED, 31)
 	for friend: Array in [[&"pip", 12], [&"wenna", 20], [&"elder_bram", 13], [&"tilda", 11], [&"guard_rolf", 4]]:
 		GameState.add_friendship(friend[0], friend[1])
-	assert_array(Array(EndingScreen.summary_lines()).slice(3)).is_equal(["Days   7", "Crops grown   31", "Friends   3 of 7"])
+	assert_array(Array(EndingScreen.summary_lines()).slice(3)).is_equal(["Days   7", "Crops grown   31", "Friends   3 of 8"])
 	var screen: EndingScreen = (load(ENDING) as PackedScene).instantiate()
 	get_tree().root.add_child(screen)
 	_area = screen
 	screen.travel = func(_path: String) -> void: pass
 	assert_int(screen.shown_stats().split("\n").size()).override_failure_message("six lines").is_equal(6)
-	assert_str(screen.shown_stats()).contains("Days   7").contains("Crops grown   31").contains("Friends   3 of 7")
+	assert_str(screen.shown_stats()).contains("Days   7").contains("Crops grown   31").contains("Friends   3 of 8")
 	var stats: Label = screen.get_node(^"Stats")
 	var menu: Control = screen.get_node(^"Menu")
 	assert_float(stats.position.y + stats.size.y).override_failure_message("the six lines end above the menu's box").is_less_equal(menu.position.y)
@@ -367,12 +371,16 @@ func _end(area: AreaController) -> void:
 	var box: DialogueBox = area.hud.dialogue
 	for step: int in 6:
 		if not area.is_talking():
-			return
+			break
 		var count: int = box.shown_options().size()
 		if count > 0:
 			box.move_cursor(count - 1 - box.selected)
 		box.confirm()
 	assert_bool(area.is_talking()).override_failure_message("the conversation ends").is_false()
+	# Where the last answer was the gift (Henrik's present is food, and can be given back while
+	# his favour is still unasked), the list it opened is shut with everything kept.
+	if area.hud.gift_menu.is_open():
+		area.hud.gift_menu.close()
 
 
 func _load(path: String) -> AreaController:

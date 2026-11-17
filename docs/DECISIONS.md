@@ -965,3 +965,15 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   lands on the nearest open cell, or where the hero stands.
 - 2026-11-17 — **The mist thickens, it doesn't move.** More of it at night is a change like the light's;
   the rule against scenery moving stands.
+- 2026-11-17 — **The flag that lights an area's lantern posts is named by the area** (`lanterns_flag` on
+  its scene), not written into the code. Willowmere's is `marsh_lanterns_lit`; an area that names none has
+  none to light.
+- 2026-11-17 — **A lit post shows its burning picture by day,** as the village's lamp posts do, and gives
+  light only from dusk. One picture, swapped once, and nothing to keep in step with the clock.
+- 2026-11-17 — **A marsh lantern holds a wisp within 44 px, a little less than the Lantern's 56.** Six of
+  them cover where the boards meet land and leave the middle of each walk dark: the favour makes the marsh
+  safer, not safe.
+- 2026-11-17 — **Henrik's favour is the fifth row in the favours' own test,** not a test of its own. The
+  plan asked that he be befriended like the others; the same test running him is the proof.
+- 2026-11-17 — **The "play" asked for was done by a script pressing real keys in a real window,** since
+  there is nobody at the keyboard. It is written up as that, with what it skipped.
