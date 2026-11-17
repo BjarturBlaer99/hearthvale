@@ -152,6 +152,12 @@ Beaten enemies sometimes drop hearts or coins.
   energy as well as hearts, and a sword only bites inside the light of the Lantern. Old Henrik stands by
   the hut by day: befriend him, bring him three Wisp Embers, and he lights the marsh lanterns and teaches
   Ember Tea.
+- **The Old Quarry:** a disused mine in the north-east corner of the North Fields: over the bridge, then
+  east along the old rails. Buy a Pickaxe at Tilda's (25 coins), put it in hand on the item bar, and strike
+  the rocks. Ore shows in the rock: copper on the first three floors, iron and coal on the next three,
+  gold and crystals on the last three, which are dark. A ladder down is under one of each floor's plain
+  rocks; reaching floors 4 and 7 opens the lift in the entrance hall. The rocks are back each morning, in
+  the same places with other things in them. Mining takes energy, so bring food.
 - **The road north:** from the top of the north rise, through the woods.
   - **The North Fields:** a stream with a bridge, a farm plot, slimes, and a goblin archer on a plateau. Keep an eye
     on the tree line beside the road.

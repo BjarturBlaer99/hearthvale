@@ -135,6 +135,23 @@ const SCENARIOS: Dictionary = {
 		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"planted_first_crop"],
 		"friends": {&"old_henrik": 5},
 	},
+	# In the Old Quarry's entrance hall with a Pickaxe, a sword and bread: for trying the mine
+	# from the top. (The lift has been nowhere yet.)
+	"quarry": {
+		"area": &"quarry",
+		"cell": Vector2i(2, 3),
+		"items": [[&"wooden_sword", 1], [&"pickaxe", 1], [&"bread", 5], [&"coin", 20]],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"planted_first_crop"],
+	},
+	# On floor 7 of the quarry by its ladder, where the dark begins, with the Lantern, food, and
+	# the lift open to floors 4 and 7: for trying the deep floors and their Bogwisps.
+	"deep": {
+		"area": &"quarry_7",
+		"cell": Vector2i(8, 1),
+		"items": [[&"wooden_sword", 1], [&"pickaxe", 1], [&"lantern", 1], [&"bread", 5], [&"vegetable_stew", 2]],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"planted_first_crop",
+			&"quarry/lift/4", &"quarry/lift/7"],
+	},
 	# Outside the Iron Warden's hall: sword, bow, 20 arrows, the boss door already open.
 	"warden": {
 		"area": &"keep",

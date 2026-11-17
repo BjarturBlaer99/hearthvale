@@ -13,7 +13,7 @@ func test_frame_names_match_the_order_the_tool_paints_them() -> void:
 		["slime", Enemy.SLIME_FRAMES], ["bat", Enemy.BAT_FRAMES], ["goblin", Enemy.GOBLIN_FRAMES],
 		["warden", Boss.FRAMES], ["villager", Villager.FRAMES], ["items", ItemIcons.FRAMES], ["torch", Torch.FRAMES], ["shade", ShadeBoss.FRAMES],
 		["crystal", CrystalSwitch.FRAMES], ["breakables", Breakable.FRAMES], ["critters", Critter.FRAMES],
-		["forage", ForageSpot.FRAMES],
+		["forage", ForageSpot.FRAMES], ["rocks", Rock.FRAMES],
 	]
 	for case: Array in cases:
 		var painted: Array = _frames_of(sprites[case[0]]).keys()

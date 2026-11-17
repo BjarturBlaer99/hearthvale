@@ -46,14 +46,15 @@
           "maximum": { "type": "number", "exclusiveMinimum": 0, "description": "A full bar." },
           "costs": {
             "type": "object",
-            "required": ["sprint_per_second", "swing", "shot", "hoe", "water"],
+            "required": ["sprint_per_second", "swing", "shot", "hoe", "water", "mine"],
             "description": "What things cost. Anything not named here is free.",
             "properties": {
               "sprint_per_second": { "type": "number", "minimum": 0, "description": "Each second the hero runs." },
               "swing": { "type": "number", "minimum": 0, "description": "A swing of the sword." },
               "shot": { "type": "number", "minimum": 0, "description": "A shot of the bow." },
               "hoe": { "type": "number", "minimum": 0, "description": "Tilling a cell of the plot with the hoe." },
-              "water": { "type": "number", "minimum": 0, "description": "Watering a cell of the plot with the can." }
+              "water": { "type": "number", "minimum": 0, "description": "Watering a cell of the plot with the can." },
+              "mine": { "type": "number", "minimum": 0, "description": "A blow of the pickaxe on a rock." }
             }
           },
           "low": {
@@ -153,15 +154,55 @@
                 "name": { "type": "string", "minLength": 1 },
                 "gains": {
                   "type": "object", "minProperties": 1,
-                  "description": "The points each deed gives. The game reports: monster, boss, till, harvest, dish.",
+                  "description": "The points each deed gives. The game reports: monster, boss, till, harvest, dish, rock, ore.",
                   "additionalProperties": { "type": "integer", "minimum": 1 }
                 },
                 "eases": {
                   "type": "array",
-                  "items": { "enum": ["sprint_per_second", "swing", "shot", "hoe", "water"] },
+                  "items": { "enum": ["sprint_per_second", "swing", "shot", "hoe", "water", "mine"] },
                   "description": "The energy costs (the energy rules' names) each level makes cheaper."
                 },
-                "enriches_dishes": { "type": "boolean", "default": false, "description": "Each level makes a cooked dish give more energy." }
+                "enriches_dishes": { "type": "boolean", "default": false, "description": "Each level makes a cooked dish give more energy." },
+                "extra_chance": { "type": "number", "minimum": 0, "maximum": 1, "description": "Each level above the first adds this to the chance that the work gives one more of what it gives (Mining: a rock of ore leaves one more). No more than 1 at the top level." }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "id": { "const": "mine" } } },
+      "then": {
+        "required": ["hall", "floors", "rocks"],
+        "properties": {
+          "hall": { "type": "string", "minLength": 1, "description": "The area the mine is entered through: where the lift stands, and where a fall ends." },
+          "floors": {
+            "type": "array", "minItems": 1,
+            "description": "The floors from the top down. The last has no ladder down.",
+            "items": {
+              "type": "object",
+              "required": ["area"],
+              "properties": {
+                "area": { "type": "string", "minLength": 1, "description": "The floor's area id. Its rocks are the 'rock' markers of its map." },
+                "ores": {
+                  "type": "object",
+                  "description": "How many of the floor's rocks hold each kind of ore today (a kind in 'rocks', never 'stone'). The rest are plain stone, and one of those hides the ladder.",
+                  "additionalProperties": { "type": "integer", "minimum": 0 }
+                }
+              }
+            }
+          },
+          "lift": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "description": "The floors (numbered from 1) the lift reaches once the hero has come to them on foot." },
+          "rocks": {
+            "type": "object",
+            "required": ["stone"],
+            "description": "Every kind of rock, 'stone' (a plain rock) among them.",
+            "additionalProperties": {
+              "type": "object",
+              "required": ["blows", "gives"],
+              "properties": {
+                "blows": { "type": "integer", "minimum": 1, "description": "The blows of the plain pickaxe it takes." },
+                "gives": { "type": "string", "minLength": 1, "description": "The item it leaves (one of it) when it breaks." }
               }
             }
           }

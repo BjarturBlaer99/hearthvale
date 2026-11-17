@@ -1157,3 +1157,55 @@ the marsh by day, step 2, the Bogwisp, and step 3, Old Henrik, are all built.
     while they burn: a Bogwisp there has a body.
 - **Played from the keys:** a scratch script (not in the repository) drove the favour and the fight in a
   real window; `docs/progress/LOG.md` has what it pressed and what happened.
+
+## 27. The Old Quarry
+Mining (the user's request, 2026-11-17; `docs/progress/mining-crafting-plan.md`, phase 1). Crafting
+(phase 2) and the balance pass (phase 3) are not built yet.
+- **Eleven places.** The mouth is six cells of the North Fields' east tree line (`quarry_rock` and
+  `mine_mouth` tiles; `QuarryMouth`, an `AreaExit`). The entrance hall is the area `quarry`; the nine floors
+  are the areas `quarry_1` to `quarry_9`, each one screen (20 by 11 cells).
+- **Maps from sketches.** A map in `build_maps.gd` may be a `"sketch"`: rows of characters, a cell each,
+  laid before its blocks (`#` the base, `~` water, `^` a ledge at height 1, `S` stairs, `T` a timber prop,
+  `o` floor with a rock marker, `=` floor with rails, anything else floor). A cave wall with floor to its
+  south gets its face tile (`_cave_faces`). The scenes' own nodes (ways in and out, monsters, the lift)
+  are in the `.tscn` files, where the letters of the sketch say they stand.
+- **The tiles** are two rows at the end of the atlas (`GreyboxTiles.ROW_QUARRY`, `ROW_QUARRY_DECOR`) and a
+  sixth spawn marker, `rock`. No older tile changed place.
+- **Underground.** `AreaController.underground` makes an area a dungeon for looks and light
+  (`Ambience.kind_of`), but the day's clock runs (`clock_runs()`), and an enemy that `waits_for_night()`
+  is always out. There is no daylight, so the night's rules never strengthen anything there.
+- **Rules, rolls and what is remembered** are three pure classes in `core/mining/`:
+  - `MineRules` reads `data/rules/mine.json`: the hall, the floors in order (an area and how many of its
+    rocks hold each ore), the lift's stops, and for each kind of rock its blows and what it gives.
+  - `MineRolls.roll()` shuffles a floor's rock cells from three numbers (the save's own, the day, the
+    floor) and hands out the day's ore, then the ladder to one of the plain rocks left.
+  - `MineState` keeps that number and the cells of the rocks broken today, by area; it empties the list
+    when asked about another day. `GameState.mine()` holds it (always as of today) and saves it.
+- **A rock** is a `Rock` node made from a `rock` marker. `AreaController.roll_rocks()` runs as the area
+  loads, before anything is marked occupied: it tells each rock its kind and blows, takes away the ones
+  `GameState.is_rock_broken()`, and shows the ladder if its rock is among them. A rock has no hurt box:
+  the sword and bombs pass it by.
+- **The Pickaxe** is an item of type `tool` whose stats say `"tool": "pick"`. `ToolUse.decide_pick()` says
+  whether there is a rock to strike; `AreaController._swing_pick()` spends `EnergyRules.MINE`, strikes,
+  and on the last blow calls `_on_rock_broken()`: the rock is marked broken, Mining is practised, and
+  what it held is left as an `ItemDrop` in its cell (or the ladder is shown). With the pickaxe in hand a
+  left click is the sword's unless he faces a rock (`faces_work()`).
+- **The ladder down** is a `LadderHole` (an `AreaExit` that draws itself) added where the day's rock stood.
+  The hall has one of its own. Every ladder up is a plain `AreaExit` on a `ladder_up` tile in a wall, and
+  leads to the hall: a way up to the floor above would have nowhere certain to arrive.
+- **The lift** is a `MineLift` (a `Talkable`) in the hall. Its conversation is built by
+  `MineRules.lift_dialogue()` from the stops whose flags are set (`quarry/lift/<floor>`, set by
+  `_open_the_lift()` on arriving). Its answers use a new effect, `travel` (`area`, `entry`): GameState
+  emits `EventBus.travel_requested`, and the area goes when the conversation closes (`go_to_area()`).
+- **A fall** on a floor ends in the hall: an area may name a `fall_area` and `fall_entry`, and `respawn()`
+  then travels there with full hearts and the usual words. `save_here()` saves a fallen hero as on his way.
+- **A drop he can't carry** stays where it lies: `ItemDrop.collect()` refuses without room, and the area
+  tells him once (`ItemDrop.told`). This holds for what monsters drop as well as for ore.
+- **The Mining skill** is the fourth in `data/rules/skills.json`: it gains by `rock` and `ore`, eases
+  `mine`, and has an `extra_chance` (0.05): `Skills.extra_chance()` is that for each level above the
+  first, and `_on_rock_broken()` rolls it for a rock of ore (`AreaController.roll_extra_ore`, which tests
+  replace). The pause menu shows two skills to a line (`Skills.lines()`), and is a line taller.
+- **Save version 5** adds `mine`: `{ "number", "day", "broken": { area: ["x,y"] } }`. The step from 4 gives
+  an old save a number made from the save itself and nothing broken.
+- **Pictures and sound:** `rocks.png` (a rock, five ores, the ladder, the lift) and seven item icons from
+  `make_sprites.gd`; the tune `mine` and the sounds `pick`, `rock_break` and `lift` from `make_audio.gd`.

@@ -154,7 +154,7 @@ func test_skill_points_go_through_a_save() -> void:
 	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
 	var on_disk: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveSystem.slot_path(TEST_SLOT)))
 	assert_dict(on_disk["skills"]).is_equal({"combat": 31.0, "farming": 12.0})
-	assert_int(int(on_disk["version"])).override_failure_message("no new version: skills have had their place since 4").is_equal(4)
+	assert_int(int(on_disk["version"])).override_failure_message("skills have had their place since version 4; 5 came with the mine").is_equal(5)
 	GameState.clear()
 	assert_int(GameState.skill_level(Skills.COMBAT)).override_failure_message("cleared").is_equal(1)
 	assert_int(SaveSystem.load_from_slot(TEST_SLOT)).is_equal(OK)
@@ -174,7 +174,7 @@ func test_a_game_saved_before_skills_starts_at_level_one() -> void:
 	for skill: StringName in GameState.skills().ids():
 		assert_int(GameState.skill_level(skill)).is_equal(1)
 	assert_float(GameState.energy_cost(EnergyRules.SWING)).is_equal(GameState.energy_rules().cost(EnergyRules.SWING))
-	assert_str(GameState.skills().line(GameState.skill_points)).is_equal("Combat 1   Farming 1   Cooking 1")
+	assert_array(Array(GameState.skills().lines(GameState.skill_points))).is_equal(["Combat 1   Farming 1", "Cooking 1   Mining 1"])
 
 
 func _on_skill_rose(skill: StringName, level: int) -> void:

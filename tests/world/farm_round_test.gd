@@ -116,8 +116,8 @@ func test_a_crop_is_planted_raised_harvested_eaten_cooked_and_sold() -> void:
 	assert_int(GameState.item_count(&"coin")).override_failure_message("two turnips at twelve").is_equal(24)
 	assert_int(GameState.item_count(&"turnip")).is_equal(1)
 	counter.switch_mode()
-	counter.move_cursor(3)
-	assert_str(counter.shown_lines()[3]).is_equal("> Turnip Seeds: 5 coins")
+	counter.move_cursor(4)
+	assert_str(counter.shown_lines()[4]).is_equal("> Turnip Seeds: 5 coins")
 	for i: int in 4:
 		assert_bool(counter.confirm()).override_failure_message("buying seed %d" % (i + 1)).is_true()
 	assert_bool(counter.confirm()).override_failure_message("four coins buy no fifth seed").is_false()

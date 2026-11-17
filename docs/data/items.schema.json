@@ -13,7 +13,7 @@
         "properties": {
           "id": { "type": "string", "minLength": 1 },
           "name": { "type": "string" },
-          "type": { "enum": ["weapon_melee", "weapon_ranged", "ammo", "bomb", "lantern", "key", "currency", "consumable", "quest", "heart", "food", "ingredient", "tool", "seed"], "description": "'food' is eaten from the item menu (its stats say what it gives); an 'ingredient' is only cooked with; a 'tool' works the farm from the item button (its stats name which tool it is); a 'seed' is planted from the item button (its stats name its crop)." },
+          "type": { "enum": ["weapon_melee", "weapon_ranged", "ammo", "bomb", "lantern", "key", "currency", "consumable", "quest", "heart", "food", "ingredient", "tool", "seed", "material"], "description": "A 'material' (stone, ore, coal, a crystal) is neither eaten nor given, only carried, sold and made into things. 'food' is eaten from the item menu (its stats say what it gives); an 'ingredient' is only cooked with; a 'tool' works the farm from the item button (its stats name which tool it is); a 'seed' is planted from the item button (its stats name its crop)." },
           "icon": { "type": "string", "description": "The item's picture (a frame of gameplay/art/items.png, ItemIcons.FRAMES). Without one, its type decides." },
           "stackable": { "type": "boolean", "default": false },
           "max_stack": { "type": "integer", "minimum": 1 },
@@ -31,7 +31,8 @@
               "energy": { "type": "number", "minimum": 0, "description": "Food: the energy it gives when eaten." },
               "hearts": { "type": "number", "minimum": 0, "description": "Food: the hearts it mends when eaten (0.5 is half a heart)." },
               "crop": { "type": "string", "description": "A seed: the id of the crop it plants (data/crops)." },
-              "tool": { "enum": ["hoe", "water"], "description": "A tool: 'hoe' tills bare soil; 'water' is the watering can, which waters tilled soil and names what it holds as its 'ammo' (that item's max_stack is how many pours it holds). 'cooldown' is how long one use takes (s)." }
+              "fewer_blows": { "type": "integer", "minimum": 0, "description": "A pickaxe: how many blows fewer than the plain one it needs to break a rock (never less than one blow)." },
+              "tool": { "enum": ["hoe", "water", "pick"], "description": "'pick' is the pickaxe, which strikes the rock the hero faces (data/rules/mine.json says how many blows each kind takes). A tool: 'hoe' tills bare soil; 'water' is the watering can, which waters tilled soil and names what it holds as its 'ammo' (that item's max_stack is how many pours it holds). 'cooldown' is how long one use takes (s)." }
             }
           }
         }

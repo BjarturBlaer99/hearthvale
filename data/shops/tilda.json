@@ -4,7 +4,8 @@
 	"sells": [
 		{ "item": "arrow", "count": 10, "price": 5 },
 		{ "item": "bomb", "count": 3, "price": 8 },
-		{ "item": "bread", "count": 1, "price": 6 }
+		{ "item": "bread", "count": 1, "price": 6 },
+		{ "item": "pickaxe", "count": 1, "price": 25 }
 	],
 	"sells_seeds": true,
 	"buys_crops": true

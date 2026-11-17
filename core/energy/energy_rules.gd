@@ -9,7 +9,7 @@ extends RefCounted
 ## What a missing rule falls back to (a test checks they are the game's own rules).
 const DEFAULTS: Dictionary = {
 	"maximum": 100.0,
-	"costs": {"sprint_per_second": 0.25, "swing": 0.5, "shot": 0.5, "hoe": 2.0, "water": 1.0},
+	"costs": {"sprint_per_second": 0.25, "swing": 0.5, "shot": 0.5, "hoe": 2.0, "water": 1.0, "mine": 2.0},
 	"low": {"below": 25.0, "move": 0.85, "cooldown": 1.3},
 	"no_sprint_below": 10.0,
 	"collapse": {"wake_share": 0.5, "coins_lost_share": 0.1, "coins_lost_most": 30},
@@ -21,8 +21,10 @@ const SHOT: String = "shot"
 ## Farm work (P3): tilling a cell with the hoe, watering one with the can.
 const HOE: String = "hoe"
 const WATER: String = "water"
+## Mining (2026-11-17): a blow of the pickaxe on a rock.
+const MINE: String = "mine"
 ## Every cost the rules name: what a skill may make cheaper (Skills' `eases`).
-const COSTS: Array[String] = [SPRINT, SWING, SHOT, HOE, WATER]
+const COSTS: Array[String] = [SPRINT, SWING, SHOT, HOE, WATER, MINE]
 
 ## A full bar.
 var maximum: float

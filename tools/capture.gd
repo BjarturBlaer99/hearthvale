@@ -176,6 +176,15 @@ const SHOTS: Array = [
 	# Willowmere (2026-11-17): the marsh by day, and after dark with the Bogwisps over its pools.
 	["141_willowmere_by_day", &"willowmere", Vector2i(21, 14), Vector2.DOWN, 0, "time:12:00"],
 	["142_willowmere_by_night", &"willowmere", Vector2i(21, 14), Vector2.DOWN, 0, "time:22:00"],
+	# The Old Quarry (2026-11-17): its mouth in the North Fields, its hall, a floor of each band,
+	# and the dark floors with no light and with the Lantern.
+	["143_quarry_mouth", &"north_fields", Vector2i(35, 6), Vector2.RIGHT, 0, ""],
+	["144_quarry_hall", &"quarry", Vector2i(4, 4), Vector2.DOWN, 0, ""],
+	["145_quarry_floor_1", &"quarry_1", Vector2i(9, 2), Vector2.DOWN, 0, ""],
+	["146_quarry_floor_5", &"quarry_5", Vector2i(2, 5), Vector2.RIGHT, 0, ""],
+	["147_quarry_floor_8_dark", &"quarry_8", Vector2i(11, 2), Vector2.DOWN, 0, ""],
+	["148_quarry_floor_8_lantern", &"quarry_8", Vector2i(11, 2), Vector2.DOWN, 0, "lantern"],
+	["149_quarry_floor_9_heart", &"quarry_9", Vector2i(16, 2), Vector2.DOWN, 0, "lantern"],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -198,6 +207,8 @@ func _capture() -> void:
 			continue
 		game_state.call(&"clear")
 		game_state.call(&"new_game")
+		# Every capture's mine rolls the same way, so the same shot shows the same rocks.
+		(game_state.call(&"mine") as RefCounted).set(&"number", 1)
 		game_state.call(&"damage", shot[4])
 		var clock: RefCounted = game_state.call(&"day_clock")
 		game_state.call(&"set_time", float(clock.call(&"in_day", str(shot[5]).trim_prefix("time:"))) if str(shot[5]).begins_with("time:") else NOON)

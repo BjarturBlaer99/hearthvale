@@ -48,6 +48,12 @@ extends SceneTree
 ## Spawns layer, and the area turns each into its node on load (GreyboxTiles.MARKER_KINDS).
 ## A map may name its "prop_ground": the solid ground its props stand on (default the grass's
 ## "solid_ground"; the marsh's is "marsh_solid").
+## A map may be drawn as a "sketch" (the Old Quarry's are): rows of characters, a cell each,
+## laid before its blocks. "#" is the map's base (cave wall), "~" water, "^" raised floor (a
+## ledge at height 1), "S" stairs up to it, "T" a timber prop, "o" floor with a rock marker on
+## it, "=" floor with rails on it, and anything else floor: the letters only mark where the
+## scene's own nodes stand (the way in, monsters, the lift). A cave wall with floor to its
+## south shows its face.
 ## Optional looks, on the Decor layer (never read for movement):
 ## - "decor": blocks [x, y, width, height, kind] of GreyboxTiles.DECOR_KINDS;
 ## - "scatter": { "seed", "kinds": [[kind, percent], ...] } sprinkled over open ground,
@@ -570,6 +576,10 @@ const MAPS: Dictionary = {
 			[3, 26, 1, 1, 0, "logs"],
 			[24, 9, 1, 1, 0, "standing_stone"],
 			[30, 23, 1, 1, 0, "stump"],
+			# The Old Quarry (2026-11-17): six cells of the east tree line are an outcrop of rock,
+			# with the mine's mouth cut through it.
+			[38, 5, 2, 3, 0, "quarry_rock"],
+			[38, 6, 2, 1, 0, "mine_mouth"],
 		],
 		"spawns": [
 			# Tall grass round the plateau's far corner hides a heart piece.
@@ -590,6 +600,9 @@ const MAPS: Dictionary = {
 			[7, 3, 1, 1, "flowers_yellow"],
 			[3, 6, 2, 1, "flowers_blue"],
 			[6, 6, 2, 1, "flowers_red"],
+			[37, 5, 1, 1, "rubble"],
+			[36, 7, 1, 1, "rubble"],
+			[34, 6, 4, 1, "rails"],
 		],
 		"scatter": {"seed": 13, "kinds": [["tuft", 8], ["flowers_red", 1], ["flowers_yellow", 2], ["flowers_blue", 1], ["pebbles", 1]]},
 	},
@@ -805,6 +818,243 @@ const MAPS: Dictionary = {
 		],
 		"scatter": {"seed": 11, "kinds": [["tuft", 9], ["flowers_red", 1], ["flowers_yellow", 1], ["flowers_blue", 1], ["mushroom", 1], ["pebbles", 2]]},
 	},
+	# The Old Quarry's entrance hall: the way out, the lift, the first ladder down, two rocks to try a pickaxe on.
+	"quarry": {
+		"scene": "res://world/areas/quarry/quarry.tscn",
+		"size": Vector2i(15, 9),
+		"base": "cave_wall",
+		"prop_ground": "cave_solid",
+		"sketch": [
+			"###############",
+			"#.....T...T...#",
+			"#..=======L...#",
+			">.............#",
+			"#.............#",
+			"#.............#",
+			"#....o...o..v.#",
+			"#..T.........##",
+			"###############",
+		],
+		"blocks": [
+			[0, 3, 1, 1, 0, "mine_mouth"],
+		],
+	},
+	# Floor 1, The Cut.
+	"quarry_1": {
+		"scene": "res://world/areas/quarry_1/quarry_1.tscn",
+		"size": Vector2i(20, 11),
+		"base": "cave_wall",
+		"prop_ground": "cave_solid",
+		"sketch": [
+			"####################",
+			"#......o.<...o....##",
+			"#......o...........#",
+			"#..oo........##..o.#",
+			"#..o....s....##..o.#",
+			"#...........oo.....#",
+			"#.o......o.......s.#",
+			"#.oo.....o....o....#",
+			"#..................#",
+			"##................##",
+			"####################",
+		],
+		"blocks": [
+			[9, 0, 1, 1, 0, "ladder_up"],
+		],
+	},
+	# Floor 2, The Galleries.
+	"quarry_2": {
+		"scene": "res://world/areas/quarry_2/quarry_2.tscn",
+		"size": Vector2i(20, 11),
+		"base": "cave_wall",
+		"prop_ground": "cave_solid",
+		"sketch": [
+			"####################",
+			"#......<.###...o...#",
+			"#.....o..o....s..o.#",
+			"#.oo.....###.......#",
+			"#.o...s..###..oo...#",
+			"#........###..o....#",
+			"#....o...###.....o.#",
+			"#...oo...###.......#",
+			"#.s...........o....#",
+			"#........###..o....#",
+			"####################",
+		],
+		"blocks": [
+			[7, 0, 1, 1, 0, "ladder_up"],
+		],
+	},
+	# Floor 3, The Old Face.
+	"quarry_3": {
+		"scene": "res://world/areas/quarry_3/quarry_3.tscn",
+		"size": Vector2i(20, 11),
+		"base": "cave_wall",
+		"prop_ground": "cave_solid",
+		"sketch": [
+			"####################",
+			"#......o<.o...s....#",
+			"#.............o....#",
+			"#...###########.oo.#",
+			"#.o.###########....#",
+			"#ooo###########..s.#",
+			"#...###########o...#",
+			"#.o.###########o...#",
+			"#......s...o.......#",
+			"#...o......o....s.o#",
+			"####################",
+		],
+		"blocks": [
+			[8, 0, 1, 1, 0, "ladder_up"],
+		],
+	},
+	# Floor 4, The Coal Seam.
+	"quarry_4": {
+		"scene": "res://world/areas/quarry_4/quarry_4.tscn",
+		"size": Vector2i(20, 11),
+		"base": "cave_wall",
+		"prop_ground": "cave_solid",
+		"sketch": [
+			"####################",
+			"#....oo.<....##....#",
+			"#....oo......##..b.#",
+			"#.....oo...........#",
+			"#......oo..........#",
+			"#..b....oo.....o...#",
+			"#........oo........#",
+			"#.........oo....##.#",
+			"#..........o....##.#",
+			"#.......b..........#",
+			"####################",
+		],
+		"blocks": [
+			[8, 0, 1, 1, 0, "ladder_up"],
+		],
+	},
+	# Floor 5, The Crossing.
+	"quarry_5": {
+		"scene": "res://world/areas/quarry_5/quarry_5.tscn",
+		"size": Vector2i(20, 11),
+		"base": "cave_wall",
+		"prop_ground": "cave_solid",
+		"sketch": [
+			"####################",
+			"#######....o.#######",
+			"#######.b.o..#######",
+			"#######.o....#######",
+			"#<...o...oo....o..g#",
+			"#....o...oo....o...#",
+			"#........o.........#",
+			"#######o.....#######",
+			"#######...b..#######",
+			"#######.oo.o.#######",
+			"####################",
+		],
+		"blocks": [
+			[1, 3, 1, 1, 0, "ladder_up"],
+		],
+	},
+	# Floor 6, The Ledges.
+	"quarry_6": {
+		"scene": "res://world/areas/quarry_6/quarry_6.tscn",
+		"size": Vector2i(20, 11),
+		"base": "cave_wall",
+		"prop_ground": "cave_solid",
+		"sketch": [
+			"####################",
+			"#^^^^^g^^^####^^g^^#",
+			"#^^^^^^^^^####^^^^^#",
+			"##--S-----####--S--#",
+			"#<....o........o...#",
+			"#..oo......b.......#",
+			"#..o....oo.....oo..#",
+			"#.......o......o...#",
+			"#.o...........b....#",
+			"#.oo....o..o.......#",
+			"####################",
+		],
+		"blocks": [
+			[1, 3, 1, 1, 0, "ladder_up"],
+		],
+	},
+	# Floor 7, The Dark Drift.
+	"quarry_7": {
+		"scene": "res://world/areas/quarry_7/quarry_7.tscn",
+		"size": Vector2i(20, 11),
+		"base": "cave_wall",
+		"prop_ground": "cave_solid",
+		"sketch": [
+			"####################",
+			"#.....o.<..#########",
+			"#..........#########",
+			"#######.o..#########",
+			"#######....o...oo..#",
+			"#######..w....o....#",
+			"#######o...#####.o.#",
+			"#..o.......#####...#",
+			"#.o..o.....#####.w.#",
+			"#.o........#####o.o#",
+			"####################",
+		],
+		"blocks": [
+			[8, 0, 1, 1, 0, "ladder_up"],
+		],
+	},
+	# Floor 8, The Flooded Gallery.
+	"quarry_8": {
+		"scene": "res://world/areas/quarry_8/quarry_8.tscn",
+		"size": Vector2i(20, 11),
+		"base": "cave_wall",
+		"prop_ground": "cave_solid",
+		"sketch": [
+			"####################",
+			"#....~~~~~.<..o...##",
+			"#....~~~~~..o......#",
+			"#..o...........~~~.#",
+			"#..o..w..~~~...~~~o#",
+			"#.o......~~~..o~~~.#",
+			"#~~~..o..~~~.......#",
+			"#~~~..o.......w..o.#",
+			"#~~~.....o.....o...#",
+			"##......oo...~~~.w.#",
+			"####################",
+		],
+		"blocks": [
+			[11, 0, 1, 1, 0, "ladder_up"],
+		],
+		"decor": [
+			[13, 0, 1, 1, "crystal_vein"],
+			[16, 0, 1, 1, "crystal_vein"],
+		],
+	},
+	# Floor 9, The Heart of the Quarry.
+	"quarry_9": {
+		"scene": "res://world/areas/quarry_9/quarry_9.tscn",
+		"size": Vector2i(20, 11),
+		"base": "cave_wall",
+		"prop_ground": "cave_solid",
+		"sketch": [
+			"####################",
+			"#......<.o....#..H.#",
+			"#.............#....#",
+			"#...oo........#ooo##",
+			"#...o.....w........#",
+			"#.........##....o..#",
+			"#.w.......##....oo.#",
+			"#......o...........#",
+			"#..o...o....w...o..#",
+			"#..oo......o....w..#",
+			"####################",
+		],
+		"blocks": [
+			[7, 0, 1, 1, 0, "ladder_up"],
+		],
+		"decor": [
+			[4, 0, 1, 1, "crystal_vein"],
+			[12, 0, 1, 1, "crystal_vein"],
+			[17, 0, 1, 1, "crystal_vein"],
+		],
+	},
 }
 
 
@@ -840,7 +1090,8 @@ func _bake(map: Dictionary) -> Error:
 	for y: int in size.y:
 		for x: int in size.x:
 			layer.set_cell(Vector2i(x, y), GreyboxTiles.SOURCE_ID, base)
-	for block: Array in map["blocks"]:
+	var blocks: Array = _sketch_blocks(map) + (map.get("blocks", []) as Array)
+	for block: Array in blocks:
 		var kind: String = block[5]
 		if not GreyboxTiles.is_known_kind(kind):
 			push_error("tools/greybox: unknown tile kind '%s' in %s" % [kind, block])
@@ -856,6 +1107,7 @@ func _bake(map: Dictionary) -> Error:
 					continue
 				var detail: String = _detail(kind, x - int(block[0]), y - int(block[1]), block[2], block[3])
 				layer.set_cell(cell, GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(detail, block[4]))
+	_cave_faces(layer, size)
 	var decor_error: Error = _decorate(root, layer, map, props)
 	if decor_error == OK:
 		decor_error = _spawns(root, map)
@@ -867,8 +1119,55 @@ func _bake(map: Dictionary) -> Error:
 	if error == OK:
 		error = ResourceSaver.save(out, path)
 	root.free()
-	print("tools/greybox: baked %d blocks into %s (%s)" % [(map["blocks"] as Array).size(), path, error_string(error)])
+	print("tools/greybox: baked %d blocks into %s (%s)" % [blocks.size(), path, error_string(error)])
 	return error
+
+
+## What a sketch's characters lay on the Height layer: [kind, height]. Anything else is floor.
+const SKETCH_KINDS: Dictionary = {"~": ["water", 0], "^": ["ledge", 1], "S": ["stairs", 1], "T": ["timber", 0]}
+const SKETCH_BASE: String = "#"
+const SKETCH_FLOOR: String = "cave_floor"
+const SKETCH_ROCK: String = "o"
+const SKETCH_RAILS: String = "="
+
+
+## The blocks a map's "sketch" stands for, a cell each: nothing where the base shows.
+func _sketch_blocks(map: Dictionary) -> Array:
+	var out: Array = []
+	var rows: Array = map.get("sketch", [])
+	for y: int in rows.size():
+		var row: String = rows[y]
+		for x: int in row.length():
+			if row[x] == SKETCH_BASE:
+				continue
+			var laid: Array = SKETCH_KINDS.get(row[x], [SKETCH_FLOOR, 0])
+			out.append([x, y, 1, 1, laid[1], laid[0]])
+	return out
+
+
+## The cells of a map's "sketch" that hold `mark`, as blocks of `kind` for the Spawns or the
+## Decor layer.
+func _sketch_marks(map: Dictionary, mark: String, kind: String) -> Array:
+	var out: Array = []
+	var rows: Array = map.get("sketch", [])
+	for y: int in rows.size():
+		var row: String = rows[y]
+		for x: int in row.length():
+			if row[x] == mark:
+				out.append([x, y, 1, 1, kind])
+	return out
+
+
+## A cave wall with anything but wall to its south shows its face.
+func _cave_faces(layer: TileMapLayer, size: Vector2i) -> void:
+	var wall: Vector2i = GreyboxTiles.coords(GreyboxTiles.CAVE_WALL)
+	var face: Vector2i = GreyboxTiles.coords(GreyboxTiles.CAVE_WALL_FACE)
+	for y: int in size.y - 1:
+		for x: int in size.x:
+			var cell: Vector2i = Vector2i(x, y)
+			var south: Vector2i = layer.get_cell_atlas_coords(cell + Vector2i.DOWN)
+			if layer.get_cell_atlas_coords(cell) == wall and south != wall and south != face:
+				layer.set_cell(cell, GreyboxTiles.SOURCE_ID, face)
 
 
 ## The prop for cell (dx, dy) of a prop block: the tree, rock, fence, crate and so on, a well
@@ -943,7 +1242,7 @@ func _decorate(root: Node, height_layer: TileMapLayer, map: Dictionary, props: D
 		if prop == "prop_tree":
 			prop = _tree_kind(cell, props, map["size"])
 		decor.set_cell(cell, GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(prop))
-	for block: Array in map.get("decor", []):
+	for block: Array in _sketch_marks(map, SKETCH_RAILS, "rails") + (map.get("decor", []) as Array):
 		var kind: String = block[4]
 		if not GreyboxTiles.is_decor(kind):
 			push_error("tools/greybox: '%s' is not a decoration (%s)" % [kind, block])
@@ -976,7 +1275,7 @@ func _decorate(root: Node, height_layer: TileMapLayer, map: Dictionary, props: D
 ## marker into its node on load.
 func _spawns(root: Node, map: Dictionary) -> Error:
 	var layer: TileMapLayer = root.get_node_or_null(^"Spawns")
-	var blocks: Array = map.get("spawns", [])
+	var blocks: Array = _sketch_marks(map, SKETCH_ROCK, GreyboxTiles.ROCK_MARKER) + (map.get("spawns", []) as Array)
 	if layer == null and blocks.is_empty():
 		return OK
 	if layer == null:

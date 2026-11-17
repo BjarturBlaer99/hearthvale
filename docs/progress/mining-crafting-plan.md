@@ -4,7 +4,7 @@ The user's request, 2026-11-17: the Old Quarry (a mine of nine floors), a Pickax
 crafting at home (a furnace, a workbench, a chest, sprinklers, tool upgrades), in phases with a stop after
 each. This is phase 0: the plan, and no code.
 
-**Status: approved as written on 2026-11-17. Phase 1 is being built.**
+**Status: approved as written on 2026-11-17. Phase 1 (mining) is built (2026-11-17). Phases 2 and 3 are not.**
 
 ## Sixteen things to decide
 
@@ -60,7 +60,9 @@ to try the pickaxe on.
 ```
 
 **The nine floors.** Each is one screen (20 by 11 cells): the whole floor is seen at once, but for the dark
-on floors 7 to 9. The sketches show the shape; the counts in the table are what gets built.
+on floors 7 to 9. The sketches are as phase 1 built them: the baker reads these very rows. They differ
+from the ones first drawn in one way: he arrives a few cells further east on seven floors, since the HUD's
+corner covers the top-left cells, and two rocks that were under it moved too. The counts are as approved.
 
 | Floor | Name | Rocks | Of them, each day | Monsters | |
 |---|---|---|---|---|---|
@@ -80,10 +82,10 @@ Legend: `#` rock wall, `.` floor, `o` a rock, `<` where he arrives (the ladder u
 ```
  1 The Cut                 2 The Galleries           3 The Old Face
 ####################      ####################      ####################
-#<.....o.....o....##      #<...o...###...o...#      #<.....o..o...s....#
-#......o...........#      #........o....s..o.#      #..o..........o....#
+#......o.<...o....##      #......<.###...o...#      #......o<.o...s....#
+#......o...........#      #.....o..o....s..o.#      #.............o....#
 #..oo........##..o.#      #.oo.....###.......#      #...###########.oo.#
-#..o....s....##..o.#      #.o...s..###..oo...#      #...###########....#
+#..o....s....##..o.#      #.o...s..###..oo...#      #.o.###########....#
 #...........oo.....#      #........###..o....#      #ooo###########..s.#
 #.o......o.......s.#      #....o...###.....o.#      #...###########o...#
 #.oo.....o....o....#      #...oo...###.......#      #.o.###########o...#
@@ -93,9 +95,9 @@ Legend: `#` rock wall, `.` floor, `o` a rock, `<` where he arrives (the ladder u
 
  4 The Coal Seam           5 The Crossing            6 The Ledges
 ####################      ####################      ####################
-#<..oo.......##....#      #######....o.#######      #^^^^^g^^^####^^g^^#
+#....oo.<....##....#      #######....o.#######      #^^^^^g^^^####^^g^^#
 #....oo......##..b.#      #######.b.o..#######      #^^^^^^^^^####^^^^^#
-#.....oo...........#      #######.o....#######      #---S-----####--S--#
+#.....oo...........#      #######.o....#######      ##--S-----####--S--#
 #......oo..........#      #<...o...oo....o..g#      #<....o........o...#
 #..b....oo.....o...#      #....o...oo....o...#      #..oo......b.......#
 #........oo........#      #........o.........#      #..o....oo.....oo..#
@@ -106,7 +108,7 @@ Legend: `#` rock wall, `.` floor, `o` a rock, `<` where he arrives (the ladder u
 
  7 The Dark Drift          8 The Flooded Gallery     9 The Heart of the Quarry
 ####################      ####################      ####################
-#<....o....#########      #<...~~~~~....o...##      #<.......o....#..H.#
+#.....o.<..#########      #....~~~~~.<..o...##      #......<.o....#..H.#
 #..........#########      #....~~~~~..o......#      #.............#....#
 #######.o..#########      #..o...........~~~.#      #...oo........#ooo##
 #######....o...oo..#      #..o..w..~~~...~~~o#      #...o.....w........#
@@ -139,6 +141,14 @@ Miner's Lantern 80), and without one he sees a cell or so. Crystals glimmer, for
 the end of the atlas; rocks and ores are pictures from the sprite tool. One tune, `mine`, slow and hollow,
 and six sounds (a pick's strike, a rock breaking, the ladder, the lift, the workbench, the furnace). All
 made in code.
+
+**As built, four things the plan didn't say:**
+- **What a rock held lies in its cell** until he walks onto it, as a pot's coins do. It is not put in his
+  pack.
+- **What he has no room for stays lying,** and he is told once. That is now true of what monsters drop
+  too: before, a drop over a full stack was taken and lost.
+- **The rock over the ladder gives no stone.**
+- **The pause menu is a line taller,** with two skills to a line: four don't fit on one.
 
 ## The Pickaxe, energy and the Mining skill
 
@@ -332,12 +342,12 @@ Each phase ends with every test passing, a commit, and a stop with screenshots a
 a phase the work is committed in the steps listed. Bugs are planted on purpose in each step's code to see
 that the tests catch them.
 
-**Phase 1: mining**
-- 1a. The mouth in the North Fields, the hall, cave tiles, the Pickaxe at Tilda's, rocks that stay broken
-  until morning, the cost of a blow, save version 5.
-- 1b. The nine floors, the day's roll, ladders, the lift, falling, the monsters of each band, the dark
+**Phase 1: mining** *(built 2026-11-17, in one commit: the three steps shared the same files)*
+- [x] 1a. The mouth in the North Fields, the hall, cave tiles, the Pickaxe at Tilda's, rocks that stay
+  broken until morning, the cost of a blow, save version 5.
+- [x] 1b. The nine floors, the day's roll, ladders, the lift, falling, the monsters of each band, the dark
   floors, the heart piece.
-- 1c. The Mining skill, the tune and the sounds, playtest scenarios.
+- [x] 1c. The Mining skill, the tune and the sounds, playtest scenarios.
 - **Done when** a new game can buy the Pickaxe, go down from floor 1 to floor 9 over as many days as it
   takes, ride the lift to 4 and 7, and find rocks and ore back the next morning in other places; a version
   4 save loads; all tests pass.

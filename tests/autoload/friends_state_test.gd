@@ -165,7 +165,7 @@ func test_friendship_goes_through_a_save() -> void:
 	assert_dict(on_disk["friends"]).is_equal({
 		"pip": {"points": 4.0, "talked": 1.0, "gift": 1.0}, "elder_bram": {"points": 1.0, "talked": 2.0, "gift": 0.0},
 	})
-	assert_int(int(on_disk["version"])).override_failure_message("no new version: friends have had their place since 4").is_equal(4)
+	assert_int(int(on_disk["version"])).override_failure_message("friends have had their place since version 4; 5 came with the mine").is_equal(5)
 	GameState.clear()
 	assert_int(GameState.friend_points(&"pip")).override_failure_message("cleared").is_equal(0)
 	assert_int(SaveSystem.load_from_slot(TEST_SLOT)).is_equal(OK)

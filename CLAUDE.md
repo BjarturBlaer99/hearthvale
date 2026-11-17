@@ -31,6 +31,11 @@ new area, a marsh east of the village, and one new enemy, the Bogwisp, in three 
 built (2026-11-17):** W1 the marsh by day, W2 the Bogwisp and the night, W3 Old Henrik, his favour and the
 lanterns. The user played it by day and by night on 2026-11-17 ("feels right" both times); handing over the
 embers and the lit lanterns have been played only by a script. Nothing further is planned: ask before building more. Build nothing beyond the plan's list.
+**Mining and crafting (the user's request, 2026-11-17; `docs/progress/mining-crafting-plan.md`, approved as
+written):** three phases, with a stop after each for the user to review. **Phase 1, mining, is built
+(2026-11-17):** the Old Quarry (an entrance hall and nine floors), the Pickaxe, rocks and ore rolled anew
+each day, the lift, the Mining skill. **Phase 2 (crafting) and phase 3 (balance) are not built:** start each
+only on the user's word, and build nothing beyond the plan's list.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -118,7 +123,7 @@ godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
 # Start partway through to try one part by hand (scenarios in the script: late, gifts, bram, gate, rest, farm, market, kitchen, home, village, marsh,
-# warden, crypt, shade, ending). An hour after the name starts at that time of day, energy=<n> with that much energy,
+# quarry, deep, warden, crypt, shade, ending). An hour after the name starts at that time of day, energy=<n> with that much energy,
 # and skills=<level> with every skill at that level.
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
 godot --path . -s res://tools/playtest.gd -- warden
@@ -166,6 +171,10 @@ removes the shim, so recreate it after upgrading.
 
 **Testing gotchas:**
 - `--ignoreHeadlessMode` is required headless. InputEvents aren't delivered headless, so tests that need input must run windowed.
+- Headless, a texture's `get_image()` hands back the same picture every time, and
+  `SpriteSheet.recoloured()` paints on it: the first villager made in a run colours the sheet for the rest.
+  The whole suite runs `tests/gameplay` before `tests/world`, so it passes; a hand-picked run that loads a
+  villager's area before `sprites_test.gd` fails its colour test. It is the run's order, not the code.
 - gdUnit4's CLI is **fail-fast by default**: it stops at the first failing test, and "Executed test cases (n/n)"
   only counts what ran. Always pass `--continue` (`-c`) to see every failure.
 - `StringName` sorts by internal pointer, not text. Compare as `String` when order matters.
@@ -351,3 +360,32 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **Do not make the mist drift or add specks to the marsh's air:** its mist thickens at night and stays
     where it lies; its fireflies are creatures, and wait for dusk (`Ambience.DUSK_FIREFLIES`).
 
+- **The Old Quarry (2026-11-17; `docs/progress/mining-crafting-plan.md`, TECH_DESIGN §27):** the areas
+  `quarry` (the entrance hall) and `quarry_1` to `quarry_9`, entered from the north-east corner of the
+  North Fields. The numbers are in `data/rules/mine.json`, read by `MineRules` (`core/mining/`, pure).
+  - **Underground** (`AreaController.underground`): shown and lit like a dungeon, but **the clock runs**,
+    and a Bogwisp is out at every hour. The keep and the crypt are as they were.
+  - **Rocks** are `Rock` nodes made from the map's `rock` markers. Which hold ore and which hides the
+    ladder is `GameState.mine_roll()`: a shuffle from the save's own number, the day and the floor
+    (`MineRolls`). **A test that wants a known roll sets `GameState.mine().number`** (a new game's is
+    random). A broken rock stays broken until morning: go through `GameState.break_rock()`.
+  - **Only the pickaxe breaks a rock,** from the item button or a left click facing it. **A test that
+    breaks one equips the pickaxe, faces the rock, calls `use_item()`, and lets the blow finish** (forty
+    frames of `player.motor.step(Vector2.ZERO, FRAME)`) before the next: two blows for stone, copper and
+    coal, three for iron, gold and crystal.
+  - **What a rock held lies in its cell** as an `ItemDrop`: he walks onto it. **A test that picks it up
+    puts the hero there with `motor.place()` and then `sync_from_motor()`**, since what touches a pickup
+    is his body, not the motor. A drop he has no room for stays lying, and he is told once.
+  - **A test arrives on a floor with `GameState.go_to(area, MineRules.ARRIVAL)`** before loading it, and
+    replaces the area's `travel`: the ladder, the lift and a fall all change scene.
+  - **A fall on a floor ends in the hall** (`fall_area`), whole. Every ladder up leads to the hall. The
+    lift is a conversation whose answers use the `travel` effect; its stops are the flags
+    `quarry/lift/4` and `quarry/lift/7`, set on arriving.
+  - **Mining** is the fourth skill. A rock of ore may leave one more: the roll is the area's
+    `roll_extra_ore`, which **a test replaces** to choose it. The pause menu shows two skills to a line.
+  - **A map can be a sketch** (`"sketch"` in `build_maps.gd`): the floors are. Their nodes (the ladder
+    up, monsters, the heart piece) are in the scenes. Re-bake one floor with `build_maps.gd -- quarry_3`.
+  - **Do not** let the sword or a bomb break a rock, put what a rock gives straight into the pack, make a
+    ladder up lead one floor up, or stop the clock in the mine: each was decided with the plan.
+  - **Save version 5** (the mine's number and today's broken rocks). The fixture
+    `tests/fixtures/saves/v4_before_the_mine.json` was written by the game as it stood before the mine.

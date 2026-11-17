@@ -47,6 +47,12 @@ const CLEARED_WORDS: String = "You clear away the withered %s."
 const NO_ROOM_WORDS: String = "Your pack holds no more %s."
 ## What is said when something lying in the world can't be carried (its name).
 const NO_ROOM_FOR_WORDS: String = "You have no room for the %s."
+## Said the first time the lift can reach the floor he has come to.
+const LIFT_OPEN_WORDS: String = "The lift can reach this floor now."
+## Said when a rock gives way to the ladder down.
+const LADDER_WORDS: String = "A ladder leads down."
+## What a fall says: here, and when it carries him to another area (the mine's hall).
+const FELL_WORDS: String = "You wake up back at the entrance."
 ## What is said when the watering can has been filled.
 const CAN_FILLED_WORDS: String = "The watering can is full."
 ## The well's four tiles (GreyboxTiles kinds, on the Decor layer): the can fills at any of them.
@@ -99,6 +105,13 @@ const NIGHT_POOL: float = 0.78
 ## it). Lit, they glow from dusk to dawn like the village lamps, and their light gives a
 ## Bogwisp a body as the hero's Lantern does. Empty: the area has none to light.
 @export var lanterns_flag: StringName
+## Underground (the Old Quarry, 2026-11-17): lit and shown like a dungeon, with no daylight,
+## but the day's clock runs, and what only comes out at night (a Bogwisp) is always out.
+@export var underground: bool = false
+## Where a hero who runs out of hearts here wakes: the entry point `fall_entry` of this other
+## area (the mine's floors: its entrance hall). Empty: at this area's own entrance.
+@export var fall_area: StringName
+@export var fall_entry: StringName
 
 var grid: HeightGrid
 var terrain: TerrainQuery
@@ -108,6 +121,8 @@ var travel: Callable
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 ## The last arrow or bomb the hero let loose (for tests), or null.
 var last_projectile: Node2D
+## Gives the roll (0 to 1) that decides whether a rock of ore leaves one more. Tests replace it.
+var roll_extra_ore: Callable = func() -> float: return rng.randf()
 ## The room the camera shows (RoomGrid coordinates).
 var current_room: Vector2i = Vector2i.ZERO
 ## Shades everything outside the current room (dungeons only), or null.
@@ -164,6 +179,12 @@ var _hours: Hours
 var _shop_due: Dictionary = {}
 ## The villager whose gift list a conversation asked for, until the conversation closes.
 var _gift_due: StringName = &""
+## Where a conversation asked to be taken ({ "area", "entry" }: the lift), until it closes.
+var _travel_due: Dictionary = {}
+## Where today's ladder down is hidden on this floor of the mine (MineRolls.NO_CELL: nowhere),
+## and the ladder once its rock is broken.
+var _ladder_cell: Vector2i = MineRolls.NO_CELL
+var _ladder: LadderHole
 ## The tune this area last asked for.
 var _tune: StringName = &""
 ## Where the hero arrived in this area, facing which way: where they come back after falling.
@@ -197,6 +218,7 @@ func _ready() -> void:
 	for pit: Vector2i in HeightGridBuilder.pit_cells(height_layer):
 		terrain.set_pit(pit)
 	spawn_markers()
+	roll_rocks()
 	for child: Node in interactables.get_children():
 		if child.has_method(&"set_dungeon"):
 			child.call(&"set_dungeon", flag_scope())
@@ -220,7 +242,7 @@ func _ready() -> void:
 	_safe_cell = _entrance_cell
 	player.motor.cell_changed.connect(_on_cell_changed)
 	rng.randomize()
-	ambience = Ambience.kind_of(height_layer, dungeon_id)
+	ambience = Ambience.kind_of(height_layer, dungeon_id, underground)
 	for enemy: Enemy in enemies():
 		# Met outdoors at night, a monster is tougher (P2e). It is decided here, as the area loads.
 		enemy.night = is_night_outdoors()
@@ -228,7 +250,8 @@ func _ready() -> void:
 		enemy.died.connect(_on_enemy_died)
 		# One that is only there by night (a Bogwisp) lies low by day, and rises if night falls
 		# while he is here.
-		if enemy.waits_for_night() and not enemy.night:
+		# Underground there is no day: it is always out there.
+		if enemy.waits_for_night() and not (enemy.night or underground):
 			enemy.lie_low()
 			continue
 		enemy.setup(terrain, player, rng)
@@ -245,6 +268,7 @@ func _ready() -> void:
 	hud.gift_menu.closed.connect(_on_item_menu_closed)
 	hud.gift_menu.given.connect(_on_gift_given)
 	EventBus.gift_requested.connect(_on_gift_requested)
+	EventBus.travel_requested.connect(_on_travel_requested)
 	EventBus.items_owed.connect(_lay_down_owed)
 	EventBus.friend_mark_gained.connect(_on_friend_mark_gained)
 	hud.pause_menu.quit_to_title.connect(_on_quit_to_title)
@@ -277,6 +301,7 @@ func _ready() -> void:
 	EventBus.heart_piece_found.connect(hud.set_pieces)
 	if arrival["through_entry"]:
 		hud.flash()
+	_open_the_lift()
 	GameState.update_player(area_id, player.motor.cell)
 	# What a full pack couldn't take of something he was given lies where it was laid, and
 	# anything owed from outside an area is laid where he arrives.
@@ -305,6 +330,10 @@ func _process(delta: float) -> void:
 		_respawn_left -= delta
 		if _respawn_left <= 0.0:
 			respawn()
+			# A fall that ends in another area (the mine's hall): he is on his way there, and
+			# the rest of this frame would write where he lay over where he is going.
+			if _travelling:
+				return
 	if _collapsing:
 		_collapse_left -= delta
 		if _collapse_left <= 0.0:
@@ -361,6 +390,8 @@ func spawn_markers() -> int:
 
 
 func _spawned(kind: String) -> Node2D:
+	if kind == GreyboxTiles.ROCK_MARKER:
+		return Rock.new()
 	if GreyboxTiles.BREAKABLE_MARKERS.has(kind):
 		var breakable: Breakable = Breakable.new()
 		breakable.breakable_id = StringName(kind)
@@ -371,6 +402,130 @@ func _spawned(kind: String) -> Node2D:
 		critter.from_dusk = kind == "firefly" and Ambience.fireflies_wait_for_dusk(area_id)
 		return critter
 	return null
+
+
+## The rocks of this area (the Old Quarry's), whole or broken.
+func rocks() -> Array[Rock]:
+	var out: Array[Rock] = []
+	for child: Node in interactables.get_children():
+		if child is Rock:
+			out.append(child as Rock)
+	return out
+
+
+## Tells every rock what it holds today (GameState.mine_roll: the day's shuffle for this
+## floor), takes away the ones broken earlier today, and shows the ladder down if its rock is
+## one of them. Returns how many rocks stand whole.
+func roll_rocks() -> int:
+	var standing: Array[Rock] = rocks()
+	if standing.is_empty():
+		return 0
+	var cells: Array[Vector2i] = []
+	for rock: Rock in standing:
+		cells.append(rock.cell())
+	var rules: MineRules = GameState.mine_rules()
+	var today: Dictionary = GameState.mine_roll(area_id, cells)
+	var kinds: Dictionary = today["kinds"]
+	_ladder_cell = today["ladder"]
+	var fewer: int = ToolUse.fewer_blows(DataRegistry.get_item(GameState.equipped))
+	var whole: int = 0
+	for rock: Rock in standing:
+		var kind: StringName = kinds.get(rock.cell(), MineRules.STONE)
+		rock.hold(kind, rules.blows(kind, fewer))
+		if GameState.is_rock_broken(area_id, rock.cell()):
+			rock.be_gone()
+			if rock.cell() == _ladder_cell:
+				_show_ladder()
+		else:
+			whole += 1
+	return whole
+
+
+## The whole rock in the cell the hero faces, or null.
+func rock_in_front() -> Rock:
+	return _find(Rock, player.front_cell()) as Rock
+
+
+## Where today's ladder down is hidden (MineRolls.NO_CELL if this floor has none).
+func ladder_cell() -> Vector2i:
+	return _ladder_cell
+
+
+## The ladder down, once the rock over it is broken; null until then.
+func ladder() -> LadderHole:
+	return _ladder
+
+
+## Swings the pickaxe on the item button at the rock the hero faces: a blow costs energy and
+## takes one off what the rock still stands (fewer are needed with a better pickaxe: the
+## blows a rock has left are counted from the one that strikes it first). Says so and costs
+## nothing with no rock there. Returns whether a blow fell.
+func _swing_pick(item: Dictionary) -> bool:
+	var rock: Rock = rock_in_front()
+	var use: Dictionary = ToolUse.decide_pick(rock != null)
+	if use["does"] == ToolUse.NOTHING:
+		EventBus.sound.emit(&"nope")
+		hud.show_message(str(use["says"]))
+		return false
+	if not player.motor.attack(player.facing_direction(), ToolUse.time_of(item)):
+		return false
+	GameState.spend_energy(GameState.energy_cost(EnergyRules.MINE))
+	ToolFlash.spawn(interactables, rock.position, ItemIcons.name_for(StringName(str(item.get("id", "")))), ToolUse.time_of(item))
+	if rock.strike():
+		_on_rock_broken(rock)
+	else:
+		EventBus.sound.emit(&"pick")
+	player.sync_from_motor()
+	return true
+
+
+## A rock gave way: it stays broken until tomorrow, and breaking it is practice at mining.
+## The one over the ladder shows it; any other leaves what it held lying in its cell, and a
+## rock of ore may leave one more (the chance his Mining gives, rolled by `roll_extra_ore`).
+func _on_rock_broken(rock: Rock) -> void:
+	var rules: MineRules = GameState.mine_rules()
+	# Rolled at the skill he broke it with: the blow that raises his Mining pays the old odds.
+	var extra: bool = rules.is_ore(rock.kind) and float(roll_extra_ore.call()) < GameState.extra_ore_chance()
+	GameState.break_rock(area_id, rock.cell())
+	GameState.practise(Skills.MINING, Skills.ORE if rules.is_ore(rock.kind) else Skills.ROCK)
+	EventBus.sound.emit(&"rock_break")
+	if rock.cell() == _ladder_cell:
+		_show_ladder()
+		EventBus.sound.emit(&"secret")
+		hud.show_message(LADDER_WORDS)
+		return
+	var gives: StringName = rules.gives(rock.kind)
+	if gives == &"":
+		return
+	var drop: ItemDrop = ItemDrop.new()
+	drop.item_id = gives
+	drop.count = 2 if extra else 1
+	drop.position = rock.position
+	interactables.add_child(drop)
+
+
+## Puts the ladder down where its rock stood: a way to the floor below.
+func _show_ladder() -> void:
+	var rules: MineRules = GameState.mine_rules()
+	var below: StringName = rules.below(rules.floor_of(area_id))
+	if _ladder != null or below == &"" or _ladder_cell == MineRolls.NO_CELL:
+		return
+	_ladder = LadderHole.new()
+	_ladder.name = "LadderDown"
+	_ladder.target_area = below
+	_ladder.target_entry = MineRules.ARRIVAL
+	_ladder.position = Vector2(_ladder_cell * GreyboxTiles.TILE_SIZE)
+	interactables.add_child(_ladder)
+
+
+## Coming to one of the lift's floors opens the lift to it, for good, and says so once.
+func _open_the_lift() -> void:
+	var rules: MineRules = GameState.mine_rules()
+	var floor: int = rules.floor_of(area_id)
+	if not rules.is_lift_stop(floor) or GameState.get_flag(MineRules.lift_flag(floor)) == true:
+		return
+	GameState.set_flag(MineRules.lift_flag(floor), true)
+	hud.show_notice(LIFT_OPEN_WORDS)
 
 
 ## Pushing a block: holding straight against one for PUSH_TIME slides it a cell. Returns
@@ -675,7 +830,7 @@ func is_paused() -> bool:
 ## and the play time.
 func pause_status() -> String:
 	var lines: PackedStringArray = ["Hearts %d   Heart pieces %d of %d" % [GameState.hearts_max, GameState.heart_pieces, GameState.PIECES_PER_HEART]]
-	lines.append(GameState.skills().line(GameState.skill_points))
+	lines.append_array(GameState.skills().lines(GameState.skill_points))
 	if dungeon_id != &"":
 		var keys: int = int(GameState.get_flag(DungeonState.keys_flag(dungeon_id), 0))
 		var big_key: bool = GameState.get_flag(DungeonState.big_key_flag(dungeon_id)) == true
@@ -732,9 +887,17 @@ func use_hand() -> bool:
 	var armed: bool = not PlayerController.best_sword().is_empty()
 	if ToolUse.kind_of(item).is_empty():
 		return player.swing() if armed and GameState.is_out_of_ammo(GameState.equipped) else use_item()
-	if faces_farm_work() or not armed:
+	if faces_work(item) or not armed:
 		return use_item()
 	return player.swing()
+
+
+## Whether the hero faces what the tool or seed `item` is for: a rock for the pickaxe, his
+## plot or water for the rest.
+func faces_work(item: Dictionary) -> bool:
+	if ToolUse.kind_of(item) == ToolUse.PICK:
+		return rock_in_front() != null
+	return faces_farm_work()
 
 
 ## Whether the hero faces something a farm tool or a seed is for: a cell of his plot, or water.
@@ -838,6 +1001,8 @@ func _shoot(bow: Dictionary, ammo: StringName) -> bool:
 ## happens; a use that does nothing says why and costs nothing. The hero stands still for the
 ## tool's time, as for the bow.
 func _use_tool(item: Dictionary) -> bool:
+	if ToolUse.kind_of(item) == ToolUse.PICK:
+		return _swing_pick(item)
 	var front: Vector2i = player.front_cell()
 	var holds: Dictionary = DataRegistry.get_item(StringName(Inventory.ammo_for(item)))
 	var held: StringName = StringName(str(holds.get("id", "")))
@@ -977,10 +1142,11 @@ func brightness_at(cell: Vector2i) -> float:
 
 
 ## Whether the day's clock runs here and now (GDD §6): not in a dungeon, where there is no
-## day; not in a conversation or the item menu; not while the hero is down or in a pit. (Behind
-## the pause menu nothing runs at all.)
+## day (but it does run underground, in the mine: a day's work there is a day gone); not in a
+## conversation or the item menu; not while the hero is down or in a pit. (Behind the pause
+## menu nothing runs at all.)
 func clock_runs() -> bool:
-	return ambience != Ambience.DUNGEON and not (is_talking() or is_in_menu() or _dying or _collapsing or is_in_pit())
+	return (ambience != Ambience.DUNGEON or underground) and not (is_talking() or is_in_menu() or _dying or _collapsing or is_in_pit())
 
 
 ## The day ran out (02:00): he passes out, which costs what collapsing costs (GDD §6), and
@@ -1404,6 +1570,11 @@ func collect_pickups() -> int:
 	var collected: int = 0
 	var at: Vector2 = player.hurt_box.global_position
 	for child: Node in interactables.get_children():
+		# What he has no room for stays where it lies, and he is told the once.
+		if child is ItemDrop and not (child as ItemDrop).told and (child as ItemDrop).touches(at, player.hurt_box.radius) \
+				and not (child as ItemDrop).has_room():
+			(child as ItemDrop).told = true
+			hud.show_message(NO_ROOM_WORDS % str(DataRegistry.get_item((child as ItemDrop).item_id).get("name", (child as ItemDrop).item_id)).to_lower())
 		if child.has_method(&"touches") and child.has_method(&"collect") \
 				and child.call(&"touches", at, player.hurt_box.radius) and child.call(&"collect"):
 			collected += 1
@@ -1430,8 +1601,18 @@ func is_dying() -> bool:
 	return _dying
 
 
-## Brings the hero back at the area's entrance with full hearts.
+## Brings the hero back at the area's entrance with full hearts. Where a fall ends somewhere
+## else (`fall_area`: a floor of the mine), he wakes there, whole, with what he carries.
 func respawn() -> void:
+	if fall_area != &"":
+		_dying = false
+		_travelling = true
+		player.controls_enabled = false
+		GameState.set_health(GameState.max_health())
+		GameState.arrival_notice = FELL_WORDS
+		GameState.go_to(fall_area, fall_entry)
+		travel.call(WorldPaths.scene_for(fall_area))
+		return
 	_dying = false
 	_pit_left = 0.0
 	_end_pit_fall()
@@ -1442,7 +1623,7 @@ func respawn() -> void:
 	update_room()
 	player.controls_enabled = not is_talking()
 	hud.flash()
-	hud.show_message("You wake up back at the entrance.")
+	hud.show_message(FELL_WORDS)
 
 
 ## Leaves through `exit`: records where the hero is going in GameState, then changes scene.
@@ -1457,6 +1638,21 @@ func take_exit(exit: AreaExit) -> void:
 	player.controls_enabled = false
 	GameState.go_to(exit.target_area, exit.target_entry)
 	travel.call(WorldPaths.scene_for(exit.target_area))
+
+
+## Leaves for the entry point `entry` of `area` (the lift's way: no door is walked through).
+func go_to_area(area: StringName, entry: StringName) -> void:
+	if _travelling:
+		return
+	_travelling = true
+	player.controls_enabled = false
+	EventBus.sound.emit(&"lift")
+	GameState.go_to(area, entry)
+	travel.call(WorldPaths.scene_for(area))
+
+
+func _on_travel_requested(area: StringName, entry: StringName) -> void:
+	_travel_due = {"area": area, "entry": entry}
 
 
 ## The entry point `entry_id` (a Marker2D under Entries), or null.
@@ -1562,6 +1758,11 @@ func _on_dialogue_closed() -> void:
 		var who: StringName = _gift_due
 		_gift_due = &""
 		open_gifts(who)
+	elif not _travel_due.is_empty():
+		# ...or to be taken somewhere (the lift): he goes now.
+		var to: Dictionary = _travel_due
+		_travel_due = {}
+		go_to_area(to["area"], to["entry"])
 
 
 ## Leaves for the ending screen (the game's last conversation just closed). The hero's place
@@ -1642,7 +1843,14 @@ func save_and_leave(then: Callable) -> void:
 ## at the entrance and whole; one down a pit, on the ground he fell from; one on his way through
 ## a door, on his way.
 func save_here() -> Error:
-	if _dying:
+	if _dying and fall_area != &"":
+		# Saved as he would wake: whole, on his way to where the fall ends. (No scene is
+		# changed: whoever asked for the save is leaving anyway.)
+		_dying = false
+		_travelling = true
+		GameState.set_health(GameState.max_health())
+		GameState.go_to(fall_area, fall_entry)
+	elif _dying:
 		respawn()
 	if not _travelling:
 		GameState.update_player(area_id, _safe_cell if is_in_pit() else player.motor.cell)

@@ -30,6 +30,8 @@ const SIZES: Dictionary = {
 	# Willowmere (2026-11-17, the user's request): a marsh east of the village, the size of the
 	# North Fields. No other area grew to make room for it.
 	&"willowmere": Vector2i(40, 30),
+	# The Old Quarry (2026-11-17): its entrance hall and nine floors, each a screen.
+	&"quarry": Vector2i(15, 9), &"quarry_1": Vector2i(20, 11), &"quarry_2": Vector2i(20, 11), &"quarry_3": Vector2i(20, 11), &"quarry_4": Vector2i(20, 11), &"quarry_5": Vector2i(20, 11), &"quarry_6": Vector2i(20, 11), &"quarry_7": Vector2i(20, 11), &"quarry_8": Vector2i(20, 11), &"quarry_9": Vector2i(20, 11),
 }
 
 var _area: Node

@@ -1,0 +1,66 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://world/areas/area_controller.gd" id="1_area"]
+[ext_resource type="TileSet" path="res://world/tiles/greybox_tiles.tres" id="2_tiles"]
+[ext_resource type="Script" path="res://world/areas/height_shading.gd" id="3_shading"]
+[ext_resource type="PackedScene" path="res://gameplay/player/player.tscn" id="4_player"]
+[ext_resource type="PackedScene" path="res://ui/area_hud.tscn" id="5_hud"]
+[ext_resource type="Script" path="res://gameplay/interactables/area_exit.gd" id="6_exit"]
+[ext_resource type="Script" path="res://gameplay/interactables/ladder_hole.gd" id="9_ladder"]
+[ext_resource type="Script" path="res://gameplay/interactables/mine_lift.gd" id="10_lift"]
+
+[node name="Quarry" type="Node2D" unique_id=1421142557]
+script = ExtResource("1_area")
+area_id = &"quarry"
+area_name = "The Old Quarry"
+music = &"mine"
+underground = true
+
+[node name="Height" type="TileMapLayer" parent="." unique_id=387621912]
+tile_map_data = PackedByteArray("AAAAAAAAAAACABkAAAABAAAAAAADABkAAAACAAAAAAADABkAAAADAAAAAAADABkAAAAEAAAAAAADABkAAAAFAAAAAAADABkAAAAGAAAAAAADABkAAAAHAAAAAAADABkAAAAIAAAAAAADABkAAAAJAAAAAAADABkAAAAKAAAAAAADABkAAAALAAAAAAADABkAAAAMAAAAAAADABkAAAANAAAAAAADABkAAAAOAAAAAAACABkAAAAAAAEAAAACABkAAAABAAEAAAAAABkAAAACAAEAAAAAABkAAAADAAEAAAAAABkAAAAEAAEAAAAAABkAAAAFAAEAAAAAABkAAAAGAAEAAAABABkAAAAHAAEAAAAAABkAAAAIAAEAAAAAABkAAAAJAAEAAAAAABkAAAAKAAEAAAABABkAAAALAAEAAAAAABkAAAAMAAEAAAAAABkAAAANAAEAAAAAABkAAAAOAAEAAAACABkAAAAAAAIAAAADABkAAAABAAIAAAAAABkAAAACAAIAAAAAABkAAAADAAIAAAAAABkAAAAEAAIAAAAAABkAAAAFAAIAAAAAABkAAAAGAAIAAAAAABkAAAAHAAIAAAAAABkAAAAIAAIAAAAAABkAAAAJAAIAAAAAABkAAAAKAAIAAAAAABkAAAALAAIAAAAAABkAAAAMAAIAAAAAABkAAAANAAIAAAAAABkAAAAOAAIAAAACABkAAAAAAAMAAAAFABkAAAABAAMAAAAAABkAAAACAAMAAAAAABkAAAADAAMAAAAAABkAAAAEAAMAAAAAABkAAAAFAAMAAAAAABkAAAAGAAMAAAAAABkAAAAHAAMAAAAAABkAAAAIAAMAAAAAABkAAAAJAAMAAAAAABkAAAAKAAMAAAAAABkAAAALAAMAAAAAABkAAAAMAAMAAAAAABkAAAANAAMAAAAAABkAAAAOAAMAAAACABkAAAAAAAQAAAACABkAAAABAAQAAAAAABkAAAACAAQAAAAAABkAAAADAAQAAAAAABkAAAAEAAQAAAAAABkAAAAFAAQAAAAAABkAAAAGAAQAAAAAABkAAAAHAAQAAAAAABkAAAAIAAQAAAAAABkAAAAJAAQAAAAAABkAAAAKAAQAAAAAABkAAAALAAQAAAAAABkAAAAMAAQAAAAAABkAAAANAAQAAAAAABkAAAAOAAQAAAACABkAAAAAAAUAAAACABkAAAABAAUAAAAAABkAAAACAAUAAAAAABkAAAADAAUAAAAAABkAAAAEAAUAAAAAABkAAAAFAAUAAAAAABkAAAAGAAUAAAAAABkAAAAHAAUAAAAAABkAAAAIAAUAAAAAABkAAAAJAAUAAAAAABkAAAAKAAUAAAAAABkAAAALAAUAAAAAABkAAAAMAAUAAAAAABkAAAANAAUAAAAAABkAAAAOAAUAAAACABkAAAAAAAYAAAACABkAAAABAAYAAAAAABkAAAACAAYAAAAAABkAAAADAAYAAAAAABkAAAAEAAYAAAAAABkAAAAFAAYAAAAAABkAAAAGAAYAAAAAABkAAAAHAAYAAAAAABkAAAAIAAYAAAAAABkAAAAJAAYAAAAAABkAAAAKAAYAAAAAABkAAAALAAYAAAAAABkAAAAMAAYAAAAAABkAAAANAAYAAAAAABkAAAAOAAYAAAACABkAAAAAAAcAAAACABkAAAABAAcAAAAAABkAAAACAAcAAAAAABkAAAADAAcAAAABABkAAAAEAAcAAAAAABkAAAAFAAcAAAAAABkAAAAGAAcAAAAAABkAAAAHAAcAAAAAABkAAAAIAAcAAAAAABkAAAAJAAcAAAAAABkAAAAKAAcAAAAAABkAAAALAAcAAAAAABkAAAAMAAcAAAAAABkAAAANAAcAAAACABkAAAAOAAcAAAACABkAAAAAAAgAAAACABkAAAABAAgAAAACABkAAAACAAgAAAACABkAAAADAAgAAAACABkAAAAEAAgAAAACABkAAAAFAAgAAAACABkAAAAGAAgAAAACABkAAAAHAAgAAAACABkAAAAIAAgAAAACABkAAAAJAAgAAAACABkAAAAKAAgAAAACABkAAAALAAgAAAACABkAAAAMAAgAAAACABkAAAANAAgAAAACABkAAAAOAAgAAAACABkAAAA=")
+tile_set = ExtResource("2_tiles")
+
+[node name="Decor" type="TileMapLayer" parent="." unique_id=105821252]
+tile_map_data = PackedByteArray("AAAGAAEAAAADABoAAAAKAAEAAAADABoAAAADAAcAAAADABoAAAADAAIAAAAAABoAAAAEAAIAAAAAABoAAAAFAAIAAAAAABoAAAAGAAIAAAAAABoAAAAHAAIAAAAAABoAAAAIAAIAAAAAABoAAAAJAAIAAAAAABoAAAA=")
+tile_set = ExtResource("2_tiles")
+
+[node name="Spawns" type="TileMapLayer" parent="." unique_id=156789008]
+tile_map_data = PackedByteArray("AAAFAAYAAAAFAAwAAAAJAAYAAAAFAAwAAAA=")
+tile_set = ExtResource("2_tiles")
+
+[node name="HeightShading" type="Node2D" parent="." unique_id=1484947568]
+script = ExtResource("3_shading")
+
+[node name="Interactables" type="Node2D" parent="." unique_id=164814368]
+
+[node name="WayOut" type="Node2D" parent="Interactables" unique_id=1477904092]
+position = Vector2(0, 48)
+script = ExtResource("6_exit")
+target_area = &"north_fields"
+target_entry = &"quarry"
+
+[node name="Lift" type="Node2D" parent="Interactables" unique_id=1555234732]
+position = Vector2(160, 32)
+script = ExtResource("10_lift")
+
+[node name="LadderDown" type="Node2D" parent="Interactables" unique_id=2014407091]
+position = Vector2(192, 96)
+script = ExtResource("9_ladder")
+target_area = &"quarry_1"
+target_entry = &"ladder"
+
+[node name="Entries" type="Node2D" parent="." unique_id=488444646]
+
+[node name="mouth" type="Marker2D" parent="Entries" unique_id=1915748361]
+position = Vector2(24, 56)
+
+[node name="ladder" type="Marker2D" parent="Entries" unique_id=2013138808]
+position = Vector2(184, 104)
+rotation = 1.5707963
+
+[node name="PlayerSpawn" type="Marker2D" parent="." unique_id=580999814]
+position = Vector2(24, 56)
+
+[node name="Player" parent="." unique_id=915541495 instance=ExtResource("4_player")]
+
+[node name="HUD" parent="." unique_id=1253900454 instance=ExtResource("5_hud")]

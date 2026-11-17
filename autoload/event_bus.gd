@@ -79,3 +79,7 @@ signal recipe_learned(recipe_id: StringName)
 ## is in the flags (LeftItems), and whoever runs the area lays it at his feet.
 signal items_owed
 
+## A conversation asks to be taken somewhere (the `travel` effect: the mine's lift): whoever
+## runs the area goes there when the conversation closes.
+signal travel_requested(area_id: StringName, entry: StringName)
+

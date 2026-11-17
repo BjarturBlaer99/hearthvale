@@ -977,3 +977,32 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   plan asked that he be befriended like the others; the same test running him is the proof.
 - 2026-11-17 — **The "play" asked for was done by a script pressing real keys in a real window,** since
   there is nobody at the keyboard. It is written up as that, with what it skipped.
+- 2026-11-17 — **Mining and crafting: sixteen decisions were approved with the plan**
+  (`docs/progress/mining-crafting-plan.md`): the clock runs underground; Bogwisps are always out there;
+  a fall in the mine ends in its hall; ladders up lead to the hall; rocks, branches and stumps come back
+  daily, not on every visit; the sword cuts wood; bombs don't break rocks; a chest's slots are stacks;
+  furnishings have fixed places; the Pickaxe and the sprinkler go on the bar; a second rug and a standing
+  lamp; Mining gives a chance of extra ore; a wider Lantern; a `buys` list and a folder for crafting
+  recipes; six cells of the North Fields change.
+- 2026-11-17 — **He arrives on a floor clear of the HUD's corner.** The plan's sketches put the way in at
+  the top-left cell, which the HUD covers at a dungeon's size. It moved a few cells east on seven floors,
+  and two rocks that were under the corner moved with it. The counts are as planned.
+- 2026-11-17 — **A broken rock leaves what it held lying in its cell,** as a breakable leaves its drop,
+  and it is picked up by walking onto it. Straight into the pack would have needed a rule for a full pack
+  that the game didn't have; a drop already had a place to lie.
+- 2026-11-17 — **A drop he has no room for stays lying, and he is told once.** Before, what a monster
+  dropped over a full stack was taken and lost. A full stack of stone would otherwise have stopped him
+  breaking plain rocks, and so stopped him finding the ladder.
+- 2026-11-17 — **The rock over the ladder gives no stone:** the ladder is what it gives.
+- 2026-11-17 — **The lift is a conversation with a new effect, `travel`,** not a menu of its own: the
+  dialogue box already lists answers, points with the mouse and closes on Tab.
+- 2026-11-17 — **The pause menu is a line taller,** and shows two skills to a line. Four skills on one
+  line are 43 letters, and its box holds 33.
+- 2026-11-17 — **Cave walls show their face by the baker picking a second tile,** not by `WallRelief`:
+  rough rock has no courses to line up, and one tile does it.
+- 2026-11-17 — **A map can be a sketch.** Nine floors as lists of blocks would have been nine chances to
+  miscount; the sketch in the plan is the sketch the baker reads.
+- 2026-11-17 — **The version 4 save in the tests' fixtures was written by the game as it stood before
+  the mine** (a checkout of the commit before, run once), not made up by hand.
+- 2026-11-17 — **Phase 1 is one commit, not the three the plan listed.** The steps shared the same
+  files (the area's script above all), and could not be told apart after the fact.

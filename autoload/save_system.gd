@@ -163,6 +163,8 @@ func migrate(data: Dictionary, from_version: int) -> Dictionary:
 		migrated = _v2_to_v3(migrated)
 	if from_version < 4:
 		migrated = _v3_to_v4(migrated)
+	if from_version < 5:
+		migrated = _v4_to_v5(migrated)
 	migrated["version"] = GameState.SAVE_VERSION
 	return migrated
 
@@ -194,6 +196,14 @@ func _v3_to_v4(data: Dictionary) -> Dictionary:
 	data["tally"] = {}
 	var saved_flags: Variant = data.get("flags", {})
 	data["flags"] = StoryGates.past_the_gates(saved_flags if typeof(saved_flags) == TYPE_DICTIONARY else {})
+	return data
+
+
+## Version 5 (2026-11-17) came with mining and crafting: the mine keeps the number its daily
+## rolls come from and the rocks broken today. A game saved before it gets a number of its own,
+## made from the save itself so the same save always rolls the same way, and a whole mine.
+func _v4_to_v5(data: Dictionary) -> Dictionary:
+	data["mine"] = {"number": hash([data.get("play_time", 0.0), data.get("day", 1), data.get("hearts_max", 0)]), "day": 0, "broken": {}}
 	return data
 
 

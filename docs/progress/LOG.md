@@ -2321,3 +2321,50 @@ The user started the `marsh` scenario at 19:00 (`tools/playtest.gd -- marsh 19:0
 **Worth knowing**
 - **A person is touched far more often than the script was:** six touches in under half a minute of night, against the script's two in a minute. The user judged it right as it is. Five wisps, 15 energy a touch and half a second of warning are all data, should that change.
 - **After the fall he stood at the entrance with 5 energy and three wisps still out:** one more touch would have been a collapse (waking at home with half a bar, a tenth of his coins gone).
+
+## 2026-11-17 — Mining, phase 1: the Old Quarry
+
+The first of three phases of mining and crafting (`docs/progress/mining-crafting-plan.md`, approved as written).
+
+**Built**
+- **The mouth:** six cells of the North Fields' east tree line, north of the stream, are an outcrop of rock with a cut through it, and old rails lead up to it over the grass.
+- **The entrance hall:** the way out, the lift, a ladder down, timber, rails, and two rocks to try a pickaxe on. No monsters.
+- **Nine floors,** each one screen, drawn as sketches that the map baker reads:
+  - 1 to 3 (The Cut, The Galleries, The Old Face): 16 rocks each, 5 of them copper; 2, 3 and 4 slimes.
+  - 4 to 6 (The Coal Seam, The Crossing, The Ledges): 16 rocks each, 3 iron and 4 coal; bats, and goblin archers from floor 5, two of them on raised ledges on floor 6.
+  - 7 to 9 (The Dark Drift, The Flooded Gallery, The Heart of the Quarry): 14, 14 and 17 rocks; gold on all three, crystal from floor 8; dark; 2, 3 and 4 Bogwisps.
+- **The Pickaxe,** 25 coins at Tilda's. A blow costs 2 energy. Stone, copper and coal take two blows; iron, gold and crystal three.
+- **The day's roll:** each morning every rock is back in its place, and which hold ore and which plain rock hides the ladder is shuffled anew, from a number kept in the save, the day and the floor.
+- **The lift:** coming to floor 4 or 7 opens it to that floor for good. Every ladder up leads to the hall.
+- **A fall** on a floor ends in the hall, whole, with what he carries.
+- **The clock runs** in the quarry, and Bogwisps are out there at every hour.
+- **A heart piece** on floor 9, in a pocket walled off by three rocks.
+- **Mining,** a fourth skill: a point for a plain rock, two for ore; each level takes a tenth off a blow and adds a twentieth to the chance of one more ore.
+- **Seven items** (the Pickaxe, stone, copper ore, coal, iron ore, gold ore, crystal), a sheet of rocks, a tune and three sounds.
+- **Save version 5,** with a step from version 4.
+- **Two playtest scenarios** (`quarry`, `deep`) and seven capture shots (143 to 149).
+
+**What differs from the plan**
+- **He arrives a few cells east of the top-left corner** on seven floors, and two rocks moved with him: the HUD covers that corner at a dungeon's size. Counts are as approved; the plan's sketches are now the built ones.
+- **What a rock held lies in its cell** until he walks onto it; it is not put in his pack.
+- **What he has no room for stays lying,** and he is told once. This changed what monsters drop too: before, a drop over a full stack was taken and lost.
+- **The rock over the ladder gives no stone.**
+- **The pause menu is a line taller** and shows two skills to a line.
+- **One commit,** not the three steps the plan listed: they shared the same files.
+
+**Verified**
+- **860 tests in 113 suites, all passing** (49 of them new: the mine's rules, rolls and state; the quarry in play; the Mining skill; the save).
+- **A version 4 save loads** with everything it had, a whole mine, no lift and no Pickaxe. The fixture was written by the game as it stood at the commit before (a second checkout, run once), not made by hand. Versions 1 to 3 still load.
+- **63 of 63 bugs planted on purpose were caught** by the tests (62 at once; the other, a floor that is no lift stop announcing the lift, slipped through until a check for it was added).
+- **A bug found by the tests while building:** a fall that ended in the hall wrote where he had lain over where he was going, in the same frame. Fixed; a planted copy of it is caught.
+- **Screenshots,** looked at: the mouth, the hall, floors 1, 5, 6 and 9, and floor 8 with and without the Lantern.
+- **The player's own save was read-only throughout** (the same checksum before and after).
+
+**Known issues and limits**
+- **Not played by a person, or by a script pressing keys.** The tests drive the game's own functions; nobody has walked a floor. Whether a floor reads at a glance, and whether a blow feels right, is for the user.
+- **The numbers are the plan's first guesses:** 2 energy a blow, the blows a rock takes, how many rocks hold ore. Phase 3 measures them.
+- **Ore can't be sold or used yet:** Tilda buys it in phase 3, and the furnace and workbench are phase 2. Until then it only stacks up (stone to 50, ores and coal to 30, crystals to 10).
+- **A tree's crown covers the lower half of the outcrop** in the North Fields. The mouth itself and the rails are clear.
+- **Without the Lantern the deep floors can be mined but not fought in:** a Bogwisp has no body there, as in the marsh. The Lantern is in the crypt.
+- **Enemies are back on every visit,** as everywhere: taking the ladder up and coming down again brings them back.
+- **Headless, a villager's colours depend on which suite ran first** (the sheet is painted on in place). The whole suite's order passes. Not new, and not touched.

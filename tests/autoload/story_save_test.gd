@@ -20,7 +20,7 @@ func after_test() -> void:
 
 func test_the_day_a_flag_came_true_is_kept() -> void:
 	GameState.new_game()
-	assert_int(GameState.SAVE_VERSION).is_equal(4)
+	assert_int(GameState.SAVE_VERSION).is_equal(5)
 	GameState.set_flag(&"met_bram", true)
 	GameState.start_next_day()
 	GameState.start_next_day()
@@ -93,7 +93,7 @@ func test_version_4_keeps_its_new_parts_through_a_save() -> void:
 	GameState.update_player(&"village", Vector2i(23, 8))
 	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
 	var on_disk: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveSystem.slot_path(TEST_SLOT)))
-	assert_int(int(on_disk["version"])).is_equal(4)
+	assert_int(int(on_disk["version"])).is_equal(5)
 	assert_dict(on_disk["flag_days"]).is_equal({"met_bram": 1.0, "keep_warden_beaten": 2.0})
 	assert_dict(on_disk["skills"]).is_equal({"farming": 12.0})
 	assert_dict(on_disk["friends"]).is_equal({"pip": {"points": 5.0, "talked": 2.0, "gift": 1.0}})
@@ -140,7 +140,7 @@ func test_a_version_3_save_loads_past_the_gates_with_nothing_lost() -> void:
 
 	# The step by itself.
 	var migrated: Dictionary = SaveSystem.migrate(old, 3)
-	assert_int(int(migrated["version"])).is_equal(4)
+	assert_int(int(migrated["version"])).is_equal(5)
 	for part: String in ["flag_days", "skills", "friends", "tally"]:
 		assert_dict(migrated[part]).override_failure_message("the step from 3 to 4 adds an empty %s" % part).is_empty()
 	assert_dict(migrated["flags"]).override_failure_message("its flags, and the two that put it past the gates").is_equal(StoryGates.past_the_gates(old["flags"]))
@@ -178,7 +178,7 @@ func test_a_version_3_save_loads_past_the_gates_with_nothing_lost() -> void:
 	# Saved again, it is a version 4 save.
 	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
 	var again: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveSystem.slot_path(TEST_SLOT)))
-	assert_int(int(again["version"])).is_equal(4)
+	assert_int(int(again["version"])).is_equal(5)
 	assert_dict(again["farm"]).is_equal(old["farm"])
 
 

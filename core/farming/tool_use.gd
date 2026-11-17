@@ -4,19 +4,22 @@ extends RefCounted
 ## button, what the hero faces and what he carries, it decides; the area then does it. A tool
 ## is an item of type "tool" whose stats name its `tool`: the hoe tills bare soil, the watering
 ## can waters tilled soil and fills at water. A seed (an item of type "seed") is planted in
-## tilled soil that has nothing in it.
+## tilled soil that has nothing in it. The pickaxe (2026-11-17) is a tool too, of the kind "pick":
+## it strikes the rock he faces (decide_pick), and its stats may say it needs `fewer_blows`.
 
 const TYPE: String = "tool"
 const HOE: String = "hoe"
 const CAN: String = "water"
 const SEED: String = "seed"
+const PICK: String = "pick"
 ## The tools an item of type "tool" can be.
-const KINDS: Array[String] = [HOE, CAN]
+const KINDS: Array[String] = [HOE, CAN, PICK]
 ## What a use can do.
 const TILL: StringName = &"till"
 const WATER: StringName = &"water"
 const FILL: StringName = &"fill"
 const PLANT: StringName = &"plant"
+const MINE: StringName = &"mine"
 const NOTHING: StringName = &""
 ## What is said when a use does nothing.
 const HOE_NOT_HERE: String = "The hoe is for the soil of your plot."
@@ -86,6 +89,21 @@ static func decide(kind: String, soil: StringName, at_water: bool, held: int, ho
 				return _no(SEED_TAKEN)
 			return _do(PLANT) if held > 0 else _no(SEED_NONE)
 	return _no("")
+
+
+## What swinging the pickaxe does: { "does": MINE or NOTHING, "says": words }. `at_rock` is
+## whether a whole rock stands in the cell he faces.
+static func decide_pick(at_rock: bool) -> Dictionary:
+	return _do(MINE) if at_rock else _no(MineRules.NOTHING_WORDS)
+
+
+## How many blows fewer than the plain pickaxe `item` needs to break a rock (a better
+## pickaxe's stats say so: "fewer_blows"). Nothing for anything else.
+static func fewer_blows(item: Dictionary) -> int:
+	var stats: Variant = item.get("stats", {})
+	if kind_of(item) != PICK or typeof(stats) != TYPE_DICTIONARY:
+		return 0
+	return maxi(int((stats as Dictionary).get("fewer_blows", 0)), 0)
 
 
 ## What is wrong with `item` as a tool, in words: nothing, if it can be used.

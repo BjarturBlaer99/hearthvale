@@ -28,6 +28,7 @@ effects (`complete_quest` only means something in a quest stage's `on_enter`, wh
 | `gift` | `villager` (a villager id from `data/villagers`). The list of what the hero can give them opens when the conversation is over. The game adds an answer with this effect to a villager's conversation by itself; a file needs it only for something out of the ordinary |
 | `teach_recipe` | `recipe` (a recipe id from `data/recipes` that is marked `"taught": true`). The hero knows it from then on, and the hearth lists it |
 | `practise` | `skill`, `deed` (a skill and one of its deeds in `data/rules/skills.json`, e.g. `cooking` and `dish`). The skill gains that deed's points |
+| `travel` | `area`, `entry` (an area id and the name of one of its entry points). The hero is taken there when the conversation is over: the mine's lift. No file in `data/dialogue` uses it yet; the lift's conversation is built by the game |
 | `shop` | `shop` (a shop id from `data/shops`), `mode` (`buy` or `sell`: the list it opens on). The shop's buy-and-sell list opens when the conversation is over |
 
 Combat and dungeon milestones will add types (e.g. `heal`, `open_door`) when they need them.

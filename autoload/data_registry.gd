@@ -62,7 +62,8 @@ const RULES_NIGHT: StringName = &"night"
 const RULES_FARM: StringName = &"farm"
 const RULES_SKILLS: StringName = &"skills"
 const RULES_FRIENDSHIP: StringName = &"friendship"
-const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM, RULES_SKILLS, RULES_FRIENDSHIP]
+const RULES_MINE: StringName = &"mine"
+const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM, RULES_SKILLS, RULES_FRIENDSHIP, RULES_MINE]
 
 ## Enemy behaviour ids (EnemyBrains makes one brain per id) and drop-table entry types.
 const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden", "shade", "wisp"]
@@ -100,6 +101,7 @@ const EFFECT_FIELDS: Dictionary = {
 	"practise": ["skill", "deed"],
 	"gift": ["villager"],
 	"teach_recipe": ["recipe"],
+	"travel": ["area", "entry"],
 }
 
 ## A field with one of these names, inside a condition or effect, must name an id
@@ -493,6 +495,8 @@ func _check_rules(rules: Dictionary) -> void:
 				if not item_types.has(str(item["type"])):
 					item_types.append(str(item["type"]))
 			problems = Friendship.problems(rules, item_types)
+		RULES_MINE:
+			problems = MineRules.problems(rules, func(item_id: String) -> Dictionary: return _collections[&"items"].get(StringName(item_id), {}))
 	for problem: String in problems:
 		errors.append("%s: rules '%s': %s" % [path, id, problem])
 

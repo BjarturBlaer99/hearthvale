@@ -1,7 +1,8 @@
 class_name ItemDrop
 extends Node2D
-## Something an enemy dropped (coins, or a bundle of arrows): touch it to pick it up. It's gone
-## for the rest of the visit and never saved. Position = the cell's top-left corner.
+## Something an enemy dropped (coins, or a bundle of arrows), or a broken rock left (stone,
+## ore): touch it to pick it up. What he has no room for stays lying (the area tells him once).
+## It's gone for the rest of the visit and never saved. Position = the cell's top-left corner.
 
 const RADIUS: float = 5.0
 const CENTER: Vector2 = Vector2(8.0, 9.0)
@@ -12,6 +13,8 @@ const GOLD: Color = Color(0.95, 0.76, 0.24)
 @export var count: int = 1
 
 var taken: bool = false
+## Whether the hero has been told he has no room for it.
+var told: bool = false
 
 
 ## Whether a circle at `point` (area pixels) with `radius` touches it, while it's there.
@@ -19,9 +22,15 @@ func touches(point: Vector2, radius: float) -> bool:
 	return not taken and CombatRules.circles_touch(global_position + CENTER, RADIUS, point, radius)
 
 
-## Puts it in the inventory and disappears. Returns false if it was already taken.
+## Whether he can carry all of it.
+func has_room() -> bool:
+	return GameState.has_room_for(item_id, count)
+
+
+## Puts it in the inventory and disappears. Returns false if it was already taken, or if he
+## has no room for it: then it stays where it lies.
 func collect() -> bool:
-	if taken:
+	if taken or not has_room():
 		return false
 	taken = true
 	GameState.add_item(item_id, count)

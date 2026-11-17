@@ -11,21 +11,29 @@ extends RefCounted
 ## adds `step` to the energy a cooked dish gives. It keeps no points itself: GameState holds
 ## them (skill id -> points) and asks this.
 ##
-## A skill changes energy and nothing else: never hearts, damage, speed or timing.
+## A skill changes energy and nothing else: never hearts, damage, speed or timing. But for
+## one, at the user's request of 2026-11-17: a skill with an `extra_chance` (Mining's) adds
+## that to the chance of one more of what the work gives (an ore rock's ore), for each level
+## above the first.
 
 const COMBAT: StringName = &"combat"
 const FARMING: StringName = &"farming"
 const COOKING: StringName = &"cooking"
+const MINING: StringName = &"mining"
 ## The deeds the game reports (GameState.practise): a skill's `gains` are named by them.
 const MONSTER: StringName = &"monster"
 const BOSS: StringName = &"boss"
 const TILL: StringName = &"till"
 const HARVEST: StringName = &"harvest"
 const DISH: StringName = &"dish"
+## Mining's deeds: a plain rock broken, a rock of ore broken.
+const ROCK: StringName = &"rock"
+const ORE: StringName = &"ore"
 ## What is said when a skill rises.
 const RISEN_WORDS: String = "%s rose to level %d."
-## What stands between two skills on the pause menu's line.
+## What stands between two skills on a line of the pause menu, and how many a line holds.
 const LINE_GAP: String = "   "
+const LINE_SKILLS: int = 2
 
 ## The points each level begins at, from the first (0) up.
 var thresholds: Array[int] = [0]
@@ -140,12 +148,28 @@ func dish_factor(points: Dictionary) -> float:
 	return factor
 
 
-## "Combat 2   Farming 3   Cooking 1": every skill's level, for the pause menu.
-func line(points: Dictionary) -> String:
+## The chance that `skill`'s work gives one more of what it gives (0 to 1), given everyone's
+## points: its `extra_chance` for each level above the first. Nothing for a skill without one.
+func extra_chance(skill: StringName, points: Dictionary) -> float:
+	var each: Variant = _rules_of(skill).get("extra_chance", 0.0)
+	if not _is_number(each):
+		return 0.0
+	return clampf(float(each) * float(level_of(skill, points) - 1), 0.0, 1.0)
+
+
+## "Combat 2   Farming 3" and "Cooking 1   Mining 1": every skill's level, for the pause menu,
+## `LINE_SKILLS` to a line (what its box is wide enough for).
+func lines(points: Dictionary) -> PackedStringArray:
+	var out: PackedStringArray = []
 	var parts: PackedStringArray = []
 	for skill: StringName in _skills:
 		parts.append("%s %d" % [name_of(skill), level_of(skill, points)])
-	return LINE_GAP.join(parts)
+		if parts.size() == LINE_SKILLS:
+			out.append(LINE_GAP.join(parts))
+			parts.clear()
+	if not parts.is_empty():
+		out.append(LINE_GAP.join(parts))
+	return out
 
 
 ## "Farming rose to level 2."
@@ -202,6 +226,8 @@ static func problems(rules: Dictionary, cost_names: Array) -> PackedStringArray:
 					out.append("skill '%s' eases an unknown cost '%s'. Known: %s." % [id, action, ", ".join(PackedStringArray(cost_names))])
 		if skill.has("enriches_dishes") and typeof(skill["enriches_dishes"]) != TYPE_BOOL:
 			out.append("skill '%s' 'enriches_dishes' must be true or false." % id)
+		if skill.has("extra_chance") and (not _is_number(skill["extra_chance"]) or float(skill["extra_chance"]) < 0.0 				or float(skill["extra_chance"]) * float(maxi(count - 1, 0)) > 1.0):
+			out.append("skill '%s' 'extra_chance' must be a number from 0 up, and no more than 1 at the top level." % id)
 	return out
 
 

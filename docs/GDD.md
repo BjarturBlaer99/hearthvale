@@ -46,6 +46,8 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
   there (two of them make Marsh Stew), a ruined fisher's hut stands in the middle, and a heart piece lies
   behind the willows. After dark the mist thickens and **Bogwisps** rise over the pools (§8). **Old
   Henrik** stands by the hut by day (§10): his favour lights the six lanterns where the boards meet land.
+- **The Old Quarry** *(2026-11-17)*: a disused mine in the north-east corner of the North Fields, past
+  the stream. Open from the first day and never needed for the story (§14).
 - **The dungeons:** the Old Keep, north of the village, and the Chapel Crypt under the chapel. The crypt is
   barred until the keep is quiet. It's dark, and its floor has fallen in. A ruin in the South Field leads down
   to a small cellar and cistern.
@@ -305,5 +307,26 @@ under thatch, red clay tiles or blue slate, with smoking chimneys, and a stone c
 
 ## 13. Out of scope (unless asked)
 Multiplayer, procedural generation, 3D, voice acting, swimming, climbing, seasons, weather, livestock of your
-own, crafting beyond cooking, fishing, an inventory limit, an open world, new areas beyond the hero's home and
-plot.
+own, crafting beyond cooking and the workbench (§14), fishing, an inventory limit, an open world, new areas
+beyond the hero's home and plot.
+
+## 14. Mining *(2026-11-17; crafting is not built yet)*
+- **The Pickaxe** is sold at Tilda's for 25 coins. It goes on the item bar like the hoe, and strikes the
+  rock the hero faces. A blow costs 2 energy.
+- **The Old Quarry** has an entrance hall and nine floors, each one screen:
+  - floors 1 to 3: stone and copper ore, with slimes;
+  - floors 4 to 6: iron ore and coal, with bats and goblin archers;
+  - floors 7 to 9: gold ore and crystals, in the dark, with Bogwisps. The Lantern lights a pool round the
+    hero and gives a Bogwisp a body; without it he sees a cell or so and can only dodge.
+- **Rocks:** a plain rock, copper and coal take two blows; iron, gold and crystal three. Ore shows in the
+  rock. A broken rock leaves one of what it held lying in its cell. Only the pickaxe breaks a rock.
+- **The ladder down** is hidden under one of each floor's plain rocks. Every ladder up climbs out to the
+  entrance hall. Coming to floor 4 or floor 7 opens the lift in the hall to that floor, for good.
+- **Each morning** every rock is back in its own place, and which of them hold ore and which hides the
+  ladder is rolled anew.
+- **The clock runs** in the quarry, unlike in the keep and the crypt: a day spent mining is a day gone.
+- **A fall** in the quarry ends in the entrance hall, whole, with what he carries.
+- **A heart piece** is walled in by rocks on the last floor.
+- **Mining** is a fourth skill: a point for a plain rock, two for a rock of ore. Each level takes a tenth
+  off the energy of a blow, and adds a twentieth to the chance that a rock of ore leaves one more.
+- **What he can't carry stays lying:** stone stacks to 50, ores and coal to 30, crystals to 10.

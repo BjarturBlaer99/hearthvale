@@ -41,6 +41,13 @@
     { "id": "bog_mushroom", "name": "Bog Mushrooms", "type": "food", "icon": "bog_mushroom", "stackable": true, "max_stack": 20, "stats": { "energy": 7 } },
     { "id": "marsh_stew", "name": "Marsh Stew", "type": "food", "icon": "marsh_stew", "stackable": true, "max_stack": 10, "stats": { "energy": 45, "hearts": 0.5 } },
     { "id": "wisp_ember", "name": "Wisp Ember", "type": "ingredient", "icon": "wisp_ember", "stackable": true, "max_stack": 10 },
-    { "id": "ember_tea", "name": "Ember Tea", "type": "food", "icon": "ember_tea", "stackable": true, "max_stack": 10, "stats": { "energy": 90 } }
+    { "id": "ember_tea", "name": "Ember Tea", "type": "food", "icon": "ember_tea", "stackable": true, "max_stack": 10, "stats": { "energy": 90 } },
+    { "id": "pickaxe", "name": "Pickaxe", "type": "tool", "icon": "pickaxe", "stats": { "tool": "pick", "cooldown": 0.4 } },
+    { "id": "stone", "name": "Stone", "type": "material", "icon": "stone", "stackable": true, "max_stack": 50 },
+    { "id": "copper_ore", "name": "Copper Ore", "type": "material", "icon": "copper_ore", "stackable": true, "max_stack": 30 },
+    { "id": "coal", "name": "Coal", "type": "material", "icon": "coal", "stackable": true, "max_stack": 30 },
+    { "id": "iron_ore", "name": "Iron Ore", "type": "material", "icon": "iron_ore", "stackable": true, "max_stack": 30 },
+    { "id": "gold_ore", "name": "Gold Ore", "type": "material", "icon": "gold_ore", "stackable": true, "max_stack": 30 },
+    { "id": "crystal", "name": "Crystal", "type": "material", "icon": "crystal", "stackable": true, "max_stack": 10 }
   ]
 }

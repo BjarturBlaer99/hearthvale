@@ -171,27 +171,29 @@ func test_five_dishes_at_the_hearth_make_a_better_cook() -> void:
 	assert_float(GameState.energy).is_equal_approx(20.0 + 22.0 * 1.1 + 7.0, 0.0001)
 
 
-func test_the_pause_menu_shows_the_three_levels() -> void:
+func test_the_pause_menu_shows_every_skills_level() -> void:
 	var village: AreaController = _load(VILLAGE)
 	assert_array(Array(village.pause_status().split("\n"))).is_equal([
-		"Hearts 3   Heart pieces 0 of 4", "Combat 1   Farming 1   Cooking 1", "Hearthvale", "Time played 0:00",
+		"Hearts 3   Heart pieces 0 of 4", "Combat 1   Farming 1", "Cooking 1   Mining 1", "Hearthvale", "Time played 0:00",
 	])
 	GameState.skill_points[Skills.COMBAT] = 30
 	GameState.skill_points[Skills.FARMING] = 55
 	GameState.skill_points[Skills.COOKING] = 12
 	assert_bool(village.open_pause_menu()).is_true()
 	var status: Label = village.hud.pause_menu.get_node(^"Panel/Status")
-	assert_str(status.text).contains("Combat 3   Farming 4   Cooking 2")
-	assert_int(status.text.split("\n").size()).override_failure_message("four lines: all its box holds").is_equal(4)
+	assert_str(status.text).contains("Combat 3   Farming 4\nCooking 2   Mining 1")
+	assert_int(status.text.split("\n").size()).override_failure_message("five lines: all its box holds").is_equal(5)
+	assert_float(status.size.y).override_failure_message("and the box is tall enough for five").is_greater_equal(5.0 * status.get_line_height())
 	village.hud.pause_menu.resume()
 	# In a dungeon the keys' line is there too, and it is still four.
 	GameState.set_flag(StoryGates.KEEP_GATE, true)
 	GameState.go_to(&"keep", &"entrance")
 	var keep: AreaController = _load(KEEP)
 	var lines: PackedStringArray = keep.pause_status().split("\n")
-	assert_int(lines.size()).is_equal(4)
-	assert_str(lines[1]).is_equal("Combat 3   Farming 4   Cooking 2")
-	assert_str(lines[2]).contains("Small keys")
+	assert_int(lines.size()).is_equal(5)
+	assert_str(lines[1]).is_equal("Combat 3   Farming 4")
+	assert_str(lines[2]).is_equal("Cooking 2   Mining 1")
+	assert_str(lines[3]).contains("Small keys")
 
 
 func test_the_chime_is_a_sound_the_game_has() -> void:

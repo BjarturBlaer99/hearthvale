@@ -47,9 +47,10 @@ const HERO_POOL: float = 88.0
 const REACH: float = 2.1
 
 
-## A dungeon if it has an id; else a house's inside if it has inner walls; else outdoors.
-static func kind_of(height_layer: TileMapLayer, dungeon_id: StringName) -> StringName:
-	if dungeon_id != &"":
+## A dungeon if it has an id, or lies underground (the mine: shown and lit as one); else a
+## house's inside if it has inner walls; else outdoors.
+static func kind_of(height_layer: TileMapLayer, dungeon_id: StringName, underground: bool = false) -> StringName:
+	if dungeon_id != &"" or underground:
 		return DUNGEON
 	if height_layer != null and not height_layer.get_used_cells_by_id(GreyboxTiles.SOURCE_ID, GreyboxTiles.coords("inner_wall")).is_empty():
 		return INTERIOR

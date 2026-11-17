@@ -566,6 +566,18 @@ func _initialize() -> void:
 	_art(GreyboxTiles.coords("prop_marsh_lantern"), MARSH_LANTERN_PALETTE, MARSH_LANTERN_ART)
 	_art(GreyboxTiles.coords("prop_marsh_lantern_lit"), MARSH_LANTERN_LIT_PALETTE, MARSH_LANTERN_ART)
 	_willow_art(GreyboxTiles.coords("prop_willow"))
+	# The Old Quarry: its earth and rock, the outcrop and the mouth, a ladder, then its looks.
+	_cave_floor(GreyboxTiles.coords("cave_floor"))
+	_cave_floor(GreyboxTiles.coords("cave_solid"))
+	_cave_wall(GreyboxTiles.coords("cave_wall"))
+	_cave_wall_face(GreyboxTiles.coords("cave_wall_face"))
+	_quarry_rock(GreyboxTiles.coords("quarry_rock"))
+	_mine_mouth(GreyboxTiles.coords("mine_mouth"))
+	_ladder_up(GreyboxTiles.coords("ladder_up"))
+	_rails(GreyboxTiles.coords("rails"))
+	_rubble(GreyboxTiles.coords("rubble"))
+	_crystal_vein(GreyboxTiles.coords("crystal_vein"))
+	_art(GreyboxTiles.coords("prop_timber"), TIMBER_PALETTE, TIMBER_ART)
 	# Art pass 3: warm every colour and soften every outline, tile by tile.
 	PixelGrade.apply(_image, OUTLINE, Rect2i(), Vector2i(T, T))
 	DirAccess.make_dir_recursive_absolute(GreyboxTiles.TEXTURE_PATH.get_base_dir())
@@ -940,7 +952,7 @@ func _ascii(tile: Vector2i, art: String) -> void:
 ## A spawn marker (only ever seen in the editor): a bright square with a dot per index, so
 ## the kinds tell apart.
 func _marker(tile: Vector2i, index: int) -> void:
-	var color: Color = [Color(0.3, 0.9, 0.3), Color(0.85, 0.5, 0.25), Color(1, 1, 1), Color(1, 0.85, 0.2), Color(0.9, 1, 0.4)][index]
+	var color: Color = [Color(0.3, 0.9, 0.3), Color(0.85, 0.5, 0.25), Color(1, 1, 1), Color(1, 0.85, 0.2), Color(0.9, 1, 0.4), Color(0.6, 0.6, 0.65)][index]
 	_rect(tile, Rect2i(2, 2, T - 4, T - 4), Color(color, 0.55))
 	_rect(tile, Rect2i(2, 2, T - 4, 1), OUTLINE)
 	for dot: int in index + 1:
@@ -1893,6 +1905,179 @@ const MARSH_LANTERN_ART: Array[String] = [
 
 
 ## Paints `rows` onto `tile` from `palette`, as _ascii() does for PROP_ART.
+# --- The Old Quarry (2026-11-17) -----------------------------------------------------------
+
+const CAVE_EARTH: Color = Color(0.37, 0.32, 0.28)
+const CAVE_ROCK: Color = Color(0.21, 0.19, 0.20)
+const CAVE_FACE: Color = Color(0.34, 0.30, 0.29)
+const QUARRY_STONE: Color = Color(0.57, 0.53, 0.48)
+const TIMBER_WOOD: Color = Color(0.50, 0.37, 0.24)
+const RAIL_IRON: Color = Color(0.46, 0.46, 0.50)
+
+
+## Packed earth underfoot: warm and dull, with grit and the odd small stone, so that rocks
+## and ore stand out on it.
+func _cave_floor(tile: Vector2i) -> void:
+	_fill(tile, CAVE_EARTH)
+	for y: int in T:
+		for x: int in T:
+			var roll: int = _hash(x, y, 71) % 23
+			if roll == 0:
+				_px(tile, x, y, CAVE_EARTH.darkened(0.22))
+			elif roll == 1:
+				_px(tile, x, y, CAVE_EARTH.lightened(0.10))
+			elif roll == 2 and _hash(x + 1, y, 71) % 23 != 2:
+				_px(tile, x, y, CAVE_EARTH.darkened(0.12))
+	for stone: Vector2i in [Vector2i(3, 4), Vector2i(11, 10)]:
+		_px(tile, stone.x, stone.y, CAVE_EARTH.lightened(0.22))
+		_px(tile, stone.x + 1, stone.y, CAVE_EARTH.lightened(0.12))
+		_px(tile, stone.x, stone.y + 1, CAVE_EARTH.darkened(0.25))
+		_px(tile, stone.x + 1, stone.y + 1, CAVE_EARTH.darkened(0.25))
+
+
+## Living rock seen from above: dark, in rough slabs with paler broken edges.
+func _cave_wall(tile: Vector2i) -> void:
+	_fill(tile, CAVE_ROCK)
+	for y: int in T:
+		for x: int in T:
+			var slab: int = _hash(x >> 2, y >> 2, 43) % 5
+			var color: Color = CAVE_ROCK.lightened(0.05 * slab)
+			if _hash(x, y, 47) % 19 == 0:
+				color = color.darkened(0.35)
+			_px(tile, x, y, color)
+	for crack: Vector2i in [Vector2i(2, 3), Vector2i(3, 4), Vector2i(4, 4), Vector2i(10, 11), Vector2i(11, 12), Vector2i(12, 12), Vector2i(13, 13)]:
+		_px(tile, crack.x, crack.y, CAVE_ROCK.darkened(0.5))
+		_px(tile, crack.x, crack.y - 1, CAVE_ROCK.lightened(0.16))
+
+
+## The same rock where it stands over the floor: a lit lip along the top, a face of broken
+## strata under it, and the dark where it meets the ground.
+func _cave_wall_face(tile: Vector2i) -> void:
+	_fill(tile, CAVE_FACE)
+	for y: int in T:
+		for x: int in T:
+			var color: Color = CAVE_FACE.darkened(0.05 * (y >> 2))
+			var strata: int = _hash(x >> 1, y >> 2, 53) % 7
+			if strata == 0:
+				color = color.lightened(0.10)
+			elif strata == 1:
+				color = color.darkened(0.16)
+			if _hash(x, y, 59) % 29 == 0:
+				color = color.darkened(0.3)
+			_px(tile, x, y, color)
+	_rect(tile, Rect2i(0, 0, T, 2), CAVE_ROCK.lightened(0.10))
+	_rect(tile, Rect2i(0, 2, T, 1), CAVE_FACE.lightened(0.24))
+	_rect(tile, Rect2i(0, T - 2, T, 2), CAVE_FACE.darkened(0.42))
+	for x: int in [4, 5, 11]:
+		_rect(tile, Rect2i(x, 5, 1, 7), CAVE_FACE.darkened(0.36))
+
+
+## The outcrop in the North Fields: weathered stone in the light, paler than the cave's, with
+## a little grass in its cracks.
+func _quarry_rock(tile: Vector2i) -> void:
+	_fill(tile, QUARRY_STONE)
+	for y: int in T:
+		for x: int in T:
+			var slab: int = _hash(x >> 2, y >> 2, 61) % 4
+			var color: Color = QUARRY_STONE.darkened(0.06 * slab)
+			if _hash(x, y, 67) % 17 == 0:
+				color = color.lightened(0.14)
+			_px(tile, x, y, color)
+	for crack: Vector2i in [Vector2i(3, 5), Vector2i(4, 6), Vector2i(5, 6), Vector2i(9, 2), Vector2i(10, 3), Vector2i(11, 12), Vector2i(12, 13), Vector2i(6, 12)]:
+		_px(tile, crack.x, crack.y, QUARRY_STONE.darkened(0.45))
+	for tuft: Vector2i in [Vector2i(4, 7), Vector2i(12, 14)]:
+		_px(tile, tuft.x, tuft.y, GreyboxTiles.GROUND_COLORS[1])
+		_px(tile, tuft.x + 1, tuft.y - 1, GreyboxTiles.GROUND_COLORS[0])
+	_rect(tile, Rect2i(0, T - 1, T, 1), QUARRY_STONE.darkened(0.30))
+
+
+## The cut into the hillside: trodden earth going dark, old rails running in, and a timber
+## beam along each side.
+func _mine_mouth(tile: Vector2i) -> void:
+	_fill(tile, CAVE_EARTH.darkened(0.62))
+	for y: int in T:
+		for x: int in T:
+			if _hash(x, y, 73) % 13 == 0:
+				_px(tile, x, y, CAVE_EARTH.darkened(0.74))
+	_rails_on(tile)
+	for beam: int in [0, T - 3]:
+		_rect(tile, Rect2i(0, beam, T, 3), TIMBER_WOOD.darkened(0.25))
+		_rect(tile, Rect2i(0, beam, T, 1), TIMBER_WOOD.lightened(0.12))
+		_px(tile, 5, beam + 1, TIMBER_WOOD.darkened(0.5))
+		_px(tile, 12, beam + 1, TIMBER_WOOD.darkened(0.5))
+
+
+## A ladder up the rock: a dark shaft in the wall's face and the rungs climbing into it.
+func _ladder_up(tile: Vector2i) -> void:
+	_cave_wall_face(tile)
+	_rect(tile, Rect2i(3, 1, 10, T - 1), OUTLINE)
+	_rect(tile, Rect2i(4, 2, 8, T - 2), Color(0.13, 0.11, 0.13))
+	for rail: int in [5, 10]:
+		_rect(tile, Rect2i(rail, 1, 1, T - 1), TIMBER_WOOD)
+	for rung: int in [3, 6, 9, 12]:
+		_rect(tile, Rect2i(6, rung, 4, 1), TIMBER_WOOD.lightened(0.14))
+	_rect(tile, Rect2i(5, T - 1, 6, 1), TIMBER_WOOD.darkened(0.2))
+
+
+## Old rails for the Decor layer: sleepers under two runs of iron, east to west.
+func _rails(tile: Vector2i) -> void:
+	_rails_on(tile)
+
+
+func _rails_on(tile: Vector2i) -> void:
+	for sleeper: int in [1, 5, 9, 13]:
+		_rect(tile, Rect2i(sleeper, 4, 2, 8), TIMBER_WOOD.darkened(0.38))
+		_rect(tile, Rect2i(sleeper, 4, 2, 1), TIMBER_WOOD.darkened(0.2))
+	for run: int in [5, 10]:
+		_rect(tile, Rect2i(0, run, T, 1), RAIL_IRON)
+		_rect(tile, Rect2i(0, run + 1, T, 1), RAIL_IRON.darkened(0.45))
+
+
+## Broken stone lying about, for the Decor layer.
+func _rubble(tile: Vector2i) -> void:
+	for stone: Vector3 in [Vector3(4, 5, 2.2), Vector3(10.5, 9, 2.6), Vector3(6, 12, 1.6), Vector3(12.5, 4, 1.4)]:
+		_ellipse(tile, Vector2(stone.x, stone.y + 0.8), Vector2(stone.z, stone.z * 0.7), OUTLINE)
+		_ellipse(tile, Vector2(stone.x, stone.y), Vector2(stone.z, stone.z * 0.7), Color(0.47, 0.44, 0.43))
+		_px(tile, int(stone.x) - 1, int(stone.y) - 1, Color(0.66, 0.63, 0.60))
+
+
+## A vein of crystal in the rock, for the Decor layer: three pale shards.
+func _crystal_vein(tile: Vector2i) -> void:
+	var shards: Array = [[Vector2i(4, 9), 5, Color(0.62, 0.86, 0.95)], [Vector2i(8, 7), 7, Color(0.80, 0.74, 0.98)], [Vector2i(12, 10), 4, Color(0.66, 0.92, 0.88)]]
+	for shard: Array in shards:
+		var foot: Vector2i = shard[0]
+		var tall: int = shard[1]
+		var color: Color = shard[2]
+		for step: int in tall:
+			_px(tile, foot.x, foot.y - step, color.darkened(0.25))
+			_px(tile, foot.x + 1, foot.y - step, color)
+		_px(tile, foot.x + 1, foot.y - tall, color.lightened(0.5))
+		_px(tile, foot.x - 1, foot.y, OUTLINE)
+		_px(tile, foot.x + 2, foot.y, OUTLINE)
+
+
+## The quarry's prop, as PROP_ART is written: pit props stacked against the wall.
+const TIMBER_PALETTE: Dictionary = {"w": Color(0.52, 0.39, 0.25), "W": Color(0.36, 0.26, 0.17), "l": Color(0.68, 0.54, 0.36), "e": Color(0.74, 0.62, 0.44), "s": Color(0.0, 0.0, 0.0, 0.28)}
+const TIMBER_ART: Array[String] = [
+	"................",
+	"................",
+	"....oooooooo....",
+	"...oellllllwo...",
+	"...oewwwwwwWo...",
+	"...oeWWWWWWWo...",
+	"..oooooooooooo..",
+	".oellllllllllwo.",
+	".oewwwwwwwwwwWo.",
+	".oeWWWWWWWWWWWo.",
+	"oooooooooooooooo",
+	"oellllllllllllwo",
+	"oewwwwwwwwwwwwWo",
+	"oeWWWWWWWWWWWWWo",
+	"oooooooooooooooo",
+	".ssssssssssssss.",
+]
+
+
 func _art(tile: Vector2i, palette: Dictionary, rows: Array[String]) -> void:
 	for y: int in T:
 		for x: int in T:

@@ -1,0 +1,18 @@
+{
+	"id": "mine",
+	"hall": "quarry",
+	"floors": [
+		{ "area": "quarry_1", "ores": { "copper_ore": 5 } },
+		{ "area": "quarry_2", "ores": { "iron_ore": 3, "coal": 4 } },
+		{ "area": "quarry_3", "ores": { "gold_ore": 2, "crystal": 2 } }
+	],
+	"lift": [2],
+	"rocks": {
+		"stone": { "blows": 2, "gives": "stone" },
+		"copper_ore": { "blows": 2, "gives": "copper_ore" },
+		"coal": { "blows": 2, "gives": "coal" },
+		"iron_ore": { "blows": 3, "gives": "iron_ore" },
+		"gold_ore": { "blows": 3, "gives": "gold_ore" },
+		"crystal": { "blows": 3, "gives": "crystal" }
+	}
+}

@@ -18,7 +18,7 @@ func test_the_games_rules_are_the_plans() -> void:
 	assert_array(_skills.thresholds).is_equal([0, 10, 25, 50, 90])
 	assert_int(_skills.top_level()).is_equal(5)
 	assert_float(_skills.step).is_equal(0.1)
-	assert_array(_skills.ids()).is_equal([Skills.COMBAT, Skills.FARMING, Skills.COOKING])
+	assert_array(_skills.ids()).is_equal([Skills.COMBAT, Skills.FARMING, Skills.COOKING, Skills.MINING])
 	assert_int(_skills.gain(Skills.COMBAT, Skills.MONSTER)).is_equal(1)
 	assert_int(_skills.gain(Skills.COMBAT, Skills.BOSS)).is_equal(10)
 	assert_int(_skills.gain(Skills.FARMING, Skills.TILL)).is_equal(1)
@@ -79,9 +79,14 @@ func test_each_level_of_cooking_adds_a_tenth_to_a_dish() -> void:
 
 
 func test_the_line_names_every_skill_and_its_level() -> void:
-	assert_str(_skills.line({})).is_equal("Combat 1   Farming 1   Cooking 1")
-	assert_str(_skills.line({Skills.COMBAT: 30, Skills.FARMING: 55, Skills.COOKING: 12})).is_equal("Combat 3   Farming 4   Cooking 2")
-	assert_int(_skills.line({Skills.COMBAT: 90, Skills.FARMING: 90, Skills.COOKING: 90}).length()).override_failure_message("it fits the pause menu's 200 pixels at 6 a letter").is_less_equal(33)
+	assert_array(Array(_skills.lines({}))).is_equal(["Combat 1   Farming 1", "Cooking 1   Mining 1"])
+	assert_array(Array(_skills.lines({Skills.COMBAT: 30, Skills.FARMING: 55, Skills.COOKING: 12}))).is_equal(["Combat 3   Farming 4", "Cooking 2   Mining 1"])
+	for line: String in _skills.lines({Skills.COMBAT: 90, Skills.FARMING: 90, Skills.COOKING: 90, Skills.MINING: 90}):
+		assert_int(line.length()).override_failure_message("'%s' fits the pause menu's 200 pixels at 6 a letter" % line).is_less_equal(33)
+	# Two to a line, and an odd one out has the last line to itself.
+	var three: Skills = Skills.new({"levels": [0], "skills": {"a": {"name": "Aa"}, "b": {"name": "Bb"}, "c": {"name": "Cc"}}})
+	assert_array(Array(three.lines({}))).is_equal(["Aa 1   Bb 1", "Cc 1"])
+	assert_array(Array(Skills.new().lines({}))).is_empty()
 	assert_str(_skills.risen_words(Skills.FARMING, 2)).is_equal("Farming rose to level 2.")
 	assert_str(_skills.name_of(&"fishing")).override_failure_message("a skill the rules don't name").is_equal("Fishing")
 
@@ -94,7 +99,7 @@ func test_no_rules_make_no_skills_and_change_nothing() -> void:
 	assert_int(none.gain(Skills.COMBAT, Skills.MONSTER)).is_equal(0)
 	assert_float(none.cost_factor(EnergyRules.SWING, {Skills.COMBAT: 90})).is_equal(1.0)
 	assert_float(none.dish_factor({Skills.COOKING: 90})).is_equal(1.0)
-	assert_str(none.line({})).is_empty()
+	assert_array(Array(none.lines({}))).is_empty()
 	# Garbled parts are passed over, not crashed on.
 	var odd: Skills = Skills.new({"levels": "many", "step": "big", "skills": {"combat": "strong", "farming": {"gains": {"till": "lots"}, "eases": "hoe"}}})
 	assert_array(odd.ids()).is_equal([Skills.FARMING])
@@ -119,7 +124,7 @@ func test_rules_that_cant_be_used_say_why() -> void:
 		[{"skills": {"combat": {"name": "Combat"}}}, "skill 'combat' needs 'gains': the points each deed gives."],
 		[{"skills": {"combat": {"name": "Combat", "gains": {"monster": 0}}}}, "skill 'combat' gains by 'monster' must be a whole number of 1 or more."],
 		[{"skills": {"combat": {"name": "Combat", "gains": {"monster": 1}, "eases": "swing"}}}, "skill 'combat' 'eases' must list the costs it makes cheaper."],
-		[{"skills": {"combat": {"name": "Combat", "gains": {"monster": 1}, "eases": ["dodge"]}}}, "skill 'combat' eases an unknown cost 'dodge'. Known: sprint_per_second, swing, shot, hoe, water."],
+		[{"skills": {"combat": {"name": "Combat", "gains": {"monster": 1}, "eases": ["dodge"]}}}, "skill 'combat' eases an unknown cost 'dodge'. Known: sprint_per_second, swing, shot, hoe, water, mine."],
 		[{"skills": {"cooking": {"name": "Cooking", "gains": {"dish": 2}, "enriches_dishes": "yes"}}}, "skill 'cooking' 'enriches_dishes' must be true or false."],
 	]
 	for case: Array in cases:

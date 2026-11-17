@@ -75,6 +75,10 @@
           "required": ["recipe"]
         },
         {
+          "properties": { "type": { "const": "travel" }, "area": { "$ref": "#/$defs/id" }, "entry": { "$ref": "#/$defs/id" } },
+          "required": ["area", "entry"]
+        },
+        {
           "properties": { "type": { "const": "practise" }, "skill": { "type": "string", "minLength": 1 }, "deed": { "type": "string", "minLength": 1 } },
           "required": ["skill", "deed"]
         },

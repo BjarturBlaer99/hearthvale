@@ -8,7 +8,8 @@ extends GdUnitTestSuite
 ## In the marsh (Willowmere) the open ground is its own mossy ground and the solid ground under a
 ## prop its own too; planks laid on the ground are a way to walk, so they may lie under an exit.
 
-const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"south_field", &"shop", &"ruin_cellar", &"cistern", &"keep", &"north_fields", &"old_wood", &"crypt", &"willowmere"]
+const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"south_field", &"shop", &"ruin_cellar", &"cistern", &"keep", &"north_fields", &"old_wood", &"crypt", &"willowmere",
+	&"quarry", &"quarry_1", &"quarry_2", &"quarry_3", &"quarry_4", &"quarry_5", &"quarry_6", &"quarry_7", &"quarry_8", &"quarry_9"]
 
 
 func test_every_area_has_a_decor_layer_just_above_its_height_layer() -> void:
@@ -64,6 +65,13 @@ func test_decorations_never_hide_the_way() -> void:
 						decorations[area_id] = int(decorations.get(area_id, 0)) + 1
 						assert_that(under).override_failure_message(where + ": %s sits on the marsh's open ground" % marsh_kind).is_equal(marsh)
 						assert_bool(busy.has(cell)).override_failure_message(where + ": nothing on what the hero uses or arrives at").is_false()
+				GreyboxTiles.ROW_QUARRY_DECOR:
+					var quarry_kind: String = GreyboxTiles.QUARRY_DECOR_KINDS[tile.x]
+					if GreyboxTiles.QUARRY_PROP_KINDS.has(quarry_kind):
+						assert_that(under).override_failure_message(where + ": the quarry's props stand on its solid earth").is_equal(GreyboxTiles.coords("cave_solid"))
+					else:
+						# Rails, rubble, a vein of crystal: looks on open ground or on the quarry's own tiles.
+						assert_bool(under.y == GreyboxTiles.ROW_GROUND or under.y == GreyboxTiles.ROW_QUARRY).override_failure_message(where + ": %s lies on open ground or the quarry's own" % quarry_kind).is_true()
 				GreyboxTiles.ROW_HOUSE_DECOR:
 					# A chimney, the chapel's cross or the shop's sign.
 					assert_bool(grid.is_solid(cell) and grid.height_at(cell) == 3).override_failure_message(where + ": a house's overlay sits on the house").is_true()

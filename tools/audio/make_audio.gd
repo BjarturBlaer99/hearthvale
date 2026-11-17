@@ -17,6 +17,7 @@ const SFX: Array[String] = [
 	"torch", "snuff", "fall", "sink", "whiff", "eat", "morning", "collapse",
 	"hoe", "pour", "fill", "plant", "harvest", "skill", "friend",
 	"wisp_flare", "wisp_dart",
+	"pick", "rock_break", "lift",
 ]
 
 ## Each song: tempo, bars (4/4; every track must last bars x 8 eighths), and its tracks.
@@ -68,6 +69,18 @@ const SONGS: Dictionary = {
 		{"wave": "square", "duty": 0.125, "volume": 0.035, "notes":
 			"R:3 A5:1 R:4 R:5 F5:1 R:2 R:3 D6:1 R:4 R:5 C6:1 R:2 " +
 			"R:3 A#5:1 R:4 R:5 A5:1 R:2 R:3 E6:1 R:4 R:5 D6:1 R:2"},
+	]},
+	# Slow and hollow, E minor, for the Old Quarry: | Em | Em | C | D | Em | G | Am B | Em |
+	# A few long notes with room between them over a low drone, and a far-off tapping.
+	"mine": {"bpm": 60, "bars": 8, "tracks": [
+		{"wave": "triangle", "volume": 0.20, "notes":
+			"E4:4 R:4 G4:2 B4:2 A4:4 G4:4 E4:2 R:2 F#4:4 D4:4 " +
+			"E4:2 G4:2 B4:4 D5:4 B4:2 R:2 C5:2 A4:2 B4:4 E4:6 R:2"},
+		{"wave": "triangle", "volume": 0.27, "notes":
+			"E2:8 E2:8 C2:8 D2:8 E2:8 G2:8 A2:4 B2:4 E2:8"},
+		{"wave": "square", "duty": 0.125, "volume": 0.03, "notes":
+			"R:2 B5:1 R:5 R:6 E6:1 R:1 R:2 G5:1 R:5 R:6 A5:1 R:1 " +
+			"R:2 B5:1 R:5 R:6 D6:1 R:1 R:2 E5:1 R:5 R:6 B5:1 R:1"},
 	]},
 	# Sparse and watchful, A minor: | Am | F | G | Em | Am | F | Dm E | Am |
 	"dungeon": {"bpm": 84, "bars": 8, "tracks": [
@@ -192,6 +205,18 @@ static func effect(id: String) -> PackedFloat32Array:
 		"wisp_dart":
 			# And letting go: a quick falling rush.
 			return Synth.mix(Synth.tone(&"sine", 1900, 500, 0.22, 0.24, 0.002, 0.14), Synth.tone(&"noise", 7000, 1800, 0.2, 0.10, 0.002, 0.12, 0.5, 41))
+		"pick":
+			# Iron on stone: a bright clink over a short thud.
+			return Synth.mix(Synth.tone(&"square", 1500, 900, 0.05, 0.20, 0.001, 0.04, 0.25), Synth.tone(&"noise", 3000, 800, 0.08, 0.24, 0.001, 0.06, 0.5, 61))
+		"rock_break":
+			# A rock giving way: a crack, and the pieces settling.
+			return Synth.join([
+				Synth.mix(Synth.tone(&"noise", 1800, 300, 0.18, 0.36, 0.001, 0.12, 0.5, 62), Synth.tone(&"square", 170, 60, 0.12, 0.24, 0.001, 0.08, 0.5)),
+				Synth.tone(&"noise", 900, 250, 0.12, 0.16, 0.005, 0.10, 0.5, 63),
+			])
+		"lift":
+			# The old lift going down: a low hum sinking under the rattle of its rope.
+			return Synth.mix(Synth.tone(&"triangle", 180, 90, 0.6, 0.20, 0.02, 0.3), Synth.tone(&"noise", 1200, 500, 0.6, 0.09, 0.02, 0.3, 0.5, 64))
 		"whiff":
 			# A blow passing through the Shade: thin air.
 			return Synth.tone(&"noise", 9000, 2500, 0.12, 0.16, 0.02, 0.08, 0.5, 33)

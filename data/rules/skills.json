@@ -17,6 +17,12 @@
 			"name": "Cooking",
 			"gains": { "dish": 2 },
 			"enriches_dishes": true
+		},
+		"mining": {
+			"name": "Mining",
+			"gains": { "rock": 1, "ore": 2 },
+			"eases": ["mine"],
+			"extra_chance": 0.05
 		}
 	}
 }

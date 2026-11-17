@@ -19,6 +19,7 @@ func test_tilda_sells_her_wares_then_a_seed_of_every_crop_cheapest_first() -> vo
 		{"item": "arrow", "count": 10, "price": 5},
 		{"item": "bomb", "count": 3, "price": 8},
 		{"item": "bread", "count": 1, "price": 6},
+		{"item": "pickaxe", "count": 1, "price": 25},
 		{"item": "turnip_seeds", "count": 1, "price": 5},
 		{"item": "wheat_seeds", "count": 1, "price": 6},
 		{"item": "carrot_seeds", "count": 1, "price": 8},
@@ -26,14 +27,14 @@ func test_tilda_sells_her_wares_then_a_seed_of_every_crop_cheapest_first() -> vo
 		{"item": "pumpkin_seeds", "count": 1, "price": 20},
 	])
 	# A shop that sells no seeds has only its own wares; one with no wares, only seeds.
-	assert_int(Shop.wares({"sells": _tilda["sells"]}, _crops).size()).is_equal(3)
+	assert_int(Shop.wares({"sells": _tilda["sells"]}, _crops).size()).is_equal(4)
 	assert_int(Shop.wares({"sells": [], "sells_seeds": true}, _crops).size()).is_equal(5)
 	assert_array(Shop.wares({}, _crops)).is_empty()
 	# A new crop is on the list without touching the shop.
 	var with_beans: Array = _crops.duplicate()
 	with_beans.append({"id": "bean", "seed": "bean_seeds", "gives": {"item": "bean"}, "seed_price": 7, "sells_for": 15})
 	var seeds: Array = Shop.wares(_tilda, with_beans).map(func(ware: Dictionary) -> String: return str(ware["item"]))
-	assert_array(seeds.slice(3)).override_failure_message("between wheat (6) and carrots (8)").is_equal(["turnip_seeds", "wheat_seeds", "bean_seeds", "carrot_seeds", "potato_seeds", "pumpkin_seeds"])
+	assert_array(seeds.slice(4)).override_failure_message("between wheat (6) and carrots (8)").is_equal(["turnip_seeds", "wheat_seeds", "bean_seeds", "carrot_seeds", "potato_seeds", "pumpkin_seeds"])
 
 
 func test_tilda_buys_what_the_crops_give_and_nothing_else() -> void:

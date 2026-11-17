@@ -18,6 +18,7 @@ const FRAMES: Dictionary = {
 	&"jam": 36, &"cake": 37, &"shepherds_pie": 38,
 	&"cattail_root": 39, &"marsh_berries": 40, &"bog_mushroom": 41, &"marsh_stew": 42,
 	&"wisp_ember": 43, &"ember_tea": 44,
+	&"pickaxe": 45, &"stone": 46, &"copper_ore": 47, &"coal": 48, &"iron_ore": 49, &"gold_ore": 50, &"crystal": 51,
 }
 
 

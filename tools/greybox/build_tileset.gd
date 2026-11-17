@@ -78,6 +78,12 @@ func _initialize() -> void:
 		_fixed(source, Vector2i(index, GreyboxTiles.ROW_MARSH), GreyboxTiles.MARSH_HEIGHTS[index], GreyboxTiles.MARSH_SOLID[index])
 	for index: int in GreyboxTiles.MARSH_DECOR_KINDS.size():
 		_fixed(source, Vector2i(index, GreyboxTiles.ROW_MARSH_DECOR), 0, false)
+	# The Old Quarry: its earth, its mouth and its ladder are walked on, its rock isn't; its
+	# decorations and its prop are for the Decor layer.
+	for index: int in GreyboxTiles.QUARRY_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_QUARRY), GreyboxTiles.QUARRY_HEIGHTS[index], GreyboxTiles.QUARRY_SOLID[index])
+	for index: int in GreyboxTiles.QUARRY_DECOR_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_QUARRY_DECOR), 0, false)
 	# Spawn markers: never walked on (the area clears them), open ground in the editor.
 	for index: int in GreyboxTiles.MARKER_KINDS.size():
 		_fixed(source, Vector2i(index, GreyboxTiles.ROW_MARKERS), 0, false)

@@ -254,6 +254,14 @@ approved as written). Three steps:
   Tea. The fight and the favour were played through in a real window by a script. The user played the marsh
   by day and by night on 2026-11-17 ("feels right" both times); the favour has been finished only by the script.
 
+## After the roadmap: mining and crafting
+At the user's request of 2026-11-17 (`docs/progress/mining-crafting-plan.md`, approved as written), in
+three phases with a stop after each:
+- **Phase 1 — Mining.** *Built 2026-11-17.* The Old Quarry (an entrance hall and nine floors in three
+  bands), the Pickaxe, rocks and ore rolled anew each day, the lift, the Mining skill, a tune.
+- **Phase 2 — Crafting.** *Not built.* A furnace, a workbench, a chest, sprinklers, tool upgrades.
+- **Phase 3 — Balance.** *Not built.* Tilda buys ore and bars, two favours, and eight days played.
+
 ---
 
 ## Later (not in phase 2)

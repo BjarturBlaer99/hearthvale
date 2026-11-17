@@ -44,13 +44,20 @@ extends RefCounted
 ##     (walkable looks), planks laid on the ground (the way to the marsh across Hearthvale's
 ##     east meadow, at any height), a mossy stone and a marsh lantern post (props), and a hole
 ##     through the ruined hut's roof (a decoration over it), and the lantern post burning
+##  25 the Old Quarry (2026-11-17), all on the Height layer: packed earth to walk on, the same
+##     earth solid (the quarry's props stand on it), a rock wall seen from above, the same wall
+##     showing its face (the baker picks it where floor lies south of a wall), the outcrop in
+##     the North Fields, the mine's mouth cut through it, and a ladder up a wall (a way out,
+##     walked onto as a stairway is)
+##  26 the quarry's looks, for the Decor layer: old rails, rubble and a vein of crystal
+##     (walkable looks), and a timber prop
 
 const TEXTURE_PATH: String = "res://world/tiles/greybox_tiles.png"
 const TILESET_PATH: String = "res://world/tiles/greybox_tiles.tres"
 const SOURCE_ID: int = 0
 const TILE_SIZE: int = 16
 const COLUMNS: int = 8
-const ROWS: int = 25
+const ROWS: int = 27
 
 const ROW_GROUND: int = 0
 const ROW_STAIRS: int = 1
@@ -74,6 +81,8 @@ const ROW_SMOKE: int = 21
 const ROW_TREES: int = 22
 const ROW_MARSH: int = 23
 const ROW_MARSH_DECOR: int = 24
+const ROW_QUARRY: int = 25
+const ROW_QUARRY_DECOR: int = 26
 ## More trees, all props like "prop_tree". The baker mixes the first three kinds by cell and
 ## uses the canopy where trees stand on all four sides; a "cherry" block is always a cherry.
 const TREE_KINDS: Array[String] = ["prop_tree_b", "prop_tree_c", "prop_canopy", "prop_cherry", "prop_willow"]
@@ -93,6 +102,18 @@ const LANTERN_DARK: String = "prop_marsh_lantern"
 const LANTERN_LIT: String = "prop_marsh_lantern_lit"
 ## Block kinds that stand for one of several marsh tiles (build_maps.gd picks): never tiles.
 const MARSH_BLOCKS: Array[String] = ["ruin"]
+## The Old Quarry's kinds for the Height layer, in atlas order, with whether each is solid and
+## the height it counts as for shading. A map says "cave_wall" (or leaves its base to it): the
+## baker shows the wall's face wherever floor lies south of it.
+const QUARRY_KINDS: Array[String] = ["cave_floor", "cave_solid", "cave_wall", "cave_wall_face", "quarry_rock", "mine_mouth", "ladder_up"]
+const QUARRY_SOLID: Array[bool] = [false, true, true, true, true, false, false]
+const QUARRY_HEIGHTS: Array[int] = [0, 0, 3, 3, 2, 0, 0]
+## A cave wall, and the same wall where it shows its face.
+const CAVE_WALL: String = "cave_wall"
+const CAVE_WALL_FACE: String = "cave_wall_face"
+## The quarry's decorations (walkable looks) and its prop, in atlas order.
+const QUARRY_DECOR_KINDS: Array[String] = ["rails", "rubble", "crystal_vein", "prop_timber"]
+const QUARRY_PROP_KINDS: Array[String] = ["prop_timber"]
 ## House fronts, in atlas order from ROW_HOUSE (eight to a row), all solid at height 3 but for
 ## HOUSE_DOOR_KINDS.
 ## A roof kind is its style ("roof" clay tiles, "roof_blue" slate, "roof_thatch"), then "_top"
@@ -123,7 +144,9 @@ const FURNITURE_B_HEIGHTS: Array[int] = [1, 2, 2, 1, 1, 1, 1, 2]
 ## Decorations among the H12 props: see-through and walkable, like DECOR_KINDS.
 const PROP_DECOR_KINDS: Array[String] = ["bucket", "laundry"]
 ## What the Spawns layer's markers stand for, in atlas order.
-const MARKER_KINDS: Array[String] = ["grass", "pot", "chicken", "butterfly", "firefly"]
+const MARKER_KINDS: Array[String] = ["grass", "pot", "chicken", "butterfly", "firefly", "rock"]
+## The marker a rock of the quarry grows from (the area makes a Rock of it).
+const ROCK_MARKER: String = "rock"
 ## Markers that become breakables (the rest become critters).
 const BREAKABLE_MARKERS: Array[String] = ["grass", "pot"]
 ## Water's animation: frames, and how long each shows (seconds).
@@ -165,6 +188,7 @@ const PROP_BLOCKS: Dictionary = {
 	"crate": "prop_crate", "keg": "prop_keg", "hay": "prop_hay", "logs": "prop_logs", "stump": "prop_stump",
 	"lamp": "prop_lamp", "standing_stone": "prop_stone", "post": "prop_post", "stall": "stall",
 	"willow": "prop_willow", "mossy_rock": "prop_mossy_rock", "marsh_lantern": "prop_marsh_lantern",
+	"timber": "prop_timber",
 }
 
 ## Custom data layers on the TileSet (TECH_DESIGN §3).
@@ -232,6 +256,10 @@ static func coords(kind: String, height: int = 0) -> Vector2i:
 		return Vector2i(MARSH_KINDS.find(kind), ROW_MARSH)
 	if MARSH_DECOR_KINDS.has(kind):
 		return Vector2i(MARSH_DECOR_KINDS.find(kind), ROW_MARSH_DECOR)
+	if QUARRY_KINDS.has(kind):
+		return Vector2i(QUARRY_KINDS.find(kind), ROW_QUARRY)
+	if QUARRY_DECOR_KINDS.has(kind):
+		return Vector2i(QUARRY_DECOR_KINDS.find(kind), ROW_QUARRY_DECOR)
 	return Vector2i(0, ROW_GROUND)
 
 
@@ -252,14 +280,16 @@ static func is_known_kind(kind: String) -> bool:
 		or DECOR_KINDS.has(kind) or DETAIL_KINDS.has(kind) or PROP_KINDS.has(kind) or PROP_BLOCKS.has(kind) \
 		or PROPS_B_KINDS.has(kind) or PROPS_C_KINDS.has(kind) or FURNITURE_B_KINDS.has(kind) \
 		or HOUSE_KINDS.has(kind) or HOUSE_DECOR_KINDS.has(kind) or kind == "smoke" or TREE_KINDS.has(kind) \
-		or MARSH_KINDS.has(kind) or MARSH_DECOR_KINDS.has(kind) or MARSH_BLOCKS.has(kind)
+		or MARSH_KINDS.has(kind) or MARSH_DECOR_KINDS.has(kind) or MARSH_BLOCKS.has(kind) \
+		or QUARRY_KINDS.has(kind) or QUARRY_DECOR_KINDS.has(kind)
 
 
 static func is_decor(kind: String) -> bool:
 	return DECOR_KINDS.has(kind) or PROP_DECOR_KINDS.has(kind) or HOUSE_DECOR_KINDS.has(kind) or kind == "smoke" \
-		or (MARSH_DECOR_KINDS.has(kind) and not MARSH_PROP_KINDS.has(kind))
+		or (MARSH_DECOR_KINDS.has(kind) and not MARSH_PROP_KINDS.has(kind)) \
+		or (QUARRY_DECOR_KINDS.has(kind) and not QUARRY_PROP_KINDS.has(kind))
 
 
 static func is_prop(kind: String) -> bool:
-	return PROP_KINDS.has(kind) or TREE_KINDS.has(kind) or MARSH_PROP_KINDS.has(kind) \
+	return PROP_KINDS.has(kind) or TREE_KINDS.has(kind) or MARSH_PROP_KINDS.has(kind) or QUARRY_PROP_KINDS.has(kind) \
 		or (PROPS_B_KINDS.has(kind) or PROPS_C_KINDS.has(kind)) and not PROP_DECOR_KINDS.has(kind)

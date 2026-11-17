@@ -5,7 +5,7 @@ extends Node
 ## methods, which emit the matching EventBus signal. `to_dict()` / `from_dict()` use the
 ## save format from TECH_DESIGN §9; SaveSystem handles files and version migration.
 
-const SAVE_VERSION: int = 4
+const SAVE_VERSION: int = 5
 const HALVES_PER_HEART: int = 2
 const START_HEARTS: int = 3
 const MAX_HEARTS: int = 20
@@ -61,6 +61,10 @@ var _skills: Skills
 var _friendship: Friendship
 ## The hero's plot (P3): made from the farm's rules when first asked for. Saved.
 var _farm: Farm
+## What the mine remembers (2026-11-17): the number its rolls come from and today's broken
+## rocks. Saved.
+var _mine: MineState
+var _mine_rules: MineRules
 ## Where the hero is: { "area", "cell": [x, y] }, or { "area", "entry" } on the way into an
 ## area through one of its entry points (go_to), until the area places them.
 var player: Dictionary = {}
@@ -72,6 +76,8 @@ func new_game() -> void:
 	hearts_max = START_HEARTS
 	health = max_health()
 	energy = max_energy()
+	# Every game's mine rolls its own way.
+	_mine = MineState.new(randi())
 
 
 func is_started() -> bool:
@@ -237,6 +243,11 @@ func skills() -> Skills:
 ## The hero's level at `skill`: 1 until its points reach the second level.
 func skill_level(skill: StringName) -> int:
 	return skills().level_of(skill, skill_points)
+
+
+## The chance that a rock of ore gives one more (0 to 1): what his Mining adds.
+func extra_ore_chance() -> float:
+	return skills().extra_chance(Skills.MINING, skill_points)
 
 
 ## The hero does a `deed` that `skill` grows by (Skills' deeds: a monster beaten, a cell
@@ -431,6 +442,43 @@ func clear_crop(cell: Vector2i) -> bool:
 	return true
 
 
+# --- The mine (2026-11-17) ---------------------------------------------------
+
+## The Old Quarry's rules (data/rules/mine.json).
+func mine_rules() -> MineRules:
+	if _mine_rules == null:
+		_mine_rules = MineRules.new(DataRegistry.get_rules(DataRegistry.RULES_MINE))
+	return _mine_rules
+
+
+## What the mine remembers, as of today: a rock broken on another day is whole again.
+func mine() -> MineState:
+	if _mine == null:
+		_mine = MineState.new()
+	_mine.start_day(day)
+	return _mine
+
+
+## Whether the rock at `cell` of `area` has been broken today.
+func is_rock_broken(area: StringName, cell: Vector2i) -> bool:
+	return mine().is_broken(area, cell, day)
+
+
+## The rock at `cell` of `area` is broken: it stays so until tomorrow.
+func break_rock(area: StringName, cell: Vector2i) -> void:
+	mine().mark_broken(area, cell, day)
+
+
+## Today's rocks for `area`, whose rocks stand at `cells`: which hold ore, and which hides the
+## ladder down (MineRolls.roll's answer). Anywhere that isn't a floor of the mine (its hall)
+## has plain rocks and no ladder.
+func mine_roll(area: StringName, cells: Array[Vector2i]) -> Dictionary:
+	var rules: MineRules = mine_rules()
+	var floor: int = rules.floor_of(area)
+	var has_ladder: bool = floor != MineRules.NO_FLOOR and not rules.is_last(floor)
+	return MineRolls.roll(mine().number, day, floor, cells, rules.ores_of(floor), has_ladder)
+
+
 ## The next day begins, at the hour days start. The plot wakes to its morning: what was
 ## watered grows, what wasn't goes a day drier.
 func start_next_day() -> void:
@@ -600,6 +648,12 @@ func sell(offer: Dictionary) -> String:
 	return why_not
 
 
+## A conversation asks to be taken somewhere (the `travel` effect: the mine's lift): whoever
+## runs the area goes there.
+func request_travel(area_id: StringName, entry: StringName) -> void:
+	EventBus.travel_requested.emit(area_id, entry)
+
+
 ## A conversation asks for a shop's list (the `shop` effect): whoever runs the area opens it.
 func request_shop(shop_id: StringName, mode: StringName) -> void:
 	EventBus.shop_requested.emit(shop_id, mode)
@@ -707,6 +761,7 @@ func clear() -> void:
 	energy = 0.0
 	arrival_notice = ""
 	_farm = null
+	_mine = null
 	flags.clear()
 	flag_days.clear()
 	skill_points.clear()
@@ -739,6 +794,7 @@ func to_dict() -> Dictionary:
 		"equipped": String(equipped),
 		"player": _json_safe(player),
 		"farm": farm().to_dict(),
+		"mine": mine().to_dict(),
 		"skills": _json_safe(skill_points),
 		"friends": _json_safe(friends),
 		"tally": _json_safe(tally),
@@ -789,6 +845,8 @@ func from_dict(data: Dictionary) -> void:
 		equipped = &""
 	player = _whole_numbers_as_int(data.get("player", {}))
 	farm().load_saved(data.get("farm", {}), DataRegistry.ids(&"crops"))
+	_mine = MineState.new()
+	_mine.load_saved(data.get("mine"))
 
 
 ## `value` if it is a Dictionary, else an empty one (a section missing from a save).

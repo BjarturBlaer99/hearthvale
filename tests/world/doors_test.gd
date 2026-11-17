@@ -6,7 +6,8 @@ extends GdUnitTestSuite
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
 const VILLAGE: String = "res://world/areas/village/village.tscn"
-const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"home", &"south_field", &"shop", &"ruin_cellar", &"cistern", &"keep", &"north_fields", &"old_wood", &"crypt", &"willowmere"]
+const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"home", &"south_field", &"shop", &"ruin_cellar", &"cistern", &"keep", &"north_fields", &"old_wood", &"crypt", &"willowmere",
+	&"quarry", &"quarry_1", &"quarry_2", &"quarry_3", &"quarry_4", &"quarry_5", &"quarry_6", &"quarry_7", &"quarry_8", &"quarry_9"]
 ## [house, the cell just outside its door]
 const HOUSES: Array = [
 	[&"elder_house", Vector2i(30, 15)],
@@ -93,7 +94,7 @@ func test_every_exit_leads_to_an_entry_point_and_every_talker_has_a_conversation
 			if child is Talkable:
 				var talkable: Talkable = child
 				# A hearth's words are built from the recipes; everyone else names a file in data.
-				assert_bool(not talkable.dialogue().is_empty() and (child is Hearth or DataRegistry.has_entry(&"dialogues", talkable.dialogue_id))) \
+				assert_bool(not talkable.dialogue().is_empty() and (child is Hearth or child is MineLift or DataRegistry.has_entry(&"dialogues", talkable.dialogue_id))) \
 					.override_failure_message("%s/%s names dialogue '%s'" % [area_id, child.name, talkable.dialogue_id]).is_true()
 				# Whoever talks stands on open ground. A bed or a hearth is furniture: it is its tile.
 				assert_bool(grid.is_solid(talkable.cell())).override_failure_message("%s/%s stands on open ground" % [area_id, child.name]).is_equal(child is Bed or child is Hearth)
@@ -119,4 +120,4 @@ func test_every_exit_leads_to_an_entry_point_and_every_talker_has_a_conversation
 			for other: Node in target.get_node(^"Interactables").get_children():
 				if other is AreaExit:
 					assert_bool((other as AreaExit).covers(entry_cell)).override_failure_message(where + ": arrives on another exit").is_false()
-	assert_int(exits).override_failure_message("four doors and four doormats (the hero's own since P2b), the south road, the cellar stairs and the cistern stairs both ways, the north road, the fields' and the wood's roads, the keep's gate both ways, the way out behind the boss, the chapel's two doors and the crypt's stairs, and the walk to the marsh both ways").is_equal(26)
+	assert_int(exits).override_failure_message("four doors and four doormats (the hero's own since P2b), the south road, the cellar stairs and the cistern stairs both ways, the north road, the fields' and the wood's roads, the keep's gate both ways, the way out behind the boss, the chapel's two doors and the crypt's stairs, the walk to the marsh both ways, and the Old Quarry: its mouth both ways, the ladder down from its hall and a ladder up from each of nine floors").is_equal(38)

@@ -6,7 +6,8 @@
 		"swing": 0.5,
 		"shot": 0.5,
 		"hoe": 2,
-		"water": 1
+		"water": 1,
+		"mine": 2
 	},
 	"low": { "below": 25, "move": 0.85, "cooldown": 1.3 },
 	"no_sprint_below": 10,
