@@ -1,0 +1,238 @@
+{
+	"day": 5,
+	"energy": 62.0,
+	"equipped": "hoe",
+	"farm": {
+		"cells": {
+			"0,0": {
+				"crop": "turnip",
+				"dry": 0,
+				"stage": 3,
+				"watered": false,
+				"withered": false
+			},
+			"0,1": {
+				"crop": "turnip",
+				"dry": 0,
+				"stage": 2,
+				"watered": false,
+				"withered": false
+			},
+			"1,0": {
+				"crop": "turnip",
+				"dry": 0,
+				"stage": 0,
+				"watered": true,
+				"withered": false
+			},
+			"1,1": {
+				"crop": "turnip",
+				"dry": 0,
+				"stage": 1,
+				"watered": false,
+				"withered": false
+			},
+			"2,0": {
+				"crop": "carrot",
+				"dry": 0,
+				"stage": 4,
+				"watered": false,
+				"withered": false
+			},
+			"2,1": {
+				"watered": true
+			},
+			"3,0": {
+				"crop": "pumpkin",
+				"dry": 0,
+				"stage": 4,
+				"watered": true,
+				"withered": false
+			},
+			"3,1": {
+				"watered": true
+			},
+			"4,0": {
+				"crop": "turnip",
+				"dry": 1,
+				"stage": 1,
+				"watered": true,
+				"withered": false
+			},
+			"4,1": {
+				"sprinkler": true,
+				"watered": false
+			},
+			"5,0": {
+				"crop": "turnip",
+				"dry": 2,
+				"stage": 0,
+				"watered": false,
+				"withered": true
+			},
+			"5,1": {
+				"watered": true
+			}
+		}
+	},
+	"flag_days": {
+		"home/chest": 4,
+		"home/furnace": 2,
+		"planted_first_crop": 1,
+		"quarry/lift/4": 2,
+		"took_hoe": 1,
+		"took_watering_can": 1,
+		"took_wooden_sword": 1
+	},
+	"flags": {
+		"cut/north_fields/5,9": 4,
+		"cut/old_wood/7,12": 5,
+		"home/chest": true,
+		"home/furnace": true,
+		"left/home/6,5/arrow": 5,
+		"left/village/14,17/arrow": 10,
+		"planted_first_crop": true,
+		"quarry/lift/4": true,
+		"quest/a_place_of_your_own/entered": "bram",
+		"took_hoe": true,
+		"took_watering_can": true,
+		"took_wooden_sword": true
+	},
+	"found": [
+		"arrow",
+		"bread",
+		"carrot_seeds",
+		"coal",
+		"coin",
+		"copper_bar",
+		"copper_ore",
+		"hoe",
+		"iron_bar",
+		"iron_ore",
+		"pickaxe",
+		"pumpkin_seeds",
+		"sprinkler",
+		"stone",
+		"turnip",
+		"turnip_seeds",
+		"water",
+		"watering_can",
+		"wood",
+		"wooden_sword"
+	],
+	"friends": {
+		"elder_bram": {
+			"gift": 0,
+			"points": 1,
+			"talked": 1
+		},
+		"tilda": {
+			"gift": 3,
+			"points": 2,
+			"talked": 1
+		}
+	},
+	"health": 6,
+	"heart_pieces": 0,
+	"hearts_max": 3,
+	"home": {
+		"chest": [
+			{
+				"count": 50,
+				"id": "stone"
+			},
+			{
+				"count": 12,
+				"id": "stone"
+			},
+			{
+				"count": 4,
+				"id": "iron_ore"
+			},
+			{
+				"count": 1,
+				"id": "turnip"
+			},
+			{
+				"count": 4,
+				"id": "wood"
+			}
+		],
+		"furnace": {
+			"count": 3,
+			"day": 5,
+			"item": "copper_bar"
+		}
+	},
+	"inventory": [
+		{
+			"count": 1,
+			"id": "wooden_sword"
+		},
+		{
+			"count": 1,
+			"id": "hoe"
+		},
+		{
+			"count": 1,
+			"id": "watering_can"
+		},
+		{
+			"count": 6,
+			"id": "water"
+		},
+		{
+			"count": 35,
+			"id": "coin"
+		},
+		{
+			"count": 1,
+			"id": "carrot_seeds"
+		},
+		{
+			"count": 2,
+			"id": "bread"
+		},
+		{
+			"count": 1,
+			"id": "pickaxe"
+		},
+		{
+			"count": 1,
+			"id": "coal"
+		},
+		{
+			"count": 1,
+			"id": "copper_bar"
+		},
+		{
+			"count": 30,
+			"id": "arrow"
+		}
+	],
+	"mine": {
+		"broken": {},
+		"day": 5,
+		"number": 20261117
+	},
+	"minute": 860.39,
+	"play_time": 0.27,
+	"player": {
+		"area": "home",
+		"cell": [
+			4,
+			5
+		]
+	},
+	"quests": {
+		"a_place_of_your_own": "bram"
+	},
+	"skills": {
+		"farming": 14,
+		"mining": 12
+	},
+	"tally": {
+		"crops_picked": 1
+	},
+	"version": 5
+}
