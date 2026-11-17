@@ -1,0 +1,11 @@
+{
+	"id": "copper_hoe",
+	"station": "workbench",
+	"order": 5,
+	"needs": [
+		{ "item": "hoe", "count": 1 },
+		{ "item": "copper_bar", "count": 2 }
+	],
+	"makes": { "item": "copper_hoe", "count": 1 },
+	"unlock": { "found": "copper_bar" }
+}

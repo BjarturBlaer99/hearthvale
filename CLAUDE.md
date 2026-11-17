@@ -35,8 +35,11 @@ embers and the lit lanterns have been played only by a script. Nothing further i
 written):** three phases, with a stop after each for the user to review. **Phase 1, mining, is built
 (2026-11-17):** the Old Quarry (an entrance hall and nine floors), the Pickaxe, rocks and ore rolled anew
 each day, the lift, the Mining skill. The user tried the hall and floor 1 the same day ("feels right"); no
-person has been below floor 1. **Phase 2 (crafting) and phase 3 (balance) are not built:** start each
-only on the user's word, and build nothing beyond the plan's list.
+person has been below floor 1. **Phase 2, crafting, is built (2026-11-17):** the workbench and its
+thirteen recipes, the furnace, the storage chest, the lamp and the rug, wood, copper and iron tools, the
+sprinkler, the Miner's Lantern. No person has played any of it (`tools/playtest.gd -- craft`).
+**Phase 3 (balance) is not built:** start it only on the user's word, and build nothing beyond the
+plan's list.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -124,7 +127,7 @@ godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
 # Start partway through to try one part by hand (scenarios in the script: late, gifts, bram, gate, rest, farm, market, kitchen, home, village, marsh,
-# quarry, deep, warden, crypt, shade, ending). An hour after the name starts at that time of day, energy=<n> with that much energy,
+# quarry, deep, craft, warden, crypt, shade, ending). An hour after the name starts at that time of day, energy=<n> with that much energy,
 # and skills=<level> with every skill at that level.
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
 godot --path . -s res://tools/playtest.gd -- warden
@@ -390,3 +393,44 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     ladder up lead one floor up, or stop the clock in the mine: each was decided with the plan.
   - **Save version 5** (the mine's number and today's broken rocks). The fixture
     `tests/fixtures/saves/v4_before_the_mine.json` was written by the game as it stood before the mine.
+
+- **Crafting (2026-11-17; `docs/progress/mining-crafting-plan.md`, TECH_DESIGN §28):** made at home.
+  - **A crafting recipe is a file in `data/crafting/`** (cooking keeps `data/recipes/`): its `station`
+    (`workbench` or `furnace`), `order`, `needs`, `makes` (an item, or a `furnishing`) and an optional
+    `unlock` (an item `found`, or a `skill` and `level`). `Crafting` (`core/crafting/`, pure) says what
+    is known and why a thing can't be made; **go through `GameState.craft(recipe_id)`**, which returns
+    "" or the reason. **A new recipe is data only.**
+  - **What he has ever held is `GameState.found`:** `add_item()` marks it whenever a count goes up, so
+    **a test that wants a recipe unknown must never have added the item it waits on,** even to take it
+    away again. A skill recipe wants the level: `GameState.skill_points[Skills.MINING] = 10` is level 2.
+  - **A furnishing is the flag `home/<id>` and a `Furnishing` node with a fixed place** in the
+    cottage's scene: the workbench (always there) at cell (9, 3), the furnace (6, 2), the chest (2, 2),
+    the lamp (4, 2), the rug (2..3, 4). **A test that wants one sets
+    `Crafting.furnished_flag(&"furnace")` or crafts it,** and stands at it with
+    `Steps.stand_before(home, "Furnace")`. Do not move one, or anything that stood in the cottage.
+  - **The workbench's list** is `hud.craft_menu` (`AreaController.open_craft()`): `entries()`,
+    `shown_lines()`, `greyed_lines()`, `need_lines()`, `confirm()`. Greyed lines are on a second label
+    in the same place (`bright_lines()` is what the bright one shows).
+  - **The furnace** (`GameState.furnace()`, a pure `Furnace`) is lit today and ready from the next
+    morning: **a test lights it, calls `GameState.start_next_day()`, and takes the bars out through its
+    conversation** (`home.interact()`, then `hud.dialogue.confirm()`). One load, five bars at the most
+    (`data/rules/crafting.json`). The bars are given: what doesn't fit is a `LeftItem` at his feet.
+  - **The chest** (`GameState.store()`, a pure `Store`) holds 24 stacks and several of one thing. Move
+    stacks with `GameState.store_put(item_id)` and `store_take(index)`; its lists are
+    `hud.store_menu` (`AreaController.open_store()`). It never holds coins, keys, quest things, or what
+    a tool holds.
+  - **Wood:** branches and stumps are breakables with `"returns": "daily"`; a stump has `"hits": 3`.
+    Cut, a flag `cut/<area>/<x>,<y>` keeps the day: **a test that wants it back sets the next day
+    (`GameState.start_next_day()`) and loads the area again.** Grass and pots are back on every visit,
+    as before.
+  - **Tool tiers** are items of their own whose stats say `reach` (hoe, can) or `fewer_blows`
+    (pickaxe). The cell he faces decides whether the stroke is made; energy and the pour are paid
+    once. **A test that uses a tool twice lets the first use finish** (forty frames of
+    `player.motor.step(Vector2.ZERO, FRAME)`).
+  - **The sprinkler** is an item of type `sprinkler`, on the item bar (the user approved it with the
+    plan). Go through `GameState.place_sprinkler()` and `take_sprinkler()` (the plot's own cell). It
+    waters the tilled cells among the four beside it in `Farm.new_day()`, after the soil has dried:
+    **set down today, a test sees wet soil only after `start_next_day()`.**
+  - **Do not** bump the save's version for crafting's fields (`home`, `found`, a cell's `sprinkler`:
+    each is read with a default), let the furnace hold two loads, let the chest take coins, keys or
+    quest things, or put a furnishing anywhere but its own place: each was decided with the plan.

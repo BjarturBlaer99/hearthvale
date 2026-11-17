@@ -4,7 +4,7 @@ The user's request, 2026-11-17: the Old Quarry (a mine of nine floors), a Pickax
 crafting at home (a furnace, a workbench, a chest, sprinklers, tool upgrades), in phases with a stop after
 each. This is phase 0: the plan, and no code.
 
-**Status: approved as written on 2026-11-17. Phase 1 (mining) is built (2026-11-17). Phases 2 and 3 are not.**
+**Status: approved as written on 2026-11-17. Phase 1 (mining) and phase 2 (crafting) are built (2026-11-17). Phase 3 is not.**
 
 ## Sixteen things to decide
 
@@ -255,6 +255,31 @@ stack across.
 cuts: ten branches and five stumps across the North Fields, the Old Wood and the South Field, off the
 paths, back each morning. Up to 20 wood a day. They look unlike the stumps that are scenery.
 
+**As built, what the plan didn't say or said otherwise:**
+- **What he has found is a list in the save** (`found`), not a flag for each item. What he carries counts
+  as found when a save loads.
+- **The workbench shows the needs of the recipe under the cursor,** a need to a line, under the list;
+  not every recipe's needs at once. Its list shows six recipes at a time and scrolls.
+- **A tool made from the one in his hand takes its place there.**
+- **The cell he faces decides whether a better hoe's or can's stroke is made.** The cells beyond it in
+  the line get it if they can; energy and the pour are paid once.
+- **A rock's blows are counted by the pickaxe that strikes it,** at each blow: a rock begun with the
+  plain pickaxe is finished sooner by a better one.
+- **The chest keeps what stacks,** and leaves coins, keys and quest things with the hero. A line chosen
+  moves the whole stack, as much of it as fits; there is no choosing how many. The can's water is not
+  on the list: it is in the can.
+- **A sprinkler set down today runs from tomorrow.** It is taken up only if he has room for it (ten to
+  a stack).
+- **What the furnace made is given, not added:** what a full pack can't take is laid at his feet.
+- **Bombs cut wood too,** as they cut grass.
+- **Three maps were re-baked for the wood's markers** (the North Fields, the Old Wood, the South
+  Field); nothing else in them changed.
+- **Two sounds, not three:** `craft` and `furnace`. The ladder uses the `secret` chime that was there.
+- **Crafting added no save version:** its three fields are read with defaults, inside version 5.
+- **The sum above is one coal short:** the whole list with three sprinklers takes 25 coal, not 24 (23
+  for the bars, one for the bombs, one for the lamp). A test makes the whole list with one sprinkler
+  from exactly 35 copper ore, 24 iron ore, 3 gold ore and 21 coal.
+
 ## The economy
 
 **Farming today,** a full plot of 18 cells, once it is turning over:
@@ -352,10 +377,11 @@ that the tests catch them.
   takes, ride the lift to 4 and 7, and find rocks and ore back the next morning in other places; a version
   4 save loads; all tests pass.
 
-**Phase 2: crafting**
-- 2a. Materials, the workbench and its menu, recipes as data, the furnace, bombs.
-- 2b. The chest, the rug, the lamp, wood.
-- 2c. Tool tiers, the sprinkler, the Miner's Lantern.
+**Phase 2: crafting** *(built 2026-11-17, in three commits, a step each, and a fourth for the checking
+and the write-up)*
+- [x] 2a. Materials, the workbench and its menu, recipes as data, the furnace, bombs.
+- [x] 2b. The chest, the rug, the lamp, wood.
+- [x] 2c. Tool tiers, the sprinkler, the Miner's Lantern.
 - **Done when** every recipe on the list can be made from what the mine and the fields give, the furnace
   turns ore to bars overnight, the chest keeps its stacks through a save, and a sprinkler waters its four
   cells each morning; all tests pass.
@@ -370,7 +396,8 @@ that the tests catch them.
   run in the hall and on floor 1)
 - [ ] *(yours)* the lower floors, the lift and the dark feel right (no person has been below floor 1)
 - [ ] *(yours)* a day in the mine feels worth it beside a day on the plot
-- [ ] *(yours)* the workbench is easy to read, and what to make next is clear
+- [ ] *(yours)* the workbench is easy to read, and what to make next is clear (no person has opened it:
+  `tools/playtest.gd -- craft` starts at home beside it, with materials for most of its list)
 
 ## Not in this plan
 

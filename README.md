@@ -22,7 +22,7 @@ Continue says so and offers it. The game has sound effects and music
 | Move (8 directions) | WASD / arrow keys | Left stick / d-pad |
 | Sprint (hold) | Shift | B |
 | Use what is in hand: the lit slot of the bar at the bottom | Left mouse button (a click anywhere) | X (sword), Y (item) |
-| Choose what is in hand: sword, bow, bombs, hoe, can, seeds | Mouse wheel, or 1 to 9 | Shoulder buttons |
+| Choose what is in hand: sword, bow, bombs, hoe, can, pickaxe, seeds, sprinklers | Mouse wheel, or 1 to 9 | Shoulder buttons |
 | Talk / read / pick up / harvest | Right mouse button | A |
 | Choose an answer, or read on | Point and left click; or W / S, the wheel or arrows, then a left click or Enter | d-pad, then A |
 | Choose in a menu | Point and click; or W / S, the wheel or arrows, then a click or Enter | d-pad, then A |
@@ -158,6 +158,21 @@ Beaten enemies sometimes drop hearts or coins.
   gold and crystals on the last three, which are dark. A ladder down is under one of each floor's plain
   rocks; reaching floors 4 and 7 opens the lift in the entrance hall. The rocks are back each morning, in
   the same places with other things in them. Mining takes energy, so bring food.
+- **Crafting at home:** the workbench stands by the east wall of your cottage. Face it and right-click for
+  its list: what you know how to make, what the thing under the cursor needs beside what you have, and
+  greyed out what you can't make yet. New things appear on the list as you find what they are made of.
+  - **The furnace** (20 stone, 5 copper ore) smelts overnight: load it with three ore and a coal for each
+    bar, up to five bars, and take them out the next morning.
+  - **The storage chest** (10 wood, 1 copper bar) holds 24 stacks. Left and right turn between your pack
+    and the chest; a click moves the stack under the cursor across.
+  - **Wood:** cut fallen branches and old stumps with the sword in the North Fields, the Old Wood and the
+    South Field. They are back each morning.
+  - **Better tools:** copper and iron hoes and watering cans work two and three cells in a line; copper and
+    iron pickaxes break a rock in fewer blows. Each is made from the tool before it.
+  - **Sprinklers** go on the item bar: set one on a tilled, empty cell of the plot and it waters the four
+    cells beside it every morning. Right-click it to take it up again.
+  - Also: bombs from coal and stone, a standing lamp, a woven rug, and the Miner's Lantern, which lights
+    further than the Lantern.
 - **The road north:** from the top of the north rise, through the woods.
   - **The North Fields:** a stream with a bridge, a farm plot, slimes, and a goblin archer on a plateau. Keep an eye
     on the tree line beside the road.
@@ -188,7 +203,8 @@ quests finished. From there you can keep exploring or save and go back to the ti
 
 To try one part without playing up to it: `godot --path . -s res://tools/playtest.gd -- crypt` (the top of the
 crypt's stairs, equipped as after the keep), `-- shade` (outside the Shade's hall), `-- ending` (one step from
-the ending) or `-- warden`. Saving in a scenario goes to a slot of its own, so it never replaces your own game.
+the ending), `-- warden`, `-- quarry` (the mine's entrance hall with a Pickaxe) or `-- craft` (at home by the
+workbench, with ore, bars and wood for most of its list). Saving in a scenario goes to a slot of its own, so it never replaces your own game.
 
 Running a playtest with someone new? `docs/progress/H15-playtest.md` says how, and what to write down.
 `godot --path . -s res://tools/playtest.gd -- full` runs the whole game for it, on a save slot of its own, and

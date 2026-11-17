@@ -107,6 +107,12 @@ func shown_lines() -> PackedStringArray:
 	return out
 
 
+## The lines of the bright list alone: a line he can't make now is blank here, since it is on
+## the dim list (the two are drawn in the same place).
+func bright_lines() -> PackedStringArray:
+	return _list.text.split("\n") if visible else PackedStringArray()
+
+
 ## Which of the shown lines are greyed out (true: it can't be made now).
 func greyed_lines() -> Array[bool]:
 	var out: Array[bool] = []

@@ -374,16 +374,18 @@ res://
 | `data/quests/` | one quest per file |
 | `data/dialogue/` | one conversation per file |
 | `data/enemies/` | one enemy type per file |
-| `data/breakables/` | one breakable (grass, pot) per file |
+| `data/breakables/` | one breakable (grass, pot, fallen branch, old stump) per file |
 | `data/recipes/` | one recipe per file: what a dish needs and what it makes |
+| `data/crafting/` | one crafting recipe per file: where it is made (the workbench or the furnace), what it needs, what it makes, and when it is known (§28) |
 | `data/crops/` | one crop per file: how long it takes, its seed, what it gives, its prices |
 | `data/shops/` | one shop per file: its wares and prices, whether it sells seeds and buys crops |
-| `data/rules/` | one set of rules per file: the numbers a system runs on (`time.json`: the day's clock; `energy.json`: the hero's energy; `hours.json`: who is where when; `night.json`: what the night does to monsters; `farm.json`: the hero's plot) |
+| `data/rules/` | one set of rules per file: the numbers a system runs on (`time.json`: the day's clock; `energy.json`: the hero's energy; `hours.json`: who is where when; `night.json`: what the night does to monsters; `farm.json`: the hero's plot; `skills.json`, `friendship.json`, `mine.json`; `crafting.json`: the furnace's load, the chest's slots and the home's furnishings) |
 
 DataRegistry validates required fields and resolves every cross-reference at load. A set of rules must be one
 the game knows (`RULE_SETS`), and is checked by the class that reads it (`DayClock.problems()`,
-`EnergyRules.problems()`, `Hours.problems()`, `NightRules.problems()`, `Farm.problems()`). A tool item is
-checked by `ToolUse.problems()`.
+`EnergyRules.problems()`, `Hours.problems()`, `NightRules.problems()`, `Farm.problems()`,
+`Crafting.rules_problems()`). A tool item is checked by `ToolUse.problems()`, and a crafting recipe by
+`Crafting.problems()`.
 
 ## 9. Save format
 ```json
@@ -438,6 +440,11 @@ a cell, until the area places them. Bump `version` on breaking changes and add a
   - `SaveSystem._v3_to_v4()` gives an older save all four empty, and puts it past the story's gates
     (`StoryGates.past_the_gates()`): the first crop counts as planted, the keep's gate is open, and the crypt's
     bars are up if the Warden had fallen. A test loads a real version 3 save made inside the keep.
+- **Version 5** (mining and crafting, 2026-11-17) added `mine` (§27), and with crafting `home` (the
+  furnace's load and the chest's stacks), `found` (what he has ever held) and a `sprinkler` in a cell of
+  `farm` (§28). The three that came with crafting are read with defaults, so the version did not change
+  again. `SaveSystem._v4_to_v5()` gives an older save a mine of its own, a cold furnace, an empty chest and
+  nothing found; a test loads a real version 4 save.
 
 ## 10. Testing
 Every class in `core/` has gdUnit4 tests. Areas get layout tests (reachability from the spawn with the real
@@ -1160,7 +1167,7 @@ the marsh by day, step 2, the Bogwisp, and step 3, Old Henrik, are all built.
 
 ## 27. The Old Quarry
 Mining (the user's request, 2026-11-17; `docs/progress/mining-crafting-plan.md`, phase 1). Crafting
-(phase 2) and the balance pass (phase 3) are not built yet.
+(phase 2) is §28; the balance pass (phase 3) is not built yet.
 - **Eleven places.** The mouth is six cells of the North Fields' east tree line (`quarry_rock` and
   `mine_mouth` tiles; `QuarryMouth`, an `AreaExit`). The entrance hall is the area `quarry`; the nine floors
   are the areas `quarry_1` to `quarry_9`, each one screen (20 by 11 cells).
@@ -1209,3 +1216,81 @@ Mining (the user's request, 2026-11-17; `docs/progress/mining-crafting-plan.md`,
   an old save a number made from the save itself and nothing broken.
 - **Pictures and sound:** `rocks.png` (a rock, five ores, the ladder, the lift) and seven item icons from
   `make_sprites.gd`; the tune `mine` and the sounds `pick`, `rock_break` and `lift` from `make_audio.gd`.
+
+## 28. Crafting
+Crafting (the user's request, 2026-11-17; `docs/progress/mining-crafting-plan.md`, phase 2). The balance
+pass (phase 3: Tilda buys ore and bars, two favours, eight days played) is not built yet.
+- **Recipes are data.** A crafting recipe is a file in `data/crafting/` (cooking keeps `data/recipes/`):
+  its `station` (`workbench` or `furnace`), its `order` on that station's list, what it `needs`, what it
+  `makes` (an item and a count, or a `furnishing` of the hero's home) and an optional `unlock` (an item
+  `found`, or a `skill` at a `level`). `Crafting` (`core/crafting/`, pure) says which are known, what is
+  missing, why a thing can't be made, and how a need reads beside what he has ("Stone 12 of 20");
+  `Crafting.problems()` checks each file as it loads. **A new recipe is data only.**
+- **What he has found** is `GameState.found`, a set of item ids, saved as a list. `add_item()` adds to it
+  whenever a count goes up, so a recipe that waits on an item stays known when the last of it is sold or
+  used. `has_found()` also counts what he carries; a loaded save marks what it carries as found.
+- **Making a thing** is `GameState.craft(recipe_id)`: only a workbench recipe he knows, and only if
+  `why_not_craft()` is empty. What it needs goes, and what it makes is added to the pack, or (a
+  furnishing) the flag `home/<id>` is set. A thing it uses up makes room for one of the same kind. A tool
+  made from the one in his hand takes its place there. `EventBus.crafted` says what was made.
+- **Furnishings.** `Furnishing` (a `Talkable`) is anything that stands in the cottage: the workbench
+  (`always`, there from the start) at cell (9, 3), the furnace (6, 2), the chest (2, 2), the lamp (4, 2)
+  and the rug (2..3, 4), each a node with a fixed place in `home.tscn`. Until its flag is set it is not
+  drawn, not in the way and not faced. The area marks its cell occupied the moment the flag is set
+  (`_on_flag_set`); the rug lies flat and is walked over. The names a recipe may give are listed in
+  `data/rules/crafting.json` (`furnishings`). No map was re-baked, and nothing that stood there moved.
+- **The workbench's list** is `CraftMenu` (`ui/craft_menu.gd`) on the HUD, opened by
+  `AreaController.open_craft()` when the workbench is faced (`talk_to()` asks `Furnishing.opens()`). It
+  shows six recipes at a time (`MenuCursor.window_top()`), on two labels in the same place: what can be
+  made now on the bright one, what can't on the dim one, so a line is on one and blank on the other
+  (`bright_lines()` and `greyed_lines()` say which).
+  Under it are the needs of the recipe under the cursor, a need to a line. It stays open for as many
+  things as he likes, and a line says what was made or why not. The mouse points, the wheel steps, Tab
+  and Esc leave. The hero stands still and the clock stops while it is open (`is_in_menu()`).
+- **The furnace** is a `Furnace` (pure) held by `GameState.furnace()`: one load of one thing, lit on a
+  day, ready from the next morning, waiting until it is taken out. Its recipes are the crafting recipes
+  whose station is `furnace`: three ore and a coal for a bar. `Furnace.dialogue()` builds its
+  conversation as `Cooking.dialogue()` builds the hearth's: burning, it says so; burned down, it offers
+  what it holds; cold, it lists what he knows to smelt, each answer loading as many as he has the makings
+  for (`load_size()`, `furnace_most` at the most: five). The ore and coal go by `take_item` effects, and
+  two new effects do the rest: `light_furnace` (`item`, `count`) and `empty_furnace`. The bars are
+  *given* (`GameState.give_item()`), so what a full pack can't take is laid at his feet. A burning
+  furnace shows its lit picture and is a light (`Furnishing.glow_now()`); the standing lamp is one always.
+- **The storage chest** is a `Store` (pure) held by `GameState.store()`: `chest_slots` stacks (24), each
+  up to its item's own `max_stack`, and several stacks of one thing if need be. It keeps what stacks, and
+  leaves coins, keys and quest things with the hero (`Store.can_hold()`); what a tool holds (the can's
+  water, `Inventory.held_in_tools()`) is not in the pack to be put away. `StoreMenu` (`ui/store_menu.gd`)
+  shows two lists, the pack and the chest; left and right turn from one to the other, and a line chosen
+  moves that stack across, as much of it as there is room for (`GameState.store_put()`, `store_take()`).
+  A list a move empties hands the cursor to the other.
+- **Wood.** A fallen branch and an old stump are breakables (`data/breakables/branch.json`,
+  `stump.json`) on two new spawn markers. A breakable's data may now say `hits` (the blows it takes: a
+  stump three) and `"returns": "daily"`: broken, it stays broken until the next morning. The day is kept
+  in the flag `cut/<area>/<x>,<y>`, so nothing new is saved. Ten branches and five stumps lie at chosen
+  cells of the North Fields, the Old Wood and the South Field (`build_maps.gd`; those three maps were
+  re-baked for their markers). The sword cuts them, as it cuts grass.
+- **Tool tiers** are items of their own (`copper_hoe`, `iron_hoe`, and so on), made from the tool before
+  them. A hoe's or a can's stats may say `reach`: `ToolUse.reach()` and `ToolUse.line()` give the cells
+  one use works, from the cell he faces onward. The cell he faces decides whether the stroke is made
+  (`ToolUse.decide()`, as before); `AreaController._cells_worked()` adds the cells beyond it that the
+  same thing can be done to. Energy and the pour are paid once. A pickaxe's stats may say `fewer_blows`:
+  `Rock.strike(fewer)` counts them at each blow, so it is the pickaxe that strikes that matters, not the
+  one in hand when he came in.
+- **The sprinkler** is an item of type `sprinkler`, on the item bar. `ToolUse.decide()` says whether it
+  can be set (tilled soil of the plot with no crop and no sprinkler); `GameState.place_sprinkler()` and
+  `take_sprinkler()` change the `Farm` and tell whoever draws it. It lies flat and blocks nothing, a seed
+  can't be planted where it stands, and facing it, interact takes it up again (if he has room). In
+  `Farm.new_day()`, after the crops have grown or dried and the soil is dry again, each sprinkler waters
+  the tilled cells among the four beside it (`Farm.watered_by()`): the morning's water, for tomorrow's
+  growth.
+- **The Miner's Lantern** is a second item of type `lantern`, with radius 80. Making it uses up the
+  Lantern; `Inventory.light_radius()` takes the widest lantern he carries.
+- **The save is still version 5.** New in it: `home` (`{ "furnace": { "item", "count", "day" } or {},
+  "chest": [{ "id", "count" }] }`), `found` (a sorted list of item ids), and `"sprinkler": true` in a
+  cell of `farm`. Furnishings and cut wood are flags. `SaveSystem._v4_to_v5()` gives an older save a cold
+  furnace, an empty chest and an empty `found`. A version 5 save from phase 1 has none of the three and
+  loads the same way: each is read with a default.
+- **Pictures and sound:** `crafted.png` (the workbench, the furnace cold and lit, the chest, the lamp, the
+  rug's two halves, the sprinkler), a branch and a stump in `breakables.png` and twelve item icons, all
+  from `make_sprites.gd`; the sounds `craft` and `furnace` from `make_audio.gd`. The plan's "ladder" sound
+  was not made: the ladder uses the `secret` chime.

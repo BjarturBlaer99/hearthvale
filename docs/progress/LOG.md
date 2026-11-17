@@ -2387,3 +2387,81 @@ The user started the `quarry` scenario (`tools/playtest.gd -- quarry`), played f
 - A full stack, and the Pickaxe bought at Tilda's (the scenario hands him one).
 
 The plan's last lines say so: the first floor is ticked, the floors below and the comparison with farming are open.
+
+## 2026-11-17 — Crafting, phase 2: the workbench, the furnace and what they make
+
+The second of three phases of mining and crafting (`docs/progress/mining-crafting-plan.md`, approved as written). Built in three commits, a step each (2a, 2b, 2c), and a fourth for the checking and this write-up.
+
+**Built**
+- **The workbench** stands by the cottage's east wall from the first day. Facing it, a right click opens its list:
+  - the recipes he knows, six at a time, in a fixed order;
+  - under it, what the one under the cursor needs and what he has of it ("Stone 12 of 20"), a need to a line;
+  - what he can't make now is greyed out, and choosing it says why (he lacks something, has no room, or has one already);
+  - it stays open for as many things as he likes; the mouse points, the wheel steps, Tab and Esc leave.
+- **Thirteen recipes at the workbench and three in the furnace,** all data (`data/crafting/`). A recipe is known once the thing it waits on has been found, or a skill has risen; the Woven Rug is known from the start.
+- **What he has ever held is remembered,** so a recipe stays on the list when the last of its ore is sold or used.
+- **The furnace** (20 stone, 5 copper ore) smelts overnight: three ore and a coal for a bar, one load of one metal, five bars at the most. Lit today, ready the next morning. Burning, it shows its fire and lights the room.
+- **The storage chest** (10 wood, 1 copper bar): 24 stacks, several of one thing if need be. Two lists, the pack and the chest; a line chosen moves that stack across, as much of it as there is room for.
+- **The Standing Lamp** (1 copper bar, 2 wood, 1 coal), a real light, and **the Woven Rug** (8 wheat, 3 cherry blossoms), beside the bed.
+- **Wood:** ten fallen branches (one blow of the sword, 1 wood) and five old stumps (three blows, 2 wood) in the North Fields, the Old Wood and the South Field, back each morning.
+- **Bombs:** 1 coal and 3 stone for three.
+- **Copper and iron tools,** each made from the tool before it, at the same energy a use:
+  - the hoe tills two cells in a line, then three;
+  - the watering can waters two cells with one pour, then three;
+  - the pickaxe breaks a rock in one blow fewer, then two fewer (every rock in one).
+- **The sprinkler** (1 copper bar, 1 iron bar; Farming 2): set on a tilled, empty cell of the plot from the item bar, taken up with a right click. Each morning it waters the four cells beside it.
+- **The Miner's Lantern** (the Lantern, 1 gold bar, 1 crystal): light for 80 pixels round the hero, where the Lantern gives 56.
+- **Twelve items,** a sheet of furnishings, a branch and a stump, twelve icons and two sounds.
+- **A playtest scenario** (`craft`) and six capture shots (150 to 155).
+
+**What differs from the plan**
+- **What he has found is a list in the save,** not a flag for each item.
+- **The workbench shows the needs of the recipe under the cursor,** not of every recipe at once.
+- **A tool made from the one in his hand takes its place there.**
+- **The cell he faces decides whether a better hoe's or can's stroke is made;** the cells beyond it get it if they can.
+- **A rock's blows are counted by the pickaxe that strikes it:** a rock begun with the plain pickaxe is finished sooner by a better one.
+- **The chest keeps what stacks,** and leaves coins, keys and quest things with the hero. A line moves the whole stack; there is no choosing how many.
+- **A sprinkler set down today runs from tomorrow,** and is taken up only if he has room for it.
+- **What the furnace made is given:** what a full pack can't take is laid at his feet.
+- **Three maps were re-baked** for the wood's markers (the plan named one re-bake, for the quarry's mouth).
+- **Two sounds, not three:** the ladder uses a chime that was there.
+- **No new save version:** crafting's three fields are read with defaults, inside version 5.
+- **Step 2b's commit was amended once,** before anything was pushed.
+
+**Changed while checking**
+- **`CraftMenu.bright_lines()`** was added, so a test can see that a greyed line is not on the bright list as well.
+- **The chest's menu chose which list to open on in two places.** One was removed; it opens as it did.
+- **A comment line that stood twice** in `GameState` stands once.
+
+**Verified**
+- **925 tests in 122 suites, all passing.** 65 are new with crafting (57 from the three steps, 8 from this check): the rules of recipes, the furnace and the chest; the workbench, the furnace, the chest, wood, the tools and the sprinkler in play; and the save.
+- **The plan's "done when", in one test each** (`tests/world/crafting_chain_test.gd`):
+  - **Everything on the workbench's list is made from what the mine and the fields give.** Starting with only raw things (stone, ore, coal, a crystal, wood, wheat, blossom) and the four plain tools, a hero with Farming 2 and Mining 3 makes all thirteen recipes at the workbench, through its own list, over six days. Five nights of the furnace turn 30 copper ore, 24 iron ore and 3 gold ore into 10, 8 and 1 bars (five more copper ore built the furnace itself). At the end nothing is left over. It takes 21 coal: the plan's sum for the whole list was one coal short (it left out the bombs' one), and the plan now says so.
+  - **Every need of every recipe comes from somewhere:** a rock, cut wood, a crop, Tilda's shelf, something lying in the world, or another recipe. No recipe needs more of a thing than a stack holds.
+  - **A save in the middle of it** keeps the furnace burning, the chest's stacks in their order and a sprinkler on the plot; the next morning the bars are ready, and for four mornings the sprinkler waters its four cells and leaves the corner dry. The turnip beside it ripens without the can; the one in the corner withers.
+- **A version 4 save loads** with a cold furnace, an empty chest, nothing furnished, and what it carries counted as found, which stays found when the last of it is gone.
+- **152 bugs planted on purpose,** one at a time, in the fourteen code files and the data, each file put back. **132 were caught at once** (one of them by tests that failed and then hung, in a loop the bug made endless). **Twenty were not.** A test was added for nineteen, and each was planted again and caught:
+  - **In the chest:** a quest's thing that stacks could be put away; so could the watering can's water; a stack that a save made bigger than its item's limit loaded as it was.
+  - **In the workbench's list:** a line he couldn't make was on the bright list too, so nothing looked greyed; the list never scrolled; pointing with the mouse in a scrolled list picked the wrong line; it opened where the cursor had been left, with the last note still up.
+  - **In the chest's lists:** turning to the other list kept the old line; pointing in a scrolled list picked the wrong line.
+  - **On the plot:** setting a sprinkler, or taking one up, told nobody, so the plot would not have been redrawn.
+  - **In his hand:** a thing made jumped into a hand that held the sword by choice.
+  - **Elsewhere:** the lamp gave light before it was made; a stump's first two blows were silent; an old save forgot what it had carried once the last of it was gone; the last lantern picked up counted, not the widest; three watering cans named their water three times (an older farming test outside the crafting suites did catch this one); a stack of gold bars held thirty.
+  - **One planted change turned out to be no bug:** the chest's menu chooses which list to open on in two places that do the same thing, so removing one changed nothing.
+- **Screenshots,** looked at (shots 150 to 155): the workbench's list, with the chest greyed and what it is short of; the cottage with the chest, the lamp, the rug and the furnace burning; the chest's two lists after a stack was put away; the plot the morning after two sprinklers were set, the four cells beside each one wet and the corners dry; the cold furnace's list; fallen branches and a stump in the Old Wood.
+- **The `craft` scenario starts** (`tools/playtest.gd -- craft`) without an error. It was run for a few seconds and closed; nobody played it.
+- **The player's own save was read-only throughout** (the same checksum before and after).
+
+**Known issues and limits**
+- **Not played by a person, or by a script pressing keys.** The tests drive the game's own functions and hand events to the menus; nobody has stood at the workbench. Whether its list is easy to read, and whether it is clear what to make next, is for the user.
+- **The numbers are the plan's first guesses:** what each recipe costs, five bars a load, 24 stacks, two and three cells of reach. Phase 3 measures them.
+- **Ore and bars can't be sold yet:** Tilda buys them in phase 3.
+- **A load can't be taken back.** Once the furnace is lit, the ore and the coal are in it until morning.
+- **The chest moves whole stacks,** as much as fits; there is no choosing how many.
+- **The workbench's list shows six recipes at a time.** With all thirteen known it scrolls; a line under the box says where he is in it.
+- **A better hoe or can works only if the cell he faces can be worked.** Facing tilled soil with bare soil beyond it, the hoe does nothing.
+- **A sprinkler waters tilled soil only,** and from the morning after it is set. It has one picture: nothing moves, as the scenery's rule asks.
+- **The HUD's "Carrying" line is cut off** once the pack holds more than three or four kinds of thing, as it always was. With ore, bars and wood in the pack that is now most of the time.
+- **Wood is the tight material early:** fifteen spots give up to 20 a day, and the chest and the lamp take 12.
+- **Making the Miner's Lantern uses up the Lantern.** It lights the crypt's torches and gives a Bogwisp a body as the Lantern did, from further off.
+- **Two older warts, not new and not touched:** entering a boss's room prints "signal already connected" (since the Bogwisp), and headless a villager's colours depend on which suite ran first.

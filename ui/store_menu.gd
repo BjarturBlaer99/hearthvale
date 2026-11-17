@@ -42,7 +42,8 @@ func _ready() -> void:
 
 
 func open() -> void:
-	side = PACK if not GameState.storable_stacks().is_empty() or GameState.store().used_slots() == 0 else CHEST
+	# It opens on the pack; with nothing there to put away, _refresh turns to the chest.
+	side = PACK
 	selected = 0
 	tops = {PACK: 0, CHEST: 0}
 	_note.text = ""

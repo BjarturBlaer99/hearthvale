@@ -259,7 +259,10 @@ At the user's request of 2026-11-17 (`docs/progress/mining-crafting-plan.md`, ap
 three phases with a stop after each:
 - **Phase 1 — Mining.** *Built 2026-11-17.* The Old Quarry (an entrance hall and nine floors in three
   bands), the Pickaxe, rocks and ore rolled anew each day, the lift, the Mining skill, a tune.
-- **Phase 2 — Crafting.** *Not built.* A furnace, a workbench, a chest, sprinklers, tool upgrades.
+- **Phase 2 — Crafting.** *Built 2026-11-17.* The workbench and its list of thirteen recipes, the furnace
+  (ore to bars overnight), the storage chest, a standing lamp and a woven rug, wood from branches and
+  stumps, copper and iron hoes, cans and pickaxes, the sprinkler, the Miner's Lantern. No person has
+  played it yet.
 - **Phase 3 — Balance.** *Not built.* Tilda buys ore and bars, two favours, and eight days played.
 
 ---

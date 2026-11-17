@@ -30,7 +30,8 @@ const KEYS: String = "keys"
 ## and skills=<level> with every skill at that level: -- village 19:30 energy=12 skills=3
 ## A scenario's "flags" came true long ago (no day is kept for them); its "today" flags came
 ## true this very day, for what waits a day on them (the crypt's bars). "day" is the day it is
-## (the plot wakes that many mornings), and "friends" the points of friendship with villagers.
+## (the plot wakes that many mornings), "friends" the points of friendship with villagers, and
+## "skills" the level of each skill it names (the rest begin at 1).
 const SCENARIOS: Dictionary = {
 	# A late day: the sixth morning at home, the keep quiet and the crypt open, every villager
 	# one liked gift short of two marks (when four ask a favour and three teach a recipe), and a
@@ -152,6 +153,21 @@ const SCENARIOS: Dictionary = {
 		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"planted_first_crop",
 			&"quarry/lift/4", &"quarry/lift/7"],
 	},
+	# At home by the workbench, with what the mine and the fields give: stone and copper ore for the
+	# furnace, ore and coal to smelt, bars for the chest, the lamp, a sprinkler and the first tool
+	# upgrades, wheat and blossoms for the rug, and the Lantern, a gold bar and a crystal for the
+	# Miner's Lantern. Farming 2 and Mining 3, so every recipe is on the list. The furnace takes a
+	# night: the bed is by the west wall. The plot is out of the door and to the east.
+	"craft": {
+		"area": &"home",
+		"cell": Vector2i(8, 3),
+		"items": [[&"wooden_sword", 1], [&"hoe", 1], [&"watering_can", 1], [&"pickaxe", 1], [&"lantern", 1],
+			[&"stone", 30], [&"copper_ore", 14], [&"coal", 10], [&"iron_ore", 9], [&"wood", 14],
+			[&"copper_bar", 6], [&"iron_bar", 3], [&"gold_bar", 1], [&"crystal", 1],
+			[&"wheat", 8], [&"cherry_blossom", 3], [&"turnip_seeds", 4], [&"bread", 3], [&"coin", 20]],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"planted_first_crop"],
+		"skills": {&"farming": 2, &"mining": 3},
+	},
 	# Outside the Iron Warden's hall: sword, bow, 20 arrows, the boss door already open.
 	"warden": {
 		"area": &"keep",
@@ -233,6 +249,11 @@ func _start() -> void:
 	(game_state.get(&"flag_days") as Dictionary).clear()
 	for flag: StringName in scenario.get("today", []):
 		game_state.call(&"set_flag", flag, true)
+	# A scenario's own skills: each at the level named, with just the points that level begins at.
+	var levels: Dictionary = scenario.get("skills", {})
+	for skill: StringName in levels:
+		var rules: Skills = game_state.call(&"skills")
+		(game_state.get(&"skill_points") as Dictionary)[skill] = rules.thresholds[clampi(int(levels[skill]), 1, rules.top_level()) - 1]
 	for arg: String in args.slice(1):
 		if DayClock.parse(arg) >= 0:
 			game_state.call(&"set_time", float((game_state.call(&"day_clock") as DayClock).in_day(arg)))

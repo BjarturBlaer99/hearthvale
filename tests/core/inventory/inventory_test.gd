@@ -34,6 +34,14 @@ func test_only_the_bow_and_bombs_go_on_the_item_button() -> void:
 	assert_bool(Inventory.is_equippable(ARROW)).is_false()
 
 
+func test_what_tools_hold_is_named_once() -> void:
+	var can: Dictionary = {"id": "watering_can", "type": "tool", "stats": {"tool": "water", "ammo": "water"}}
+	var copper: Dictionary = {"id": "copper_watering_can", "type": "tool", "stats": {"tool": "water", "ammo": "water"}}
+	var hoe: Dictionary = {"id": "hoe", "type": "tool", "stats": {"tool": "hoe"}}
+	assert_array(Inventory.held_in_tools([can, hoe, copper, BOW, ARROW])).override_failure_message("every can holds the same water; a bow's arrows are in the pack").is_equal(["water"])
+	assert_array(Inventory.held_in_tools([hoe, BOMB, SWORD])).is_empty()
+
+
 func test_what_each_item_uses_up() -> void:
 	assert_str(Inventory.ammo_for(BOW)).is_equal("arrow")
 	assert_str(Inventory.ammo_for(BOMB)).override_failure_message("bombs use themselves").is_equal("bomb")
@@ -60,6 +68,7 @@ func test_a_lantern_is_carried_not_put_on_the_item_button_and_lights_the_dark() 
 	assert_float(Inventory.light_radius([{"id": "lantern", "count": 1}], items, 20.0)).is_equal(56.0)
 	assert_float(Inventory.light_radius([{"id": "lantern", "count": 0}], items, 20.0)).override_failure_message("none left: none held").is_equal(20.0)
 	assert_float(Inventory.light_radius([{"id": "lantern", "count": 1}, {"id": "great_lantern", "count": 1}], items, 20.0)).override_failure_message("the widest counts").is_equal(80.0)
+	assert_float(Inventory.light_radius([{"id": "great_lantern", "count": 1}, {"id": "lantern", "count": 1}], items, 20.0)).override_failure_message("whichever was picked up first").is_equal(80.0)
 	var held: Array[Dictionary] = Inventory.held_of_type([{"id": "arrow", "count": 5}, {"id": "lantern", "count": 1}], items, "lantern")
 	assert_int(held.size()).is_equal(1)
 	assert_str(str(held[0]["id"])).is_equal("lantern")

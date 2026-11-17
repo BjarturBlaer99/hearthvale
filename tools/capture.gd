@@ -31,7 +31,11 @@ extends SceneTree
 ## pause menu's Friends page with friendships at different marks. "friend:<villager>:<points>"
 ## talks to whoever the hero faces with that much friendship behind him (a favour asked, a
 ## recipe taught, a present); "long_log" opens the quest log with eight quests, scrolled;
-## "new_dishes" opens the item menu with the three dishes that are taught.
+## "new_dishes" opens the item menu with the three dishes that are taught. Crafting: "workbench"
+## opens the workbench's list with some things within reach and some not; "furnished" shows the
+## cottage with every furnishing made and the furnace burning; "chest" opens the chest's two
+## lists; "furnace_talk" asks the cold furnace what to smelt; "sprinkler" shows the plot the
+## morning after two sprinklers were set.
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -185,6 +189,15 @@ const SHOTS: Array = [
 	["147_quarry_floor_8_dark", &"quarry_8", Vector2i(11, 2), Vector2.DOWN, 0, ""],
 	["148_quarry_floor_8_lantern", &"quarry_8", Vector2i(11, 2), Vector2.DOWN, 0, "lantern"],
 	["149_quarry_floor_9_heart", &"quarry_9", Vector2i(16, 2), Vector2.DOWN, 0, "lantern"],
+	# Crafting (2026-11-17): the workbench's list in the bare cottage; the cottage with all four
+	# furnishings and the furnace burning; the chest's two lists; the plot the morning after two
+	# sprinklers were set; the cold furnace's list; and fallen wood in the Old Wood.
+	["150_the_workbench_list", &"home", Vector2i(8, 3), Vector2.RIGHT, 0, "workbench"],
+	["151_the_cottage_furnished", &"home", Vector2i(5, 5), Vector2.UP, 0, "furnished"],
+	["152_the_chest_two_lists", &"home", Vector2i(2, 3), Vector2.UP, 0, "chest"],
+	["153_sprinklers_on_the_plot", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "sprinkler"],
+	["154_the_furnace_asks", &"home", Vector2i(6, 3), Vector2.UP, 0, "furnace_talk"],
+	["155_fallen_wood", &"old_wood", Vector2i(24, 8), Vector2.DOWN, 0, ""],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -225,6 +238,12 @@ func _capture() -> void:
 			game_state.call(&"add_item", &"lantern", 1)
 		if shot[5] == "tale":
 			game_state.call(&"set_flag", &"keep_warden_beaten", true)
+		if shot[5] in ["furnished", "chest", "furnace_talk"]:
+			# Everything the workbench makes for the cottage, each in its own place.
+			for furnishing: String in ["furnace", "chest", "rug", "lamp"]:
+				game_state.call(&"set_flag", StringName("home/%s" % furnishing), true)
+		if shot[5] == "furnished":
+			game_state.call(&"light_furnace", &"copper_bar", 3)
 		if shot[1] == &"ending":
 			# A game of seven days: thirty-one crops picked, three friends made.
 			for day: int in 6:
@@ -345,11 +364,49 @@ func _capture() -> void:
 					for y: int in 2:
 						game_state.call(&"till_soil", Vector2i(x, y))
 					game_state.call(&"water_soil", Vector2i(x, 0))
+		if shot[5] == "workbench":
+			# Nine recipes known (Farming and Mining at their second level), six of them within
+			# reach: the list scrolls, and the rest are greyed.
+			for skill: StringName in [&"farming", &"mining"]:
+				(game_state.get(&"skill_points") as Dictionary)[skill] = 10
+			for item: Array in [[&"hoe", 1], [&"watering_can", 1], [&"pickaxe", 1], [&"stone", 30], [&"copper_ore", 5], [&"coal", 2],
+					[&"wood", 4], [&"copper_bar", 2], [&"wheat", 8], [&"cherry_blossom", 3]]:
+				game_state.call(&"add_item", item[0], item[1])
+		if shot[5] == "chest":
+			# A pack after a day in the mine and on the plot, and a chest with a few days in it.
+			for item: Array in [[&"copper_ore", 30], [&"coal", 12], [&"stone", 40], [&"wood", 9], [&"turnip", 6], [&"wheat", 5], [&"bread", 2]]:
+				game_state.call(&"add_item", item[0], item[1])
+			var chest: RefCounted = game_state.call(&"store")
+			for stack: Array in [["copper_ore", 30, 30], ["copper_ore", 12, 30], ["iron_ore", 18, 30], ["copper_bar", 7, 20], ["pumpkin", 3, 20], ["potato", 8, 20]]:
+				chest.call(&"put", stack[0], stack[1], stack[2])
+		if shot[5] == "furnace_talk":
+			for item: Array in [[&"copper_ore", 11], [&"coal", 8], [&"iron_ore", 3]]:
+				game_state.call(&"add_item", item[0], item[1])
+		if shot[5] == "sprinkler":
+			# The whole plot tilled, two sprinklers set, crops beside them and in the corners; then a
+			# night goes by. The four cells beside each sprinkler are wet in the morning, and the
+			# corners are dry.
+			var cells: Dictionary = {}
+			for x: int in 6:
+				for y: int in 3:
+					cells["%d,%d" % [x, y]] = {"watered": false}
+			for at: String in ["1,1", "4,1"]:
+				cells[at] = {"watered": false, "sprinkler": true}
+			for grown: Array in [["0,1", "turnip", 2], ["1,0", "carrot", 2], ["2,1", "turnip", 1], ["1,2", "wheat", 3], ["3,1", "potato", 3],
+					["4,0", "pumpkin", 4], ["5,1", "carrot", 1], ["4,2", "turnip", 2], ["0,0", "turnip", 1], ["5,2", "wheat", 2]]:
+				cells[grown[0]] = {"watered": true, "crop": grown[1], "stage": grown[2]}
+			(game_state.call(&"farm") as Farm).load_saved({"cells": cells})
+			game_state.call(&"start_next_day")
+			game_state.call(&"set_time", NOON)
+			root.get_node("EventBus").emit_signal(&"farm_changed")
+			for item: Array in [[&"hoe", 1], [&"watering_can", 1], [&"water", 4], [&"sprinkler", 2]]:
+				game_state.call(&"add_item", item[0], item[1])
+			game_state.call(&"equip", &"sprinkler")
 		if shot[5] == "shut":
 			# An hour after closing: the hero tries the shop's door.
 			game_state.call(&"set_time", float(clock.call(&"in_day", "19:00")))
 			scene.call(&"interact")
-		if shot[5] in ["talk", "accept", "tale", "lantern_talk", "cook", "lights", "try", "gift_talk", "gift_list", "gift_given"] or str(shot[5]).begins_with("friend:"):
+		if shot[5] in ["talk", "accept", "tale", "lantern_talk", "cook", "lights", "try", "gift_talk", "gift_list", "gift_given", "furnace_talk"] or str(shot[5]).begins_with("friend:"):
 			scene.call(&"interact")
 		if shot[5] in ["gift_talk", "gift_list", "gift_given"]:
 			# The answer that gives is the second of Pip's three.
@@ -427,6 +484,17 @@ func _capture() -> void:
 			await _frames(2)
 		elif shot[5] in ["cook_menu", "new_dishes"]:
 			scene.call(&"open_item_menu")
+			await _frames(2)
+		elif shot[5] == "workbench":
+			# The cursor on the chest, which he hasn't the wood for: its needs show what is short.
+			scene.call(&"open_craft")
+			scene.get(&"hud").get(&"craft_menu").call(&"move_cursor", 1)
+			await _frames(2)
+		elif shot[5] == "chest":
+			# One stack put away, so the line that says so shows.
+			scene.call(&"open_store")
+			scene.get(&"hud").get(&"store_menu").call(&"move_cursor", 3)
+			scene.get(&"hud").get(&"store_menu").call(&"confirm")
 			await _frames(2)
 		elif shot[5] in ["hoe", "fill", "plant"]:
 			scene.call(&"use_item")

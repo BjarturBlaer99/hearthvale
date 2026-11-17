@@ -103,7 +103,9 @@ func test_the_sword_cuts_a_branch_in_one_blow_and_a_stump_in_three() -> void:
 	var stump: Breakable = _wood_at(fields, Vector2i(3, 17))
 	assert_int(stump.hits_left).is_equal(3)
 	for blow: int in 2:
+		_heard.clear()
 		_swing_at(fields, stump)
+		assert_array(_heard).override_failure_message("blow %d is heard, though it fells nothing" % (blow + 1)).contains([&"cut"])
 		assert_bool(stump.broken).override_failure_message("blow %d doesn't fell it" % (blow + 1)).is_false()
 		assert_int(stump.hits_left).is_equal(2 - blow)
 		assert_object(stump.dropped).is_null()

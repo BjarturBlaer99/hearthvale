@@ -11,6 +11,7 @@ func test_it_keeps_what_stacks_and_leaves_coins_keys_and_quest_things() -> void:
 	assert_bool(Store.can_hold({"id": "coin", "type": "currency", "stackable": true, "max_stack": 999})).is_false()
 	assert_bool(Store.can_hold({"id": "small_key", "type": "key", "stackable": true, "max_stack": 9})).is_false()
 	assert_bool(Store.can_hold({"id": "egg_basket", "type": "quest"})).is_false()
+	assert_bool(Store.can_hold({"id": "wisp_ember", "type": "quest", "stackable": true, "max_stack": 9})).override_failure_message("a quest's thing stays with him even when it stacks").is_false()
 	assert_bool(Store.can_hold({"id": "hoe", "type": "tool"})).override_failure_message("a thing there is one of stays in the pack").is_false()
 	assert_bool(Store.can_hold({})).is_false()
 	# The game's own: every material and every food is kept; the sword, the Lantern and coins are not.

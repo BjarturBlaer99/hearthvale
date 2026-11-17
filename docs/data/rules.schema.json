@@ -2,11 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "rules.schema.json",
   "title": "Rules file (data/rules/<id>.json, one set of rules per file)",
-  "description": "The numbers a system runs on, so tuning needs no code (GDD §6). The file's id says which rules it holds. Known ids: 'time' (the day's clock, read by DayClock), 'energy' (the hero's energy, read by EnergyRules), 'hours' (when places are open and villagers are out, read by Hours), 'night' (what the night does to monsters, read by NightRules), 'farm' (the hero's plot, read by Farm), 'skills' (the hero's skills, read by Skills) and 'friendship' (what talk and gifts are worth, read by Friendship).",
+  "description": "The numbers a system runs on, so tuning needs no code (GDD §6). The file's id says which rules it holds. Known ids: 'time' (the day's clock, read by DayClock), 'energy' (the hero's energy, read by EnergyRules), 'hours' (when places are open and villagers are out, read by Hours), 'night' (what the night does to monsters, read by NightRules), 'farm' (the hero's plot, read by Farm), 'skills' (the hero's skills, read by Skills), 'friendship' (what talk and gifts are worth, read by Friendship), 'mine' (the Old Quarry, read by MineRules) and 'crafting' (the furnace, the chest and the home's furnishings, checked by Crafting).",
   "type": "object",
   "required": ["id"],
   "properties": {
-    "id": { "enum": ["time", "energy", "hours", "night", "farm", "skills", "friendship"], "description": "Which rules these are." }
+    "id": { "enum": ["time", "energy", "hours", "night", "farm", "skills", "friendship", "mine", "crafting"], "description": "Which rules these are." }
   },
   "allOf": [
     {
@@ -227,9 +227,24 @@
           "friend_marks": { "type": "integer", "minimum": 1, "description": "The marks at which a villager counts as a friend on the ending screen. At most marks; left out, only a full friendship counts." }
         }
       }
+    },
+    {
+      "if": { "properties": { "id": { "const": "crafting" } } },
+      "then": {
+        "required": ["furnace_most", "chest_slots", "furnishings"],
+        "properties": {
+          "furnace_most": { "type": "integer", "minimum": 1, "description": "The most the furnace makes in one load (so many bars a night)." },
+          "chest_slots": { "type": "integer", "minimum": 1, "description": "How many stacks the storage chest holds, each up to its item's own max_stack." },
+          "furnishings": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "description": "What the hero's home can be furnished with: the names a crafting recipe's 'makes' may give as its 'furnishing'. Each is a Furnishing node of that id in the home's scene, and the flag home/<name> once it is made."
+          }
+        }
+      }
     }
   ],
-  "$comment": "One entry of allOf for each id: time, energy, hours, night, farm, skills, friendship.",
+  "$comment": "One entry of allOf for each id: time, energy, hours, night, farm, skills, mine, friendship, crafting.",
   "$defs": {
     "time_of_day": { "type": "string", "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$", "description": "A time on a 24-hour clock, like \"06:00\"." },
     "span": {

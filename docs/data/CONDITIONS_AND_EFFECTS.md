@@ -29,6 +29,8 @@ effects (`complete_quest` only means something in a quest stage's `on_enter`, wh
 | `teach_recipe` | `recipe` (a recipe id from `data/recipes` that is marked `"taught": true`). The hero knows it from then on, and the hearth lists it |
 | `practise` | `skill`, `deed` (a skill and one of its deeds in `data/rules/skills.json`, e.g. `cooking` and `dish`). The skill gains that deed's points |
 | `travel` | `area`, `entry` (an area id and the name of one of its entry points). The hero is taken there when the conversation is over: the mine's lift. No file in `data/dialogue` uses it yet; the lift's conversation is built by the game |
+| `light_furnace` | `item`, `count` (an item id and how many of it the load will make). The furnace in the hero's home is lit today and holds that from the next morning. It takes nothing itself: the ore and the coal go by `take_item` effects beside it. No file in `data/dialogue` uses it; the furnace's conversation is built by the game |
+| `empty_furnace` | — (what the furnace made is given to the hero, as `give_item` gives: what a full pack can't take is laid at his feet). Built into the furnace's conversation by the game |
 | `shop` | `shop` (a shop id from `data/shops`), `mode` (`buy` or `sell`: the list it opens on). The shop's buy-and-sell list opens when the conversation is over |
 
 Combat and dungeon milestones will add types (e.g. `heal`, `open_door`) when they need them.

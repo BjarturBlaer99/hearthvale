@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "crafting.schema.json",
+  "title": "Crafting recipe file (data/crafting/<id>.json, one recipe per file)",
+  "description": "Something made at the workbench or smelted in the furnace at the hero's home (GDD §14, TECH_DESIGN §28): where it is made, what it needs, what it makes, and when the hero knows it. Every item id must be in data/items. The workbench lists every recipe of its own that the hero knows, in 'order'; the furnace offers its own. Adding one needs no code. (Cooking has its own folder and schema: data/recipes, recipe.schema.json.)",
+  "type": "object",
+  "required": ["id", "needs", "makes"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "description": "What the list calls it. Left out, it is the name of the item it makes. A recipe that makes a furnishing needs one." },
+    "station": { "enum": ["workbench", "furnace"], "default": "workbench", "description": "Where it is made. A 'furnace' recipe is smelted overnight, several to a load (data/rules/crafting.json: furnace_most), and must make an item." },
+    "order": { "type": "integer", "default": 0, "description": "Its place on its station's list, lowest first; recipes that share a number are listed by id." },
+    "needs": {
+      "type": "array", "minItems": 1,
+      "description": "What is used up, each with how many. A tool made from another names the old tool here.",
+      "items": {
+        "type": "object",
+        "required": ["item", "count"],
+        "properties": {
+          "item": { "type": "string", "minLength": 1 },
+          "count": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "makes": {
+      "type": "object",
+      "description": "An item for the pack, or a furnishing of the hero's home: one of the two.",
+      "oneOf": [
+        {
+          "required": ["item"],
+          "properties": {
+            "item": { "type": "string", "minLength": 1 },
+            "count": { "type": "integer", "minimum": 1, "default": 1 }
+          },
+          "not": { "required": ["furnishing"] }
+        },
+        {
+          "required": ["furnishing"],
+          "properties": {
+            "furnishing": { "type": "string", "minLength": 1, "description": "One of the furnishings in data/rules/crafting.json. It is made once, and stands in its own place in the cottage (a Furnishing node of that id in the home's scene)." }
+          },
+          "not": { "required": ["item"] }
+        }
+      ]
+    },
+    "unlock": {
+      "type": "object",
+      "description": "When the hero knows the recipe. Left out, from the start. One of the two: an item 'found' (ever held, even if he has none now), or a 'skill' at a 'level'.",
+      "oneOf": [
+        {
+          "required": ["found"],
+          "properties": { "found": { "type": "string", "minLength": 1, "description": "An item id." } },
+          "not": { "required": ["skill"] }
+        },
+        {
+          "required": ["skill", "level"],
+          "properties": {
+            "skill": { "type": "string", "minLength": 1, "description": "A skill id from data/rules/skills.json." },
+            "level": { "type": "integer", "minimum": 2, "description": "Every skill begins at level 1, so 2 is the first that waits on anything." }
+          },
+          "not": { "required": ["found"] }
+        }
+      ]
+    }
+  }
+}

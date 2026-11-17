@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "breakable.schema.json",
   "title": "Breakable file (data/breakables/<id>.json, one kind per file)",
-  "description": "Something in the world a blow cuts or breaks: tall grass, a clay pot (TECH_DESIGN §6). Placed by the map baker's spawn markers; back on every visit.",
+  "description": "Something in the world a blow cuts or breaks: tall grass, a clay pot, a fallen branch, an old stump (TECH_DESIGN §6, §28). Placed by the map baker's spawn markers; back on every visit unless it 'returns' daily.",
   "type": "object",
   "required": ["id", "name", "breaks_on", "drops"],
   "properties": {
@@ -13,6 +13,8 @@
       "items": { "enum": ["sword", "arrow", "bomb"] },
       "description": "The kinds of blow (Hit.kind) that break it; anything else does nothing."
     },
+    "hits": { "type": "integer", "minimum": 1, "default": 1, "description": "The blows it takes: a fallen branch one, an old stump three. Each blow before the last plays its sound and throws up a little of its burst." },
+    "returns": { "enum": ["daily"], "description": "Left out, it is back on every visit. 'daily': broken, it stays broken until the next morning (the flag cut/<area>/<x>,<y> keeps the day). Wood says so." },
     "sound": { "type": "string", "description": "A sound id (audio/sfx) played when it breaks." },
     "burst": { "enum": ["leaves", "shards", "dust", "spark", "sparkle"], "description": "The Burst it throws up." },
     "frames": {

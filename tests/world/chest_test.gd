@@ -72,6 +72,9 @@ func test_each_has_its_place_in_the_cottage_and_nothing_that_was_there_moved() -
 	# Where he wakes, the hearth's front and the way to the door are clear of every place.
 	for cell: Vector2i in [Vector2i(2, 3), Vector2i(5, 2), Vector2i(5, 7), Vector2i(5, 6)]:
 		assert_bool(places.values().has(cell) or RUG_CELLS.has(cell)).override_failure_message("%s is kept clear" % cell).is_false()
+	# Unmade, the lamp gives no light.
+	var lights_before: int = home.glows_now().size()
+	assert_bool((home.interactables.get_node(^"Lamp") as Furnishing).glow_now().is_empty()).override_failure_message("no lamp, no light").is_true()
 	# Made, each is there at once.
 	GameState.add_item(&"wood", 12)
 	GameState.add_item(&"copper_bar", 2)
@@ -98,6 +101,7 @@ func test_each_has_its_place_in_the_cottage_and_nothing_that_was_there_moved() -
 	assert_bool(lamp.covers(LAMP_CELL)).override_failure_message("nothing to face").is_false()
 	assert_bool(lamp.glow_now().is_empty()).is_false()
 	assert_array(home.glows_now()).contains([lamp.glow_now()])
+	assert_int(home.glows_now().size()).override_failure_message("one light more than before: the lamp's").is_equal(lights_before + 1)
 	assert_str(chest.prompt()).is_equal("Open the chest")
 	# A second of any can't be made.
 	GameState.add_item(&"wheat", 8)
@@ -143,6 +147,9 @@ func test_the_chest_opens_two_lists_and_a_line_chosen_moves_that_stack_across() 
 	assert_int(GameState.item_count(&"copper_ore")).is_equal(30)
 	assert_bool(GameState.store().to_list().is_empty()).is_true()
 	assert_str(menu.note_text()).is_equal("Took out: Copper Ore x30.")
+	assert_str(GameState.store_put(&"water")).override_failure_message("the water is in the can, not in the pack").is_equal(Store.NOT_KEPT_WORDS)
+	assert_int(GameState.item_count(&"water")).is_equal(5)
+	assert_bool(GameState.store().to_list().is_empty()).is_true()
 	assert_that(menu.side).override_failure_message("the chest is empty: the cursor goes back to the pack").is_equal(StoreMenu.PACK)
 	menu.close()
 	assert_bool(home.player.controls_enabled).is_true()
@@ -266,6 +273,22 @@ func test_a_long_list_scrolls_and_the_chest_goes_through_a_save() -> void:
 	assert_int(menu.selected).is_equal(10)
 	assert_int(menu.shown_lines().size()).is_equal(StoreMenu.ROWS)
 	assert_str(menu.shown_lines()[StoreMenu.ROWS - 1]).override_failure_message("the cursor's line is in view").is_equal("> Copper Ore x13")
+	# Pointing at the first line shown puts the cursor on the fifth stack, not the first.
+	await await_idle_frame()
+	menu._unhandled_input(_move(menu.get_node(^"Panel/ChestList"), 0))
+	assert_int(menu.selected).is_equal(4)
+	assert_str(menu.shown_lines()[0]).is_equal("> Gold Ore x3")
+	# Turning to the pack and back begins at the top of the list turned to.
+	for carried: Array in [[&"bread", 2], [&"stone", 5], [&"coal", 2]]:
+		GameState.add_item(carried[0], carried[1])
+	menu.switch_side()
+	assert_that(menu.side).is_equal(StoreMenu.PACK)
+	assert_int(menu.selected).is_equal(0)
+	menu.move_cursor(2)
+	menu.switch_side()
+	assert_that(menu.side).is_equal(StoreMenu.CHEST)
+	assert_int(menu.selected).override_failure_message("not where the cursor was left").is_equal(0)
+	assert_str(menu.shown_lines()[0]).is_equal("> Stone x3")
 	menu.close()
 	GameState.update_player(&"home", Vector2i(5, 5))
 	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
@@ -279,6 +302,11 @@ func test_a_long_list_scrolls_and_the_chest_goes_through_a_save() -> void:
 	assert_str(JSON.stringify(GameState.to_dict(), "", true)).is_equal(before)
 	assert_int(GameState.store().count_of("copper_ore")).is_equal(43)
 	assert_bool(GameState.is_furnished(&"chest")).is_true()
+	# A stack a save makes bigger than its item's limit is cut down to it as the game loads.
+	var odd: Dictionary = GameState.to_dict()
+	odd["home"]["chest"] = [{"id": "copper_ore", "count": 99}, {"id": "coal", "count": 4}]
+	GameState.from_dict(odd)
+	assert_array(GameState.store().to_list()).is_equal([{"id": "copper_ore", "count": 30}, {"id": "coal", "count": 4}])
 
 
 # --- Helpers -------------------------------------------------------------------------------

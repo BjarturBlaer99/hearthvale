@@ -94,6 +94,7 @@ func test_the_list_shows_what_each_thing_needs_and_greys_out_what_he_cant_make()
 	assert_array(_ids(menu.entries())).override_failure_message("the rug waits on nothing: it is always on the list").is_equal(["furnace", "bombs", "rug"])
 	assert_array(Array(menu.shown_lines())).is_equal(["> Furnace", "  Bombs x3", "  Woven Rug"])
 	assert_array(menu.greyed_lines()).override_failure_message("twelve stone of twenty: the furnace is greyed; bombs can be made; he has no wheat for the rug").is_equal([true, false, true])
+	assert_array(Array(menu.bright_lines())).override_failure_message("a greyed line is on the dim list only: the bright one is blank there").is_equal(["", "  Bombs x3", ""])
 	assert_bool(menu.can_make(0)).is_false()
 	assert_bool(menu.can_make(1)).is_true()
 	assert_array(Array(menu.need_lines())).is_equal(["Stone 12 of 20", "Copper Ore 5 of 5"])
@@ -293,6 +294,46 @@ func test_the_mouse_points_and_the_wheel_steps_in_the_workbenchs_list() -> void:
 	assert_bool(home.player.controls_enabled).is_true()
 
 
+func test_a_long_list_scrolls_and_opens_at_the_top_each_time() -> void:
+	# Everything found and both skills risen: all thirteen recipes are known.
+	for item: StringName in [&"copper_ore", &"wood", &"coal", &"copper_bar", &"iron_bar", &"crystal"]:
+		GameState.add_item(item, 1)
+	GameState.skill_points[Skills.FARMING] = 10
+	GameState.skill_points[Skills.MINING] = 25
+	var home: AreaController = _load(HOME)
+	home.open_craft()
+	var menu: CraftMenu = home.hud.craft_menu
+	var list: Label = menu.get_node(^"Panel/List")
+	await await_idle_frame()
+	assert_int(menu.entries().size()).is_equal(13)
+	assert_int(CraftMenu.ROWS).override_failure_message("the box has room for six").is_equal(6)
+	assert_int(menu.shown_lines().size()).override_failure_message("six lines, however many he knows").is_equal(6)
+	assert_str(menu.shown_lines()[0]).is_equal("> Furnace")
+	assert_str((menu.get_node(^"Panel/Count") as Label).text).override_failure_message("it says there is more below").is_not_equal("")
+	# The list moves along with the cursor.
+	for step: int in 8:
+		menu.move_cursor(1)
+	assert_int(menu.selected).is_equal(8)
+	assert_int(menu.top).is_equal(3)
+	assert_int(menu.shown_lines().size()).is_equal(6)
+	assert_str(menu.shown_lines()[5]).override_failure_message("the cursor's line is in view").is_equal("> Iron Watering Can")
+	assert_array(Array(menu.need_lines())).is_equal(["Copper Watering Can 0 of 1", "Iron Bar 1 of 2"])
+	# Pointing at the second line shown puts the cursor on the fifth recipe, not the second.
+	menu._unhandled_input(_move(list, 1))
+	assert_int(menu.selected).is_equal(4)
+	assert_str(menu.shown_lines()[1]).is_equal("> Copper Hoe")
+	# He hasn't the hoe: it says why. Closed and opened again, the list begins at the top
+	# with nothing said.
+	assert_bool(menu.confirm()).is_false()
+	assert_str(menu.note_text()).is_equal(Crafting.LACKING_WORDS)
+	menu.close()
+	assert_bool(home.open_craft()).is_true()
+	assert_int(menu.selected).override_failure_message("the cursor is on the first line again").is_equal(0)
+	assert_int(menu.top).is_equal(0)
+	assert_str(menu.note_text()).override_failure_message("what was said last time is gone").is_equal("")
+	assert_str(menu.shown_lines()[0]).is_equal("> Furnace")
+
+
 func test_crafting_goes_through_a_save_and_an_old_save_starts_with_none_of_it() -> void:
 	GameState.add_item(&"copper_ore", 3)
 	GameState.add_item(&"copper_ore", -3)
@@ -324,6 +365,9 @@ func test_crafting_goes_through_a_save_and_an_old_save_starts_with_none_of_it() 
 		assert_bool(GameState.is_furnished(StringName(furnishing))).override_failure_message(furnishing).is_false()
 	assert_bool(GameState.has_found(&"bread")).override_failure_message("what he carries, he has found").is_true()
 	assert_bool(GameState.has_found(&"copper_ore")).is_false()
+	GameState.add_item(&"bread", -GameState.item_count(&"bread"))
+	assert_int(GameState.item_count(&"bread")).is_equal(0)
+	assert_bool(GameState.has_found(&"bread")).override_failure_message("and it stays found when the last of it is eaten").is_true()
 	# A save with no home in it at all still loads.
 	migrated.erase("home")
 	migrated.erase("found")

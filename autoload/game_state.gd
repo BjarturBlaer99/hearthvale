@@ -609,7 +609,6 @@ func store_take(index: int) -> String:
 
 
 # --- The mine (2026-11-17) ---------------------------------------------------
-# --- The mine (2026-11-17) ---------------------------------------------------
 
 ## The Old Quarry's rules (data/rules/mine.json).
 func mine_rules() -> MineRules:

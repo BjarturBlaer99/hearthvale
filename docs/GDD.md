@@ -177,6 +177,7 @@ meals in 3c.)*
   pumpkin 22.
 - No seasons and no weather.
 - Harvested crops can be eaten, cooked, sold, or given to villagers *(P4)*.
+- Better hoes and cans, and sprinklers that water by themselves, are made at the workbench (§14).
 
 | Crop | Days | Seed price | Sells for |
 |---|---|---|---|
@@ -307,10 +308,11 @@ under thatch, red clay tiles or blue slate, with smoking chimneys, and a stone c
 
 ## 13. Out of scope (unless asked)
 Multiplayer, procedural generation, 3D, voice acting, swimming, climbing, seasons, weather, livestock of your
-own, crafting beyond cooking and the workbench (§14), fishing, an inventory limit, an open world, new areas
+own, crafting beyond cooking, the workbench and the furnace (§14), placing furniture by hand, fishing, an inventory limit, an open world, new areas
 beyond the hero's home and plot.
 
-## 14. Mining *(2026-11-17; crafting is not built yet)*
+## 14. Mining and crafting *(2026-11-17)*
+**Mining**
 - **The Pickaxe** is sold at Tilda's for 25 coins. It goes on the item bar like the hoe, and strikes the
   rock the hero faces. A blow costs 2 energy.
 - **The Old Quarry** has an entrance hall and nine floors, each one screen:
@@ -330,3 +332,38 @@ beyond the hero's home and plot.
 - **Mining** is a fourth skill: a point for a plain rock, two for a rock of ore. Each level takes a tenth
   off the energy of a blow, and adds a twentieth to the chance that a rock of ore leaves one more.
 - **What he can't carry stays lying:** stone stacks to 50, ores and coal to 30, crystals to 10.
+
+**Crafting** *(built 2026-11-17; Tilda does not buy ore or bars yet: that is the balance pass)*
+- **The workbench** stands in the cottage from the first day. Its list shows what he knows how to make,
+  what the thing under the cursor needs beside what he has ("Stone 12 of 20"), and greys out what he
+  can't make now. A recipe is known once the thing it waits on has been found (held even once), or once
+  a skill has risen; the Woven Rug is known from the start.
+- **The furnace** (20 stone, 5 copper ore) smelts overnight: three ore and a coal for a bar, one load a
+  night of one metal, five bars at the most. Lit today, the bars are there from the next morning. Coal
+  comes from floor 4 down, so nothing is smelted before the lift's first stop.
+- **Furnishings** each have their own place in the cottage and are made once: the furnace, the storage
+  chest (10 wood, 1 copper bar), the Standing Lamp (1 copper bar, 2 wood, 1 coal), which is a real
+  light, and the Woven Rug (8 wheat, 3 cherry blossoms), beside the bed.
+- **The chest** holds 24 stacks, and may hold several stacks of one thing. Its two lists are the pack
+  and the chest; choosing a line moves that stack across, as much of it as there is room for. It keeps
+  what stacks; coins, keys and quest things stay with the hero.
+- **Wood** comes from fallen branches (one blow of the sword, 1 wood) and old stumps (three blows, 2
+  wood): ten branches and five stumps across the North Fields, the Old Wood and the South Field, back
+  each morning.
+- **Bombs** can be made: 1 coal and 3 stone for three.
+- **Better tools** are made from the tool before them, and cost the same energy to use:
+
+| Tool | Plain | Copper (2 or 3 copper bars) | Iron (2 or 3 iron bars) |
+|---|---|---|---|
+| Hoe | tills 1 cell | 2 cells in a line | 3 cells in a line |
+| Watering Can | waters 1 cell a pour | 2 cells a pour | 3 cells a pour |
+| Pickaxe | 2 or 3 blows a rock | one blow fewer | two fewer (every rock in one) |
+
+- The cell he faces decides whether a stroke is made; the cells beyond it get it if they can. The
+  pickaxes wait on Mining 2 and 3; the hoes and cans on a first bar of their metal.
+- **The sprinkler** (1 copper bar, 1 iron bar; Farming 2) is set on a tilled, empty cell of the plot from
+  the item bar, and taken up again with a right click. Each morning it waters the four cells beside it,
+  not the corners. Nothing can be planted in its own cell.
+- **The Miner's Lantern** (the Lantern, 1 gold bar, 1 crystal) lights 80 pixels round the hero, where the
+  Lantern lights 56.
+- **Materials** (stone, wood, ore, coal, bars, crystals) can't be eaten or given as gifts.

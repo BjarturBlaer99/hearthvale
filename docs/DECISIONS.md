@@ -1006,3 +1006,51 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the mine** (a checkout of the commit before, run once), not made up by hand.
 - 2026-11-17 — **Phase 1 is one commit, not the three the plan listed.** The steps shared the same
   files (the area's script above all), and could not be told apart after the fact.
+- 2026-11-17 — **Crafting recipes have a folder and a shape of their own** (`data/crafting/`; cooking
+  keeps `data/recipes/`). Each names its `station` (the workbench or the furnace), its `order` on the
+  list, what it `needs`, what it `makes` (an item, or a furnishing of the home) and, if it waits on
+  anything, an `unlock`: an item `found`, or a `skill` at a `level`.
+- 2026-11-17 — **What he has found is a list in the save, not a flag for each item.** The plan said
+  flags (`found/<item>`); a set of ids says the same with one field, and keeps a hundred entries out of
+  the flags. What he carries counts as found when a save loads, so an older save loses nothing.
+- 2026-11-17 — **A furnishing is a flag and a node with a fixed place.** `home/<id>` says it has been
+  made; a `Furnishing` in the cottage's scene says where it stands: the workbench (there from the start)
+  at cell (9, 3), the furnace (6, 2), the chest (2, 2), the lamp (4, 2), the rug (2..3, 4). Nothing that
+  stood in the cottage moved, and its map was not re-baked.
+- 2026-11-17 — **The furnace's list is a conversation, built as the hearth's is,** with two new effects,
+  `light_furnace` and `empty_furnace`. One load of up to five bars, three ore and a coal each, lit today
+  and ready the next morning. The bars are given, not added: what a full pack can't take is laid at his
+  feet.
+- 2026-11-17 — **The workbench greys out what can't be made by showing two labels in the same place,**
+  a bright one and a dim one; a line is on one and blank on the other. The pixel font has one colour to
+  a label, and this needed no new kind of text. What the recipe under the cursor needs is shown beside
+  what he has, a need to a line.
+- 2026-11-17 — **The chest may hold several stacks of one thing,** which is its use: more ore, bars and
+  crops than one stack. It holds 24 stacks, keeps what stacks, and leaves coins, keys and quest things
+  with the hero. A line chosen moves that stack, as much of it as fits; there is no choosing how many.
+- 2026-11-17 — **Wood lies at chosen cells, and comes back in the morning.** A fallen branch (one blow,
+  1 wood) and an old stump (three blows, 2 wood) are breakables; a breakable's data may now say `hits`
+  and `"returns": "daily"`, and a flag (`cut/<area>/<x>,<y>`) keeps the day. Ten branches and five
+  stumps lie off the paths in the North Fields, the Old Wood and the South Field; those three maps were
+  re-baked for their markers and nothing else in them changed.
+- 2026-11-17 — **A better tool is an item of its own** (`copper_hoe`, `iron_hoe`, and so on), not a
+  level kept beside the plain one: its stats say `reach` or `fewer_blows`, and the workbench takes the
+  old tool to make it. The cell he faces decides whether a stroke is made; the cells beyond it in the
+  line get it if they can; energy and the pour are paid once.
+- 2026-11-17 — **A rock's blows are counted by the pickaxe that strikes it,** at each blow. Counting
+  them once as the floor loads would have gone by whichever pickaxe was in hand at the ladder.
+- 2026-11-17 — **The sprinkler is an item of type `sprinkler`, on the item bar** (approved with the
+  plan). It is set on tilled, empty soil, lies flat, and is taken up with interact. Each morning, after
+  the plot wakes, it waters the tilled cells among the four beside it: set down today, it runs from
+  tomorrow.
+- 2026-11-17 — **The Miner's Lantern is a second item of type `lantern`,** with radius 80, and making
+  it uses up the Lantern. The hero's light is the widest lantern he carries, so nothing else changed.
+- 2026-11-17 — **Crafting did not change the save's version.** `home` (the furnace's load, the chest's
+  stacks), `found`, and a sprinkler in a cell of the plot are each read with a default, so a version 5
+  save from before crafting loads as it is. A version 4 save starts with none of them.
+- 2026-11-17 — **What tools hold is named once** (`Inventory.held_in_tools`): three watering cans hold
+  the same water, and it is in the can, not in the pack, so the chest's list leaves it out.
+- 2026-11-17 — **Two sounds were made for crafting, `craft` and `furnace`.** The plan's list of six had
+  a "ladder" sound; the ladder uses the `secret` chime that was there already.
+- 2026-11-17 — **Step 2b's commit was amended once,** before anything was pushed, to bring one test up
+  to date with it. Nothing else in the history was rewritten.

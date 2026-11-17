@@ -95,6 +95,22 @@ func test_an_upgrade_takes_the_old_tool_and_the_new_one_takes_its_place_in_his_h
 	assert_str(GameState.craft(&"iron_pickaxe")).override_failure_message("iron wants the third level").is_equal(Crafting.UNKNOWN_WORDS)
 
 
+func test_a_thing_made_stays_out_of_a_hand_that_holds_the_sword_by_choice() -> void:
+	GameState.add_item(&"wooden_sword")
+	GameState.add_item(&"hoe")
+	GameState.add_item(&"watering_can")
+	GameState.add_item(&"copper_bar", 2)
+	GameState.add_item(&"coal", 1)
+	GameState.add_item(&"stone", 3)
+	assert_that(GameState.equipped).override_failure_message("his first tool went on the item button").is_equal(&"hoe")
+	GameState.equip(&"")
+	assert_str(GameState.craft(&"copper_hoe")).is_equal("")
+	assert_int(GameState.item_count(&"copper_hoe")).is_equal(1)
+	assert_that(GameState.equipped).override_failure_message("the hoe was not in his hand: the copper one isn't either").is_equal(&"")
+	assert_str(GameState.craft(&"bombs")).is_equal("")
+	assert_that(GameState.equipped).override_failure_message("bombs made go on the bar, not into his hand").is_equal(&"")
+
+
 func test_a_better_hoe_tills_further_in_one_stroke_for_the_same_energy() -> void:
 	GameState.add_item(&"copper_hoe")
 	GameState.equip(&"copper_hoe")
@@ -259,6 +275,22 @@ func test_a_sprinkler_is_set_on_the_plot_waters_each_morning_and_is_taken_up_aga
 	assert_str(village.hud.message_text()).is_equal(AreaController.NO_ROOM_WORDS % "sprinklers")
 
 
+func test_the_plot_is_told_when_a_sprinkler_is_set_or_taken_up() -> void:
+	var told: Array[int] = [0]
+	var count: Callable = func() -> void: told[0] += 1
+	GameState.till_soil(Vector2i(1, 1))
+	EventBus.farm_changed.connect(count)
+	assert_bool(GameState.place_sprinkler(Vector2i(1, 1))).is_true()
+	assert_int(told[0]).override_failure_message("whoever draws the plot is told").is_equal(1)
+	assert_bool(GameState.place_sprinkler(Vector2i(1, 1))).is_false()
+	assert_int(told[0]).override_failure_message("nothing changed: nothing is told").is_equal(1)
+	assert_bool(GameState.take_sprinkler(Vector2i(1, 1))).is_true()
+	assert_int(told[0]).is_equal(2)
+	assert_bool(GameState.take_sprinkler(Vector2i(1, 1))).is_false()
+	assert_int(told[0]).is_equal(2)
+	EventBus.farm_changed.disconnect(count)
+
+
 func test_the_miners_lantern_lights_further_than_the_lantern() -> void:
 	var lantern: Dictionary = DataRegistry.get_item(&"lantern")
 	var miners: Dictionary = DataRegistry.get_item(&"miners_lantern")
@@ -279,6 +311,7 @@ func test_the_miners_lantern_lights_further_than_the_lantern() -> void:
 	assert_int(GameState.item_count(&"miners_lantern")).is_equal(1)
 	assert_float(floor.hero_light_radius()).is_equal(80.0)
 	assert_bool(floor.holds_at(far)).override_failure_message("and inside the Miner's Lantern").is_true()
+	assert_bool(Torch.has_lantern()).override_failure_message("it lights the crypt's torches as the Lantern did").is_true()
 	assert_str(GameState.craft(&"miners_lantern")).override_failure_message("no Lantern left to make another from").is_equal(Crafting.LACKING_WORDS)
 
 

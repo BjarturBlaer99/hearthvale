@@ -79,6 +79,13 @@
           "required": ["area", "entry"]
         },
         {
+          "properties": { "type": { "const": "light_furnace" }, "item": { "$ref": "#/$defs/id" }, "count": { "type": "integer", "minimum": 1 } },
+          "required": ["item", "count"]
+        },
+        {
+          "properties": { "type": { "const": "empty_furnace" } }
+        },
+        {
           "properties": { "type": { "const": "practise" }, "skill": { "type": "string", "minLength": 1 }, "deed": { "type": "string", "minLength": 1 } },
           "required": ["skill", "deed"]
         },
