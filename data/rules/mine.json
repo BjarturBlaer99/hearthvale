@@ -5,9 +5,9 @@
 		{ "area": "quarry_1", "ores": { "copper_ore": 5 } },
 		{ "area": "quarry_2", "ores": { "copper_ore": 5 } },
 		{ "area": "quarry_3", "ores": { "copper_ore": 5 } },
-		{ "area": "quarry_4", "ores": { "iron_ore": 3, "coal": 4 } },
-		{ "area": "quarry_5", "ores": { "iron_ore": 3, "coal": 4 } },
-		{ "area": "quarry_6", "ores": { "iron_ore": 3, "coal": 4 } },
+		{ "area": "quarry_4", "ores": { "iron_ore": 3, "coal": 2 } },
+		{ "area": "quarry_5", "ores": { "iron_ore": 3, "coal": 2 } },
+		{ "area": "quarry_6", "ores": { "iron_ore": 3, "coal": 2 } },
 		{ "area": "quarry_7", "ores": { "gold_ore": 2, "coal": 2 } },
 		{ "area": "quarry_8", "ores": { "gold_ore": 2, "crystal": 1, "coal": 2 } },
 		{ "area": "quarry_9", "ores": { "gold_ore": 2, "crystal": 2 } }

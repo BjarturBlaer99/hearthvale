@@ -36,7 +36,7 @@ func test_the_game_has_nine_floors_in_three_bands() -> void:
 	for floor: int in [1, 2, 3]:
 		assert_dict(_game.ores_of(floor)).is_equal({&"copper_ore": 5})
 	for floor: int in [4, 5, 6]:
-		assert_dict(_game.ores_of(floor)).is_equal({&"iron_ore": 3, &"coal": 4})
+		assert_dict(_game.ores_of(floor)).is_equal({&"iron_ore": 3, &"coal": 2})
 	assert_dict(_game.ores_of(7)).is_equal({&"gold_ore": 2, &"coal": 2})
 	assert_dict(_game.ores_of(8)).is_equal({&"gold_ore": 2, &"crystal": 1, &"coal": 2})
 	assert_dict(_game.ores_of(9)).is_equal({&"gold_ore": 2, &"crystal": 2})

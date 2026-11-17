@@ -4,7 +4,7 @@ extends RefCounted
 ##   { "id": "tilda", "name": "Tilda's Shop",
 ##     "sells": [ { "item": "arrow", "count": 10, "price": 5 } ],
 ##     "sells_seeds": true, "buys_crops": true,
-##     "buys": [ { "item": "copper_ore", "price": 3 } ] }
+##     "buys": [ { "item": "copper_ore", "price": 2 } ] }
 ## `sells` are its own wares. With `sells_seeds` it also sells a seed of every crop at the
 ## crop's seed price, and with `buys_crops` it buys what every crop gives at the crop's sale
 ## price (data/crops), so a new crop is on both lists without touching the shop. `buys` are the

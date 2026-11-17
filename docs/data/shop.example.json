@@ -9,7 +9,7 @@
 	"sells_seeds": true,
 	"buys_crops": true,
 	"buys": [
-		{ "item": "copper_ore", "price": 3 },
-		{ "item": "copper_bar", "price": 12 }
+		{ "item": "copper_ore", "price": 2 },
+		{ "item": "copper_bar", "price": 8 }
 	]
 }

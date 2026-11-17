@@ -957,8 +957,9 @@ run headless; see CLAUDE.md for the command and gotchas.
   own wares: an item, how many a deal gives, the price), `sells_seeds`, `buys_crops`, and `buys` (the other
   things it pays for: an item and the price of one). Seed prices and what a crop sells for are in
   `data/crops`, so a new crop is on both lists without touching the shop. There is one shop, `tilda`.
-- **What Tilda buys from the quarry** (mining and crafting, phase 3a) is her `buys` list: copper ore 3,
-  iron ore 5, gold ore 10, a crystal 15, a copper bar 12, an iron bar 20, a gold bar 36. Stone, wood and
+- **What Tilda buys from the quarry** (mining and crafting, phase 3a) is her `buys` list: copper ore 2,
+  iron ore 3, gold ore 7, a crystal 10, a copper bar 8, an iron bar 12, a gold bar 25 (a third less than
+  first set: the tuning of phase 3). Stone, wood and
   coal are not on it, so they are not bought. **A new thing to buy is a line of data.**
 - **`Shop`** (`core/shop/`, pure) says what is on each list: `wares(shop, crops)` (her own wares in order,
   then a seed of every crop, cheapest first) and `offers(shop, crops, stacks)` (the harvest he carries, in
@@ -1223,7 +1224,7 @@ Mining (the user's request, 2026-11-17; `docs/progress/mining-crafting-plan.md`,
   then travels there with full hearts and the usual words. `save_here()` saves a fallen hero as on his way.
 - **A drop he can't carry** stays where it lies: `ItemDrop.collect()` refuses without room, and the area
   tells him once (`ItemDrop.told`). This holds for what monsters drop as well as for ore.
-- **The Mining skill** is the fourth in `data/rules/skills.json`: it gains by `rock` and `ore`, eases
+- **The Mining skill** is the fourth in `data/rules/skills.json`: it gains by `ore` (1 point; a plain rock, the deed `rock`, is not in its `gains` since the tuning), eases
   `mine`, and has an `extra_chance` (0.05): `Skills.extra_chance()` is that for each level above the
   first, and `_on_rock_broken()` rolls it for a rock of ore (`AreaController.roll_extra_ore`, which tests
   replace). The pause menu shows two skills to a line (`Skills.lines()`), and is a line taller.
@@ -1344,4 +1345,7 @@ in a shop's data, two favours as data, and a tool that plays the game.
     `deep` is a trial of the dark floors alone, with a kit handed over.
 - **The report** is `docs/progress/mining-balance-report.md`: the eight days, the floors, what the script
   set up or left out, a day in the quarry beside a day on the plot against the plan's first guesses, and
-  the numbers it proposes to change. **No price or count was changed by the pass.**
+  the numbers it proposes to change.
+- **The tuning** (the user's word, 2026-11-17: all three proposals) was data and the tests that carry
+  it: Tilda's seven prices in `data/shops/tilda.json`, Mining's `gains` in `data/rules/skills.json`, and
+  the coal on floors 4 to 6 in `data/rules/mine.json`. No code changed.

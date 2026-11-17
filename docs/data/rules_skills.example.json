@@ -20,7 +20,7 @@
     },
     "mining": {
       "name": "Mining",
-      "gains": { "rock": 1, "ore": 2 },
+      "gains": { "ore": 1 },
       "eases": ["mine"],
       "extra_chance": 0.05
     }

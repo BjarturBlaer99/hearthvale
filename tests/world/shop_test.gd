@@ -193,8 +193,8 @@ func test_ore_bars_and_crystals_are_sold_beside_the_crops() -> void:
 	shop.open_shop(&"tilda", Shop.SELL)
 	var counter: ShopMenu = shop.hud.shop_menu
 	var lines: Array[String] = [
-		"Turnip x1: 12 coins each", "Copper Ore x2: 3 coins each", "Iron Ore x1: 5 coins each", "Gold Ore x1: 10 coins each",
-		"Crystal x1: 15 coins each", "Copper Bar x1: 12 coins each", "Iron Bar x1: 20 coins each", "Gold Bar x1: 36 coins each"]
+		"Turnip x1: 12 coins each", "Copper Ore x2: 2 coins each", "Iron Ore x1: 3 coins each", "Gold Ore x1: 7 coins each",
+		"Crystal x1: 10 coins each", "Copper Bar x1: 8 coins each", "Iron Bar x1: 12 coins each", "Gold Bar x1: 25 coins each"]
 	assert_int(counter.entries().size()).override_failure_message("the turnip and seven things from the quarry: no stone, coal or wood").is_equal(lines.size())
 	assert_array(Array(counter.shown_lines())).is_equal(["> " + lines[0], "  " + lines[1], "  " + lines[2], "  " + lines[3], "  " + lines[4]])
 	assert_str((counter.get_node(^"Panel/Count") as Label).text).is_equal("  1/8 v")
@@ -203,13 +203,13 @@ func test_ore_bars_and_crystals_are_sold_beside_the_crops() -> void:
 		counter.move_cursor(1)
 		assert_bool(Array(counter.shown_lines()).has("> " + lines[i])).override_failure_message("the cursor on '%s' is in view" % lines[i]).is_true()
 	counter.move_cursor(2)
-	assert_bool(Array(counter.shown_lines()).has("> Copper Ore x2: 3 coins each")).override_failure_message("past the end and round to the second line").is_true()
-	# One ore: three coins, and one fewer on its line.
+	assert_bool(Array(counter.shown_lines()).has("> Copper Ore x2: 2 coins each")).override_failure_message("past the end and round to the second line").is_true()
+	# One ore: two coins, and one fewer on its line.
 	assert_bool(counter.confirm()).is_true()
 	assert_int(GameState.item_count(&"copper_ore")).is_equal(1)
-	assert_int(GameState.item_count(&"coin")).is_equal(3)
-	assert_str(counter.note_text()).is_equal("Sold: Copper Ore, for 3 coins.")
-	assert_bool(Array(counter.shown_lines()).has("> Copper Ore x1: 3 coins each")).is_true()
+	assert_int(GameState.item_count(&"coin")).is_equal(2)
+	assert_str(counter.note_text()).is_equal("Sold: Copper Ore, for 2 coins.")
+	assert_bool(Array(counter.shown_lines()).has("> Copper Ore x1: 2 coins each")).is_true()
 	# Everything she buys, sold: the plan's prices.
 	counter.move_cursor(-1)
 	var sold: int = 1
@@ -217,7 +217,7 @@ func test_ore_bars_and_crystals_are_sold_beside_the_crops() -> void:
 		assert_bool(counter.confirm()).is_true()
 		sold += 1
 	assert_int(sold).override_failure_message("nine things, one at a time").is_equal(9)
-	assert_int(GameState.item_count(&"coin")).override_failure_message("12 + 3 + 3 + 5 + 10 + 15 + 12 + 20 + 36").is_equal(116)
+	assert_int(GameState.item_count(&"coin")).override_failure_message("12 + 2 + 2 + 3 + 7 + 10 + 8 + 12 + 25").is_equal(81)
 	assert_array(Array(counter.shown_lines())).is_equal([ShopMenu.NOTHING_TO_SELL])
 	for kept: Array in [[&"stone", 3], [&"coal", 2], [&"wood", 2]]:
 		assert_int(GameState.item_count(kept[0])).override_failure_message("she bought no %s" % kept[0]).is_equal(kept[1])
@@ -234,14 +234,14 @@ func test_a_full_purse_keeps_the_ore_too() -> void:
 	var shop: AreaController = _load(SHOP)
 	shop.open_shop(&"tilda", Shop.SELL)
 	var counter: ShopMenu = shop.hud.shop_menu
-	assert_array(Array(counter.shown_lines())).is_equal(["> Copper Ore x4: 3 coins each", "  Gold Bar x1: 36 coins each"])
+	assert_array(Array(counter.shown_lines())).is_equal(["> Copper Ore x4: 2 coins each", "  Gold Bar x1: 25 coins each"])
 	counter.move_cursor(1)
-	assert_bool(counter.confirm()).override_failure_message("990 and 36 are more than a purse holds").is_false()
+	assert_bool(counter.confirm()).override_failure_message("990 and 25 are more than a purse holds").is_false()
 	assert_str(counter.note_text()).is_equal(Shop.FULL_PURSE)
 	assert_int(GameState.item_count(&"gold_bar")).is_equal(1)
 	counter.move_cursor(-1)
-	assert_bool(counter.confirm()).override_failure_message("three coins still fit").is_true()
-	assert_int(GameState.item_count(&"coin")).is_equal(993)
+	assert_bool(counter.confirm()).override_failure_message("two coins still fit").is_true()
+	assert_int(GameState.item_count(&"coin")).is_equal(992)
 
 
 func test_a_full_purse_keeps_the_crop() -> void:

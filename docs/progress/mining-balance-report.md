@@ -1,8 +1,8 @@
 # Eight days played: the quarry beside the plot
 
-The report of phase 3b of mining and crafting (`docs/progress/mining-crafting-plan.md`). **No price and no
-count has been changed.** The last section says which numbers I would change; the tuning waits for the
-user's word.
+The report of phase 3b of mining and crafting (`docs/progress/mining-crafting-plan.md`). **Everything below was measured at the first numbers.** The last section says which I would change. The
+user took all three proposals on 2026-11-17 ("All three"), and they are in the data now. The two under
+"Worth a thought" were not asked for and are as they were. The eight days have not been played again.
 
 ## How it was played
 

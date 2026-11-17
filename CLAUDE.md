@@ -43,9 +43,10 @@ sprinkler on the plot have been played only by the tests (`tools/playtest.gd -- 
 **Phase 3, balance, is built (2026-11-17):** Tilda buys ore, bars and crystals; Wenna and Shepherd
 Edda each ask a favour at three marks; and a script played eight days by pressing real keys
 (`tools/play_days.gd`), with a report of what each day cost and paid
-(`docs/progress/mining-balance-report.md`). **No price or count has been tuned:** the report proposes
-numbers, and they are changed only on the user's word, in data, with the tests that carry them. The
-plan's "done when" waits on that word. Nothing further is planned: ask before building more.
+(`docs/progress/mining-balance-report.md`). **The numbers were settled the same day** (the user:
+"All three"): a third off what Tilda pays for ore, bars and crystals; a rock of ore is 1 point of
+Mining and a plain rock none; two coal rocks a floor on floors 4 to 6. The eight days have not been
+played again with them. The plan is finished. Nothing further is planned: ask before building more.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -450,8 +451,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
 - **The balance pass (2026-11-17; `docs/progress/mining-crafting-plan.md` phase 3, TECH_DESIGN §21, §25, §29):**
   - **A shop's data may list what it buys besides crops** (`buys`: an item and what is paid for one).
     `Shop.offers()` lists the harvest first, then `buys` in its own order; `Shop.bought_things()` is the
-    list as read. Tilda pays 3, 5 and 10 for copper, iron and gold ore, 15 for a crystal, and 12, 20 and
-    36 for the bars; stone, wood and coal are not bought. **A new thing to buy is a line of data.**
+    list as read. Tilda pays 2, 3 and 7 for copper, iron and gold ore, 10 for a crystal, and 8, 12 and
+    25 for the bars (a bar is worth more than its three ore: a test holds that); stone, wood and coal are not bought. **A new thing to buy is a line of data.**
   - **Tilda's answer reads "I have things to sell."** (not "crops"), and a test that sells ore opens
     her list with `open_shop(&"tilda", Shop.SELL)`: the lines are "Copper Ore x2: 3 coins each".
   - **There are eleven quests.** A test that lists them, counts the quest log's lines, or reads the
@@ -466,5 +467,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     sets `Engine.time_scale` back to 1 after every hit's freeze, so a tool that runs the game faster
     says its speed again each step, and takes more steps a second (`Engine.physics_ticks_per_second`)
     rather than longer ones.
-  - **Do not** change a price, a count or a skill's numbers for balance without the user's word: the
-    report lists what is proposed.
+  - **Mining's points:** a rock of ore (coal too) is 1, a plain rock none: `rock` is not in the
+    skill's `gains`. **A test that wants Mining to rise breaks rocks of ore,** or sets
+    `GameState.skill_points[Skills.MINING]`. Twenty-five rocks of ore are level 3.
+  - **Floors 4, 5 and 6 have 3 iron and 2 coal rocks each** (they had 4 coal until the tuning).
+  - **Do not** change a price, a count or a skill's numbers for balance without the user's word.

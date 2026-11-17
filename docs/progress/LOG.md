@@ -2540,3 +2540,21 @@ The third of three phases of mining and crafting (`docs/progress/mining-crafting
 - **The script's first run at life's speed was thrown away:** a change to day 4 had him count the plot's empty cells from his cottage, and he bought no seed. Found in the log, fixed, and played again from the start.
 - **`tools/play_days.gd` is long** (two thousand lines), and has no tests of its own: its test is that it plays.
 - **Two warts met on the way, not touched:** the HUD's "Carrying" line is cut off all week, and the engine's time scale is set back to 1 after every hit's freeze, which a tool that runs the game faster has to undo each step.
+
+## 2026-11-17 — Balance: the numbers settled (the user: "All three")
+
+Shown the report and its three proposals, the user took all three. Each is a change to data and to the tests that carry it; no code changed.
+
+**Changed**
+- **What Tilda pays, a third off:** copper ore 3 to 2, iron ore 5 to 3, gold ore 10 to 7, a crystal 15 to 10, a copper bar 12 to 8, an iron bar 20 to 12, a gold bar 36 to 25. A bar is still worth more than its three ore.
+- **Mining's points:** a rock of ore or coal 2 to 1, a plain rock 1 to none.
+- **Coal on floors 4, 5 and 6:** 4 rocks a floor to 2.
+
+**Verified**
+- **935 tests in 123 suites pass.** Six tests carried the old numbers and were brought up to date: Tilda's prices in the pure class and at her counter, the floors' ore, a point for ore and none for stone, the blow that raises his Mining (now a rock of ore), and the crafting chain (twenty-five rocks of ore for Mining 3, where thirteen did).
+- **The player's own save was not touched.**
+
+**Known issues and limits**
+- **The eight days were not played again with the new numbers.** By the report's own ore the days would have paid 53, 69 and 173 coins where they paid 83, 109 and 261. What the slower skill and the scarcer coal do to a week is worked out, not played.
+- **With 2 coal a floor a day on floors 4 to 6 gives 6 or 7,** against 5 a night in the furnace: enough, with little to spare for Wenna's five.
+- **Not asked for and unchanged:** the Iron Pickaxe's gate (Mining 3) and the furnace's five bars a night.

@@ -36,8 +36,8 @@ func test_mining_is_a_fourth_skill_with_the_others_levels() -> void:
 	var skills: Skills = GameState.skills()
 	assert_array(skills.ids()).is_equal([Skills.COMBAT, Skills.FARMING, Skills.COOKING, Skills.MINING])
 	assert_str(skills.name_of(Skills.MINING)).is_equal("Mining")
-	assert_int(skills.gain(Skills.MINING, Skills.ROCK)).override_failure_message("a plain rock").is_equal(1)
-	assert_int(skills.gain(Skills.MINING, Skills.ORE)).override_failure_message("a rock of ore").is_equal(2)
+	assert_int(skills.gain(Skills.MINING, Skills.ROCK)).override_failure_message("a plain rock is no practice").is_equal(0)
+	assert_int(skills.gain(Skills.MINING, Skills.ORE)).override_failure_message("a rock of ore").is_equal(1)
 	assert_bool(skills.eases(Skills.MINING, EnergyRules.MINE)).is_true()
 	for other: String in [EnergyRules.SWING, EnergyRules.HOE, EnergyRules.WATER, EnergyRules.SPRINT]:
 		assert_bool(skills.eases(Skills.MINING, other)).override_failure_message("it eases the pickaxe, not %s" % other).is_false()
@@ -77,34 +77,34 @@ func test_a_chance_that_cant_be_used_says_why() -> void:
 		assert_array(Array(Skills.problems(rules, EnergyRules.COSTS))).override_failure_message("%s" % [bad]).contains([words])
 
 
-func test_breaking_rocks_is_practice_a_point_for_stone_and_two_for_ore() -> void:
+func test_breaking_rocks_is_practice_a_point_for_ore_and_none_for_stone() -> void:
 	var floor: AreaController = _floor(1)
 	floor.roll_extra_ore = func() -> float: return 0.99
 	_break(floor, _rock_of(floor, MineRules.STONE))
-	assert_int(int(GameState.skill_points.get(Skills.MINING, 0))).is_equal(1)
+	assert_int(int(GameState.skill_points.get(Skills.MINING, 0))).override_failure_message("a plain rock is no practice").is_equal(0)
 	_break(floor, _rock_of(floor, &"copper_ore"))
-	assert_int(int(GameState.skill_points.get(Skills.MINING, 0))).is_equal(3)
-	# The rock over the ladder is a plain rock like any other.
+	assert_int(int(GameState.skill_points.get(Skills.MINING, 0))).is_equal(1)
+	# The rock over the ladder is a plain rock like any other: no practice.
 	_break(floor, _rock_at(floor, floor.ladder_cell()))
-	assert_int(int(GameState.skill_points.get(Skills.MINING, 0))).is_equal(4)
+	assert_int(int(GameState.skill_points.get(Skills.MINING, 0))).is_equal(1)
 	assert_float(GameState.energy).override_failure_message("six blows at the first level's price").is_equal(88.0)
 	assert_bool(_risen.is_empty()).is_true()
 	# A blow that doesn't break a rock is no practice.
 	var half: Rock = _rock_of(floor, MineRules.STONE)
 	_face(floor, half)
 	assert_bool(floor.use_item()).is_true()
-	assert_int(int(GameState.skill_points.get(Skills.MINING, 0))).is_equal(4)
+	assert_int(int(GameState.skill_points.get(Skills.MINING, 0))).is_equal(1)
 
 
 func test_the_blow_that_raises_his_mining_pays_the_old_price_and_the_next_the_new() -> void:
 	GameState.skill_points[Skills.MINING] = 9
 	var floor: AreaController = _floor(1)
 	floor.roll_extra_ore = func() -> float: return 0.99
-	_break(floor, _rock_of(floor, MineRules.STONE))
+	_break(floor, _rock_of(floor, &"copper_ore"))
 	assert_float(GameState.energy).override_failure_message("two blows at 2").is_equal(96.0)
 	assert_array(_risen).is_equal([[Skills.MINING, 2]])
 	assert_array(Array(floor.hud.notice_lines())).contains([GameState.skills().risen_words(Skills.MINING, 2)])
-	_break(floor, _rock_of(floor, MineRules.STONE))
+	_break(floor, _rock_of(floor, &"copper_ore"))
 	assert_float(GameState.energy).override_failure_message("then two at 1.8").is_equal_approx(92.4, 0.0001)
 	# His hearts, his sword and his speed are as they were.
 	assert_int(GameState.health).is_equal(GameState.max_health())

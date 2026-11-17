@@ -43,8 +43,8 @@ func test_everything_on_the_list_is_made_from_what_the_mine_and_the_fields_give(
 	for item: Array in [[&"hoe", 1], [&"watering_can", 1], [&"pickaxe", 1], [&"lantern", 1], [&"stone", 23], [&"copper_ore", 30],
 			[&"coal", 21], [&"iron_ore", 24], [&"gold_ore", 3], [&"crystal", 1], [&"wood", 12], [&"wheat", 8], [&"cherry_blossom", 3]]:
 		assert_int(GameState.add_item(item[0], item[1])).override_failure_message("%s fits in the pack" % item[0]).is_equal(item[1])
-	# The skills come from the work itself: thirteen rocks of ore, ten cells tilled.
-	for rock: int in 13:
+	# The skills come from the work itself: twenty-five rocks of ore, ten cells tilled.
+	for rock: int in 25:
 		GameState.practise(Skills.MINING, &"ore")
 	for cell: int in 10:
 		GameState.practise(Skills.FARMING, &"till")

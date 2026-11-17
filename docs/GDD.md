@@ -224,8 +224,8 @@ Enemies sometimes drop hearts or coins.
 - **Coins** drop from enemies, grass and pots, and come from selling crops and what the quarry gives.
 - **Tilda's shop** has a list to buy from and a list to sell on, opened from her conversation. She sells ten
   arrows (5 coins), three bombs (8), a loaf of bread (6), and a seed of each crop at its price (§7). She buys
-  what the crops give, one at a time, at each crop's price, and what the quarry gives (§14): copper ore (3
-  coins), iron ore (5), gold ore (10), a crystal (15), and a copper, iron or gold bar (12, 20, 36). Nothing
+  what the crops give, one at a time, at each crop's price, and what the quarry gives (§14): copper ore (2
+  coins), iron ore (3), gold ore (7), a crystal (10), and a copper, iron or gold bar (8, 12, 25). Nothing
   else: not stone, wood or coal. The list stays open for as many
   deals as he likes and says why one can't be made: not enough coins, no room to carry it, a full purse. She
   is open from 08:00 to 18:00 (§6).
@@ -339,7 +339,7 @@ beyond the hero's home and plot.
 - **The clock runs** in the quarry, unlike in the keep and the crypt: a day spent mining is a day gone.
 - **A fall** in the quarry ends in the entrance hall, whole, with what he carries.
 - **A heart piece** is walled in by rocks on the last floor.
-- **Mining** is a fourth skill: a point for a plain rock, two for a rock of ore. Each level takes a tenth
+- **Mining** is a fourth skill: a point for a rock of ore or coal, none for a plain rock. Each level takes a tenth
   off the energy of a blow, and adds a twentieth to the chance that a rock of ore leaves one more.
 - **What he can't carry stays lying:** stone stacks to 50, ores and coal to 30, crystals to 10.
 
@@ -378,11 +378,13 @@ beyond the hero's home and plot.
   Lantern lights 56.
 - **Materials** (stone, wood, ore, coal, bars, crystals) can't be eaten or given as gifts.
 
-**Balance** *(2026-11-17; the numbers are first guesses until the user settles them)*
+**Balance** *(2026-11-17; the numbers were settled with the user the same day)*
 - **Tilda buys** ore, bars and crystals at the prices in §10. Three ore and a coal make a bar, and a bar
   sells for more than its three ore. Stone, wood and coal are not bought.
 - **Two favours** want what the quarry gives: Wenna's five coal and Shepherd Edda's two iron bars (§10).
 - **Eight days were played** by a script that presses real keys, from a new game, with days on the plot
   and days in the quarry. What each day cost and paid, set beside the plan's first guesses, and the
-  numbers proposed for changing are in `docs/progress/mining-balance-report.md`. No price or count has
-  been changed.
+  numbers proposed for changing are in `docs/progress/mining-balance-report.md`.
+- **Tuned on the user's word:** Tilda pays a third less than first set (the prices in §10 are the new
+  ones); Mining rises by a point for a rock of ore and none for a plain rock (it had been two and one,
+  and reached its top level on the second day); floors 4 to 6 have two coal rocks each, not four.

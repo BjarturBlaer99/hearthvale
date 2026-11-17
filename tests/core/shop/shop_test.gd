@@ -56,26 +56,26 @@ func test_tilda_buys_what_the_crops_give_and_nothing_else() -> void:
 func test_tilda_buys_ore_bars_and_crystals_at_her_own_prices_after_the_crops() -> void:
 	# The plan's prices (docs/progress/mining-crafting-plan.md, "Items"), in her data's order.
 	assert_array(Shop.bought_things(_tilda)).is_equal([
-		{"item": "copper_ore", "price": 3},
-		{"item": "iron_ore", "price": 5},
-		{"item": "gold_ore", "price": 10},
-		{"item": "crystal", "price": 15},
-		{"item": "copper_bar", "price": 12},
-		{"item": "iron_bar", "price": 20},
-		{"item": "gold_bar", "price": 36},
+		{"item": "copper_ore", "price": 2},
+		{"item": "iron_ore", "price": 3},
+		{"item": "gold_ore", "price": 7},
+		{"item": "crystal", "price": 10},
+		{"item": "copper_bar", "price": 8},
+		{"item": "iron_bar", "price": 12},
+		{"item": "gold_bar", "price": 25},
 	])
 	var pack: Array = [{"id": &"gold_bar", "count": 1}, {"id": &"coal", "count": 9}, {"id": &"copper_ore", "count": 12}, {"id": &"stone", "count": 30},
 		{"id": &"wood", "count": 4}, {"id": &"turnip", "count": 2}, {"id": &"crystal", "count": 3}, {"id": &"iron_bar", "count": 2},
 		{"id": &"iron_ore", "count": 5}, {"id": &"gold_ore", "count": 1}, {"id": &"copper_bar", "count": 4}, {"id": &"pickaxe", "count": 1}]
 	assert_array(Shop.offers(_tilda, _crops, pack)).override_failure_message("the harvest first, then her own list in its order: no stone, wood or coal").is_equal([
 		{"item": "turnip", "count": 2, "price": 12},
-		{"item": "copper_ore", "count": 12, "price": 3},
-		{"item": "iron_ore", "count": 5, "price": 5},
-		{"item": "gold_ore", "count": 1, "price": 10},
-		{"item": "crystal", "count": 3, "price": 15},
-		{"item": "copper_bar", "count": 4, "price": 12},
-		{"item": "iron_bar", "count": 2, "price": 20},
-		{"item": "gold_bar", "count": 1, "price": 36},
+		{"item": "copper_ore", "count": 12, "price": 2},
+		{"item": "iron_ore", "count": 5, "price": 3},
+		{"item": "gold_ore", "count": 1, "price": 7},
+		{"item": "crystal", "count": 3, "price": 10},
+		{"item": "copper_bar", "count": 4, "price": 8},
+		{"item": "iron_bar", "count": 2, "price": 12},
+		{"item": "gold_bar", "count": 1, "price": 25},
 	])
 	assert_array(Shop.offers(_tilda, _crops, [{"id": &"stone", "count": 50}, {"id": &"wood", "count": 30}, {"id": &"coal", "count": 30}])).override_failure_message("stone, wood and coal are not bought").is_empty()
 	assert_array(Shop.offers(_tilda, _crops, [{"id": &"iron_ore", "count": 0}])).override_failure_message("no ore he hasn't got").is_empty()
@@ -95,7 +95,7 @@ func test_a_new_thing_to_buy_is_a_line_of_data() -> void:
 	var with_stone: Dictionary = _tilda.duplicate(true)
 	(with_stone["buys"] as Array).push_front({"item": "stone", "price": 1})
 	assert_array(Shop.offers(with_stone, _crops, ore)).is_equal([
-		{"item": "turnip", "count": 1, "price": 12}, {"item": "stone", "count": 7, "price": 1}, {"item": "copper_ore", "count": 2, "price": 3}])
+		{"item": "turnip", "count": 1, "price": 12}, {"item": "stone", "count": 7, "price": 1}, {"item": "copper_ore", "count": 2, "price": 2}])
 	# A shop may buy only what it lists, only crops, or nothing.
 	assert_array(Shop.offers({"sells": [], "buys": [{"item": "stone", "price": 2}]}, _crops, ore)).override_failure_message("no crops at this one").is_equal([{"item": "stone", "count": 7, "price": 2}])
 	assert_array(Shop.offers({"sells": [], "buys_crops": true}, _crops, ore)).is_equal([{"item": "turnip", "count": 1, "price": 12}])

@@ -1078,3 +1078,9 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the tool says its speed again each step. The report's run is at life's own speed.
 - 2026-11-17 — **No price and no count was changed in phase 3.** The report proposes numbers; they are
   changed only on the user's word, in data, with the tests that carry them.
+- 2026-11-17 — **Phase 3's numbers were settled by the user: all three of the report's proposals.**
+  Tilda pays a third less for what the quarry gives (2, 3, 7 for the ores, 10 for a crystal, 8, 12, 25
+  for the bars). A rock of ore or coal is 1 point of Mining and a plain rock none: `rock` was taken out
+  of the skill's `gains`, since a deed there must be worth a whole point or more. Floors 4, 5 and 6 have
+  2 coal rocks each. The Iron Pickaxe's gate and the furnace's five bars were raised in the report as
+  the user's to call, were not asked for, and are unchanged.

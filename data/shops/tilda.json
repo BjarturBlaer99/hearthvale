@@ -10,12 +10,12 @@
 	"sells_seeds": true,
 	"buys_crops": true,
 	"buys": [
-		{ "item": "copper_ore", "price": 3 },
-		{ "item": "iron_ore", "price": 5 },
-		{ "item": "gold_ore", "price": 10 },
-		{ "item": "crystal", "price": 15 },
-		{ "item": "copper_bar", "price": 12 },
-		{ "item": "iron_bar", "price": 20 },
-		{ "item": "gold_bar", "price": 36 }
+		{ "item": "copper_ore", "price": 2 },
+		{ "item": "iron_ore", "price": 3 },
+		{ "item": "gold_ore", "price": 7 },
+		{ "item": "crystal", "price": 10 },
+		{ "item": "copper_bar", "price": 8 },
+		{ "item": "iron_bar", "price": 12 },
+		{ "item": "gold_bar", "price": 25 }
 	]
 }

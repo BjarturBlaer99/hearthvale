@@ -4,7 +4,7 @@ The user's request, 2026-11-17: the Old Quarry (a mine of nine floors), a Pickax
 crafting at home (a furnace, a workbench, a chest, sprinklers, tool upgrades), in phases with a stop after
 each. This is phase 0: the plan, and no code.
 
-**Status: approved as written on 2026-11-17. Phase 1 (mining), phase 2 (crafting) and phase 3 (balance) are built (2026-11-17). Phase 3's numbers are not settled: the report proposes them (`mining-balance-report.md`), and nothing is tuned until the user says which.**
+**Status: approved as written on 2026-11-17. Phase 1 (mining), phase 2 (crafting) and phase 3 (balance) are built (2026-11-17). Phase 3's numbers were settled with the user the same day: all three of the report's proposals (`mining-balance-report.md`). The tables below are as approved; what changed is listed under Phase 3.**
 
 ## Sixteen things to decide
 
@@ -340,8 +340,13 @@ this table.*
   story gives it in the crypt, which eight days of plot and quarry don't reach.
 - **It did not play the two favours.** Three marks take about a week of gifts, and it gave none. They
   are covered by tests and shown in two pictures.
-- **Nothing has been tuned.** The report says what the days measured and which numbers it would change;
-  the tuning waits for the user's word.
+- **Tuned on the user's word** ("All three", 2026-11-17), in data:
+  - **Tilda pays a third less:** copper ore 2, iron ore 3, gold ore 7, a crystal 10, a copper bar 8, an
+    iron bar 12, a gold bar 25. (The items table above has the first prices: 3, 5, 10, 15, 12, 20, 36.)
+  - **Mining rises more slowly:** a rock of ore or coal is 1 point and a plain rock none. (It was 2 and
+    1, and the top level came on the second day.)
+  - **Floors 4, 5 and 6 have 2 coal rocks each,** not 4: 3 iron, 2 coal and 11 plain rocks a floor.
+  - **The eight days were not played again** with the new numbers.
 
 ## The save
 
@@ -405,12 +410,12 @@ and the write-up)*
   turns ore to bars overnight, the chest keeps its stacks through a save, and a sprinkler waters its four
   cells each morning; all tests pass.
 
-**Phase 3: balance** *(built 2026-11-17, in two commits and a third for the write-up; the tuning waits)*
+**Phase 3: balance** *(built 2026-11-17, in two commits, a third for the write-up and a fourth for the tuning)*
 - [x] 3a. Tilda buys; the two favours.
 - [x] 3b. The eight days played, and the report.
-- [ ] 3b. The tuning: in data, on the user's word, with the tests that carry the numbers.
-- **Done when** the report is in hand, the numbers are settled with the user, and all tests pass. *The
-  report is in hand and all tests pass; the numbers are not settled yet.*
+- [x] 3b. The tuning: in data, on the user's word, with the tests that carry the numbers.
+- **Done when** the report is in hand, the numbers are settled with the user, and all tests pass. *Met
+  on 2026-11-17.*
 
 **The last word is the user's:**
 - [x] *(yours)* the Pickaxe and a floor of rocks feel right (the user, 2026-11-17: "Feels right", after a
