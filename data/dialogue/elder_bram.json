@@ -54,7 +54,7 @@
   "nodes": {
     "welcome": {
       "speaker": "bram",
-      "text": "So you are the one who has taken the old cottage. Welcome to Hearthvale. It is the thatched house at the west end of the lane, and the plot by the well is yours.",
+      "text": "So you are the one the old farmstead was left to. Welcome to Hearthvale. It lies out the west lane, past the last cottage: run down and overgrown, but the house stands and the soil is good.",
       "options": [
         {
           "text": "What should I do first?",
@@ -345,7 +345,7 @@
     },
     "favour_tale": {
       "speaker": "bram",
-      "text": "They say the cottage you sleep in was his. He left it for whoever would look after the valley. I think it has found its keeper.",
+      "text": "They say the farm you keep was his. He left it for whoever would look after the valley. I think it has found its keeper.",
       "options": [
         {
           "text": "Goodbye.",

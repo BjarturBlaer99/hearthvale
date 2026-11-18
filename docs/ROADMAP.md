@@ -272,6 +272,19 @@ three phases with a stop after each:
   pays, a slower Mining skill, and half the coal on floors 4 to 6. The days have not been played again
   with the new numbers.
 
+## After the roadmap: the Homestead
+At the user's request of 2026-11-17 (`docs/progress/homestead-request.md`; the plan,
+`docs/progress/homestead-plan.md`, approved as written), a farm of the hero's own west of the village, in
+five phases with a stop after each:
+- **Phase 1 — The homestead and the home's move.** *Built 2026-11-18, in three steps.*
+  - **1a, the move:** the lane's west end opened, the farm's map (40 by 30), the farmhouse as the hero's
+    home (the same room the cottage was), the old cottage locked, the field of 12 by 6 with the old plot
+    as its clear corner, a pond, save version 6, and the story's words.
+- **Phase 2 — Placing things.** *Not built.* Build mode and fifteen things to set down.
+- **Phase 3 — Buildings.** *Not built.* A Well, a Silo, a Coop, a Barn and a Shed.
+- **Phase 4 — Animals.** *Not built.* Chickens, sheep and cows.
+- **Phase 5 — Balance.** *Not built.* Two favours, ten days played, and the numbers settled.
+
 ---
 
 ## Later (not in phase 2)

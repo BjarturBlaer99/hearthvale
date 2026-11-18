@@ -14,7 +14,7 @@
 [node name="Home" type="Node2D" unique_id=909247244]
 script = ExtResource("1_area")
 area_id = &"home"
-area_name = "Your cottage"
+area_name = "Your farmhouse"
 music = &"village"
 
 [node name="Height" type="TileMapLayer" parent="." unique_id=746255457]
@@ -39,8 +39,8 @@ script = ExtResource("p2d_hearth")
 [node name="Doormat" type="Node2D" parent="Interactables" unique_id=1207237581]
 position = Vector2(80, 128)
 script = ExtResource("6_exit")
-target_area = &"village"
-target_entry = &"home_door"
+target_area = &"homestead"
+target_entry = &"farmhouse_door"
 
 [node name="Bed" type="Node2D" parent="Interactables" unique_id=1511607315]
 position = Vector2(16, 48)

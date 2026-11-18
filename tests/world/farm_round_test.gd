@@ -1,16 +1,19 @@
 extends GdUnitTestSuite
 ## The whole round (P3's "done when", docs/ROADMAP.md): a crop is planted, raised, harvested,
-## eaten, cooked and sold, as a player does it: the tools and the first seeds from the cottage,
+## eaten, cooked and sold, as a player does it: the tools and the first seeds from the farmhouse,
 ## the plot worked with the left click, the turnips picked with the right, one eaten raw, one
 ## roasted at the hearth, two sold to Tilda, and her coins spent on seeds for the next round.
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
 const HOME: String = "res://world/areas/home/home.tscn"
-const VILLAGE: String = "res://world/areas/village/village.tscn"
+const FARM: String = "res://world/areas/homestead/homestead.tscn"
 const SHOP: String = "res://world/areas/shop/shop.tscn"
 const FRAME: float = 1.0 / 60.0
-const PLOT: Vector2i = Vector2i(12, 18)
+## The field's north-west corner on the homestead (its clear corner is worked here), and the
+## pond's west bank.
+const PLOT: Vector2i = Vector2i(22, 17)
+const POND_BANK: Vector2i = Vector2i(3, 22)
 const TEST_SLOT: int = 980
 
 var _area: Node
@@ -43,38 +46,38 @@ func test_a_crop_is_planted_raised_harvested_eaten_cooked_and_sold() -> void:
 	assert_int(GameState.item_count(&"coin")).override_failure_message("he starts with nothing in his purse").is_equal(0)
 
 	# The plot: five cells tilled and planted with the left click.
-	var village: AreaController = _load(VILLAGE)
+	var farm: AreaController = _load(FARM)
 	for x: int in 5:
-		_face(village, Vector2i(x, 0))
+		_face(farm, Vector2i(x, 0))
 		GameState.equip(&"hoe")
-		assert_bool(village.use_hand()).override_failure_message("tilling").is_true()
-		_rest(village)
+		assert_bool(farm.use_hand()).override_failure_message("tilling").is_true()
+		_rest(farm)
 		GameState.equip(&"turnip_seeds")
-		assert_bool(village.use_hand()).override_failure_message("planting").is_true()
-		_rest(village)
+		assert_bool(farm.use_hand()).override_failure_message("planting").is_true()
+		_rest(farm)
 	assert_int(GameState.item_count(&"turnip_seeds")).is_equal(0)
 	assert_int(GameState.farm().crop_count()).is_equal(5)
 
-	# Three days: the can filled at the well, every seed watered, and a night's sleep.
+	# Three days: the can filled at the pond, every seed watered, and a night's sleep.
 	GameState.equip(&"watering_can")
 	for day: int in 3:
 		assert_bool(GameState.is_crop_ripe(Vector2i(0, 0))).override_failure_message("not ripe before its third morning").is_false()
 		if GameState.item_count(&"water") < 5:
-			village.player.motor.place(PLOT + Vector2i(5, 1))
-			village.player.face(Vector2.RIGHT)
-			assert_bool(village.use_hand()).override_failure_message("filling the can at the well").is_true()
-			_rest(village)
+			farm.player.motor.place(POND_BANK)
+			farm.player.face(Vector2.RIGHT)
+			assert_bool(farm.use_hand()).override_failure_message("filling the can at the pond").is_true()
+			_rest(farm)
 		for x: int in 5:
-			_face(village, Vector2i(x, 0))
-			assert_bool(village.use_hand()).override_failure_message("watering on day %d" % (day + 1)).is_true()
-			_rest(village)
+			_face(farm, Vector2i(x, 0))
+			assert_bool(farm.use_hand()).override_failure_message("watering on day %d" % (day + 1)).is_true()
+			_rest(farm)
 		GameState.start_next_day()
 	assert_int(GameState.day).is_equal(4)
 
 	# The harvest: five turnips picked with the right click.
 	for x: int in 5:
-		_face(village, Vector2i(x, 0))
-		assert_bool(village.interact()).override_failure_message("picking turnip %d" % x).is_true()
+		_face(farm, Vector2i(x, 0))
+		assert_bool(farm.interact()).override_failure_message("picking turnip %d" % x).is_true()
 	assert_int(GameState.item_count(&"turnip")).is_equal(5)
 	assert_int(GameState.farm().crop_count()).is_equal(0)
 	assert_float(GameState.energy).override_failure_message("ten for the hoe and fifteen for the can, and nothing for planting or picking").is_equal(75.0)

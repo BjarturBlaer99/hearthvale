@@ -45,7 +45,7 @@ offset_top = 92.0
 offset_bottom = 104.0
 theme_override_colors/font_color = Color(0.95, 0.92, 0.85, 1)
 theme_override_font_sizes/font_size = 8
-text = "A cottage, a plot of soil, and lights over the old keep."
+text = "An old farm, a field gone wild, and lights over the old keep."
 horizontal_alignment = 1
 
 [node name="Menu" type="ColorRect" parent="."]

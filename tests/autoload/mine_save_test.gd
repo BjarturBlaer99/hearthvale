@@ -20,7 +20,7 @@ func after_test() -> void:
 
 
 func test_every_new_game_s_mine_rolls_its_own_way() -> void:
-	assert_int(GameState.SAVE_VERSION).is_equal(5)
+	assert_int(GameState.SAVE_VERSION).is_equal(6)
 	var numbers: Dictionary = {}
 	for game: int in 6:
 		GameState.clear()
@@ -75,7 +75,7 @@ func test_the_mine_goes_through_a_save() -> void:
 	GameState.update_player(&"quarry_4", Vector2i(8, 1))
 	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
 	var on_disk: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveSystem.slot_path(TEST_SLOT)))
-	assert_int(int(on_disk["version"])).is_equal(5)
+	assert_int(int(on_disk["version"])).is_equal(6)
 	assert_dict(on_disk["mine"]).is_equal({"number": 424242.0, "day": 2.0, "broken": {"quarry_1": ["3,4", "7,2"], "quarry_4": ["9,9"]}})
 	var before: String = JSON.stringify(GameState.to_dict(), "", true)
 	GameState.clear()
@@ -109,7 +109,7 @@ func test_a_version_4_save_loads_with_all_it_had_and_a_whole_mine() -> void:
 
 	# The step by itself: it adds the mine and touches nothing else.
 	var migrated: Dictionary = SaveSystem.migrate(old, 4)
-	assert_int(int(migrated["version"])).is_equal(5)
+	assert_int(int(migrated["version"])).is_equal(6)
 	assert_dict(migrated["mine"]["broken"]).is_empty()
 	assert_int(int(migrated["mine"]["day"])).is_equal(0)
 	assert_int(typeof(migrated["mine"]["number"])).is_equal(TYPE_INT)
@@ -144,10 +144,10 @@ func test_a_version_4_save_loads_with_all_it_had_and_a_whole_mine() -> void:
 		assert_bool(GameState.get_flag(MineRules.lift_flag(floor)) == true).override_failure_message("the lift has been nowhere").is_false()
 	assert_bool(GameState.get_flag(&"took_quarry_heart_piece") == true).is_false()
 
-	# Saved again, it is a version 5 save, and loads back the same.
+	# Saved again, it is a save of today's version, and loads back the same.
 	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
 	var again: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveSystem.slot_path(TEST_SLOT)))
-	assert_int(int(again["version"])).is_equal(5)
+	assert_int(int(again["version"])).is_equal(6)
 	assert_dict(again["farm"]).is_equal(old["farm"])
 	var before: String = JSON.stringify(GameState.to_dict(), "", true)
 	assert_int(SaveSystem.load_from_slot(TEST_SLOT)).is_equal(OK)
@@ -158,7 +158,7 @@ func test_versions_1_to_3_still_load_and_come_out_with_a_mine() -> void:
 	for file: String in ["v1_playtest.json", "v1_finished.json", "v2_third_day.json", "v3_in_the_keep.json"]:
 		var old: Dictionary = _old_save(file)
 		var migrated: Dictionary = SaveSystem.migrate(old, int(old["version"]))
-		assert_int(int(migrated["version"])).override_failure_message(file).is_equal(5)
+		assert_int(int(migrated["version"])).override_failure_message(file).is_equal(6)
 		assert_dict(migrated["mine"]["broken"]).override_failure_message(file).is_empty()
 		assert_int(_load_old(file)).override_failure_message(file).is_equal(OK)
 		assert_bool(GameState.is_started()).is_true()

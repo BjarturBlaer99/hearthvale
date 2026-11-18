@@ -56,7 +56,7 @@ func test_a_new_game_has_the_main_quest_in_its_log_and_says_so() -> void:
 	village.hud.pause_menu.choose(PauseMenu.QUESTS)
 	var quest_log: QuestLog = village.hud.pause_menu.quest_log
 	assert_array(Array(quest_log.shown_lines())).is_equal(["> A Place of Your Own", "  Back"])
-	assert_str(quest_log.shown_detail()).contains("thatched house at the west end of the lane")
+	assert_str(quest_log.shown_detail()).contains("The old farmstead is yours now").contains("Follow the lane west out of Hearthvale").contains("farmhouse")
 	assert_str(quest_log.shown_detail()).contains("[ ] Take the hoe").contains("[ ] Take the watering can").contains("[ ] Take the seeds")
 	quest_log.close()
 	village.hud.pause_menu.resume()
@@ -73,7 +73,7 @@ func test_no_game_no_quest() -> void:
 
 
 func test_the_quest_follows_the_hero_through_his_first_day() -> void:
-	# The cottage: what lies inside the door.
+	# The farmhouse: what lies inside the door.
 	var home: AreaController = _load(HOME)
 	for found: String in ["Hoe", "WateringCan"]:
 		home.player.motor.place((home.interactables.get_node(NodePath(found)) as ItemPickup).cell())
@@ -83,14 +83,14 @@ func test_the_quest_follows_the_hero_through_his_first_day() -> void:
 	home.player.motor.place((home.interactables.get_node(^"TurnipSeeds") as ItemPickup).cell())
 	assert_bool(home.interact()).is_true()
 	assert_that(Quests.runner.stage(QUEST)).is_equal(&"plant")
-	assert_str(Quests.runner.journal(QUEST)).contains("by the well").contains("hoe").contains("wheel").contains("number key")
+	assert_str(Quests.runner.journal(QUEST)).contains("below the farmhouse").contains("one corner of it is clear").contains("hoe").contains("wheel").contains("number key")
 
 	# The plot: tilling is not yet planting.
 	GameState.till_soil(Vector2i(0, 0))
 	assert_that(Quests.runner.stage(QUEST)).is_equal(&"plant")
 	assert_bool(GameState.plant_crop(Vector2i(0, 0), &"turnip")).is_true()
 	assert_that(Quests.runner.stage(QUEST)).is_equal(&"bram")
-	assert_str(Quests.runner.journal(QUEST)).contains("Elder Bram").contains("blue-roofed").contains("Water it each morning")
+	assert_str(Quests.runner.journal(QUEST)).contains("Elder Bram").contains("blue-roofed").contains("Water it each morning").contains("the can fills at the pond")
 
 	# Elder Bram: refusing leaves the quest where it is; the promise moves it on.
 	var house: AreaController = _load(ELDER_HOUSE)
@@ -126,7 +126,7 @@ func test_elder_bram_welcomes_a_newcomer_and_speaks_of_the_keep_only_after_the_f
 	assert_bool(house.interact()).is_true()
 	assert_str(box.shown_name()).is_equal("Elder Bram")
 	assert_str(box.shown_text()).is_equal(str(nodes["welcome"]["text"]))
-	assert_str(box.shown_text()).contains("Welcome to Hearthvale").contains("thatched house").contains("plot by the well")
+	assert_str(box.shown_text()).contains("Welcome to Hearthvale").contains("the old farmstead was left to").contains("out the west lane").contains("the soil is good")
 	assert_array(Array(box.shown_options())).is_equal(["What should I do first?", "Goodbye."])
 	_say(house, "What should I do first?")
 	assert_str(box.shown_text()).contains("tools by your door").contains("seed").contains("Tilda").contains("first crop")
@@ -291,11 +291,20 @@ func test_the_quest_runs_to_the_end_of_the_story() -> void:
 	assert_that(Quests.runner.status(QUEST)).is_equal(QuestState.COMPLETE)
 	assert_str(Quests.runner.journal(QUEST)).contains("The Shade is gone")
 	assert_that((_announced.back() as Array)[1]).is_equal(&"completed")
-	# Every stage has words that fit the quest log's box: a few lines, and something to do.
+	# Every stage has words that fit the quest log's box, with its things to do under them: laid
+	# out by the log's own label, they end above its line of help. (Until the Homestead this
+	# was counted in letters, 150 at the most; the farm's words are longer and are measured.)
 	var quest: Dictionary = DataRegistry.get_quest(QUEST)
+	var quest_log: QuestLog = auto_free((load("res://ui/quest_log.tscn") as PackedScene).instantiate())
+	add_child(quest_log)
+	var detail: Label = quest_log.get_node(^"Panel/Detail")
+	var room: float = (quest_log.get_node(^"Panel/Help") as Label).position.y - detail.position.y
 	for stage_id: String in quest["stages"]:
 		var stage: Dictionary = quest["stages"][stage_id]
-		assert_int(str(stage["journal"]).length()).override_failure_message("'%s' is short enough for the log" % stage_id).is_less_equal(150)
+		detail.text = QuestLog.detail_text({"journal": stage["journal"], "objectives": stage.get("objectives", [])})
+		assert_int(detail.get_line_count()).override_failure_message("'%s' is laid out" % stage_id).is_greater(0)
+		assert_float(float(detail.get_line_count() * detail.get_line_height())).override_failure_message("'%s' fits the log: %d lines" % [stage_id, detail.get_line_count()]).is_less_equal(room)
+		assert_int(str(stage["journal"]).length()).override_failure_message("'%s' is a few lines, not a page" % stage_id).is_less_equal(200)
 		if stage_id != "done":
 			assert_int((stage["objectives"] as Array).size()).override_failure_message("'%s' has one to three things to do" % stage_id).is_between(1, 3)
 
@@ -341,11 +350,11 @@ func test_a_game_saved_before_the_gates_is_past_them() -> void:
 	assert_that(Quests.runner.stage(QUEST)).is_equal(&"crypt")
 
 
-func test_the_title_speaks_of_the_cottage_the_plot_and_the_keep() -> void:
+func test_the_title_speaks_of_the_farm_the_field_and_the_keep() -> void:
 	var title: TitleScreen = (load(TITLE) as PackedScene).instantiate()
 	get_tree().root.add_child(title)
 	_area = title
-	assert_str((title.get_node(^"Subtitle") as Label).text).is_equal("A cottage, a plot of soil, and lights over the old keep.")
+	assert_str((title.get_node(^"Subtitle") as Label).text).is_equal("An old farm, a field gone wild, and lights over the old keep.")
 
 
 ## Picks the answer that reads `text` in the open conversation.

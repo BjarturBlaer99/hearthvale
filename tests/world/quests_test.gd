@@ -164,7 +164,7 @@ func test_the_quest_log_shows_where_each_quest_stands() -> void:
 	var quest_log: QuestLog = menu.quest_log
 	# A game just begun has the main quest, and nothing else (P4a).
 	assert_array(Array(quest_log.shown_lines())).is_equal(["> A Place of Your Own", "  Back"])
-	assert_str(quest_log.shown_detail()).contains("Your cottage").contains("[ ] Take the hoe")
+	assert_str(quest_log.shown_detail()).contains("The old farmstead is yours now").contains("[ ] Take the hoe")
 	quest_log.close()
 	menu.resume()
 

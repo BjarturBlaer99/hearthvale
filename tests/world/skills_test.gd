@@ -7,13 +7,15 @@ extends GdUnitTestSuite
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
 const VILLAGE: String = "res://world/areas/village/village.tscn"
+const FARM: String = "res://world/areas/homestead/homestead.tscn"
 const HOME: String = "res://world/areas/home/home.tscn"
 const FIELD: String = "res://world/areas/south_field/south_field.tscn"
 const KEEP: String = "res://world/areas/keep/keep.tscn"
 const FRAME: float = 1.0 / 60.0
 const TEST_SLOT: int = 976
-## The plot's north-west corner in Hearthvale, and open grass well away from it.
-const PLOT: Vector2i = Vector2i(12, 18)
+## The field's north-west corner on the homestead (its first row is worked from the grass above
+## it), and open grass in Hearthvale.
+const PLOT: Vector2i = Vector2i(22, 17)
 const GRASS: Vector2i = Vector2i(23, 20)
 
 var _area: Node
@@ -99,21 +101,21 @@ func test_a_swing_and_a_shot_cost_less_as_combat_rises() -> void:
 func test_the_hoe_and_the_can_cost_less_as_farming_rises() -> void:
 	for item: Array in [[&"hoe", 1], [&"watering_can", 1], [&"water", 10]]:
 		GameState.add_item(item[0], item[1])
-	var village: AreaController = _load(VILLAGE)
+	var farm: AreaController = _load(FARM)
 	# [farming points before the stroke, the plot's column, what the hoe and the can cost]
 	var cases: Array = [[0, 0, 2.0, 1.0], [10, 1, 1.8, 0.9], [25, 2, 1.6, 0.8], [50, 3, 1.4, 0.7], [90, 4, 1.2, 0.6]]
 	for case: Array in cases:
 		GameState.skill_points[Skills.FARMING] = case[0]
 		GameState.set_energy(50.0)
-		_stand(village, PLOT + Vector2i(case[1], 3), Vector2.UP)
+		_stand(farm, PLOT + Vector2i(case[1], -1), Vector2.DOWN)
 		GameState.equip(&"hoe")
-		assert_bool(village.use_item()).override_failure_message("tilling at %d points" % case[0]).is_true()
+		assert_bool(farm.use_item()).override_failure_message("tilling at %d points" % case[0]).is_true()
 		assert_float(GameState.energy).override_failure_message("the hoe at %d points" % case[0]).is_equal_approx(50.0 - float(case[2]), 0.0001)
-		_rest(village)
+		_rest(farm)
 		GameState.equip(&"watering_can")
-		assert_bool(village.use_item()).override_failure_message("watering at %d points" % case[0]).is_true()
+		assert_bool(farm.use_item()).override_failure_message("watering at %d points" % case[0]).is_true()
 		assert_float(GameState.energy).override_failure_message("the can at %d points" % case[0]).is_equal_approx(50.0 - float(case[2]) - float(case[3]), 0.0001)
-		_rest(village)
+		_rest(farm)
 	assert_int(GameState.farm().count_of(Farm.WATERED)).is_equal(5)
 
 
@@ -121,18 +123,18 @@ func test_the_stroke_that_raises_farming_costs_the_old_price_and_is_said_once() 
 	GameState.add_item(&"hoe")
 	GameState.equip(&"hoe")
 	GameState.skill_points[Skills.FARMING] = 9
-	var village: AreaController = _load(VILLAGE)
+	var farm: AreaController = _load(FARM)
 	var hearts: int = GameState.health
-	_stand(village, PLOT + Vector2i(0, 3), Vector2.UP)
-	assert_str(village.hud.notice_text()).is_not_equal("Farming rose to level 2.")
-	assert_bool(village.use_item()).is_true()
+	_stand(farm, PLOT + Vector2i(0, -1), Vector2.DOWN)
+	assert_str(farm.hud.notice_text()).is_not_equal("Farming rose to level 2.")
+	assert_bool(farm.use_item()).is_true()
 	assert_int(GameState.skill_level(Skills.FARMING)).is_equal(2)
 	assert_float(GameState.energy).override_failure_message("level 1's price for the stroke that made level 2").is_equal(98.0)
-	assert_str(village.hud.notice_text()).is_equal("Farming rose to level 2.")
+	assert_str(farm.hud.notice_text()).is_equal("Farming rose to level 2.")
 	assert_array(_heard.filter(func(id: StringName) -> bool: return id == &"skill")).override_failure_message("one chime").has_size(1)
-	_rest(village)
-	_stand(village, PLOT + Vector2i(1, 3), Vector2.UP)
-	assert_bool(village.use_item()).is_true()
+	_rest(farm)
+	_stand(farm, PLOT + Vector2i(1, -1), Vector2.DOWN)
+	assert_bool(farm.use_item()).is_true()
 	assert_float(GameState.energy).override_failure_message("and the next is cheaper").is_equal_approx(98.0 - 1.8, 0.0001)
 	assert_array(_heard.filter(func(id: StringName) -> bool: return id == &"skill")).override_failure_message("not said again").has_size(1)
 	assert_int(GameState.health).is_equal(hearts)

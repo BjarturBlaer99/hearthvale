@@ -1,5 +1,5 @@
 extends GdUnitTestSuite
-## Farm (P3a): the hero's plot of eighteen cells; tilling and watering one; the morning that
+## Farm (P3a): the hero's plot (the field of seventy-two cells, since the Homestead); tilling and watering one; the morning that
 ## dries the soil; and the farm as it is saved. The numbers are the game's own
 ## (data/rules/farm.json).
 
@@ -14,15 +14,15 @@ func before_test() -> void:
 	_farm = Farm.new(_data)
 
 
-func test_the_plot_is_eighteen_cells_of_bare_soil() -> void:
-	assert_that(_farm.size).is_equal(Vector2i(6, 3))
-	assert_int(_farm.size.x * _farm.size.y).is_equal(18)
-	assert_int(_farm.count_of(Farm.BARE)).is_equal(18)
+func test_the_field_is_seventy_two_cells_of_bare_soil() -> void:
+	assert_that(_farm.size).is_equal(Vector2i(12, 6))
+	assert_int(_farm.size.x * _farm.size.y).is_equal(72)
+	assert_int(_farm.count_of(Farm.BARE)).is_equal(72)
 	assert_int(_farm.count_of(Farm.TILLED)).is_equal(0)
-	for cell: Vector2i in [Vector2i(0, 0), Vector2i(5, 0), Vector2i(0, 2), Vector2i(5, 2), Vector2i(3, 1)]:
+	for cell: Vector2i in [Vector2i(0, 0), Vector2i(11, 0), Vector2i(0, 5), Vector2i(11, 5), Vector2i(5, 2), Vector2i(6, 3), Vector2i(3, 1)]:
 		assert_bool(_farm.has(cell)).override_failure_message("%s is a cell of the plot" % cell).is_true()
 		assert_that(_farm.state_of(cell)).is_equal(Farm.BARE)
-	for cell: Vector2i in [Vector2i(-1, 0), Vector2i(6, 0), Vector2i(0, 3), Vector2i(0, -1), Vector2i(12, 18)]:
+	for cell: Vector2i in [Vector2i(-1, 0), Vector2i(12, 0), Vector2i(0, 6), Vector2i(0, -1), Vector2i(22, 17)]:
 		assert_bool(_farm.has(cell)).override_failure_message("%s is not" % cell).is_false()
 	assert_int(_farm.wither_after).override_failure_message("two dry mornings wither a crop (3b)").is_equal(2)
 
@@ -35,9 +35,9 @@ func test_the_hoe_tills_a_bare_cell_once() -> void:
 	assert_bool(_farm.till(Vector2i(2, 1))).override_failure_message("already tilled").is_false()
 	assert_that(_farm.state_of(Vector2i(3, 1))).override_failure_message("its neighbour is as it was").is_equal(Farm.BARE)
 	assert_int(_farm.count_of(Farm.TILLED)).is_equal(1)
-	assert_bool(_farm.till(Vector2i(6, 1))).override_failure_message("no soil outside the plot").is_false()
+	assert_bool(_farm.till(Vector2i(12, 1))).override_failure_message("no soil outside the plot").is_false()
 	assert_bool(_farm.till(Vector2i(-1, -1))).is_false()
-	assert_bool(_farm.is_tilled(Vector2i(6, 1))).is_false()
+	assert_bool(_farm.is_tilled(Vector2i(12, 1))).is_false()
 
 
 func test_the_can_waters_tilled_soil_once() -> void:
@@ -93,7 +93,7 @@ func test_a_save_cant_put_soil_where_there_is_none() -> void:
 	for junk: Variant in [null, 7, "farm", [], {}, {"cells": []}, {"cells": null}]:
 		_farm.till(Vector2i(0, 0))
 		_farm.load_saved(junk)
-		assert_int(_farm.count_of(Farm.BARE)).override_failure_message("%s is an untouched plot" % [junk]).is_equal(18)
+		assert_int(_farm.count_of(Farm.BARE)).override_failure_message("%s is an untouched plot" % [junk]).is_equal(72)
 
 
 func test_cells_have_keys() -> void:
@@ -109,7 +109,7 @@ func test_the_farms_rules_are_sound_and_bad_ones_are_named() -> void:
 	assert_array(Array(Farm.problems(_data))).is_empty()
 	assert_dict(Farm.DEFAULTS["plot"]).override_failure_message("what a missing rule falls back to is the game's own").is_equal({"columns": int(_data["plot"]["columns"]), "rows": int(_data["plot"]["rows"])})
 	assert_int(int(Farm.DEFAULTS["wither_after"])).is_equal(int(_data["wither_after"]))
-	assert_that(Farm.new().size).is_equal(Vector2i(6, 3))
+	assert_that(Farm.new().size).is_equal(Vector2i(12, 6))
 	assert_that(Farm.new({"plot": {"columns": 2, "rows": 4}}).size).override_failure_message("the plot's size is the rules'").is_equal(Vector2i(2, 4))
 	assert_array(Array(Farm.problems({"plot": {"columns": 0, "rows": 3}, "wither_after": 1.5}))).contains_exactly([
 		"'plot' needs 'columns' and 'rows', each a whole number of 1 or more.",

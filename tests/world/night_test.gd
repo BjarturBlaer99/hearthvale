@@ -63,7 +63,9 @@ func test_the_shops_door_is_shut_outside_its_hours() -> void:
 	var door: AreaExit = village.interactables.get_node(^"ShopDoor")
 	assert_that(door.hours).is_equal(&"shop")
 	assert_that(door.cell()).is_equal(SHOP_DOOR)
-	assert_array(village.doors_with_hours()).override_failure_message("only the shop keeps hours").contains_exactly([door])
+	# (The old cottage's door keeps the hours of a place that is never open: tests/world/home_move_test.gd.)
+	var cottage: AreaExit = village.interactables.get_node(^"HomeDoor")
+	assert_array(village.doors_with_hours()).override_failure_message("only the shop keeps hours, and the cottage is locked").contains_exactly_in_any_order([door, cottage])
 	assert_bool(village.is_shut(door)).is_true()
 	assert_bool(village.terrain.is_occupied(SHOP_DOOR)).override_failure_message("a shut door is solid").is_true()
 	# He walks up to it: he is told, and stands before it.

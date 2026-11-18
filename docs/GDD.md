@@ -37,8 +37,10 @@ dark (cook, sleep). Dungeons keep their own loop: keys, puzzles, the dungeon ite
   down (one way, never hurts); trees, rocks, walls, fences and water block the way. No swimming or climbing.
 - **Hearthvale:** houses you can enter, a well, a chapel on the rise, a shop, a fenced field, a pond, and
   **cherry blossom trees** by the chapel, round the pond and along the main path *(P1)*.
-- **The hero's home:** the thatched cottage west of the weaver's, with a bed and a hearth, and a plot of soil
-  across the road, between the shop and the well.
+- **The hero's home** *(moved by the Homestead, 2026-11-17; §15)*: the farmhouse on his own land, an old
+  farmstead out the lane's west end, with a bed and a hearth, and his field below it across the road. Until
+  then it was the thatched cottage west of the weaver's, which now stands empty and locked, and the plot
+  lay in Hearthvale between the shop and the well.
 - **The countryside:** the South Field, the North Fields and the Old Wood.
 - **Willowmere** *(2026-11-17)*: a misty marsh east of the village, reached by planks across the east
   meadow. Open from the first day and never needed for the story. Shallow pools and deep reeds block, and
@@ -160,10 +162,13 @@ The last three are not known from the start: a villager teaches each as a friend
 ## 7. Farming *(P3)*
 *(Built: the plot, the hoe and the watering can in step 3a; seeds and crops in 3b; buying, selling and the
 meals in 3c.)*
-- **The plot:** 18 cells of soil (6 by 3) across the road from the cottages, between Tilda's shop and the
-  well. It is ground: the hero walks over it.
+- **The plot** is the field on the homestead (§15): 72 cells of soil (12 by 6) below the farmhouse, across
+  the road. It is ground: the hero walks over it. Its corner by the house, 18 cells (6 by 3), is clear from
+  the first day; the rest starts overgrown. *(Until the Homestead the plot was those 18 cells, in Hearthvale
+  between Tilda's shop and the well: a save from then has its soil and crops in the clear corner.)*
 - Hoe a cell, plant a seed, water it. A crop grows one stage each morning if it was watered the day before. Two
-  dry mornings in a row and it withers. The watering can holds ten pours and refills at the well or the pond.
+  dry mornings in a row and it withers. The watering can holds ten pours and refills at water: the pond in the
+  corner of the farm, or the village's well and pond.
 - A tool works on the cell the hero faces, and takes a moment. A tool with nothing to do says so and costs
   nothing. Watered soil is dry again each morning; tilled soil stays tilled.
 - **Seeds** go on the item button like the tools: one is planted in the tilled, empty cell he faces. Planting
@@ -287,8 +292,9 @@ in the crypt, and the closing words of each dungeon. The main story ends when th
 
 **Over days (P4a).** The story is spread over the days of the game, and a main quest, "A Place of Your Own",
 is in the quest log from the first morning. Its words say where to go at each stage:
-1. Find the cottage and take what lies inside its door: the hoe, the watering can, a pouch of seeds.
-2. Till a patch of the plot and plant a seed.
+1. Follow the lane west out of Hearthvale to the old farmstead that was left to him, and take what lies
+   inside the farmhouse door: the hoe, the watering can, a pouch of seeds.
+2. Till a patch of the field's clear corner and plant a seed.
 3. See Elder Bram. Before the first crop he only welcomes the hero and sends him to settle in. After it he
    speaks of the lights over the keep and asks for the promise.
 4. Quiet the Old Keep. Its gate in the Old Wood is chained until Bram gives his word.
@@ -301,7 +307,7 @@ The aim is the main story in six to eight in-game days. Whether it runs to that 
 it took, the crops grown, and how many of the seven villagers are friends (three marks or more).
 
 **More of Sir Aldric** *(P4d)*: for his supper Elder Bram tells that Aldric was a farmer of the valley before
-he took up the sword, and that the hero's cottage was his.
+he took up the sword, and that the hero's farm was his.
 
 ## 12. Tone & look
 Warm and cosy: a storybook countryside in modern pixel art. Green meadows, cherry blossom, half-timbered houses
@@ -319,7 +325,7 @@ under thatch, red clay tiles or blue slate, with smoking chimneys, and a stone c
 ## 13. Out of scope (unless asked)
 Multiplayer, procedural generation, 3D, voice acting, swimming, climbing, seasons, weather, livestock of your
 own, crafting beyond cooking, the workbench and the furnace (§14), placing furniture by hand, fishing, an inventory limit, an open world, new areas
-beyond the hero's home and plot.
+beyond the hero's homestead (§15: the farm and the farmhouse's inside; the user asked for it on 2026-11-17).
 
 ## 14. Mining and crafting *(2026-11-17)*
 **Mining**
@@ -344,14 +350,14 @@ beyond the hero's home and plot.
 - **What he can't carry stays lying:** stone stacks to 50, ores and coal to 30, crystals to 10.
 
 **Crafting** *(built 2026-11-17)*
-- **The workbench** stands in the cottage from the first day. Its list shows what he knows how to make,
+- **The workbench** stands in the hero's home (the farmhouse, since the Homestead) from the first day. Its list shows what he knows how to make,
   what the thing under the cursor needs beside what he has ("Stone 12 of 20"), and greys out what he
   can't make now. A recipe is known once the thing it waits on has been found (held even once), or once
   a skill has risen; the Woven Rug is known from the start.
 - **The furnace** (20 stone, 5 copper ore) smelts overnight: three ore and a coal for a bar, one load a
   night of one metal, five bars at the most. Lit today, the bars are there from the next morning. Coal
   comes from floor 4 down, so nothing is smelted before the lift's first stop.
-- **Furnishings** each have their own place in the cottage and are made once: the furnace, the storage
+- **Furnishings** each have their own place in the farmhouse (the same room the cottage was) and are made once: the furnace, the storage
   chest (10 wood, 1 copper bar), the Standing Lamp (1 copper bar, 2 wood, 1 coal), which is a real
   light, and the Woven Rug (8 wheat, 3 cherry blossoms), beside the bed.
 - **The chest** holds 24 stacks, and may hold several stacks of one thing. Its two lists are the pack
@@ -388,3 +394,24 @@ beyond the hero's home and plot.
 - **Tuned on the user's word:** Tilda pays a third less than first set (the prices in §10 are the new
   ones); Mining rises by a point for a rock of ore and none for a plain rock (it had been two and one,
   and reached its top level on the second day); floors 4 to 6 have two coal rocks each, not four.
+
+## 15. The Homestead *(2026-11-17; `docs/progress/homestead-plan.md`)*
+*(Built: phase 1, the farm and the home's move. Phases 2 to 5, placing things, buildings, animals and the
+balance, are planned and not built.)*
+- **The farm** is an old farmstead on the road west of Hearthvale, left to the hero: the lane through the
+  village runs on through the west woods and comes in at the farm's east edge. It is a map of its own, 40
+  by 30 cells, with woods all round.
+- **The walk is short:** twelve cells from the edge to the farmhouse door (under three seconds), and about
+  eight seconds from the village square, where a new game still begins.
+- **The farmhouse** is the hero's home: the same room the cottage was, with the bed, the hearth, the
+  workbench and every furnishing in the same places. He sleeps there, and wakes there after staying up
+  until 02:00 or collapsing. Its door opens onto the farm. The tools and the first seeds lie inside it.
+- **The old cottage** in Hearthvale stands empty: "The cottage stands empty, and its door is locked."
+- **The field** lies below the farmhouse across the road (§7), and **a pond** in the south-west corner
+  fills the watering can. There is no well on the farm.
+- **Nobody lives there, nothing hunts there, and nothing grows to be gathered.**
+- **The story's words** say so: the title ("An old farm, a field gone wild, and lights over the old
+  keep."), the main quest's first three stages and its last, Elder Bram's welcome and his tale of Sir
+  Aldric, whose farm it was. Nothing else in the story changed.
+- **An older save loads with nothing lost:** a hero saved in the cottage is in the farmhouse on the cell he
+  stood on, and his soil, crops and sprinklers are in the field's clear corner.

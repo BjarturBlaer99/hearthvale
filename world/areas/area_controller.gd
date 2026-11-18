@@ -102,6 +102,9 @@ const NIGHT_POOL: float = 0.78
 @export var room_size: Vector2i = Vector2i.ZERO
 ## The tune this area plays (audio/music); empty: whatever is playing carries on.
 @export var music: StringName = &""
+## The tune it plays out of doors at night in place of the game's night tune (the Homestead's
+## own quiet one); empty: the night tune every other place has.
+@export var night_music: StringName = &""
 ## A dark area (the crypt): only what lights reach is seen (LightRules, drawn by AreaLighting).
 @export var dark: bool = false
 ## The flag that lights this area's marsh lantern posts (Willowmere's: Old Henrik's favour sets
@@ -1360,9 +1363,12 @@ func hours() -> Hours:
 	return _hours
 
 
-## The tune for here and now: the area's own, or the night's out of doors after nightfall.
+## The tune for here and now: the area's own, or out of doors after nightfall the night's (the
+## area's own night tune, if it names one).
 func tune_now() -> StringName:
-	return NIGHT_TUNE if music != &"" and is_night_outdoors() else music
+	if music == &"" or not is_night_outdoors():
+		return music
+	return night_music if night_music != &"" else NIGHT_TUNE
 
 
 ## Asks for the tune for here and now, when it is another than the one last asked for (so a

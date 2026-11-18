@@ -2,14 +2,16 @@ extends GdUnitTestSuite
 ## Seeds and crops in the world (P3b): the first pouch of seeds at home; a seed planted from
 ## the item button; crops that grow by the morning, wither unwatered and wait when ripe; the
 ## harvest picked with E; every crop raised from seed to pack in its days, and eaten raw. The
-## plot stays ground to walk on, whatever grows there.
+## plot stays ground to walk on, whatever grows there. (On the homestead since 2026-11-17: the
+## field's clear corner is the plot these tests always worked.)
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
-const VILLAGE: String = "res://world/areas/village/village.tscn"
+const FARM: String = "res://world/areas/homestead/homestead.tscn"
 const HOME: String = "res://world/areas/home/home.tscn"
 const FRAME: float = 1.0 / 60.0
-const PLOT: Vector2i = Vector2i(12, 18)
+## The field's north-west corner on the homestead: the cells worked here are in its clear corner.
+const PLOT: Vector2i = Vector2i(22, 17)
 const TEST_SLOT: int = 983
 ## The plot's cell the tests work, and the map cell the hero stands in to face it (from below).
 const CELL: Vector2i = Vector2i(2, 1)
@@ -61,43 +63,43 @@ func test_a_seed_is_planted_from_the_item_button_in_tilled_soil() -> void:
 	GameState.damage(1)
 	var hearts: int = GameState.health
 	GameState.till_soil(CELL)
-	var village: AreaController = _load(VILLAGE)
-	_face(village, CELL)
-	assert_bool(village.use_item()).is_true()
+	var farm: AreaController = _load(FARM)
+	_face(farm, CELL)
+	assert_bool(farm.use_item()).is_true()
 	assert_str(GameState.farm().crop_at(CELL)).is_equal("turnip")
 	assert_that(GameState.crop_phase(CELL)).is_equal(Farm.SEEDED)
 	assert_int(GameState.item_count(&"turnip_seeds")).override_failure_message("one seed").is_equal(1)
 	assert_float(GameState.energy).override_failure_message("planting costs no energy").is_equal(100.0)
 	assert_int(GameState.health).is_equal(hearts)
 	assert_array(_heard).contains([&"plant"])
-	assert_bool(village.player.motor.is_attacking()).override_failure_message("it takes a moment").is_true()
-	assert_that(_flashes(village)[0].icon).is_equal(&"turnip_seeds")
+	assert_bool(farm.player.motor.is_attacking()).override_failure_message("it takes a moment").is_true()
+	assert_that(_flashes(farm)[0].icon).is_equal(&"turnip_seeds")
 	# Not twice in one cell, not in bare soil, not off the plot: none of it costs a seed.
-	_rest(village)
+	_rest(farm)
 	_heard.clear()
-	assert_bool(village.use_item()).is_false()
-	assert_str(village.hud.message_text()).is_equal(ToolUse.SEED_TAKEN)
+	assert_bool(farm.use_item()).is_false()
+	assert_str(farm.hud.message_text()).is_equal(ToolUse.SEED_TAKEN)
 	assert_array(_heard).contains_exactly([&"nope"])
-	_face(village, CELL + Vector2i(1, 0))
-	assert_bool(village.use_item()).is_false()
-	assert_str(village.hud.message_text()).is_equal(ToolUse.SEED_BARE)
-	village.player.motor.place(PLOT + Vector2i(1, 0))
-	village.player.face(Vector2.UP)
-	assert_bool(village.use_item()).is_false()
-	assert_str(village.hud.message_text()).is_equal(ToolUse.SEED_NOT_HERE)
+	_face(farm, CELL + Vector2i(1, 0))
+	assert_bool(farm.use_item()).is_false()
+	assert_str(farm.hud.message_text()).is_equal(ToolUse.SEED_BARE)
+	farm.player.motor.place(PLOT + Vector2i(1, 0))
+	farm.player.face(Vector2.UP)
+	assert_bool(farm.use_item()).is_false()
+	assert_str(farm.hud.message_text()).is_equal(ToolUse.SEED_NOT_HERE)
 	assert_int(GameState.item_count(&"turnip_seeds")).is_equal(1)
 	assert_int(GameState.farm().crop_count()).is_equal(1)
 	# The last seed goes in; then there are none: their slot is gone and the item button is empty.
 	GameState.till_soil(CELL + Vector2i(1, 0))
-	_face(village, CELL + Vector2i(1, 0))
-	assert_bool(village.use_item()).is_true()
+	_face(farm, CELL + Vector2i(1, 0))
+	assert_bool(farm.use_item()).is_true()
 	assert_int(GameState.item_count(&"turnip_seeds")).is_equal(0)
 	GameState.till_soil(CELL + Vector2i(2, 0))
-	_face(village, CELL + Vector2i(2, 0))
-	_rest(village)
+	_face(farm, CELL + Vector2i(2, 0))
+	_rest(farm)
 	assert_that(GameState.equipped).override_failure_message("nothing he no longer has is on the button").is_equal(&"")
-	assert_bool(village.use_item()).is_false()
-	assert_str(village.hud.message_text()).is_equal("Nothing on the item button yet.")
+	assert_bool(farm.use_item()).is_false()
+	assert_str(farm.hud.message_text()).is_equal("Nothing on the item button yet.")
 	assert_int(GameState.farm().crop_count()).is_equal(2)
 
 
@@ -106,14 +108,14 @@ func test_the_tools_on_a_planted_cell() -> void:
 		GameState.add_item(item[0], item[1])
 	GameState.till_soil(CELL)
 	GameState.plant_crop(CELL, &"carrot")
-	var village: AreaController = _load(VILLAGE)
-	_face(village, CELL)
-	assert_bool(village.use_item()).override_failure_message("the hoe leaves a crop alone").is_false()
-	assert_str(village.hud.message_text()).is_equal(ToolUse.HOE_GROWING)
+	var farm: AreaController = _load(FARM)
+	_face(farm, CELL)
+	assert_bool(farm.use_item()).override_failure_message("the hoe leaves a crop alone").is_false()
+	assert_str(farm.hud.message_text()).is_equal(ToolUse.HOE_GROWING)
 	assert_float(GameState.energy).is_equal(100.0)
 	assert_str(GameState.farm().crop_at(CELL)).is_equal("carrot")
 	GameState.equip(&"watering_can")
-	assert_bool(village.use_item()).override_failure_message("the can waters it").is_true()
+	assert_bool(farm.use_item()).override_failure_message("the can waters it").is_true()
 	assert_bool(GameState.farm().is_watered(CELL)).is_true()
 	assert_float(GameState.energy).is_equal(99.0)
 
@@ -121,34 +123,34 @@ func test_the_tools_on_a_planted_cell() -> void:
 func test_a_watered_turnip_ripens_in_three_mornings_and_is_picked_with_e() -> void:
 	GameState.till_soil(CELL)
 	GameState.plant_crop(CELL, &"turnip")
-	var village: AreaController = _load(VILLAGE)
-	_face(village, CELL)
+	var farm: AreaController = _load(FARM)
+	_face(farm, CELL)
 	var seen: Array = [GameState.crop_phase(CELL)]
 	for morning: int in 3:
-		village._update_hud()
-		assert_str(village.hud.prompt_text()).override_failure_message("nothing to pick yet").is_equal("")
-		assert_bool(village.interact()).override_failure_message("E does nothing to a growing crop").is_false()
+		farm._update_hud()
+		assert_str(farm.hud.prompt_text()).override_failure_message("nothing to pick yet").is_equal("")
+		assert_bool(farm.interact()).override_failure_message("E does nothing to a growing crop").is_false()
 		GameState.water_soil(CELL)
 		GameState.start_next_day()
 		seen.append(GameState.crop_phase(CELL))
 	assert_array(seen).is_equal([Farm.SEEDED, Farm.SPROUT, Farm.GROWING, Farm.RIPE])
 	assert_bool(GameState.is_crop_ripe(CELL)).is_true()
-	village._update_hud()
-	assert_str(village.hud.prompt_text()).is_equal("[Right click] Pick the Turnip")
-	assert_dict(village.crop_in_front()).is_equal({"cell": CELL, "name": "Turnip", "phase": Farm.RIPE})
+	farm._update_hud()
+	assert_str(farm.hud.prompt_text()).is_equal("[Right click] Pick the Turnip")
+	assert_dict(farm.crop_in_front()).is_equal({"cell": CELL, "name": "Turnip", "phase": Farm.RIPE})
 	var energy: float = GameState.energy
 	_heard.clear()
-	assert_bool(village.interact()).is_true()
+	assert_bool(farm.interact()).is_true()
 	assert_int(GameState.item_count(&"turnip")).is_equal(1)
 	assert_bool(GameState.farm().has_crop(CELL)).is_false()
 	assert_bool(GameState.farm().is_tilled(CELL)).override_failure_message("the soil is still tilled").is_true()
 	assert_float(GameState.energy).override_failure_message("picking costs no energy").is_equal(energy)
-	assert_str(village.hud.message_text()).is_equal("Picked: Turnip.")
+	assert_str(farm.hud.message_text()).is_equal("Picked: Turnip.")
 	assert_array(_heard).contains([&"harvest"])
-	assert_bool(village.player.controls_enabled).is_true()
-	village._update_hud()
-	assert_str(village.hud.prompt_text()).is_equal("")
-	assert_bool(village.interact()).override_failure_message("nothing left to pick").is_false()
+	assert_bool(farm.player.controls_enabled).is_true()
+	farm._update_hud()
+	assert_str(farm.hud.prompt_text()).is_equal("")
+	assert_bool(farm.interact()).override_failure_message("nothing left to pick").is_false()
 	assert_int(GameState.item_count(&"turnip")).is_equal(1)
 
 
@@ -156,54 +158,54 @@ func test_two_dry_mornings_wither_a_crop_and_e_clears_it_away() -> void:
 	GameState.till_soil(CELL)
 	GameState.plant_crop(CELL, &"wheat")
 	GameState.water_soil(CELL)
-	var village: AreaController = _load(VILLAGE)
-	_face(village, CELL)
+	var farm: AreaController = _load(FARM)
+	_face(farm, CELL)
 	GameState.start_next_day()
 	GameState.start_next_day()
 	assert_that(GameState.crop_phase(CELL)).override_failure_message("one dry morning").is_equal(Farm.SPROUT)
 	GameState.start_next_day()
 	assert_that(GameState.crop_phase(CELL)).is_equal(Farm.WITHERED)
-	village._update_hud()
-	assert_str(village.hud.prompt_text()).is_equal("[Right click] Clear the withered Wheat")
-	assert_bool(village.interact()).is_true()
+	farm._update_hud()
+	assert_str(farm.hud.prompt_text()).is_equal("[Right click] Clear the withered Wheat")
+	assert_bool(farm.interact()).is_true()
 	assert_bool(GameState.farm().has_crop(CELL)).is_false()
 	assert_bool(GameState.farm().is_tilled(CELL)).is_true()
 	assert_int(GameState.item_count(&"wheat")).override_failure_message("a withered crop gives nothing").is_equal(0)
-	assert_str(village.hud.message_text()).is_equal("You clear away the withered wheat.")
+	assert_str(farm.hud.message_text()).is_equal("You clear away the withered wheat.")
 	assert_float(GameState.energy).is_equal(100.0)
 	# And the cell can be planted again.
 	GameState.add_item(&"wheat_seeds", 1)
 	GameState.equip(&"wheat_seeds")
-	assert_bool(village.use_item()).is_true()
+	assert_bool(farm.use_item()).is_true()
 	assert_that(GameState.crop_phase(CELL)).is_equal(Farm.SEEDED)
 
 
 func test_every_crop_is_raised_from_seed_to_pack_in_its_days_and_eaten_raw() -> void:
 	GameState.add_item(&"hoe")
 	GameState.add_item(&"watering_can")
-	var village: AreaController = _load(VILLAGE)
+	var farm: AreaController = _load(FARM)
 	var crops: Array = DataRegistry.entries(&"crops")
 	assert_int(crops.size()).is_equal(5)
 	# A column a crop: till it, plant it and water it, as the player does.
 	for x: int in crops.size():
 		var cell: Vector2i = Vector2i(x, 0)
-		_face(village, cell)
+		_face(farm, cell)
 		GameState.equip(&"hoe")
-		assert_bool(village.use_item()).is_true()
-		_rest(village)
+		assert_bool(farm.use_item()).is_true()
+		_rest(farm)
 		GameState.add_item(StringName(str(crops[x]["seed"])), 1)
 		GameState.equip(StringName(str(crops[x]["seed"])))
-		assert_bool(village.use_item()).override_failure_message("planting %s" % crops[x]["id"]).is_true()
-		_rest(village)
+		assert_bool(farm.use_item()).override_failure_message("planting %s" % crops[x]["id"]).is_true()
+		_rest(farm)
 	var mornings: Dictionary = {}
 	for morning: int in range(1, 9):
 		GameState.add_item(&"water", 10)
 		GameState.equip(&"watering_can")
 		for x: int in crops.size():
-			_face(village, Vector2i(x, 0))
+			_face(farm, Vector2i(x, 0))
 			if not GameState.is_crop_ripe(Vector2i(x, 0)):
-				assert_bool(village.use_item()).is_true()
-				_rest(village)
+				assert_bool(farm.use_item()).is_true()
+				_rest(farm)
 		GameState.set_energy(GameState.max_energy())
 		GameState.start_next_day()
 		for x: int in crops.size():
@@ -213,8 +215,8 @@ func test_every_crop_is_raised_from_seed_to_pack_in_its_days_and_eaten_raw() -> 
 	# The harvest goes into the pack, and each crop can be eaten raw.
 	GameState.set_energy(20.0)
 	for x: int in crops.size():
-		_face(village, Vector2i(x, 0))
-		assert_bool(village.interact()).override_failure_message("picking %s" % crops[x]["id"]).is_true()
+		_face(farm, Vector2i(x, 0))
+		assert_bool(farm.interact()).override_failure_message("picking %s" % crops[x]["id"]).is_true()
 		var item_id: StringName = StringName(str(crops[x]["gives"]["item"]))
 		assert_int(GameState.item_count(item_id)).is_equal(1)
 		var before: float = GameState.energy
@@ -229,16 +231,16 @@ func test_every_crop_is_raised_from_seed_to_pack_in_its_days_and_eaten_raw() -> 
 func test_a_full_pack_leaves_the_crop_in_the_soil() -> void:
 	GameState.farm().load_saved({"cells": {"2,1": {"watered": false, "crop": "pumpkin", "stage": 8}}})
 	GameState.add_item(&"pumpkin", 30)
-	var village: AreaController = _load(VILLAGE)
-	_face(village, CELL)
+	var farm: AreaController = _load(FARM)
+	_face(farm, CELL)
 	assert_bool(GameState.is_crop_ripe(CELL)).is_true()
-	assert_bool(village.interact()).override_failure_message("he tried, and was told").is_true()
-	assert_str(village.hud.message_text()).is_equal("Your pack holds no more pumpkin.")
+	assert_bool(farm.interact()).override_failure_message("he tried, and was told").is_true()
+	assert_str(farm.hud.message_text()).is_equal("Your pack holds no more pumpkin.")
 	assert_array(_heard).contains([&"nope"])
 	assert_str(GameState.farm().crop_at(CELL)).override_failure_message("it waits in the soil").is_equal("pumpkin")
 	assert_int(GameState.item_count(&"pumpkin")).is_equal(30)
 	GameState.add_item(&"pumpkin", -1)
-	assert_bool(village.interact()).is_true()
+	assert_bool(farm.interact()).is_true()
 	assert_int(GameState.item_count(&"pumpkin")).is_equal(30)
 	assert_bool(GameState.farm().has_crop(CELL)).is_false()
 
@@ -250,14 +252,17 @@ func test_he_walks_through_his_crops_and_harms_nothing() -> void:
 			cells["%d,%d" % [x, y]] = {"watered": false, "crop": "pumpkin", "stage": 8 if y == 1 else 3}
 	GameState.farm().load_saved({"cells": cells})
 	var before: Dictionary = GameState.farm().to_dict()
-	var village: AreaController = _load(VILLAGE)
-	village.player.motor.place(PLOT + Vector2i(-1, 1))
-	village.player.face(Vector2.RIGHT)
+	var farm: AreaController = _load(FARM)
+	farm.player.motor.place(PLOT + Vector2i(-1, 1))
+	farm.player.face(Vector2.RIGHT)
 	for i: int in 200:
-		village.player.motor.step(Vector2.RIGHT, FRAME)
-	assert_that(village.player.motor.cell).override_failure_message("across the whole plot, ripe pumpkins and all").is_equal(PLOT + Vector2i(5, 1))
-	for cell: Vector2i in village.plot.cells():
-		assert_bool(village.grid.is_solid(cell) or village.terrain.is_occupied(cell)).override_failure_message("%s is open" % cell).is_false()
+		farm.player.motor.step(Vector2.RIGHT, FRAME)
+	assert_int(farm.player.motor.cell.x).override_failure_message("across the whole clear corner, ripe pumpkins and all").is_greater_equal(PLOT.x + 5)
+	assert_int(farm.player.motor.cell.y).is_equal(PLOT.y + 1)
+	for x: int in 6:
+		for y: int in 3:
+			var cell: Vector2i = PLOT + Vector2i(x, y)
+			assert_bool(farm.grid.is_solid(cell) or farm.terrain.is_occupied(cell)).override_failure_message("%s is open" % cell).is_false()
 	assert_dict(GameState.farm().to_dict()).override_failure_message("nothing was trampled").is_equal(before)
 
 
@@ -307,9 +312,9 @@ func test_a_long_item_list_scrolls_to_keep_the_cursor_in_view() -> void:
 			[&"turnip", 4], [&"carrot", 2], [&"wheat", 6], [&"potato", 1], [&"pumpkin", 1], [&"bread", 2], [&"wild_berries", 3], [&"mushroom", 1]]:
 		GameState.add_item(item[0], item[1])
 	assert_int(GameState.hand_entries().size()).is_equal(7)
-	var village: AreaController = _load(VILLAGE)
-	assert_bool(village.open_item_menu()).is_true()
-	var menu: ItemMenu = village.hud.item_menu
+	var farm: AreaController = _load(FARM)
+	assert_bool(farm.open_item_menu()).is_true()
+	var menu: ItemMenu = farm.hud.item_menu
 	assert_int(menu.items.size()).is_equal(8)
 	assert_int(menu.shown_lines().size()).override_failure_message("five lines, never more").is_equal(ItemMenu.ROWS)
 	assert_array(Array(menu.shown_lines())).is_equal(["> Turnip x4 (+7 energy)", "  Carrot x2 (+7 energy)", "  Wheat x6 (+5 energy)", "  Potato x1 (+8 energy)", "  Pumpkin x1 (+22 energy)"])

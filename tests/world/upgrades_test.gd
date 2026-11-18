@@ -7,11 +7,12 @@ extends GdUnitTestSuite
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
-const VILLAGE: String = "res://world/areas/village/village.tscn"
+const FARM: String = "res://world/areas/homestead/homestead.tscn"
 const FRAME: float = 1.0 / 60.0
 const SIDES: Array[Vector2i] = [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
 ## The plot's north-west corner in Hearthvale.
-const PLOT: Vector2i = Vector2i(12, 18)
+## The field's north-west corner on the homestead: its clear corner is worked here.
+const PLOT: Vector2i = Vector2i(22, 17)
 
 var _area: Node
 var _heard: Array[StringName] = []
@@ -114,35 +115,35 @@ func test_a_thing_made_stays_out_of_a_hand_that_holds_the_sword_by_choice() -> v
 func test_a_better_hoe_tills_further_in_one_stroke_for_the_same_energy() -> void:
 	GameState.add_item(&"copper_hoe")
 	GameState.equip(&"copper_hoe")
-	var village: AreaController = _load(VILLAGE)
-	_stand(village, PLOT + Vector2i(0, 1), Vector2.RIGHT)
-	assert_bool(village.use_item()).is_true()
+	var farm: AreaController = _load(FARM)
+	_stand(farm, PLOT + Vector2i(0, 1), Vector2.RIGHT)
+	assert_bool(farm.use_item()).is_true()
 	assert_that(GameState.farm().state_of(Vector2i(1, 1))).is_equal(Farm.TILLED)
 	assert_that(GameState.farm().state_of(Vector2i(2, 1))).override_failure_message("and the cell beyond").is_equal(Farm.TILLED)
 	assert_that(GameState.farm().state_of(Vector2i(3, 1))).is_equal(Farm.BARE)
 	assert_int(GameState.farm().count_of(Farm.TILLED)).is_equal(2)
 	assert_float(GameState.energy).override_failure_message("one stroke's energy for both").is_equal(98.0)
 	assert_int(int(GameState.skill_points.get(Skills.FARMING, 0))).override_failure_message("each cell tilled is practice").is_equal(2)
-	_finish(village)
+	_finish(farm)
 	# The iron hoe tills three; a cell already tilled in the line is passed over, not paid for.
 	GameState.add_item(&"iron_hoe")
 	GameState.equip(&"iron_hoe")
-	_stand(village, PLOT + Vector2i(2, 1), Vector2.RIGHT)
-	assert_bool(village.use_item()).is_true()
+	_stand(farm, PLOT + Vector2i(2, 1), Vector2.RIGHT)
+	assert_bool(farm.use_item()).is_true()
 	for x: int in [3, 4, 5]:
 		assert_that(GameState.farm().state_of(Vector2i(x, 1))).is_equal(Farm.TILLED)
 	assert_float(GameState.energy).is_equal(96.0)
-	_finish(village)
+	_finish(farm)
 	# At the plot's edge the stroke stops with the plot.
-	_stand(village, PLOT + Vector2i(4, 0), Vector2.RIGHT)
-	assert_bool(village.use_item()).is_true()
-	assert_that(GameState.farm().state_of(Vector2i(5, 0))).is_equal(Farm.TILLED)
+	_stand(farm, PLOT + Vector2i(1, 0), Vector2.LEFT)
+	assert_bool(farm.use_item()).is_true()
+	assert_that(GameState.farm().state_of(Vector2i(0, 0))).is_equal(Farm.TILLED)
 	assert_int(GameState.farm().count_of(Farm.TILLED)).override_failure_message("one more cell, and nothing outside the plot").is_equal(6)
-	_finish(village)
+	_finish(farm)
 	# The cell he faces decides: tilled already, the stroke isn't made, though bare soil lies beyond.
-	_stand(village, PLOT + Vector2i(1, 2), Vector2.UP)
-	assert_bool(village.use_item()).is_false()
-	assert_str(village.hud.message_text()).is_equal(ToolUse.HOE_DONE)
+	_stand(farm, PLOT + Vector2i(1, 2), Vector2.UP)
+	assert_bool(farm.use_item()).is_false()
+	assert_str(farm.hud.message_text()).is_equal(ToolUse.HOE_DONE)
 	assert_float(GameState.energy).is_equal(94.0)
 
 
@@ -153,28 +154,28 @@ func test_a_better_can_waters_further_with_one_pour() -> void:
 	for x: int in 6:
 		GameState.till_soil(Vector2i(x, 1))
 	GameState.plant_crop(Vector2i(1, 1), &"turnip")
-	var village: AreaController = _load(VILLAGE)
-	_stand(village, PLOT + Vector2i(0, 1), Vector2.RIGHT)
-	assert_bool(village.use_item()).is_true()
+	var farm: AreaController = _load(FARM)
+	_stand(farm, PLOT + Vector2i(0, 1), Vector2.RIGHT)
+	assert_bool(farm.use_item()).is_true()
 	assert_bool(GameState.farm().is_watered(Vector2i(1, 1))).is_true()
 	assert_bool(GameState.farm().is_watered(Vector2i(2, 1))).override_failure_message("and the cell beyond").is_true()
 	assert_bool(GameState.farm().is_watered(Vector2i(3, 1))).is_false()
 	assert_int(GameState.item_count(&"water")).override_failure_message("one pour for both").is_equal(9)
 	assert_float(GameState.energy).is_equal(99.0)
-	_finish(village)
+	_finish(farm)
 	GameState.add_item(&"iron_watering_can")
 	GameState.equip(&"iron_watering_can")
-	_stand(village, PLOT + Vector2i(2, 1), Vector2.RIGHT)
-	assert_bool(village.use_item()).is_true()
+	_stand(farm, PLOT + Vector2i(2, 1), Vector2.RIGHT)
+	assert_bool(farm.use_item()).is_true()
 	for x: int in [3, 4, 5]:
 		assert_bool(GameState.farm().is_watered(Vector2i(x, 1))).is_true()
 	assert_int(GameState.item_count(&"water")).is_equal(8)
 	assert_float(GameState.energy).is_equal(98.0)
-	_finish(village)
+	_finish(farm)
 	# Wet already, the cell he faces takes no pour.
-	_stand(village, PLOT + Vector2i(0, 1), Vector2.RIGHT)
-	assert_bool(village.use_item()).is_false()
-	assert_str(village.hud.message_text()).is_equal(ToolUse.CAN_DONE)
+	_stand(farm, PLOT + Vector2i(0, 1), Vector2.RIGHT)
+	assert_bool(farm.use_item()).is_false()
+	assert_str(farm.hud.message_text()).is_equal(ToolUse.CAN_DONE)
 	assert_int(GameState.item_count(&"water")).is_equal(8)
 
 
@@ -226,25 +227,25 @@ func test_a_sprinkler_is_set_on_the_plot_waters_each_morning_and_is_taken_up_aga
 	for cell: Vector2i in [Vector2i(1, 1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(2, 1), Vector2i(1, 2), Vector2i(3, 1)]:
 		GameState.till_soil(cell)
 	GameState.plant_crop(Vector2i(2, 1), &"turnip")
-	var village: AreaController = _load(VILLAGE)
+	var farm: AreaController = _load(FARM)
 	# Not on bare soil, and not where something grows.
-	_stand(village, PLOT + Vector2i(4, 2), Vector2.RIGHT)
-	assert_bool(village.use_item()).is_false()
-	assert_str(village.hud.message_text()).is_equal(ToolUse.SPRINKLER_BARE)
-	_stand(village, PLOT + Vector2i(2, 2), Vector2.UP)
-	assert_bool(village.use_item()).is_false()
-	assert_str(village.hud.message_text()).is_equal(ToolUse.SPRINKLER_GROWING)
+	_stand(farm, PLOT + Vector2i(4, 2), Vector2.RIGHT)
+	assert_bool(farm.use_item()).is_false()
+	assert_str(farm.hud.message_text()).is_equal(ToolUse.SPRINKLER_BARE)
+	_stand(farm, PLOT + Vector2i(2, 2), Vector2.UP)
+	assert_bool(farm.use_item()).is_false()
+	assert_str(farm.hud.message_text()).is_equal(ToolUse.SPRINKLER_GROWING)
 	assert_int(GameState.item_count(&"sprinkler")).is_equal(2)
 	# On tilled, empty soil it is set down, and one is gone from his pack.
-	_stand(village, PLOT + Vector2i(1, 2), Vector2.UP)
-	assert_bool(village.use_hand()).override_failure_message("a left click sets it down too").is_true()
+	_stand(farm, PLOT + Vector2i(1, 2), Vector2.UP)
+	assert_bool(farm.use_hand()).override_failure_message("a left click sets it down too").is_true()
 	assert_bool(GameState.farm().has_sprinkler(Vector2i(1, 1))).is_true()
 	assert_int(GameState.item_count(&"sprinkler")).is_equal(1)
 	assert_array(_heard).contains([&"plant"])
-	_finish(village)
-	assert_bool(village.use_item()).override_failure_message("not a second in the same cell").is_false()
-	assert_str(village.hud.message_text()).is_equal(ToolUse.SPRINKLER_TAKEN)
-	assert_bool(village.terrain.is_occupied(PLOT + Vector2i(1, 1))).override_failure_message("it lies flat: he walks over it").is_false()
+	_finish(farm)
+	assert_bool(farm.use_item()).override_failure_message("not a second in the same cell").is_false()
+	assert_str(farm.hud.message_text()).is_equal(ToolUse.SPRINKLER_TAKEN)
+	assert_bool(farm.terrain.is_occupied(PLOT + Vector2i(1, 1))).override_failure_message("it lies flat: he walks over it").is_false()
 	# The next morning the four cells beside it are wet, and the turnip has begun to grow the day after.
 	GameState.start_next_day()
 	for cell: Vector2i in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(2, 1), Vector2i(1, 2)]:
@@ -255,24 +256,24 @@ func test_a_sprinkler_is_set_on_the_plot_waters_each_morning_and_is_taken_up_aga
 	# A seed isn't planted where it stands.
 	GameState.add_item(&"turnip_seeds", 2)
 	GameState.equip(&"turnip_seeds")
-	assert_bool(village.use_item()).is_false()
-	assert_str(village.hud.message_text()).is_equal(ToolUse.SEED_SPRINKLER)
+	assert_bool(farm.use_item()).is_false()
+	assert_str(farm.hud.message_text()).is_equal(ToolUse.SEED_SPRINKLER)
 	# Facing it, a right click takes it up again.
-	village._process(FRAME)
-	assert_str(village.hud.prompt_text()).contains(AreaController.SPRINKLER_PROMPT)
-	assert_that(village.sprinkler_in_front()).is_equal(Vector2i(1, 1))
-	assert_bool(village.interact()).is_true()
+	farm._process(FRAME)
+	assert_str(farm.hud.prompt_text()).contains(AreaController.SPRINKLER_PROMPT)
+	assert_that(farm.sprinkler_in_front()).is_equal(Vector2i(1, 1))
+	assert_bool(farm.interact()).is_true()
 	assert_bool(GameState.farm().has_sprinkler(Vector2i(1, 1))).is_false()
 	assert_int(GameState.item_count(&"sprinkler")).is_equal(2)
 	assert_array(_heard).contains([&"item_get"])
-	assert_that(village.sprinkler_in_front()).is_equal(Vector2i(-1, -1))
+	assert_that(farm.sprinkler_in_front()).is_equal(Vector2i(-1, -1))
 	# With ten already, it stays where it is and he is told.
 	GameState.place_sprinkler(Vector2i(1, 1))
 	GameState.add_item(&"sprinkler", 8)
-	assert_bool(village.interact()).is_true()
+	assert_bool(farm.interact()).is_true()
 	assert_bool(GameState.farm().has_sprinkler(Vector2i(1, 1))).is_true()
 	assert_int(GameState.item_count(&"sprinkler")).is_equal(10)
-	assert_str(village.hud.message_text()).is_equal(AreaController.NO_ROOM_WORDS % "sprinklers")
+	assert_str(farm.hud.message_text()).is_equal(AreaController.NO_ROOM_WORDS % "sprinklers")
 
 
 func test_the_plot_is_told_when_a_sprinkler_is_set_or_taken_up() -> void:

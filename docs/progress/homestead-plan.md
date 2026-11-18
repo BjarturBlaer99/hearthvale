@@ -554,9 +554,12 @@ planted on purpose in each step's code to see that the tests catch them. Each ph
 TECH_DESIGN, the roadmap, the README and DECISIONS up to date; CLAUDE.md is the coordinator's.
 
 **Phase 1: the homestead** *(three commits)*
-- [ ] 1a. **The move.** First the version 5 fixture. Then the village's west gap, the map, the farmhouse
+- [x] 1a. **The move.** First the version 5 fixture. Then the village's west gap, the map, the farmhouse
   and its door, the cottage locked, the field on the homestead, save version 6, the story's words, and
   the nine test suites that used the village's plot moved to the farm.
+  *Built 2026-11-18. The map was baked as drawn: no cell shifted. He arrives on the farm at (38, 14) and
+  in the village at (1, 16). The main quest's words are measured against the quest log's box where a
+  test counted them in letters (150 at the most): the approved words are longer than that, and fit.*
 - [ ] 1b. **The overgrowth.** The seven kinds of debris as data, cleared for good, fibre, boulders that
   want a better pickaxe, and no tilling under debris.
 - [ ] 1c. **The rest.** The two tunes, playtest scenarios (`homestead`; `farm` moved), capture shots, and

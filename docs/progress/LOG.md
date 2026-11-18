@@ -2595,3 +2595,40 @@ The user asked for a farm of the hero's own outside the village: a new area wher
 - **`docs/HOMESTEAD.md`,** an untracked copy of the request, was left as it is.
 
 **Approved.** Shown the plan, the user approved it as written the same day ("Approve as written"). The thirty decisions are recorded in `docs/DECISIONS.md` and at the head of the plan, and CLAUDE.md has the Homestead's paragraph under "Current goal". No phase is built yet; phase 1 is next.
+
+## 2026-11-18 — The Homestead, phase 1, step 1a: the move
+
+The first of phase 1's three steps (`docs/progress/homestead-plan.md`, approved as written). **The phase was stopped once and picked up again.** A first subagent wrote the version 5 fixture (committed, `569ddf0`) and most of this step, and was stopped as it began the step's new tests, with nothing run. A second read every change it left against the plan, kept it, finished the tests and ran everything. What was found is under "Picked up" below.
+
+**Built**
+- **The way west.** Two cells of Hearthvale's west tree line are open on the lane's rows and the lane runs on to the edge (one re-bake of the village; four cells changed and no others). `WestRoad` there and `EastRoad` on the farm lead to each other.
+- **The farm's map** (`homestead`, "Your farm"): 40 by 30, baked from the plan's own drawing. Woods all round, the road in along rows 14 and 15, a path up to the farmhouse door, the farmhouse (the village's house tiles, thatched), a pond in the south-west corner, eleven old trees. Twelve cells from where he comes in to his doorstep.
+- **The home's move.** The area `home` is the same room, now "Your farmhouse"; its doormat leads onto the farm. Sleeping, 02:00 and a collapse wake him there, with no rule changed.
+- **The old cottage is locked:** its door names a place that is never open (`old_cottage` in `data/rules/hours.json`) and says "The cottage stands empty, and its door is locked."
+- **The field:** the plot is 12 by 6 and lies on the farm at (22, 17); the village has none. The old plot's cells are its north-west corner.
+- **Save version 6:** a section `homestead` (what is cleared for good; nothing clears anything until step 1b). `_v5_to_v6()` adds it and moves nothing.
+- **The story's words,** exactly the plan's table: the title's line, four stages of the main quest, Elder Bram's welcome and his tale, and his supper's journal.
+- **Nine test suites moved to the farm** with their checks: `farm_test`, `crops_test`, `farm_round_test`, `skills_test`, `upgrades_test`, `whole_story_test`, `mouse_test`, `farm_save_test`, `crop_save_test`.
+
+**Picked up**
+- **Kept as found:** all of the first subagent's code, data, map and moved tests. Every changed test was read line by line for a check weakened in the moving.
+- **Three checks were looser than before the move, each for a reason that ends with step 1b:** two "he walks across the plot and stops at its far end" checks (`farm_test`, `crops_test`) said "at least as far", because on the farm nothing yet stands beyond the clear corner to stop him; and "every cell of the plot is open" says "open ground" for the whole field and "nothing stands on it" for the clear corner only, since the rest is to be overgrown. Step 1b puts the first two back at full strength.
+- **Finished:** `tests/world/home_move_test.gd` was named by four other suites and did not exist. It was written: in and out of the farmhouse door; staying up, collapsing (on the farm and in the village) and sleeping each wake him in the farmhouse; the cottage shut at nine hours of the day and night with its words; the version 5 save opened in the world.
+- **Fixed, three tests that had never been run:** the order of the saved cells (row by row, which the test had wrong); a comparison of whole numbers with the fractions a JSON file gives; and the whole story's walk out of the farmhouse, which began beside the door instead of at it.
+- **The map and the village were baked already,** and baking them again gives the same two scenes, byte for byte.
+
+**What differs from the plan**
+- **Nothing in the map shifted:** it is the drawing, cell for cell.
+- **The main quest's words are measured against the quest log's box,** where a test counted letters (150 at most). The approved words for two stages are longer, and fit.
+
+**Verified**
+- **959 tests in 127 suites, all passing** (935 in 123 before the Homestead). Twenty-four are new: the homestead as it is kept (5), the save (5), the map and the walk (6), the home's move (7), and the can at the farm's pond (1, where one test of the well and the pond became two).
+- **The suites that moved were read against what they were before the move,** change by change (above).
+- **The game boots headless** with no script error.
+- **Baking `village` and `homestead` again changes nothing.**
+- **The player's own save has the same checksum as before** (it is version 5 and was not opened).
+
+**Known issues and limits**
+- **Nothing is overgrown yet** (step 1b), and the farm plays the village's tune (step 1c).
+- **`tools/playtest.gd -- farm`, `tools/play_days.gd` and twelve capture shots still take the plot to be in the village** (step 1c).
+- **Not played by a person.**

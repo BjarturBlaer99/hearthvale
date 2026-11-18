@@ -8,13 +8,17 @@ extends GdUnitTestSuite
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
 const VILLAGE: String = "res://world/areas/village/village.tscn"
+const FARM: String = "res://world/areas/homestead/homestead.tscn"
 const FIELD: String = "res://world/areas/south_field/south_field.tscn"
 const TITLE: String = "res://ui/title_screen.tscn"
 const ENDING: String = "res://ui/ending_screen.tscn"
 const TEST_SLOT: int = 981
 const FRAME: float = 1.0 / 60.0
-## The plot's north-west corner in Hearthvale, and open grass well away from it and from water.
-const PLOT: Vector2i = Vector2i(12, 18)
+## The field's north-west corner on the homestead, the pond's west bank there, and open grass
+## on the farm well away from the field and from water; and open grass in Hearthvale.
+const PLOT: Vector2i = Vector2i(22, 17)
+const POND_BANK: Vector2i = Vector2i(3, 22)
+const FARM_GRASS: Vector2i = Vector2i(34, 12)
 const GRASS: Vector2i = Vector2i(23, 20)
 
 var _area: Node
@@ -220,56 +224,56 @@ func test_a_left_click_works_the_plot_with_a_tool_and_swings_the_sword_elsewhere
 	for item: Array in [[&"wooden_sword", 1], [&"hoe", 1], [&"watering_can", 1], [&"turnip_seeds", 2]]:
 		GameState.add_item(item[0], item[1])
 	GameState.equip(&"hoe")
-	var village: AreaController = _load(VILLAGE)
+	var farm: AreaController = _load(FARM)
 	# Facing the plot: the hoe.
-	_face_plot(village, Vector2i(2, 0))
-	assert_bool(village.faces_farm_work()).is_true()
-	village._unhandled_input(_click(MOUSE_BUTTON_LEFT))
+	_face_plot(farm, Vector2i(2, 0))
+	assert_bool(farm.faces_farm_work()).is_true()
+	farm._unhandled_input(_click(MOUSE_BUTTON_LEFT))
 	assert_bool(GameState.farm().is_tilled(Vector2i(2, 0))).override_failure_message("a left click hoes").is_true()
 	assert_array(_heard).contains([&"hoe"])
 	assert_array(_heard).not_contains([&"sword"])
 	# The same cell again: the hoe says why not, and he doesn't hack at his plot.
-	_rest(village)
+	_rest(farm)
 	_heard.clear()
-	assert_bool(village.use_hand()).is_false()
-	assert_str(village.hud.message_text()).is_equal(ToolUse.HOE_DONE)
+	assert_bool(farm.use_hand()).is_false()
+	assert_str(farm.hud.message_text()).is_equal(ToolUse.HOE_DONE)
 	assert_array(_heard).contains_exactly([&"nope"])
-	# Seeds, then the can at the well and on the seed.
+	# Seeds, then the can at the pond and on the seed.
 	GameState.equip(&"turnip_seeds")
-	assert_bool(village.use_hand()).is_true()
+	assert_bool(farm.use_hand()).is_true()
 	assert_str(GameState.farm().crop_at(Vector2i(2, 0))).is_equal("turnip")
-	_rest(village)
+	_rest(farm)
 	GameState.equip(&"watering_can")
-	village.player.motor.place(PLOT + Vector2i(5, 1))
-	village.player.face(Vector2.RIGHT)
-	assert_bool(village.faces_farm_work()).override_failure_message("the well is work for the can").is_true()
-	assert_bool(village.use_hand()).is_true()
+	farm.player.motor.place(POND_BANK)
+	farm.player.face(Vector2.RIGHT)
+	assert_bool(farm.faces_farm_work()).override_failure_message("the pond is work for the can").is_true()
+	assert_bool(farm.use_hand()).is_true()
 	assert_int(GameState.item_count(&"water")).is_equal(10)
-	_rest(village)
-	_face_plot(village, Vector2i(2, 0))
-	assert_bool(village.use_hand()).is_true()
+	_rest(farm)
+	_face_plot(farm, Vector2i(2, 0))
+	assert_bool(farm.use_hand()).is_true()
 	assert_bool(GameState.farm().is_watered(Vector2i(2, 0))).is_true()
 	# Away from the plot and the water a tool in hand is no use: he swings his sword.
 	for tool: StringName in [&"hoe", &"watering_can", &"turnip_seeds"]:
-		_rest(village)
+		_rest(farm)
 		GameState.equip(tool)
-		village.player.motor.place(GRASS)
-		village.player.face(Vector2.UP)
-		assert_bool(village.faces_farm_work()).is_false()
+		farm.player.motor.place(FARM_GRASS)
+		farm.player.face(Vector2.UP)
+		assert_bool(farm.faces_farm_work()).is_false()
 		_heard.clear()
 		var energy: float = GameState.energy
-		village.hud.show_message("-")
-		assert_bool(village.use_hand()).override_failure_message("with the %s in hand" % tool).is_true()
+		farm.hud.show_message("-")
+		assert_bool(farm.use_hand()).override_failure_message("with the %s in hand" % tool).is_true()
 		assert_array(_heard).contains_exactly([&"sword"])
 		assert_float(GameState.energy).is_equal(energy - 0.5)
-		assert_str(village.hud.message_text()).override_failure_message("and the tool says nothing").is_equal("-")
+		assert_str(farm.hud.message_text()).override_failure_message("and the tool says nothing").is_equal("-")
 	assert_int(GameState.item_count(&"turnip_seeds")).is_equal(1)
 	assert_int(GameState.farm().crop_count()).is_equal(1)
 	# The item's own key still asks the tool, wherever he is.
-	_rest(village)
+	_rest(farm)
 	GameState.equip(&"hoe")
-	assert_bool(village.use_item()).is_false()
-	assert_str(village.hud.message_text()).is_equal(ToolUse.HOE_NOT_HERE)
+	assert_bool(farm.use_item()).is_false()
+	assert_str(farm.hud.message_text()).is_equal(ToolUse.HOE_NOT_HERE)
 
 
 func test_with_no_sword_a_tool_says_what_it_is_for() -> void:

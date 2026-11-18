@@ -205,6 +205,10 @@ const SHOTS: Array = [
 	["156_tilda_buys_ore_and_bars", &"shop", Vector2i(5, 4), Vector2.UP, 0, "shop_ore"],
 	["157_wenna_asks_for_coal", &"weaver_house", Vector2i(7, 4), Vector2.UP, 0, "favour:wenna:12"],
 	["158_edda_asks_for_iron", &"north_fields", Vector2i(25, 22), Vector2.UP, 0, "favour:shepherd_edda:12"],
+	# The Homestead (2026-11-17), phase 1: the farm as he comes in by the road, and the farmhouse
+	# from its yard.
+	["159_arriving_on_the_farm", &"homestead", Vector2i(37, 14), Vector2.LEFT, 0, ""],
+	["160_the_farmhouse_and_its_yard", &"homestead", Vector2i(28, 13), Vector2.UP, 0, ""],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0

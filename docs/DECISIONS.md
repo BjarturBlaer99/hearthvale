@@ -1147,3 +1147,21 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   full tests again, confirms the commit, and records what the user approves here, in the plan and, where
   a phase changes how something works, in CLAUDE.md. CLAUDE.md is the coordinator's to edit, not a
   phase's.
+- 2026-11-18 — **The Homestead, step 1a: what the plan left open.**
+  - **A sketch may have a legend of its own** (`tools/greybox/build_maps.gd`): the farm's map is the
+    plan's drawing, read character by character, and its legend says which characters lay a tile. The Old
+    Quarry's sketches are read as before. Why: the plan's drawing is the map, and its letters for debris
+    are not the quarry's.
+  - **The old cottage keeps its door, its entry point (`home_door`) and its scene's node name
+    (`HomeDoor`).** Nothing leads to the entry now. Why: D9 says "no scene removed", and the tests of the
+    doorway still hold.
+  - **The main quest's words are measured, not counted.** A test held each stage's journal to 150
+    letters; the approved words for `settle` and `bram` are longer. The test now lays each stage out in
+    the quest log's own label and checks that it ends above the line of help, and that no stage is over
+    200 letters.
+  - **The farm is named "Your farm" and the room "Your farmhouse"** (the HUD's corner and the title's
+    line for a save).
+  - **For looks only, on the farm's Decor layer:** a chimney with its smoke, flowers gone wild along the
+    farmhouse's front, three lily pads on the pond, and a scatter of tufts, flowers, pebbles and
+    mushrooms as the other outdoor maps have.
+  - **Until step 1c the farm plays the village's tune.**

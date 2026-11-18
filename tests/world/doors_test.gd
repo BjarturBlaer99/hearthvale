@@ -1,19 +1,21 @@
 extends GdUnitTestSuite
 ## Doors (H1): walking into a house door takes the hero inside, in front of the doormat;
 ## walking out over the doormat brings them back out of the same door. Every exit in every
-## area leads to a real entry point, and every villager and sign has a conversation.
+## area leads to a real entry point, and every villager and sign has a conversation. The
+## hero's own door is the farmhouse's, on the homestead (2026-11-17).
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
 const VILLAGE: String = "res://world/areas/village/village.tscn"
 const AREAS: Array[StringName] = [&"village", &"elder_house", &"weaver_house", &"home", &"south_field", &"shop", &"ruin_cellar", &"cistern", &"keep", &"north_fields", &"old_wood", &"crypt", &"willowmere",
+	&"homestead",
 	&"quarry", &"quarry_1", &"quarry_2", &"quarry_3", &"quarry_4", &"quarry_5", &"quarry_6", &"quarry_7", &"quarry_8", &"quarry_9"]
-## [house, the cell just outside its door]
+## [house, the area its door is in, the cell just outside its door]
 const HOUSES: Array = [
-	[&"elder_house", Vector2i(30, 15)],
-	[&"weaver_house", Vector2i(16, 15)],
-	# The hero's own cottage (P2b).
-	[&"home", Vector2i(8, 15)],
+	[&"elder_house", &"village", Vector2i(30, 15)],
+	[&"weaver_house", &"village", Vector2i(16, 15)],
+	# The hero's own home (P2b): the farmhouse on the homestead since 2026-11-17.
+	[&"home", &"homestead", Vector2i(28, 12)],
 ]
 
 var _area: Node
@@ -32,10 +34,11 @@ func after_test() -> void:
 func test_you_can_enter_the_houses_and_come_out_the_same_door() -> void:
 	for house: Array in HOUSES:
 		var house_id: StringName = house[0]
-		var outside: Vector2i = house[1]
+		var outdoors: String = WorldPaths.scene_for(house[1])
+		var outside: Vector2i = house[2]
 		GameState.new_game()
-		GameState.update_player(&"village", outside)
-		_area = Steps.load_area(VILLAGE, _area)
+		GameState.update_player(house[1], outside)
+		_area = Steps.load_area(outdoors, _area)
 		var village: AreaController = _area
 		assert_that(village.player.motor.cell).is_equal(outside)
 
@@ -52,7 +55,7 @@ func test_you_can_enter_the_houses_and_come_out_the_same_door() -> void:
 		assert_that(str(GameState.player["area"])).is_equal(String(house_id))
 
 		path = Steps.walk_until_travel(inside, Vector2.DOWN)
-		assert_str(path).override_failure_message("walking out of %s" % house_id).is_equal(VILLAGE)
+		assert_str(path).override_failure_message("walking out of %s" % house_id).is_equal(outdoors)
 		_area = Steps.load_area(path, _area)
 		var back: AreaController = _area
 		assert_that(back.player.motor.cell).override_failure_message("out of %s's own door" % house_id).is_equal(outside)
@@ -122,4 +125,4 @@ func test_every_exit_leads_to_an_entry_point_and_every_talker_has_a_conversation
 			for other: Node in target.get_node(^"Interactables").get_children():
 				if other is AreaExit:
 					assert_bool((other as AreaExit).covers(entry_cell)).override_failure_message(where + ": arrives on another exit").is_false()
-	assert_int(exits).override_failure_message("four doors and four doormats (the hero's own since P2b), the south road, the cellar stairs and the cistern stairs both ways, the north road, the fields' and the wood's roads, the keep's gate both ways, the way out behind the boss, the chapel's two doors and the crypt's stairs, the walk to the marsh both ways, and the Old Quarry: its mouth both ways, the ladder down from its hall and a ladder up from each of nine floors").is_equal(38)
+	assert_int(exits).override_failure_message("four doors and four doormats (the hero's own since P2b), the south road, the cellar stairs and the cistern stairs both ways, the north road, the fields' and the wood's roads, the keep's gate both ways, the way out behind the boss, the chapel's two doors and the crypt's stairs, the walk to the marsh both ways, the Old Quarry: its mouth both ways, the ladder down from its hall and a ladder up from each of nine floors, and the Homestead: the lane's west end both ways and the farmhouse's door (the old cottage's door still stands, locked)").is_equal(41)

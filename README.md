@@ -94,7 +94,7 @@ Beaten enemies sometimes drop hearts or coins.
   of cooking adds a tenth to the energy a dish gives. A level rising is said at the top of the screen, and
   the pause menu shows all three. Skills never change hearts, damage or speed.
 - **The story over days** (the pivot, step 4a): a new game begins with a quest, "A Place of Your Own", in the
-  quest log (Esc, Quests). It says where your cottage is, how to till and plant, and what comes next. Elder
+  quest log (Esc, Quests). It says where your farm is, how to till and plant, and what comes next. Elder
   Bram welcomes a newcomer and speaks of the old keep only once a first seed is in the ground. Until he gives
   his word the keep's gate in the Old Wood is chained. The bars under the chapel lift at dawn on the day after
   the Warden falls, so there is a night at home between the two dungeons.
@@ -114,10 +114,11 @@ Beaten enemies sometimes drop hearts or coins.
 - **Seeds and crops** (the pivot, step 3b): turnips, carrots, wheat, potatoes and pumpkins. A seed is planted
   from the item button in tilled soil; a crop grows a stage each morning if it was watered the day before,
   withers after two dry mornings in a row, and waits when ripe; a right click picks it. The harvest can be eaten raw. A
-  first pouch of turnip seeds lies in the cottage; Tilda sells the rest.
-- **A plot to farm** (the pivot, step 3a): eighteen cells of soil between Tilda's shop and the well. The hoe
-  and the watering can lie in the hero's cottage and go on the item button: the hoe tills a cell, the can
-  waters it and fills at the well or the pond. Watered soil is dry again by morning.
+  first pouch of turnip seeds lies in the farmhouse; Tilda sells the rest.
+- **A plot to farm** (the pivot, step 3a; on the homestead since 2026-11-17): the field below the
+  farmhouse. The hoe and the watering can lie in the farmhouse and go on the item button: the hoe tills a
+  cell, the can waters it and fills at the farm's pond (or the village's well or pond). Watered soil is
+  dry again by morning.
 - **Hours and night** (the pivot, step 2e): Tilda's shop is open from 08:00 to 18:00; villagers who stand
   outdoors go home at 20:00 and are back at 06:00; house windows are lit from dusk to dawn; monsters met in the
   fields and the wood at night are tougher and drop coins more often; and the night has a tune of its own.
@@ -127,9 +128,10 @@ Beaten enemies sometimes drop hearts or coins.
 - **Energy** (the pivot, step 2c): a bar under the hearts. Sprinting, swinging the sword and shooting the bow
   spend it. Low on energy the hero slows; out of it he collapses and wakes at home, a little poorer. Sleep
   refills it. It never costs a heart.
-- **A home and a bed** (the pivot, step 2b): the thatched cottage west of the weaver's is the hero's own, with
-  a door and a room inside. Sleeping in the bed starts the next day with full hearts and saves the game; stay
-  up until 02:00 and he wakes there anyway.
+- **A home and a bed** (the pivot, step 2b; moved by the Homestead): the farmhouse on your own land is the
+  hero's home, with a door and a room inside. Sleeping in the bed starts the next day with full hearts and
+  saves the game; stay up until 02:00 and he wakes there anyway. (Until the Homestead it was the thatched
+  cottage west of the weaver's, which is now locked.)
 - **A day that passes** (the pivot, step 2a): a day runs from 06:00 to 02:00 in fourteen minutes; dawn is
   peach, dusk orange, night blue; lamps light at dusk; the day and the hour show under the hearts.
 - **A finished look to the screens** (the pivot, step 1f): a painted evening on the title screen, a larger
@@ -147,6 +149,13 @@ Beaten enemies sometimes drop hearts or coins.
   you; the Old Wood has mist. Only the water moves.
 - **Walls with height** (the pivot, step 1d): dungeon and house walls show a lit front and a dark top, pillars
   stand tall, and roofs have a ridge you walk behind.
+- **The Homestead** (asked for on 2026-11-17; phase 1 of five is built): an old farmstead of your own.
+  Follow the lane west out of Hearthvale, past the last cottage and through the trees: it is a few
+  seconds' walk. The farmhouse there is your home (the bed, the hearth and the workbench are inside), your
+  field lies below it across the road, and a pond in the south-west corner fills the watering can.
+  - **One corner of the field is clear** and can be tilled on the first morning.
+  - **An older save loads as it was:** a game saved in the old cottage opens in the farmhouse, and its
+    soil and crops are in the field's clear corner.
 - **Willowmere:** a marsh east of the village. Climb the stairs at the south end of the east meadow and
   follow the planks through the gap in the trees. Boardwalks cross the water between its banks and islets;
   cattail root, marsh berries and bog mushrooms grow there, and two of them make Marsh Stew at your hearth.
@@ -161,7 +170,7 @@ Beaten enemies sometimes drop hearts or coins.
   rocks; reaching floors 4 and 7 opens the lift in the entrance hall. The rocks are back each morning, in
   the same places with other things in them. Mining takes energy, so bring food. Tilda buys the ore, the
   bars a furnace makes of it, and crystals; she has no use for stone, coal or wood.
-- **Crafting at home:** the workbench stands by the east wall of your cottage. Face it and right-click for
+- **Crafting at home:** the workbench stands by the east wall of your farmhouse. Face it and right-click for
   its list: what you know how to make, what the thing under the cursor needs beside what you have, and
   greyed out what you can't make yet. New things appear on the list as you find what they are made of.
   - **The furnace** (20 stone, 5 copper ore) smelts overnight: load it with three ore and a coal for each

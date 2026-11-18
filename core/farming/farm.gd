@@ -3,12 +3,14 @@ extends RefCounted
 ## The hero's plot (P3, GDD §7), pure: which of its cells are tilled and which are watered, what
 ## grows in each and how far along it is; what the hoe, the can, a seed and a harvesting hand do
 ## to one; and what a new morning does. Cells are the plot's own ((0, 0) is its north-west
-## corner), so the plot can stand anywhere on a map. The numbers are data
+## corner), so the plot can stand anywhere on a map: it lay in Hearthvale, 6 by 3, until the
+## Homestead (2026-11-17), and is the field there now, 12 by 6, with the old plot's cells its
+## north-west corner, so a saved plot is where it was. The numbers are data
 ## (data/rules/farm.json); how long a crop takes is the crop's own (data/crops), handed in by
 ## whoever asks. GameState keeps one farm and saves it.
 
 ## What a missing rule falls back to (a test checks they are the game's own rules).
-const DEFAULTS: Dictionary = {"plot": {"columns": 6, "rows": 3}, "wither_after": 2}
+const DEFAULTS: Dictionary = {"plot": {"columns": 12, "rows": 6}, "wither_after": 2}
 ## What a cell's soil can be.
 const BARE: StringName = &"bare"
 const TILLED: StringName = &"tilled"

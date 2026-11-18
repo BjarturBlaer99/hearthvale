@@ -5,7 +5,7 @@
   "start_stage": "settle",
   "stages": {
     "settle": {
-      "journal": "Your cottage is the thatched house at the west end of the lane in Hearthvale. Take what lies inside its door.",
+      "journal": "The old farmstead is yours now. Follow the lane west out of Hearthvale, past the last cottage, to its farmhouse. Take what lies inside the door.",
       "objectives": [
         {
           "id": "take_hoe",
@@ -72,7 +72,7 @@
       ]
     },
     "plant": {
-      "journal": "Your plot is across the lane, by the well. Choose the hoe with the wheel or a number key, and left click to till. Plant a seed the same way.",
+      "journal": "Your field lies below the farmhouse, across the road: one corner of it is clear. Choose the hoe with the wheel or a number key, and left click to till. Plant a seed the same way.",
       "objectives": [
         {
           "id": "plant_seed",
@@ -96,7 +96,7 @@
       ]
     },
     "bram": {
-      "journal": "Your first seed is in the ground. Water it each morning: the can fills at the well. Elder Bram, in the blue-roofed house, wants a word.",
+      "journal": "Your first seed is in the ground. Water it each morning: the can fills at the pond in the corner of your land. Elder Bram, in the blue-roofed house in Hearthvale, wants a word.",
       "objectives": [
         {
           "id": "see_bram",
@@ -208,7 +208,7 @@
       ]
     },
     "done": {
-      "journal": "The Shade is gone. Hearthvale sleeps easy, and the cottage is yours.",
+      "journal": "The Shade is gone. Hearthvale sleeps easy, and the farm is yours.",
       "on_enter": [
         {
           "type": "complete_quest"

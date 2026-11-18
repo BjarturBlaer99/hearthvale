@@ -48,7 +48,7 @@
       ]
     },
     "done": {
-      "journal": "Elder Bram had his supper. He told you that Sir Aldric was a farmer of this valley, and that your cottage was his. He gave you thirty coins.",
+      "journal": "Elder Bram had his supper. He told you that Sir Aldric was a farmer of this valley, and that your farm was his. He gave you thirty coins.",
       "on_enter": [
         {
           "type": "give_item",

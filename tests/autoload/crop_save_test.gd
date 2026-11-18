@@ -134,7 +134,7 @@ func test_a_save_from_step_3a_loads_as_it_is_and_an_unknown_crop_is_left_out() -
 	_write(TEST_SLOT, JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/saves/v2_third_day.json")))
 	assert_int(SaveSystem.load_from_slot(TEST_SLOT)).is_equal(OK)
 	assert_int(GameState.farm().crop_count()).is_equal(0)
-	assert_int(GameState.farm().count_of(Farm.BARE)).is_equal(18)
+	assert_int(GameState.farm().count_of(Farm.BARE)).is_equal(72)
 
 
 func _on_farm_changed() -> void:

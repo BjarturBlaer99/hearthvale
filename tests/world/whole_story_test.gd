@@ -1,7 +1,7 @@
 extends GdUnitTestSuite
 ## The whole story in one test (P4d): a new game carried through every gate of the pivot's
 ## story to the ending's lines, with what P4 added on the way. Six days:
-##   1  the cottage, the tools, five turnips planted; Elder Bram's welcome, then his promise;
+##   1  the farmhouse, the tools, five turnips planted in the field's clear corner; Elder Bram's welcome, then his promise;
 ##      the keep's gate chained, then open; berries for Pip
 ##   2  watering; berries for Pip: two marks
 ##   3  Pip asks his favour; blossoms for Wenna
@@ -14,12 +14,14 @@ extends GdUnitTestSuite
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
 const VILLAGE: String = "res://world/areas/village/village.tscn"
+const FARM: String = "res://world/areas/homestead/homestead.tscn"
 const HOME: String = "res://world/areas/home/home.tscn"
 const ELDER_HOUSE: String = "res://world/areas/elder_house/elder_house.tscn"
 const WEAVER: String = "res://world/areas/weaver_house/weaver_house.tscn"
 const WOOD: String = "res://world/areas/old_wood/old_wood.tscn"
 const FRAME: float = 1.0 / 60.0
-const PLOT: Vector2i = Vector2i(12, 18)
+## The field's north-west corner on the homestead: its clear corner is where he plants.
+const PLOT: Vector2i = Vector2i(22, 17)
 const QUEST: StringName = &"a_place_of_your_own"
 const TEST_SLOT: int = 972
 
@@ -63,22 +65,25 @@ func test_a_new_game_runs_through_every_gate_to_the_endings_lines() -> void:
 	_talk(house, "Bram")
 	assert_str(house.hud.dialogue.shown_text()).contains("Welcome to Hearthvale")
 	_end(house)
-	# The cottage: what lies inside the door.
+	# The farmhouse: what lies inside the door.
 	var home: AreaController = _load(HOME)
 	for found: String in ["Hoe", "WateringCan", "TurnipSeeds"]:
 		home.player.motor.place((home.interactables.get_node(NodePath(found)) as ItemPickup).cell())
 		assert_bool(home.interact()).is_true()
 	assert_that(Quests.runner.stage(QUEST)).is_equal(&"plant")
-	# The plot: five cells tilled and planted with the left click, and watered.
-	village = _load(VILLAGE)
+	# Out of his door he is on the farm. The field: five cells of its clear corner tilled and
+	# planted with the left click, and watered.
+	home.player.motor.place(PlayerMotor.cell_of(home.entry_marker(&"door").position))
+	assert_str(Steps.walk_until_travel(home, Vector2.DOWN)).is_equal(FARM)
+	var farm: AreaController = _load(FARM)
 	for x: int in 5:
-		_face(village, Vector2i(x, 0))
+		_face(farm, Vector2i(x, 0))
 		GameState.equip(&"hoe")
-		assert_bool(village.use_hand()).is_true()
-		_rest(village)
+		assert_bool(farm.use_hand()).is_true()
+		_rest(farm)
 		GameState.equip(&"turnip_seeds")
-		assert_bool(village.use_hand()).is_true()
-		_rest(village)
+		assert_bool(farm.use_hand()).is_true()
+		_rest(farm)
 	assert_that(Quests.runner.stage(QUEST)).override_failure_message("the first seed is in").is_equal(&"bram")
 	_water_the_plot()
 	# Elder Bram speaks of the keep now, and his promise unchains its gate.
@@ -120,12 +125,13 @@ func test_a_new_game_runs_through_every_gate_to_the_endings_lines() -> void:
 	_sleep(weaver)
 
 	# --- Day 4: the harvest, and the keep -----------------------------------------------
-	village = _load(VILLAGE)
+	farm = _load(FARM)
 	for x: int in 5:
-		_face(village, Vector2i(x, 0))
-		assert_bool(village.interact()).override_failure_message("picking turnip %d" % x).is_true()
+		_face(farm, Vector2i(x, 0))
+		assert_bool(farm.interact()).override_failure_message("picking turnip %d" % x).is_true()
 	assert_int(GameState.item_count(&"turnip")).is_equal(5)
 	assert_int(GameState.skill_level(Skills.FARMING)).override_failure_message("five cells tilled and five crops picked").is_equal(2)
+	village = _load(VILLAGE)
 	_give(village, "Pip", "Wild Berries")
 	weaver = _load(WEAVER)
 	_give(weaver, "Wenna", "Cherry Blossoms")

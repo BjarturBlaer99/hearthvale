@@ -165,6 +165,8 @@ func migrate(data: Dictionary, from_version: int) -> Dictionary:
 		migrated = _v3_to_v4(migrated)
 	if from_version < 5:
 		migrated = _v4_to_v5(migrated)
+	if from_version < 6:
+		migrated = _v5_to_v6(migrated)
 	migrated["version"] = GameState.SAVE_VERSION
 	return migrated
 
@@ -209,6 +211,18 @@ func _v4_to_v5(data: Dictionary) -> Dictionary:
 	data["mine"] = {"number": hash([data.get("play_time", 0.0), data.get("day", 1), data.get("hearts_max", 0)]), "day": 0, "broken": {}}
 	data["home"] = {"furnace": {}, "chest": []}
 	data["found"] = []
+	return data
+
+
+## Version 6 (2026-11-17) came with the Homestead: the hero's home is the farmhouse on his own
+## land west of the village, and his plot is the field there. Nothing in an older save needs
+## moving. Its home is the same room, now inside the farmhouse, so a hero saved in his cottage
+## wakes in the farmhouse on the cell he stood on, with his furnishings, his furnace's load and
+## his chest as they were; and its plot's cells are the field's north-west corner, which is
+## clear in every game, so its soil, crops and sprinklers are where they were. What it gains is
+## the homestead itself, as a new game's: overgrown, with nothing cleared.
+func _v5_to_v6(data: Dictionary) -> Dictionary:
+	data["homestead"] = {"cleared": []}
 	return data
 
 

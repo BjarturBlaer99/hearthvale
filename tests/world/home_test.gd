@@ -1,7 +1,8 @@
 extends GdUnitTestSuite
 ## Home and sleep (P2b): the thatched cottage has a door and a room inside; sleeping in the bed
 ## starts the next day rested and saves; and staying up until the day runs out wakes the hero
-## by his bed.
+## by his bed. Since the Homestead (2026-11-17) the room is the farmhouse's inside and the
+## cottage's door is locked: tests/world/home_move_test.gd has the move.
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
@@ -48,15 +49,19 @@ func test_the_cottage_has_a_door_and_the_doorway_is_the_one_new_cell() -> void:
 	assert_that(AreaController.entry_facing(out)).is_equal(Vector2.DOWN)
 	var reachable: Dictionary = _reachable(TerrainQuery.new(village.grid), SQUARE)
 	assert_bool(reachable.has(DOORWAY)).is_true()
-	# (And two more since Willowmere: the way out through the east tree line, tests/world/willowmere_test.gd.)
-	assert_int(reachable.size()).override_failure_message("one more cell to walk to than before, the doorway").is_equal(REACHABLE_BEFORE + 1 + 2)
+	# (And two more since Willowmere: the way out through the east tree line, tests/world/willowmere_test.gd;
+	# and four since the Homestead: the lane's west end through the west tree line, tests/world/homestead_test.gd.)
+	assert_int(reachable.size()).override_failure_message("one more cell to walk to than before, the doorway").is_equal(REACHABLE_BEFORE + 1 + 2 + 4)
+	# The door still stands in the wall, and is locked for good since the Homestead.
+	assert_that(door.hours).is_equal(&"old_cottage")
+	assert_bool(village.is_shut(door)).is_true()
 
 
 func test_home_is_one_room_with_a_bed_a_hearth_and_a_candle() -> void:
 	var home: AreaController = _load(HOME)
 	assert_that(home.ambience).is_equal(Ambience.INTERIOR)
 	assert_int(home.player.camera_zoom()).is_equal(2)
-	assert_str(WorldPaths.area_name(WorldPaths.HOME_AREA)).is_equal("Your cottage")
+	assert_str(WorldPaths.area_name(WorldPaths.HOME_AREA)).is_equal("Your farmhouse")
 	assert_that(home.grid.size).override_failure_message("the size of the other houses").is_equal(Vector2i(11, 9))
 	var layer: TileMapLayer = home.get_node(^"Height")
 	var bed: Bed = home.interactables.get_node(^"Bed")
@@ -71,7 +76,8 @@ func test_home_is_one_room_with_a_bed_a_hearth_and_a_candle() -> void:
 	var reachable: Dictionary = _reachable(TerrainQuery.new(home.grid), door_cell)
 	for must: Vector2i in [bed.cell() + Vector2i.RIGHT, Vector2i(5, 2), Vector2i(5, 8), Vector2i(9, 3)]:
 		assert_bool(reachable.has(must)).override_failure_message("%s can be walked to" % must).is_true()
-	assert_that((home.interactables.get_node(^"Doormat") as AreaExit).target_entry).is_equal(&"home_door")
+	assert_that((home.interactables.get_node(^"Doormat") as AreaExit).target_area).override_failure_message("its door opens onto the farm").is_equal(&"homestead")
+	assert_that((home.interactables.get_node(^"Doormat") as AreaExit).target_entry).is_equal(&"farmhouse_door")
 
 
 func test_the_bed_asks_and_not_yet_changes_nothing() -> void:

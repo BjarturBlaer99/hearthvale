@@ -445,6 +445,11 @@ a cell, until the area places them. Bump `version` on breaking changes and add a
   `farm` (§28). The three that came with crafting are read with defaults, so the version did not change
   again. `SaveSystem._v4_to_v5()` gives an older save a mine of its own, a cold furnace, an empty chest and
   nothing found; a test loads a real version 4 save.
+- **Version 6** (the Homestead, 2026-11-18) added `homestead` (§30): `{ "cleared": ["x,y", ...] }`, the
+  cells of the farm cleared for good. Later phases add fields to it, read with defaults.
+  `SaveSystem._v5_to_v6()` gives an older save an overgrown homestead and moves nothing: the home is the
+  same area and the plot's cells are the field's clear corner. A test loads a real version 5 save made
+  inside the old cottage (`tests/fixtures/saves/v5_in_the_old_cottage.json`).
 
 ## 10. Testing
 Every class in `core/` has gdUnit4 tests. Areas get layout tests (reachability from the spawn with the real
@@ -802,8 +807,8 @@ run headless; see CLAUDE.md for the command and gotchas.
   by his bed (`WorldPaths.HOME_AREA`, `HOME_BED`), saves, and leaves `GameState.arrival_notice` for the home
   area to say once as it loads (words that are not part of a save). `_process` stops there for the frame: the
   rest of it would write where he stood over where he is going.
-- **Home and sleep (P2b):** `home` is an area like the other houses (the thatched cottage's inside; its door is
-  an `AreaExit` in the village). The bed is a `Bed` (`gameplay/interactables/`), a `Talkable` on the bed's
+- **Home and sleep (P2b):** `home` is an area like the other houses (the farmhouse's inside since the
+  Homestead, §30, and the thatched cottage's before it; its door is an `AreaExit` on the homestead). The bed is a `Bed` (`gameplay/interactables/`), a `Talkable` on the bed's
   tile whose conversation is data (`data/dialogue/bed.json`). Its first answer has the effect `sleep`:
   `EffectApplier` calls `GameState.sleep()`, which starts the next day, fills hearts and energy and emits
   `EventBus.slept`; the area running then saves the game and says so.
@@ -896,7 +901,8 @@ run headless; see CLAUDE.md for the command and gotchas.
 - **Tools:** `tools/capture.gd` has the action `shut` (the hero tries the shop's door at 19:00).
 
 ## 20. Farming
-- **The farm's rules are data** (`data/rules/farm.json`): the plot's size in cells (6 by 3) and how many dry
+- **The farm's rules are data** (`data/rules/farm.json`): the plot's size in cells (12 by 6 since the
+  Homestead, §30; 6 by 3 before it) and how many dry
   mornings wither a crop (3b). What hoeing and watering cost is in the energy rules (`hoe`, `water`).
 - **`Farm`** (`core/farming/`, pure) is the plot: which cells are tilled and which watered. Cells are the
   plot's own ((0, 0) is its north-west corner), so the plot can lie anywhere. `till()` and `water()` return
@@ -906,7 +912,8 @@ run headless; see CLAUDE.md for the command and gotchas.
   `clear()`). `till_soil()` and `water_soil()` change it and emit `EventBus.farm_changed`;
   `start_next_day()` calls `new_day()`, so sleeping, collapsing and staying up all dry the soil.
 - **`FarmPlot`** (`world/areas/`) is the plot as it lies in an area: a node at the plot's north-west corner
-  (Hearthvale's is at cell (12, 18), between the shop and the well). It draws each cell from
+  (the homestead's is at cell (22, 17), below the farmhouse; until the Homestead it lay in Hearthvale at
+  (12, 18), between the shop and the well). It draws each cell from
   `gameplay/art/soil.png` (bare in two kinds, tilled, watered) and redraws on `farm_changed`. It blocks
   nothing and nothing is picked up from it. As the area loads it takes the Decor tiles off its cells
   (`clear_ground()`): no map is re-baked for it. It sits just after the Decor layer in the scene.
@@ -1349,3 +1356,46 @@ in a shop's data, two favours as data, and a tool that plays the game.
 - **The tuning** (the user's word, 2026-11-17: all three proposals) was data and the tests that carry
   it: Tilda's seven prices in `data/shops/tilda.json`, Mining's `gains` in `data/rules/skills.json`, and
   the coal on floors 4 to 6 in `data/rules/mine.json`. No code changed.
+
+## 30. The Homestead
+The user's request of 2026-11-17 (`docs/progress/homestead-plan.md`, approved as written), in five phases.
+**Phase 1 is built** (2026-11-18): the farm and the home's move.
+- **The area `homestead`** (`world/areas/homestead/homestead.tscn`, "Your farm") is a map of 40 by 30
+  cells, baked by `tools/greybox/build_maps.gd` from a sketch with a legend of its own (below). Woods two
+  deep stand all round it; the ground is level (height 0 everywhere).
+  - **The way in** is the lane's west end. In Hearthvale the exit `WestRoad` covers cells (0, 16..17) and
+    leads to `homestead` / `east_road`; on the farm `EastRoad` covers (39, 14..15) and leads to `village`
+    / `west_road`. He arrives at (38, 14) on the farm and at (1, 16) in the village. For it the village
+    was re-baked once: cells (0..1, 16..17) of the west tree line became lane, and the lane was laid over
+    (2, 16..17). Nothing else in the village moved.
+  - **The road** is rows 14 and 15 from column 20 to the edge, and a path up column 28 to the doorstep at
+    (28, 12): twelve cells from where he arrives to his doorstep.
+  - **The farmhouse** is (26..31, 8..11), laid with the village's own house tiles (thatch, a
+    half-timbered upper floor, a ground floor), with its door at (28, 11): the exit `FarmhouseDoor`, to
+    `home` / `door`. `WallRelief`, `Scenery`'s ridge, `WindowGlow` and the chimney's smoke treat it as
+    they treat the village's cottages.
+  - **The pond** is (4..9, 21..24), water tiles on the Height layer, so `is_water_source()` is true there
+    and the can fills. There is no well.
+  - **Eleven old trees** stand inside the woods, tall pictures from `Scenery`, each blocking its own cell.
+  - **Nothing lives there:** no villagers, monsters, critters or forage spots.
+- **The home's move is where two doors lead.** The area `home` is the same scene and the same room, named
+  "Your farmhouse"; its `Doormat` leads to `homestead` / `farmhouse_door` (the cell (28, 12), facing
+  south). `WorldPaths.HOME_AREA` and `HOME_BED` are as they were, so sleeping, 02:00 and a collapse wake
+  him there with no change to any rule of energy or sleep.
+  - **The old cottage** in Hearthvale keeps its door (`HomeDoor`, at (8, 14)) and its entry (`home_door`,
+    which nothing leads to now). The door names the place `old_cottage`, whose hours in
+    `data/rules/hours.json` begin and end together, so `Hours.is_open()` is never true: the cell is solid
+    and walking into it or trying it says the place's words.
+- **The field** is the `FarmPlot` node at (22, 17): the plot of the farm's rules, 12 by 6 (§20). The
+  village's `FarmPlot` node is gone. The plot's own cells (0..5, 0..2) are the old plot, so a saved farm
+  needs nothing moved.
+- **`Homestead`** (`core/homestead/`, pure) is what the hero has done to his land that is for good.
+  `GameState.homestead()` keeps the one (thrown away by `clear()`), and it is the save's section
+  `homestead` (§9, version 6).
+- **A sketch with a legend** (`build_maps.gd`): a map's `"legend"` names the characters that lay a tile
+  (`[kind, height]`, a cell each) and every other character leaves the base showing; its `"marks"` name
+  the characters that are spawn markers. A sketch without one is read as the Old Quarry's are.
+- **Tests:** `tests/world/homestead_test.gd` (the map and the walk), `tests/world/home_move_test.gd` (the
+  doors, waking, the locked cottage, the version 5 save in the world), `tests/autoload/homestead_save_test.gd`
+  and `tests/core/homestead/homestead_test.gd`. The suites that worked the village's plot work the
+  field's clear corner (`PLOT = Vector2i(22, 17)`).

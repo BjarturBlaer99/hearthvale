@@ -87,7 +87,7 @@
         "properties": {
           "places": {
             "type": "object",
-            "description": "A place's id (an AreaExit's `hours`), then when its door is open. May run over midnight.",
+            "description": "A place's id (an AreaExit's `hours`), then when its door is open. May run over midnight. A place whose hours begin and end together is never open: the old cottage in Hearthvale ('old_cottage', 00:00 to 00:00), locked since the Homestead.",
             "additionalProperties": {
               "type": "object",
               "required": ["from", "to"],
@@ -123,7 +123,7 @@
           "plot": {
             "type": "object",
             "required": ["columns", "rows"],
-            "description": "The size of the hero's plot in cells. Where it lies is the FarmPlot node's position in its area.",
+            "description": "The size of the hero's plot in cells: the field on the homestead, 12 by 6 (6 by 3 until the Homestead; a saved plot's cells are its north-west corner). Where it lies is the FarmPlot node's position in its area.",
             "properties": {
               "columns": { "type": "integer", "minimum": 1 },
               "rows": { "type": "integer", "minimum": 1 }

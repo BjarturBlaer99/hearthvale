@@ -139,7 +139,7 @@ func test_pip_tells_his_secret_and_bram_more_of_aldrics_tale() -> void:
 	_say(house, "Your supper, Elder.")
 	assert_str(house.hud.dialogue.shown_text()).contains("Aldric").contains("farmed")
 	_say(house, "Go on.")
-	assert_str(house.hud.dialogue.shown_text()).contains("cottage").contains("keeper")
+	assert_str(house.hud.dialogue.shown_text()).contains("the farm you keep was his").contains("keeper")
 	_end(house)
 	assert_int(GameState.item_count(&"coin")).override_failure_message("fifteen from Pip and thirty from Bram").is_equal(45)
 

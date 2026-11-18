@@ -5,7 +5,7 @@ extends Node
 ## methods, which emit the matching EventBus signal. `to_dict()` / `from_dict()` use the
 ## save format from TECH_DESIGN §9; SaveSystem handles files and version migration.
 
-const SAVE_VERSION: int = 5
+const SAVE_VERSION: int = 6
 const HALVES_PER_HEART: int = 2
 const START_HEARTS: int = 3
 const MAX_HEARTS: int = 20
@@ -72,6 +72,8 @@ var found: Dictionary[StringName, bool] = {}
 var _furnace: Furnace
 ## The storage chest in his home: its stacks. Saved.
 var _store: Store
+## His homestead (2026-11-17): what he has cleared from the land for good. Saved.
+var _homestead: Homestead
 ## Where the hero is: { "area", "cell": [x, y] }, or { "area", "entry" } on the way into an
 ## area through one of its entry points (go_to), until the area places them.
 var player: Dictionary = {}
@@ -608,6 +610,15 @@ func store_take(index: int) -> String:
 	return ""
 
 
+# --- The Homestead (2026-11-17) ----------------------------------------------
+
+## The hero's homestead: what he has done to his land that is for good (what he has cleared).
+func homestead() -> Homestead:
+	if _homestead == null:
+		_homestead = Homestead.new()
+	return _homestead
+
+
 # --- The mine (2026-11-17) ---------------------------------------------------
 
 ## The Old Quarry's rules (data/rules/mine.json).
@@ -932,6 +943,7 @@ func clear() -> void:
 	_mine = null
 	_furnace = null
 	_store = null
+	_homestead = null
 	found.clear()
 	flags.clear()
 	flag_days.clear()
@@ -967,6 +979,7 @@ func to_dict() -> Dictionary:
 		"farm": farm().to_dict(),
 		"mine": mine().to_dict(),
 		"home": {"furnace": furnace().to_dict(), "chest": store().to_list()},
+		"homestead": homestead().to_dict(),
 		"found": _found_list(),
 		"skills": _json_safe(skill_points),
 		"friends": _json_safe(friends),
@@ -1025,6 +1038,7 @@ func from_dict(data: Dictionary) -> void:
 	_furnace.load_saved(home.get("furnace"))
 	_store = null
 	store().load_saved(home.get("chest"), func(item_id: String) -> int: return Inventory.capacity(DataRegistry.get_item(StringName(item_id))))
+	homestead().load_saved(data.get("homestead"))
 	var src_found: Variant = data.get("found")
 	if typeof(src_found) == TYPE_ARRAY:
 		for id: Variant in src_found:

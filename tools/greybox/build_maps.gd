@@ -35,6 +35,9 @@ extends SceneTree
 ## and a walled shrine with a cracked wall and a heart piece).
 ## Willowmere (2026-11-17, tests/world/willowmere_test.gd): a marsh reached from the village's
 ## east meadow; water and reeds block, boardwalks are the paths, a nook behind the willows.
+## The Homestead (2026-11-17, tests/world/homestead_test.gd): the hero's farm west of the village,
+## at the end of the lane: the road in, the farmhouse and the path to its door, a pond, old trees,
+## and the land's overgrowth as markers.
 
 ## Each area: scene, size in cells, blocks, and optionally the base kind (default grass).
 ## Block = [x, y, width, height, terrain height, kind]; kind is "ground", "stairs", "path" (at
@@ -54,6 +57,9 @@ extends SceneTree
 ## it, "=" floor with rails on it, and anything else floor: the letters only mark where the
 ## scene's own nodes stand (the way in, monsters, the lift). A cave wall with floor to its
 ## south shows its face.
+## A sketch may have a "legend" of its own (the Homestead's has): each character it names lays
+## [kind, height] in its cell, and every other character leaves the map's base showing. Its
+## "marks" then say which characters are spawn markers (character -> marker kind).
 ## Optional looks, on the Decor layer (never read for movement):
 ## - "decor": blocks [x, y, width, height, kind] of GreyboxTiles.DECOR_KINDS;
 ## - "scatter": { "seed", "kinds": [[kind, percent], ...] } sprinkled over open ground,
@@ -157,6 +163,10 @@ const MAPS: Dictionary = {
 			# The way east to Willowmere (2026-11-17): two cells of the east tree line opened,
 			# level with the east meadow, approved by the user (tests/world/willowmere_test.gd).
 			[47, 17, 1, 2, 1, "ground"],
+			# The way west to the Homestead (2026-11-17): two cells of the west tree line opened
+			# on the lane's rows, and the lane run on to the edge, approved by the user (the
+			# Homestead's plan, D1; tests/world/homestead_test.gd).
+			[0, 16, 3, 2, 0, "path"],
 		],
 		"spawns": [
 			# Tall grass (one tuft hides the heart piece's nook), pots, chickens in and by the field, butterflies over flowers.
@@ -780,6 +790,76 @@ const MAPS: Dictionary = {
 		],
 		"scatter": {"seed": 23, "kinds": [["moss", 9], ["tuft", 4], ["pebbles", 2], ["mushroom", 1], ["flowers_blue", 1]]},
 	},
+	# The Homestead (2026-11-17, tests/world/homestead_test.gd): the old farmstead west of
+	# Hearthvale, the size of the North Fields, drawn as the plan drew it
+	# (docs/progress/homestead-plan.md). The lane from the village comes in through the east
+	# woods (">", rows 14 and 15) and runs west as the road ("="), with a path up to the
+	# farmhouse's door. The farmhouse (H, its door D) is laid by the blocks below, with the
+	# village's own house tiles. "F" is the field's clear corner; the whole field is the
+	# FarmPlot node in the scene, (22..33, 17..22). "~" is the pond. "T" is the woods round the
+	# edge and "t" an old tree left standing. The other letters are the land's overgrowth,
+	# laid in step 1b: "w" weeds, "b" a bush, "l" a fallen log, "s" an old stump, "o" a rock,
+	# "O" a boulder, "@" a great boulder. The quote marks are the meadow's tall grass, which
+	# is phase 3's: until then they are grass like any other.
+	"homestead": {
+		"scene": "res://world/areas/homestead/homestead.tscn",
+		"size": Vector2i(40, 30),
+		"sketch": [
+			"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+			"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+			"TT.........ww...........s.............TT",
+			"TT..\".\"..\".\".\"...................o.t..TT",
+			"TT.o.\".l\".\".\".b.t.............o...t.twTT",
+			"TT..\"..\".\".\".\"..s.............o.......TT",
+			"TT...............oww.......l......l...TT",
+			"TT............O.w..............w..ww..TT",
+			"TTs..w....w........w......HHHHHH..to.lTT",
+			"TT.t.O..oOs..........w.t..HHHHHH....w.TT",
+			"TT.....b....O...O......wsbHHHHHH......TT",
+			"TTw.............o.b....o..HHDHHH......TT",
+			"TT........w...l..o.s........=.........TT",
+			"TT.O.....w.....w............=.........TT",
+			"TTs....O..w.l.......==================>>",
+			"TT...............w..==================>>",
+			"TT....................................TT",
+			"TT.....b......o....b..FFFFFFwwwwww....TT",
+			"TT.t..................FFFFFFwwwsww....TT",
+			"TT.ow.......o.O.b.....FFFFFFwbwbww..o.TT",
+			"TTb..w....wl....o...s.wowwblowwbww....TT",
+			"TT..~~~~~~w@.@........wwwwwlwwooww....TT",
+			"TT..~~~~~~.....b...l..wsbwwwwwwwwo....TT",
+			"TT..~~~~~~...o......................b.TT",
+			"TT..~~~~~~....s........b............t.TT",
+			"TT....@.s......o....o..............t..TT",
+			"TT....s.....t..........sw...........w.TT",
+			"TT.......w.w..w.................o.....TT",
+			"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+			"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+		],
+		"legend": {
+			"T": ["tree", 0], "t": ["tree", 0], "~": ["water", 0], "=": ["path", 0], ">": ["path", 0],
+		},
+		"marks": {},
+		"blocks": [
+			# The farmhouse: thatch over a half-timbered upper floor and a ground floor, as the
+			# village's cottages are, with its door where theirs is.
+			[26, 8, 6, 2, 3, "roof_thatch"],
+			[26, 10, 6, 1, 3, "wall_upper"],
+			[26, 11, 6, 1, 3, "wall"],
+			[28, 11, 1, 1, 0, "door"],
+		],
+		"decor": [
+			# Its chimney (as the cottages': on the roof, with its smoke), flowers gone wild
+			# along its front, and lily pads on the pond.
+			[30, 8, 1, 1, "chimney"], [30, 7, 1, 1, "smoke"],
+			[26, 12, 2, 1, "flowers_yellow"],
+			[30, 12, 2, 1, "flowers_red"],
+			[5, 22, 1, 1, "lily"],
+			[8, 23, 1, 1, "lily"],
+			[6, 24, 1, 1, "lily"],
+		],
+		"scatter": {"seed": 31, "kinds": [["tuft", 12], ["flowers_yellow", 2], ["flowers_red", 1], ["flowers_blue", 1], ["pebbles", 2], ["mushroom", 1]]},
+	},
 	"south_field": {
 		"scene": "res://world/areas/south_field/south_field.tscn",
 		"size": Vector2i(40, 28),
@@ -1150,13 +1230,21 @@ const SKETCH_ROCK: String = "o"
 const SKETCH_RAILS: String = "="
 
 
-## The blocks a map's "sketch" stands for, a cell each: nothing where the base shows.
+## The blocks a map's "sketch" stands for, a cell each: nothing where the base shows. A map
+## with a "legend" of its own lays only what the legend names; without one, the Old Quarry's
+## characters are read.
 func _sketch_blocks(map: Dictionary) -> Array:
 	var out: Array = []
 	var rows: Array = map.get("sketch", [])
+	var legend: Dictionary = map.get("legend", {})
 	for y: int in rows.size():
 		var row: String = rows[y]
 		for x: int in row.length():
+			if map.has("legend"):
+				if legend.has(row[x]):
+					var named: Array = legend[row[x]]
+					out.append([x, y, 1, 1, named[1], named[0]])
+				continue
 			if row[x] == SKETCH_BASE:
 				continue
 			var laid: Array = SKETCH_KINDS.get(row[x], [SKETCH_FLOOR, 0])
@@ -1174,6 +1262,18 @@ func _sketch_marks(map: Dictionary, mark: String, kind: String) -> Array:
 		for x: int in row.length():
 			if row[x] == mark:
 				out.append([x, y, 1, 1, kind])
+	return out
+
+
+## The spawn markers a map's sketch stands for: what its "marks" name (character -> marker
+## kind), or, for a sketch with no legend of its own, a rock of the quarry at every "o".
+func _sketch_spawns(map: Dictionary) -> Array:
+	if not map.has("legend"):
+		return _sketch_marks(map, SKETCH_ROCK, GreyboxTiles.ROCK_MARKER)
+	var out: Array = []
+	var marks: Dictionary = map.get("marks", {})
+	for mark: String in marks:
+		out.append_array(_sketch_marks(map, mark, str(marks[mark])))
 	return out
 
 
@@ -1261,7 +1361,9 @@ func _decorate(root: Node, height_layer: TileMapLayer, map: Dictionary, props: D
 		if prop == "prop_tree":
 			prop = _tree_kind(cell, props, map["size"])
 		decor.set_cell(cell, GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(prop))
-	for block: Array in _sketch_marks(map, SKETCH_RAILS, "rails") + (map.get("decor", []) as Array):
+	# The Old Quarry's sketches draw their rails; a sketch with a legend of its own has none.
+	var rails: Array = [] if map.has("legend") else _sketch_marks(map, SKETCH_RAILS, "rails")
+	for block: Array in rails + (map.get("decor", []) as Array):
 		var kind: String = block[4]
 		if not GreyboxTiles.is_decor(kind):
 			push_error("tools/greybox: '%s' is not a decoration (%s)" % [kind, block])
@@ -1294,7 +1396,7 @@ func _decorate(root: Node, height_layer: TileMapLayer, map: Dictionary, props: D
 ## marker into its node on load.
 func _spawns(root: Node, map: Dictionary) -> Error:
 	var layer: TileMapLayer = root.get_node_or_null(^"Spawns")
-	var blocks: Array = _sketch_marks(map, SKETCH_ROCK, GreyboxTiles.ROCK_MARKER) + (map.get("spawns", []) as Array)
+	var blocks: Array = _sketch_spawns(map) + (map.get("spawns", []) as Array)
 	if layer == null and blocks.is_empty():
 		return OK
 	if layer == null:
