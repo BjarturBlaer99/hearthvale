@@ -10,11 +10,22 @@ extends Node2D
 ## Two things its data may also say (crafting, 2026-11-17: a fallen branch, an old stump):
 ## "hits", the blows it takes (one unless said), and "returns": "daily", which keeps it broken
 ## until the next morning instead of the next visit (a flag remembers the day: `cut_flag()`).
+## On the hero's land (the Homestead, 2026-11-18: weeds, a bush, a fallen log, an old stump) it
+## says "returns": "never": cleared, it is gone for good, and GameState keeps its cell
+## (`clear_debris()`), not a flag.
 
 const SHEET: Texture2D = preload("res://gameplay/art/breakables.png")
 ## Frames in the order tools/art/make_sprites.gd paints them (a test checks).
-const FRAMES: Dictionary = {&"grass": 0, &"grass_cut": 1, &"pot": 2, &"branch": 3, &"stump": 4}
+const FRAMES: Dictionary = {
+	&"grass": 0, &"grass_cut": 1, &"pot": 2, &"branch": 3, &"stump": 4,
+	# The hero's land (the Homestead): weeds, a bush and a fallen log (its stumps wear "stump").
+	&"weeds": 5, &"bush": 6, &"log": 7,
+}
 const SIZE: Vector2i = Vector2i(16, 16)
+## What a breakable's "returns" may say (left out, it is back on every visit).
+const DAILY: String = "daily"
+const NEVER: String = "never"
+const RETURNS: Array[String] = [DAILY, NEVER]
 
 @export var breakable_id: StringName = &"grass"
 
@@ -39,8 +50,9 @@ func _ready() -> void:
 		push_warning("%s: no breakable '%s' in data/breakables." % [name, breakable_id])
 	roll_drop = func() -> float: return randf()
 	hits_left = maxi(int(data.get("hits", 1)), 1)
-	# One that comes back only in the morning, and was broken today, is gone already.
-	broken = is_daily() and cut_today()
+	# One that comes back only in the morning, and was broken today, is gone already; and so
+	# is one that never comes back, once it has been cleared.
+	broken = (is_daily() and cut_today()) or (is_for_good() and GameState.is_debris_cleared(area_id, cell()))
 	hurt_box = HurtBox.new()
 	hurt_box.team = &"enemy"
 	hurt_box.radius = 6.0
@@ -76,7 +88,13 @@ func breaks_on(kind: StringName) -> bool:
 
 ## Whether it stays broken until the next morning (its data's "returns": "daily").
 func is_daily() -> bool:
-	return str(data.get("returns", "")) == "daily"
+	return str(data.get("returns", "")) == DAILY
+
+
+## Whether, once cleared, it never comes back (its data's "returns": "never"): the overgrowth
+## of the hero's land.
+func is_for_good() -> bool:
+	return str(data.get("returns", "")) == NEVER
 
 
 ## The flag a daily one keeps the day it was broken in: "cut/<area>/<x>,<y>".
@@ -114,6 +132,8 @@ func smash() -> Node2D:
 	hurt_box.enabled = false
 	if is_daily():
 		GameState.set_flag(cut_flag(), GameState.day)
+	elif is_for_good():
+		GameState.clear_debris(area_id, cell())
 	if _terrain != null:
 		_terrain.set_occupied(cell(), false)
 	EventBus.sound.emit(StringName(str(data.get("sound", "cut"))))

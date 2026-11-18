@@ -168,7 +168,7 @@ func test_breakables_that_cant_be_used_say_why() -> void:
 	var registry: Node = auto_free((load("res://autoload/data_registry.gd") as GDScript).new())
 	var errors: String = "; ".join(registry.load_all("res://tests/fixtures/bad_wood"))
 	assert_str(errors).contains("breakable 'log' 'hits' must be a whole number of 1 or more.")
-	assert_str(errors).contains("breakable 'log' 'returns' must be 'daily' (left out, it is back on every visit).")
+	assert_str(errors).contains("breakable 'log' 'returns' must be 'daily' or 'never' (left out, it is back on every visit).")
 
 
 # --- Helpers -------------------------------------------------------------------------------

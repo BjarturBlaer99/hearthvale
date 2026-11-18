@@ -22,6 +22,7 @@ const FRAMES: Dictionary = {
 	&"wood": 52, &"copper_bar": 53, &"iron_bar": 54, &"gold_bar": 55, &"sprinkler": 56, &"miners_lantern": 57,
 	&"copper_pickaxe": 58, &"iron_pickaxe": 59, &"copper_hoe": 60, &"iron_hoe": 61,
 	&"copper_watering_can": 62, &"iron_watering_can": 63,
+	&"fibre": 64,
 }
 
 

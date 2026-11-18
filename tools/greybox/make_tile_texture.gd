@@ -530,6 +530,8 @@ func _initialize() -> void:
 		_water_frame(Vector2i(frame, GreyboxTiles.ROW_WATER), frame)
 	for index: int in GreyboxTiles.MARKER_KINDS.size():
 		_marker(Vector2i(index, GreyboxTiles.ROW_MARKERS), index)
+	for index: int in GreyboxTiles.LAND_MARKER_KINDS.size():
+		_marker(Vector2i(index, GreyboxTiles.ROW_LAND_MARKERS), index, true)
 	for kind: String in GreyboxTiles.HOUSE_KINDS:
 		_house(GreyboxTiles.coords(kind), kind)
 	_pine_art(GreyboxTiles.coords("prop_tree_b"))
@@ -950,11 +952,15 @@ func _ascii(tile: Vector2i, art: String) -> void:
 
 
 ## A spawn marker (only ever seen in the editor): a bright square with a dot per index, so
-## the kinds tell apart.
-func _marker(tile: Vector2i, index: int) -> void:
-	var color: Color = [Color(0.3, 0.9, 0.3), Color(0.85, 0.5, 0.25), Color(1, 1, 1), Color(1, 0.85, 0.2), Color(0.9, 1, 0.4), Color(0.6, 0.6, 0.65), Color(0.7, 0.5, 0.3), Color(0.5, 0.35, 0.2)][index]
+## the kinds tell apart. One of the hero's land (`land`: the second row of markers) has its
+## line along the bottom.
+func _marker(tile: Vector2i, index: int, land: bool = false) -> void:
+	var colors: Array = [Color(0.3, 0.9, 0.3), Color(0.85, 0.5, 0.25), Color(1, 1, 1), Color(1, 0.85, 0.2), Color(0.9, 1, 0.4), Color(0.6, 0.6, 0.65), Color(0.7, 0.5, 0.3), Color(0.5, 0.35, 0.2)]
+	if land:
+		colors = [Color(0.55, 0.8, 0.3), Color(0.2, 0.55, 0.25), Color(0.6, 0.45, 0.3), Color(0.45, 0.3, 0.2), Color(0.5, 0.5, 0.55), Color(0.35, 0.35, 0.4)]
+	var color: Color = colors[index]
 	_rect(tile, Rect2i(2, 2, T - 4, T - 4), Color(color, 0.55))
-	_rect(tile, Rect2i(2, 2, T - 4, 1), OUTLINE)
+	_rect(tile, Rect2i(2, T - 3 if land else 2, T - 4, 1), OUTLINE)
 	for dot: int in index + 1:
 		_px(tile, 4 + dot * 2, 8, OUTLINE)
 

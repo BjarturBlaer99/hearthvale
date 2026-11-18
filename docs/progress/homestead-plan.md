@@ -560,8 +560,15 @@ TECH_DESIGN, the roadmap, the README and DECISIONS up to date; CLAUDE.md is the 
   *Built 2026-11-18. The map was baked as drawn: no cell shifted. He arrives on the farm at (38, 14) and
   in the village at (1, 16). The main quest's words are measured against the quest log's box where a
   test counted them in letters (150 at the most): the approved words are longer than that, and fit.*
-- [ ] 1b. **The overgrowth.** The seven kinds of debris as data, cleared for good, fibre, boulders that
+- [x] 1b. **The overgrowth.** The seven kinds of debris as data, cleared for good, fibre, boulders that
   want a better pickaxe, and no tilling under debris.
+  *Built 2026-11-18, with the table's counts, blows and drops. The land's stump is a breakable of its
+  own (`farm_stump`: the countryside's `stump` comes back each morning). "Clear this first." is said to
+  the can, a seed and a sprinkler as well as the hoe. Fibre stacks to 50. **Twenty things shifted when
+  baked:** in the drawing above they stood behind a crown (against the woods' edge on the west, east and
+  south, or behind an old tree), where the hero could not see what blocked him. Each moved a cell or
+  two onto open grass; none on the field moved, and every count is the same. The map as baked is the
+  sketch in `tools/greybox/build_maps.gd`.*
 - [ ] 1c. **The rest.** The two tunes, playtest scenarios (`homestead`; `farm` moved), capture shots, and
   `tools/play_days.gd` kept running (the smallest change, tried for two days at four times speed).
 - **Tests:**

@@ -410,6 +410,19 @@ balance, are planned and not built.)*
 - **The field** lies below the farmhouse across the road (§7), and **a pond** in the south-west corner
   fills the watering can. There is no well on the farm.
 - **Nobody lives there, nothing hunts there, and nothing grows to be gathered.**
+- **The land starts overgrown.** The field's corner by the house (18 cells) is clear; the other 54 cells
+  of it, and about ninety places round the land, carry something: 145 in all.
+  - **The sword clears** weeds (one blow, 1 fibre), a bush (two, 2 fibre), a fallen log (three, 3 wood)
+    and an old stump (three, 2 wood). A bomb does what the sword does.
+  - **The pickaxe clears** a rock (two blows, 1 stone). A boulder wants the Copper Pickaxe (three blows,
+    or two of the Iron; 4 stone) and a great boulder the Iron (three; 8 stone). A lesser pickaxe is told
+    "It wants a better pickaxe." and spends nothing. Nothing on the field needs a better tool.
+  - **What it leaves lies in its cell** until he walks onto it, and stays lying if his pack is full.
+  - **Cleared is cleared:** no morning brings it back. (A branch in the countryside is back the next
+    day, and a rock in the quarry too.)
+  - **A cell with something on it can't be tilled:** "Clear this first."
+  - **In all** the land gives 102 fibre, 58 wood and 80 stone. Fibre is a new material; the buildings of
+    phase 3 are thatched with it.
 - **The story's words** say so: the title ("An old farm, a field gone wild, and lights over the old
   keep."), the main quest's first three stages and its last, Elder Bram's welcome and his tale of Sir
   Aldric, whose farm it was. Nothing else in the story changed.

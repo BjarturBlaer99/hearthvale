@@ -1,0 +1,24 @@
+{
+	"id": "bush",
+	"name": "Bush",
+	"breaks_on": [
+		"sword",
+		"bomb"
+	],
+	"hits": 2,
+	"returns": "never",
+	"sound": "cut",
+	"burst": "leaves",
+	"frames": {
+		"whole": "bush",
+		"broken": ""
+	},
+	"drops": [
+		{
+			"type": "item",
+			"item": "fibre",
+			"count": 2,
+			"weight": 1
+		}
+	]
+}

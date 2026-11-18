@@ -109,12 +109,11 @@ func test_he_walks_over_the_plot_as_over_grass() -> void:
 	farm.player.face(Vector2.RIGHT)
 	for i: int in 200:
 		farm.player.motor.step(Vector2.RIGHT, FRAME)
-	assert_int(farm.player.motor.cell.x).override_failure_message("across all six cells of the clear corner").is_greater_equal(PLOT.x + 5)
-	assert_int(farm.player.motor.cell.y).is_equal(PLOT.y + 1)
+	assert_that(farm.player.motor.cell).override_failure_message("across all six cells of the clear corner, to the weeds beyond it").is_equal(PLOT + Vector2i(5, 1))
 	farm.player.motor.place(PLOT + Vector2i(3, -2))
 	for i: int in 200:
 		farm.player.motor.step(Vector2.DOWN, FRAME)
-	assert_int(farm.player.motor.cell.y).override_failure_message("and down through all three of its rows").is_greater_equal(PLOT.y + 2)
+	assert_int(farm.player.motor.cell.y).override_failure_message("and down through all three of its rows, to the weeds below them").is_equal(PLOT.y + 2)
 	assert_float(farm.player.motor.speed_scale).is_equal(1.0)
 
 

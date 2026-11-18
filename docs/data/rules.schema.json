@@ -2,11 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "rules.schema.json",
   "title": "Rules file (data/rules/<id>.json, one set of rules per file)",
-  "description": "The numbers a system runs on, so tuning needs no code (GDD §6). The file's id says which rules it holds. Known ids: 'time' (the day's clock, read by DayClock), 'energy' (the hero's energy, read by EnergyRules), 'hours' (when places are open and villagers are out, read by Hours), 'night' (what the night does to monsters, read by NightRules), 'farm' (the hero's plot, read by Farm), 'skills' (the hero's skills, read by Skills), 'friendship' (what talk and gifts are worth, read by Friendship), 'mine' (the Old Quarry, read by MineRules) and 'crafting' (the furnace, the chest and the home's furnishings, checked by Crafting).",
+  "description": "The numbers a system runs on, so tuning needs no code (GDD §6). The file's id says which rules it holds. Known ids: 'time' (the day's clock, read by DayClock), 'energy' (the hero's energy, read by EnergyRules), 'hours' (when places are open and villagers are out, read by Hours), 'night' (what the night does to monsters, read by NightRules), 'farm' (the hero's plot, read by Farm), 'skills' (the hero's skills, read by Skills), 'friendship' (what talk and gifts are worth, read by Friendship), 'mine' (the Old Quarry, read by MineRules), 'crafting' (the furnace, the chest and the home's furnishings, checked by Crafting) and 'homestead' (which map is the hero's land and the rocks that stand on it, read by HomesteadRules).",
   "type": "object",
   "required": ["id"],
   "properties": {
-    "id": { "enum": ["time", "energy", "hours", "night", "farm", "skills", "friendship", "mine", "crafting"], "description": "Which rules these are." }
+    "id": { "enum": ["time", "energy", "hours", "night", "farm", "skills", "friendship", "mine", "crafting", "homestead"], "description": "Which rules these are." }
   },
   "allOf": [
     {
@@ -242,9 +242,33 @@
           }
         }
       }
+    },
+    {
+      "if": { "properties": { "id": { "const": "homestead" } } },
+      "then": {
+        "required": ["area", "rocks"],
+        "properties": {
+          "area": { "type": "string", "minLength": 1, "description": "The map that is the hero's land (an area's id). What is cleared there is cleared for good, and nowhere else." },
+          "rocks": {
+            "type": "object",
+            "required": ["rock"],
+            "description": "The kinds of rock that stand on the land (read by HomesteadRules). 'rock' is the plain one, grown from the map's rock markers; any other kind is a spawn marker of its own name (GreyboxTiles.ROCK_MARKERS) and a frame of gameplay/art/rocks.png.",
+            "additionalProperties": {
+              "type": "object",
+              "required": ["blows", "gives"],
+              "properties": {
+                "blows": { "type": "integer", "minimum": 1, "description": "The blows it is counted at for the plain pickaxe. A better pickaxe takes its 'fewer_blows' off that: a boulder of 4 is 3 blows of the Copper Pickaxe and 2 of the Iron." },
+                "wants": { "type": "string", "description": "The least pickaxe that breaks it (an item id). A pickaxe that needs more blows than that one is told \"It wants a better pickaxe.\" and spends nothing. Left out, any pickaxe breaks it." },
+                "gives": { "type": "string", "description": "The item it leaves lying in its cell." },
+                "count": { "type": "integer", "minimum": 1, "default": 1, "description": "How many of it." }
+              }
+            }
+          }
+        }
+      }
     }
   ],
-  "$comment": "One entry of allOf for each id: time, energy, hours, night, farm, skills, mine, friendship, crafting.",
+  "$comment": "One entry of allOf for each id: time, energy, hours, night, farm, skills, mine, friendship, crafting, homestead.",
   "$defs": {
     "time_of_day": { "type": "string", "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$", "description": "A time on a 24-hour clock, like \"06:00\"." },
     "span": {

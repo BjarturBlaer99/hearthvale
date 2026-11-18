@@ -67,7 +67,8 @@ const RULES_SKILLS: StringName = &"skills"
 const RULES_FRIENDSHIP: StringName = &"friendship"
 const RULES_MINE: StringName = &"mine"
 const RULES_CRAFTING: StringName = &"crafting"
-const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM, RULES_SKILLS, RULES_FRIENDSHIP, RULES_MINE, RULES_CRAFTING]
+const RULES_HOMESTEAD: StringName = &"homestead"
+const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM, RULES_SKILLS, RULES_FRIENDSHIP, RULES_MINE, RULES_CRAFTING, RULES_HOMESTEAD]
 
 ## Enemy behaviour ids (EnemyBrains makes one brain per id) and drop-table entry types.
 const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden", "shade", "wisp"]
@@ -79,6 +80,8 @@ const DROP_TYPES: Array[String] = ["heart", "item", "nothing"]
 const WEAK_POINTS: Array[String] = ["sword", "arrow", "bomb"]
 ## The bursts a breakable can throw up (Burst kinds).
 const BREAK_BURSTS: Array[String] = ["leaves", "shards", "dust", "spark", "sparkle"]
+## What a breakable's "returns" may say (Breakable.RETURNS): back the next morning, or never.
+const BREAKABLE_RETURNS: Array[String] = ["daily", "never"]
 
 ## Condition type -> required fields (docs/data/CONDITIONS_AND_EFFECTS.md).
 const CONDITION_FIELDS: Dictionary = {
@@ -520,6 +523,8 @@ func _check_rules(rules: Dictionary) -> void:
 			problems = MineRules.problems(rules, func(item_id: String) -> Dictionary: return _collections[&"items"].get(StringName(item_id), {}))
 		RULES_CRAFTING:
 			problems = Crafting.rules_problems(rules)
+		RULES_HOMESTEAD:
+			problems = HomesteadRules.problems(rules, func(item_id: String) -> Dictionary: return _collections[&"items"].get(StringName(item_id), {}))
 	for problem: String in problems:
 		errors.append("%s: rules '%s': %s" % [path, id, problem])
 
@@ -538,8 +543,8 @@ func _check_breakable(breakable: Dictionary) -> void:
 	var hits: Variant = breakable.get("hits", 1)
 	if (typeof(hits) != TYPE_INT and typeof(hits) != TYPE_FLOAT) or float(hits) != floorf(float(hits)) or int(hits) < 1:
 		errors.append("%s: %s 'hits' must be a whole number of 1 or more." % [path, label])
-	if breakable.has("returns") and str(breakable["returns"]) != "daily":
-		errors.append("%s: %s 'returns' must be 'daily' (left out, it is back on every visit)." % [path, label])
+	if breakable.has("returns") and not BREAKABLE_RETURNS.has(str(breakable["returns"])):
+		errors.append("%s: %s 'returns' must be 'daily' or 'never' (left out, it is back on every visit)." % [path, label])
 	_check_drops(path, label, breakable)
 
 

@@ -87,6 +87,8 @@ func _initialize() -> void:
 	# Spawn markers: never walked on (the area clears them), open ground in the editor.
 	for index: int in GreyboxTiles.MARKER_KINDS.size():
 		_fixed(source, Vector2i(index, GreyboxTiles.ROW_MARKERS), 0, false)
+	for index: int in GreyboxTiles.LAND_MARKER_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_LAND_MARKERS), 0, false)
 	# Water: one tile that plays its frames (which lie to its right) in a loop.
 	var water: Vector2i = Vector2i(0, GreyboxTiles.ROW_WATER)
 	_fixed(source, water, 0, true)

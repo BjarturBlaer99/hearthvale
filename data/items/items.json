@@ -60,6 +60,7 @@
     { "id": "copper_pickaxe", "name": "Copper Pickaxe", "type": "tool", "icon": "copper_pickaxe", "stats": { "tool": "pick", "cooldown": 0.4, "fewer_blows": 1 } },
     { "id": "iron_pickaxe", "name": "Iron Pickaxe", "type": "tool", "icon": "iron_pickaxe", "stats": { "tool": "pick", "cooldown": 0.4, "fewer_blows": 2 } },
     { "id": "sprinkler", "name": "Sprinkler", "type": "sprinkler", "icon": "sprinkler", "stackable": true, "max_stack": 10 },
-    { "id": "miners_lantern", "name": "Miner's Lantern", "type": "lantern", "icon": "miners_lantern", "stats": { "radius": 80 } }
+    { "id": "miners_lantern", "name": "Miner's Lantern", "type": "lantern", "icon": "miners_lantern", "stats": { "radius": 80 } },
+    { "id": "fibre", "name": "Fibre", "type": "material", "icon": "fibre", "stackable": true, "max_stack": 50 }
   ]
 }

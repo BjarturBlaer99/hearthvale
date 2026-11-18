@@ -52,13 +52,16 @@ extends RefCounted
 ##     walked onto as a stairway is)
 ##  26 the quarry's looks, for the Decor layer: old rails, rubble and a vein of crystal
 ##     (walkable looks), and a timber prop
+##  27 more spawn markers (the Homestead, 2026-11-18): what stands on the hero's land to be
+##     cleared: weeds, a bush, a fallen log, an old stump, a boulder and a great boulder (a
+##     plain rock of the land grows from row 12's rock marker)
 
 const TEXTURE_PATH: String = "res://world/tiles/greybox_tiles.png"
 const TILESET_PATH: String = "res://world/tiles/greybox_tiles.tres"
 const SOURCE_ID: int = 0
 const TILE_SIZE: int = 16
 const COLUMNS: int = 8
-const ROWS: int = 27
+const ROWS: int = 28
 
 const ROW_GROUND: int = 0
 const ROW_STAIRS: int = 1
@@ -84,6 +87,7 @@ const ROW_MARSH: int = 23
 const ROW_MARSH_DECOR: int = 24
 const ROW_QUARRY: int = 25
 const ROW_QUARRY_DECOR: int = 26
+const ROW_LAND_MARKERS: int = 27
 ## More trees, all props like "prop_tree". The baker mixes the first three kinds by cell and
 ## uses the canopy where trees stand on all four sides; a "cherry" block is always a cherry.
 const TREE_KINDS: Array[String] = ["prop_tree_b", "prop_tree_c", "prop_canopy", "prop_cherry", "prop_willow"]
@@ -146,10 +150,16 @@ const FURNITURE_B_HEIGHTS: Array[int] = [1, 2, 2, 1, 1, 1, 1, 2]
 const PROP_DECOR_KINDS: Array[String] = ["bucket", "laundry"]
 ## What the Spawns layer's markers stand for, in atlas order.
 const MARKER_KINDS: Array[String] = ["grass", "pot", "chicken", "butterfly", "firefly", "rock", "branch", "stump"]
-## The marker a rock of the quarry grows from (the area makes a Rock of it).
+## The markers of what stands on the hero's land to be cleared (the Homestead), in atlas order
+## on a row of their own: the first row of markers is full.
+const LAND_MARKER_KINDS: Array[String] = ["weeds", "bush", "log", "farm_stump", "boulder", "great_boulder"]
+## The marker a rock of the quarry grows from (the area makes a Rock of it), and a plain rock
+## of the hero's land.
 const ROCK_MARKER: String = "rock"
+## Every marker the area makes a Rock of: the land's boulders say their kind by their marker.
+const ROCK_MARKERS: Array[String] = ["rock", "boulder", "great_boulder"]
 ## Markers that become breakables (the rest become critters).
-const BREAKABLE_MARKERS: Array[String] = ["grass", "pot", "branch", "stump"]
+const BREAKABLE_MARKERS: Array[String] = ["grass", "pot", "branch", "stump", "weeds", "bush", "log", "farm_stump"]
 ## Water's animation: frames, and how long each shows (seconds).
 const WATER_FRAMES: int = 4
 const WATER_FRAME_TIME: float = 0.4
@@ -264,13 +274,22 @@ static func coords(kind: String, height: int = 0) -> Vector2i:
 	return Vector2i(0, ROW_GROUND)
 
 
-## Atlas coordinates for spawn marker `kind` (MARKER_KINDS).
+## Whether `kind` is a spawn marker (MARKER_KINDS, LAND_MARKER_KINDS).
+static func is_marker(kind: String) -> bool:
+	return MARKER_KINDS.has(kind) or LAND_MARKER_KINDS.has(kind)
+
+
+## Atlas coordinates for spawn marker `kind` (MARKER_KINDS, LAND_MARKER_KINDS).
 static func marker_coords(kind: String) -> Vector2i:
+	if LAND_MARKER_KINDS.has(kind):
+		return Vector2i(LAND_MARKER_KINDS.find(kind), ROW_LAND_MARKERS)
 	return Vector2i(MARKER_KINDS.find(kind), ROW_MARKERS)
 
 
 ## What the marker at atlas `coords` stands for, or empty if it isn't one.
 static func marker_kind(coords: Vector2i) -> String:
+	if coords.y == ROW_LAND_MARKERS and coords.x >= 0 and coords.x < LAND_MARKER_KINDS.size():
+		return LAND_MARKER_KINDS[coords.x]
 	if coords.y != ROW_MARKERS or coords.x < 0 or coords.x >= MARKER_KINDS.size():
 		return ""
 	return MARKER_KINDS[coords.x]

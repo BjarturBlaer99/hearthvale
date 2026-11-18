@@ -90,3 +90,6 @@ signal crafted(recipe_id: StringName)
 ## The furnace was lit, or what it made was taken out: whoever draws it shows it so.
 signal furnace_changed
 
+## Something on the hero's land was cleared for good (GameState.clear_debris; the Homestead).
+signal homestead_changed
+

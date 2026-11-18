@@ -6,6 +6,8 @@ extends Node2D
 ## coal, rust, gold, crystal. The area tells it what it holds today (hold), strikes it
 ## (strike), and decides what breaking it gives; a rock broken earlier today is gone when the
 ## area loads (be_gone). Only the pickaxe touches it: the sword and bombs pass it by.
+## On the hero's land (the Homestead, 2026-11-18) a rock is a kind of the homestead's rules
+## (a rock, a boulder, a great boulder), and one broken is gone for good.
 ## The area makes rocks from the map's Spawns markers. Position = the cell's top-left corner.
 
 const SHEET: Texture2D = preload("res://gameplay/art/rocks.png")
@@ -13,6 +15,8 @@ const SHEET: Texture2D = preload("res://gameplay/art/rocks.png")
 const FRAMES: Dictionary = {
 	&"stone": 0, &"copper_ore": 1, &"coal": 2, &"iron_ore": 3, &"gold_ore": 4, &"crystal": 5,
 	&"ladder": 6, &"lift": 7,
+	# The hero's land (the Homestead): a field stone, a boulder and a great boulder.
+	&"rock": 8, &"boulder": 9, &"great_boulder": 10,
 }
 const SIZE: Vector2i = Vector2i(16, 16)
 ## How long it shudders under a blow that doesn't break it (s).

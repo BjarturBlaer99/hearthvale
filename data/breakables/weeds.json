@@ -1,0 +1,23 @@
+{
+	"id": "weeds",
+	"name": "Weeds",
+	"breaks_on": [
+		"sword",
+		"bomb"
+	],
+	"returns": "never",
+	"sound": "cut",
+	"burst": "leaves",
+	"frames": {
+		"whole": "weeds",
+		"broken": ""
+	},
+	"drops": [
+		{
+			"type": "item",
+			"item": "fibre",
+			"count": 1,
+			"weight": 1
+		}
+	]
+}

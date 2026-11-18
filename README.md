@@ -153,7 +153,10 @@ Beaten enemies sometimes drop hearts or coins.
   Follow the lane west out of Hearthvale, past the last cottage and through the trees: it is a few
   seconds' walk. The farmhouse there is your home (the bed, the hearth and the workbench are inside), your
   field lies below it across the road, and a pond in the south-west corner fills the watering can.
-  - **One corner of the field is clear** and can be tilled on the first morning.
+  - **One corner of the field is clear** and can be tilled on the first morning. The rest of it, and
+    the land around, is overgrown: cut weeds, bushes, fallen logs and old stumps with the sword, and
+    break rocks with the Pickaxe. They leave fibre, wood and stone, and never come back. A boulder wants
+    the Copper Pickaxe and a great boulder the Iron one. Soil can't be tilled until it is cleared.
   - **An older save loads as it was:** a game saved in the old cottage opens in the farmhouse, and its
     soil and crops are in the field's clear corner.
 - **Willowmere:** a marsh east of the village. Climb the stairs at the south end of the east meadow and

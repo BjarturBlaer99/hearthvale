@@ -2632,3 +2632,40 @@ The first of phase 1's three steps (`docs/progress/homestead-plan.md`, approved 
 - **Nothing is overgrown yet** (step 1b), and the farm plays the village's tune (step 1c).
 - **`tools/playtest.gd -- farm`, `tools/play_days.gd` and twelve capture shots still take the plot to be in the village** (step 1c).
 - **Not played by a person.**
+
+## 2026-11-18 — The Homestead, phase 1, step 1b: the overgrowth
+
+The second of phase 1's three steps (`docs/progress/homestead-plan.md`).
+
+**Built**
+- **145 things stand on the land in a new game,** where the plan's drawing put them: 70 weeds, 16 bushes, 10 fallen logs, 14 old stumps, 24 rocks, 8 boulders and 3 great boulders. 54 are on the field (40 weeds, 5 bushes, 5 rocks, 2 stumps, 2 logs), and none on its clear corner, the road, the path or the row before the farmhouse.
+- **The sword clears** weeds in one blow (1 fibre), a bush in two (2 fibre), a log in three (3 wood) and a stump in three (2 wood). A bomb's blast is one blow of the same.
+- **The pickaxe clears** a rock in two blows (1 stone). A boulder takes three blows of the Copper Pickaxe or two of the Iron (4 stone); a great boulder three of the Iron (8 stone).
+- **A lesser pickaxe at a boulder** is told "It wants a better pickaxe.": no swing, no energy.
+- **What one leaves lies in its cell,** and stays lying if the pack has no room for all of it.
+- **Cleared is cleared.** The cell is kept in `GameState.homestead()` and the save's `homestead` section. No visit, morning or save brings it back; a new game starts overgrown.
+- **Nothing is tilled under it:** the hoe, and the can, a seed and a sprinkler, say "Clear this first." and spend nothing.
+- **Fibre,** a new material with its own picture. It stacks to 50. Nothing uses it yet.
+- **All of it is data:** four breakables that never return, three kinds of rock in a new set of rules (`data/rules/homestead.json`), and one item.
+- **Pictures, painted by the tools:** weeds, a bush, a log; a field stone, a boulder, a great boulder; fibre. Six new spawn markers are a row at the end of the tile atlas. Every older tile and frame is where it was, pixel for pixel (checked).
+
+**What differs from the plan**
+- **The numbers are the plan's table,** each one: counts, blows, drops, and the totals (102 fibre, 58 wood, 80 stone).
+- **Twenty things moved a cell or two when the map was baked.** In the plan's drawing they stood behind a tree's crown: against the woods' edge on the west, east and south, or behind an old tree. A first screenshot showed stumps and weeds peeking from under the trees, and the hero stopped by things he couldn't see. Each was moved onto open grass nearby (three of them further, to keep the pond's banks and a great boulder's foot open). Nothing on the field moved, and every count is the plan's.
+- **"Clear this first." is said to every tool of the plot,** not the hoe alone.
+- **The land's stump is a breakable of its own** (`farm_stump`), with the countryside's picture: the countryside's comes back each morning.
+- **Not in the plan, chosen and written down** (`docs/DECISIONS.md`): fibre's stack of 50; a left click with the hoe at weeds on the field says "Clear this first." (off the field it swings the sword, as before); a better hoe's stroke passes over a cell with something on it; stone from the land is no practice at mining, as plain stone in the quarry is none.
+
+**Verified**
+- **974 tests in 129 suites, all passing.** Fifteen are new in this step: the homestead's rules (4), the overgrowth in the world (9), a game saved where the plot lay in Hearthvale (1), and a new game's first day on the farm from the square to bed (1), which is the plan's "done when" in one test.
+- **The two walks that step 1a had loosened are exact again:** across the clear corner he stops at its last cell, against the weeds beyond, and down through it at its last row.
+- **Sixty bugs planted on purpose,** one at a time, each file put back, in the new code, data and scenes of steps 1a and 1b: **all sixty were caught.** Among them: nothing recorded as cleared; every map taken for his land; the homestead not saved, not loaded, or kept by a new game; no step from version 5; the old plot's size; a blocked cell tilled; a weak pickaxe swinging anyway; cleared weeds back on the next visit; a boulder that is a plain rock, leaves one stone, or puts its stone straight in the pack; a land rock broken only for today; each kind's blows, drop and pickaxe changed in its data; the cottage open for half an hour at midnight; the farmhouse door opening onto the village; the field a row too high; a quest stage too long for the log. A run of each suite with no bug planted reports nothing caught, so the catching is the tests' own.
+- **One check was found empty by reading it, and fixed:** "nothing stands on the road" compared a cell against a word the area never gives. It now reads the tile under each thing. (By the way the map is drawn a cell is road or carries a thing, never both, and the road's 42 cells are counted elsewhere.)
+- **Every older picture is unchanged:** the four repainted sheets were compared with the ones before, pixel by pixel, over the part that was there.
+- **The game boots headless** with no script error.
+
+**Known issues and limits**
+- **Not played by a person.** How long the land takes to clear, and whether a swing that catches two weeds at once feels right, is for a playtest.
+- **A swing of the sword cuts everything in its arc,** so weeds that stand side by side fall two or three to a blow. The plan's "about 250 energy for the whole land" is by the blow, and will be an overestimate.
+- **Fibre has no use until phase 3,** and Tilda does not buy it (as planned).
+- **The farm still plays the village's tune,** and the tools still take the plot to be in the village (step 1c).

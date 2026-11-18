@@ -1389,13 +1389,61 @@ The user's request of 2026-11-17 (`docs/progress/homestead-plan.md`, approved as
 - **The field** is the `FarmPlot` node at (22, 17): the plot of the farm's rules, 12 by 6 (§20). The
   village's `FarmPlot` node is gone. The plot's own cells (0..5, 0..2) are the old plot, so a saved farm
   needs nothing moved.
-- **`Homestead`** (`core/homestead/`, pure) is what the hero has done to his land that is for good.
-  `GameState.homestead()` keeps the one (thrown away by `clear()`), and it is the save's section
-  `homestead` (§9, version 6).
+- **`Homestead`** (`core/homestead/`, pure) is what the hero has done to his land that is for good: the
+  cells he has cleared. `GameState.homestead()` keeps the one (thrown away by `clear()`), and it is the
+  save's section `homestead` (§9, version 6).
+- **The overgrowth** (step 1b): 145 things stand on the land in a new game, 54 of them on the field.
+  The field's clear corner, the road, the path and the row before the farmhouse carry none, and none
+  stands behind a tree's crown (`Scenery.hiding()`): twenty of the plan's drawing did, and were moved a
+  cell or two when the map was baked.
+
+  | What | A | Cleared by | Blows | Leaves | On the land |
+  |---|---|---|---|---|---|
+  | Weeds | `Breakable` `weeds` | the sword, a bomb | 1 | 1 fibre | 70 |
+  | A bush | `Breakable` `bush` | the sword, a bomb | 2 | 2 fibre | 16 |
+  | A fallen log | `Breakable` `log` | the sword, a bomb | 3 | 3 wood | 10 |
+  | An old stump | `Breakable` `farm_stump` | the sword, a bomb | 3 | 2 wood | 14 |
+  | A rock | `Rock` `rock` | any pickaxe | 2 (plain), 1 | 1 stone | 24 |
+  | A boulder | `Rock` `boulder` | the Copper Pickaxe or better | 3 (copper), 2 (iron) | 4 stone | 8 |
+  | A great boulder | `Rock` `great_boulder` | the Iron Pickaxe | 3 | 8 stone | 3 |
+
+  - **All of it is data.** The four the sword clears are files in `data/breakables/` whose `returns` is
+    `"never"`. The three rocks are kinds in `data/rules/homestead.json`, read by `HomesteadRules`
+    (`core/homestead/`, pure): `blows` (counted for the plain pickaxe; a better one takes its
+    `fewer_blows` off, as in the quarry), `wants` (the least pickaxe, an item id), `gives` and `count`.
+    The same file names the map that is his land (`area`).
+  - **Where each stands** is a spawn marker baked from the sketch's letters (the map's `"marks"`). The
+    first row of markers was full, so six new ones are a row of their own at the end of the atlas
+    (`GreyboxTiles.LAND_MARKER_KINDS`, row 27); a plain rock grows from the quarry's rock marker.
+    `AreaController._spawned()` makes a `Rock` of every `ROCK_MARKERS` kind, and a boulder's kind is its
+    marker's name.
+  - **Cleared for good:** `GameState.clear_debris(area, cell)` records the cell in `Homestead` and emits
+    `EventBus.homestead_changed`; `is_debris_cleared(area, cell)` asks. Both answer "no" for any map but
+    the land. A `Breakable` that never returns calls the first as it is smashed and asks the second as
+    it is made (`is_for_good()`); on the land `roll_rocks()` stands each rock as its kind
+    (`_stand_land_rocks()`) and takes away those cleared, and `_on_rock_broken()` clears the cell
+    (`_on_land_rock_broken()`) where the quarry marks it broken for the day. No flag and nothing of the
+    mine's record is used.
+  - **What one leaves** is an `ItemDrop` in its cell, as in the quarry: walked onto, and left lying by
+    a full pack.
+  - **A boulder and a lesser pickaxe:** `ToolUse.decide_pick(at_rock, too_hard)` says
+    `ToolUse.PICK_WEAK` ("It wants a better pickaxe.") and nothing is swung or spent.
+    `HomesteadRules.is_too_hard()` compares the `fewer_blows` of the pickaxe in hand with those of the
+    one the kind wants.
+  - **Nothing is tilled under it:** `ToolUse.decide()` takes `blocked`, and the hoe, the can, a seed and
+    a sprinkler at a cell of the plot with something standing on it are all told `ToolUse.CLEAR_FIRST`
+    ("Clear this first."). A better hoe's stroke passes over such a cell (`_cells_worked()`).
+  - **`AreaController.debris()` and `debris_at(cell)`** are what still stands. Each fills its cell
+    (`TerrainQuery.set_occupied`, as every breakable and rock does) until it is cleared.
+  - **Pictures:** weeds, a bush and a log in `breakables.png` (the land's stumps wear the countryside's
+    stump); a field stone, a boulder and a great boulder in `rocks.png`; fibre in `items.png`. All from
+    `tools/art/make_sprites.gd`, added after the frames that were there.
+  - **Fibre** is a material (stacks to 50). Nothing uses it until phase 3.
 - **A sketch with a legend** (`build_maps.gd`): a map's `"legend"` names the characters that lay a tile
   (`[kind, height]`, a cell each) and every other character leaves the base showing; its `"marks"` name
   the characters that are spawn markers. A sketch without one is read as the Old Quarry's are.
 - **Tests:** `tests/world/homestead_test.gd` (the map and the walk), `tests/world/home_move_test.gd` (the
-  doors, waking, the locked cottage, the version 5 save in the world), `tests/autoload/homestead_save_test.gd`
-  and `tests/core/homestead/homestead_test.gd`. The suites that worked the village's plot work the
+  doors, waking, the locked cottage, the version 5 save in the world), `tests/world/debris_test.gd` (the
+  overgrowth), `tests/autoload/homestead_save_test.gd`, and `tests/core/homestead/` (`Homestead`,
+  `HomesteadRules`). The suites that worked the village's plot work the
   field's clear corner (`PLOT = Vector2i(22, 17)`).

@@ -74,6 +74,7 @@ var _furnace: Furnace
 var _store: Store
 ## His homestead (2026-11-17): what he has cleared from the land for good. Saved.
 var _homestead: Homestead
+var _homestead_rules: HomesteadRules
 ## Where the hero is: { "area", "cell": [x, y] }, or { "area", "entry" } on the way into an
 ## area through one of its entry points (go_to), until the area places them.
 var player: Dictionary = {}
@@ -617,6 +618,29 @@ func homestead() -> Homestead:
 	if _homestead == null:
 		_homestead = Homestead.new()
 	return _homestead
+
+
+## The homestead's rules (data/rules/homestead.json): which map is his land, and its rocks.
+func homestead_rules() -> HomesteadRules:
+	if _homestead_rules == null:
+		_homestead_rules = HomesteadRules.new(DataRegistry.get_rules(DataRegistry.RULES_HOMESTEAD))
+	return _homestead_rules
+
+
+## Whether what stood at `cell` of `area` has been cleared for good. Only his land keeps such
+## a thing: anywhere else nothing is ever cleared for good.
+func is_debris_cleared(area: StringName, cell: Vector2i) -> bool:
+	return homestead_rules().is_land(area) and homestead().is_cleared(cell)
+
+
+## What stood at `cell` of `area` (weeds, a bush, a log, a stump, a rock, a boulder) is
+## cleared, for good: no morning brings it back. Returns whether that is news; it never is
+## off his land, or for a cell cleared already.
+func clear_debris(area: StringName, cell: Vector2i) -> bool:
+	if not homestead_rules().is_land(area) or not homestead().clear(cell):
+		return false
+	EventBus.homestead_changed.emit()
+	return true
 
 
 # --- The mine (2026-11-17) ---------------------------------------------------

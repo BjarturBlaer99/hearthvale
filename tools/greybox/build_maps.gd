@@ -798,8 +798,8 @@ const MAPS: Dictionary = {
 	# village's own house tiles. "F" is the field's clear corner; the whole field is the
 	# FarmPlot node in the scene, (22..33, 17..22). "~" is the pond. "T" is the woods round the
 	# edge and "t" an old tree left standing. The other letters are the land's overgrowth,
-	# laid in step 1b: "w" weeds, "b" a bush, "l" a fallen log, "s" an old stump, "o" a rock,
-	# "O" a boulder, "@" a great boulder. The quote marks are the meadow's tall grass, which
+	# spawn markers named by "marks": "w" weeds, "b" a bush, "l" a fallen log, "s" an old
+	# stump, "o" a rock, "O" a boulder, "@" a great boulder. The quote marks are the meadow's tall grass, which
 	# is phase 3's: until then they are grass like any other.
 	"homestead": {
 		"scene": "res://world/areas/homestead/homestead.tscn",
@@ -808,38 +808,41 @@ const MAPS: Dictionary = {
 			"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
 			"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
 			"TT.........ww...........s.............TT",
-			"TT..\".\"..\".\".\"...................o.t..TT",
-			"TT.o.\".l\".\".\".b.t.............o...t.twTT",
-			"TT..\"..\".\".\".\"..s.............o.......TT",
-			"TT...............oww.......l......l...TT",
-			"TT............O.w..............w..ww..TT",
-			"TTs..w....w........w......HHHHHH..to.lTT",
-			"TT.t.O..oOs..........w.t..HHHHHH....w.TT",
-			"TT.....b....O...O......wsbHHHHHH......TT",
-			"TTw.............o.b....o..HHDHHH......TT",
+			"TT..\".\"..\".\".\"..................o..t..TT",
+			"TT.o.\".l\".\".\".b.t.............o...t.t.TT",
+			"TT..\"..\".\".\".\"..s.............o...l.w.TT",
+			"TT...............oww.......l..........TT",
+			"TT............O.w..............ww...w.TT",
+			"TT...w....w........w......HHHHHH..t.l.TT",
+			"TT.t.O..oOs..........w.t..HHHHHH...ow.TT",
+			"TT.s...b....O...O......wsbHHHHHH......TT",
+			"TT.w............o.b....o..HHDHHH......TT",
 			"TT........w...l..o.s........=.........TT",
 			"TT.O.....w.....w............=.........TT",
-			"TTs....O..w.l.......==================>>",
+			"TT.s...O..w.l.......==================>>",
 			"TT...............w..==================>>",
 			"TT....................................TT",
 			"TT.....b......o....b..FFFFFFwwwwww....TT",
 			"TT.t..................FFFFFFwwwsww....TT",
 			"TT.ow.......o.O.b.....FFFFFFwbwbww..o.TT",
-			"TTb..w....wl....o...s.wowwblowwbww....TT",
-			"TT..~~~~~~w@.@........wwwwwlwwooww....TT",
+			"TT.b.w....wl....o...s.wowwblowwbww....TT",
+			"TT..~~~~~~w@.@........wwwwwlwwooww..b.TT",
 			"TT..~~~~~~.....b...l..wsbwwwwwwwwo....TT",
-			"TT..~~~~~~...o......................b.TT",
+			"TT..~~~~~~..wo........................TT",
 			"TT..~~~~~~....s........b............t.TT",
-			"TT....@.s......o....o..............t..TT",
-			"TT....s.....t..........sw...........w.TT",
-			"TT.......w.w..w.................o.....TT",
+			"TT.s..@.s.w...wo....o..sw.......ow.t..TT",
+			"TT..........t.........................TT",
+			"TT....................................TT",
 			"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
 			"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
 		],
 		"legend": {
 			"T": ["tree", 0], "t": ["tree", 0], "~": ["water", 0], "=": ["path", 0], ">": ["path", 0],
 		},
-		"marks": {},
+		"marks": {
+			"w": "weeds", "b": "bush", "l": "log", "s": "farm_stump",
+			"o": "rock", "O": "boulder", "@": "great_boulder",
+		},
 		"blocks": [
 			# The farmhouse: thatch over a half-timbered upper floor and a ground floor, as the
 			# village's cottages are, with its door where theirs is.
@@ -1409,7 +1412,7 @@ func _spawns(root: Node, map: Dictionary) -> Error:
 	layer.clear()
 	for block: Array in blocks:
 		var kind: String = block[4]
-		if not GreyboxTiles.MARKER_KINDS.has(kind):
+		if not GreyboxTiles.is_marker(kind):
 			push_error("tools/greybox: '%s' is not a spawn marker (%s)" % [kind, block])
 			return ERR_INVALID_DATA
 		for y: int in range(block[1], block[1] + block[3]):

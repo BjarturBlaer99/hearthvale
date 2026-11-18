@@ -1165,3 +1165,36 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
     farmhouse's front, three lily pads on the pond, and a scatter of tufts, flowers, pebbles and
     mushrooms as the other outdoor maps have.
   - **Until step 1c the farm plays the village's tune.**
+- 2026-11-18 — **The Homestead, step 1b: what the plan left open.**
+  - **The seven kinds are two sorts of data.** What the sword clears are breakables with `"returns":
+    "never"` (the plan's R7); the three rocks are kinds in a new set of rules, `data/rules/homestead.json`
+    (the plan lists the file), which also names the map that is his land. Why: a breakable already has
+    its blows and its drop as data, and a rock's blows were already a rule.
+  - **The land's stump is `farm_stump`,** a breakable of its own with the countryside's picture and
+    numbers. Why: `stump` returns daily, and one id can't do both.
+  - **A boulder's "blows" are counted for the plain pickaxe** (4, and 5 for a great boulder), and a
+    better pickaxe takes off what it takes off in the quarry. That gives the plan's numbers exactly: 3
+    with the Copper and 2 with the Iron; 3 with the Iron. The plain pickaxe never gets to try.
+  - **A rock on the land breaks in one blow of a better pickaxe,** as a plain rock of the quarry does.
+  - **Stone from the land is no practice at mining,** as plain stone in the quarry is none (no number of
+    the skill was changed).
+  - **Only the land keeps what is cleared.** `clear_debris()` and `is_debris_cleared()` take the area
+    and answer "no" anywhere else, so a breakable that "never" returns means that only on the homestead.
+  - **"Clear this first." is said by every tool of the plot,** not the hoe alone: the can, a seed and a
+    sprinkler at such a cell would otherwise say "Till the soil with the hoe first.", which he can't.
+  - **With a hoe in hand a left click at weeds on the field says "Clear this first."** and does not
+    swing the sword: the field is the hoe's work, as it was. Space still swings, and the wheel changes
+    what is in hand. (Off the field the click is the sword's, as before.)
+  - **A better hoe's stroke passes over a cell with something on it,** as it passes over a cell tilled
+    already.
+  - **Fibre stacks to 50,** as stone does. The plan gives no number; no building's plan asks for more
+    than 25.
+  - **Six new spawn markers are a row of their own at the end of the atlas** (row 27): the markers' row
+    had no room, and an older tile never changes place.
+  - **A bomb's blast is one blow,** so it clears weeds and only starts on a log: what a bomb already
+    does to a stump in the countryside.
+  - **Twenty things of the plan's drawing were moved a cell or two** (three were moved further, to
+    keep the pond's banks and a great boulder's foot open): they stood behind a tree's crown, against
+    the woods' edge or behind an old tree, by the rule the wood in the countryside is held to
+    (`Scenery.hiding()`). Why: what blocks his way should be in plain sight, and the plan allows a cell
+    to shift when baked. Nothing on the field moved; the counts and the field's 54 are as approved.

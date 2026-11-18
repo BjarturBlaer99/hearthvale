@@ -398,8 +398,12 @@ func spawn_markers() -> int:
 
 
 func _spawned(kind: String) -> Node2D:
-	if kind == GreyboxTiles.ROCK_MARKER:
-		return Rock.new()
+	if GreyboxTiles.ROCK_MARKERS.has(kind):
+		var rock: Rock = Rock.new()
+		# A boulder of the hero's land says what it is by its marker.
+		if kind != GreyboxTiles.ROCK_MARKER:
+			rock.kind = StringName(kind)
+		return rock
 	if GreyboxTiles.BREAKABLE_MARKERS.has(kind):
 		var breakable: Breakable = Breakable.new()
 		breakable.breakable_id = StringName(kind)
@@ -429,6 +433,8 @@ func roll_rocks() -> int:
 	var standing: Array[Rock] = rocks()
 	if standing.is_empty():
 		return 0
+	if GameState.homestead_rules().is_land(area_id):
+		return _stand_land_rocks(standing)
 	var cells: Array[Vector2i] = []
 	for rock: Rock in standing:
 		cells.append(rock.cell())
@@ -449,6 +455,49 @@ func roll_rocks() -> int:
 	return whole
 
 
+## The rocks of the hero's land (the Homestead): each is the kind its marker said, with that
+## kind's blows, and one cleared on any day before is gone for good. Returns how many stand.
+func _stand_land_rocks(standing: Array[Rock]) -> int:
+	var rules: HomesteadRules = GameState.homestead_rules()
+	var whole: int = 0
+	for rock: Rock in standing:
+		var kind: StringName = rules.rock_kind(rock.kind)
+		rock.hold(kind, rules.blows(kind))
+		if GameState.is_debris_cleared(area_id, rock.cell()):
+			rock.be_gone()
+		else:
+			whole += 1
+	return whole
+
+
+## What stands on the hero's land to be cleared (the Homestead): its whole weeds, bushes,
+## logs, stumps, rocks and boulders. Nothing, anywhere else.
+func debris() -> Array[Node2D]:
+	var out: Array[Node2D] = []
+	if not GameState.homestead_rules().is_land(area_id):
+		return out
+	for child: Node in interactables.get_children():
+		if child is Rock and not (child as Rock).broken:
+			out.append(child as Node2D)
+		elif child is Breakable and (child as Breakable).is_for_good() and not (child as Breakable).broken:
+			out.append(child as Node2D)
+	return out
+
+
+## What stands in `cell` of the hero's land to be cleared, or null.
+func debris_at(cell: Vector2i) -> Node2D:
+	for thing: Node2D in debris():
+		if thing.call(&"cell") == cell:
+			return thing
+	return null
+
+
+## Whether `rock` wants a better pickaxe than `pick` (a boulder of the hero's land).
+func _is_too_hard(rock: Rock, pick: Dictionary) -> bool:
+	var rules: HomesteadRules = GameState.homestead_rules()
+	return rules.is_land(area_id) and rules.is_too_hard(rock.kind, pick, DataRegistry.get_item(rules.wants(rock.kind)))
+
+
 ## The whole rock in the cell the hero faces, or null.
 func rock_in_front() -> Rock:
 	return _find(Rock, player.front_cell()) as Rock
@@ -466,10 +515,11 @@ func ladder() -> LadderHole:
 
 ## Swings the pickaxe on the item button at the rock the hero faces: a blow costs energy and
 ## takes one off what the rock still stands, and a better pickaxe breaks it with fewer. Says
-## so and costs nothing with no rock there. Returns whether a blow fell.
+## so and costs nothing with no rock there, or at a rock that wants a better pickaxe (a
+## boulder of his land). Returns whether a blow fell.
 func _swing_pick(item: Dictionary) -> bool:
 	var rock: Rock = rock_in_front()
-	var use: Dictionary = ToolUse.decide_pick(rock != null)
+	var use: Dictionary = ToolUse.decide_pick(rock != null, rock != null and _is_too_hard(rock, item))
 	if use["does"] == ToolUse.NOTHING:
 		EventBus.sound.emit(&"nope")
 		hud.show_message(str(use["says"]))
@@ -490,6 +540,9 @@ func _swing_pick(item: Dictionary) -> bool:
 ## The one over the ladder shows it; any other leaves what it held lying in its cell, and a
 ## rock of ore may leave one more (the chance his Mining gives, rolled by `roll_extra_ore`).
 func _on_rock_broken(rock: Rock) -> void:
+	if GameState.homestead_rules().is_land(area_id):
+		_on_land_rock_broken(rock)
+		return
 	var rules: MineRules = GameState.mine_rules()
 	# Rolled at the skill he broke it with: the blow that raises his Mining pays the old odds.
 	var extra: bool = rules.is_ore(rock.kind) and float(roll_extra_ore.call()) < GameState.extra_ore_chance()
@@ -501,13 +554,27 @@ func _on_rock_broken(rock: Rock) -> void:
 		EventBus.sound.emit(&"secret")
 		hud.show_message(LADDER_WORDS)
 		return
-	var gives: StringName = rules.gives(rock.kind)
-	if gives == &"":
+	_leave_lying(rules.gives(rock.kind), 2 if extra else 1, rock.position)
+
+
+## A rock of the hero's land gave way (the Homestead): it is gone for good, and what its kind
+## leaves lies in its cell. Plain stone is no more practice at mining here than in the quarry.
+func _on_land_rock_broken(rock: Rock) -> void:
+	var rules: HomesteadRules = GameState.homestead_rules()
+	GameState.clear_debris(area_id, rock.cell())
+	GameState.practise(Skills.MINING, Skills.ROCK)
+	EventBus.sound.emit(&"rock_break")
+	_leave_lying(rules.gives(rock.kind), rules.count(rock.kind), rock.position)
+
+
+## Leaves `count` of `item_id` lying at `at` (a cell's top-left corner), to be walked onto.
+func _leave_lying(item_id: StringName, count: int, at: Vector2) -> void:
+	if item_id == &"":
 		return
 	var drop: ItemDrop = ItemDrop.new()
-	drop.item_id = gives
-	drop.count = 2 if extra else 1
-	drop.position = rock.position
+	drop.item_id = item_id
+	drop.count = count
+	drop.position = at
 	interactables.add_child(drop)
 
 
@@ -1045,8 +1112,10 @@ func _use_tool(item: Dictionary) -> bool:
 	var held: StringName = StringName(str(holds.get("id", "")))
 	var growing: bool = plot != null and plot.covers(front) and GameState.farm().has_crop(plot.plot_cell(front))
 	var sprinkler: bool = plot != null and plot.covers(front) and GameState.farm().has_sprinkler(plot.plot_cell(front))
+	# A cell of the field with something standing on it (the Homestead's overgrowth) is cleared first.
+	var blocked: bool = plot != null and plot.covers(front) and debris_at(front) != null
 	var use: Dictionary = ToolUse.decide(ToolUse.kind_of(item), plot.soil_at(front) if plot != null else &"",
-		is_water_source(front), GameState.item_count(held), Inventory.capacity(holds) if not holds.is_empty() else 0, growing, sprinkler)
+		is_water_source(front), GameState.item_count(held), Inventory.capacity(holds) if not holds.is_empty() else 0, growing, sprinkler, blocked)
 	if use["does"] == ToolUse.NOTHING:
 		EventBus.sound.emit(&"nope")
 		hud.show_message(str(use["says"]))
@@ -1097,7 +1166,8 @@ func _cells_worked(item: Dictionary, front: Vector2i, what: StringName) -> Array
 	var cells: Array[Vector2i] = ToolUse.line(front, player.facing_direction(), ToolUse.reach(item))
 	for index: int in range(1, cells.size()):
 		var cell: Vector2i = cells[index]
-		if plot == null or not plot.covers(cell):
+		# What stands on a cell beyond (the Homestead's overgrowth) is passed over, not worked.
+		if plot == null or not plot.covers(cell) or debris_at(cell) != null:
 			continue
 		var growing: bool = GameState.farm().has_crop(plot.plot_cell(cell))
 		if ToolUse.decide(ToolUse.kind_of(item), plot.soil_at(cell), false, 1, 1, growing)["does"] == what:

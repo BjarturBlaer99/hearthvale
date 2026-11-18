@@ -43,6 +43,10 @@ const SPRINKLER_BARE: String = "Till the soil with the hoe first."
 const SPRINKLER_GROWING: String = "Something is growing here."
 const SPRINKLER_TAKEN: String = "A sprinkler stands here already."
 const SPRINKLER_NONE: String = "You have no more sprinklers."
+## At a cell of the plot with something standing on it (the Homestead's overgrowth).
+const CLEAR_FIRST: String = "Clear this first."
+## The pickaxe at a rock that wants a better one (a boulder of the hero's land).
+const PICK_WEAK: String = "It wants a better pickaxe."
 
 
 static func is_farm_tool(item: Dictionary) -> bool:
@@ -73,7 +77,11 @@ static func time_of(item: Dictionary) -> float:
 ## takes (the can's pours, the seeds of this kind) and `holds` how much of it fits; `growing`
 ## whether something is planted in the cell, alive or withered.
 ## `sprinkler` is whether a sprinkler stands in the cell.
-static func decide(kind: String, soil: StringName, at_water: bool, held: int, holds: int, growing: bool = false, sprinkler: bool = false) -> Dictionary:
+## `blocked` is whether something stands on the cell that has to be cleared first (weeds, a
+## rock: the Homestead's overgrowth): nothing can be done to such a cell of the plot.
+static func decide(kind: String, soil: StringName, at_water: bool, held: int, holds: int, growing: bool = false, sprinkler: bool = false, blocked: bool = false) -> Dictionary:
+	if blocked and soil != &"" and not at_water and (kind == HOE or kind == CAN or kind == SEED or kind == SPRINKLER):
+		return _no(CLEAR_FIRST)
 	match kind:
 		HOE:
 			if soil == &"":
@@ -134,9 +142,12 @@ static func line(front: Vector2i, facing: Vector2i, cells: int) -> Array[Vector2
 
 
 ## What swinging the pickaxe does: { "does": MINE or NOTHING, "says": words }. `at_rock` is
-## whether a whole rock stands in the cell he faces.
-static func decide_pick(at_rock: bool) -> Dictionary:
-	return _do(MINE) if at_rock else _no(MineRules.NOTHING_WORDS)
+## whether a whole rock stands in the cell he faces, and `too_hard` whether that rock wants a
+## better pickaxe than this one (a boulder of the hero's land): then no blow falls.
+static func decide_pick(at_rock: bool, too_hard: bool = false) -> Dictionary:
+	if not at_rock:
+		return _no(MineRules.NOTHING_WORDS)
+	return _no(PICK_WEAK) if too_hard else _do(MINE)
 
 
 ## How many blows fewer than the plain pickaxe `item` needs to break a rock (a better

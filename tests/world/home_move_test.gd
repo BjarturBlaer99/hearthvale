@@ -275,6 +275,121 @@ func test_a_save_made_in_the_old_cottage_opens_in_the_farmhouse_with_all_it_had(
 	assert_bool(village.is_shut(village.interactables.get_node(^"HomeDoor"))).is_true()
 
 
+func test_a_game_saved_where_the_plot_lay_in_hearthvale_opens_on_grass() -> void:
+	# The hero standing in the village, on what was a cell of his plot.
+	GameState.update_player(&"village", OLD_PLOT + Vector2i(2, 1))
+	GameState.till_soil(Vector2i(2, 1))
+	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
+	GameState.clear()
+	assert_int(SaveSystem.load_from_slot(TEST_SLOT)).is_equal(OK)
+	var village: AreaController = _load(VILLAGE)
+	assert_that(village.player.motor.cell).override_failure_message("where he stood").is_equal(OLD_PLOT + Vector2i(2, 1))
+	assert_that((village.get_node(^"Height") as TileMapLayer).get_cell_atlas_coords(village.player.motor.cell)).override_failure_message("the old plot is grass under him").is_equal(GreyboxTiles.coords("ground"))
+	assert_bool(village.grid.is_solid(village.player.motor.cell) or village.terrain.is_occupied(village.player.motor.cell)).is_false()
+	# The soil he tilled is the same cell of the plot, on the farm.
+	var farm: AreaController = _load(FARM)
+	assert_that(farm.plot.soil_at(PLOT + Vector2i(2, 1))).is_equal(Farm.TILLED)
+
+
+func test_a_new_games_first_day_on_the_farm() -> void:
+	# The plan's "done when", in one go: from the square to the farmhouse, the tools, a seed in
+	# the clear corner, the can filled at the pond, weeds and a rock cleared, a night's sleep.
+	var village: AreaController = _load(VILLAGE)
+	assert_that(village.player.motor.cell).override_failure_message("a new game begins in the square").is_equal(Vector2i(23, 20))
+	village.player.motor.place(Vector2i(2, 16))
+	assert_str(Steps.walk_until_travel(village, Vector2.LEFT)).override_failure_message("west along the lane").is_equal(FARM)
+	var farm: AreaController = _load(FARM)
+	farm.player.motor.place(DOORSTEP)
+	assert_str(Steps.walk_until_travel(farm, Vector2.UP)).is_equal(HOME)
+	var home: AreaController = _load(HOME)
+	for found: String in ["Hoe", "WateringCan", "TurnipSeeds"]:
+		home.player.motor.place((home.interactables.get_node(NodePath(found)) as ItemPickup).cell())
+		assert_bool(home.interact()).override_failure_message("taking the %s" % found).is_true()
+	assert_that(Quests.runner.stage(&"a_place_of_your_own")).is_equal(&"plant")
+	home.player.motor.place(INSIDE)
+	assert_str(Steps.walk_until_travel(home, Vector2.DOWN)).is_equal(FARM)
+	farm = _load(FARM)
+	# A seed in the clear corner: tilled and planted from the grass above the field.
+	farm.player.motor.place(PLOT + Vector2i(1, -1))
+	farm.player.face(Vector2.DOWN)
+	GameState.equip(&"hoe")
+	assert_bool(farm.use_hand()).override_failure_message("tilling").is_true()
+	_rest(farm)
+	GameState.equip(&"turnip_seeds")
+	assert_bool(farm.use_hand()).override_failure_message("planting").is_true()
+	_rest(farm)
+	assert_that(Quests.runner.stage(&"a_place_of_your_own")).override_failure_message("the first seed is in the ground").is_equal(&"bram")
+	# The can fills at the pond, and waters the seed.
+	GameState.equip(&"watering_can")
+	assert_int(GameState.item_count(&"water")).is_equal(0)
+	farm.player.motor.place(Vector2i(3, 22))
+	farm.player.face(Vector2.RIGHT)
+	assert_bool(farm.use_hand()).override_failure_message("filling the can at the pond").is_true()
+	assert_int(GameState.item_count(&"water")).is_equal(10)
+	_rest(farm)
+	farm.player.motor.place(PLOT + Vector2i(1, -1))
+	farm.player.face(Vector2.DOWN)
+	assert_bool(farm.use_hand()).override_failure_message("watering").is_true()
+	_rest(farm)
+	assert_bool(GameState.farm().is_watered(Vector2i(1, 0))).is_true()
+	# Weeds with the sword and a rock with the Pickaxe (found and bought in the village).
+	GameState.add_item(&"wooden_sword")
+	GameState.add_item(&"pickaxe")
+	var weeds: Vector2i = Vector2i(28, 17)
+	farm.player.motor.place(weeds + Vector2i.LEFT)
+	farm.player.face(Vector2.RIGHT)
+	farm.player.sync_from_motor()
+	assert_bool(farm.player.swing()).is_true()
+	for i: int in 40:
+		farm.player.motor.step(Vector2.ZERO, FRAME)
+		farm.player.sync_from_motor()
+		farm.resolve_combat()
+	assert_object(farm.debris_at(weeds)).override_failure_message("the weeds are cut").is_null()
+	var rock: Vector2i = Vector2i(23, 20)
+	GameState.equip(&"pickaxe")
+	farm.player.motor.place(rock + Vector2i.UP)
+	farm.player.face(Vector2.DOWN)
+	for blow: int in 2:
+		assert_bool(farm.use_hand()).override_failure_message("the pickaxe at the rock").is_true()
+		_rest(farm)
+	assert_object(farm.debris_at(rock)).override_failure_message("the rock is broken").is_null()
+	# What they left is his when he walks onto it.
+	for cell: Vector2i in [rock, weeds]:
+		farm.player.motor.place(cell)
+		farm.player.sync_from_motor()
+		farm.collect_pickups()
+	assert_int(GameState.item_count(&"stone")).is_equal(1)
+	assert_int(GameState.item_count(&"fibre")).is_greater_equal(1)
+	# To bed: he wakes in the farmhouse on the second day, the seed has sprouted, and what he
+	# cleared is still clear.
+	farm.player.motor.place(DOORSTEP)
+	assert_str(Steps.walk_until_travel(farm, Vector2.UP)).is_equal(HOME)
+	home = _load(HOME)
+	var bed: Bed = home.interactables.get_node(^"Bed")
+	var by_bed: Vector2i = bed.cell() + Vector2i.RIGHT
+	home.player.motor.place(by_bed)
+	home.player.face(Vector2.LEFT)
+	assert_bool(home.interact()).is_true()
+	home.hud.dialogue.confirm()
+	assert_int(GameState.day).is_equal(2)
+	assert_that(home.player.motor.cell).is_equal(by_bed)
+	assert_str(home.area_name).is_equal("Your farmhouse")
+	assert_that(GameState.crop_phase(Vector2i(1, 0))).is_equal(Farm.SPROUT)
+	assert_bool(SaveSystem.has_slot(TEST_SLOT)).is_true()
+	GameState.clear()
+	assert_int(SaveSystem.load_from_slot(TEST_SLOT)).is_equal(OK)
+	farm = _load(FARM)
+	assert_object(farm.debris_at(weeds)).is_null()
+	assert_object(farm.debris_at(rock)).is_null()
+	assert_int(farm.debris().size()).is_less_equal(143)
+
+
+## Lets a tool's stroke finish.
+func _rest(area: AreaController) -> void:
+	for i: int in 40:
+		area.player.motor.step(Vector2.ZERO, FRAME)
+
+
 ## After a day ended somewhere else: he arrives by his bed in the farmhouse and is told why,
 ## and walking out of his door he is on the farm.
 func _wakes_by_his_bed_and_his_door_opens_onto_the_farm(words: String) -> void:

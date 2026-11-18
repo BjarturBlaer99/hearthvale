@@ -257,8 +257,7 @@ func test_he_walks_through_his_crops_and_harms_nothing() -> void:
 	farm.player.face(Vector2.RIGHT)
 	for i: int in 200:
 		farm.player.motor.step(Vector2.RIGHT, FRAME)
-	assert_int(farm.player.motor.cell.x).override_failure_message("across the whole clear corner, ripe pumpkins and all").is_greater_equal(PLOT.x + 5)
-	assert_int(farm.player.motor.cell.y).is_equal(PLOT.y + 1)
+	assert_that(farm.player.motor.cell).override_failure_message("across the whole clear corner, ripe pumpkins and all, to the weeds beyond it").is_equal(PLOT + Vector2i(5, 1))
 	for x: int in 6:
 		for y: int in 3:
 			var cell: Vector2i = PLOT + Vector2i(x, y)
