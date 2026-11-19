@@ -1,9 +1,9 @@
 class_name BuildMode
 extends Node2D
 ## Build mode (the Homestead, phase 2; docs/TECH_DESIGN.md §30; the plan's D12): a screen, as
-## a menu is, in which the hero sets things down on his land and takes them up again. The area
-## opens it (B, on the homestead only) and keeps him still, and the clock with him, while it
-## is open (`is_in_menu()`).
+## a menu is, in which the hero sets things down on his land, moves them and takes them up
+## again. The area opens it (B, on the homestead only) and keeps him still, and the clock with
+## him, while it is open (`is_in_menu()`).
 ## - The mouse points at a cell, and the movement keys move the ghost a cell at a time. Only
 ##   what is on screen can be built on: the ghost stops at the edge of the view.
 ## - The ghost shows the thing chosen, green where it fits and red where it doesn't, and a
@@ -11,16 +11,19 @@ extends Node2D
 ## - A left click (or the sword's key) sets it down and takes one from the pack. A right click
 ##   (or the item's key) takes up what is under the ghost, into the pack: what stands there
 ##   before what lies there.
+## - With the hand chosen, a left click lifts the thing under the ghost and the next sets it
+##   down elsewhere, as it is (a sapling keeps its mornings). It is not in the pack meanwhile:
+##   it stays where it was until it is set down, so leaving, or a right click, puts it back.
 ## - The wheel steps along the build bar, which takes the item bar's place, and the keys 1 to
-##   9 choose on it (BuildBar).
+##   9 choose on it (BuildBar: the hand first, then what he carries).
 ## - Tab, Esc or B leave.
-## Placement (pure) says what fits; GameState sets down and takes up; PlacedThings shows it.
-## This is the only place anything is set down from: in play the mouse is two buttons, as
-## ever, and where a click lands doesn't matter.
+## Placement (pure) says what fits; GameState sets down, moves and takes up; PlacedThings
+## shows it. This is the only place anything is set down from: in play the mouse is two
+## buttons, as ever, and where a click lands doesn't matter.
 
 signal closed
 
-## The ghost's colours: where the thing fits, where it doesn't, and with nothing to set down.
+## The ghost's colours: where the thing fits, where it doesn't, and the hand with nothing to do.
 const FITS: Color = Color(0.42, 1.0, 0.52)
 const REFUSED: Color = Color(1.0, 0.36, 0.30)
 const POINTER: Color = Color(1.0, 0.93, 0.70)
@@ -28,10 +31,14 @@ const POINTER: Color = Color(1.0, 0.93, 0.70)
 const PICTURE_ALPHA: float = 0.78
 const WASH_ALPHA: float = 0.24
 const EDGE_ALPHA: float = 0.95
-## The words under the ghost: the thing chosen and how many he carries, and what is said with
-## nothing to set down.
+## The words under the ghost: the thing chosen and how many he carries; and for the hand, with
+## nothing under it, with a thing under it (its name), and with a thing lifted, over where it
+## was and over a place it fits.
 const CHOSEN_WORDS: String = "%s x%d"
-const NOTHING_WORDS: String = "You carry nothing to set down."
+const HAND_WORDS: String = "The hand lifts a thing to move it."
+const LIFT_WORDS: String = "Lift the %s"
+const BACK_WORDS: String = "Put the %s back"
+const MOVE_WORDS: String = "Set the %s down here"
 ## What is said when a thing is taken up (its name).
 const TAKEN_UP_WORDS: String = "Taken up: %s."
 ## The ghost is drawn over the world and under the HUD, in the world's own coordinates, clear
@@ -39,10 +46,13 @@ const TAKEN_UP_WORDS: String = "Taken up: %s."
 const GHOST_LAYER: int = 1
 
 var area: AreaController
-## The id of the placeable chosen on the bar (&"": he carries none).
+## What is chosen on the bar: BuildBar.HAND, or the id of a placeable he carries. (&"" until
+## the mode has been opened once.)
 var chosen: StringName = &""
 ## The cell the ghost is on.
 var cell: Vector2i = Vector2i.ZERO
+## What the hand has lifted: { "cell": where it is, "layer", "item": its id }, or {}.
+var lifted: Dictionary = {}
 
 var _open: bool = false
 var _layer: CanvasLayer
@@ -69,22 +79,24 @@ func setup(area_controller: AreaController) -> void:
 
 
 ## Opens the mode with the ghost on the cell the hero faces, and what was chosen last time
-## chosen still, if he has any left.
+## chosen still, if it is still on the bar (else the first thing he carries to set down).
 func open() -> void:
 	if _open:
 		return
 	_open = true
-	chosen = BuildBar.kept(entries(), chosen)
+	chosen = BuildBar.opening(entries(), chosen)
 	cell = in_view(area.player.front_cell())
 	_ghost.visible = true
 	EventBus.sound.emit(&"menu_select")
 	_refresh()
 
 
+## Leaves the mode. A thing the hand had lifted is where it was.
 func close() -> void:
 	if not _open:
 		return
 	_open = false
+	lifted = {}
 	_ghost.visible = false
 	area.hud.hide_build()
 	EventBus.sound.emit(&"menu_select")
@@ -95,14 +107,24 @@ func is_open() -> bool:
 	return _open
 
 
-## What is on the build bar: every placeable he carries (item data entries).
+## What is on the build bar: the hand, then every placeable he carries (item data entries).
 func entries() -> Array[Dictionary]:
 	return BuildBar.entries(GameState.inventory, DataRegistry.entries(&"items"))
 
 
-## The data of the thing chosen, or {} with nothing chosen.
+## Whether the hand is chosen.
+func is_hand() -> bool:
+	return chosen == BuildBar.HAND
+
+
+## The data of the placeable chosen, or {} with the hand chosen.
 func chosen_item() -> Dictionary:
-	return DataRegistry.get_item(chosen) if chosen != &"" and GameState.item_count(chosen) > 0 else {}
+	return DataRegistry.get_item(chosen) if not is_hand() and GameState.item_count(chosen) > 0 else {}
+
+
+## The data of the thing the hand has lifted, or {}.
+func lifted_item() -> Dictionary:
+	return DataRegistry.get_item(lifted["item"]) if not lifted.is_empty() else {}
 
 
 ## Chooses the thing `step` slots on along the bar (the wheel). Returns whether the choice
@@ -111,18 +133,20 @@ func step(by: int) -> bool:
 	return _choose(BuildBar.stepped(entries(), chosen, by))
 
 
-## Chooses the thing in slot `slot` of the bar as it shows (a number key; 0 is the leftmost).
-## Returns whether the choice changed.
+## Chooses the thing in slot `slot` of the bar as it shows (a number key; 0 is the leftmost,
+## the hand's unless the bar has moved along). Returns whether the choice changed.
 func choose_slot(slot: int) -> bool:
 	var held: Array[Dictionary] = entries()
 	var top: int = BuildBar.first_shown(area.hud.build_bar.top, BuildBar.index_of(held, chosen), held.size())
 	return slot >= 0 and slot < BuildBar.SLOTS and _choose(BuildBar.id_at(held, top + slot))
 
 
-func _choose(item_id: StringName) -> bool:
-	if item_id == &"" or item_id == chosen:
+## Chooses `id` (BuildBar.HAND, or a placeable he carries). What the hand had lifted is let go.
+func _choose(id: StringName) -> bool:
+	if id == &"" or id == chosen:
 		return false
-	chosen = item_id
+	chosen = id
+	lifted = {}
 	EventBus.sound.emit(&"menu_move")
 	_refresh()
 	return true
@@ -202,54 +226,112 @@ func lies_at(at: Vector2i) -> bool:
 	return false
 
 
-## Why the thing chosen can't be set down where the ghost is, in Placement's words; "" if it
-## can, and with nothing chosen.
+## The thing a left click would set down where the ghost is: the placeable chosen, or what the
+## hand has lifted. {} with the hand empty.
+func thing_in_hand() -> Dictionary:
+	return lifted_item() if is_hand() else chosen_item()
+
+
+## Whether the ghost is over the place the lifted thing was lifted from.
+func over_its_own_place() -> bool:
+	return not lifted.is_empty() and cell == lifted["cell"]
+
+
+## Why the thing chosen (or lifted) can't be set down where the ghost is, in Placement's
+## words; "" if it can, with the hand empty, and over the place a lifted thing came from.
 func why_not() -> String:
-	var item: Dictionary = chosen_item()
-	return "" if item.is_empty() else Placement.why_not(item, site_at(cell))
+	var item: Dictionary = thing_in_hand()
+	return "" if item.is_empty() or over_its_own_place() else Placement.why_not(item, site_at(cell))
 
 
-## Whether the ghost is green: there is a thing chosen, and it fits here.
+## Whether a left click would set a thing down here: there is one in hand, and it fits.
 func fits() -> bool:
-	return not chosen_item().is_empty() and why_not().is_empty()
+	return not thing_in_hand().is_empty() and why_not().is_empty()
+
+
+## The layer of what a click takes at `at`: what stands there, else what lies there.
+func layer_to_take(at: Vector2i) -> StringName:
+	return Placement.STANDING if GameState.homestead().standing_at(at) != &"" else Placement.LYING
+
+
+## The id of what a click would take at `at` (to lift it, or to take it up), or &"".
+func thing_under(at: Vector2i) -> StringName:
+	return GameState.homestead().thing_at(at, layer_to_take(at))
 
 
 ## The line of words under the ghost: why the thing doesn't fit, or what it is and how many
-## he carries.
+## he carries; and for the hand, what a click would lift or do with what it has lifted.
 func words() -> String:
-	var item: Dictionary = chosen_item()
-	if item.is_empty():
-		return NOTHING_WORDS
 	var why: String = why_not()
-	return why if not why.is_empty() else CHOSEN_WORDS % [str(item.get("name", chosen)), GameState.item_count(chosen)]
+	if not why.is_empty():
+		return why
+	if not is_hand():
+		return CHOSEN_WORDS % [str(chosen_item().get("name", chosen)), GameState.item_count(chosen)]
+	if not lifted.is_empty():
+		return (BACK_WORDS if over_its_own_place() else MOVE_WORDS) % _name_of(lifted["item"])
+	var under: StringName = thing_under(cell)
+	return LIFT_WORDS % _name_of(under) if under != &"" else HAND_WORDS
 
 
-## Sets the thing chosen down where the ghost is (a left click). Returns whether it was set
-## down; refused, nothing changes and the words say why.
+## A left click where the ghost is. With a placeable chosen it is set down, and one leaves the
+## pack. With the hand, the thing there is lifted, or the lifted thing set down. Returns
+## whether anything was done; refused, nothing changes and the words say why.
 func set_down() -> bool:
 	if not _open:
 		return false
+	if is_hand():
+		return _use_hand()
 	if not fits() or not GameState.set_down(area.area_id, cell, chosen):
 		EventBus.sound.emit(&"nope")
 		_refresh()
 		return false
 	EventBus.sound.emit(&"set_down")
 	Burst.spawn(area.interactables, GridBody.cell_center(cell), &"dust", 0.6)
-	# The last of a thing leaves the bar: the next on it is chosen.
+	# The last of a thing leaves the bar, and the hand is chosen.
 	chosen = BuildBar.kept(entries(), chosen)
 	_refresh()
 	return true
 
 
-## The layer of what a right click takes up at `at`: what stands there, else what lies there.
-func layer_to_take(at: Vector2i) -> StringName:
-	return Placement.STANDING if GameState.homestead().standing_at(at) != &"" else Placement.LYING
+## The hand's click: lifts what is under the ghost; or, with a thing lifted, sets it down
+## here (where it came from: it is simply put back). Returns whether anything was done.
+func _use_hand() -> bool:
+	if lifted.is_empty():
+		var layer: StringName = layer_to_take(cell)
+		var under: StringName = GameState.homestead().thing_at(cell, layer)
+		if under == &"":
+			EventBus.sound.emit(&"nope")
+			return false
+		lifted = {"cell": cell, "layer": layer, "item": under}
+		EventBus.sound.emit(&"take_up")
+		_refresh()
+		return true
+	if over_its_own_place():
+		lifted = {}
+		EventBus.sound.emit(&"set_down")
+		_refresh()
+		return true
+	if not fits() or not GameState.move_placed(area.area_id, lifted["cell"], cell, lifted["layer"]):
+		EventBus.sound.emit(&"nope")
+		_refresh()
+		return false
+	lifted = {}
+	EventBus.sound.emit(&"set_down")
+	Burst.spawn(area.interactables, GridBody.cell_center(cell), &"dust", 0.6)
+	_refresh()
+	return true
 
 
-## Takes up what is under the ghost into the pack (a right click). Returns whether a thing was
-## taken up; with nothing there, or no room for it, he is told and nothing changes.
+## A right click where the ghost is: takes up what is there into the pack. With a thing
+## lifted it lets that go instead (it is where it was). Returns whether a thing was taken up;
+## with nothing there, or no room for it, he is told and nothing changes.
 func take_up() -> bool:
 	if not _open:
+		return false
+	if not lifted.is_empty():
+		lifted = {}
+		EventBus.sound.emit(&"menu_move")
+		_refresh()
 		return false
 	var layer: StringName = layer_to_take(cell)
 	var why: String = GameState.why_not_take_up(area.area_id, cell, layer)
@@ -259,8 +341,7 @@ func take_up() -> bool:
 		return false
 	var item_id: StringName = GameState.take_up(area.area_id, cell, layer)
 	EventBus.sound.emit(&"take_up")
-	area.hud.show_message(TAKEN_UP_WORDS % str(DataRegistry.get_item(item_id).get("name", item_id)))
-	chosen = BuildBar.kept(entries(), chosen)
+	area.hud.show_message(TAKEN_UP_WORDS % _name_of(item_id))
 	_refresh()
 	return true
 
@@ -312,25 +393,48 @@ static func _slot_of(event: InputEvent) -> int:
 	return BuildBar.NONE
 
 
+func _name_of(item_id: StringName) -> String:
+	return str(DataRegistry.get_item(item_id).get("name", item_id))
+
+
 ## Shows the mode as it now is: the bar, the words, the ghost.
 func _refresh() -> void:
 	if not _open:
 		return
 	var held: Array[Dictionary] = entries()
-	area.hud.show_build(held, BuildBar.index_of(held, chosen), words(), fits() or chosen_item().is_empty())
+	area.hud.show_build(held, BuildBar.index_of(held, chosen), words(), why_not().is_empty())
 	_ghost.queue_redraw()
+
+
+## The colour of the ghost: red where the thing in hand doesn't fit; green where it does, and
+## where the empty hand has something to lift; pale with nothing to do.
+func ghost_colour() -> Color:
+	if not why_not().is_empty():
+		return REFUSED
+	if thing_in_hand().is_empty():
+		return FITS if thing_under(cell) != &"" else POINTER
+	return POINTER if over_its_own_place() else FITS
 
 
 func _draw_ghost() -> void:
 	var size: float = float(GreyboxTiles.TILE_SIZE)
+	var item: Dictionary = thing_in_hand()
+	var colour: Color = ghost_colour()
+	# Where a lifted thing came from: it is still there until it is set down.
+	if not lifted.is_empty() and not over_its_own_place():
+		_draw_outline(Vector2(lifted["cell"] as Vector2i) * size, Color(POINTER, EDGE_ALPHA * 0.7))
 	var origin: Vector2 = Vector2(cell) * size
-	var item: Dictionary = chosen_item()
-	var colour: Color = POINTER if item.is_empty() else (FITS if fits() else REFUSED)
 	_ghost.draw_rect(Rect2(origin, Vector2(size, size)), Color(colour, WASH_ALPHA))
 	if not item.is_empty():
-		PlacedArt.draw_thing(_ghost, item, 0, origin, PlacedThing.joined_at(cell, item), Color(colour.lerp(Color.WHITE, 0.45), PICTURE_ALPHA))
-	var edge: Color = Color(colour, EDGE_ALPHA)
-	_ghost.draw_rect(Rect2(origin, Vector2(size, 1.0)), edge)
-	_ghost.draw_rect(Rect2(origin + Vector2(0.0, size - 1.0), Vector2(size, 1.0)), edge)
-	_ghost.draw_rect(Rect2(origin + Vector2(0.0, 1.0), Vector2(1.0, size - 2.0)), edge)
-	_ghost.draw_rect(Rect2(origin + Vector2(size - 1.0, 1.0), Vector2(1.0, size - 2.0)), edge)
+		var age: int = GameState.homestead().age_at(lifted["cell"]) if not lifted.is_empty() else 0
+		PlacedArt.draw_thing(_ghost, item, age, origin, PlacedThing.joined_at(cell, item), Color(colour.lerp(Color.WHITE, 0.45), PICTURE_ALPHA))
+	_draw_outline(origin, Color(colour, EDGE_ALPHA))
+
+
+## A one-pixel outline of the cell whose top-left is `origin`.
+func _draw_outline(origin: Vector2, colour: Color) -> void:
+	var size: float = float(GreyboxTiles.TILE_SIZE)
+	_ghost.draw_rect(Rect2(origin, Vector2(size, 1.0)), colour)
+	_ghost.draw_rect(Rect2(origin + Vector2(0.0, size - 1.0), Vector2(size, 1.0)), colour)
+	_ghost.draw_rect(Rect2(origin + Vector2(0.0, 1.0), Vector2(1.0, size - 2.0)), colour)
+	_ghost.draw_rect(Rect2(origin + Vector2(size - 1.0, 1.0), Vector2(1.0, size - 2.0)), colour)

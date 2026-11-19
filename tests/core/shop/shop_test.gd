@@ -20,6 +20,14 @@ func test_tilda_sells_her_wares_then_a_seed_of_every_crop_cheapest_first() -> vo
 		{"item": "bomb", "count": 3, "price": 8},
 		{"item": "bread", "count": 1, "price": 6},
 		{"item": "pickaxe", "count": 1, "price": 25},
+		# For the homestead (phase 2): fibre five at a time, and what grows there to be set down.
+		{"item": "fibre", "count": 5, "price": 6},
+		{"item": "hedge", "count": 1, "price": 5},
+		{"item": "flower_bed_red", "count": 1, "price": 3},
+		{"item": "flower_bed_yellow", "count": 1, "price": 3},
+		{"item": "flower_bed_blue", "count": 1, "price": 3},
+		{"item": "oak_sapling", "count": 1, "price": 10},
+		{"item": "cherry_sapling", "count": 1, "price": 30},
 		{"item": "turnip_seeds", "count": 1, "price": 5},
 		{"item": "wheat_seeds", "count": 1, "price": 6},
 		{"item": "carrot_seeds", "count": 1, "price": 8},
@@ -27,14 +35,14 @@ func test_tilda_sells_her_wares_then_a_seed_of_every_crop_cheapest_first() -> vo
 		{"item": "pumpkin_seeds", "count": 1, "price": 20},
 	])
 	# A shop that sells no seeds has only its own wares; one with no wares, only seeds.
-	assert_int(Shop.wares({"sells": _tilda["sells"]}, _crops).size()).is_equal(4)
+	assert_int(Shop.wares({"sells": _tilda["sells"]}, _crops).size()).is_equal(11)
 	assert_int(Shop.wares({"sells": [], "sells_seeds": true}, _crops).size()).is_equal(5)
 	assert_array(Shop.wares({}, _crops)).is_empty()
 	# A new crop is on the list without touching the shop.
 	var with_beans: Array = _crops.duplicate()
 	with_beans.append({"id": "bean", "seed": "bean_seeds", "gives": {"item": "bean"}, "seed_price": 7, "sells_for": 15})
 	var seeds: Array = Shop.wares(_tilda, with_beans).map(func(ware: Dictionary) -> String: return str(ware["item"]))
-	assert_array(seeds.slice(4)).override_failure_message("between wheat (6) and carrots (8)").is_equal(["turnip_seeds", "wheat_seeds", "bean_seeds", "carrot_seeds", "potato_seeds", "pumpkin_seeds"])
+	assert_array(seeds.slice(11)).override_failure_message("between wheat (6) and carrots (8)").is_equal(["turnip_seeds", "wheat_seeds", "bean_seeds", "carrot_seeds", "potato_seeds", "pumpkin_seeds"])
 
 
 func test_tilda_buys_what_the_crops_give_and_nothing_else() -> void:

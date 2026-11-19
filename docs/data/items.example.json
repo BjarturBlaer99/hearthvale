@@ -8,7 +8,7 @@
     { "id": "small_key", "name": "Small Key", "type": "key", "stackable": true, "max_stack": 9 },
     { "id": "coin", "name": "Coin", "type": "currency", "stackable": true, "max_stack": 999 },
     { "id": "heart_container", "name": "Heart Container", "type": "heart" },
-    { "id": "stone_path", "name": "Stone Path", "type": "placeable", "icon": "stone_path", "stackable": true, "max_stack": 99, "stats": { "layer": "lying" } },
+    { "id": "stone_path", "name": "Stone Path", "type": "placeable", "icon": "stone_path", "stackable": true, "max_stack": 99, "stats": { "layer": "lying", "fills": true } },
     { "id": "gate", "name": "Gate", "type": "placeable", "icon": "gate", "stackable": true, "max_stack": 20, "stats": { "layer": "standing", "joins": true, "blocks": false } },
     { "id": "lamp_post", "name": "Lamp Post", "type": "placeable", "icon": "lamp_post", "stackable": true, "max_stack": 10, "stats": { "layer": "standing", "light": { "at": [8, 3], "radius": 22, "strength": 0.3 } } },
     { "id": "oak_sapling", "name": "Oak Sapling", "type": "placeable", "icon": "oak_sapling", "stackable": true, "max_stack": 10, "stats": { "layer": "standing", "grows": { "mornings": 4, "tree": "oak" } } }

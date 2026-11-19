@@ -1,26 +1,36 @@
 class_name BuildBar
 extends RefCounted
-## What can be set down, in the order of the build bar (the Homestead, phase 2; docs/TECH_DESIGN.md
-## §30), pure: every placeable the hero carries, in the order he came by them, each with how many
-## he has. In build mode this bar takes the item bar's place: the wheel steps along it, round
-## and round, and the keys 1 to 9 choose a slot. One entry is chosen (or none, with nothing to
-## set down): it is what a left click sets down. Works on item entries from data and on stacks
-## in GameState.inventory's shape; BuildMode keeps the choice and BuildBarView draws it.
-## Nothing here is ever on the item bar: placeables are no Inventory.EQUIPPABLE_TYPES.
+## What is on the build bar, in its order (the Homestead, phase 2; docs/TECH_DESIGN.md §30),
+## pure: first the hand, which lifts a thing and sets it down elsewhere, then every placeable
+## the hero carries, in the order he came by them, each with how many he has. In build mode
+## this bar takes the item bar's place: the wheel steps along it, round and round, and the
+## keys 1 to 9 choose a slot. One entry is always chosen: a placeable is what a left click sets
+## down, and the hand is what moves things. Works on item entries from data and on stacks in
+## GameState.inventory's shape; BuildMode keeps the choice and BuildBarView draws it. Nothing
+## here is ever on the item bar: placeables are no Inventory.EQUIPPABLE_TYPES.
 
 ## How many slots show at once, each with a number key.
 const SLOTS: int = HandBar.SLOTS
 ## No entry.
 const NONE: int = -1
+## The hand: its id on the bar, and its entry (it is no item: it has a name and a picture).
+const HAND: StringName = &"hand"
+const HAND_ENTRY: Dictionary = {"id": "hand", "name": "Hand", "icon": "hand"}
 
 
-## The bar's entries (item data entries): the placeables among `stacks`, in the stacks' order.
-## `items` are the game's item entries.
+## The bar's entries: the hand, then the placeables among `stacks` (item data entries), in the
+## stacks' order. `items` are the game's item entries.
 static func entries(stacks: Array, items: Array) -> Array[Dictionary]:
-	return Inventory.held_of_type(stacks, items, Placement.TYPE)
+	var out: Array[Dictionary] = [HAND_ENTRY]
+	out.append_array(Inventory.held_of_type(stacks, items, Placement.TYPE))
+	return out
 
 
-## Which entry of `held` is `chosen` (an item id), or NONE if it isn't among them.
+static func is_hand(entry: Dictionary) -> bool:
+	return str(entry.get("id", "")) == String(HAND)
+
+
+## Which entry of `held` is `chosen` (an item id, or HAND), or NONE if it isn't among them.
 static func index_of(held: Array, chosen: StringName) -> int:
 	for i: int in held.size():
 		if str((held[i] as Dictionary).get("id", "")) == String(chosen):
@@ -33,11 +43,19 @@ static func id_at(held: Array, index: int) -> StringName:
 	return StringName(str((held[index] as Dictionary).get("id", ""))) if index >= 0 and index < held.size() else &""
 
 
-## What is chosen once `held` is what he carries: `chosen` while he still has some, else the
-## first thing on the bar (&"" with nothing on it). The last of a thing set down doesn't leave
-## the bar pointing at nothing.
+## What is chosen as the mode opens with `held` on the bar: what was `chosen` last time, if it
+## is still there; else the first thing he carries to set down; else the hand.
+static func opening(held: Array, chosen: StringName) -> StringName:
+	if index_of(held, chosen) != NONE:
+		return chosen
+	return id_at(held, 1) if held.size() > 1 else HAND
+
+
+## What is chosen once `held` is what he carries: `chosen` while it is still on the bar, else
+## the hand. The last of a thing set down leaves the hand chosen, so the next click sets
+## nothing else down by mistake.
 static func kept(held: Array, chosen: StringName) -> StringName:
-	return chosen if index_of(held, chosen) != NONE else id_at(held, 0)
+	return chosen if index_of(held, chosen) != NONE else HAND
 
 
 ## The id of the entry `step` slots on from `chosen`, round and round. With nothing chosen a
@@ -57,7 +75,7 @@ static func first_shown(first: int, chosen_index: int, count: int) -> int:
 	return MenuCursor.window_top(first, maxi(chosen_index, 0), count, SLOTS)
 
 
-## What a slot's number says: how many of `entry` he carries. `count_of` gives how many of an
-## item id the hero carries.
+## What a slot's number says: how many of `entry` he carries, and nothing for the hand.
+## `count_of` gives how many of an item id the hero carries.
 static func count_text(entry: Dictionary, count_of: Callable) -> String:
-	return str(int(count_of.call(StringName(str(entry.get("id", ""))))))
+	return "" if is_hand(entry) else str(int(count_of.call(StringName(str(entry.get("id", ""))))))

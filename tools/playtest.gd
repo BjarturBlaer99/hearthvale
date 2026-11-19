@@ -120,11 +120,17 @@ const SCENARIOS: Dictionary = {
 	# 37, rows 8 to 13, and the strip below the road), with a stock of everything that can be set
 	# down: for trying build mode. B opens it; the mouse points at a cell and the movement keys
 	# move the ghost; a left click sets down and a right click takes up; the wheel and 1 to 9
-	# choose; B, Tab or Esc leave. A sword too, to clear more ground.
+	# choose (the hand, the bar's first slot, lifts a thing to move it); B, Tab or Esc leave.
+	# A sword too, to clear more ground; wood, stone and coins for the workbench's "Place" tab
+	# (in the farmhouse) and Tilda's hedges, flower beds and saplings. A lamp post lights at
+	# 18:30 (-- build 18:20), and a sapling grows a stage with the bed's mornings.
 	"build": {
 		"area": &"homestead",
 		"cell": Vector2i(30, 13),
-		"items": [[&"wooden_sword", 1], [&"fence", 40], [&"gate", 4], [&"dirt_path", 20], [&"stone_path", 20], [&"wood_path", 20]],
+		"items": [[&"wooden_sword", 1], [&"fence", 40], [&"gate", 4], [&"dirt_path", 20], [&"stone_path", 20], [&"wood_path", 20],
+			[&"wooden_flooring", 20], [&"stone_flooring", 20], [&"hedge", 12], [&"lamp_post", 4], [&"bench", 2],
+			[&"flower_bed_red", 4], [&"flower_bed_yellow", 4], [&"flower_bed_blue", 4], [&"oak_sapling", 3], [&"cherry_sapling", 2],
+			[&"wood", 20], [&"stone", 20], [&"coin", 60]],
 		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds"],
 		"cleared": [Rect2i(29, 8, 9, 6), Rect2i(20, 16, 18, 1)],
 	},

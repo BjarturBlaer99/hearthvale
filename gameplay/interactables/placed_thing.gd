@@ -6,6 +6,9 @@ extends Node2D
 ## PlacedThings makes one for every standing thing and takes it away again; this only draws
 ## it, joined to its neighbours, with a shadow at its foot. It is sorted with the hero and
 ## everyone else by where it stands, so he walks before it and behind it.
+## - A lamp post shows its burning picture and gives light from dusk to dawn, steadily.
+## - A sapling shows its stage's picture, which changes with the morning and never sways.
+##   Grown, it draws nothing: PlacedThings stands a tall tree in its cell (Scenery).
 ## Position = the top-left corner of its cell.
 
 ## Which item it is, that item's data, and the mornings it has stood (a sapling's).
@@ -13,12 +16,20 @@ var item_id: StringName = &""
 var item: Dictionary = {}
 var age: int = 0
 
+## Whether it was burning at the last look: it is drawn again when that turns.
+var _was_lit: bool = false
+
+
+func _ready() -> void:
+	EventBus.time_changed.connect(_on_time_changed)
+
 
 ## Shows it as `id` after `mornings`.
 func show_as(id: StringName, mornings: int = 0) -> void:
 	item_id = id
 	item = DataRegistry.get_item(id)
 	age = mornings
+	_was_lit = is_lit()
 	queue_redraw()
 
 
@@ -29,6 +40,25 @@ func cell() -> Vector2i:
 ## Whether it fills its cell (a gate doesn't).
 func blocks() -> bool:
 	return Placement.blocks(item)
+
+
+## Whether it is a sapling that has grown into a tree.
+func is_grown() -> bool:
+	return Placement.is_grown(item, age)
+
+
+## Whether it burns now: a thing that gives light, between dusk and dawn.
+func is_lit() -> bool:
+	return not Placement.light_of(item).is_empty() and GameState.day_clock().lamps_lit(GameState.minute)
+
+
+## The light it gives now (an Ambience.glow), or {}: a lamp post's while it burns. It is
+## steady: it doesn't flicker.
+func glow_now() -> Dictionary:
+	if not is_lit():
+		return {}
+	var light: Dictionary = Placement.light_of(item)
+	return Ambience.glow(position + (light["at"] as Vector2), float(light["radius"]), Ambience.LAMP, float(light["strength"]), false)
 
 
 ## The neighbours it runs on to (PlacedArt's bits).
@@ -50,7 +80,14 @@ static func joined_at(at: Vector2i, thing: Dictionary) -> int:
 
 
 func _draw() -> void:
-	if item.is_empty():
+	if item.is_empty() or is_grown():
 		return
 	SoftShadow.draw(self, Vector2(8, 14), Vector2(6, 1.6), 0.8)
-	PlacedArt.draw_thing(self, item, age, Vector2.ZERO, joined())
+	PlacedArt.draw_thing(self, item, age, Vector2.ZERO, joined(), Color.WHITE, is_lit())
+
+
+## Dusk or dawn: a lamp post lights or goes dark.
+func _on_time_changed(_day: int, _minute: int) -> void:
+	if is_lit() != _was_lit:
+		_was_lit = not _was_lit
+		queue_redraw()

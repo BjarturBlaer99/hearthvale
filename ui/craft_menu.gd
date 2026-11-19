@@ -4,6 +4,9 @@ extends Control
 ## what the one under the cursor needs beside what he has ("Stone 12 of 20"), and the ones he
 ## can't make now greyed out. Up and down (or the wheel) move the cursor; a click or Enter makes
 ## the thing under it; Tab or Esc leaves. The mouse points: at a line to put the cursor there.
+## The list has tabs, as Tilda's counter has (the Homestead, phase 2): "Make", the list as it
+## always was, and "Place", what is made to be set down on his land. Left and right turn from
+## one to the other, and so does a click on a tab's name.
 ## It stays open for as many things as he likes, and a line says what was made, or why not.
 ## Crafting (pure) says what is known and what is missing; GameState makes it. The area opens it
 ## and keeps the hero still while it is open.
@@ -17,12 +20,18 @@ const TITLE: String = "Workbench"
 const NOTHING_WORDS: String = "You know nothing to make yet."
 ## The heading over what the thing under the cursor needs: each need has a line of its own.
 const NEEDS_WORDS: String = "Needs:"
+## The tabs as they are named, and what stands between the names.
+const TAB_NAMES: Dictionary = {Crafting.TAB_MAKE: "Make", Crafting.TAB_PLACE: "Place"}
+const TAB_GAP: String = "  "
 
 var selected: int = 0
 ## The first entry shown.
 var top: int = 0
+## The tab he is looking at (Crafting.TABS).
+var tab: String = Crafting.TAB_MAKE
 
 @onready var _title: Label = $Panel/Title
+@onready var _tabs: Label = $Panel/Tabs
 ## Two lists in the same place: what he can make now, and (greyed) what he can't. A line is on
 ## one of them and blank on the other.
 @onready var _list: Label = $Panel/List
@@ -36,7 +45,9 @@ func _ready() -> void:
 	hide()
 
 
+## Opens the list on its first tab, "Make".
 func open() -> void:
+	tab = Crafting.TAB_MAKE
 	selected = 0
 	top = 0
 	_note.text = ""
@@ -48,9 +59,53 @@ func is_open() -> bool:
 	return visible
 
 
-## The recipes on the list: what the workbench makes that he knows, in their order.
+## The recipes on the list: what the workbench makes that he knows, of the tab he is looking
+## at, in their order.
 func entries() -> Array[Dictionary]:
-	return GameState.known_crafts(Crafting.WORKBENCH)
+	return Crafting.of_tab(GameState.known_crafts(Crafting.WORKBENCH), tab)
+
+
+## Turns to the next tab, round and round (`step` -1: the one before).
+func switch_tab(step: int = 1) -> void:
+	show_tab(Crafting.TABS[wrapi(Crafting.TABS.find(tab) + step, 0, Crafting.TABS.size())])
+
+
+## Turns to `to` (one of Crafting.TABS). Returns whether the tab changed.
+func show_tab(to: String) -> bool:
+	if to == tab or not Crafting.TABS.has(to):
+		return false
+	tab = to
+	selected = 0
+	top = 0
+	_note.text = ""
+	EventBus.sound.emit(&"menu_move")
+	_refresh()
+	return true
+
+
+## "[Make]   Place": the tabs, the one shown in brackets.
+func tabs_text() -> String:
+	return TAB_GAP.join(tab_parts())
+
+
+## The tabs' names as they are written, the one shown in brackets.
+func tab_parts() -> PackedStringArray:
+	var parts: PackedStringArray = []
+	for name_of_tab: String in Crafting.TABS:
+		parts.append("[%s]" % TAB_NAMES[name_of_tab] if name_of_tab == tab else " %s " % TAB_NAMES[name_of_tab])
+	return parts
+
+
+## The tab whose name the mouse is on in `event`, or "" if it is on none.
+func tab_under(event: InputEvent) -> String:
+	if MenuInput.line_under(_tabs, event, 1) == MenuPointer.NONE:
+		return ""
+	var widths: PackedFloat32Array = []
+	for part_words: String in tab_parts():
+		widths.append(MenuInput.width_of(_tabs, part_words))
+	var x: float = (_tabs.make_input_local(event) as InputEventMouse).position.x
+	var part: int = MenuPointer.part_at(x, widths, MenuInput.width_of(_tabs, TAB_GAP))
+	return Crafting.TABS[part] if part != MenuPointer.NONE else ""
 
 
 ## Whether entry `index` can be made now.
@@ -146,14 +201,24 @@ func _unhandled_input(event: InputEvent) -> void:
 		point_at(event)
 		return
 	if MenuInput.is_confirm(event):
-		point_at(event)
-		confirm()
+		# A click on a tab's name turns to it; a click on a line makes that thing; on neither,
+		# the thing under the cursor. (A click beside the names does nothing: it was aimed at
+		# them.)
+		if MenuInput.line_under(_tabs, event, 1) != MenuPointer.NONE:
+			show_tab(tab_under(event))
+		else:
+			point_at(event)
+			confirm()
 	elif MenuInput.is_back(event):
 		close()
 	elif MenuInput.is_up(event):
 		move_cursor(-1)
 	elif MenuInput.is_down(event):
 		move_cursor(1)
+	elif event.is_action_pressed(&"move_left"):
+		switch_tab(-1)
+	elif event.is_action_pressed(&"move_right"):
+		switch_tab(1)
 	else:
 		return
 	get_viewport().set_input_as_handled()
@@ -193,6 +258,7 @@ func _refresh() -> void:
 		bright.append(NOTHING_WORDS)
 		grey.append("")
 	_title.text = TITLE
+	_tabs.text = tabs_text()
 	_list.text = "\n".join(bright)
 	_dim.text = "\n".join(grey)
 	_needs.text = NEEDS_WORDS + "\n" + "\n".join(need_lines()) if not list.is_empty() else ""

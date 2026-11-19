@@ -51,11 +51,11 @@ func test_the_three_are_made_at_the_workbench_from_what_the_plan_says() -> void:
 		assert_array(needs).override_failure_message(String(case[0])).is_equal(case[2])
 		assert_that(recipe.get("unlock")).override_failure_message("%s: when it is known" % case[0]).is_equal(case[3])
 	# The rug is known from the first day; the chest once wood is found; the lamp once a bar is.
-	assert_array(_ids(GameState.known_crafts(Crafting.WORKBENCH))).is_equal(["rug"])
+	assert_array(_ids(Crafting.of_tab(GameState.known_crafts(Crafting.WORKBENCH), Crafting.TAB_MAKE))).is_equal(["rug"])
 	GameState.add_item(&"wood", 1)
-	assert_array(_ids(GameState.known_crafts(Crafting.WORKBENCH))).is_equal(["chest", "rug"])
+	assert_array(_ids(Crafting.of_tab(GameState.known_crafts(Crafting.WORKBENCH), Crafting.TAB_MAKE))).is_equal(["chest", "rug"])
 	GameState.add_item(&"copper_bar", 1)
-	assert_array(_ids(GameState.known_crafts(Crafting.WORKBENCH))).override_failure_message("a copper bar opens the lamp, and the copper hoe and can with it").is_equal(["chest", "copper_hoe", "copper_watering_can", "rug", "lamp"])
+	assert_array(_ids(Crafting.of_tab(GameState.known_crafts(Crafting.WORKBENCH), Crafting.TAB_MAKE))).override_failure_message("a copper bar opens the lamp, and the copper hoe and can with it").is_equal(["chest", "copper_hoe", "copper_watering_can", "rug", "lamp"])
 	assert_array(Array(DataRegistry.errors)).is_empty()
 
 

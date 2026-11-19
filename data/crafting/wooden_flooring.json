@@ -1,0 +1,16 @@
+{
+	"id": "wooden_flooring",
+	"station": "workbench",
+	"tab": "place",
+	"order": 4,
+	"needs": [
+		{
+			"item": "wood",
+			"count": 2
+		}
+	],
+	"makes": {
+		"item": "wooden_flooring",
+		"count": 4
+	}
+}

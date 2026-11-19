@@ -1277,3 +1277,46 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   - **`SpriteSheet.draw()` is left as it is,** though in this engine it draws a mirrored frame one
     frame's width to the right (measured). It is older than the Homestead and draws four creatures; a
     fence's west rail is mirrored by `PlacedArt` itself. Needs the user's word.
+- 2026-11-19 — **The Homestead, step 2b: what the plan left open.**
+  - **The hand moves a thing as it is** (`GameState.move_placed()`): nothing goes through the pack, a
+    sapling keeps its mornings, and a grown tree is a tree in its new place. It is a right click that
+    takes a tree up and gives back its sapling (D16). **A reading of D16 for the coordinator to confirm
+    with the user:** "moving is taking up and setting down in one go", read to the letter, would make a
+    moved tree a sapling again and would refuse a move with a full pack. Why this way: tidying a yard
+    should cost nothing, and a full pack "loses nothing" either way.
+  - **A lifted thing stays where it was until it is set down.** The ghost shows it and its old cell is
+    outlined. A click on its old cell puts it back; a right click, another choice on the bar, or leaving
+    the mode lets it go. Why: nothing is ever in limbo, so nothing can be lost or saved half moved.
+  - **The hand lifts what stands in a cell before what lies in it,** as a right click takes up.
+  - **With the hand on the bar, the last of a thing set down leaves the hand chosen** (step 2a chose the
+    next thing). Why: the next click then sets nothing else down by mistake. The mode opens on what was
+    chosen last time while it is still carried, else on the first thing he carries, else on the hand.
+  - **A build bar longer than nine slots moves along with the choice,** as the item bar does, so the key
+    1 is the leftmost slot showing: the hand, until he carries more than eight kinds of thing.
+  - **A path or a floor says `"fills": true`,** and is drawn with a thin rim where none lies beside it.
+    A flower bed has its own edge and gets none.
+  - **A lamp post has the village lamps' own numbers** (a reach of 22, a strength of 0.3, their colour,
+    no flicker) and their hours: it is lit when the day's lamps are, 18:30 to 06:30. It is one cell tall,
+    as the village's are, with a dark picture and a burning one.
+  - **A sapling's three pictures are spread evenly over its mornings:** the oak's over two, one and one,
+    the cherry's over two each. Any morning counts (a night slept, stayed up through, or collapsed in),
+    and no water is needed.
+  - **A grown sapling is one of `Scenery`'s trees** (`Scenery.stand()`, the code that stands the map's):
+    the "oak" picture, or one of the two cherry pictures by its cell, as the map's cherries vary. It
+    blocks its own cell, as the sapling did. No petals lie round a planted cherry: the map's are laid
+    once as the area loads, and nothing drifts.
+  - **A sapling's mornings are saved beside it** (`"age"`, left out at 0), and a tree stands again as the
+    land loads.
+  - **The nine recipes of the "Place" tab are known from the first day:** the plan's table gives them a
+    cost and no condition. Each is named for the item it makes, with how many ("Fence x2").
+  - **A recipe's `tab` is `make` or `place`** (`make` if it names none); `build` is phase 3's to add.
+    `GameState.known_crafts()` still gives every workbench recipe he knows: the list splits them by tab.
+  - **The workbench opens on "Make" every time.** A and D (or the arrows) turn the tab, round and round.
+  - **Tilda's list:** her four old wares, then fibre, the hedge, the red, yellow and blue flower beds and
+    the two saplings, then the seeds: sixteen lines. She buys none of them back: the plan's "no selling
+    of fibre" is kept, and no selling of what is set down was asked for.
+  - **Stacks:** floors 99, hedges 50, flower beds 30; lamp posts, benches and saplings 10.
+  - **The sprite tool can make a frame from another by swapping colours** (`"swap"`), beside breathing
+    and blinking: the dark lamp, two flower beds and the cherry sapling are made so.
+  - **Older tests that counted Tilda's wares or the workbench's list were brought up to date,** each
+    keeping its checks: the shop's carry sixteen wares, and the workbench's ask for the "Make" tab.

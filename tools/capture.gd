@@ -40,8 +40,11 @@ extends SceneTree
 ## a turnip and a pack from the quarry; "favour:<villager>:<points>" talks to a villager who
 ## has taught her recipe already, so that at three marks she asks her favour. The Homestead's
 ## build mode: "build:<x>,<y>" opens it with a stock of placeables and the ghost on that cell
-## ("build:<x>,<y>:<slot>" with that slot of the build bar chosen); "yard" shows a yard fenced,
-## gated and paved east of the farmhouse.
+## ("build:<x>,<y>:<slot>" with that slot of the build bar chosen); "yard" shows a yard hedged,
+## fenced, gated, floored and furnished east of the farmhouse ("yard_night": after dark, its
+## lamp post lit; "yard_hand": in build mode, the hand moving its bench); "saplings" shows an
+## oak and a cherry sapling at each age and the hero behind a grown oak; "place_tab" opens the
+## workbench's "Place" tab; "shop_land" opens Tilda's list on what she sells for the land.
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -227,25 +230,49 @@ const SHOTS: Array = [
 	["167_the_field_and_its_clear_corner", &"homestead", Vector2i(28, 16), Vector2.DOWN, 0, ""],
 	# The Homestead, phase 2 (2026-11-19): build mode with a green ghost and the build bar; a
 	# red ghost on the road, with its words; a yard fenced, gated and paved, the hero before
-	# its fence; and the hero walking through its gate.
-	["168_build_mode_a_green_ghost", &"homestead", Vector2i(30, 13), Vector2.RIGHT, 0, "build:33,12"],
-	["169_a_red_ghost_on_the_road", &"homestead", Vector2i(30, 13), Vector2.RIGHT, 0, "build:32,14"],
+	# its fence; the hero walking through its gate; the yard after dark, its lamp post lit;
+	# saplings at each age, and the hero behind a grown oak; the hand moving the yard's bench;
+	# the workbench's "Place" tab; and what Tilda sells for the land.
+	["168_build_mode_a_green_ghost", &"homestead", Vector2i(30, 13), Vector2.RIGHT, 0, "build:33,12:1"],
+	["169_a_red_ghost_on_the_road", &"homestead", Vector2i(30, 13), Vector2.RIGHT, 0, "build:32,14:1"],
 	["170_a_fenced_yard_with_paths", &"homestead", Vector2i(33, 14), Vector2.UP, 0, "yard"],
 	["171_through_the_gate", &"homestead", Vector2i(34, 13), Vector2.DOWN, 0, "yard"],
+	["172_a_lamp_post_at_night", &"homestead", Vector2i(37, 13), Vector2.LEFT, 0, "yard_night"],
+	["173_saplings_and_a_grown_tree", &"homestead", Vector2i(34, 12), Vector2.DOWN, 0, "saplings"],
+	["174_the_hand_moves_a_bench", &"homestead", Vector2i(37, 13), Vector2.LEFT, 0, "yard_hand"],
+	["175_the_workbench_place_tab", &"home", Vector2i(8, 3), Vector2.RIGHT, 0, "place_tab"],
+	["176_tilda_sells_for_the_land", &"shop", Vector2i(5, 4), Vector2.UP, 0, "shop_land"],
 ]
 ## What a build shot carries: enough of each thing for a yard, in the order of the build bar.
-const BUILD_STOCK: Array = [[&"fence", 30], [&"gate", 3], [&"dirt_path", 12], [&"stone_path", 20], [&"wood_path", 12]]
+const BUILD_STOCK: Array = [[&"fence", 30], [&"gate", 3], [&"dirt_path", 12], [&"stone_path", 20], [&"wood_path", 12],
+	[&"wooden_flooring", 12], [&"stone_flooring", 12], [&"hedge", 8], [&"lamp_post", 2], [&"bench", 2],
+	[&"flower_bed_red", 2], [&"flower_bed_yellow", 2], [&"flower_bed_blue", 2], [&"oak_sapling", 2], [&"cherry_sapling", 2]]
 ## The yard of the "yard" shots, east of the farmhouse: [item, the cells it is set down in].
-## A fence round (32..36, 10..13) with a gate in its west side and one in its south side,
-## stone paving inside, and a dirt path from the west gate to the door's path.
+## A hedge along the north of (32..36, 10..13) and a fence round the rest, with a gate in its
+## west side and one in its south side; a wooden floor inside with a lamp post and a bench on
+## it; a stone path through the south gate and a dirt path from the west gate to the door's
+## path; and three flower beds below that.
 const YARD: Array = [
-	[&"fence", [Vector2i(32, 10), Vector2i(33, 10), Vector2i(34, 10), Vector2i(35, 10), Vector2i(36, 10),
-		Vector2i(32, 11), Vector2i(36, 11), Vector2i(36, 12),
+	[&"hedge", [Vector2i(32, 10), Vector2i(33, 10), Vector2i(34, 10), Vector2i(35, 10), Vector2i(36, 10)]],
+	[&"fence", [Vector2i(32, 11), Vector2i(36, 11), Vector2i(36, 12),
 		Vector2i(32, 13), Vector2i(33, 13), Vector2i(35, 13), Vector2i(36, 13)]],
 	[&"gate", [Vector2i(32, 12), Vector2i(34, 13)]],
-	[&"stone_path", [Vector2i(33, 11), Vector2i(34, 11), Vector2i(35, 11),
-		Vector2i(33, 12), Vector2i(34, 12), Vector2i(35, 12), Vector2i(34, 13)]],
+	[&"wooden_flooring", [Vector2i(33, 11), Vector2i(34, 11), Vector2i(35, 11), Vector2i(33, 12), Vector2i(34, 12), Vector2i(35, 12)]],
+	[&"stone_path", [Vector2i(34, 13)]],
 	[&"dirt_path", [Vector2i(29, 12), Vector2i(30, 12), Vector2i(31, 12), Vector2i(32, 12)]],
+	[&"lamp_post", [Vector2i(33, 11)]],
+	[&"bench", [Vector2i(35, 11)]],
+	[&"flower_bed_red", [Vector2i(29, 13)]],
+	[&"flower_bed_yellow", [Vector2i(30, 13)]],
+	[&"flower_bed_blue", [Vector2i(31, 13)]],
+]
+## The "saplings" shot: [item, cell, the mornings it has seen]. An oak at each of its three
+## pictures and grown, and a cherry the same, with room to stand behind the grown oak.
+const SAPLINGS: Array = [
+	[&"oak_sapling", Vector2i(30, 13), 0], [&"oak_sapling", Vector2i(31, 13), 2], [&"oak_sapling", Vector2i(32, 13), 3],
+	[&"oak_sapling", Vector2i(34, 13), 4],
+	[&"cherry_sapling", Vector2i(30, 16), 0], [&"cherry_sapling", Vector2i(31, 16), 2], [&"cherry_sapling", Vector2i(32, 16), 4],
+	[&"cherry_sapling", Vector2i(36, 13), 6],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -423,13 +450,27 @@ func _capture() -> void:
 					for y: int in 2:
 						game_state.call(&"till_soil", Vector2i(x, y))
 					game_state.call(&"water_soil", Vector2i(x, 0))
-		if str(shot[5]).begins_with("build:") or shot[5] == "yard":
+		if str(shot[5]).begins_with("build:") or str(shot[5]).begins_with("yard"):
 			for item: Array in BUILD_STOCK:
 				game_state.call(&"add_item", item[0], item[1])
-		if shot[5] == "yard":
+		if str(shot[5]).begins_with("yard"):
 			for row: Array in YARD:
 				for cell: Vector2i in row[1]:
 					game_state.call(&"set_down", &"homestead", cell, row[0])
+		if shot[5] == "yard_night":
+			game_state.call(&"set_time", float(clock.call(&"in_day", "22:00")))
+		if shot[5] == "saplings":
+			# Each as old as the list says, as if set down that many mornings ago.
+			var land: RefCounted = game_state.call(&"homestead")
+			for sapling: Array in SAPLINGS:
+				land.call(&"set_down", sapling[1], &"standing", sapling[0], sapling[2])
+			root.get_node("EventBus").emit_signal(&"homestead_changed")
+		if shot[5] == "place_tab":
+			# Wood and stone for most of the list, and none of the lamp post's iron or coal.
+			for item: Array in [[&"wood", 9], [&"stone", 2]]:
+				game_state.call(&"add_item", item[0], item[1])
+		if shot[5] == "shop_land":
+			game_state.call(&"add_item", &"coin", 34)
 		if shot[5] == "boulder":
 			# The plain Pickaxe in hand, at a boulder that wants the Copper one.
 			game_state.call(&"add_item", &"pickaxe", 1)
@@ -571,6 +612,31 @@ func _capture() -> void:
 				scene.get(&"build").call(&"choose_slot", int(build_parts[2]))
 			scene.get(&"build").call(&"point_at", Vector2i(int(at[0]), int(at[1])))
 			await _frames(3)
+		elif shot[5] == "yard_hand":
+			# Build mode with the hand chosen: the bench lifted, and the ghost where it would go.
+			scene.call(&"open_build")
+			var hand_mode: Node = scene.get(&"build")
+			while hand_mode.get(&"chosen") != &"hand":
+				hand_mode.call(&"step", -1)
+			hand_mode.call(&"point_at", Vector2i(35, 11))
+			hand_mode.call(&"set_down")
+			hand_mode.call(&"point_at", Vector2i(34, 12))
+			await _frames(3)
+		elif shot[5] == "place_tab":
+			# The "Place" tab, the cursor on the fence and one made, so the line that says so shows.
+			scene.call(&"open_craft")
+			var bench_list: Node = scene.get(&"hud").get(&"craft_menu")
+			bench_list.call(&"switch_tab", 1)
+			bench_list.call(&"move_cursor", 5)
+			bench_list.call(&"confirm")
+			await _frames(2)
+		elif shot[5] == "shop_land":
+			# The cursor on the oak sapling and one bought, so the line that says so shows.
+			scene.call(&"open_shop", &"tilda", &"buy")
+			var land_counter: Node = scene.get(&"hud").get(&"shop_menu")
+			land_counter.call(&"move_cursor", 9)
+			land_counter.call(&"confirm")
+			await _frames(2)
 		elif shot[5] == "workbench":
 			# The cursor on the chest, which he hasn't the wood for: its needs show what is short.
 			scene.call(&"open_craft")

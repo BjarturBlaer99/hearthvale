@@ -683,6 +683,18 @@ func take_up(area: StringName, cell: Vector2i, layer: StringName) -> StringName:
 	return item_id
 
 
+## Moves what is on `layer` in cell `from` of `area` to cell `to`, as it is (the hand of build
+## mode: a sapling keeps its mornings, and a grown tree stays a tree). Nothing goes through
+## the pack, so a full one is no hindrance. Whether it fits the ground at `to` is the area's to
+## ask first (Placement.why_not). Returns whether it moved: never off his land, with nothing
+## to move, or onto a thing of its layer.
+func move_placed(area: StringName, from: Vector2i, to: Vector2i, layer: StringName) -> bool:
+	if not homestead_rules().is_land(area) or not homestead().move(from, to, layer):
+		return false
+	EventBus.homestead_changed.emit()
+	return true
+
+
 ## What grows on his land, for a morning (Homestead.grow): item id -> the mornings it takes.
 func growing_things() -> Dictionary:
 	return Placement.growing(DataRegistry.entries(&"items"))

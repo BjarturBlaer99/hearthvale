@@ -51,7 +51,7 @@ func test_everything_on_the_list_is_made_from_what_the_mine_and_the_fields_give(
 	assert_int(GameState.skill_level(Skills.MINING)).is_equal(3)
 	assert_int(GameState.skill_level(Skills.FARMING)).is_equal(2)
 	var home: AreaController = _load(HOME)
-	var all: Array = _ids(Crafting.of_station(DataRegistry.entries(&"crafting"), Crafting.WORKBENCH))
+	var all: Array = _ids(Crafting.of_tab(Crafting.of_station(DataRegistry.entries(&"crafting"), Crafting.WORKBENCH), Crafting.TAB_MAKE))
 	assert_int(all.size()).is_equal(13)
 
 	# Day 1. Stone and ore make the furnace; nothing of metal can be made before it has burned.

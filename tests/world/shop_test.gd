@@ -11,8 +11,11 @@ const VILLAGE: String = "res://world/areas/village/village.tscn"
 const FRAME: float = 1.0 / 60.0
 ## GDD §7 and §9: what each ware costs, and what each crop sells for.
 const BUY_LINES: Array[String] = [
-	"Arrows x10: 5 coins", "Bombs x3: 8 coins", "Bread: 6 coins", "Pickaxe: 25 coins", "Turnip Seeds: 5 coins",
-	"Wheat Seeds: 6 coins", "Carrot Seeds: 8 coins", "Seed Potatoes: 10 coins", "Pumpkin Seeds: 20 coins",
+	"Arrows x10: 5 coins", "Bombs x3: 8 coins", "Bread: 6 coins", "Pickaxe: 25 coins",
+	# For the homestead (phase 2).
+	"Fibre x5: 6 coins", "Hedge: 5 coins", "Red Flower Bed: 3 coins", "Yellow Flower Bed: 3 coins", "Blue Flower Bed: 3 coins",
+	"Oak Sapling: 10 coins", "Cherry Sapling: 30 coins",
+	"Turnip Seeds: 5 coins", "Wheat Seeds: 6 coins", "Carrot Seeds: 8 coins", "Seed Potatoes: 10 coins", "Pumpkin Seeds: 20 coins",
 ]
 const SELLS_FOR: Dictionary = {&"turnip": 12, &"wheat": 10, &"carrot": 18, &"potato": 24, &"pumpkin": 60}
 
@@ -82,7 +85,7 @@ func test_tildas_conversation_opens_her_list() -> void:
 	assert_str(box.shown_options()[0]).is_equal("Eggs from Farmer Oda.")
 
 
-func test_her_list_shows_nine_wares_five_at_a_time() -> void:
+func test_her_list_shows_sixteen_wares_five_at_a_time() -> void:
 	GameState.add_item(&"coin", 47)
 	var shop: AreaController = _load(SHOP)
 	assert_bool(shop.open_shop(&"tilda", Shop.BUY)).is_true()
@@ -91,19 +94,20 @@ func test_her_list_shows_nine_wares_five_at_a_time() -> void:
 	assert_str((counter.get_node(^"Panel/Coins") as Label).text).is_equal("47 coins")
 	assert_int(counter.entries().size()).is_equal(BUY_LINES.size())
 	assert_array(Array(counter.shown_lines())).is_equal(["> " + BUY_LINES[0], "  " + BUY_LINES[1], "  " + BUY_LINES[2], "  " + BUY_LINES[3], "  " + BUY_LINES[4]])
-	assert_str((counter.get_node(^"Panel/Count") as Label).text).is_equal("  1/9 v")
+	assert_int(BUY_LINES.size()).is_equal(16)
+	assert_str((counter.get_node(^"Panel/Count") as Label).text).is_equal("  1/16 v")
 	for i: int in range(1, BUY_LINES.size()):
 		counter.move_cursor(1)
 		assert_bool(Array(counter.shown_lines()).has("> " + BUY_LINES[i])).override_failure_message("the cursor on '%s' is in view" % BUY_LINES[i]).is_true()
 		assert_int(counter.shown_lines().size()).is_equal(ShopMenu.ROWS)
-	assert_str((counter.get_node(^"Panel/Count") as Label).text).is_equal("^ 9/9  ")
+	assert_str((counter.get_node(^"Panel/Count") as Label).text).is_equal("^ 16/16  ")
 	counter.move_cursor(1)
 	assert_str(counter.shown_lines()[0]).override_failure_message("past the end it wraps to the top").is_equal("> " + BUY_LINES[0])
 	assert_bool(shop.open_shop(&"nowhere", Shop.BUY)).override_failure_message("no such shop").is_false()
 
 
 func test_seeds_and_wares_are_bought_for_their_prices() -> void:
-	GameState.add_item(&"coin", 93)
+	GameState.add_item(&"coin", 153)
 	var shop: AreaController = _load(SHOP)
 	shop.open_shop(&"tilda", Shop.BUY)
 	var counter: ShopMenu = shop.hud.shop_menu
@@ -114,10 +118,10 @@ func test_seeds_and_wares_are_bought_for_their_prices() -> void:
 		assert_bool(counter.confirm()).override_failure_message("buying %s" % wares[i]["item"]).is_true()
 		spent += int(wares[i]["price"])
 		assert_int(GameState.item_count(StringName(str(wares[i]["item"])))).is_equal(int(wares[i]["count"]))
-		assert_int(GameState.item_count(&"coin")).is_equal(93 - spent)
+		assert_int(GameState.item_count(&"coin")).is_equal(153 - spent)
 		assert_array(_heard).contains([&"coin"])
 		counter.move_cursor(1)
-	assert_int(spent).override_failure_message("one of everything: 5+8+6+25 and 5+6+8+10+20").is_equal(93)
+	assert_int(spent).override_failure_message("one of everything: 5+8+6+25, 6+5+3+3+3+10+30 for the homestead, and 5+6+8+10+20").is_equal(153)
 	assert_str(counter.note_text()).is_equal("Bought: Pumpkin Seeds.")
 	assert_str((counter.get_node(^"Panel/Coins") as Label).text).is_equal("0 coins")
 	# With an empty purse nothing more is sold, and nothing changes.
@@ -144,7 +148,7 @@ func test_a_ware_there_is_no_room_for_is_not_sold() -> void:
 	counter.move_cursor(1)
 	assert_bool(counter.confirm()).override_failure_message("eight bombs and three more don't fit a bag of ten").is_false()
 	assert_str(counter.note_text()).is_equal(Shop.NO_ROOM)
-	counter.move_cursor(3)
+	counter.move_cursor(10)
 	assert_bool(counter.confirm()).override_failure_message("thirty seeds is a full pouch").is_false()
 	assert_str(counter.note_text()).is_equal(Shop.NO_ROOM)
 	assert_int(GameState.item_count(&"coin")).is_equal(100)

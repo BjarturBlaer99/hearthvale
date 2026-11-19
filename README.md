@@ -29,6 +29,7 @@ Continue says so and offers it. The game has sound effects and music
 | Swing the sword whatever is in hand | Space / J | X |
 | Use the item on the item button (bow, bombs, hoe, can, seeds) | Q / K | Y |
 | Food menu (eat something) | Tab / I | Back |
+| Build mode, on your own farm: set things down, move them, take them up | B; then point and left click to set down, right click to take up, the wheel or 1 to 9 to choose (or WASD, Space and Q); B, Tab or Esc to leave | Left stick click; then d-pad, X to set down, A or Y to take up, shoulders to choose |
 | Pause menu (save, settings, quit) | Esc / P | Start |
 
 Read the sign in the square, then walk into a door: Elder Bram lives in the blue-roofed house, Wenna the weaver
@@ -149,7 +150,7 @@ Beaten enemies sometimes drop hearts or coins.
   you; the Old Wood has mist. Only the water moves.
 - **Walls with height** (the pivot, step 1d): dungeon and house walls show a lit front and a dark top, pillars
   stand tall, and roofs have a ridge you walk behind.
-- **The Homestead** (asked for on 2026-11-17; phase 1 of five is built, and the first step of phase 2): an old farmstead of your own.
+- **The Homestead** (asked for on 2026-11-17; phases 1 and 2 of five are built): an old farmstead of your own.
   Follow the lane west out of Hearthvale, past the last cottage and through the trees: it is a few
   seconds' walk. The farmhouse there is your home (the bed, the hearth and the workbench are inside), your
   field lies below it across the road, and a pond in the south-west corner fills the watering can.
@@ -157,12 +158,18 @@ Beaten enemies sometimes drop hearts or coins.
     the land around, is overgrown: cut weeds, bushes, fallen logs and old stumps with the sword, and
     break rocks with the Pickaxe. They leave fibre, wood and stone, and never come back. A boulder wants
     the Copper Pickaxe and a great boulder the Iron one. Soil can't be tilled until it is cleared.
-  - **Build mode** (phase 2, its first step): on the farm, **B** opens it. The mouse points at a cell
-    (or move the ghost with the movement keys): it is green where the thing fits and red where it
-    doesn't, with the reason in words. **Left click** sets the thing down, **right click** takes one
-    up; the **wheel** or **1 to 9** choose what to set down; **B**, **Tab** or **Esc** leave. Time
-    stands still while you build. So far there are three paths, a fence that blocks and a gate you
-    walk through.
+  - **Build mode** (phase 2): on the farm, **B** opens it. The mouse points at a cell (or move the
+    ghost with the movement keys): it is green where the thing fits and red where it doesn't, with
+    the reason in words. **Left click** sets the thing down, **right click** takes one up; the
+    **wheel** or **1 to 9** choose what to set down; **B**, **Tab** or **Esc** leave. Time stands
+    still while you build. Without a mouse, Space sets down and Q takes up.
+  - **Fifteen things to set down:** three paths and two floors, three flower beds, a fence that
+    blocks and a gate you walk through, a hedge, a bench, a lamp post that lights at dusk, and oak and
+    cherry saplings that grow into trees over a few mornings. Nine are made at the workbench (its
+    new "Place" tab: press A or D to turn to it), and Tilda sells the hedge, the flower beds and the
+    saplings.
+  - **The hand,** the build bar's first slot, moves things: click a thing to lift it, click again to
+    set it down. Not on trees, water, the house, the road, the field, or anything still to be cleared.
   - **An older save loads as it was:** a game saved in the old cottage opens in the farmhouse, and its
     soil and crops are in the field's clear corner.
   - **The farm has its own tune,** and a quieter one after dark.
@@ -229,7 +236,7 @@ the ending), `-- warden`, `-- quarry` (the mine's entrance hall with a Pickaxe),
 workbench, with ore, bars and wood for most of its list), `-- homestead` (arriving on your farm with a sword
 and all three pickaxes; add `20:30` for its night), `-- farm` (on the farm's road above the field, with the
 hoe, the can and seeds) or `-- build` (on the farm by the farmhouse, the ground cleared, with a stock of
-things to set down: press B). Saving in a scenario goes to a slot of its own, so it never replaces your own game.
+all fifteen things to set down, and wood, stone and coins: press B). Saving in a scenario goes to a slot of its own, so it never replaces your own game.
 
 To have a script play eight days by pressing real keys (the balance pass's run: the field's clear corner,
 Tilda's counter, the quarry, the furnace and the workbench): `godot --path . -s res://tools/play_days.gd -- <folder>`. It

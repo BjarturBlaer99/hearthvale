@@ -228,7 +228,7 @@ Enemies sometimes drop hearts or coins.
 ## 10. Village & economy
 - **Coins** drop from enemies, grass and pots, and come from selling crops and what the quarry gives.
 - **Tilda's shop** has a list to buy from and a list to sell on, opened from her conversation. She sells ten
-  arrows (5 coins), three bombs (8), a loaf of bread (6), and a seed of each crop at its price (§7). She buys
+  arrows (5 coins), three bombs (8), a loaf of bread (6), the Pickaxe (25), for the homestead (§15) fibre five at a time (6), a hedge (5), a red, yellow or blue flower bed (3) and an oak or cherry sapling (10, 30), and a seed of each crop at its price (§7). She buys
   what the crops give, one at a time, at each crop's price, and what the quarry gives (§14): copper ore (2
   coins), iron ore (3), gold ore (7), a crystal (10), and a copper, iron or gold bar (8, 12, 25). Nothing
   else: not stone, wood or coal. The list stays open for as many
@@ -350,7 +350,7 @@ beyond the hero's homestead (§15: the farm and the farmhouse's inside; the user
 - **What he can't carry stays lying:** stone stacks to 50, ores and coal to 30, crystals to 10.
 
 **Crafting** *(built 2026-11-17)*
-- **The workbench** stands in the hero's home (the farmhouse, since the Homestead) from the first day. Its list shows what he knows how to make,
+- **The workbench** stands in the hero's home (the farmhouse, since the Homestead) from the first day. Its list (two tabs since the Homestead's phase 2: "Make", and "Place" for what is set down on the farm, §15) shows what he knows how to make,
   what the thing under the cursor needs beside what he has ("Stone 12 of 20"), and greys out what he
   can't make now. A recipe is known once the thing it waits on has been found (held even once), or once
   a skill has risen; the Woven Rug is known from the start.
@@ -396,8 +396,8 @@ beyond the hero's homestead (§15: the farm and the farmhouse's inside; the user
   and reached its top level on the second day); floors 4 to 6 have two coal rocks each, not four.
 
 ## 15. The Homestead *(2026-11-17; `docs/progress/homestead-plan.md`)*
-*(Built: phase 1, the farm and the home's move, and of phase 2, placing things, its first step. Phases 3
-to 5, buildings, animals and the balance, are planned and not built.)*
+*(Built: phase 1, the farm and the home's move, and phase 2, placing things. Phases 3 to 5, buildings,
+animals and the balance, are planned and not built.)*
 - **The farm** is an old farmstead on the road west of Hearthvale, left to the hero: the lane through the
   village runs on through the west woods and comes in at the farm's east edge. It is a map of its own, 40
   by 30 cells, with woods all round.
@@ -439,12 +439,36 @@ to 5, buildings, animals and the balance, are planned and not built.)*
     is under the ghost and gives it back, if there is room for it. Neither costs energy or time.
   - **The build bar** takes the item bar's place: everything he carries that can be set down, each
     with how many. The wheel and the keys 1 to 9 choose. B, Tab or Esc leave.
-  - **Two things to a cell at most:** one lying (a path) and one standing (a fence, a gate).
+  - **The hand** is the bar's first slot: with it a left click lifts a thing and the next sets it
+    down elsewhere, as it is (a sapling keeps the mornings it has grown). A right click lets it go.
+  - **Two things to a cell at most:** one lying (a path, a floor, a flower bed) and one standing (a
+    fence, a gate, a hedge, a lamp post, a bench, a sapling).
   - **Never on** trees, water or the house; the road, the path to the door or the way out; a
     doorstep; the field; anything that still wants clearing; and, for a standing thing, the cell he
     stands in.
   - **A fence blocks.** A gate lets the hero through (and will keep animals in). A path is walked on.
     He walks before a fence and behind it.
-  - **What is set down** *(so far)*: the Dirt Path, the Stone Path and the Wood Path; the Fence; the
-    Gate.
+  - **What is set down:** fifteen things, each taking one cell.
+
+    | Thing | Lies or stands | From | Cost |
+    |---|---|---|---|
+    | Dirt Path | lies | the workbench | 1 stone makes 4 |
+    | Stone Path | lies | the workbench | 2 stone make 4 |
+    | Wood Path | lies | the workbench | 1 wood makes 4 |
+    | Wooden Flooring | lies | the workbench | 2 wood make 4 |
+    | Stone Flooring | lies | the workbench | 3 stone make 4 |
+    | Fence | stands, blocks | the workbench | 1 wood makes 2 |
+    | Gate | stands; the hero walks through | the workbench | 3 wood |
+    | Lamp Post | stands, blocks; lit from dusk to dawn | the workbench | 1 iron bar, 1 coal, 2 wood |
+    | Bench | stands, blocks | the workbench | 4 wood |
+    | Hedge | stands, blocks | Tilda | 5 coins |
+    | Flower Bed: red, yellow, blue | lies | Tilda | 3 coins each |
+    | Oak Sapling | stands, blocks; a tree after 4 mornings | Tilda | 10 coins |
+    | Cherry Sapling | stands, blocks; a cherry tree after 6 mornings | Tilda | 30 coins |
+
+  - **A lamp post** burns with the village's lamps, from 18:30 to 06:30, steadily.
+  - **A sapling** needs no water. It shows three pictures as it grows, changing with the morning, and
+    is then a tree the hero walks behind. **A tree taken up gives back its sapling.**
+  - **The workbench has two tabs:** "Make", its list as it was, and "Place", the nine made there.
+    **Tilda sells** the hedge, the flower beds and the saplings, and fibre five at a time for 6 coins.
   - **It is all kept in the save,** and there after a night.

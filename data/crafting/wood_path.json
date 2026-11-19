@@ -1,0 +1,16 @@
+{
+	"id": "wood_path",
+	"station": "workbench",
+	"tab": "place",
+	"order": 3,
+	"needs": [
+		{
+			"item": "wood",
+			"count": 1
+		}
+	],
+	"makes": {
+		"item": "wood_path",
+		"count": 4
+	}
+}

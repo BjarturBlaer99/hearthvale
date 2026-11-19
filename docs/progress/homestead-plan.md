@@ -5,8 +5,9 @@ west of Hearthvale, where he now lives, clears and shapes the land, raises build
 five phases with a stop after each. This is phase 0: the plan, and no code.
 
 **Status: approved as written by the user on 2026-11-17 ("Approve as written"). All thirty decisions
-below (D1 to D30) stand as proposed, and each is recorded in `docs/DECISIONS.md`. Phase 1 is built
-(2026-11-19) and waits for the user's review; phases 2 to 5 are not built.** Every number is a first guess, kept in data, to be measured in phase 5. The tables below are as
+below (D1 to D30) stand as proposed, and each is recorded in `docs/DECISIONS.md`. Phase 1 is built and
+approved (2026-11-19); phase 2 is built (2026-11-19) and waits for the user's review; phases 3 to 5 are
+not built.** Every number is a first guess, kept in data, to be measured in phase 5. The tables below are as
 approved; where a phase builds something differently, it says so under "What the user has decided" and
 in the log.
 
@@ -45,6 +46,24 @@ which does not exist. The coordinator adds to it after each review.
     something on it, and `AreaController.debris_at(cell)` is how the area asks;
   - spawn markers for the land are a second row at the end of the atlas (`LAND_MARKER_KINDS`);
   - an area may name its own night tune (`night_music`).
+- **2026-11-19, phase 2 is built** (steps 2a and 2b, each ticked below with what was built
+  differently) **and waits for the user's review.** *(Written by the phase's subagent, for the
+  coordinator to confirm.)* Every approved decision it touches (D12 to D19, D30) held as written.
+  One reading wants the user's word: **D16 says moving "is taking up and setting down in one go";
+  the hand as built moves a thing as it is,** so a moved sapling keeps its mornings, a moved tree
+  stays a tree, and a full pack is no hindrance. Taking a tree up (a right click) gives back its
+  sapling, as D16 says. What else the plan left open is in `docs/DECISIONS.md` under the two steps;
+  what a later phase will meet:
+  - a placeable is an item of type `placeable`, set down through `GameState.set_down()`, moved
+    through `move_placed()` and taken up through `take_up()`; `Placement.why_not(item, site)` says
+    whether it fits, and `BuildMode.site_at(cell)` describes a cell (a building's cells will ask the
+    same, and add their own doorsteps);
+  - what stands is `GameState.homestead().standing_at(cell)`, and `Placement.blocks()` and `joins()`
+    say what an animal or a pasture needs to know of it (a gate doesn't block the hero and still
+    joins a fence);
+  - a crafting recipe has a `tab` (`make` or `place`): "Build" is one more name in `Crafting.TABS`;
+  - `SpriteSheet.draw()` draws a mirrored frame a frame's width to the right in this engine: found,
+    measured, and left alone (it is older than the Homestead).
 
 ## The short of it
 
@@ -615,8 +634,12 @@ TECH_DESIGN, the roadmap, the README and DECISIONS up to date; CLAUDE.md is the 
   of today's land says "That is a doorstep.", and the rule waits for phase 3's buildings. The keys do
   what the mouse's two buttons do (the sword's key sets down, the item's key takes up). In this step
   the five things come only from `tools/playtest.gd -- build`: the "Place" tab is step 2b's.*
-- [ ] 2b. **The rest of the list.** Two floors, the hedge, the lamp post, the bench, the flower beds, the
+- [x] 2b. **The rest of the list.** Two floors, the hedge, the lamp post, the bench, the flower beds, the
   saplings; the hand; the workbench's "Place" tab and Tilda's new wares.
+  *Built 2026-11-19, with the table's fifteen, costs and prices, and D16, D17 and D19 as written. The
+  hand moves a thing as it is: a sapling keeps its mornings and a grown tree stays a tree (a right
+  click takes it up and gives back the sapling). The nine recipes are known from the first day. A lamp
+  post keeps the village lamps' hours, 18:30 to 06:30. Nobody has played the phase by hand.*
 - **Tests:**
   - *placement rules:* every refusal in the table with its words; two things to a cell; only on the
     homestead;

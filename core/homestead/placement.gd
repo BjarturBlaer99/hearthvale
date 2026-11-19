@@ -10,6 +10,8 @@ extends RefCounted
 ## - `layer`: "lying" (a path, a floor, a flower bed: flat, walked over, never in the way) or
 ##   "standing" (a fence, a gate, a hedge, a lamp post, a bench, a sapling). A cell holds one of
 ##   each at most.
+## - `fills` (lying things): its picture covers its cell edge to edge (a path, a floor), so it
+##   is drawn with a rim where nothing of the kind lies beside it. A flower bed has its own edge.
 ## - `blocks` (standing things; true unless said): whether it fills its cell. A gate says false:
 ##   the hero walks through it, and it still counts as fence to whatever a fence keeps in.
 ## - `joins`: it runs on to its neighbours that join too (a fence's rails, a gate's posts).
@@ -66,6 +68,11 @@ static func layer_of(item: Dictionary) -> StringName:
 ## gate); a lying thing never does.
 static func blocks(item: Dictionary) -> bool:
 	return layer_of(item) == STANDING and bool(_stats(item).get("blocks", true))
+
+
+## Whether `item`, lying, covers its cell edge to edge (a path, a floor; not a flower bed).
+static func fills(item: Dictionary) -> bool:
+	return layer_of(item) == LYING and bool(_stats(item).get("fills", false))
 
 
 ## Whether `item` runs on to its neighbours (a fence, a gate).
@@ -196,7 +203,11 @@ static func problems(item: Dictionary, trees: Array) -> PackedStringArray:
 		for standing_only: String in ["blocks", "joins", "light", "grows"]:
 			if stats.has(standing_only):
 				out.append("'%s' is for a standing thing: a lying one never blocks, joins, shines or grows." % standing_only)
+		if stats.has("fills") and typeof(stats["fills"]) != TYPE_BOOL:
+			out.append("'fills' must be true or false.")
 		return out
+	if stats.has("fills"):
+		out.append("'fills' is for a lying thing: a path or a floor that covers its cell.")
 	for flag: String in ["blocks", "joins"]:
 		if stats.has(flag) and typeof(stats[flag]) != TYPE_BOOL:
 			out.append("'%s' must be true or false." % flag)

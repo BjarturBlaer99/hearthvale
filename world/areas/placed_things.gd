@@ -7,7 +7,9 @@ extends Node2D
 ##   everyone, as the field's soil is; they are never in the way;
 ## - each standing thing is a PlacedThing in the area's Interactables, sorted by depth with
 ##   the hero; one that blocks fills its cell the moment it is set down and frees it the moment
-##   it is taken up (TerrainQuery.set_occupied, as a villager or a furnishing does).
+##   it is taken up (TerrainQuery.set_occupied, as a villager or a furnishing does);
+## - a sapling that has grown is one of the area's tall trees (Scenery.stand): the hero walks
+##   behind it and its crown fades when he does, as with every tree. Taken up, it is felled.
 ## Nothing else in the area changes for any of it: no hit box, no collision, no timing.
 ## It sits at the area's origin, just over the ground and its shading.
 
@@ -20,6 +22,8 @@ var area: AreaController
 var _standing: Dictionary[Vector2i, PlacedThing] = {}
 ## The cells this has filled.
 var _blocked: Dictionary[Vector2i, bool] = {}
+## The cells where this has stood a grown tree among the area's scenery.
+var _trees: Dictionary[Vector2i, bool] = {}
 
 
 func _init() -> void:
@@ -68,7 +72,29 @@ func sync() -> void:
 	for node: PlacedThing in _standing.values():
 		node.queue_redraw()
 	_fill_cells()
+	_stand_trees()
 	queue_redraw()
+
+
+## Whether a tree this stood is in `cell` (a sapling that has grown).
+func has_tree(cell: Vector2i) -> bool:
+	return _trees.has(cell)
+
+
+## Stands a tall tree where a sapling has grown, and fells the ones whose sapling is gone
+## (taken up, or moved away).
+func _stand_trees() -> void:
+	var now: Dictionary[Vector2i, bool] = {}
+	for cell: Vector2i in _standing:
+		if _standing[cell].is_grown():
+			now[cell] = true
+	for cell: Vector2i in _trees:
+		if not now.has(cell):
+			area.scenery.fell(cell)
+	for cell: Vector2i in now:
+		if not _trees.has(cell):
+			area.scenery.stand(cell, Placement.tree_of(_standing[cell].item))
+	_trees = now
 
 
 ## Fills the cell of every standing thing that blocks, and frees those this had filled that
@@ -92,13 +118,23 @@ func _draw() -> void:
 	for thing: Dictionary in home.placed(Placement.LYING):
 		var cell: Vector2i = thing["cell"]
 		var origin: Vector2 = Vector2(cell) * size
-		PlacedArt.draw_thing(self, DataRegistry.get_item(thing["item"]), 0, origin)
-		# A rim on each side where nothing lies beside it, so a path reads as laid, not painted.
-		if home.lying_at(cell + Vector2i.UP) == &"":
+		var item: Dictionary = DataRegistry.get_item(thing["item"])
+		PlacedArt.draw_thing(self, item, 0, origin)
+		if not Placement.fills(item):
+			continue
+		# A rim on each side where no path or floor lies beside it, so it reads as laid, not
+		# painted.
+		if not _filled(home, cell + Vector2i.UP):
 			draw_rect(Rect2(origin, Vector2(size, 1.0)), RIM)
-		if home.lying_at(cell + Vector2i.DOWN) == &"":
+		if not _filled(home, cell + Vector2i.DOWN):
 			draw_rect(Rect2(origin + Vector2(0.0, size - 1.0), Vector2(size, 1.0)), RIM)
-		if home.lying_at(cell + Vector2i.LEFT) == &"":
+		if not _filled(home, cell + Vector2i.LEFT):
 			draw_rect(Rect2(origin, Vector2(1.0, size)), RIM)
-		if home.lying_at(cell + Vector2i.RIGHT) == &"":
+		if not _filled(home, cell + Vector2i.RIGHT):
 			draw_rect(Rect2(origin + Vector2(size - 1.0, 0.0), Vector2(1.0, size)), RIM)
+
+
+## Whether a path or a floor lies in `cell`: something that covers it edge to edge.
+static func _filled(home: Homestead, cell: Vector2i) -> bool:
+	var lying: StringName = home.lying_at(cell)
+	return lying != &"" and Placement.fills(DataRegistry.get_item(lying))

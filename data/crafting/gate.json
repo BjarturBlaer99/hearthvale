@@ -1,0 +1,16 @@
+{
+	"id": "gate",
+	"station": "workbench",
+	"tab": "place",
+	"order": 7,
+	"needs": [
+		{
+			"item": "wood",
+			"count": 3
+		}
+	],
+	"makes": {
+		"item": "gate",
+		"count": 1
+	}
+}

@@ -1,0 +1,16 @@
+{
+	"id": "bench",
+	"station": "workbench",
+	"tab": "place",
+	"order": 9,
+	"needs": [
+		{
+			"item": "wood",
+			"count": 4
+		}
+	],
+	"makes": {
+		"item": "bench",
+		"count": 1
+	}
+}

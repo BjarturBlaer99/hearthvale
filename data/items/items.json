@@ -62,10 +62,20 @@
     { "id": "sprinkler", "name": "Sprinkler", "type": "sprinkler", "icon": "sprinkler", "stackable": true, "max_stack": 10 },
     { "id": "miners_lantern", "name": "Miner's Lantern", "type": "lantern", "icon": "miners_lantern", "stats": { "radius": 80 } },
     { "id": "fibre", "name": "Fibre", "type": "material", "icon": "fibre", "stackable": true, "max_stack": 50 },
-    { "id": "dirt_path", "name": "Dirt Path", "type": "placeable", "icon": "dirt_path", "stackable": true, "max_stack": 99, "stats": { "layer": "lying" } },
-    { "id": "stone_path", "name": "Stone Path", "type": "placeable", "icon": "stone_path", "stackable": true, "max_stack": 99, "stats": { "layer": "lying" } },
-    { "id": "wood_path", "name": "Wood Path", "type": "placeable", "icon": "wood_path", "stackable": true, "max_stack": 99, "stats": { "layer": "lying" } },
+    { "id": "dirt_path", "name": "Dirt Path", "type": "placeable", "icon": "dirt_path", "stackable": true, "max_stack": 99, "stats": { "layer": "lying", "fills": true } },
+    { "id": "stone_path", "name": "Stone Path", "type": "placeable", "icon": "stone_path", "stackable": true, "max_stack": 99, "stats": { "layer": "lying", "fills": true } },
+    { "id": "wood_path", "name": "Wood Path", "type": "placeable", "icon": "wood_path", "stackable": true, "max_stack": 99, "stats": { "layer": "lying", "fills": true } },
     { "id": "fence", "name": "Fence", "type": "placeable", "icon": "fence", "stackable": true, "max_stack": 99, "stats": { "layer": "standing", "joins": true } },
-    { "id": "gate", "name": "Gate", "type": "placeable", "icon": "gate", "stackable": true, "max_stack": 20, "stats": { "layer": "standing", "joins": true, "blocks": false } }
+    { "id": "gate", "name": "Gate", "type": "placeable", "icon": "gate", "stackable": true, "max_stack": 20, "stats": { "layer": "standing", "joins": true, "blocks": false } },
+    { "id": "wooden_flooring", "name": "Wooden Flooring", "type": "placeable", "icon": "wooden_flooring", "stackable": true, "max_stack": 99, "stats": { "layer": "lying", "fills": true } },
+    { "id": "stone_flooring", "name": "Stone Flooring", "type": "placeable", "icon": "stone_flooring", "stackable": true, "max_stack": 99, "stats": { "layer": "lying", "fills": true } },
+    { "id": "hedge", "name": "Hedge", "type": "placeable", "icon": "hedge", "stackable": true, "max_stack": 50, "stats": { "layer": "standing" } },
+    { "id": "lamp_post", "name": "Lamp Post", "type": "placeable", "icon": "lamp_post", "stackable": true, "max_stack": 10, "stats": { "layer": "standing", "light": { "at": [8, 3], "radius": 22, "strength": 0.3 } } },
+    { "id": "bench", "name": "Bench", "type": "placeable", "icon": "bench", "stackable": true, "max_stack": 10, "stats": { "layer": "standing" } },
+    { "id": "flower_bed_red", "name": "Red Flower Bed", "type": "placeable", "icon": "flower_bed_red", "stackable": true, "max_stack": 30, "stats": { "layer": "lying" } },
+    { "id": "flower_bed_yellow", "name": "Yellow Flower Bed", "type": "placeable", "icon": "flower_bed_yellow", "stackable": true, "max_stack": 30, "stats": { "layer": "lying" } },
+    { "id": "flower_bed_blue", "name": "Blue Flower Bed", "type": "placeable", "icon": "flower_bed_blue", "stackable": true, "max_stack": 30, "stats": { "layer": "lying" } },
+    { "id": "oak_sapling", "name": "Oak Sapling", "type": "placeable", "icon": "oak_sapling", "stackable": true, "max_stack": 10, "stats": { "layer": "standing", "grows": { "mornings": 4, "tree": "oak" } } },
+    { "id": "cherry_sapling", "name": "Cherry Sapling", "type": "placeable", "icon": "cherry_sapling", "stackable": true, "max_stack": 10, "stats": { "layer": "standing", "grows": { "mornings": 6, "tree": "cherry" } } }
   ]
 }

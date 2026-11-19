@@ -9,7 +9,9 @@ extends SceneTree
 ## in marker colours that the game swaps for each villager's robe and hair.
 ## A sprite may also list frames "made" from its drawn ones, painted after them (frames_of):
 ## "breathe" lowers everything above the sprite's "sink_row" a pixel, "blink" closes the eyes
-## (the "e" pixels: the "lid" colour over an eye's upper row, "shut" on its last).
+## (the "e" pixels: the "lid" colour over an eye's upper row, "shut" on its last), and "swap"
+## paints it again with some of its colours changed for others of the palette (a third entry
+## says which: { "r": "y" }).
 
 const OUT_DIR: String = "res://gameplay/art"
 const OUTLINE: Color = Color(0.10, 0.08, 0.12)
@@ -3299,10 +3301,12 @@ const SPRITES: Dictionary = {
 	# A lying thing fills its cell, edge to edge, so that a run of them joins up. A fence is
 	# put together from its post and the rails that run to its neighbours (the west rail is
 	# the east one mirrored); a gate is two capped posts with the way between them open, or
-	# in a fence that runs north and south, the two ends of the gap.
+	# in a fence that runs north and south, the two ends of the gap. A lamp post is drawn lit
+	# and made dark, the yellow and blue flower beds are the red one in other colours, and a
+	# cherry sapling is an oak's in blossom ("made", by swapping colours).
 	"placed": {
 		"size": Vector2i(16, 16),
-		"palette": {"l": Color(0.80, 0.64, 0.42), "w": Color(0.62, 0.46, 0.28), "W": Color(0.42, 0.30, 0.18), "s": Color(0.74, 0.72, 0.70), "g": Color(0.58, 0.56, 0.55), "G": Color(0.38, 0.36, 0.38), "d": Color(0.72, 0.56, 0.36), "D": Color(0.59, 0.45, 0.29), "e": Color(0.82, 0.68, 0.47)},
+		"palette": {"l": Color(0.80, 0.64, 0.42), "w": Color(0.62, 0.46, 0.28), "W": Color(0.42, 0.30, 0.18), "s": Color(0.74, 0.72, 0.70), "g": Color(0.58, 0.56, 0.55), "G": Color(0.38, 0.36, 0.38), "d": Color(0.72, 0.56, 0.36), "D": Color(0.59, 0.45, 0.29), "e": Color(0.82, 0.68, 0.47), "h": Color(0.23, 0.52, 0.24), "H": Color(0.14, 0.39, 0.24), "i": Color(0.38, 0.65, 0.26), "k": Color(0.16, 0.15, 0.20), "K": Color(0.30, 0.29, 0.36), "F": Color(1.00, 0.93, 0.62), "f": Color(1.00, 0.74, 0.32), "m": Color(0.40, 0.28, 0.18), "M": Color(0.30, 0.20, 0.13), "r": Color(0.88, 0.25, 0.22), "y": Color(0.98, 0.82, 0.25), "b": Color(0.42, 0.56, 0.94), "c": Color(1.00, 0.95, 0.72), "t": Color(0.42, 0.27, 0.15), "P": Color(0.98, 0.74, 0.82), "p": Color(0.91, 0.53, 0.67), "q": Color(0.76, 0.35, 0.52), "n": Color(0.94, 0.78, 0.62), "N": Color(0.78, 0.58, 0.44)},
 		"frames": {
 			"dirt_path": [
 			"dddddddDdddddddd",
@@ -3466,6 +3470,194 @@ const SPRITES: Dictionary = {
 			".....olwwWo.....",
 			".....oooooo.....",
 			],
+			"wooden_flooring": [
+			"lwwWlwwWlwwWlwwW",
+			"lwwWlwwWlwwWlwwW",
+			"lwwWlwwWWWWWlwwW",
+			"lwwWlwwWlwwWlwwW",
+			"lwwWlwwWlwwWlwwW",
+			"WWWWlwwWlwwWlwwW",
+			"lwwWlwwWlwwWlwwW",
+			"lwwWlwwWlwwWlwwW",
+			"lwwWlwwWlwwWWWWW",
+			"lwwWlwwWlwwWlwwW",
+			"lwwWWWWWlwwWlwwW",
+			"lwwWlwwWlwwWlwwW",
+			"lwwWlwwWlwwWlwwW",
+			"lwwWlwwWWWWWlwwW",
+			"lwwWlwwWlwwWlwwW",
+			"lwwWlwwWlwwWlwwW",
+			],
+			"stone_flooring": [
+			"sssssssGsssssssG",
+			"sggggggGsggggggG",
+			"sggggggGsggggggG",
+			"sggggggGsggggggG",
+			"sggggggGsggggggG",
+			"sggggggGsggggggG",
+			"sggggggGsggggggG",
+			"GGGGGGGGGGGGGGGG",
+			"sssGsssssssGssss",
+			"gggGsggggggGsggg",
+			"gggGsggggggGsggg",
+			"gggGsggggggGsggg",
+			"gggGsggggggGsggg",
+			"gggGsggggggGsggg",
+			"gggGsggggggGsggg",
+			"GGGGGGGGGGGGGGGG",
+			],
+			"hedge": [
+			"................",
+			"................",
+			"..oooooooooooo..",
+			".oiiihiiihiiiho.",
+			".oihhihhiihhhho.",
+			"oihhhhihhhhihhHo",
+			"oihhihhhhihhhhHo",
+			"ohhhhhhihhhhhHHo",
+			"ohihhhhhhhhihhHo",
+			"ohhhhihhhhhhhHHo",
+			"ohhhhhhhhihhhHHo",
+			"ohhHhhhhhhhhHHHo",
+			"oHhhhhHhhhHhHHHo",
+			"oHHHhHHHHHHHHHHo",
+			".oHHHHHHHHHHHHo.",
+			"..oooooooooooo..",
+			],
+			"bench": [
+			"................",
+			"................",
+			"................",
+			"................",
+			".oooooooooooooo.",
+			".ollllllllllllo.",
+			".owwwwwwwwwwwwo.",
+			".oooooooooooooo.",
+			".oWo........oWo.",
+			".oooooooooooooo.",
+			".ollllllllllllo.",
+			".owwwwwwwwwwwwo.",
+			".oooooooooooooo.",
+			".oWo........oWo.",
+			".oWo........oWo.",
+			".ooo........ooo.",
+			],
+			"lamp_post_lit": [
+			"......oooo......",
+			".....okkkko.....",
+			".....oFFFFo.....",
+			".....oFffFo.....",
+			".....oFFFFo.....",
+			".....okkkko.....",
+			"......oKko......",
+			"......oKko......",
+			"......oKko......",
+			"......oKko......",
+			"......oKko......",
+			"......oKko......",
+			"......oKko......",
+			".....oKKkko.....",
+			"....oKKkkkko....",
+			"....oooooooo....",
+			],
+			"flower_bed_red": [
+			"................",
+			"..oooooooooooo..",
+			".ommmmmmmmmmmmo.",
+			".omrmmmhmmrmmmo.",
+			".orcrmhrhrcrmmo.",
+			".omrhmrcrmrhmmo.",
+			".omhmmhrhmhmmMo.",
+			".ommrmmhmmmrmMo.",
+			".omrcrmmmmrcrMo.",
+			".omhrhmrmmhrhMo.",
+			".ommhmrcrmmhmMo.",
+			".omMMmhrhmMMMMo.",
+			".oMMMMMhMMMMMMo.",
+			"..oooooooooooo..",
+			"................",
+			"................",
+			],
+			"oak_sapling": [
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			".......o.o......",
+			"......oioho.....",
+			"......ohtio.....",
+			".......oto......",
+			".......oto......",
+			"......omtmo.....",
+			".....ommmmmo....",
+			"......ooooo.....",
+			],
+			"oak_sapling_1": [
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			".......ooo......",
+			"......oiiho.....",
+			".....oihhhho....",
+			".....ohihhHo....",
+			"......ohhHo.....",
+			".......oto......",
+			".......oto......",
+			".......oto......",
+			"......omtmo.....",
+			".....ommmmmo....",
+			"......ooooo.....",
+			],
+			"oak_sapling_2": [
+			"................",
+			".....oooooo.....",
+			"....oiiihhho....",
+			"...oiihihhhho...",
+			"..oiihhhihhhHo..",
+			"..oihhihhhhhHo..",
+			"..ohhhhhhihHHo..",
+			"..ohhihhhhhHHo..",
+			"...ohhhhHhHHo...",
+			"....oHHtHHHo....",
+			".....ootooo.....",
+			".......oto......",
+			".......oto......",
+			"......ootoo.....",
+			".....ommtmmo....",
+			"......oooooo....",
+			],
+			"hand": [
+			"................",
+			".....oo.oo......",
+			"....onnonno.oo..",
+			"....onnonnoonno.",
+			".oo.onnonnoonno.",
+			"onnoonnonnoonno.",
+			"onnoonnnnnnnnno.",
+			"onnnonnnnnnnnno.",
+			".onnnnnnnnnnnno.",
+			".onnnnnnnnnnnNo.",
+			"..onnnnnnnnnnNo.",
+			"..onnnnnnnnnNNo.",
+			"...onnnnnnnNNo..",
+			"....oNNNNNNNo...",
+			"....oNNNNNNNo...",
+			".....ooooooo....",
+			],
+		},
+		"made": {
+			"lamp_post": ["lamp_post_lit", "swap", {"F": "s", "f": "g"}],
+			"flower_bed_yellow": ["flower_bed_red", "swap", {"r": "y", "c": "f"}],
+			"flower_bed_blue": ["flower_bed_red", "swap", {"r": "b"}],
+			"cherry_sapling": ["oak_sapling", "swap", {"i": "P"}],
+			"cherry_sapling_1": ["oak_sapling_1", "swap", {"i": "P", "h": "p", "H": "q"}],
+			"cherry_sapling_2": ["oak_sapling_2", "swap", {"i": "P", "h": "p", "H": "q"}],
 		},
 	},
 }
@@ -3488,6 +3680,8 @@ static func frames_of(sprite: Dictionary) -> Dictionary:
 		var from: Array = frames[made[frame_name][0]]
 		if made[frame_name][1] == "breathe":
 			frames[frame_name] = sink(from, int(sprite["sink_row"]))
+		elif made[frame_name][1] == "swap":
+			frames[frame_name] = swap(from, made[frame_name][2])
 		else:
 			frames[frame_name] = blink(from, str(sprite["lid"]), str(sprite["shut"]))
 	return frames
@@ -3499,6 +3693,17 @@ static func sink(rows: Array, row: int) -> Array:
 	for y: int in rows.size():
 		if y != row:
 			out.append(rows[y])
+	return out
+
+
+## `rows` with each colour that `colours` names (a palette key) changed for the one it gives.
+static func swap(rows: Array, colours: Dictionary) -> Array:
+	var out: Array = []
+	for row: String in rows:
+		var line: String = ""
+		for x: int in row.length():
+			line += str(colours.get(row[x], row[x]))
+		out.append(line)
 	return out
 
 

@@ -76,18 +76,41 @@ func build(decor: TileMapLayer) -> int:
 		if kind == "":
 			continue
 		decor.erase_cell(cell)
-		var tree: Sprite2D = Sprite2D.new()
-		tree.name = "%s_%d_%d" % [kind.capitalize(), cell.x, cell.y]
-		tree.texture = texture
-		tree.region_enabled = true
-		tree.region_rect = SceneryAtlas.region(SceneryAtlas.variant(kind, cell))
-		tree.centered = false
-		tree.offset = -SceneryAtlas.FOOT
-		tree.position = foot_of(cell)
-		tree.set_meta(&"kind", kind)
-		add_child(tree)
-		by_cell[cell] = tree
+		_stand(cell, kind, texture)
 	return by_cell.size()
+
+
+## Stands a tree of `kind` (a SceneryAtlas kind) in `cell`, as build() does for a tree of the
+## map: a sapling the hero set down has grown (the Homestead). It only shows the tree: whoever
+## asks sees to it that the cell is filled. Returns it (the one there already, if one is).
+func stand(cell: Vector2i, kind: String) -> Sprite2D:
+	return by_cell[cell] if by_cell.has(cell) else _stand(cell, kind, load(SceneryAtlas.TEXTURE_PATH))
+
+
+## Takes away the tree standing in `cell` (one the hero has taken up again). Returns whether
+## one stood there.
+func fell(cell: Vector2i) -> bool:
+	if not by_cell.has(cell):
+		return false
+	by_cell[cell].free()
+	by_cell.erase(cell)
+	_faded.erase(cell)
+	return true
+
+
+func _stand(cell: Vector2i, kind: String, texture: Texture2D) -> Sprite2D:
+	var tree: Sprite2D = Sprite2D.new()
+	tree.name = "%s_%d_%d" % [kind.capitalize(), cell.x, cell.y]
+	tree.texture = texture
+	tree.region_enabled = true
+	tree.region_rect = SceneryAtlas.region(SceneryAtlas.variant(kind, cell))
+	tree.centered = false
+	tree.offset = -SceneryAtlas.FOOT
+	tree.position = foot_of(cell)
+	tree.set_meta(&"kind", kind)
+	add_child(tree)
+	by_cell[cell] = tree
+	return tree
 
 
 ## Stands a tall pillar on every pillar tile of `layer` (the Height layer, which keeps the tile:

@@ -1,0 +1,24 @@
+{
+	"id": "lamp_post",
+	"station": "workbench",
+	"tab": "place",
+	"order": 8,
+	"needs": [
+		{
+			"item": "iron_bar",
+			"count": 1
+		},
+		{
+			"item": "coal",
+			"count": 1
+		},
+		{
+			"item": "wood",
+			"count": 2
+		}
+	],
+	"makes": {
+		"item": "lamp_post",
+		"count": 1
+	}
+}

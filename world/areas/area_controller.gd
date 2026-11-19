@@ -1702,6 +1702,11 @@ func glows_now() -> Array:
 			var home_glow: Dictionary = (child as Furnishing).glow_now()
 			if not home_glow.is_empty():
 				out.append(home_glow)
+		elif child is PlacedThing:
+			# A lamp post he has set down on his land, from dusk to dawn.
+			var post_glow: Dictionary = (child as PlacedThing).glow_now()
+			if not post_glow.is_empty():
+				out.append(post_glow)
 	if hero_light_radius() > DIM_RADIUS:
 		out.append(Ambience.glow(player.position + Vector2(0, -8), hero_light_radius() * 0.5, Ambience.LAMP, 0.16, true))
 	return out

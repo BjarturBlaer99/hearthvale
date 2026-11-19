@@ -1,0 +1,16 @@
+{
+	"id": "dirt_path",
+	"station": "workbench",
+	"tab": "place",
+	"order": 1,
+	"needs": [
+		{
+			"item": "stone",
+			"count": 1
+		}
+	],
+	"makes": {
+		"item": "dirt_path",
+		"count": 4
+	}
+}

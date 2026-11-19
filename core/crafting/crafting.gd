@@ -12,10 +12,17 @@ extends RefCounted
 ## start. The workbench lists what is known, in `order`; the furnace's recipes (station
 ## "furnace") are what it smelts. This says what is known, what is missing and why a thing
 ## can't be made; GameState makes it. It keeps nothing itself.
+## The workbench's list has tabs (the Homestead, phase 2): a recipe's `tab` is "make" (what is
+## made for use: the list as it always was; a recipe that names none is here) or "place" (what
+## is made to be set down on the hero's land).
 
 const WORKBENCH: String = "workbench"
 const FURNACE: String = "furnace"
 const STATIONS: Array[String] = [WORKBENCH, FURNACE]
+## The workbench's tabs, in the order they are shown.
+const TAB_MAKE: String = "make"
+const TAB_PLACE: String = "place"
+const TABS: Array[String] = [TAB_MAKE, TAB_PLACE]
 ## The flag that says a furnishing has been made: "home/furnace".
 const FURNISHED_FLAG: String = "home/%s"
 ## Why a thing can't be made.
@@ -37,6 +44,20 @@ static func furnished_flag(furnishing: StringName) -> StringName:
 
 static func station_of(recipe: Dictionary) -> String:
 	return str(recipe.get("station", WORKBENCH))
+
+
+## The workbench's tab `recipe` is listed on: the one it names, or "make".
+static func tab_of(recipe: Dictionary) -> String:
+	return str(recipe.get("tab", TAB_MAKE))
+
+
+## Those of `recipes` (data entries) that are on `tab`, in the order they came.
+static func of_tab(recipes: Array, tab: String) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for recipe: Variant in recipes:
+		if typeof(recipe) == TYPE_DICTIONARY and tab_of(recipe) == tab:
+			out.append(recipe)
+	return out
 
 
 ## The recipes of `station` among `recipes` (data entries), in their `order`, then by id.
@@ -159,6 +180,11 @@ static func problems(recipe: Dictionary, item_of: Callable, furnishings: Array, 
 	var out: PackedStringArray = []
 	if recipe.has("station") and not STATIONS.has(str(recipe["station"])):
 		out.append("'station' must be one of: %s." % ", ".join(PackedStringArray(STATIONS)))
+	if recipe.has("tab"):
+		if not TABS.has(str(recipe["tab"])):
+			out.append("'tab' must be one of: %s." % ", ".join(PackedStringArray(TABS)))
+		elif station_of(recipe) != WORKBENCH:
+			out.append("only the workbench's list has tabs.")
 	var makes: Variant = recipe.get("makes")
 	if typeof(makes) != TYPE_DICTIONARY or ((makes as Dictionary).has("item") == (makes as Dictionary).has("furnishing")):
 		out.append("'makes' must name an 'item' or a 'furnishing', one of the two.")

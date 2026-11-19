@@ -5,7 +5,14 @@
 		{ "item": "arrow", "count": 10, "price": 5 },
 		{ "item": "bomb", "count": 3, "price": 8 },
 		{ "item": "bread", "count": 1, "price": 6 },
-		{ "item": "pickaxe", "count": 1, "price": 25 }
+		{ "item": "pickaxe", "count": 1, "price": 25 },
+		{ "item": "fibre", "count": 5, "price": 6 },
+		{ "item": "hedge", "count": 1, "price": 5 },
+		{ "item": "flower_bed_red", "count": 1, "price": 3 },
+		{ "item": "flower_bed_yellow", "count": 1, "price": 3 },
+		{ "item": "flower_bed_blue", "count": 1, "price": 3 },
+		{ "item": "oak_sapling", "count": 1, "price": 10 },
+		{ "item": "cherry_sapling", "count": 1, "price": 30 }
 	],
 	"sells_seeds": true,
 	"buys_crops": true,

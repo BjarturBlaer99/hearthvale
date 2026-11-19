@@ -7,7 +7,9 @@ extends RefCounted
 ## draws these too). A thing that joins its neighbours (Placement.joins) is put together from
 ## its own frame and, toward each neighbour that joins, a rail: "<frame>_n", "<frame>_e" (the
 ## west one is the east one mirrored) and "<frame>_s". One with a "<frame>_v" stands in a run
-## going north and south as that picture (a gate).
+## going north and south as that picture (a gate). A thing that gives light shows "<frame>_lit"
+## while it burns (a lamp post), and a sapling its stage's picture (Placement.frame_of). "hand"
+## is the build bar's first slot.
 
 const SHEET: Texture2D = preload("res://gameplay/art/placed.png")
 const SIZE: Vector2i = Vector2i(16, 16)
@@ -15,6 +17,10 @@ const SIZE: Vector2i = Vector2i(16, 16)
 const FRAMES: Dictionary = {
 	&"dirt_path": 0, &"stone_path": 1, &"wood_path": 2,
 	&"fence": 3, &"fence_e": 4, &"fence_n": 5, &"fence_s": 6, &"gate": 7, &"gate_v": 8,
+	&"wooden_flooring": 9, &"stone_flooring": 10, &"hedge": 11, &"bench": 12, &"lamp_post_lit": 13,
+	&"flower_bed_red": 14, &"oak_sapling": 15, &"oak_sapling_1": 16, &"oak_sapling_2": 17, &"hand": 18,
+	&"lamp_post": 19, &"flower_bed_yellow": 20, &"flower_bed_blue": 21,
+	&"cherry_sapling": 22, &"cherry_sapling_1": 23, &"cherry_sapling_2": 24,
 }
 ## The neighbours a thing joins, as bits: north, east, south, west.
 const NORTH: int = 1
@@ -46,10 +52,12 @@ static func draw(canvas: CanvasItem, frame: StringName, origin: Vector2 = Vector
 
 
 ## The frames that show `item` (a placeable's data) after `age` mornings, joined to the
-## neighbours in `joined` (NORTH | EAST | ...), in the order they are drawn: each
-## [frame, mirrored].
-static func pieces(item: Dictionary, age: int = 0, joined: int = 0) -> Array:
+## neighbours in `joined` (NORTH | EAST | ...), burning if `lit`, in the order they are drawn:
+## each [frame, mirrored].
+static func pieces(item: Dictionary, age: int = 0, joined: int = 0, lit: bool = false) -> Array:
 	var frame: StringName = Placement.frame_of(item, age)
+	if lit and FRAMES.has(StringName("%s_lit" % frame)):
+		frame = StringName("%s_lit" % frame)
 	if not Placement.joins(item):
 		return [[frame, false]]
 	var upright: StringName = StringName("%s_v" % frame)
@@ -70,6 +78,6 @@ static func pieces(item: Dictionary, age: int = 0, joined: int = 0) -> Array:
 
 ## Draws `item` on `canvas` as it lies or stands in a cell whose top-left is `origin`.
 static func draw_thing(canvas: CanvasItem, item: Dictionary, age: int = 0, origin: Vector2 = Vector2.ZERO, joined: int = 0,
-		tint: Color = Color.WHITE) -> void:
-	for piece: Array in pieces(item, age, joined):
+		tint: Color = Color.WHITE, lit: bool = false) -> void:
+	for piece: Array in pieces(item, age, joined, lit):
 		draw(canvas, piece[0], origin, piece[1], tint)

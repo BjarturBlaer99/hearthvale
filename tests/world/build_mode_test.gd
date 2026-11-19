@@ -1,12 +1,13 @@
 extends GdUnitTestSuite
-## Build mode (the Homestead, phase 2, step 2a): B opens it on the hero's land and nowhere
+## Build mode (the Homestead, phase 2): B opens it on the hero's land and nowhere
 ## else. In it he stands still and the clock with him; the mouse points at a cell and the
 ## movement keys move the ghost a cell at a time, no further than the screen shows; the ghost
 ## is green where the thing fits and red where it doesn't, with the reason in words; a left
 ## click sets a thing down and a right click takes one up; the wheel and the keys 1 to 9
 ## choose on the build bar; Tab, Esc or B leave. A fence blocks the moment it is set and frees
 ## its cell the moment it is taken up; a path never blocks; the hero walks through a gate.
-## Nothing is set down outside the mode.
+## Nothing is set down outside the mode. The bar's first slot is the hand, which lifts a thing
+## and sets it down elsewhere (tests/world/placeables_test.gd has the rest of step 2b).
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
@@ -175,9 +176,11 @@ func test_the_build_bar_takes_the_item_bars_place() -> void:
 	farm._process(FRAME)
 	assert_bool(farm.hud.item_bar.visible).override_failure_message("the item bar is out of sight").is_false()
 	assert_bool(farm.hud.build_bar.visible).is_true()
-	assert_array(farm.hud.build_bar.shown_ids()).is_equal([&"fence", &"gate", &"dirt_path", &"stone_path", &"wood_path"])
-	assert_array(Array(farm.hud.build_bar.shown_counts())).is_equal(["12", "2", "8", "8", "8"])
-	assert_int(farm.hud.build_bar.lit_slot()).override_failure_message("the first thing is chosen").is_equal(0)
+	assert_array(farm.hud.build_bar.shown_ids()).override_failure_message("the hand first, then what he carries").is_equal([&"hand", &"fence", &"gate", &"dirt_path", &"stone_path", &"wood_path"])
+	assert_array(Array(farm.hud.build_bar.shown_counts())).is_equal(["", "12", "2", "8", "8", "8"])
+	assert_int(farm.hud.build_bar.lit_slot()).override_failure_message("the first thing he carries is chosen").is_equal(1)
+	assert_that(farm.hud.build_bar.icon_of(farm.hud.build_bar.entries[0])).override_failure_message("the hand has its own picture").is_equal(&"hand")
+	assert_bool(PlacedArt.has(&"hand")).is_true()
 	assert_that(farm.build.chosen).is_equal(&"fence")
 	assert_str(farm.hud.build_words()).is_equal("Fence x12")
 	# The bar sits where the item bar sits.
@@ -195,18 +198,24 @@ func test_the_wheel_and_the_number_keys_choose() -> void:
 	_heard.clear()
 	farm.build._unhandled_input(_wheel(MOUSE_BUTTON_WHEEL_DOWN))
 	assert_that(farm.build.chosen).is_equal(&"gate")
-	assert_int(farm.hud.build_bar.lit_slot()).is_equal(1)
+	assert_int(farm.hud.build_bar.lit_slot()).is_equal(2)
 	assert_str(farm.hud.build_words()).is_equal("Gate x2")
 	farm.build._unhandled_input(_wheel(MOUSE_BUTTON_WHEEL_UP))
 	farm.build._unhandled_input(_wheel(MOUSE_BUTTON_WHEEL_UP))
+	assert_that(farm.build.chosen).override_failure_message("back past the fence to the hand").is_equal(BuildBar.HAND)
+	assert_bool(farm.build.is_hand()).is_true()
+	farm.build._unhandled_input(_wheel(MOUSE_BUTTON_WHEEL_UP))
 	assert_that(farm.build.chosen).override_failure_message("round to the last").is_equal(&"wood_path")
-	assert_array(_heard).override_failure_message("each change of choice is heard").is_equal([&"menu_move", &"menu_move", &"menu_move"])
-	farm.build._unhandled_input(_key(&"slot_3"))
+	assert_array(_heard).override_failure_message("each change of choice is heard").is_equal([&"menu_move", &"menu_move", &"menu_move", &"menu_move"])
+	farm.build._unhandled_input(_key(&"slot_4"))
 	assert_that(farm.build.chosen).is_equal(&"dirt_path")
-	assert_int(farm.hud.build_bar.lit_slot()).is_equal(2)
+	assert_int(farm.hud.build_bar.lit_slot()).is_equal(3)
+	farm.build._unhandled_input(_key(&"slot_1"))
+	assert_that(farm.build.chosen).override_failure_message("1 is the hand").is_equal(BuildBar.HAND)
+	farm.build._unhandled_input(_key(&"slot_4"))
 	# The slot it is on already, and a slot with nothing in it, change nothing.
 	_heard.clear()
-	farm.build._unhandled_input(_key(&"slot_3"))
+	farm.build._unhandled_input(_key(&"slot_4"))
 	farm.build._unhandled_input(_key(&"slot_8"))
 	assert_that(farm.build.chosen).is_equal(&"dirt_path")
 	assert_array(_heard).is_empty()
@@ -222,11 +231,22 @@ func test_the_ghost_starts_before_him_and_the_keys_move_it_a_cell_at_a_time() ->
 	for step: Array in [[&"move_right", Vector2i(32, 13)], [&"move_up", Vector2i(32, 12)], [&"move_left", Vector2i(31, 12)], [&"move_down", Vector2i(31, 13)]]:
 		farm.build._unhandled_input(_key(step[0]))
 		assert_that(farm.build.cell).override_failure_message(String(step[0])).is_equal(step[1])
-	# A key held repeats, as it does in a menu.
-	var held: InputEventAction = _key(&"move_right")
+	# A key held down repeats: the keyboard's own echo of it moves the ghost on.
+	var held: InputEventKey = InputEventKey.new()
+	held.physical_keycode = KEY_D
+	held.pressed = true
+	farm.build._unhandled_input(held)
+	assert_that(farm.build.cell).is_equal(Vector2i(32, 13))
+	held.echo = true
 	farm.build._unhandled_input(held)
 	farm.build._unhandled_input(held)
-	assert_that(farm.build.cell).is_equal(Vector2i(33, 13))
+	assert_that(farm.build.cell).override_failure_message("two echoes, two cells").is_equal(Vector2i(34, 13))
+	var up: InputEventKey = InputEventKey.new()
+	up.physical_keycode = KEY_W
+	up.pressed = true
+	up.echo = true
+	farm.build._unhandled_input(up)
+	assert_that(farm.build.cell).is_equal(Vector2i(34, 12))
 	assert_that(farm.player.motor.cell).override_failure_message("the hero is where he was").is_equal(START)
 
 
@@ -347,7 +367,7 @@ func test_the_ghost_is_green_where_it_fits_and_red_with_the_reason_where_not() -
 	assert_bool(farm.build.is_road(DOORSTEP)).is_true()
 	assert_str(Placement.why_not(DataRegistry.get_item(&"fence"), farm.build.site_at(DOORSTEP))).is_equal(Placement.ROAD_WORDS)
 	# A lying thing may go under his feet; nothing may go on the road, whatever it is.
-	farm.build.choose_slot(2)
+	farm.build.choose_slot(3)
 	assert_that(farm.build.chosen).is_equal(&"dirt_path")
 	farm.build.point_at(farm.player.motor.cell)
 	assert_bool(farm.build.fits()).override_failure_message("a path under the hero").is_true()
@@ -361,18 +381,18 @@ func test_a_cell_takes_one_lying_thing_and_one_standing() -> void:
 	var farm: AreaController = _farm()
 	farm.open_build()
 	farm.build.point_at(YARD)
-	farm.build.choose_slot(3)
+	farm.build.choose_slot(4)
 	assert_bool(farm.build.set_down()).override_failure_message("a stone path").is_true()
 	assert_str(farm.build.why_not()).override_failure_message("a second path on it").is_equal(Placement.TAKEN_WORDS)
-	farm.build.choose_slot(2)
+	farm.build.choose_slot(3)
 	assert_str(farm.build.why_not()).override_failure_message("nor a path of another kind").is_equal(Placement.TAKEN_WORDS)
-	farm.build.choose_slot(0)
+	farm.build.choose_slot(1)
 	assert_bool(farm.build.fits()).override_failure_message("a fence on the paved cell").is_true()
 	assert_bool(farm.build.set_down()).is_true()
 	assert_that(GameState.homestead().lying_at(YARD)).is_equal(&"stone_path")
 	assert_that(GameState.homestead().standing_at(YARD)).is_equal(&"fence")
 	assert_str(farm.build.why_not()).is_equal(Placement.TAKEN_WORDS)
-	farm.build.choose_slot(1)
+	farm.build.choose_slot(2)
 	assert_str(farm.build.why_not()).override_failure_message("a gate where a fence stands").is_equal(Placement.TAKEN_WORDS)
 	assert_bool(farm.build.set_down()).is_false()
 	assert_int(GameState.homestead().placed_count()).is_equal(2)
@@ -425,17 +445,17 @@ func test_a_path_never_blocks_and_the_hero_walks_through_a_gate() -> void:
 	var farm: AreaController = _farm()
 	farm.open_build()
 	# A fence line across row 13 east of him, with a gate in it, and a path leading through.
-	farm.build.choose_slot(2)
+	farm.build.choose_slot(3)
 	for x: int in range(31, 35):
 		farm.build.point_at(Vector2i(x, 13))
 		assert_bool(farm.build.set_down()).is_true()
 		assert_bool(farm.terrain.is_occupied(Vector2i(x, 13))).override_failure_message("a path is walked on").is_false()
-	farm.build.choose_slot(1)
+	farm.build.choose_slot(2)
 	farm.build.point_at(Vector2i(32, 13))
 	assert_bool(farm.build.set_down()).override_failure_message("a gate on the path").is_true()
 	assert_bool(farm.terrain.is_occupied(Vector2i(32, 13))).override_failure_message("a gate lets the hero through").is_false()
 	assert_bool(farm.placed.standing_node(Vector2i(32, 13)).blocks()).is_false()
-	farm.build.choose_slot(0)
+	farm.build.choose_slot(1)
 	farm.build.point_at(Vector2i(32, 12))
 	assert_bool(farm.build.set_down()).is_true()
 	farm.build.close()
@@ -481,45 +501,69 @@ func test_taking_up_gives_the_item_back_and_a_full_pack_refuses() -> void:
 	assert_that(GameState.homestead().standing_at(YARD)).is_equal(&"")
 
 
-func test_the_last_of_a_thing_leaves_the_bar_and_the_next_is_chosen() -> void:
+func test_the_last_of_a_thing_leaves_the_bar_and_the_hand_is_chosen() -> void:
 	GameState.add_item(&"gate", 1)
 	GameState.add_item(&"dirt_path", 2)
 	var farm: AreaController = _farm()
 	farm.open_build()
-	assert_that(farm.build.chosen).is_equal(&"gate")
+	assert_that(farm.build.chosen).override_failure_message("the first thing he carries").is_equal(&"gate")
 	farm.build.point_at(YARD)
 	assert_bool(farm.build.set_down()).is_true()
-	assert_array(farm.hud.build_bar.shown_ids()).is_equal([&"dirt_path"])
-	assert_that(farm.build.chosen).override_failure_message("the next thing on the bar").is_equal(&"dirt_path")
+	assert_array(farm.hud.build_bar.shown_ids()).is_equal([&"hand", &"dirt_path"])
+	assert_that(farm.build.chosen).override_failure_message("the hand, so the next click sets nothing else down").is_equal(BuildBar.HAND)
+	assert_int(farm.hud.build_bar.lit_slot()).is_equal(0)
+	farm.build.choose_slot(1)
 	for x: int in [34, 35]:
 		farm.build.point_at(Vector2i(x, 12))
 		assert_bool(farm.build.set_down()).is_true()
-	# Nothing left to set down: the bar is empty, the ghost a pointer, and a click sets nothing.
-	assert_that(farm.build.chosen).is_equal(&"")
-	assert_array(farm.hud.build_bar.shown_ids()).is_empty()
-	assert_str(farm.hud.build_words()).is_equal("You carry nothing to set down.")
-	assert_bool(farm.hud.build_refused()).is_false()
+	# Nothing left to set down: the bar is the hand alone, and a click on bare ground does nothing.
+	assert_that(farm.build.chosen).is_equal(BuildBar.HAND)
+	assert_array(farm.hud.build_bar.shown_ids()).is_equal([&"hand"])
 	farm.build.point_at(Vector2i(36, 12))
+	assert_str(farm.hud.build_words()).is_equal("The hand lifts a thing to move it.")
+	assert_bool(farm.hud.build_refused()).is_false()
 	_heard.clear()
 	assert_bool(farm.build.set_down()).is_false()
 	assert_array(_heard).contains_exactly([&"nope"])
 	assert_that(GameState.homestead().thing_at(Vector2i(36, 12), Placement.LYING)).is_equal(&"")
-	# He can still take things up, and what he takes up is on the bar again, chosen.
+	assert_object(farm.build.lifted).is_equal({})
+	# He can still take things up, and what he takes up is on the bar again. The hand stays chosen.
 	farm.build.point_at(YARD)
 	assert_bool(farm.build.take_up()).is_true()
-	assert_that(farm.build.chosen).is_equal(&"gate")
-	assert_array(farm.hud.build_bar.shown_ids()).is_equal([&"gate"])
+	assert_that(farm.build.chosen).is_equal(BuildBar.HAND)
+	assert_array(farm.hud.build_bar.shown_ids()).is_equal([&"hand", &"gate"])
 	# What was chosen is remembered when he comes back to it.
+	farm.build.choose_slot(1)
 	farm.build.close()
 	GameState.add_item(&"fence", 3)
 	farm.open_build()
 	assert_that(farm.build.chosen).is_equal(&"gate")
+	farm.build.choose_slot(0)
+	farm.build.close()
+	farm.open_build()
+	assert_that(farm.build.chosen).override_failure_message("the hand too").is_equal(BuildBar.HAND)
+
+
+func test_with_nothing_to_set_down_the_mode_opens_on_the_hand() -> void:
+	var farm: AreaController = _farm()
+	assert_bool(farm.open_build()).override_failure_message("it opens with an empty pack: there may be things to move").is_true()
+	assert_that(farm.build.chosen).is_equal(BuildBar.HAND)
+	assert_array(farm.hud.build_bar.shown_ids()).is_equal([&"hand"])
+	assert_array(Array(farm.hud.build_bar.shown_counts())).is_equal([""])
+	assert_str(farm.hud.build_words()).is_equal("The hand lifts a thing to move it.")
 
 
 func test_nothing_is_set_down_outside_the_mode() -> void:
 	GameState.add_item(&"wooden_sword")
 	_stock()
 	var farm: AreaController = _farm()
+	# The mode has been open, a fence is chosen and the ghost is on open ground: shut, it is
+	# as if it had never been.
+	farm.open_build()
+	assert_that(farm.build.chosen).is_equal(&"fence")
+	assert_bool(farm.build.fits()).is_true()
+	farm.build.close()
+	_changes = 0
 	farm._process(FRAME)
 	# In play the mouse is two buttons: a left click swings the sword, a right click finds
 	# nothing to do, and the wheel and the number keys are the item bar's. Nothing is set down.
@@ -557,7 +601,7 @@ func test_standing_things_are_sorted_with_the_hero_and_lying_things_lie_under_ev
 	farm.open_build()
 	farm.build.point_at(YARD)
 	farm.build.set_down()
-	farm.build.choose_slot(2)
+	farm.build.choose_slot(3)
 	farm.build.point_at(YARD + Vector2i.RIGHT)
 	farm.build.set_down()
 	farm.build.close()
@@ -591,10 +635,10 @@ func test_what_is_set_down_is_there_after_a_save() -> void:
 	for cell: Vector2i in fences:
 		farm.build.point_at(cell)
 		assert_bool(farm.build.set_down()).is_true()
-	farm.build.choose_slot(1)
+	farm.build.choose_slot(2)
 	farm.build.point_at(Vector2i(35, 12))
 	farm.build.set_down()
-	farm.build.choose_slot(3)
+	farm.build.choose_slot(4)
 	for cell: Vector2i in [Vector2i(33, 12), Vector2i(33, 13)]:
 		farm.build.point_at(cell)
 		assert_bool(farm.build.set_down()).is_true()
@@ -657,7 +701,7 @@ func test_cleared_ground_can_be_built_on_and_what_lies_there_is_not_shut_in() ->
 	# The fibre they left lies there: a fence would shut it in, a path may go under it.
 	assert_bool(farm.build.lies_at(LONE_WEEDS)).is_true()
 	assert_str(farm.build.why_not()).is_equal(Placement.TAKEN_WORDS)
-	farm.build.choose_slot(2)
+	farm.build.choose_slot(3)
 	assert_bool(farm.build.fits()).is_true()
 	farm.build.close()
 	farm.player.motor.place(LONE_WEEDS)
@@ -667,7 +711,7 @@ func test_cleared_ground_can_be_built_on_and_what_lies_there_is_not_shut_in() ->
 	farm.player.motor.place(LONE_WEEDS + Vector2i.DOWN)
 	farm.player.sync_from_motor()
 	farm.open_build()
-	farm.build.choose_slot(0)
+	farm.build.choose_slot(1)
 	farm.build.point_at(LONE_WEEDS)
 	assert_bool(farm.build.lies_at(LONE_WEEDS)).is_false()
 	assert_bool(farm.build.set_down()).override_failure_message("cleared and picked up: a fence stands where the weeds stood").is_true()

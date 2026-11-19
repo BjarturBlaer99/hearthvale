@@ -964,6 +964,8 @@ run headless; see CLAUDE.md for the command and gotchas.
   own wares: an item, how many a deal gives, the price), `sells_seeds`, `buys_crops`, and `buys` (the other
   things it pays for: an item and the price of one). Seed prices and what a crop sells for are in
   `data/crops`, so a new crop is on both lists without touching the shop. There is one shop, `tilda`.
+  (Since the Homestead's phase 2 she also sells fibre five at a time, hedges, flower beds and
+  saplings: seven more lines of `sells`, §30.)
 - **What Tilda buys from the quarry** (mining and crafting, phase 3a) is her `buys` list: copper ore 2,
   iron ore 3, gold ore 7, a crystal 10, a copper bar 8, an iron bar 12, a gold bar 25 (a third less than
   first set: the tuning of phase 3). Stone, wood and
@@ -1244,7 +1246,8 @@ Mining (the user's request, 2026-11-17; `docs/progress/mining-crafting-plan.md`,
 Crafting (the user's request, 2026-11-17; `docs/progress/mining-crafting-plan.md`, phase 2). The balance
 pass (phase 3: Tilda buys ore and bars, two favours, eight days played) is §29.
 - **Recipes are data.** A crafting recipe is a file in `data/crafting/` (cooking keeps `data/recipes/`):
-  its `station` (`workbench` or `furnace`), its `order` on that station's list, what it `needs`, what it
+  its `station` (`workbench` or `furnace`), its `tab` at the workbench (`make`, or `place` for what is
+  set down on the homestead, §30; `make` if it names none), its `order` on that list, what it `needs`, what it
   `makes` (an item and a count, or a `furnishing` of the hero's home) and an optional `unlock` (an item
   `found`, or a `skill` at a `level`). `Crafting` (`core/crafting/`, pure) says which are known, what is
   missing, why a thing can't be made, and how a need reads beside what he has ("Stone 12 of 20");
@@ -1359,7 +1362,7 @@ in a shop's data, two favours as data, and a tool that plays the game.
 
 ## 30. The Homestead
 The user's request of 2026-11-17 (`docs/progress/homestead-plan.md`, approved as written), in five phases.
-**Phase 1 is built** (2026-11-18 and 19): the farm and the home's move. **Phase 2 is being built**
+**Phase 1 is built** (2026-11-18 and 19): the farm and the home's move. **Phase 2 is built**
 (2026-11-19): placing things, under "Placing things" below.
 - **The area `homestead`** (`world/areas/homestead/homestead.tscn`, "Your farm") is a map of 40 by 30
   cells, baked by `tools/greybox/build_maps.gd` from a sketch with a legend of its own (below). Woods two
@@ -1466,23 +1469,42 @@ The user's request of 2026-11-17 (`docs/progress/homestead-plan.md`, approved as
     then the village) and that the plot is on the homestead (`PLOT_AREA`). It works the cells with
     nothing standing on them, the clear corner, and fills the can at the pond. It does not clear land.
     Two days at `days=2 speed=4` played through with nothing left out.
-- **Placing things** (phase 2, step 2a; the plan's D12 to D19):
+- **Placing things** (phase 2; the plan's D12 to D19):
   - **A placeable is an item of type `placeable`** (data/items; `docs/data/items.schema.json`). Its
-    stats say what it is on the ground: `layer` (`lying` or `standing`), and for a standing thing
-    `blocks` (true unless said: a gate says false) and `joins` (a fence, a gate). Its `icon` names a
-    frame of `gameplay/art/placed.png` (`PlacedArt.FRAMES`), which is its picture on the ground and on
-    the build bar. `Placement.problems()` checks each as the data loads. **A new placeable is data and
-    a picture.** It is no `Inventory.EQUIPPABLE_TYPES`, so it is never on the item bar.
+    stats say what it is on the ground: `layer` (`lying` or `standing`); for a lying thing `fills`
+    (a path or a floor: it covers its cell and is drawn with a rim); for a standing thing `blocks`
+    (true unless said: a gate says false), `joins` (a fence, a gate), `light` (a lamp post: where,
+    how far, how strong) and `grows` (a sapling: `mornings` and the `tree` it becomes). Its `icon`
+    names a frame of `gameplay/art/placed.png` (`PlacedArt.FRAMES`), which is its picture on the
+    ground and on the build bar. `Placement.problems()` checks each as the data loads. **A new
+    placeable is data and a picture.** It is no `Inventory.EQUIPPABLE_TYPES`, so it is never on the
+    item bar. There are fifteen: three paths, two floors, three flower beds; the fence, the gate, the
+    hedge, the lamp post, the bench, and the oak and cherry saplings.
   - **`Placement`** (`core/homestead/`, pure) says whether a thing fits a cell. The area describes the
     cell as a `site` (`Placement.site()`: on his land, ground to stand on, road, doorstep, field,
     debris, what lies and stands there, someone in it, something lying to be picked up) and
     `Placement.why_not(item, site)` gives the first refusal that holds, in the plan's table's order
     and words, or "".
   - **`Homestead` keeps what is set down** on two layers, a cell to one thing of each: `lying_at()`,
-    `standing_at()`, `set_down()`, `take_up()`, `move()`, `placed(layer)`. It knows nothing of what an
-    item is. **Go through `GameState.set_down(area, cell, item_id)` and `take_up(area, cell, layer)`**
-    (`why_not_take_up()` says why not: nothing there, or no room), which move the item between the pack
-    and the land, refuse anywhere but his land, and emit `EventBus.homestead_changed`.
+    `standing_at()`, `age_at()`, `set_down()`, `take_up()`, `move()`, `placed(layer)`, and `grow()`
+    for a morning. It knows nothing of what an item is. **Go through `GameState.set_down(area, cell,
+    item_id)`, `take_up(area, cell, layer)` and `move_placed(area, from, to, layer)`**
+    (`why_not_take_up()` says why not: nothing there, or no room). The first two move the item
+    between the pack and the land; a move goes through no pack and keeps a sapling's mornings. All
+    three refuse anywhere but his land and emit `EventBus.homestead_changed`. None asks whether the
+    ground fits: that is `Placement`'s, and build mode asks it first.
+  - **A lamp post** (`PlacedThing.is_lit()`, `glow_now()`) is lit while the day's lamps are
+    (`DayClock.lamps_lit`: 18:30 to 06:30): it draws `<frame>_lit`, and the area adds its glow to
+    `glows_now()` with the village lamps' numbers, never flickering. Each is two engine lights (a
+    pool and a glow) of the area's fourteen.
+  - **A sapling** grows by `GameState.start_next_day()`: `Homestead.grow()` adds a morning to
+    everything standing whose item grows (`Placement.growing()`), up to the mornings it takes, and
+    `homestead_changed` is emitted if anything grew. `Placement.stage_of()` picks its picture
+    (`<icon>`, `<icon>_1`, `<icon>_2`); `Placement.is_grown()` says when it is a tree. Then its
+    `PlacedThing` draws nothing and `PlacedThings` stands a tree in its cell with `Scenery.stand()`
+    (the code that stands the map's trees, so it sorts and fades as they do), and fells it
+    (`Scenery.fell()`) when the sapling's item is taken up or moved away. The item that stands there
+    is still the sapling's, so taking it up gives a sapling back.
   - **`PlacedThings`** (`world/areas/placed_things.gd`), a node of the homestead's area, keeps the
     area in step with that on every `homestead_changed`: it draws the lying things flat, just over
     the ground's shading and under everyone; makes a `PlacedThing` (`gameplay/interactables/`) in
@@ -1506,18 +1528,37 @@ The user's request of 2026-11-17 (`docs/progress/homestead-plan.md`, approved as
     - `set_down()` (a left click; the sword's key) and `take_up()` (a right click; the item's key)
       do the work; `step()` and `choose_slot()` choose on the bar (the wheel; 1 to 9); B, Tab and
       Esc `close()`.
+    - **The hand** (`BuildBar.HAND`, the bar's first entry): `set_down()` with it lifts what is
+      under the ghost (`lifted`: its cell, layer and item; nothing changes yet) and, with a thing
+      lifted, moves it to where the ghost is if it fits there (`GameState.move_placed()`), or puts
+      it back on its own cell. `take_up()`, another choice, or `close()` lets it go.
+    - `words()` is the line the HUD shows: the refusal, or "Fence x12", or what the hand would do;
+      `ghost_colour()` is green, red or pale.
     - The ghost is drawn on a canvas layer of its own that follows the camera, under the HUD.
-  - **The build bar** is `BuildBar` (`core/homestead/`, pure: what is on it, the choice, stepping)
-    and `BuildBarView` (`ui/`, the item bar's own drawing with a count in every slot). The HUD shows
-    it with a line of words (`AreaHud.show_build()`, `build_words()`, `build_refused()`).
+  - **The build bar** is `BuildBar` (`core/homestead/`, pure: the hand and then every placeable
+    he carries; the choice as the mode opens and after a thing runs out; stepping) and
+    `BuildBarView` (`ui/`, the item bar's own drawing with the hand's picture and a count in every
+    other slot). The HUD shows it with a line of words (`AreaHud.show_build()`, `build_words()`,
+    `build_refused()`). Longer than nine slots, it moves along with the choice as the item bar does.
+  - **The workbench's tabs** (§28): a crafting recipe's `tab` is `make` (or none) or `place`
+    (`Crafting.TABS`, `tab_of()`, `of_tab()`); `CraftMenu` shows one tab's recipes at a time, opens
+    on "Make", and turns with left and right or a click on a tab's name (`switch_tab()`,
+    `show_tab()`, `tab_under()`), as `ShopMenu` turns its lists. The nine recipes of "Place" are
+    files in `data/crafting/` named for what they make. `GameState.known_crafts()` and `craft()` are
+    as they were: every workbench recipe he knows, of either tab.
+  - **Tilda's wares for the land** (§21) are seven more lines of her `sells`: fibre five at a time,
+    the hedge, the three flower beds and the two saplings. No code changed for them.
   - **The save is still version 6.** The section `homestead` gains `"lying": { "x,y": item id }` and
     `"standing": { "x,y": { "item": id, "age": mornings } }`, each written only when it has something
     in it and read as empty when it is missing. A thing the game doesn't know, or on the wrong layer,
     is left out as it loads.
   - **Sounds and tools:** `set_down` and `take_up` (`make_audio.gd`); `tools/playtest.gd -- build`;
-    capture shots 168 to 171 (`build:<x>,<y>` opens the mode with the ghost on a cell; `yard` shows a
-    yard fenced, gated and paved).
-- **Tests:** `tests/world/build_mode_test.gd` (build mode in the world), `tests/core/homestead/`
+    capture shots 168 to 176 (`build:<x>,<y>:<slot>` opens the mode with the ghost on a cell and a
+    slot chosen; `yard`, `yard_night` and `yard_hand` show a yard hedged, fenced, gated, floored and
+    lit; `saplings`; `place_tab`; `shop_land`). The sprite tool's `"made"` frames may be a `"swap"`
+    of another frame's colours.
+- **Tests:** `tests/world/build_mode_test.gd` (build mode in the world), `tests/world/placeables_test.gd`
+  (the lamp post, saplings and trees, the hand, the tabs, Tilda's wares, a whole yard), `tests/core/homestead/`
   (`Placement`, `BuildBar`, what `Homestead` keeps), `tests/world/homestead_test.gd` (the map and the walk), `tests/world/home_move_test.gd` (the
   doors, waking, the locked cottage, the version 5 save in the world), `tests/world/debris_test.gd` (the
   overgrowth), `tests/world/homestead_tune_test.gd` (the tunes), `tests/autoload/homestead_save_test.gd`,
