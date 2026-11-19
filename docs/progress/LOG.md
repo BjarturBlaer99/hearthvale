@@ -2715,3 +2715,5 @@ The last of phase 1's three steps (`docs/progress/homestead-plan.md`). **The pha
 - **Fibre has no use until phase 3.**
 - **`docs/HOMESTEAD.md`,** an untracked copy of the request, was left as it is.
 - **CLAUDE.md is as it was:** its words for phase 1 (the plan's R2 to R8, R18, R19) are the coordinator's to write, and the phase's report proposes them as built.
+
+**Approved (phase 1).** The coordinator ran the full suite again (977 tests in 130 suites pass), confirmed the four commits and looked at the pictures; shown the summary and the pictures, the user approved phase 1 on 2026-11-19 ("Approve Phase 1"). Nobody has played it by hand. CLAUDE.md's rules now describe the game with phase 1 built. Phase 2 is next.

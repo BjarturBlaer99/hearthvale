@@ -1215,3 +1215,13 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   - **"Quieter" is tested as the sum of a tune's track volumes** in the audio tool's `SONGS`: the
     farm's night tune is under its day tune and under the game's own night tune, and slower than the
     day's. Nobody has listened to either tune: that is the user's to judge.
+- 2026-11-19 — **The Homestead's phase 1 was approved by the user** ("Approve Phase 1"), shown the
+  summary and seventeen pictures; nobody has played it by hand. Nothing was changed at the review. The
+  choices the phase made where the plan was silent are above, under its three steps, and stand.
+- 2026-11-19 — **CLAUDE.md's rules were brought up to date for phase 1 after that approval** (the plan's
+  R2 to R8, R18 and R19), in the words of what was built: the home in the farmhouse, the plot on the
+  homestead, the areas that may be added, the area's own night tune, land cleared for good, and a block
+  for the homestead itself. The passages for phases 2 to 5 (R9 to R17) wait for their phases.
+- 2026-11-19 — **Phase 1 was stopped by the user twice and picked up each time by a fresh subagent**
+  from what was committed and what lay in the working tree; nothing was discarded. The last subagent
+  re-read every test suite the first had moved and planted thirteen bugs, all caught.

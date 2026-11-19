@@ -51,19 +51,20 @@ played again with them. The plan is finished.
 `docs/progress/homestead-plan.md`, approved as written on 2026-11-17):** a farm of the hero's own west
 of the village, in five phases with a stop after each for the user to review: 1 the homestead and the
 home's move, 2 placing things, 3 buildings, 4 animals, 5 balance. **Phase 1 is built (2026-11-19) and
-waits for the user's review:** the lane's west end, the farm's map, the farmhouse as the hero's home,
-the old cottage locked, the field 12 by 6, a pond, save version 6, the story's words, the overgrowth
-(145 things cleared for good, fibre) and the farm's two tunes. Nobody has played it by hand: only the
-tests, and two days by `tools/play_days.gd` at four times speed. Phases 2 to 5 are not built. The plan's
+the user approved it the same day** (shown the summary and the pictures: "Approve Phase 1"): the lane's
+west end, the farm's map, the farmhouse as the hero's home, the old cottage locked, the field 12 by 6,
+a pond, save version 6, the story's words, the overgrowth (145 things cleared for good, fibre) and the
+farm's two tunes. Nobody has played it by hand: only the tests, and two days by `tools/play_days.gd`
+at four times speed. Phases 2 to 5 are not built. The plan's
 thirty numbered decisions are the approved ones: they are at the head of the plan ("What the user has
 decided", which stands in for the `docs/HOMESTEAD-NOTES.md` the request names) and in
 `docs/DECISIONS.md`. Each phase is built by a subagent with a fresh context; **CLAUDE.md is the
 coordinator's to edit, not a phase's** (a phase says in its report what should change here). The rules
-below describe the game as it stands, before the Homestead: where the plan changes one (the home's
-place, the plot in Hearthvale, no new areas, the mouse in build mode, a second furnace), **the plan's
-approved decision is the rule for the phase that builds it,** and the words here follow once that phase
-is reviewed (the plan's R2 to R19). Build nothing beyond the plan's list, and nothing of a later phase
-early. Nothing beyond it is planned: ask before building more.
+below describe the game as it stands, with phase 1 built: where the plan changes one for a later phase
+(the mouse in build mode, what a crafting recipe may make, a second furnace and more chests, a second
+shop, the count of quests), **the plan's approved decision is the rule for the phase that builds it,**
+and the words here follow once that phase is reviewed (the plan's R9 to R17). Build nothing beyond the
+plan's list, and nothing of a later phase early. Nothing beyond it is planned: ask before building more.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -150,9 +151,10 @@ godot --headless --path . --quit-after 30
 godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
-# Start partway through to try one part by hand (scenarios in the script: late, gifts, bram, gate, rest, farm, market, kitchen, home, village, marsh,
-# quarry, deep, craft, warden, crypt, shade, ending). An hour after the name starts at that time of day, energy=<n> with that much energy,
-# and skills=<level> with every skill at that level.
+# Start partway through to try one part by hand (scenarios in the script: late, gifts, bram, gate, rest, kitchen, farm, homestead, market, home,
+# village, marsh, quarry, deep, craft, warden, crypt, shade, ending). An hour after the name starts at that time of day, energy=<n> with that
+# much energy, and skills=<level> with every skill at that level. `farm` starts on the homestead's road above the field; `homestead` arrives
+# by the lane with all three pickaxes (`-- homestead 20:30` for its night tune).
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
 godot --path . -s res://tools/playtest.gd -- warden
 godot --path . -s res://tools/playtest.gd -- village 19:30 energy=12
@@ -161,8 +163,9 @@ godot --path . -s res://tools/playtest.gd -- village 19:30 energy=12
 godot --path . -s res://tools/playtest.gd -- full
 # Eight days played by a script that presses real keys and mouse buttons, from the title's "New game"
 # (about 35 minutes; needs a window). Its save is slot 956, emptied before and after. It writes days.json,
-# play_log.txt and pictures to the folder. speed=4 is a quick trial of the script; "deep" tries the dark
-# floors alone.
+# play_log.txt and pictures to the folder. speed=4 is a quick trial of the script (days=2 speed=4 is the
+# quickest); "deep" tries the dark floors alone. Since the Homestead it works the field's clear corner
+# and does not clear land; the eight days have not been played at life's speed since the move.
 godot --path . -s res://tools/play_days.gd -- <output_dir>
 godot --path . -s res://tools/play_days.gd -- <output_dir> speed=4
 # Repaint the hero's sprite sheet after editing its ASCII art (optional 8x preview), then re-import
@@ -292,7 +295,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   `SaveSystem.current_slot`,** so it points that at a slot of its own, and sets `SaveSystem.leave_delay` to
   0 or the area leaves half a second later. A closing window saves only `get_tree().current_scene`: call
   `SaveSystem.close_requested()` with the area made the current scene to test it.
-- Do not add areas beyond the hero's home and plot unless the user asks.
+- Do not add areas beyond the homestead (`homestead`) and the insides of its buildings (`coop`, `barn`,
+  `shed`, from the Homestead's phase 3) unless the user asks.
 - Do not add a dependency/addon without noting why in `docs/DECISIONS.md`. Allowed now: gdUnit4.
 - Do not write story, dialogue or quest content beyond what the current milestone needs.
 
@@ -302,11 +306,20 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   dungeons, conversations or menus. Outdoors the ambient light is the hour's; lamps are lit from dusk to dawn.
   A test that needs daylight sets the hour itself (a new game starts at dawn). `P2` is built in five steps:
   see `docs/progress/P2-plan.md`.
-- **Home and sleep (P2b):** the hero's home is the area `home` (the thatched cottage west of the weaver's; its
-  inside is baked by `build_maps.gd` like the other houses). Sleeping is the `sleep` effect of the bed's
-  conversation (`data/dialogue/bed.json`): `GameState.sleep()` starts the next day rested, and the area saves.
-  At 02:00 the hero wakes by his bed. **Anything that ends a day saves the game and changes scene:** a test
-  that does it points `SaveSystem.current_slot` at a slot of its own and replaces the area's `travel`.
+- **Home and sleep (P2b; moved by the Homestead):** the hero's home is the area `home` ("Your farmhouse"),
+  the inside of **the farmhouse on the homestead**. Until the Homestead it was the thatched cottage west of
+  the weaver's; the room and every place in it are the same. Its `Doormat` leads to `homestead` /
+  `farmhouse_door` (cell (28, 12), facing south); on the farm the door is `FarmhouseDoor` at (28, 11). The
+  cottage in Hearthvale is empty: its door (`HomeDoor`, at (8, 14)) keeps the hours of a place that is
+  never open (`old_cottage` in `data/rules/hours.json`), so its cell is solid and the area says "The
+  cottage stands empty, and its door is locked." Its entry `home_door` is still in the village's scene and
+  nothing leads to it. Sleeping is the `sleep` effect of the bed's conversation (`data/dialogue/bed.json`):
+  `GameState.sleep()` starts the next day rested, and the area saves. At 02:00, and after a collapse, the
+  hero wakes by his bed in the farmhouse. **Anything that ends a day saves the game and changes scene:** a
+  test that does it points `SaveSystem.current_slot` at a slot of its own and replaces the area's `travel`.
+  **A test that walks out of his door arrives on the homestead, not in the village:** it puts him on the
+  door's cell first (`PlayerMotor.cell_of(home.entry_marker(&"door").position)`, which is (5, 7)) and walks
+  down. **A test that lists the village's doors with hours finds two,** the shop's and the cottage's.
 - **Energy (P2c):** the numbers are in `data/rules/energy.json`, read by `EnergyRules` (`core/energy/`, pure).
   `GameState.energy` is spent by sprinting (while he runs), a swing and a shot; under 25 he is slower, under 10
   he can't sprint, and at zero he collapses and wakes at home with half a bar and a tenth of his coins gone.
@@ -321,12 +334,22 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   (`Villager.present`), so **a test that talks to one sets the hour itself.** Monsters met outdoors at night
   are set up from `NightRules.strengthen()` (`data/rules/night.json`), decided once as the area loads; never
   in dungeons, never bosses. Windows are lit with the lamps (`WindowGlow`), and outdoors at night the tune is
-  `night`. All for show except the door, the villagers and the monsters' numbers.
+  `night`, or the area's own `night_music` where it names one (only the homestead does: `homestead_night`;
+  its day tune is `homestead`, which the farmhouse plays at every hour). All for show except the door, the
+  villagers and the monsters' numbers.
 - **Farming (P3a; `docs/progress/P3-plan.md` has P3's three steps):** the plot is `GameState.farm()`, a pure
   `Farm` (`core/farming/`) in the plot's own cells; the rules are `data/rules/farm.json`. Change it only
   through `GameState.till_soil()` and `water_soil()`, which tell whoever draws it (`EventBus.farm_changed`).
-  It lies in Hearthvale as a `FarmPlot` node (cells 12..17, 18..20): ground to walk on, drawn over the map,
-  **no map re-baked.** The hoe and the can are items of type `tool`; `ToolUse.decide()` (pure) says what a use
+  It lies **on the homestead** as a `FarmPlot` node (cells 22..33, 17..22; the rules' plot is 12 by 6):
+  ground to walk on, drawn over the map. **Hearthvale has no plot** (`village.plot` is null). The plot's
+  own cells (0..5, 0..2), its north-west corner, are clear in every game and are where an older save's soil
+  and crops are; the rest starts overgrown, and **a cell with something on it can't be tilled, watered or
+  sown until it is cleared** ("Clear this first.", `ToolUse.CLEAR_FIRST`; `ToolUse.decide()` takes
+  `blocked`). **A test that tills, plants or waters loads `homestead`, with the plot at `Vector2i(22, 17)`,
+  works cells of the clear corner,** and fills the can at the pond (4..9, 21..24; from (3, 22) facing
+  right). The first row is worked from the grass above it (`PLOT + Vector2i(x, -1)`, facing down). **A hero
+  who walks across the clear corner stops at its edge:** weeds stand at (28, 17..19) and in row 20. The hoe
+  and the can are items of type `tool`; `ToolUse.decide()` (pure) says what a use
   does and the area does it. The can's water is the item `water` (its `ammo`). **Save version 3.**
 - **Crops (P3b):** a crop is a file in `data/crops/` (days, seed, what it gives, prices), read by `Crops`
   (pure); its seed is an item of type `seed` and its harvest an ordinary `food` item, so **a new crop is data
@@ -403,6 +426,14 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     ladder is `GameState.mine_roll()`: a shuffle from the save's own number, the day and the floor
     (`MineRolls`). **A test that wants a known roll sets `GameState.mine().number`** (a new game's is
     random). A broken rock stays broken until morning: go through `GameState.break_rock()`.
+    **On the homestead a rock is broken for good:** it goes through `GameState.clear_debris(area, cell)`,
+    which keeps its cell in `GameState.homestead()`, and no morning brings it back. Its kind is not
+    rolled: it is `rock`, `boulder` or `great_boulder` of `data/rules/homestead.json` (read by
+    `HomesteadRules`), by the marker it was baked from, so `GameState.mine().number` changes nothing
+    there. A boulder wants the Copper Pickaxe (three blows, or two of the Iron) and a great boulder the
+    Iron (three); a lesser pickaxe is told "It wants a better pickaxe." (`ToolUse.PICK_WEAK`) and spends
+    nothing. A plain rock takes two blows of the plain pickaxe. Each leaves stone (1, 4, 8) lying as an
+    `ItemDrop`, and is no practice at mining.
   - **Only the pickaxe breaks a rock,** from the item button or a left click facing it. **A test that
     breaks one equips the pickaxe, faces the rock, calls `use_item()`, and lets the blow finish** (forty
     frames of `player.motor.step(Vector2.ZERO, FRAME)`) before the next: two blows for stone, copper and
@@ -424,7 +455,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **Save version 5** (the mine's number and today's broken rocks). The fixture
     `tests/fixtures/saves/v4_before_the_mine.json` was written by the game as it stood before the mine.
 
-- **Crafting (2026-11-17; `docs/progress/mining-crafting-plan.md`, TECH_DESIGN §28):** made at home.
+- **Crafting (2026-11-17; `docs/progress/mining-crafting-plan.md`, TECH_DESIGN §28):** made at home, in
+  the farmhouse.
   - **A crafting recipe is a file in `data/crafting/`** (cooking keeps `data/recipes/`): its `station`
     (`workbench` or `furnace`), `order`, `needs`, `makes` (an item, or a `furnishing`) and an optional
     `unlock` (an item `found`, or a `skill` and `level`). `Crafting` (`core/crafting/`, pure) says what
@@ -433,11 +465,12 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **What he has ever held is `GameState.found`:** `add_item()` marks it whenever a count goes up, so
     **a test that wants a recipe unknown must never have added the item it waits on,** even to take it
     away again. A skill recipe wants the level: `GameState.skill_points[Skills.MINING] = 10` is level 2.
-  - **A furnishing is the flag `home/<id>` and a `Furnishing` node with a fixed place** in the
-    cottage's scene: the workbench (always there) at cell (9, 3), the furnace (6, 2), the chest (2, 2),
-    the lamp (4, 2), the rug (2..3, 4). **A test that wants one sets
+  - **A furnishing is a flag and a `Furnishing` node with a fixed place** in a room's scene. In the
+    farmhouse (`home.tscn`, flags `home/<id>`): the workbench (always there) at cell (9, 3), the
+    furnace (6, 2), the chest (2, 2), the lamp (4, 2), the rug (2..3, 4). **A test that wants one sets
     `Crafting.furnished_flag(&"furnace")` or crafts it,** and stands at it with
-    `Steps.stand_before(home, "Furnace")`. Do not move one, or anything that stood in the cottage.
+    `Steps.stand_before(home, "Furnace")`. Do not move one, or anything that stood in that room: it is
+    the old cottage's room, cell for cell. **A furnishing is never set down by hand.**
   - **The workbench's list** is `hud.craft_menu` (`AreaController.open_craft()`): `entries()`,
     `shown_lines()`, `greyed_lines()`, `need_lines()`, `confirm()`. Greyed lines are on a second label
     in the same place (`bright_lines()` is what the bright one shows).
@@ -452,7 +485,12 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **Wood:** branches and stumps are breakables with `"returns": "daily"`; a stump has `"hits": 3`.
     Cut, a flag `cut/<area>/<x>,<y>` keeps the day: **a test that wants it back sets the next day
     (`GameState.start_next_day()`) and loads the area again.** Grass and pots are back on every visit,
-    as before.
+    as before. **On the homestead what the sword clears is gone for good** (the breakables `weeds`,
+    `bush`, `log` and `farm_stump`, whose data says `"returns": "never"`; their cells are kept in
+    `GameState.homestead()`, not in flags). **A test that wants one back starts a new game.** A swing
+    cuts everything in its arc, so **a test that counts blows uses one that stands alone:** weeds
+    (36, 5), a bush (7, 17), a log (7, 4), a stump (24, 2), a rock (3, 4). Boulders: (14, 7), (5, 9),
+    (7, 14). Great boulders: (11, 21), (13, 21).
   - **Tool tiers** are items of their own whose stats say `reach` (hoe, can) or `fewer_blows`
     (pickaxe). The cell he faces decides whether the stroke is made; energy and the pour are paid
     once. **A test that uses a tool twice lets the first use finish** (forty frames of
@@ -489,3 +527,40 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     `GameState.skill_points[Skills.MINING]`. Twenty-five rocks of ore are level 3.
   - **Floors 4, 5 and 6 have 3 iron and 2 coal rocks each** (they had 4 coal until the tuning).
   - **Do not** change a price, a count or a skill's numbers for balance without the user's word.
+
+- **The Homestead, phase 1 (2026-11-19; `docs/progress/homestead-plan.md`, TECH_DESIGN §30):** the area
+  `homestead` ("Your farm", 40 by 30), west of the village by the lane's west end (`WestRoad` in the
+  village at (0, 16..17), `EastRoad` on the farm at (39, 14..15); he arrives at (38, 14) on the farm and
+  (1, 16) in the village). The farmhouse is (26..31, 8..11) with its door at (28, 11); the field is
+  (22..33, 17..22); the pond is (4..9, 21..24). No villagers, monsters, critters or forage.
+  - **`GameState.homestead()`** is a pure `Homestead` (`core/homestead/`): the cells cleared for good. Go
+    through `GameState.clear_debris(area, cell)` and ask with `is_debris_cleared(area, cell)`: both
+    answer "no" for any area but the land (`GameState.homestead_rules().is_land()`).
+    `EventBus.homestead_changed` tells whoever draws it.
+  - **Debris** is weeds, bushes, logs and stumps (breakables that never return) and rocks, boulders and
+    great boulders (`Rock` nodes). 145 stand in a new game, 54 of them on the field.
+    `AreaController.debris()` is what still stands and `debris_at(cell)` what stands in a cell; each
+    fills its cell until cleared. **A test that clears one equips the sword or the right pickaxe, faces
+    it, and lets each blow finish** (forty frames; for the sword call `player.sync_from_motor()` and
+    `resolve_combat()` each frame, as `tests/world/debris_test.gd` does).
+  - **Where each stands is a spawn marker baked from the map's sketch** (`"marks"` in `build_maps.gd`; a
+    sketch may have a `"legend"` of its own). The land's markers are a row of their own at the end of
+    the atlas (`GreyboxTiles.LAND_MARKER_KINDS`).
+  - **Fibre** is the item `fibre`, a material that stacks to 50; nothing uses it until phase 3. A test
+    that lists every item or every breakable carries it and the four new breakables.
+  - **Save version 6** (the section `homestead`: `{"cleared": ["x,y", ...]}`). The fixture
+    `tests/fixtures/saves/v5_in_the_old_cottage.json` was written by the game as it stood before the
+    Homestead. A test that reads a save's version carries 6.
+  - **Two more tunes:** `Audio.MUSIC` and the audio tool's `SONGS` both list `homestead` and
+    `homestead_night`.
+  - **The main quest's words are measured against the quest log's box**
+    (`tests/world/story_days_test.gd`), not counted to 150 letters: a stage must end above the line of
+    help and be no longer than 200.
+  - **In a capture shot the hero hides anything in the cell north of him:** he is two cells tall.
+    `tools/capture.gd`'s shots end at 167; its title shot reads (only reads) the player's slot 1 for its
+    "Continue" line.
+  - **A subagent's scratch folder may hold an earlier subagent's files:** work in a subfolder of your
+    own, and never run a script there you did not just write.
+  - **Do not** let anything cleared come back, put debris on the field's clear corner, the road, the
+    path or the row before the farmhouse, change a count, a blow or a drop of the overgrowth without the
+    user's word, or add monsters, villagers or forage to the homestead: each was decided with the plan.

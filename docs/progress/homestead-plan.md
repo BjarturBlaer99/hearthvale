@@ -30,8 +30,11 @@ which does not exist. The coordinator adds to it after each review.
   after step 3a is not decided: the coordinator asks before phase 3 begins.
 - **CLAUDE.md:** the paragraph R1 was added under "Current goal" on approval. R2 to R19 are added by the
   coordinator as each phase is built and reviewed, in the words below unless the phase built otherwise.
+  **R2 to R8, R18 and R19 went in on 2026-11-19, after phase 1's approval, in the words of what was
+  built** (baked cells and real names; the phase's report gave them and the coordinator checked the
+  names against the code). R9 to R17 wait for phases 2 to 5.
 - **2026-11-19, phase 1 is built** (steps 1a and 1b on 2026-11-18, step 1c finished on 2026-11-19;
-  each is ticked below with what was built differently) **and waits for the user's review.** *(Written
+  each is ticked below with what was built differently) **and the user approved it on 2026-11-19** ("Approve Phase 1", shown the summary and the pictures; nobody has played it by hand). *(Written
   by the phase's subagent; the coordinator ran the full suite again, 977 tests in 130 suites, and
   confirmed the commits and the pictures. The phase was stopped by the user twice and picked up again
   each time.)* Every approved decision it touches
