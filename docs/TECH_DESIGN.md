@@ -806,7 +806,9 @@ run headless; see CLAUDE.md for the command and gotchas.
     with a diamond in the middle. `bracket_arms()`, `rule_parts()` and `diamond_rows()` say where, and are tested.
 - **Drawing:** `SpriteSheet.draw(canvas, texture, frame, size, origin, flip_h, white, tint)` draws one frame.
   - Origins are rounded so sprites stay on the pixel grid.
-  - A negative width mirrors it (side views face left).
+  - A negative width mirrors it (side views face left). This engine mirrors a negative-width rectangle
+    in its own place, so the corner stays where it is (`target_of()`; until the tool polish's step 4 it was
+    moved a frame's width right first, and every creature facing right stood off its node).
   - Scripts name frames in dictionaries (`Enemy.SLIME_FRAMES`, `Boss.FRAMES`, `ItemIcons.FRAMES`...), and a test
     checks they match the tool's order.
   - Shadows, glows, sparks, poofs, arrows and the sword's swing stay drawn in code: they're effects, not shapes.
@@ -1569,8 +1571,8 @@ buildings, under "Buildings" below. **Phase 4 is built** (2026-11-19): animals, 
     area changes.
   - **`PlacedArt`** draws a thing: its frame, and for one that joins, a rail toward each neighbour
     that joins too (`<frame>_n`, `<frame>_e`, mirrored for the west, `<frame>_s`); a `<frame>_v` is
-    how it stands in a run going north and south (the gate). It mirrors in place itself:
-    `SpriteSheet.draw()` puts a mirrored frame a frame's width to the right in this engine.
+    how it stands in a run going north and south (the gate). It mirrors in place itself (it did so
+    while `SpriteSheet.draw()` put a mirrored frame a frame's width to the right; that is fixed).
   - **Build mode** is `BuildMode` (`world/areas/build_mode.gd`), a node of the area that only the
     homestead has. `AreaController.open_build()` opens it on the action `build` (B; a pad's left
     stick), when he is free to act; any other area says `Placement.NOT_LAND_WORDS`. Open, it counts

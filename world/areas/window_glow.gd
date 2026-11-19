@@ -10,6 +10,13 @@ const GLASS: Dictionary = {
 	"wall_window": Rect2i(5, 5, 6, 4),
 	"wall_upper_window": Rect2i(5, 4, 6, 7),
 }
+## The windows of the buildings of the hero's land (tool polish, D11): a house's, and the barn's
+## loft with its four panes.
+const BUILDING_GLASS: Dictionary = {
+	"wall_window": Rect2i(5, 5, 6, 4),
+	"wall_upper_window": Rect2i(5, 4, 6, 7),
+	"barn_loft": Rect2i(5, 5, 6, 5),
+}
 const LIGHT: Color = Color(1.0, 0.80, 0.42, 0.88)
 const HALO: Color = Color(1.0, 0.74, 0.36, 0.22)
 
@@ -20,8 +27,7 @@ var lit: bool = false
 
 ## The glow for the windows of `layer`, or null if it has none.
 static func make(layer: TileMapLayer) -> WindowGlow:
-	var glow: WindowGlow = WindowGlow.new()
-	glow.name = "WindowGlow"
+	var glow: WindowGlow = unlit("WindowGlow")
 	for kind: String in GLASS:
 		var cells: Array[Vector2i] = layer.get_used_cells_by_id(GreyboxTiles.SOURCE_ID, GreyboxTiles.coords(kind))
 		cells.sort()
@@ -31,10 +37,23 @@ static func make(layer: TileMapLayer) -> WindowGlow:
 	if glow.windows.is_empty():
 		glow.free()
 		return null
+	return glow
+
+
+## An empty glow named `node_name`, drawn unshaded (the hour's light doesn't dim it).
+static func unlit(node_name: String) -> WindowGlow:
+	var glow: WindowGlow = WindowGlow.new()
+	glow.name = node_name
 	var unshaded: CanvasItemMaterial = CanvasItemMaterial.new()
 	unshaded.light_mode = CanvasItemMaterial.LIGHT_MODE_UNSHADED
 	glow.material = unshaded
 	return glow
+
+
+## Shows `glass` (area px) as its windows, lit or not as it is.
+func set_windows(glass: Array[Rect2]) -> void:
+	windows = glass
+	queue_redraw()
 
 
 ## Lights the windows, or puts them out.

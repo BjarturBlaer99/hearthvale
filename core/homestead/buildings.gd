@@ -207,6 +207,11 @@ static func casts_shadow(building: Dictionary) -> bool:
 	return bool(building.get("shadow", true))
 
 
+## Whether `building`'s windows glow with the lamps once it stands (its data's "lit_at_night").
+static func lit_at_night(building: Dictionary) -> bool:
+	return bool(building.get("lit_at_night", false))
+
+
 ## Its look's blocks: its own, or with `big` its upgrade's (its own if that names none).
 static func look_of(building: Dictionary, big: bool = false) -> Array:
 	if big and has_big(building) and typeof((building["big"] as Dictionary).get("look")) == TYPE_ARRAY:

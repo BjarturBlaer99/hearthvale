@@ -1,6 +1,7 @@
 {
 	"id": "barn",
 	"name": "Barn",
+	"lit_at_night": true,
 	"size": [6, 4],
 	"door": [3, 3],
 	"room": "barn",

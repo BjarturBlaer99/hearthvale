@@ -281,3 +281,18 @@ and three films (`take_wool`, `pet_hen`, `silo_hay`). What building it decided:
 **Step 4 waits for the art switch** (the user, 2026-11-19: "Keep, switch next"): step 3 stays as
 built, the switch to PNG art comes next, and step 4's site twine is then drawn by editing the tile
 atlas PNG, not a tool.
+
+## Step 4 — built (2026-11-19)
+
+After the switch to PNG art (`9231a9e`), as approved:
+- **D9:** `SpriteSheet.draw()` mirrors a frame in its own place (`target_of()`): a window probe measured
+  a 16-pixel frame painted at x 41 to 52 landing at 59 to 70 mirrored, and at 43 to 54 after the fix.
+  The village's hens, side-on goblins, the Warden and the Shade stand on their node facing either way.
+- **D10:** the two site tiles of the atlas PNG (row 28) lost their string and peg (a one-off pixel
+  edit, the dug soil of the same tile put in their place); `BuildingArt.twine()` draws one string round
+  the site's outside, a pixel in from its edge, with a peg of nine pixels at each corner (the old peg's
+  colours).
+- **D11:** a building's data may say `"lit_at_night": true` (the Coop, the Barn, the Shed); once it
+  stands, `PlacedBuildings.glow` (a `WindowGlow`) lights the glass of its windows (a house's, and the
+  barn's loft) with the lamps, from dusk to dawn, as the farmhouse's are. The Well and the Silo have none.
+- Capture shot 208: the farm at night with every building standing.

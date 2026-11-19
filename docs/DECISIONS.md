@@ -1642,3 +1642,8 @@ PNG". What building it decided:
   mipmaps, no 3D detection); the existing `.import` files already match and were not edited.
 - **The master palette is the 256 most-used colours** of all the art (near-twins within two steps
   merged), named by family and by the sheet that uses each most; every sheet has its own exact palette.
+- 2026-11-19 — **Tool polish, step 4: what building it decided.** The mirrored frame is fixed in
+  `SpriteSheet` itself (one place), measured in a window before and after; `PlacedArt` and `Animal`, which
+  mirror themselves, are left as they are. A site's string is drawn in code once round its outside (any
+  size of site), and the tiles lost theirs by an edit of the atlas PNG (the art is PNG now). Which
+  buildings light their windows is data (`lit_at_night`), and the barn's loft counts as a window.

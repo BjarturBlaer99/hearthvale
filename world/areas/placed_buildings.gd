@@ -15,6 +15,8 @@ extends Node2D
 ## - a building with a room that stands has a door (an AreaExit on its door's cell, into its
 ##   room's entry "door") and, under the area's Entries, the entry "<id>_door" on its doorstep,
 ##   where its room's doormat leads: so the door follows the building wherever it stands.
+## - a building whose data says "lit_at_night" (the Coop, the Barn, the Shed) has its windows
+##   glow with the lamps, from dusk to dawn, once it stands (`glow`; tool polish, D11).
 ## Nothing else in the area changes for any of it: no hit box, no collision, no timing.
 ## It sits at the area's origin, just over what lies on the ground.
 
@@ -30,6 +32,9 @@ var _shown: Dictionary[StringName, String] = {}
 var _doors: Dictionary[StringName, AreaExit] = {}
 ## The cells this has filled.
 var _filled: Dictionary[Vector2i, bool] = {}
+## The glow of the standing buildings' windows, lit with the lamps (the area says when).
+## Made in setup(), so one never set up leaves nothing behind.
+var glow: WindowGlow
 
 
 func _init() -> void:
@@ -39,6 +44,8 @@ func _init() -> void:
 ## Takes up the area it is in, and shows what stands there already (a loaded game).
 func setup(area_controller: AreaController) -> void:
 	area = area_controller
+	glow = WindowGlow.unlit("BuildingWindows")
+	add_child(glow)
 	EventBus.homestead_changed.connect(sync)
 	sync()
 
@@ -136,7 +143,26 @@ func sync() -> void:
 	_place_doors()
 	mark_doors(area)
 	_fill_cells()
+	if glow != null:
+		glow.set_windows(window_glass())
 	queue_redraw()
+
+
+## The glass of every window of the standing buildings that light theirs at night (area px).
+func window_glass() -> Array[Rect2]:
+	var out: Array[Rect2] = []
+	var home: Homestead = GameState.homestead()
+	for id: StringName in home.building_ids():
+		var building: Dictionary = DataRegistry.get_building(id)
+		if not GameState.is_built(id) or not Buildings.lit_at_night(building):
+			continue
+		var origin: Vector2i = home.building_at(id) * GreyboxTiles.TILE_SIZE
+		var laid: Dictionary = BuildingArt.tiles(building, GameState.is_big(id), false)
+		for cell: Vector2i in laid:
+			var glass: Variant = WindowGlow.BUILDING_GLASS.get(str(laid[cell]))
+			if glass != null:
+				out.append(Rect2(Vector2(origin + cell * GreyboxTiles.TILE_SIZE + (glass as Rect2i).position), Vector2((glass as Rect2i).size)))
+	return out
 
 
 ## A door on the door's cell of every building with a room that stands, into its room; none

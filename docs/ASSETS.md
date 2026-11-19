@@ -37,7 +37,7 @@ painted each picture from ASCII art written for this game (no outside art) and a
 | `gameplay/art/animals.png` | sheep, cows | code: `make_sprites.gd` | 2026-11-19 | Hearthvale's own |
 | `gameplay/art/torch.png` | torches | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
 | `gameplay/art/placed.png` | things set down on the homestead | code: `make_sprites.gd` | 2026-11-19 | Hearthvale's own |
-| `world/tiles/greybox_tiles.png` | the tile atlas | code: `make_tile_texture.gd` | 2026-11-19 | Hearthvale's own |
+| `world/tiles/greybox_tiles.png` | the tile atlas | code: `make_tile_texture.gd`; the two site tiles (row 28) edited by hand, the string and peg taken out (a script, the tool polish) | 2026-11-19 | Hearthvale's own |
 | `world/tiles/scenery.png` | tall trees | code: `make_scenery.gd` | 2026-11-16 | Hearthvale's own |
 | `world/tiles/relief.png` | wall faces and tops, pillar, ridges | code: `make_relief.gd` | 2026-11-19 | Hearthvale's own |
 | `ui/title/backdrop.png` | the title screen's picture | code: `make_title.gd` | 2026-11-12 | Hearthvale's own |

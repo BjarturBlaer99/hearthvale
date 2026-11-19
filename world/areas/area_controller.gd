@@ -1749,6 +1749,9 @@ func _update_light() -> void:
 		lighting.set_ambient(GameState.daylight())
 	if windows != null:
 		windows.set_lit(GameState.day_clock().lamps_lit(GameState.minute))
+	# The windows of the buildings on his land (tool polish, D11), with the same lamps.
+	if buildings != null and buildings.glow != null:
+		buildings.glow.set_lit(GameState.day_clock().lamps_lit(GameState.minute))
 	var room: Rect2i = RoomGrid.camera_rect(player.motor.cell, room_size, grid.size, GreyboxTiles.TILE_SIZE)
 	lighting.show_lights(scene_lights(), Rect2(room))
 

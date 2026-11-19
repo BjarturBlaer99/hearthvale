@@ -70,7 +70,7 @@ colour within two steps of them anywhere else on the sheet.
 **Drawn in code, not in a PNG:** shadows and soft edges, sparks, bursts, the pour and the ring, the
 sword's blade, lights and darkness, the water's movement and reflections, mist, fireflies, chests,
 dungeon doors, pickups, signposts, plates and push blocks, the boxes' frames, the title's stars and
-window. Their colours are in the code.
+window, a building site's string and pegs, and lit windows. Their colours are in the code.
 
 **Two colours in code match the art:** the grass's soft fringe (`HeightShading.fringe_color()`) and
 the title's sky above the picture (`TitlePicture.SKY_TOP`). Repaint the grass or the sky and change

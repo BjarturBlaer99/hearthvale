@@ -6,12 +6,16 @@ extends RefCounted
 ## barn's planks and doors, the silo), all tiles of the one atlas
 ## (world/tiles/greybox_tiles.png); they are drawn flat on the ground, under everyone, with the shadow a tall
 ## thing casts east and south (HeightShading's), and a roof's ridge rises over its top row as a
-## strip that the hero walks behind (Scenery's, ReliefAtlas). A site is one picture: dug ground
-## pegged out over its cells, and its stack of timber.
+## strip that the hero walks behind (Scenery's, ReliefAtlas). A site is dug ground over its cells
+## with its stack of timber (tiles), pegged out with one string round its outside (twine(), drawn
+## here: tool polish D10; until then each tile carried its own string, and a site read as a grid).
 
 const T: float = float(GreyboxTiles.TILE_SIZE)
 ## The shadow a tall thing casts on the ground (HeightShading's numbers).
 const CAST: float = HeightShading.CAST
+## A site's string, and its peg (a corner of three by three: the post, its light and shade).
+const TWINE: Color = Color("efda98")
+const PEG: Array[String] = ["794a1a", "794a1a", "795930", "794a1a", "b37b40", "74532c", "795930", "74532c", "7b5c33"]
 
 static var _atlas: Texture2D
 static var _relief: Texture2D
@@ -47,6 +51,9 @@ static func draw(canvas: CanvasItem, building: Dictionary, origin: Vector2, big:
 	var laid: Dictionary = tiles(building, big, site)
 	for cell: Vector2i in laid:
 		draw_tile(canvas, str(laid[cell]), origin + Vector2(cell) * T, tint)
+	if site:
+		for piece: Array in twine(size):
+			canvas.draw_rect(Rect2(origin + (piece[0] as Rect2).position, (piece[0] as Rect2).size), piece[1] * tint)
 	if not site:
 		var decor: Dictionary = Buildings.decor_of(Buildings.look_of(building, big))
 		for cell: Vector2i in decor:
@@ -54,6 +61,19 @@ static func draw(canvas: CanvasItem, building: Dictionary, origin: Vector2, big:
 		if ridge:
 			for strip: Dictionary in ridges(building, big):
 				canvas.draw_texture_rect_region(relief(), Rect2(origin + strip["at"], Vector2(ReliefAtlas.RIDGE_SIZE)), strip["region"], tint)
+
+
+## A site's string round the outside of `size` (px) and a peg at each corner, as [rect from the
+## site's top-left, colour]: a line a pixel in from each edge, and the pegs over its ends.
+static func twine(size: Vector2) -> Array[Array]:
+	var out: Array[Array] = [
+		[Rect2(1.0, 1.0, size.x - 2.0, 1.0), TWINE], [Rect2(1.0, size.y - 2.0, size.x - 2.0, 1.0), TWINE],
+		[Rect2(1.0, 1.0, 1.0, size.y - 2.0), TWINE], [Rect2(size.x - 2.0, 1.0, 1.0, size.y - 2.0), TWINE],
+	]
+	for corner: Vector2 in [Vector2.ZERO, Vector2(size.x - 3.0, 0.0), Vector2(0.0, size.y - 3.0), size - Vector2(3.0, 3.0)]:
+		for i: int in PEG.size():
+			out.append([Rect2(corner + Vector2(i % 3, i / 3), Vector2.ONE), Color(PEG[i])])
+	return out
 
 
 ## Draws the atlas tile `kind` on `canvas` with its top-left at `at`.

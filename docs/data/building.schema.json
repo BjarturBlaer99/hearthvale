@@ -37,6 +37,7 @@
         "look": { "$ref": "#/$defs/look" }
       }
     },
+    "lit_at_night": { "type": "boolean", "default": false, "description": "Whether its windows glow with the lamps, from dusk to dawn, once it stands (tool polish, D11): the Coop, the Barn and the Shed." },
     "shadow": { "type": "boolean", "default": true, "description": "Whether it casts a tall thing's shadow east and south, as the farmhouse does (the Well, which is low, says false)." },
     "look": { "$ref": "#/$defs/look" }
   },

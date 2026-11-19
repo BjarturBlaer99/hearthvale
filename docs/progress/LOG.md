@@ -3217,3 +3217,34 @@ connected" from the Warden and the Shade: older than this change, and harmless t
 - **Pivots are listed, not tested,** but for the hero's and villagers' feet and the trees' trunks.
 - **The capture runs' "already connected" errors** (the Warden and the Shade) are older than the
   switch and were left alone.
+
+## 2026-11-19 — Tool polish, step 4: the unfinished looks
+
+The user approved the switch to PNG art ("Approve, do step 4"). Step 4 (D9 to D11), the tool
+polish's last:
+- **Mirrored frames in their own place (D9):** `SpriteSheet.draw()` drew a mirrored frame a frame's
+  width to the right. A window probe drew the village's hen, a side-on goblin, the Warden and the
+  Shade facing both ways over a line at their node: before, each facing right stood off its line (a
+  16-pixel frame painted at x 41 to 52 landed at 59 to 70); after, on it (43 to 54).
+  `SpriteSheet.target_of()` keeps the corner; `PlacedArt` and `Animal` mirror themselves, as before.
+- **The site's string round its outside (D10):** the two site tiles of the atlas PNG lost their string
+  and peg (a one-off pixel edit: the art is PNG); `BuildingArt.twine()` draws one string a pixel in
+  from the site's edge with a peg at each corner. A site reads as one pegged plot, not a grid.
+- **Windows lit at night (D11):** `"lit_at_night": true` in the Coop's, the Barn's and the Shed's
+  data (schema too); `PlacedBuildings.glow` lights their windows' glass (a house window, the barn's
+  loft) with the lamps, from dusk to dawn, once the building stands. Capture shot 208 shows the farm at
+  22:00.
+
+**Verified:** 1168 tests in 157 suites pass, exit 0. New: `tests/world/unfinished_looks_test.gd` (a
+mirrored frame keeps its corner; the string lies along the edges, four sides and four pegs, and the
+site tiles have none; which buildings light their windows; the coop's window, dark as a site, lit at
+22:00 and dark at noon).
+
+**In a window:** the mirror probe before and after (a few seconds each), capture shots 1, 180, 181
+and 208 (about twenty seconds). No save but the capture's slot 994.
+
+**Known issues and limits**
+- **The site's soil repeats one tile,** now that no string breaks it up.
+- **The windows are lit whenever the lamps are,** whether or not anyone is in the building (the animals
+  are, by night).
+- **The tool polish is finished:** all four steps built. Nobody has played any of it by hand.

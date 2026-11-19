@@ -109,7 +109,7 @@ in `docs/DECISIONS.md` are superseded.
 - **Drawn in code, and kept in code:** shadows, cast shadows and soft edges (`HeightShading`), bursts
   and sparks, the sword's blade, lights and darkness (`AreaLighting`, `Ambience`), the water's movement
   and reflections, mist, the boxes' frames (`PanelFrame`), villager recolouring, the title's stars,
-  window and petals, and the things outlined in `PixelGrade.INK` (chests, doors, pickups). Two colours
+  window and petals, a building site's string and pegs (`BuildingArt.twine()`), lit windows, and the things outlined in `PixelGrade.INK` (chests, doors, pickups). Two colours
   in code match the art and change with it: the grass's fringe (`HeightShading.fringe_color()`) and
   the title's sky (`TitlePicture.SKY_TOP`).
 - **Sound and fonts are made in code:** `tools/audio/make_audio.gd` bakes `audio/` (edit the tool,
@@ -597,7 +597,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     (`tests/world/story_days_test.gd`), not counted to 150 letters: a stage must end above the line of
     help and be no longer than 200.
   - **In a capture shot the hero hides anything in the cell north of him:** he is two cells tall.
-    `tools/capture.gd`'s shots end at 207 (168 to 176 are phase 2's, 177 to 191 phase 3's, 192 to 203 phase 4's, 204 to 207 phase 5's); its title shot reads (only reads) the player's slot 1 for its
+    `tools/capture.gd`'s shots end at 208 (168 to 176 are phase 2's, 177 to 191 phase 3's, 192 to 203 phase 4's, 204 to 207 phase 5's, 208 the tool polish's); its title shot reads (only reads) the player's slot 1 for its
     "Continue" line.
   - **A subagent's scratch folder may hold an earlier subagent's files:** work in a subfolder of your
     own, and never run a script there you did not just write.
@@ -653,9 +653,10 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **Tilda sells sixteen wares** (her four, seven for the land, five seeds): turnip seeds are her twelfth
     line (`move_cursor(11)`), and one of everything costs 153 coins. A test that lists every item carries
     the fifteen; `Audio.SFX` and the audio tool list `set_down` and `take_up`.
-  - **`SpriteSheet.draw()` with `flip_h` draws a frame's width to the right in this engine** (measured by
-    phase 2's subagent, not fixed: it is older than the Homestead and wants the user's word). `PlacedArt`
-    mirrors in place itself; the creatures are as they were.
+  - **`SpriteSheet.draw()` with `flip_h` mirrors a frame in its own place** (fixed by the tool polish,
+    2026-11-19: until then it drew a frame's width to the right, and every creature facing right stood
+    off its node). This engine mirrors a negative-width rectangle over its corner's own columns
+    (`SpriteSheet.target_of()`); `PlacedArt` and `Animal` mirror in place themselves, as before.
   - **Do not** put a placeable on the item bar, call `GameState.set_down()` from play, make a lamp post
     flicker or a sapling sway, bump the save's version for what is set down, or change a cost or price of
     the fifteen without the user's word.

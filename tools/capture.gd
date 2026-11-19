@@ -47,7 +47,8 @@ extends SceneTree
 ## workbench's "Place" tab; "shop_land" opens Tilda's list on what she sells for the land.
 ## The Homestead's buildings (phase 3), "b:<what>": "b:tab" opens the workbench's "Build" tab;
 ## "b:ghost:<x>,<y>" opens build mode with the Coop's kit and its ghost held at that cell; "b:site"
-## shows the Coop's site set down; "b:farm" the farm with every building standing (BUILT), as do
+## shows the Coop's site set down; "b:farm" the farm with every building standing (BUILT) ("b:night":
+## the same at 22:00, the windows lit), as do
 ## "b:fill" (the can filled at the Well), "b:hay" (hay put in the Silo), "b:demolish" (the Coop
 ## pulled down with a full stack of wood: half its materials back, what doesn't fit at his feet),
 ## "b:moved" (the Shed moved west, the hero just out of its door) and "b:big" (the Big Coop and
@@ -329,6 +330,8 @@ const SHOTS: Array = [
 	["205_tilda_has_her_eggs", &"shop", Vector2i(5, 4), Vector2.UP, 0, "f:done:tilda"],
 	["206_oda_asks_for_a_coop", &"village", Vector2i(15, 32), Vector2.UP, 0, "f:ask:farmer_oda"],
 	["207_oda_hears_the_coop_stands", &"village", Vector2i(15, 32), Vector2.UP, 0, "f:done:farmer_oda"],
+	# The tool polish, step 4: the buildings' windows lit at night, and a site's string.
+	["208_the_farm_at_night_its_windows_lit", &"homestead", Vector2i(16, 13), Vector2.DOWN, 0, "b:night"],
 ]
 ## What a build shot carries: enough of each thing for a yard, in the order of the build bar.
 const BUILD_STOCK: Array = [[&"fence", 30], [&"gate", 3], [&"dirt_path", 12], [&"stone_path", 20], [&"wood_path", 12],
@@ -870,7 +873,7 @@ func _set_up_buildings(game_state: Node, action: String) -> void:
 		game_state.call(&"add_item", kit, 1)
 		game_state.call(&"set_down_kit", &"homestead", BUILT[id], kit)
 	game_state.call(&"start_next_day")
-	game_state.call(&"set_time", NOON)
+	game_state.call(&"set_time", float((game_state.call(&"day_clock") as RefCounted).call(&"in_day", "22:00")) if action == "b:night" else NOON)
 	if action == "b:big":
 		var land: RefCounted = game_state.call(&"homestead")
 		for id: StringName in [&"coop", &"barn"]:

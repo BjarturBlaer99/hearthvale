@@ -16,11 +16,15 @@ static var _recoloured: Dictionary = {}
 static func draw(canvas: CanvasItem, texture: Texture2D, index: int, size: Vector2i, origin: Vector2,
 		flip_h: bool = false, white: bool = false, tint: Color = Color.WHITE) -> void:
 	var source: Rect2 = Rect2(Vector2(index * size.x, size.y if white else 0), Vector2(size))
-	var target: Rect2 = Rect2(origin.round(), Vector2(size))
-	if flip_h:
-		# A negative width draws the frame mirrored.
-		target = Rect2(origin.round() + Vector2(size.x, 0), Vector2(-size.x, size.y))
-	canvas.draw_texture_rect_region(texture, target, source, tint)
+	canvas.draw_texture_rect_region(texture, target_of(origin, size, flip_h), source, tint)
+
+
+## Where draw() puts a frame of `size` whose top-left is at `origin`: a rectangle with a negative
+## width when `flip_h`, which this engine mirrors in place, over the same columns (measured in a
+## window, 2026-11-19: until then the corner was moved a frame's width right first, and every
+## mirrored creature stood a frame's width to the right of where it was).
+static func target_of(origin: Vector2, size: Vector2i, flip_h: bool) -> Rect2:
+	return Rect2(origin.round(), Vector2(-size.x if flip_h else size.x, size.y))
 
 
 ## `texture` with each marker colour in `swaps` (marker -> colour) replaced, made once per `key`.
