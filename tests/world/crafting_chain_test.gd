@@ -182,7 +182,7 @@ func test_all_that_the_list_is_made_of_comes_from_the_mine_the_fields_or_the_ben
 func test_the_things_crafting_added_are_what_the_plan_says() -> void:
 	# [item, its type, how many a stack holds]: the plan's table of items.
 	var plan: Array = [
-		[&"copper_bar", "material", 20], [&"iron_bar", "material", 20], [&"gold_bar", "material", 20], [&"wood", "material", 30],
+		[&"copper_bar", "material", 20], [&"iron_bar", "material", 20], [&"gold_bar", "material", 20], [&"wood", "material", 50],
 		[&"copper_hoe", "tool", 1], [&"iron_hoe", "tool", 1], [&"copper_watering_can", "tool", 1], [&"iron_watering_can", "tool", 1],
 		[&"copper_pickaxe", "tool", 1], [&"iron_pickaxe", "tool", 1], [&"sprinkler", "sprinkler", 10], [&"miners_lantern", "lantern", 1],
 	]

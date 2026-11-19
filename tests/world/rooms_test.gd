@@ -210,7 +210,7 @@ func test_the_seven_plans_cost_what_the_plan_says_and_are_known_when_it_says() -
 	var table: Array = [
 		[&"well", [["stone", 40], ["wood", 10], ["copper_bar", 1], ["coin", 80]], {"found": "copper_bar"}, Vector2i(2, 2)],
 		[&"silo", [["stone", 30], ["wood", 10], ["copper_bar", 2], ["coin", 100]], {"skill": "farming", "level": 2.0}, Vector2i(2, 2)],
-		[&"coop", [["wood", 30], ["stone", 20], ["fibre", 15], ["coin", 250]], {"found": "wood"}, Vector2i(4, 3)],
+		[&"coop", [["wood", 30], ["stone", 20], ["fibre", 15], ["coin", 150]], {"found": "wood"}, Vector2i(4, 3)],
 		[&"big_coop", [["wood", 20], ["fibre", 10], ["iron_bar", 2], ["coin", 350]], {"built": "coop"}, Vector2i.ZERO],
 		[&"barn", [["wood", 30], ["stone", 40], ["fibre", 25], ["iron_bar", 4], ["coin", 600]], {"skill": "farming", "level": 3.0}, Vector2i(6, 4)],
 		[&"big_barn", [["wood", 30], ["stone", 30], ["gold_bar", 2], ["coin", 800]], {"built": "barn"}, Vector2i.ZERO],
@@ -231,7 +231,7 @@ func test_the_seven_plans_cost_what_the_plan_says_and_are_known_when_it_says() -
 			assert_that(Buildings.size_of(DataRegistry.get_building(row[0]))).is_equal(row[3])
 	assert_array(order).override_failure_message("listed in the table's order").is_equal([1, 2, 3, 4, 5, 6, 7])
 	# The plan's sum of all seven.
-	assert_dict(totals).is_equal({"wood": 160, "stone": 180, "fibre": 65, "copper_bar": 5, "iron_bar": 6, "gold_bar": 2, "coin": 2380})
+	assert_dict(totals).is_equal({"wood": 160, "stone": 180, "fibre": 65, "copper_bar": 5, "iron_bar": 6, "gold_bar": 2, "coin": 2280})
 	assert_int(Buildings.animals_of(DataRegistry.get_building(&"coop"))).is_equal(4)
 	# The doors: in the middle of the Coop's and the Shed's bottom row, the Barn's a cell right of it.
 	for door: Array in [[&"coop", Vector2i(2, 2)], [&"shed", Vector2i(2, 2)], [&"barn", Vector2i(3, 3)]]:

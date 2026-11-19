@@ -217,14 +217,14 @@ func test_an_upgrade_comes_back_by_half_too_and_what_doesnt_fit_is_laid_at_his_f
 	assert_array(GameState.demolish_refund(&"coop")).is_equal([
 		{"item": "wood", "count": 25}, {"item": "stone", "count": 10}, {"item": "fibre", "count": 12}, {"item": "iron_bar", "count": 1}])
 	# A full stack of wood: what the pack can't take lies at his feet.
-	GameState.add_item(&"wood", 30)
+	GameState.add_item(&"wood", 50)
 	var farm: AreaController = _farm()
 	await await_idle_frame()
 	farm.open_build()
 	farm.build.point_at(SHED_AT)
 	farm.build.take_up()
 	assert_bool(farm.build.take_up()).is_true()
-	assert_int(GameState.item_count(&"wood")).is_equal(30)
+	assert_int(GameState.item_count(&"wood")).is_equal(50)
 	var left: Array = farm.interactables.get_children().filter(func(child: Node) -> bool: return child is LeftItem)
 	assert_int(left.size()).is_equal(1)
 	assert_that((left[0] as LeftItem).item_id).is_equal(&"wood")

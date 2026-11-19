@@ -7,7 +7,7 @@ five phases with a stop after each. This is phase 0: the plan, and no code.
 **Status: approved as written by the user on 2026-11-17 ("Approve as written"). All thirty decisions
 below (D1 to D30) stand as proposed, and each is recorded in `docs/DECISIONS.md`. Phase 1 is built and
 approved (2026-11-19); phase 2 is built and approved (2026-11-19); phase 3 is built and approved (2026-11-19);
-phase 4 is built and approved (2026-11-19); phase 5 is not built.** Every number is a first guess, kept in data, to be measured in phase 5. The tables below are as
+phase 4 is built and approved (2026-11-19); phase 5 is built (2026-11-19), its numbers settled with the user, and waits for the user's review.** Every number is a first guess, kept in data, to be measured in phase 5. The tables below are as
 approved; where a phase builds something differently, it says so under "What the user has decided" and
 in the log.
 
@@ -453,7 +453,7 @@ plot), `docs/GDD.md` (§4, §7, §11, §13) and a comment in `tools/playtest.gd`
 |---|---|---|---|---|---|---|
 | Well | 2 by 2 | | 40 stone, 10 wood, 1 copper bar | 80 | a copper bar is found | the can fills at it |
 | Silo | 2 by 2 | | 30 stone, 10 wood, 2 copper bars | 100 | Farming 2 | holds 60 hay |
-| Coop | 4 by 3 | yes | 30 wood, 20 stone, 15 fibre | 250 | wood is found | 4 chickens |
+| Coop | 4 by 3 | yes | 30 wood, 20 stone, 15 fibre | 150 (was 250 until the tuning, 2026-11-19) | wood is found | 4 chickens |
 | Big Coop | the same | | 20 wood, 10 fibre, 2 iron bars | 350 | a Coop stands | 8 chickens |
 | Barn | 6 by 4 | yes | 30 wood, 40 stone, 25 fibre, 4 iron bars | 600 | Farming 3 | 4 sheep and cows |
 | Big Barn | the same | | 30 wood, 30 stone, 2 gold bars | 800 | a Barn stands | 8 sheep and cows |
@@ -784,7 +784,7 @@ TECH_DESIGN, the roadmap, the README and DECISIONS up to date; CLAUDE.md is the 
     second run of five days with the makings handed over (`play_days.gd -- farm`): the ten days reached
     the Well (day 8), not the Coop. The report proposes three numbers for 5c (the Coop's coins, the
     Well's copper bar, wood's stack); none is changed.
-- [ ] 5c. **The tuning,** in data, on the user's word.
+- [x] 5c. **The tuning,** in data, on the user's word (2026-11-19): the Coop costs 150 coins (was 250); wood stacks to 50 (was 30); the Well keeps its copper bar.
 - **Done when** the report is in hand, the numbers are settled with the user, and all tests pass.
 
 **The last word is the user's,** after each phase:

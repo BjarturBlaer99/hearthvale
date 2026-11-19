@@ -157,3 +157,11 @@ Each is a question for the user; none is changed.
   at his stall.
 - **The animals' run was handed its makings**, so its coins are not a game's.
 - **The eggs were not sold, cooked or given** by the script, and no sheep, cow, Silo or hay was tried.
+
+## Settled with the user (step 5c, 2026-11-19)
+
+Asked the three questions above, the user chose: **the Coop costs 150 coins** (was 250), **wood stacks
+to 50** (was 30), and **the Well keeps its copper bar**. Crop prices, clearing and the hens stay as they
+were. Both changes are in data (`data/crafting/coop.json`, `data/items/items.json`). The ten days have
+not been played again with the new numbers. Note that the script spends every coin on seed, so its
+"no Coop in ten days" says as much about its own habit as about the price.

@@ -453,7 +453,7 @@ animals. Phase 5, the balance, is planned and not built.)*
   |---|---|---|---|---|
   | Well | 2 by 2 | 40 stone, 10 wood, a copper bar, 80 coins | a copper bar is found | the can fills at it |
   | Silo | 2 by 2 | 30 stone, 10 wood, 2 copper bars, 100 coins | Farming 2 | holds 60 hay |
-  | Coop | 4 by 3 | 30 wood, 20 stone, 15 fibre, 250 coins | wood is found | a room (room for 4 animals) |
+  | Coop | 4 by 3 | 30 wood, 20 stone, 15 fibre, 150 coins | wood is found | a room (room for 4 animals) |
   | Barn | 6 by 4 | 30 wood, 40 stone, 25 fibre, 4 iron bars, 600 coins | Farming 3 | a room (4 animals) |
   | Shed | 4 by 3 | 30 wood, 20 stone, 15 fibre, 2 copper bars, 200 coins | a copper bar is found | a room for two chests and a furnace |
   - **A plan bought is a kit** in the pack (never in a chest). In build mode its ghost covers the

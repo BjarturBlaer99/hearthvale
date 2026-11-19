@@ -69,14 +69,16 @@ looks first", shown the summary and the pictures): animals as data, the herd's m
 pastures, Farmer Oda's stall, hens, sheep and cows in the world, and eggs, milk, wool, cloth, the
 blanket and three dishes. The user kept a pasture as built (anything standing closes it, the meadow's
 tall grass is grass) and asked for smaller badges over the animals, which were made the same day.
-Nobody has played it by hand. Phase 5 is not built. The plan's
+Nobody has played it by hand. **Phase 5 is built (2026-11-19) and waits for the user's review:** Tilda's
+and Oda's favours, ten days played by `tools/play_days.gd` (`docs/progress/homestead-balance-report.md`),
+and the numbers the user settled on the report ("Lower to 150", "Keep the copper bar", "Stack to 50"):
+the Coop costs 150 coins, wood stacks to 50, the Well is as it was. The ten days were not played again
+with them. Nobody has played phase 5 by hand. The plan's
 thirty numbered decisions are the approved ones: they are at the head of the plan ("What the user has
 decided", which stands in for the `docs/HOMESTEAD-NOTES.md` the request names) and in
 `docs/DECISIONS.md`. Each phase is built by a subagent with a fresh context; **CLAUDE.md is the
 coordinator's to edit, not a phase's** (a phase says in its report what should change here). The rules
-below describe the game as it stands, with phases 1 to 4 built: where the plan changes one for a later
-phase (the count of quests), **the plan's approved decision is the rule for the phase that builds it,** and the words here
-follow once that phase is reviewed (the plan's R17). Build nothing beyond the
+below describe the game as it stands, with all five phases built. Build nothing beyond the
 plan's list, and nothing of a later phase early. Nothing beyond it is planned: ask before building more.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
@@ -176,11 +178,11 @@ godot --path . -s res://tools/playtest.gd -- village 19:30 energy=12
 # The whole game for a playtest: from the title, on its own save slot (901, kept between runs; "fresh" empties
 # it), with a log of what happens in user://playtests
 godot --path . -s res://tools/playtest.gd -- full
-# Eight days played by a script that presses real keys and mouse buttons, from the title's "New game"
-# (about 35 minutes; needs a window). Its save is slot 956, emptied before and after. It writes days.json,
-# play_log.txt and pictures to the folder. speed=4 is a quick trial of the script (days=2 speed=4 is the
-# quickest); "deep" tries the dark floors alone. Since the Homestead it works the field's clear corner
-# and does not clear land; the eight days have not been played at life's speed since the move.
+# Ten days played by a script that presses real keys and mouse buttons, from the title's "New game"
+# (about 40 minutes; needs a window). Its save is slot 956, emptied before and after. It writes days.json,
+# play_log.txt and pictures to the folder. Farm days clear the field, make and set down the Well and the
+# Coop with a pen, buy hens and tend them. speed=4 is a quick trial of the script (days=2 speed=4 is the
+# quickest); "deep" tries the dark floors alone, "farm" the farm alone (five days, its makings handed over).
 godot --path . -s res://tools/play_days.gd -- <output_dir>
 godot --path . -s res://tools/play_days.gd -- <output_dir> speed=4
 # Repaint the hero's sprite sheet after editing its ASCII art (optional 8x preview), then re-import
@@ -567,8 +569,14 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     the egg, the milk, the wool and cloth; stone, wood and coal are not bought. **A new thing to buy is a line of data.**
   - **Tilda's answer reads "I have things to sell."** (not "crops"), and a test that sells ore opens
     her list with `open_shop(&"tilda", Shop.SELL)`: the lines are "Copper Ore x2: 3 coins each".
-  - **There are eleven quests.** A test that lists them, counts the quest log's lines, or reads the
-    ending's "of 11" carries that number.
+  - **There are thirteen quests.** A test that lists them, counts the quest log's lines, or reads the
+    ending's "of 13" carries that number.
+  - **Tilda and Farmer Oda ask a favour at three marks too** ("Market Day": 6 eggs, for 50 coins and 2
+    Carrot Cakes; "A Roof for the Flock": a coop standing, the flag `built/coop`, for 60 coins and 5
+    hay). **A test that talks to Tilda at three marks gets her lesson first if `recipe/carrot_cake`
+    isn't set; one that talks to Oda gets his seed wheat first if `seed_stock` hasn't begun.**
+    **`GameState.built_flag(id)` (`built/<id>`) is true while a building stands:** set by
+    `start_next_day()`, erased by `demolish()`, put right by `from_dict()`.
   - **Wenna and Shepherd Edda ask a favour at three marks** ("Black for the Loom": 5 coal; "New
     Shears": 2 iron bars), after the recipe each teaches at two. **A test that talks to either at three
     marks gets her lesson first if the recipe isn't known, then her favour at the next talk:** set
@@ -584,6 +592,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     `GameState.skill_points[Skills.MINING]`. Twenty-five rocks of ore are level 3.
   - **Floors 4, 5 and 6 have 3 iron and 2 coal rocks each** (they had 4 coal until the tuning).
   - **Do not** change a price, a count or a skill's numbers for balance without the user's word.
+    **The Homestead's tuning (2026-11-19, on the user's word):** the Coop costs 150 coins (was 250) and
+    wood stacks to 50 (was 30); the Well keeps its copper bar. A test that fills a stack of wood fills 50.
 
 - **The Homestead, phase 1 (2026-11-19; `docs/progress/homestead-plan.md`, TECH_DESIGN §30):** the area
   `homestead` ("Your farm", 40 by 30), west of the village by the lane's west end (`WestRoad` in the
@@ -614,7 +624,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     (`tests/world/story_days_test.gd`), not counted to 150 letters: a stage must end above the line of
     help and be no longer than 200.
   - **In a capture shot the hero hides anything in the cell north of him:** he is two cells tall.
-    `tools/capture.gd`'s shots end at 191 (168 to 176 are phase 2's, 177 to 191 phase 3's); its title shot reads (only reads) the player's slot 1 for its
+    `tools/capture.gd`'s shots end at 207 (168 to 176 are phase 2's, 177 to 191 phase 3's, 192 to 203 phase 4's, 204 to 207 phase 5's); its title shot reads (only reads) the player's slot 1 for its
     "Continue" line.
   - **A subagent's scratch folder may hold an earlier subagent's files:** work in a subfolder of your
     own, and never run a script there you did not just write.

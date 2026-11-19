@@ -3009,3 +3009,11 @@ Tilda's "Market Day" (six eggs; 50 coins and 2 Carrot Cakes) and Farmer Oda's "A
 - **One life run is one roll of the quarry:** coal came on day 3 in the report's run and on day 9 in the other, and the Well's day follows it.
 - **The sites of the buildings and the pen are fixed cells** chosen from this map's overgrowth; a change to the farm's map would want them chosen again (the script says "!!" when a ghost doesn't fit).
 - **Nobody has played the Homestead by hand;** the script never reached a favour (three marks), a sheep, a cow, the Silo or hay.
+
+**The Homestead's phase 5, step 5c (2026-11-19).** Checked before asking: the suite after 5a and 5b, 1129
+tests in 148 suites, only `sprites_test.gd`'s run-order failure; the favours' shots (204, 206) and the
+tenth day's picture looked at. The user settled the numbers: the Coop 150 coins (was 250), wood stacks to
+50 (was 30), the Well as it was. Tests that carried the old numbers were changed (`rooms_test`, the plans'
+sum 2280; `wood_test`; `crafting_chain_test`; `building_moves_test`'s full stack). The suite is as it
+was. Known: the ten days were not played again with the new numbers; nobody has played phase 5 by hand,
+and no run has reached the favours or the Silo, sheep and cows.

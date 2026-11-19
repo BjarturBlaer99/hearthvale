@@ -1577,3 +1577,9 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
     a time for the ghost, and the sword's key to set down; the workbench's tabs are turned with D.
   - **`farm`** is a trial of the farm alone (five days, the makings handed over: SETUP), for the
     animals the ten days don't reach.
+
+## 2026-11-19 — The Homestead's tuning (phase 5, step 5c)
+On the balance report (`docs/progress/homestead-balance-report.md`) the user chose: the Coop costs 150
+coins (was 250), so a player who saves a little can keep hens in the first ten days; wood stacks to 50
+(was 30), as stone and fibre do, so one stack covers the Coop or the Barn and a pen; the Well keeps its
+copper bar, so the first building stays tied to the quarry.

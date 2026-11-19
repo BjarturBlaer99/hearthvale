@@ -52,7 +52,7 @@ func test_a_branch_and_a_stump_are_data_and_wood_is_a_material() -> void:
 	assert_int(int(DropTable.roll(stump["drops"], 0.5)["count"])).is_equal(2)
 	var wood: Dictionary = DataRegistry.get_item(&"wood")
 	assert_str(str(wood["type"])).is_equal("material")
-	assert_int(int(wood["max_stack"])).is_equal(30)
+	assert_int(int(wood["max_stack"])).is_equal(50)
 	assert_that(ItemIcons.name_for(&"wood")).is_equal(&"wood")
 	GameState.add_item(&"wood")
 	assert_bool(GameState.eat(&"wood")).override_failure_message("not to be eaten").is_false()
