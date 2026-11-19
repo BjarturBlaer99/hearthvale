@@ -14,6 +14,9 @@ const OUT_PATH: String = ReliefAtlas.TEXTURE_PATH
 const ROOF_RED: Color = Color(0.74, 0.30, 0.22)
 const ROOF_BLUE: Color = Color(0.30, 0.40, 0.62)
 const THATCH: Color = Color(0.80, 0.66, 0.34)
+## The coop's weathered shingles and the big barn's green boards (the tile tool's colours).
+const SHINGLE: Color = Color(0.58, 0.48, 0.38)
+const ROOF_GREEN: Color = Color(0.28, 0.50, 0.38)
 ## A colour no picture uses: PixelGrade is asked to warm the colours, not to hunt outlines.
 const NO_OUTLINE: Color = Color(1.0, 0.0, 1.0)
 
@@ -175,7 +178,16 @@ func _pillar(region: Rect2) -> void:
 func _ridge(region: Rect2, style: String, part: String) -> void:
 	var origin: Vector2i = Vector2i(region.position)
 	var size: Vector2i = Vector2i(region.size)
-	var base: Color = THATCH if style == "roof_thatch" else (ROOF_BLUE if style == "roof_blue" else ROOF_RED)
+	var base: Color = ROOF_RED
+	match style:
+		"roof_thatch":
+			base = THATCH
+		"roof_blue":
+			base = ROOF_BLUE
+		"roof_shingle":
+			base = SHINGLE
+		"roof_green":
+			base = ROOF_GREEN
 	for y: int in size.y:
 		for x: int in size.x:
 			# The gable: the strip narrows towards its top at the roof's end.
@@ -188,6 +200,16 @@ func _ridge(region: Rect2, style: String, part: String) -> void:
 					color = color.darkened(0.14)
 				elif _hash(x, y, 85) % 7 == 0:
 					color = color.lightened(0.12)
+			elif style == "roof_shingle":
+				if y % 4 == 3 or (x + (2 if y >= 4 else 0)) % 4 == 0:
+					color = color.darkened(0.26)
+				elif _hash((x + (2 if y >= 4 else 0)) / 4, y / 4, 89) % 3 == 0:
+					color = color.lightened(0.12)
+			elif style == "roof_green":
+				if x % 4 == 3:
+					color = color.darkened(0.30)
+				elif x % 4 == 0:
+					color = color.lightened(0.14)
 			elif (y % 4 == 3) or ((x + (4 if y >= 4 else 0)) % 8 == 0):
 				color = color.darkened(0.22)
 			if y == 0:

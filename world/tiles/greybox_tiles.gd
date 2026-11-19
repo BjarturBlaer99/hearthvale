@@ -61,13 +61,18 @@ extends RefCounted
 ##     A building site (dug ground, and its stack of timber), and the barn's plank wall, its
 ##     loft door and its door
 ##  29 the silo, a 2 by 2 picture in quarters (north-west, north-east, south-west, south-east)
+##  30-32 two more roofs for the buildings of the hero's land (ROOF_B_KINDS, laid as HOUSE_KINDS
+##     are, eight to a row: the coop's wooden shingles, then the big barn's green boards), drawn by
+##     BuildingArt as the coop's and the barn's looks name them
+##  33 more furniture, on a wooden floor: a rack of tools on the wall, and sacks stacked on a
+##     crate (the shed's room)
 
 const TEXTURE_PATH: String = "res://world/tiles/greybox_tiles.png"
 const TILESET_PATH: String = "res://world/tiles/greybox_tiles.tres"
 const SOURCE_ID: int = 0
 const TILE_SIZE: int = 16
 const COLUMNS: int = 8
-const ROWS: int = 30
+const ROWS: int = 34
 
 const ROW_GROUND: int = 0
 const ROW_STAIRS: int = 1
@@ -96,9 +101,25 @@ const ROW_QUARRY_DECOR: int = 26
 const ROW_LAND_MARKERS: int = 27
 const ROW_BUILDINGS: int = 28
 const ROW_SILO: int = 29
+const ROW_ROOFS_B: int = 30
+const ROW_FURNITURE_C: int = 33
 ## The buildings' own tiles (rows 28 and 29), in atlas order. Never on a Height layer.
 const BUILDING_KINDS: Array[String] = ["site", "site_timber", "barn_wall", "barn_loft", "barn_door"]
 const SILO_KINDS: Array[String] = ["silo_nw", "silo_ne", "silo_sw", "silo_se"]
+## Two more roof styles (the Homestead, phase 3, at the user's word): "roof_shingle" (the coop's
+## wooden shingles) and "roof_green" (the big barn's green boards), each named as HOUSE_KINDS'
+## roofs are, from ROW_ROOFS_B eight to a row. Never on a Height layer.
+const ROOF_B_STYLES: Array[String] = ["roof_shingle", "roof_green"]
+const ROOF_B_KINDS: Array[String] = [
+	"roof_shingle", "roof_shingle_l", "roof_shingle_r", "roof_shingle_top", "roof_shingle_top_l", "roof_shingle_top_r",
+	"roof_shingle_eave", "roof_shingle_eave_l", "roof_shingle_eave_r",
+	"roof_green", "roof_green_l", "roof_green_r", "roof_green_top", "roof_green_top_l", "roof_green_top_r",
+	"roof_green_eave", "roof_green_eave_l", "roof_green_eave_r",
+]
+## More solid indoor furniture (the shed's), with shading heights like FURNITURE_HEIGHTS: a
+## rack of tools on the wall and sacks on a crate, as tall as the shelves they replaced.
+const FURNITURE_C_KINDS: Array[String] = ["tool_rack", "sacks"]
+const FURNITURE_C_HEIGHTS: Array[int] = [2, 2]
 ## More trees, all props like "prop_tree". The baker mixes the first three kinds by cell and
 ## uses the canopy where trees stand on all four sides; a "cherry" block is always a cherry.
 const TREE_KINDS: Array[String] = ["prop_tree_b", "prop_tree_c", "prop_canopy", "prop_cherry", "prop_willow"]
@@ -284,6 +305,12 @@ static func coords(kind: String, height: int = 0) -> Vector2i:
 		return Vector2i(BUILDING_KINDS.find(kind), ROW_BUILDINGS)
 	if SILO_KINDS.has(kind):
 		return Vector2i(SILO_KINDS.find(kind), ROW_SILO)
+	if ROOF_B_KINDS.has(kind):
+		var at: int = ROOF_B_KINDS.find(kind)
+		@warning_ignore("integer_division")
+		return Vector2i(at % COLUMNS, ROW_ROOFS_B + at / COLUMNS)
+	if FURNITURE_C_KINDS.has(kind):
+		return Vector2i(FURNITURE_C_KINDS.find(kind), ROW_FURNITURE_C)
 	if QUARRY_DECOR_KINDS.has(kind):
 		return Vector2i(QUARRY_DECOR_KINDS.find(kind), ROW_QUARRY_DECOR)
 	return Vector2i(0, ROW_GROUND)
@@ -316,7 +343,8 @@ static func is_known_kind(kind: String) -> bool:
 		or PROPS_B_KINDS.has(kind) or PROPS_C_KINDS.has(kind) or FURNITURE_B_KINDS.has(kind) \
 		or HOUSE_KINDS.has(kind) or HOUSE_DECOR_KINDS.has(kind) or kind == "smoke" or TREE_KINDS.has(kind) \
 		or MARSH_KINDS.has(kind) or MARSH_DECOR_KINDS.has(kind) or MARSH_BLOCKS.has(kind) \
-		or QUARRY_KINDS.has(kind) or QUARRY_DECOR_KINDS.has(kind) or BUILDING_KINDS.has(kind) or SILO_KINDS.has(kind)
+		or QUARRY_KINDS.has(kind) or QUARRY_DECOR_KINDS.has(kind) or BUILDING_KINDS.has(kind) or SILO_KINDS.has(kind) \
+		or ROOF_B_KINDS.has(kind) or FURNITURE_C_KINDS.has(kind)
 
 
 static func is_decor(kind: String) -> bool:

@@ -262,7 +262,7 @@ static func detail(kind: String, dx: int, dy: int, width: int, height: int) -> S
 	if QUARTERS.has(kind):
 		return QUARTERS[kind][(dy % 2) * 2 + (dx % 2)]
 	match kind:
-		"roof", "roof_blue", "roof_thatch":
+		"roof", "roof_blue", "roof_thatch", "roof_shingle", "roof_green":
 			var part: String = ""
 			if height >= 2 and dy == 0:
 				part = "_top"
@@ -366,7 +366,7 @@ static func _look_problems(blocks: Array, size: Vector2i, is_tile: Callable, wha
 		if QUARTERS.has(kind):
 			if rect.size.x % 2 != 0 or rect.size.y % 2 != 0:
 				out.append("'%s' is a 2 by 2 picture: its block must be whole pictures." % kind)
-		elif not ["roof", "roof_blue", "roof_thatch", "wall", "wall_upper"].has(kind) and not bool(is_tile.call(kind)):
+		elif not ["roof", "roof_blue", "roof_thatch", "roof_shingle", "roof_green", "wall", "wall_upper"].has(kind) and not bool(is_tile.call(kind)):
 			out.append("'%s' names an unknown tile '%s'." % [what, kind])
 	return out
 

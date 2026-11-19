@@ -270,8 +270,9 @@ const MAPS: Dictionary = {
 	# The insides of the Homestead's buildings (phase 3): 11 by 9 like every house's, the way out
 	# a doormat in the middle of the bottom wall, which leads out before the building's door
 	# wherever it stands. They stand empty of animals (phase 4's). The coop has perches and
-	# nesting boxes along its back wall, the barn its troughs and feed, the shed its shelves
-	# and the places of its two chests and its furnace (2, 2), (8, 2) and (5, 2), left clear.
+	# nesting boxes along its back wall, the barn its troughs and feed, the shed a rack of
+	# tools and sacks on a crate (bookshelves until the user's review of phase 3) and the
+	# places of its two chests and its furnace (2, 2), (8, 2) and (5, 2), left clear.
 	"coop": {
 		"scene": "res://world/areas/coop/coop.tscn",
 		"size": Vector2i(11, 9),
@@ -317,8 +318,8 @@ const MAPS: Dictionary = {
 			[10, 0, 1, 9, 0, "inner_wall"],
 			[0, 8, 11, 1, 0, "inner_wall"],
 			[5, 8, 1, 1, 0, "doormat"],
-			[3, 2, 1, 1, 0, "shelf"],
-			[7, 2, 1, 1, 0, "shelf"],
+			[3, 2, 1, 1, 0, "tool_rack"],
+			[7, 2, 1, 1, 0, "sacks"],
 			[9, 2, 1, 1, 0, "barrel"],
 			[1, 7, 1, 1, 0, "barrel"],
 			[9, 7, 1, 1, 0, "stool"],

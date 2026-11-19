@@ -18,13 +18,18 @@ const CROWN_HALF_WIDTH: float = 16.0
 const CROWN_TOP: float = 37.0
 const CROWN_BOTTOM: float = 9.0
 ## Every roof tile kind (GreyboxTiles): the solid roofs, their ridge and eave details, and the
-## house fronts' roofs with gable ends.
+## house fronts' roofs with gable ends, and the two roofs of the hero's buildings
+## (GreyboxTiles.ROOF_B_KINDS).
 const ROOF_TILES: Array[String] = [
 	"roof", "roof_blue", "roof_top", "roof_eave", "roof_blue_top", "roof_blue_eave",
 	"roof_l", "roof_r", "roof_top_l", "roof_top_r", "roof_eave_l", "roof_eave_r",
 	"roof_blue_l", "roof_blue_r", "roof_blue_top_l", "roof_blue_top_r", "roof_blue_eave_l", "roof_blue_eave_r",
 	"roof_thatch", "roof_thatch_l", "roof_thatch_r", "roof_thatch_top", "roof_thatch_top_l", "roof_thatch_top_r",
 	"roof_thatch_eave", "roof_thatch_eave_l", "roof_thatch_eave_r",
+	"roof_shingle", "roof_shingle_l", "roof_shingle_r", "roof_shingle_top", "roof_shingle_top_l", "roof_shingle_top_r",
+	"roof_shingle_eave", "roof_shingle_eave_l", "roof_shingle_eave_r",
+	"roof_green", "roof_green_l", "roof_green_r", "roof_green_top", "roof_green_top_l", "roof_green_top_r",
+	"roof_green_eave", "roof_green_eave_l", "roof_green_eave_r",
 ]
 
 ## The tree standing in each cell.

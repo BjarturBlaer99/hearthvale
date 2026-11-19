@@ -12,6 +12,10 @@ const ROOF_BLUE: Color = Color(0.30, 0.40, 0.62)
 const PLASTER: Color = Color(0.92, 0.87, 0.74)
 const TIMBER: Color = Color(0.30, 0.19, 0.11)
 const THATCH: Color = Color(0.80, 0.66, 0.34)
+## The coop's roof: wooden shingles gone silver-brown in the weather.
+const SHINGLE: Color = Color(0.58, 0.48, 0.38)
+## The big barn's roof: boards painted green, with standing seams.
+const ROOF_GREEN: Color = Color(0.28, 0.50, 0.38)
 ## The shadow under eaves and under an upper floor that juts out.
 const EAVE_SHADOW: Color = Color(0.16, 0.10, 0.09)
 ## Shadows on see-through props darken whatever grass they're drawn over (violet, not black).
@@ -532,7 +536,7 @@ func _initialize() -> void:
 		_marker(Vector2i(index, GreyboxTiles.ROW_MARKERS), index)
 	for index: int in GreyboxTiles.LAND_MARKER_KINDS.size():
 		_marker(Vector2i(index, GreyboxTiles.ROW_LAND_MARKERS), index, true)
-	for kind: String in GreyboxTiles.HOUSE_KINDS:
+	for kind: String in GreyboxTiles.HOUSE_KINDS + GreyboxTiles.ROOF_B_KINDS:
 		_house(GreyboxTiles.coords(kind), kind)
 	_pine_art(GreyboxTiles.coords("prop_tree_b"))
 	_oak_art(GreyboxTiles.coords("prop_tree_c"))
@@ -594,6 +598,11 @@ func _initialize() -> void:
 	for kind: String in GreyboxTiles.SILO_KINDS:
 		silo.append(GreyboxTiles.coords(kind))
 	_silo(silo)
+	# The shed's furniture: a rack of tools on the wall, and sacks on a crate.
+	for index: int in GreyboxTiles.FURNITURE_C_KINDS.size():
+		_floor(Vector2i(index, GreyboxTiles.ROW_FURNITURE_C))
+	_tool_rack(GreyboxTiles.coords("tool_rack"))
+	_sacks(GreyboxTiles.coords("sacks"))
 	# Art pass 3: warm every colour and soften every outline, tile by tile.
 	PixelGrade.apply(_image, OUTLINE, Rect2i(), Vector2i(T, T))
 	DirAccess.make_dir_recursive_absolute(GreyboxTiles.TEXTURE_PATH.get_base_dir())
@@ -1339,6 +1348,10 @@ func _house(tile: Vector2i, kind: String) -> void:
 		var edge: String = "l" if kind.ends_with("_l") else ("r" if kind.ends_with("_r") else "")
 		if kind.begins_with("roof_thatch"):
 			_thatch(tile, part)
+		elif kind.begins_with("roof_shingle"):
+			_shingles(tile, part)
+		elif kind.begins_with("roof_green"):
+			_green_boards(tile, part)
 		else:
 			var slate: bool = kind.begins_with("roof_blue")
 			var color: Color = ROOF_BLUE if slate else ROOF_RED
@@ -1400,6 +1413,123 @@ func _thatch(tile: Vector2i, part: String) -> void:
 			_px(tile, x, ends - 1, THATCH.lightened(0.2))
 			for y: int in range(ends, T):
 				_px(tile, x, y, EAVE_SHADOW)
+
+
+## Wooden shingles (the coop's roof): small boards in courses of four pixels, each shingle
+## its own shade of weathered wood, the joints staggered from course to course and the butt
+## of each course catching the light. `part` "top" adds a capping board nailed along the
+## ridge, "eave" the ragged ends of the last course above their shadow.
+func _shingles(tile: Vector2i, part: String) -> void:
+	for y: int in T:
+		@warning_ignore("integer_division")
+		var course: int = y / 4
+		var offset: int = 0 if course % 2 == 0 else 2
+		for x: int in T:
+			@warning_ignore("integer_division")
+			var shingle: int = (x + offset) / 4
+			var tone: int = _hash(shingle, course, 79) % 5
+			var shade: Color = SHINGLE
+			if tone == 0:
+				shade = SHINGLE.lightened(0.16)
+			elif tone == 1:
+				shade = SHINGLE.darkened(0.12)
+			elif tone == 2:
+				shade = SHINGLE.lerp(Color(0.62, 0.40, 0.24), 0.35)
+			if y % 4 == 3:
+				shade = SHINGLE.darkened(0.45)
+			elif posmod(x + offset, 4) == 0:
+				shade = shade.darkened(0.28)
+			elif y % 4 == 2:
+				shade = shade.lightened(0.10)
+			elif _hash(x, y, 81) % 11 == 0:
+				shade = shade.darkened(0.10)
+			_px(tile, x, y, shade)
+	if part == "top":
+		var cap: Color = SHINGLE.darkened(0.18)
+		_rect(tile, Rect2i(0, 0, T, 4), cap)
+		_rect(tile, Rect2i(0, 0, T, 1), SHINGLE.darkened(0.55))
+		_rect(tile, Rect2i(0, 1, T, 1), cap.lightened(0.22))
+		_rect(tile, Rect2i(0, 4, T, 1), SHINGLE.darkened(0.5))
+		for x: int in range(3, T, 8):
+			_px(tile, x, 2, Color(0.30, 0.30, 0.34))
+	elif part == "eave":
+		for x: int in T:
+			var ends: int = 12 + (1 if posmod(x + 2, 4) < 2 else 0)
+			_px(tile, x, ends - 1, SHINGLE.lightened(0.22))
+			for y: int in range(ends, T):
+				_px(tile, x, y, EAVE_SHADOW)
+
+
+## Green boards (the big barn's roof): upright boards four pixels wide, each with a lit edge
+## and a standing seam, crossed by the faint line of the battens under them. `part` "top" adds
+## a ridge of flashing, "eave" a lit edge over the shadow the eaves cast.
+func _green_boards(tile: Vector2i, part: String) -> void:
+	for y: int in T:
+		for x: int in T:
+			var shade: Color = ROOF_GREEN
+			if x % 4 == 3:
+				shade = ROOF_GREEN.darkened(0.42)
+			elif x % 4 == 0:
+				shade = ROOF_GREEN.lightened(0.18)
+			elif y % 8 == 6:
+				shade = ROOF_GREEN.darkened(0.12)
+			elif _hash(x, y, 87) % 13 == 0:
+				shade = ROOF_GREEN.darkened(0.08)
+			_px(tile, x, y, shade)
+	if part == "top":
+		var flashing: Color = ROOF_GREEN.darkened(0.25)
+		_rect(tile, Rect2i(0, 0, T, 4), flashing)
+		_rect(tile, Rect2i(0, 0, T, 1), ROOF_GREEN.darkened(0.6))
+		_rect(tile, Rect2i(0, 1, T, 1), flashing.lightened(0.3))
+		_rect(tile, Rect2i(0, 4, T, 1), ROOF_GREEN.darkened(0.55))
+	elif part == "eave":
+		_rect(tile, Rect2i(0, 12, T, 1), ROOF_GREEN.lightened(0.3))
+		_rect(tile, Rect2i(0, 13, T, 3), EAVE_SHADOW)
+
+
+## A rack of tools on the shed's wall: a plank on two brackets with a rake, a spade and a
+## saw hung from its pegs, over the wooden floor.
+func _tool_rack(tile: Vector2i) -> void:
+	_art(tile, PROP_PALETTES["furniture"].merged({"m": Color(0.84, 0.86, 0.90), "M": Color(0.56, 0.58, 0.64)}), [
+		"................",
+		".oooooooooooooo.",
+		".owwwwwwwwwwwwo.",
+		".oLLLLLLLLLLLLo.",
+		".oooooooooooooo.",
+		"...ow....ow..o..",
+		"...ow....ow.oLLo",
+		"...ow....ow.omMo",
+		"...ow....ow.omMo",
+		"...ow...ommmomMo",
+		"ooooooo.omMmomMo",
+		"ommmmmo.omMmomMo",
+		"om.m.mo..omo.oo.",
+		".o.o.o....o.....",
+		"................",
+		"..ssssssssssss..",
+	])
+
+
+## Sacks of grain on a crate, against the shed's wall, over the wooden floor.
+func _sacks(tile: Vector2i) -> void:
+	_art(tile, PROP_PALETTES["furniture"].merged({"k": Color(0.86, 0.76, 0.56), "K": Color(0.68, 0.58, 0.40)}), [
+		"....oo....oo....",
+		"...okko..okko...",
+		"..okkkkooKkkko..",
+		"..okkkkkoKkkko..",
+		".okkkkKkoKkkkko.",
+		".okkkkKkoKkkKko.",
+		".oKkkkKkoKkkKko.",
+		".oKKKKKoooKKKKo.",
+		".oooooooooooooo.",
+		".owwwwwwwwwwwwo.",
+		".oLLLWLLLLWLLLo.",
+		".oLLLWLLLLWLLLo.",
+		".oLLLWLLLLWLLLo.",
+		".oWWWWWWWWWWWWo.",
+		".oooooooooooooo.",
+		"..ssssssssssss..",
+	])
 
 
 ## A gable's barge board down a roof tile's outer edge (`left`: its left edge). Over the

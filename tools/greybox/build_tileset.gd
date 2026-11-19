@@ -91,8 +91,10 @@ func _initialize() -> void:
 		_fixed(source, Vector2i(index, GreyboxTiles.ROW_LAND_MARKERS), 0, false)
 	# The buildings the hero sets down (the Homestead, phase 3): drawn over the ground by
 	# BuildingArt and never laid on a Height layer; in the editor they read as a house's tiles.
-	for kind: String in GreyboxTiles.BUILDING_KINDS + GreyboxTiles.SILO_KINDS:
+	for kind: String in GreyboxTiles.BUILDING_KINDS + GreyboxTiles.SILO_KINDS + GreyboxTiles.ROOF_B_KINDS:
 		_fixed(source, GreyboxTiles.coords(kind), 3, true)
+	for index: int in GreyboxTiles.FURNITURE_C_KINDS.size():
+		_fixed(source, Vector2i(index, GreyboxTiles.ROW_FURNITURE_C), GreyboxTiles.FURNITURE_C_HEIGHTS[index], true)
 	# Water: one tile that plays its frames (which lie to its right) in a loop.
 	var water: Vector2i = Vector2i(0, GreyboxTiles.ROW_WATER)
 	_fixed(source, water, 0, true)

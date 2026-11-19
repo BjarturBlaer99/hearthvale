@@ -6,7 +6,7 @@ extends RefCounted
 ## tools/art/make_relief.gd, read by WallRelief and Scenery.
 
 const TEXTURE_PATH: String = "res://world/tiles/relief.png"
-const SIZE: Vector2i = Vector2i(96, 96)
+const SIZE: Vector2i = Vector2i(96, 112)
 ## The wall tiles (GreyboxTiles kinds) that get relief, and what each is built of.
 const MATERIALS: Dictionary = {"dungeon_wall": "stone", "inner_wall": "timber", "stone": "ruin"}
 const MATERIAL_ORDER: Array[String] = ["stone", "timber", "ruin"]
@@ -22,9 +22,10 @@ const TOP_SIZE: Vector2i = Vector2i(16, 16)
 const PILLAR_SIZE: Vector2i = Vector2i(16, 28)
 const PILLAR_FOOT: Vector2 = Vector2(8, 26)
 ## A roof's ridge strip: its size, the roof styles (the first part of a roof tile's kind) and
-## the parts of a ridge.
+## the parts of a ridge. The last two styles are the buildings' of the hero's land (the coop's
+## shingles, the big barn's green boards), whose strips made the atlas 16 pixels taller.
 const RIDGE_SIZE: Vector2i = Vector2i(16, 8)
-const ROOF_STYLES: Array[String] = ["roof", "roof_blue", "roof_thatch"]
+const ROOF_STYLES: Array[String] = ["roof", "roof_blue", "roof_thatch", "roof_shingle", "roof_green"]
 const RIDGE_PARTS: Array[String] = ["mid", "l", "r"]
 
 
@@ -55,7 +56,7 @@ static func ridge(style: String, part: String) -> Rect2:
 ## The roof style and ridge part of a roof's top-row tile kind ("roof_blue_top_l" -> ["roof_blue",
 ## "l"]), or an empty array if `kind` isn't the top row of a roof.
 static func ridge_of(kind: String) -> Array:
-	for style: String in ["roof_thatch", "roof_blue", "roof"]:
+	for style: String in ["roof_thatch", "roof_blue", "roof_shingle", "roof_green", "roof"]:
 		if kind == style + "_top":
 			return [style, "mid"]
 		if kind == style + "_top_l":

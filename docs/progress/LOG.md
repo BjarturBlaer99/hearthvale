@@ -2889,3 +2889,17 @@ The three steps of phase 3 (`docs/progress/homestead-plan.md`), committed one by
 - **The Big Barn wears the Shed's slate:** the two look alike but for the barn's red planks.
 - **The site's twine** is drawn on each cell's top and left edges, so a site reads as a pegged-out grid, open on its right and bottom edges.
 - **CLAUDE.md is as it was:** its words for phase 3 (the plan's R4, R7's hay sentence, R8's shed sentence, R9, R10's `build` tab) are the coordinator's to write; the phase's report proposes them as built.
+
+## 2026-11-19 — The Homestead, phase 3: three looks the user asked for
+
+The user approved phase 3 and asked for three changes of look, nothing else, before phase 4.
+
+- **The Coop's roof** is wooden shingles gone silver-brown in the weather (`roof_shingle`), no longer the farmhouse's thatch. The Big Coop keeps its red tiles.
+- **The Big Barn's roof** is green boards with standing seams (`roof_green`), no longer the Shed's blue slate (the small Barn keeps its red tiles).
+- **The Shed's room** has a rack of tools (a rake, a spade and a saw) at (3, 2) and sacks on a crate at (7, 2) where its two bookshelves stood. Both are solid furniture as tall as the shelves were, so the same cells block and the same cells are free; re-baking the shed (`build_maps.gd -- shed`) changed those two cells of its Height layer and nothing else (checked cell by cell). The chests, the furnace, the rug and the doormat are where they were.
+
+**The atlas:** four new rows at the end (34 rows now; no older tile moved). Rows 30 to 32 hold the two roofs' eighteen tiles (`GreyboxTiles.ROOF_B_KINDS`, laid as `HOUSE_KINDS` are, eight to a row: the shingles at (0..7, 30) and (0, 31), the green boards at (1..7, 31) and (0..1, 32)); row 33 holds `tool_rack` (0, 33) and `sacks` (1, 33) (`FURNITURE_C_KINDS`). All painted by `make_tile_texture.gd`. **The relief atlas is 96 by 112** (it was 96 by 96): the two roofs' ridge strips are rows of their own (`ReliefAtlas.ROOF_STYLES` has five styles), painted by `make_relief.gd`. `Buildings.detail()`, its check of a look, `Scenery.ROOF_TILES` and `build_tileset.gd` know the two styles.
+
+**Verified:** 1080 tests in 140 suites; one fails, `tests/gameplay/sprites_test.gd` `test_villagers_wear_their_own_colours`, for the run's order on this machine only (`tests/gameplay` alone passes, 29 of 29). No test needed changing. The game boots headless with no script error. Capture shots 181 and 185 to 190 were taken before and after and looked at: only the two roofs and the shed's two cells changed (185 and 186 are the same to the pixel).
+
+**Seen, not changed:** the Coop's room has the same bookshelves along its back wall (two runs of three `shelf` tiles, meant as perches and nesting boxes); the Barn's room has tables and barrels, which read well enough.

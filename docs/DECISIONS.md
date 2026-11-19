@@ -1437,3 +1437,12 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   - **A pulled-down shed's furnishings stay with the room** (their flags are kept): a shed built again
     has its chests and furnace, empty. Nothing is lost, and no refund is given for them.
   - **A building pulled down can be bought again:** one of each is one that stands, or is a site or kit.
+
+## 2026-11-19 — Two roofs and the shed's furniture (the user's review of the Homestead's phase 3)
+- **The Coop wears wooden shingles, silver-brown with the weather, and the Big Barn green boards
+  with standing seams:** two new roof styles (`roof_shingle`, `roof_green`) beside the clay, slate
+  and thatch, each with its tiles at the end of the atlas and its own ridge strip. Chosen to be told
+  apart by colour and by pattern from the farmhouse's thatch, the Shed's slate and the red tiles of
+  the small Barn and the Big Coop. For show only.
+- **The Shed's two bookshelves became a rack of tools and sacks on a crate,** two new furniture
+  tiles as solid and as tall as the shelves (height 2), so nothing changed but the pictures.
