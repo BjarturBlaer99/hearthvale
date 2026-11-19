@@ -79,6 +79,8 @@ func test_in_at_20_and_out_at_06() -> void:
 	var coop: AreaController = _load(COOP_ROOM)
 	assert_int(coop.animals.shown().size()).is_equal(2)
 	var floor_cells: Array[Vector2i] = coop.animals.room_floor()
+	assert_bool(floor_cells.has(Vector2i(5, 8)) or floor_cells.has(Vector2i(5, 7))).override_failure_message("not on the doormat or the cell before it").is_false()
+	assert_bool(floor_cells.has(Vector2i(4, 7))).is_true()
 	for hen: Animal in coop.animals.shown():
 		assert_bool(floor_cells.has(hen.cell())).is_true()
 		assert_bool(coop.terrain.is_occupied(hen.cell())).override_failure_message("in the room, as out of doors, it blocks nobody").is_false()
@@ -152,6 +154,13 @@ func test_one_right_click_pets_and_takes_and_a_full_pack_leaves_the_egg_waiting(
 	_fence_pen()
 	var farm: AreaController = _farm()
 	var hen: Animal = farm.animals.shown()[0]
+	# Two cells off, she can't be reached; in the cell he faces, she can.
+	_put(hen, Vector2i(16, 13))
+	farm.player.motor.place(Vector2i(16, 15))
+	farm.player.face(Vector2.RIGHT)
+	assert_object(farm.animal_in_front()).override_failure_message("two cells off").is_null()
+	farm.player.face(Vector2.UP)
+	assert_object(farm.animal_in_front()).override_failure_message("a cell beyond the one he faces").is_null()
 	_face(farm, hen, Vector2i(16, 14))
 	assert_object(farm.animal_in_front()).is_same(hen)
 	farm._update_hud()

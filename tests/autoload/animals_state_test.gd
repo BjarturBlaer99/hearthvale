@@ -115,8 +115,41 @@ func test_a_fenced_pen_by_the_door_is_a_pasture() -> void:
 	GameState.homestead().take_up(Vector2i(19, 14), Placement.STANDING)
 	assert_bool(GameState.pasture_of(&"coop")["fenced"]).is_false()
 	assert_bool(GameState.has_pasture(&"coop")).is_false()
-	# A building that doesn't stand has none.
+	# A building that doesn't stand has none: neither one never set down, nor a site.
 	assert_dict(GameState.pasture_of(&"barn")).is_empty()
+	_set_down(&"barn", BARN_AT)
+	assert_bool(GameState.homestead().has_building(&"barn")).is_true()
+	assert_dict(GameState.pasture_of(&"barn")).override_failure_message("a site has no pasture yet").is_empty()
+
+
+func test_two_doors_on_one_fenced_ground_share_it() -> void:
+	# A coop and a barn side by side on the land west of the farmhouse, their doors on one pen:
+	# (3..15, 10..12), fenced on (2..16, 9..13) but where the two buildings stand.
+	GameState.add_item(GameState.COIN, 999)
+	_build(&"coop", Vector2i(4, 7))
+	_build(&"barn", Vector2i(9, 6))
+	var pen: Rect2i = Rect2i(3, 10, 13, 3)
+	_fence(pen)
+	GameState.buy_animal(&"chicken", 60)
+	GameState.buy_animal(&"cow", 240)
+	var shared: Array[Dictionary] = GameState.pastures()
+	assert_int(shared.size()).override_failure_message("one pasture for both doors").is_equal(1)
+	assert_array(shared[0]["buildings"]).contains_exactly_in_any_order(["barn", "coop"])
+	assert_int(int(shared[0]["grass"])).is_equal(39)
+	assert_dict(GameState.pasture_of(&"coop")).is_equal(GameState.pasture_of(&"barn"))
+	# Both graze, and the hay is kept. Paved to ten cells of grass, the hen (bought first) takes
+	# four, and the six left are too few for the cow, who eats a hay.
+	_build(&"silo", SILO_AT)
+	GameState.homestead().hay = 5
+	GameState.start_next_day()
+	assert_int(GameState.homestead().hay).is_equal(5)
+	for x: int in range(3, 16):
+		for y: int in range(10, 13):
+			if (y - 10) * 13 + (x - 3) >= 10:
+				GameState.homestead().set_down(Vector2i(x, y), Placement.LYING, &"stone_path")
+	assert_int(int(GameState.pastures()[0]["grass"])).is_equal(10)
+	GameState.start_next_day()
+	assert_int(GameState.homestead().hay).override_failure_message("the hen grazed four, and six were too few for the cow").is_equal(4)
 
 
 func test_a_morning_feeds_from_the_pasture_then_the_hay_then_nobody() -> void:
@@ -239,6 +272,7 @@ func test_the_land_is_read_from_its_scene() -> void:
 	assert_int(land.debris_count()).override_failure_message("the overgrowth of a new game, and not the meadow's tall grass").is_equal(145)
 	assert_bool(land.is_road(Vector2i(28, 12))).override_failure_message("the farmhouse's doorstep is the path's end").is_true()
 	assert_bool(land.is_road(Vector2i(39, 14))).override_failure_message("the way out").is_true()
+	assert_bool(land.is_road(Vector2i(28, 11))).override_failure_message("the farmhouse's door is a way out too").is_true()
 	assert_bool(land.is_solid(Vector2i(28, 9))).override_failure_message("the farmhouse").is_true()
 	assert_bool(land.is_solid(Vector2i(5, 22))).override_failure_message("the pond").is_true()
 	assert_bool(land.is_solid(Vector2i(0, 0))).override_failure_message("the woods").is_true()
@@ -264,6 +298,17 @@ func _set_down(id: StringName, at: Vector2i) -> void:
 func _build(id: StringName, at: Vector2i) -> void:
 	_set_down(id, at)
 	GameState.start_next_day()
+
+
+## Clears `pen` and the ring round it, and fences the ring but where a building stands.
+func _fence(pen: Rect2i) -> void:
+	var ring: Rect2i = pen.grow(1)
+	for y: int in range(ring.position.y, ring.end.y):
+		for x: int in range(ring.position.x, ring.end.x):
+			var cell: Vector2i = Vector2i(x, y)
+			GameState.clear_debris(LAND, cell)
+			if not pen.has_point(cell) and GameState.building_covering(LAND, cell) == &"":
+				GameState.homestead().set_down(cell, Placement.STANDING, &"fence")
 
 
 ## Clears the pen round the coop's door and fences it.

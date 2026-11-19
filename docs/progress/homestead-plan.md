@@ -6,8 +6,8 @@ five phases with a stop after each. This is phase 0: the plan, and no code.
 
 **Status: approved as written by the user on 2026-11-17 ("Approve as written"). All thirty decisions
 below (D1 to D30) stand as proposed, and each is recorded in `docs/DECISIONS.md`. Phase 1 is built and
-approved (2026-11-19); phase 2 is built and approved (2026-11-19); phase 3 is built (2026-11-19) and
-waits for the user's review; phases 4 and 5 are not built.** Every number is a first guess, kept in data, to be measured in phase 5. The tables below are as
+approved (2026-11-19); phase 2 is built and approved (2026-11-19); phase 3 is built and approved (2026-11-19);
+phase 4 is built (2026-11-19) and waits for the user's review; phase 5 is not built.** Every number is a first guess, kept in data, to be measured in phase 5. The tables below are as
 approved; where a phase builds something differently, it says so under "What the user has decided" and
 in the log.
 
@@ -88,6 +88,24 @@ which does not exist. The coordinator adds to it after each review.
   pulled down** ("Keep as built"); the tall grass reading was approved with the phase as built. R4, R7's
   hay, R8's shed, R9 and R10's `build` tab are in CLAUDE.md, with a block of phase 3's rules. R15 to R17
   wait for phases 4 and 5.
+
+- *(Written by phase 4's subagent, for the coordinator to confirm with the user.)* **2026-11-19, phase 4
+  is built** (steps 4a, 4b and 4c, each ticked below with what was built differently). Every approved
+  decision it touches (D25 to D28, D29's stall, D30's point for a product) held as written, with the
+  table's prices, products, paces and grass. What the plan left open and the phase chose is in
+  `docs/DECISIONS.md` under the three steps; the readings worth the user's eye:
+  - **a pasture is the ground the doorstep reaches through what can be crossed,** and anything
+    standing closes it (a bench or a sapling as well as a fence, a gate or a hedge); the meadow's tall
+    grass is grazed like any grass;
+  - **the herd is fed in the order it was bought,** and two buildings whose doors open on one fenced
+    ground share its grass;
+  - **"unhappy" is a day's hunger,** shown over its head, and nothing more;
+  - **the Wool Blanket is a farmhouse furnishing that lies over the bed,** and cloth and the blanket
+    are on the "Make" tab once their makings are found;
+  - **Oda's stall is the village's market stall again,** at (16..18, 30..31) beside her.
+  What phase 5 will meet: an animal is `GameState.homestead().animal(index)`, bought through
+  `GameState.buy()` of Oda's ware or `buy_animal()`, petted through `pet_animal()`; `has_pasture(id)`
+  and `pastures()`; the products are the items `egg`, `wool`, `milk` and `cloth`.
 
 ## The short of it
 
