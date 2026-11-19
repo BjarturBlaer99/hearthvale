@@ -1225,3 +1225,55 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
 - 2026-11-19 — **Phase 1 was stopped by the user twice and picked up each time by a fresh subagent**
   from what was committed and what lay in the working tree; nothing was discarded. The last subagent
   re-read every test suite the first had moved and planted thirteen bugs, all caught.
+- 2026-11-19 — **The Homestead, step 2a: what the plan left open.**
+  - **A placeable is an item of type `placeable`** whose stats say what it is on the ground (`layer`, and
+    for a standing thing `blocks` and `joins`). There is no `data/placeables/`: the plan's list of new
+    data has none, a seed and a sprinkler are items in the same way, and the shop, the workbench and the
+    chest already deal in items. Why: a new placeable is then a line of data and a picture.
+  - **Its icon is its picture on the ground.** One sheet, `gameplay/art/placed.png`, holds both;
+    `ItemIcons` draws from it for an icon it doesn't have itself.
+  - **What is set down is two layers of `Homestead`,** saved as `lying` and `standing` in the save's
+    `homestead` section, **and written only when something is set down:** a homestead with nothing on
+    it is saved exactly as phase 1 saved it. Why: D30's "fields read with defaults", and every phase 1
+    test of the save holds unchanged.
+  - **A thing saved that the game no longer has, or on the wrong layer, is left out** as the save loads.
+  - **The table's order is the order the refusals are tried in.** So the farmhouse's doorstep, which is
+    the end of the path to its door, says "That is the road.", and the door's own cell (a way out) says
+    the same. No cell of today's land says "That is a doorstep."; phase 3's buildings will have some.
+  - **The road is read from the map:** a path tile of the Height layer, or a cell an exit covers. A
+    doorstep is the cell below a door tile that an exit covers.
+  - **A standing thing is not set down where something lies to be picked up** (what a rock left, what a
+    full pack couldn't take): "Something is there already." Why: it would be shut in. A path may be laid
+    under it.
+  - **A lying thing may be laid under the hero's feet:** the table's "someone is standing there" is for
+    standing things.
+  - **"On screen" is the cells whose middle the camera shows.** The ghost stops at the view's edge, by
+    the keys and by the mouse.
+  - **The keys do what the two mouse buttons do,** where the ghost is: the sword's key (Space, J, a
+    pad's X) sets down, and the item's key (Q, K, a pad's Y) takes up. A pad's A is the right click's
+    twin, as in play, so it takes up. A movement key held repeats. Why: the plan gives the mouse its two
+    buttons and the keys the ghost; without these a pad could move the ghost and do nothing with it.
+  - **The ghost starts on the cell the hero faces** and goes to the mouse as soon as it moves.
+  - **A right click takes up what stands in a cell before what lies in it.**
+  - **The words the plan didn't give:** "Fence x12" over the bar where the thing fits; "You carry nothing
+    to set down."; "Taken up: Fence."; "There is nothing here to take up."; and, for a full pack, the
+    game's own "You have no room for the Fence."
+  - **When the last of a thing is set down the first thing on the bar is chosen,** and with nothing left
+    the ghost is a plain pointer that can still take things up. What was chosen is remembered while he
+    stays on the farm.
+  - **The build bar is the item bar drawn again** (`BuildBarView` extends `ItemBar`): the same slots in
+    the same place, each with its count.
+  - **The controls hint,** where the player has it showing, says build mode's keys while the mode is open.
+  - **A fence shows a post, and a rail toward every neighbour that is a fence or a gate.** A gate is two
+    capped posts with the way between them open (D18: no opening and shutting); in a fence that runs
+    north and south it is the two ends of the gap. A lying thing has a thin dark rim on each side where
+    nothing lies beside it.
+  - **The ghost is drawn on a layer of its own that follows the camera,** so the night's tint doesn't
+    dim it. It is tinted, not solid: what it would hide still shows.
+  - **Setting a thing down raises a little dust and has a sound** (`set_down`; `take_up` for taking one
+    up), both made in code.
+  - **A stack of paths or fences is 99, of gates 20.** They go in the storage chest like anything that
+    stacks, and are never eaten, given or on the item bar.
+  - **`SpriteSheet.draw()` is left as it is,** though in this engine it draws a mirrored frame one
+    frame's width to the right (measured). It is older than the Homestead and draws four creatures; a
+    fence's west rail is mirrored by `PlacedArt` itself. Needs the user's word.

@@ -1359,7 +1359,8 @@ in a shop's data, two favours as data, and a tool that plays the game.
 
 ## 30. The Homestead
 The user's request of 2026-11-17 (`docs/progress/homestead-plan.md`, approved as written), in five phases.
-**Phase 1 is built** (2026-11-18 and 19): the farm and the home's move.
+**Phase 1 is built** (2026-11-18 and 19): the farm and the home's move. **Phase 2 is being built**
+(2026-11-19): placing things, under "Placing things" below.
 - **The area `homestead`** (`world/areas/homestead/homestead.tscn`, "Your farm") is a map of 40 by 30
   cells, baked by `tools/greybox/build_maps.gd` from a sketch with a legend of its own (below). Woods two
   deep stand all round it; the ground is level (height 0 everywhere).
@@ -1465,7 +1466,59 @@ The user's request of 2026-11-17 (`docs/progress/homestead-plan.md`, approved as
     then the village) and that the plot is on the homestead (`PLOT_AREA`). It works the cells with
     nothing standing on them, the clear corner, and fills the can at the pond. It does not clear land.
     Two days at `days=2 speed=4` played through with nothing left out.
-- **Tests:** `tests/world/homestead_test.gd` (the map and the walk), `tests/world/home_move_test.gd` (the
+- **Placing things** (phase 2, step 2a; the plan's D12 to D19):
+  - **A placeable is an item of type `placeable`** (data/items; `docs/data/items.schema.json`). Its
+    stats say what it is on the ground: `layer` (`lying` or `standing`), and for a standing thing
+    `blocks` (true unless said: a gate says false) and `joins` (a fence, a gate). Its `icon` names a
+    frame of `gameplay/art/placed.png` (`PlacedArt.FRAMES`), which is its picture on the ground and on
+    the build bar. `Placement.problems()` checks each as the data loads. **A new placeable is data and
+    a picture.** It is no `Inventory.EQUIPPABLE_TYPES`, so it is never on the item bar.
+  - **`Placement`** (`core/homestead/`, pure) says whether a thing fits a cell. The area describes the
+    cell as a `site` (`Placement.site()`: on his land, ground to stand on, road, doorstep, field,
+    debris, what lies and stands there, someone in it, something lying to be picked up) and
+    `Placement.why_not(item, site)` gives the first refusal that holds, in the plan's table's order
+    and words, or "".
+  - **`Homestead` keeps what is set down** on two layers, a cell to one thing of each: `lying_at()`,
+    `standing_at()`, `set_down()`, `take_up()`, `move()`, `placed(layer)`. It knows nothing of what an
+    item is. **Go through `GameState.set_down(area, cell, item_id)` and `take_up(area, cell, layer)`**
+    (`why_not_take_up()` says why not: nothing there, or no room), which move the item between the pack
+    and the land, refuse anywhere but his land, and emit `EventBus.homestead_changed`.
+  - **`PlacedThings`** (`world/areas/placed_things.gd`), a node of the homestead's area, keeps the
+    area in step with that on every `homestead_changed`: it draws the lying things flat, just over
+    the ground's shading and under everyone; makes a `PlacedThing` (`gameplay/interactables/`) in
+    `Interactables` for each standing thing, sorted by depth with the hero; and fills the cell of each
+    that blocks (`TerrainQuery.set_occupied`), freeing it when the thing is gone. Nothing else in the
+    area changes.
+  - **`PlacedArt`** draws a thing: its frame, and for one that joins, a rail toward each neighbour
+    that joins too (`<frame>_n`, `<frame>_e`, mirrored for the west, `<frame>_s`); a `<frame>_v` is
+    how it stands in a run going north and south (the gate). It mirrors in place itself:
+    `SpriteSheet.draw()` puts a mirrored frame a frame's width to the right in this engine.
+  - **Build mode** is `BuildMode` (`world/areas/build_mode.gd`), a node of the area that only the
+    homestead has. `AreaController.open_build()` opens it on the action `build` (B; a pad's left
+    stick), when he is free to act; any other area says `Placement.NOT_LAND_WORDS`. Open, it counts
+    as a menu (`is_in_menu()`): the hero stands still, the clock stops, the item bar is out of sight.
+    - It reads its own input before the area does. The mouse's motion and clicks are turned into a
+      cell through the canvas's own transform (`make_input_local`), so the camera's scroll is
+      accounted for; the movement keys move the ghost a cell (a held key repeats).
+    - `view_cells()` is the cells whose middle the camera shows; `point_at()` clamps to it.
+    - `site_at(cell)` builds the site from the area: the grid, the Height layer's path tiles and the
+      exits (road), a door tile under an exit (doorstep), the plot, `debris_at()`, the hero's cell.
+    - `set_down()` (a left click; the sword's key) and `take_up()` (a right click; the item's key)
+      do the work; `step()` and `choose_slot()` choose on the bar (the wheel; 1 to 9); B, Tab and
+      Esc `close()`.
+    - The ghost is drawn on a canvas layer of its own that follows the camera, under the HUD.
+  - **The build bar** is `BuildBar` (`core/homestead/`, pure: what is on it, the choice, stepping)
+    and `BuildBarView` (`ui/`, the item bar's own drawing with a count in every slot). The HUD shows
+    it with a line of words (`AreaHud.show_build()`, `build_words()`, `build_refused()`).
+  - **The save is still version 6.** The section `homestead` gains `"lying": { "x,y": item id }` and
+    `"standing": { "x,y": { "item": id, "age": mornings } }`, each written only when it has something
+    in it and read as empty when it is missing. A thing the game doesn't know, or on the wrong layer,
+    is left out as it loads.
+  - **Sounds and tools:** `set_down` and `take_up` (`make_audio.gd`); `tools/playtest.gd -- build`;
+    capture shots 168 to 171 (`build:<x>,<y>` opens the mode with the ghost on a cell; `yard` shows a
+    yard fenced, gated and paved).
+- **Tests:** `tests/world/build_mode_test.gd` (build mode in the world), `tests/core/homestead/`
+  (`Placement`, `BuildBar`, what `Homestead` keeps), `tests/world/homestead_test.gd` (the map and the walk), `tests/world/home_move_test.gd` (the
   doors, waking, the locked cottage, the version 5 save in the world), `tests/world/debris_test.gd` (the
   overgrowth), `tests/world/homestead_tune_test.gd` (the tunes), `tests/autoload/homestead_save_test.gd`,
   and `tests/core/homestead/` (`Homestead`, `HomesteadRules`). The suites that worked the village's plot work the

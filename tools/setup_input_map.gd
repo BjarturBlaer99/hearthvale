@@ -30,6 +30,9 @@ func _initialize() -> void:
 	_action("use_item", [_key(KEY_Q), _key(KEY_K), _button(JOY_BUTTON_Y)])
 	_action("item_menu", [_key(KEY_TAB), _key(KEY_I), _button(JOY_BUTTON_BACK)])
 	_action("pause", [_key(KEY_ESCAPE), _key(KEY_P), _button(JOY_BUTTON_START)])
+	# Build mode (the Homestead, phase 2): B, or a click of a pad's left stick. On his own land
+	# it opens the mode in which things are set down; B, Tab or Esc leave it.
+	_action("build", [_key(KEY_B), _button(JOY_BUTTON_LEFT_STICK)])
 	# The item bar (the user's request, 2026-11-15): the wheel steps through what can be in hand
 	# (a gamepad's shoulders too), and the keys 1 to 9 choose a slot. In a menu the wheel moves
 	# the highlight up and down.

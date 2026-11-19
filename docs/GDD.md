@@ -324,7 +324,7 @@ under thatch, red clay tiles or blue slate, with smoking chimneys, and a stone c
 
 ## 13. Out of scope (unless asked)
 Multiplayer, procedural generation, 3D, voice acting, swimming, climbing, seasons, weather, livestock of your
-own, crafting beyond cooking, the workbench and the furnace (§14), placing furniture by hand, fishing, an inventory limit, an open world, new areas
+own, crafting beyond cooking, the workbench and the furnace (§14), placing furniture by hand indoors (out of doors on the homestead things are set down by hand: §15), fishing, an inventory limit, an open world, new areas
 beyond the hero's homestead (§15: the farm and the farmhouse's inside; the user asked for it on 2026-11-17).
 
 ## 14. Mining and crafting *(2026-11-17)*
@@ -396,8 +396,8 @@ beyond the hero's homestead (§15: the farm and the farmhouse's inside; the user
   and reached its top level on the second day); floors 4 to 6 have two coal rocks each, not four.
 
 ## 15. The Homestead *(2026-11-17; `docs/progress/homestead-plan.md`)*
-*(Built: phase 1, the farm and the home's move. Phases 2 to 5, placing things, buildings, animals and the
-balance, are planned and not built.)*
+*(Built: phase 1, the farm and the home's move, and of phase 2, placing things, its first step. Phases 3
+to 5, buildings, animals and the balance, are planned and not built.)*
 - **The farm** is an old farmstead on the road west of Hearthvale, left to the hero: the lane through the
   village runs on through the west woods and comes in at the farm's east edge. It is a map of its own, 40
   by 30 cells, with woods all round.
@@ -430,3 +430,21 @@ balance, are planned and not built.)*
   Aldric, whose farm it was. Nothing else in the story changed.
 - **An older save loads with nothing lost:** a hero saved in the cottage is in the farmhouse on the cell he
   stood on, and his soil, crops and sprinklers are in the field's clear corner.
+- **Build mode** *(phase 2)*: B opens it, on the homestead only ("You can only build on your own land."
+  anywhere else). The hero stands still and the clock with him.
+  - **The mouse points at a cell,** and the movement keys move the ghost a cell at a time. The ghost
+    shows the thing chosen: green where it fits, red where it doesn't, with the reason in a line of
+    words. Only what is on screen can be built on.
+  - **A left click sets the thing down** and takes one from the pack; **a right click takes up** what
+    is under the ghost and gives it back, if there is room for it. Neither costs energy or time.
+  - **The build bar** takes the item bar's place: everything he carries that can be set down, each
+    with how many. The wheel and the keys 1 to 9 choose. B, Tab or Esc leave.
+  - **Two things to a cell at most:** one lying (a path) and one standing (a fence, a gate).
+  - **Never on** trees, water or the house; the road, the path to the door or the way out; a
+    doorstep; the field; anything that still wants clearing; and, for a standing thing, the cell he
+    stands in.
+  - **A fence blocks.** A gate lets the hero through (and will keep animals in). A path is walked on.
+    He walks before a fence and behind it.
+  - **What is set down** *(so far)*: the Dirt Path, the Stone Path and the Wood Path; the Fence; the
+    Gate.
+  - **It is all kept in the save,** and there after a night.

@@ -373,6 +373,10 @@ func _validate_references() -> void:
 		if ToolUse.is_farm_tool(item):
 			for problem: String in ToolUse.problems(item):
 				errors.append("%s: item '%s': %s" % [item["_source"], item["id"], problem])
+		# What is set down on the hero's land (the Homestead): its stats say what it is there.
+		if Placement.is_placeable(item):
+			for problem: String in Placement.problems(item, SceneryAtlas.KINDS):
+				errors.append("%s: item '%s': %s" % [item["_source"], item["id"], problem])
 
 
 func _check_quest(quest: Dictionary) -> void:

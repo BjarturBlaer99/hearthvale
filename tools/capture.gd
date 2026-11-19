@@ -38,7 +38,10 @@ extends SceneTree
 ## a boulder of the homestead, which wants a better one; "sprinkler" shows the plot the
 ## morning after two sprinklers were set. "shop_ore" opens Tilda's list of what she buys with
 ## a turnip and a pack from the quarry; "favour:<villager>:<points>" talks to a villager who
-## has taught her recipe already, so that at three marks she asks her favour.
+## has taught her recipe already, so that at three marks she asks her favour. The Homestead's
+## build mode: "build:<x>,<y>" opens it with a stock of placeables and the ghost on that cell
+## ("build:<x>,<y>:<slot>" with that slot of the build bar chosen); "yard" shows a yard fenced,
+## gated and paved east of the farmhouse.
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -222,6 +225,27 @@ const SHOTS: Array = [
 	["165_the_farm_at_night", &"homestead", Vector2i(28, 13), Vector2.DOWN, 0, "time:22:00"],
 	["166_cutting_weeds_on_the_field", &"homestead", Vector2i(27, 18), Vector2.RIGHT, 0, "swing"],
 	["167_the_field_and_its_clear_corner", &"homestead", Vector2i(28, 16), Vector2.DOWN, 0, ""],
+	# The Homestead, phase 2 (2026-11-19): build mode with a green ghost and the build bar; a
+	# red ghost on the road, with its words; a yard fenced, gated and paved, the hero before
+	# its fence; and the hero walking through its gate.
+	["168_build_mode_a_green_ghost", &"homestead", Vector2i(30, 13), Vector2.RIGHT, 0, "build:33,12"],
+	["169_a_red_ghost_on_the_road", &"homestead", Vector2i(30, 13), Vector2.RIGHT, 0, "build:32,14"],
+	["170_a_fenced_yard_with_paths", &"homestead", Vector2i(33, 14), Vector2.UP, 0, "yard"],
+	["171_through_the_gate", &"homestead", Vector2i(34, 13), Vector2.DOWN, 0, "yard"],
+]
+## What a build shot carries: enough of each thing for a yard, in the order of the build bar.
+const BUILD_STOCK: Array = [[&"fence", 30], [&"gate", 3], [&"dirt_path", 12], [&"stone_path", 20], [&"wood_path", 12]]
+## The yard of the "yard" shots, east of the farmhouse: [item, the cells it is set down in].
+## A fence round (32..36, 10..13) with a gate in its west side and one in its south side,
+## stone paving inside, and a dirt path from the west gate to the door's path.
+const YARD: Array = [
+	[&"fence", [Vector2i(32, 10), Vector2i(33, 10), Vector2i(34, 10), Vector2i(35, 10), Vector2i(36, 10),
+		Vector2i(32, 11), Vector2i(36, 11), Vector2i(36, 12),
+		Vector2i(32, 13), Vector2i(33, 13), Vector2i(35, 13), Vector2i(36, 13)]],
+	[&"gate", [Vector2i(32, 12), Vector2i(34, 13)]],
+	[&"stone_path", [Vector2i(33, 11), Vector2i(34, 11), Vector2i(35, 11),
+		Vector2i(33, 12), Vector2i(34, 12), Vector2i(35, 12), Vector2i(34, 13)]],
+	[&"dirt_path", [Vector2i(29, 12), Vector2i(30, 12), Vector2i(31, 12), Vector2i(32, 12)]],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -399,6 +423,13 @@ func _capture() -> void:
 					for y: int in 2:
 						game_state.call(&"till_soil", Vector2i(x, y))
 					game_state.call(&"water_soil", Vector2i(x, 0))
+		if str(shot[5]).begins_with("build:") or shot[5] == "yard":
+			for item: Array in BUILD_STOCK:
+				game_state.call(&"add_item", item[0], item[1])
+		if shot[5] == "yard":
+			for row: Array in YARD:
+				for cell: Vector2i in row[1]:
+					game_state.call(&"set_down", &"homestead", cell, row[0])
 		if shot[5] == "boulder":
 			# The plain Pickaxe in hand, at a boulder that wants the Copper one.
 			game_state.call(&"add_item", &"pickaxe", 1)
@@ -531,6 +562,15 @@ func _capture() -> void:
 		elif shot[5] in ["cook_menu", "new_dishes"]:
 			scene.call(&"open_item_menu")
 			await _frames(2)
+		elif str(shot[5]).begins_with("build:"):
+			# Build mode open, the ghost on the cell named (and the slot named chosen).
+			var build_parts: PackedStringArray = str(shot[5]).split(":")
+			var at: PackedStringArray = build_parts[1].split(",")
+			scene.call(&"open_build")
+			if build_parts.size() > 2:
+				scene.get(&"build").call(&"choose_slot", int(build_parts[2]))
+			scene.get(&"build").call(&"point_at", Vector2i(int(at[0]), int(at[1])))
+			await _frames(3)
 		elif shot[5] == "workbench":
 			# The cursor on the chest, which he hasn't the wood for: its needs show what is short.
 			scene.call(&"open_craft")

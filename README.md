@@ -149,7 +149,7 @@ Beaten enemies sometimes drop hearts or coins.
   you; the Old Wood has mist. Only the water moves.
 - **Walls with height** (the pivot, step 1d): dungeon and house walls show a lit front and a dark top, pillars
   stand tall, and roofs have a ridge you walk behind.
-- **The Homestead** (asked for on 2026-11-17; phase 1 of five is built): an old farmstead of your own.
+- **The Homestead** (asked for on 2026-11-17; phase 1 of five is built, and the first step of phase 2): an old farmstead of your own.
   Follow the lane west out of Hearthvale, past the last cottage and through the trees: it is a few
   seconds' walk. The farmhouse there is your home (the bed, the hearth and the workbench are inside), your
   field lies below it across the road, and a pond in the south-west corner fills the watering can.
@@ -157,6 +157,12 @@ Beaten enemies sometimes drop hearts or coins.
     the land around, is overgrown: cut weeds, bushes, fallen logs and old stumps with the sword, and
     break rocks with the Pickaxe. They leave fibre, wood and stone, and never come back. A boulder wants
     the Copper Pickaxe and a great boulder the Iron one. Soil can't be tilled until it is cleared.
+  - **Build mode** (phase 2, its first step): on the farm, **B** opens it. The mouse points at a cell
+    (or move the ghost with the movement keys): it is green where the thing fits and red where it
+    doesn't, with the reason in words. **Left click** sets the thing down, **right click** takes one
+    up; the **wheel** or **1 to 9** choose what to set down; **B**, **Tab** or **Esc** leave. Time
+    stands still while you build. So far there are three paths, a fence that blocks and a gate you
+    walk through.
   - **An older save loads as it was:** a game saved in the old cottage opens in the farmhouse, and its
     soil and crops are in the field's clear corner.
   - **The farm has its own tune,** and a quieter one after dark.
@@ -221,8 +227,9 @@ To try one part without playing up to it: `godot --path . -s res://tools/playtes
 crypt's stairs, equipped as after the keep), `-- shade` (outside the Shade's hall), `-- ending` (one step from
 the ending), `-- warden`, `-- quarry` (the mine's entrance hall with a Pickaxe), `-- craft` (at home by the
 workbench, with ore, bars and wood for most of its list), `-- homestead` (arriving on your farm with a sword
-and all three pickaxes; add `20:30` for its night) or `-- farm` (on the farm's road above the field, with the
-hoe, the can and seeds). Saving in a scenario goes to a slot of its own, so it never replaces your own game.
+and all three pickaxes; add `20:30` for its night), `-- farm` (on the farm's road above the field, with the
+hoe, the can and seeds) or `-- build` (on the farm by the farmhouse, the ground cleared, with a stock of
+things to set down: press B). Saving in a scenario goes to a slot of its own, so it never replaces your own game.
 
 To have a script play eight days by pressing real keys (the balance pass's run: the field's clear corner,
 Tilda's counter, the quarry, the furnace and the workbench): `godot --path . -s res://tools/play_days.gd -- <folder>`. It

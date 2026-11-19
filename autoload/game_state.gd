@@ -613,7 +613,8 @@ func store_take(index: int) -> String:
 
 # --- The Homestead (2026-11-17) ----------------------------------------------
 
-## The hero's homestead: what he has done to his land that is for good (what he has cleared).
+## The hero's homestead: what he has done to his land (what he has cleared for good, and what
+## he has set down).
 func homestead() -> Homestead:
 	if _homestead == null:
 		_homestead = Homestead.new()
@@ -641,6 +642,50 @@ func clear_debris(area: StringName, cell: Vector2i) -> bool:
 		return false
 	EventBus.homestead_changed.emit()
 	return true
+
+
+## Sets one `item_id` (a placeable he carries) down in `cell` of `area`: it leaves the pack
+## and lies or stands there, as its data says (Placement). Whether it fits the ground is the
+## area's to ask first (Placement.why_not: build mode does); here it is refused only off his
+## land, for what he hasn't got or can't be set down, and where a thing of its layer is
+## already. Returns whether it was set down.
+func set_down(area: StringName, cell: Vector2i, item_id: StringName) -> bool:
+	var layer: StringName = Placement.layer_of(DataRegistry.get_item(item_id))
+	if not homestead_rules().is_land(area) or layer == &"" or item_count(item_id) <= 0:
+		return false
+	if not homestead().set_down(cell, layer, item_id):
+		return false
+	add_item(item_id, -1)
+	EventBus.homestead_changed.emit()
+	return true
+
+
+## Why what is on `layer` (Placement.LYING or STANDING) in `cell` of `area` can't be taken up,
+## in Placement's words: nothing is there, or the pack has no room for it. "" if it can.
+func why_not_take_up(area: StringName, cell: Vector2i, layer: StringName) -> String:
+	var item_id: StringName = homestead().thing_at(cell, layer) if homestead_rules().is_land(area) else &""
+	if item_id == &"":
+		return Placement.NOTHING_WORDS
+	if not has_room_for(item_id):
+		return Placement.NO_ROOM_WORDS % str(DataRegistry.get_item(item_id).get("name", item_id))
+	return ""
+
+
+## Takes up what is on `layer` in `cell` of `area` and puts its item back in the pack (a grown
+## tree gives back its sapling: it is the sapling's item that stands there). A full pack
+## refuses, and the thing stays where it is. Returns the item taken up, or &"" if none was.
+func take_up(area: StringName, cell: Vector2i, layer: StringName) -> StringName:
+	if not why_not_take_up(area, cell, layer).is_empty():
+		return &""
+	var item_id: StringName = homestead().take_up(cell, layer)
+	add_item(item_id, 1)
+	EventBus.homestead_changed.emit()
+	return item_id
+
+
+## What grows on his land, for a morning (Homestead.grow): item id -> the mornings it takes.
+func growing_things() -> Dictionary:
+	return Placement.growing(DataRegistry.entries(&"items"))
 
 
 # --- The mine (2026-11-17) ---------------------------------------------------
@@ -687,6 +732,9 @@ func start_next_day() -> void:
 	minute = float(day_clock().starts)
 	farm().new_day(Crops.days_by_id(DataRegistry.entries(&"crops")))
 	EventBus.farm_changed.emit()
+	# A sapling on his land is a morning older (the Homestead): no water needed.
+	if homestead().grow(growing_things()):
+		EventBus.homestead_changed.emit()
 	EventBus.day_started.emit(day)
 	EventBus.time_changed.emit(day, floori(minute))
 
@@ -1062,7 +1110,7 @@ func from_dict(data: Dictionary) -> void:
 	_furnace.load_saved(home.get("furnace"))
 	_store = null
 	store().load_saved(home.get("chest"), func(item_id: String) -> int: return Inventory.capacity(DataRegistry.get_item(StringName(item_id))))
-	homestead().load_saved(data.get("homestead"))
+	homestead().load_saved(data.get("homestead"), func(item_id: String) -> StringName: return Placement.layer_of(DataRegistry.get_item(StringName(item_id))))
 	var src_found: Variant = data.get("found")
 	if typeof(src_found) == TYPE_ARRAY:
 		for id: Variant in src_found:

@@ -147,6 +147,10 @@ var relief: WallRelief
 var windows: WindowGlow
 ## The hero's plot (P3), if it lies in this area.
 var plot: FarmPlot
+## On the hero's land (the Homestead, phase 2): what he has set down there, as it lies and
+## stands, and the mode he sets it down in. Null anywhere else.
+var placed: PlacedThings
+var build: BuildMode
 ## Nature that is only for show (P1c): petals lying round the cherry trees; the water's surface
 ## and what it mirrors; mist. The water is the one thing in the scenery that moves (the user's
 ## request, 2026-11-13): grass, trees, petals, mist and smoke are still.
@@ -265,6 +269,7 @@ func _ready() -> void:
 	player.set_camera_zoom(Ambience.ZOOM[ambience])
 	update_room(true)
 	_add_ambience()
+	_add_building()
 	_update_light()
 	hud.dialogue.closed.connect(_on_dialogue_closed)
 	hud.item_menu.chosen.connect(_on_item_chosen)
@@ -641,6 +646,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		used = open_item_menu()
 	elif event.is_action_pressed(&"pause"):
 		used = open_pause_menu()
+	elif event.is_action_pressed(&"build"):
+		used = open_build()
 	elif event.is_action_pressed(&"slot_next"):
 		used = step_hand(1)
 	elif event.is_action_pressed(&"slot_previous"):
@@ -1006,7 +1013,46 @@ func open_item_menu() -> bool:
 
 func is_in_menu() -> bool:
 	return hud.item_menu.is_open() or hud.shop_menu.is_open() or hud.gift_menu.is_open() or hud.craft_menu.is_open() \
-		or hud.store_menu.is_open()
+		or hud.store_menu.is_open() or is_building()
+
+
+## Whether build mode is open (the Homestead): a screen like the lists above.
+func is_building() -> bool:
+	return build != null and build.is_open()
+
+
+## Opens build mode (B; the Homestead, phase 2): only on his own land, and only when he is
+## free to act. He stands still while it is open, and the clock with him. Anywhere else he is
+## told why not. Returns whether anything came of the key.
+func open_build() -> bool:
+	if _busy() or not player.controls_enabled:
+		return false
+	if build == null:
+		EventBus.sound.emit(&"nope")
+		hud.show_message(Placement.NOT_LAND_WORDS)
+		return true
+	player.controls_enabled = false
+	hud.set_prompt("")
+	build.open()
+	return true
+
+
+## On the hero's land: what he has set down there is shown, lying and standing, and build
+## mode is ready. (Any other area has neither.)
+func _add_building() -> void:
+	if not GameState.homestead_rules().is_land(area_id):
+		return
+	placed = PlacedThings.new()
+	add_child(placed)
+	# Just over the ground and its shading, under everyone who walks on it.
+	move_child(placed, _shading.get_index() + 1)
+	placed.setup(self)
+	build = BuildMode.new()
+	add_child(build)
+	# Before the HUD, so the ghost is drawn under it.
+	move_child(build, hud.get_index())
+	build.setup(self)
+	build.closed.connect(_on_item_menu_closed)
 
 
 ## Opens the storage chest's two lists (crafting, GDD §14). The hero stands still while they

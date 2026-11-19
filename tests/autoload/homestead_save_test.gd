@@ -218,3 +218,75 @@ func _write(slot: int, data: Dictionary) -> void:
 	var file: FileAccess = FileAccess.open(SaveSystem.slot_path(slot), FileAccess.WRITE)
 	file.store_string(JSON.stringify(data, "\t"))
 	file.close()
+
+
+# --- What is set down (phase 2): still version 6, new fields read with defaults ---
+
+func test_what_is_set_down_goes_through_a_save_and_back() -> void:
+	GameState.new_game()
+	for item: Array in [[&"fence", 5], [&"gate", 1], [&"stone_path", 4]]:
+		GameState.add_item(item[0], item[1])
+	GameState.homestead().clear(Vector2i(5, 9))
+	assert_bool(GameState.set_down(&"homestead", Vector2i(32, 12), &"fence")).is_true()
+	assert_bool(GameState.set_down(&"homestead", Vector2i(33, 12), &"gate")).is_true()
+	assert_bool(GameState.set_down(&"homestead", Vector2i(33, 12), &"stone_path")).override_failure_message("a path under the gate").is_true()
+	assert_bool(GameState.set_down(&"homestead", Vector2i(33, 12), &"fence")).override_failure_message("a second standing thing").is_false()
+	assert_int(GameState.item_count(&"fence")).override_failure_message("one fence set down, one refused and kept").is_equal(4)
+	assert_int(GameState.item_count(&"gate")).override_failure_message("the last gate: none left").is_equal(0)
+	GameState.update_player(&"homestead", Vector2i(30, 13))
+	assert_int(SaveSystem.save_to_slot(TEST_SLOT)).is_equal(OK)
+	var on_disk: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveSystem.slot_path(TEST_SLOT)))
+	assert_int(int(on_disk["version"])).override_failure_message("no new version: the new fields are read with defaults").is_equal(6)
+	assert_dict(on_disk["homestead"]).is_equal({
+		"cleared": ["5,9"],
+		"lying": {"33,12": "stone_path"},
+		"standing": {"32,12": {"item": "fence"}, "33,12": {"item": "gate"}},
+	})
+	var before: String = JSON.stringify(GameState.to_dict(), "", true)
+	GameState.clear()
+	assert_int(GameState.homestead().placed_count()).override_failure_message("cleared").is_equal(0)
+	assert_int(SaveSystem.load_from_slot(TEST_SLOT)).is_equal(OK)
+	assert_str(JSON.stringify(GameState.to_dict(), "", true)).is_equal(before)
+	assert_that(GameState.homestead().standing_at(Vector2i(32, 12))).is_equal(&"fence")
+	assert_that(GameState.homestead().standing_at(Vector2i(33, 12))).is_equal(&"gate")
+	assert_that(GameState.homestead().lying_at(Vector2i(33, 12))).is_equal(&"stone_path")
+	assert_bool(GameState.homestead().is_cleared(Vector2i(5, 9))).is_true()
+	# Taken up after the load, each comes back to the pack; a new game has none of it.
+	assert_that(GameState.take_up(&"homestead", Vector2i(33, 12), Placement.STANDING)).is_equal(&"gate")
+	assert_int(GameState.item_count(&"gate")).is_equal(1)
+	GameState.new_game()
+	assert_int(GameState.homestead().placed_count()).is_equal(0)
+	assert_dict(GameState.to_dict()["homestead"]).is_equal({"cleared": []})
+
+
+func test_a_version_6_save_from_before_things_could_be_set_down_still_loads() -> void:
+	# Phase 1's save: the homestead is its cleared cells and nothing else.
+	GameState.new_game()
+	GameState.homestead().clear(Vector2i(28, 17))
+	GameState.update_player(&"homestead", Vector2i(28, 16))
+	var early: Dictionary = GameState.to_dict()
+	assert_dict(early["homestead"]).override_failure_message("with nothing set down, the homestead is saved as phase 1 saved it").is_equal({"cleared": ["28,17"]})
+	_write(TEST_SLOT, early)
+	GameState.clear()
+	assert_int(SaveSystem.load_from_slot(TEST_SLOT)).is_equal(OK)
+	assert_int(GameState.homestead().placed_count()).is_equal(0)
+	assert_bool(GameState.homestead().is_cleared(Vector2i(28, 17))).is_true()
+	assert_dict(GameState.player).is_equal({"area": "homestead", "cell": [28, 16]})
+	# And a version 5 save, which knew no homestead, has nothing set down either.
+	assert_int(_load_old(V5)).is_equal(OK)
+	assert_int(GameState.homestead().placed_count()).is_equal(0)
+	assert_array(GameState.homestead().placed(Placement.STANDING)).is_empty()
+	assert_array(GameState.homestead().placed(Placement.LYING)).is_empty()
+
+
+func test_a_saved_thing_the_game_does_not_know_is_left_out() -> void:
+	GameState.new_game()
+	var data: Dictionary = GameState.to_dict()
+	data["homestead"] = {
+		"cleared": [],
+		"lying": {"30,12": "stone_path", "31,12": "fence", "32,12": "magic_carpet", "33,12": "stone"},
+		"standing": {"30,12": {"item": "fence"}, "31,12": {"item": "stone_path"}, "32,12": {"item": "statue"}, "33,12": {"item": "wooden_sword"}},
+	}
+	GameState.from_dict(JSON.parse_string(JSON.stringify(data)))
+	assert_array(GameState.homestead().placed(Placement.LYING)).is_equal([{"cell": Vector2i(30, 12), "item": &"stone_path", "age": 0}])
+	assert_array(GameState.homestead().placed(Placement.STANDING)).is_equal([{"cell": Vector2i(30, 12), "item": &"fence", "age": 0}])

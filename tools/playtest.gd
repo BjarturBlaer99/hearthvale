@@ -31,7 +31,8 @@ const KEYS: String = "keys"
 ## A scenario's "flags" came true long ago (no day is kept for them); its "today" flags came
 ## true this very day, for what waits a day on them (the crypt's bars). "day" is the day it is
 ## (the plot wakes that many mornings), "friends" the points of friendship with villagers, and
-## "skills" the level of each skill it names (the rest begin at 1).
+## "skills" the level of each skill it names (the rest begin at 1). "cleared" are rectangles of
+## its area's cells whose overgrowth is gone already (the homestead's).
 const SCENARIOS: Dictionary = {
 	# A late day: the sixth morning at home, the keep quiet and the crypt open, every villager
 	# one liked gift short of two marks (when four ask a favour and three teach a recipe), and a
@@ -114,6 +115,18 @@ const SCENARIOS: Dictionary = {
 		"items": [[&"wooden_sword", 1], [&"pickaxe", 1], [&"copper_pickaxe", 1], [&"iron_pickaxe", 1], [&"hoe", 1],
 			[&"watering_can", 1], [&"turnip_seeds", 5], [&"bread", 3], [&"coin", 30]],
 		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds"],
+	},
+	# On the homestead east of the farmhouse's door, where the ground is cleared (columns 29 to
+	# 37, rows 8 to 13, and the strip below the road), with a stock of everything that can be set
+	# down: for trying build mode. B opens it; the mouse points at a cell and the movement keys
+	# move the ghost; a left click sets down and a right click takes up; the wheel and 1 to 9
+	# choose; B, Tab or Esc leave. A sword too, to clear more ground.
+	"build": {
+		"area": &"homestead",
+		"cell": Vector2i(30, 13),
+		"items": [[&"wooden_sword", 1], [&"fence", 40], [&"gate", 4], [&"dirt_path", 20], [&"stone_path", 20], [&"wood_path", 20]],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds"],
+		"cleared": [Rect2i(29, 8, 9, 6), Rect2i(20, 16, 18, 1)],
 	},
 	# In Tilda's shop at her counter, with coins and a harvest: for trying her list. (Start it by
 	# day: the shop is shut from 18:00 to 08:00, and he could not get back in.)
@@ -257,6 +270,11 @@ func _start() -> void:
 		game_state.call(&"add_friendship", villager, friends[villager])
 	for flag: StringName in scenario["flags"]:
 		game_state.call(&"set_flag", flag, true)
+	# Ground cleared before he came: its weeds, logs and rocks are gone for good.
+	for patch: Rect2i in scenario.get("cleared", []):
+		for x: int in range(patch.position.x, patch.end.x):
+			for y: int in range(patch.position.y, patch.end.y):
+				game_state.call(&"clear_debris", scenario["area"], Vector2i(x, y))
 	# Those came true long ago: no day is kept for them, so nothing waits a day on them.
 	(game_state.get(&"flag_days") as Dictionary).clear()
 	for flag: StringName in scenario.get("today", []):

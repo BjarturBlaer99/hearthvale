@@ -18,6 +18,7 @@ const SFX: Array[String] = [
 	"hoe", "pour", "fill", "plant", "harvest", "skill", "friend",
 	"wisp_flare", "wisp_dart",
 	"pick", "rock_break", "lift", "craft", "furnace",
+	"set_down", "take_up",
 ]
 
 ## Each song: tempo, bars (4/4; every track must last bars x 8 eighths), and its tracks.
@@ -254,6 +255,18 @@ static func effect(id: String) -> PackedFloat32Array:
 		"furnace":
 			# The furnace catching: a low breath that swells into a roar and settles.
 			return Synth.mix(Synth.tone(&"noise", 300, 1100, 0.7, 0.24, 0.25, 0.3, 0.5, 73), Synth.tone(&"triangle", 70, 110, 0.7, 0.16, 0.2, 0.3))
+		"set_down":
+			# A thing set down on the land: a firm knock on the ground and a short settle.
+			return Synth.join([
+				Synth.mix(Synth.tone(&"square", 190, 120, 0.07, 0.24, 0.001, 0.05, 0.5), Synth.tone(&"noise", 900, 300, 0.07, 0.20, 0.001, 0.05, 0.5, 81)),
+				Synth.tone(&"noise", 500, 220, 0.06, 0.10, 0.004, 0.05, 0.5, 82),
+			])
+		"take_up":
+			# A thing taken up again: a soft scrape and a light knock, rising.
+			return Synth.join([
+				Synth.tone(&"noise", 600, 1500, 0.07, 0.16, 0.004, 0.04, 0.5, 83),
+				Synth.mix(Synth.tone(&"square", 240, 330, 0.06, 0.20, 0.001, 0.04, 0.5), Synth.tone(&"noise", 1200, 700, 0.05, 0.12, 0.001, 0.04, 0.5, 84)),
+			])
 		"whiff":
 			# A blow passing through the Shade: thin air.
 			return Synth.tone(&"noise", 9000, 2500, 0.12, 0.16, 0.02, 0.08, 0.5, 33)

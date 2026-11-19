@@ -2717,3 +2717,49 @@ The last of phase 1's three steps (`docs/progress/homestead-plan.md`). **The pha
 - **CLAUDE.md is as it was:** its words for phase 1 (the plan's R2 to R8, R18, R19) are the coordinator's to write, and the phase's report proposes them as built.
 
 **Approved (phase 1).** The coordinator ran the full suite again (977 tests in 130 suites pass), confirmed the four commits and looked at the pictures; shown the summary and the pictures, the user approved phase 1 on 2026-11-19 ("Approve Phase 1"). Nobody has played it by hand. CLAUDE.md's rules now describe the game with phase 1 built. Phase 2 is next.
+
+## 2026-11-19 — The Homestead, phase 2, step 2a: the rules and the mode
+
+The first of phase 2's two steps (`docs/progress/homestead-plan.md`). Phase 1 was approved by the user the same day.
+
+**Built**
+- **Build mode.** B (or a click of a pad's left stick) opens it on the homestead, and only when the hero is free to act. Anywhere else it says "You can only build on your own land." While it is open he stands still and the clock with him, as at the workbench. B, Tab or Esc leave.
+- **The ghost.** It shows the thing chosen on the cell the mouse points at, snapped to the grid; the movement keys move it a cell at a time. It is green where the thing fits and red where it doesn't, and a line of words over the bar says why, or what the thing is and how many he carries ("Fence x12").
+- **Only what is on screen can be built on.** The ghost stops at the edge of the view, by the keys and by the mouse alike. To build further off he leaves, walks, and opens it again.
+- **A left click sets the thing down** and takes one from the pack. **A right click takes up** what is under the ghost and puts it back in the pack: what stands there before what lies there. A full pack refuses ("You have no room for the Fence.") and the thing stays.
+- **The build bar** takes the item bar's place: a slot for each thing he carries that can be set down, with how many. The wheel steps along it and the keys 1 to 9 choose a slot. Nothing of it is ever on the item bar.
+- **The rules** are the plan's table, with its words: never on trees, water, the house or the map's edge ("Nothing can stand there."); the road, the path to the door or the way out ("That is the road."); a doorstep; the field ("That is your field."); where something stands to be cleared ("Clear this first."); where a thing of its kind is already ("Something is there already."); and, for a standing thing, the cell he is in ("Someone is standing there.").
+- **Two things to a cell at most:** one lying and one standing. A fence stands on a paved cell.
+- **Five things to set down:** the Dirt Path, the Stone Path and the Wood Path (lying), the Fence (standing, blocks) and the Gate (standing; the hero walks through it).
+- **Collisions.** A fence fills its cell the moment it is set down and frees it the moment it is taken up. A path never blocks. Nothing else on the land changes for any of it.
+- **Sorting.** Standing things are drawn with the hero by where they stand: he walks before a fence and behind it. Lying things are drawn flat under everyone, with a thin rim where nothing lies beside them.
+- **A fence joins its neighbours:** a post, and a rail toward every fence or gate beside it. A gate is two capped posts with the way open; in a fence that runs north and south it is the two ends of the gap.
+- **Kept and saved.** What is set down is in `GameState.homestead()` and in the save's `homestead` section. The save is still version 6: the two new parts are written only when something is set down, so a homestead with nothing on it is saved exactly as phase 1 saved it.
+- **Two sounds,** made in code: a thing set down, and a thing taken up.
+- **Pictures, painted by the tool:** a new sheet, `placed.png`, with the three paths, a fence's post and rails, and the gate's two pictures. A placeable's icon is its picture on the ground.
+- **Tools:** `tools/playtest.gd -- build` (on the homestead east of the farmhouse's door, the ground cleared, with a stock of all five); four capture shots, 168 to 171.
+
+**What differs from the plan**
+- **Nothing in the approved decisions (D12 to D19).** D12 is built as written.
+- **The farmhouse's doorstep says "That is the road."** It is the end of the path to the door, and the table lists the road first. No cell of today's land says "That is a doorstep.": the rule is there and tested by itself, for phase 3's buildings.
+- **In this step the five things can only be had from the playtest scenario and the tests.** The workbench's "Place" tab is step 2b's, as the plan orders it.
+- **Not in the plan, chosen and written down** (`docs/DECISIONS.md`): a placeable is an item of type `placeable`; the keys that do what the two mouse buttons do; a standing thing is not set down over something that lies to be picked up; which thing a right click takes first; the words the plan didn't give; what is chosen when the last of a thing is set down.
+
+**Verified**
+- **1021 tests in 133 suites, all passing** (977 in 130 before). Forty-four are new: Placement's rules (9), the build bar (5), what the homestead keeps (8), its save (3), and build mode in the world (19).
+- **The plan's tests for this step each have one:** every refusal with its words, and the table's order; two things to a cell; only on the homestead; a fence that blocks at once and frees its cell at once; a path that never blocks; a gate walked through; save and load, with an older version 6 save and the version 5 one; the item back, and a full pack's refusal; the mode's keys and mouse; the clock standing; nothing set down outside the mode.
+- **The two things the plan had not checked:** the ghost reads the mouse against the camera through the canvas's own transform (`make_input_local`), and it is right headless (a test points at a cell's last pixel and at the next cell's first) and in a window (below). A tall picture set down at run time is step 2b's (the grown tree).
+- **In a window, with real keys and a real mouse** (a scratch script sending them through `Input`, about a second, the camera scrolled as far south as it goes): B opened the mode, the ghost went to each of four cells the mouse was put on, a left click set a fence down and a right click took it up.
+- **In a window, about four seconds:** four capture shots, each looked at. A first look found the west rail of every fence drawn a cell too far east: fixed (below), and taken again.
+- **The game boots headless** with no script error.
+- **Planted bugs are the phase's last job,** after step 2b: see that entry.
+
+**Found on the way, and left alone**
+- **`SpriteSheet.draw()` puts a mirrored frame one frame's width to the right** in this engine (Godot 4.7.2): asked to draw at columns 40 to 55, a mirrored frame covers 56 to 71 (measured in a window with a scratch script). The engine keeps a negative-width rectangle's corner and mirrors the picture in it; `SpriteSheet` moves the corner right first. It is what draws a chicken, a goblin seen from the side, the Warden and the Shade when they face the other way. **It is older than this phase and not this phase's to change:** `PlacedArt` mirrors a fence's west rail itself, in place. It needs the user's word, and a look at each creature before and after.
+
+**Known issues and limits**
+- **Nobody has played it by hand.** Whether the ghost is easy to see, and whether laying a long fence a click a cell is a pleasure or a chore, is for the user.
+- **A click sets down one thing.** There is no dragging a line of fence.
+- **On a pad** the ghost moves a cell a press: slow over forty cells, as the plan warned.
+- **The ghost starts on the cell the hero faces,** and jumps to the mouse as soon as it moves.
+- **The dirt path is close in colour to the farm's own road.** It reads as laid by its rim.

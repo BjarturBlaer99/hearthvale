@@ -61,6 +61,11 @@
     { "id": "iron_pickaxe", "name": "Iron Pickaxe", "type": "tool", "icon": "iron_pickaxe", "stats": { "tool": "pick", "cooldown": 0.4, "fewer_blows": 2 } },
     { "id": "sprinkler", "name": "Sprinkler", "type": "sprinkler", "icon": "sprinkler", "stackable": true, "max_stack": 10 },
     { "id": "miners_lantern", "name": "Miner's Lantern", "type": "lantern", "icon": "miners_lantern", "stats": { "radius": 80 } },
-    { "id": "fibre", "name": "Fibre", "type": "material", "icon": "fibre", "stackable": true, "max_stack": 50 }
+    { "id": "fibre", "name": "Fibre", "type": "material", "icon": "fibre", "stackable": true, "max_stack": 50 },
+    { "id": "dirt_path", "name": "Dirt Path", "type": "placeable", "icon": "dirt_path", "stackable": true, "max_stack": 99, "stats": { "layer": "lying" } },
+    { "id": "stone_path", "name": "Stone Path", "type": "placeable", "icon": "stone_path", "stackable": true, "max_stack": 99, "stats": { "layer": "lying" } },
+    { "id": "wood_path", "name": "Wood Path", "type": "placeable", "icon": "wood_path", "stackable": true, "max_stack": 99, "stats": { "layer": "lying" } },
+    { "id": "fence", "name": "Fence", "type": "placeable", "icon": "fence", "stackable": true, "max_stack": 99, "stats": { "layer": "standing", "joins": true } },
+    { "id": "gate", "name": "Gate", "type": "placeable", "icon": "gate", "stackable": true, "max_stack": 20, "stats": { "layer": "standing", "joins": true, "blocks": false } }
   ]
 }

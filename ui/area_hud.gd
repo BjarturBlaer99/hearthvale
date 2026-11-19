@@ -13,6 +13,12 @@ const FLASH_TIME: float = 0.35
 ## line ends in an ellipsis.
 const BOX_MAX: float = 192.0
 
+## Build mode (the Homestead): the colour of its line of words where the thing fits and where
+## it doesn't, and what the controls hint says while it is open.
+const BUILD_FITS: Color = Color(0.62, 1.0, 0.66)
+const BUILD_REFUSED: Color = Color(1.0, 0.52, 0.45)
+const BUILD_HINT: String = "Build mode   Mouse or WASD: point   B or Tab: leave\nLeft click: set down   Right click: take up\nWheel or 1-9: choose what to set down"
+
 ## The corners of the screen: how dark they get, and how far from the middle it starts (0-1).
 const VIGNETTE_COLOR: Color = Color(0.06, 0.03, 0.12, 0.36)
 const VIGNETTE_START: float = 0.58
@@ -24,6 +30,8 @@ var _message_left: float = 0.0
 var _notice_left: float = 0.0
 var _flash_left: float = 0.0
 var _flash_time: float = FLASH_TIME
+## What the controls hint says in play (the scene's words): put back when build mode closes.
+var _play_hint: String = ""
 
 @onready var hearts: HeartsBar = $Panel/Box/Hearts
 ## The hero's energy, under the hearts. Hidden until the energy rules exist (P2).
@@ -39,6 +47,9 @@ var _flash_time: float = FLASH_TIME
 @onready var pause_menu: PauseMenu = $PauseMenu
 ## What can be in the hero's hand, along the bottom of the screen.
 @onready var item_bar: ItemBar = $ItemBar
+## Build mode's bar, in the item bar's place while that mode is open, and its line of words.
+@onready var build_bar: BuildBarView = $BuildBar
+@onready var _build_words: Label = $BuildWords
 @onready var _hint: Label = $Hint
 @onready var _hint_panel: ColorRect = $HintPanel
 @onready var _equipped: Label = $Panel/Box/Equipped
@@ -57,6 +68,7 @@ func _ready() -> void:
 	_prompt.text = ""
 	_message.text = ""
 	_notice.text = ""
+	_play_hint = _hint.text
 	_show_settings()
 	EventBus.settings_changed.connect(_show_settings)
 	_box.minimum_size_changed.connect(_fit_panel)
@@ -186,6 +198,45 @@ func _lines() -> Array[Label]:
 
 func set_prompt(text: String) -> void:
 	_prompt.text = text
+
+
+## Build mode is open: its bar shows `held` (BuildBar.entries) with entry `chosen` lit, in the
+## item bar's place; `words` stand over it, in the colour of a thing that `fits` or doesn't;
+## and the controls hint says what the buttons do there.
+func show_build(held: Array[Dictionary], chosen: int, words: String, fits: bool) -> void:
+	item_bar.visible = false
+	build_bar.visible = true
+	build_bar.show_hand(held, chosen)
+	_build_words.visible = true
+	_build_words.text = words
+	_build_words.add_theme_color_override(&"font_color", BUILD_FITS if fits else BUILD_REFUSED)
+	_hint.text = BUILD_HINT
+
+
+## Build mode has closed: its bar and words go, and the hint says what it said.
+func hide_build() -> void:
+	build_bar.visible = false
+	_build_words.visible = false
+	_build_words.text = ""
+	_hint.text = _play_hint
+
+
+## Whether build mode's bar is showing.
+func is_building() -> bool:
+	return build_bar.visible
+
+
+## Build mode's line of words ("" when it isn't open), and whether they are a refusal's.
+func build_words() -> String:
+	return _build_words.text if _build_words.visible else ""
+
+
+func build_refused() -> bool:
+	return _build_words.visible and _build_words.get_theme_color(&"font_color") == BUILD_REFUSED
+
+
+func hint_text() -> String:
+	return _hint.text
 
 
 ## What the prompt says now ("[Right click] Pick the Turnip"), or "" when there is nothing to do

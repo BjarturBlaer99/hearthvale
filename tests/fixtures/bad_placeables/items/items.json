@@ -1,0 +1,9 @@
+{
+  "items": [
+    { "id": "floating_rug", "name": "Floating Rug", "type": "placeable", "icon": "dirt_path", "stackable": true, "max_stack": 10, "stats": { "layer": "floating" } },
+    { "id": "loose_post", "name": "Loose Post", "type": "placeable", "icon": "fence", "stats": { "layer": "standing" } },
+    { "id": "glow_mat", "name": "Glow Mat", "type": "placeable", "icon": "dirt_path", "stackable": true, "max_stack": 10, "stats": { "layer": "lying", "light": { "radius": 20 } } },
+    { "id": "dark_lamp", "name": "Dark Lamp", "type": "placeable", "icon": "fence", "stackable": true, "max_stack": 10, "stats": { "layer": "standing", "light": { "radius": 0 } } },
+    { "id": "quick_sprig", "name": "Quick Sprig", "type": "placeable", "icon": "fence", "stackable": true, "max_stack": 10, "stats": { "layer": "standing", "grows": { "mornings": 1, "tree": "beanstalk" } } }
+  ]
+}

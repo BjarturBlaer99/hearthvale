@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://ui/panel_frame.gd" id="90_frame"]
 [ext_resource type="Script" path="res://ui/energy_bar.gd" id="91_energy"]
 [ext_resource type="Script" path="res://ui/item_bar.gd" id="92_bar"]
+[ext_resource type="Script" path="res://ui/build_bar_view.gd" id="93_build"]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_hud")
@@ -136,6 +137,26 @@ layout_mode = 3
 anchors_preset = 0
 mouse_filter = 2
 script = ExtResource("92_bar")
+
+[node name="BuildBar" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("93_build")
+
+[node name="BuildWords" type="Label" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -46.0
+offset_bottom = -32.0
+theme_override_colors/font_color = Color(0.62, 1, 0.66, 1)
+theme_override_font_sizes/font_size = 8
+horizontal_alignment = 1
 
 [node name="DialogueBox" parent="." instance=ExtResource("3_dialogue")]
 

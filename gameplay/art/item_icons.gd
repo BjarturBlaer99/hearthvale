@@ -27,11 +27,12 @@ const FRAMES: Dictionary = {
 
 
 ## The picture for an item: the one its data names ("icon"), else by its type: a sword, a bow,
-## arrows, a bomb, a key, a coin, or a gem for anything else.
+## arrows, a bomb, a key, a coin, or a gem for anything else. What is set down on the land
+## names its picture on the ground (PlacedArt), which is its icon too.
 static func name_for(item_id: StringName) -> StringName:
 	var item: Dictionary = DataRegistry.get_item(item_id)
 	var named: StringName = StringName(str(item.get("icon", "")))
-	if FRAMES.has(named):
+	if has(named):
 		return named
 	match str(item.get("type", "")):
 		"weapon_melee":
@@ -49,6 +50,14 @@ static func name_for(item_id: StringName) -> StringName:
 	return &"gem"
 
 
+## Whether there is a picture named `icon`: one of the items' own, or one of what is set down.
+static func has(icon: StringName) -> bool:
+	return FRAMES.has(icon) or PlacedArt.has(icon)
+
+
 ## Draws picture `icon` on `canvas` with its top-left at `origin` (white: a silhouette).
 static func draw(canvas: CanvasItem, icon: StringName, origin: Vector2 = Vector2.ZERO, white: bool = false) -> void:
+	if not FRAMES.has(icon) and PlacedArt.has(icon):
+		PlacedArt.draw(canvas, icon, origin, false, Color.WHITE, white)
+		return
 	SpriteSheet.draw(canvas, SHEET, int(FRAMES.get(icon, FRAMES[&"gem"])), SIZE, origin, false, white)

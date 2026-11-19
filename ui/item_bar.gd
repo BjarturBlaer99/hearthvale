@@ -8,7 +8,7 @@ extends Control
 ## hand), and tells this what to show. HandBar (pure) says what is in the bar and in what
 ## order; this only draws it. With more than HandBar.SLOTS things it shows that many and moves
 ## along with the one in hand, with a mark at the end where there is more. For show only: it
-## takes no clicks.
+## takes no clicks. (BuildBarView is this bar with other things in it: build mode's.)
 
 ## A slot's side (px): a 16 px picture with a two-pixel rim.
 const SLOT: int = 20
@@ -71,8 +71,18 @@ func shown_ids() -> Array[StringName]:
 func shown_counts() -> PackedStringArray:
 	var out: PackedStringArray = []
 	for slot: int in shown_count():
-		out.append(HandBar.count_text(entries[top + slot], GameState.item_count))
+		out.append(count_of(entries[top + slot]))
 	return out
+
+
+## The picture of `entry` (one of `entries`).
+func icon_of(entry: Dictionary) -> StringName:
+	return ItemIcons.name_for(StringName(str(entry.get("id", ""))))
+
+
+## The number `entry`'s slot shows ("" for none): how many it has left to use.
+func count_of(entry: Dictionary) -> String:
+	return HandBar.count_text(entry, GameState.item_count)
 
 
 ## Which of the slots showing is lit (0 is the leftmost), or HandBar.NONE.
@@ -102,7 +112,7 @@ func _draw() -> void:
 		var lit: bool = slot == lit_slot()
 		draw_rect(rect, LIT_BACK if lit else BACK)
 		_draw_edge(rect, LIT_EDGE if lit else EDGE)
-		ItemIcons.draw(self, ItemIcons.name_for(StringName(str(entries[top + slot].get("id", "")))), rect.position + Vector2(2, 2))
+		ItemIcons.draw(self, icon_of(entries[top + slot]), rect.position + Vector2(2, 2))
 		if not counts[slot].is_empty():
 			var at: Vector2 = Vector2(rect.position.x, rect.end.y - 2.0 - font.get_descent(FONT_SIZE))
 			draw_string(font, at + Vector2(0, 1), counts[slot], HORIZONTAL_ALIGNMENT_RIGHT, SLOT - 1.0, FONT_SIZE, COUNT_SHADE)

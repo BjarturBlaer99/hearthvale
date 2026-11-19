@@ -287,7 +287,14 @@ five phases with a stop after each:
     shots moved and nine added; `tools/play_days.gd` taught where home and the plot are.
   - **Not played by a person:** by the tests, and for two days by `tools/play_days.gd` at four times
     speed. The user reviews before phase 2.
-- **Phase 2 — Placing things.** *Not built.* Build mode and fifteen things to set down.
+- **Phase 2 — Placing things.** *Being built, 2026-11-19, in two steps.* Build mode and fifteen things to
+  set down.
+  - **2a, the rules and the mode:** *built.* `Placement` and its refusals; what is set down kept in
+    the homestead and the save (still version 6); build mode (B, the ghost, the build bar, a left
+    click to set down and a right click to take up); the three paths, the fence and the gate;
+    collisions and sorting.
+  - **2b, the rest of the list:** *not built.* The floors, the hedge, the lamp post, the bench, the
+    flower beds, the saplings; the hand; the workbench's "Place" tab; Tilda's new wares.
 - **Phase 3 — Buildings.** *Not built.* A Well, a Silo, a Coop, a Barn and a Shed.
 - **Phase 4 — Animals.** *Not built.* Chickens, sheep and cows.
 - **Phase 5 — Balance.** *Not built.* Two favours, ten days played, and the numbers settled.

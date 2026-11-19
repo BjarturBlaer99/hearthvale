@@ -608,8 +608,13 @@ TECH_DESIGN, the roadmap, the README and DECISIONS up to date; CLAUDE.md is the 
   the quest log; Bram's welcome; the title.
 
 **Phase 2: placing** *(two commits)*
-- [ ] 2a. **The rules and the mode.** `Placement`, what is kept, build mode with its ghost and bar, the
+- [x] 2a. **The rules and the mode.** `Placement`, what is kept, build mode with its ghost and bar, the
   three paths, the fence and the gate, collisions and sorting, the save.
+  *Built 2026-11-19, with D12 to D15 and D18 as written. A placeable is an item of type `placeable`.
+  The farmhouse's doorstep is the path's end, so it is refused as road ("That is the road."): no cell
+  of today's land says "That is a doorstep.", and the rule waits for phase 3's buildings. The keys do
+  what the mouse's two buttons do (the sword's key sets down, the item's key takes up). In this step
+  the five things come only from `tools/playtest.gd -- build`: the "Place" tab is step 2b's.*
 - [ ] 2b. **The rest of the list.** Two floors, the hedge, the lamp post, the bench, the flower beds, the
   saplings; the hand; the workbench's "Place" tab and Tilda's new wares.
 - **Tests:**

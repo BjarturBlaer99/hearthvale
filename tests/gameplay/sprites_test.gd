@@ -14,6 +14,7 @@ func test_frame_names_match_the_order_the_tool_paints_them() -> void:
 		["warden", Boss.FRAMES], ["villager", Villager.FRAMES], ["items", ItemIcons.FRAMES], ["torch", Torch.FRAMES], ["shade", ShadeBoss.FRAMES],
 		["crystal", CrystalSwitch.FRAMES], ["breakables", Breakable.FRAMES], ["critters", Critter.FRAMES],
 		["forage", ForageSpot.FRAMES], ["rocks", Rock.FRAMES], ["crafted", Furnishing.FRAMES],
+		["placed", PlacedArt.FRAMES],
 	]
 	for case: Array in cases:
 		var painted: Array = _frames_of(sprites[case[0]]).keys()
@@ -127,4 +128,8 @@ func test_items_take_the_picture_their_data_names() -> void:
 	assert_that(ItemIcons.name_for(&"wooden_sword")).is_equal(&"sword")
 	for item: Dictionary in DataRegistry.entries(&"items"):
 		if item.has("icon"):
-			assert_bool(ItemIcons.FRAMES.has(StringName(str(item["icon"])))).override_failure_message("%s names a picture that exists" % item["id"]).is_true()
+			# What is set down on the land wears its picture on the ground (PlacedArt); the rest,
+			# one of the items' own.
+			var sheet: Dictionary = PlacedArt.FRAMES if Placement.is_placeable(item) else ItemIcons.FRAMES
+			assert_bool(sheet.has(StringName(str(item["icon"])))).override_failure_message("%s names a picture that exists" % item["id"]).is_true()
+			assert_that(ItemIcons.name_for(StringName(str(item["id"])))).override_failure_message("%s shows it" % item["id"]).is_equal(StringName(str(item["icon"])))
