@@ -150,11 +150,13 @@ func test_the_hoe_tills_the_cell_he_faces_for_two_energy() -> void:
 	assert_int(GameState.farm().count_of(Farm.TILLED)).override_failure_message("that cell and no other").is_equal(1)
 	assert_float(GameState.energy).is_equal(98.0)
 	assert_int(GameState.health).override_failure_message("farm work never costs a heart").is_equal(hearts)
+	# The sound comes when the tool lands (tool polish).
+	Steps.to_the_blow(farm)
 	assert_array(_heard).contains([&"hoe"])
 	assert_bool(farm.player.motor.is_attacking()).override_failure_message("he stands still for the stroke").is_true()
 	assert_that(farm.player.work_stroke()).override_failure_message("a stroke of the hoe").is_equal(ToolStroke.HOE)
 	assert_bool(farm.player.held_tool().visible).override_failure_message("the hoe is in his hands").is_true()
-	assert_int(farm.player.held_tool().frame_index).is_equal(HeldTools.frame_of(&"hoe", "side", ToolStroke.RAISE))
+	assert_int(farm.player.held_tool().frame_index).override_failure_message("come down at the blow").is_equal(HeldTools.frame_of(&"hoe", "side", ToolStroke.STRIKE))
 	assert_array(_flashes(farm)).override_failure_message("no hoe floats over the cell").is_empty()
 	# Mid-stroke he can't start another.
 	farm.player.face(Vector2.UP)
@@ -202,6 +204,8 @@ func test_the_can_waters_a_tilled_cell_for_one_energy_and_a_pour() -> void:
 	assert_int(GameState.item_count(&"water")).override_failure_message("one pour").is_equal(2)
 	assert_float(GameState.energy).is_equal(99.0)
 	assert_int(GameState.health).is_equal(hearts)
+	# The sound comes when the tool lands (tool polish).
+	Steps.to_the_blow(farm)
 	assert_array(_heard).contains([&"pour"])
 	assert_that(farm.player.work_stroke()).is_equal(ToolStroke.POUR)
 	assert_int(farm.player.held_tool().frame_index).override_failure_message("the can tipped in his hands").is_equal(HeldTools.frame_of(&"watering_can", "side", ToolStroke.TIP))
@@ -253,6 +257,8 @@ func test_the_can_fills_at_the_farms_pond() -> void:
 	assert_bool(farm.use_item()).is_true()
 	assert_int(GameState.item_count(&"water")).override_failure_message("ten pours").is_equal(10)
 	assert_float(GameState.energy).override_failure_message("filling is free").is_equal(energy)
+	# The sound comes when the tool lands (tool polish).
+	Steps.to_the_blow(farm)
 	assert_array(_heard).contains([&"fill"])
 	assert_str(farm.hud.message_text()).is_equal(AreaController.CAN_FILLED_WORDS)
 	_rest(farm)
@@ -290,6 +296,8 @@ func test_the_can_still_fills_at_the_villages_well_and_pond() -> void:
 	assert_bool(village.use_item()).is_true()
 	assert_int(GameState.item_count(&"water")).override_failure_message("ten pours").is_equal(10)
 	assert_float(GameState.energy).override_failure_message("filling is free").is_equal(energy)
+	# The sound comes when the tool lands (tool polish).
+	Steps.to_the_blow(village)
 	assert_array(_heard).contains([&"fill"])
 	assert_str(village.hud.message_text()).is_equal(AreaController.CAN_FILLED_WORDS)
 	_rest(village)

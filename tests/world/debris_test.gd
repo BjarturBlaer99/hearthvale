@@ -221,12 +221,15 @@ func test_the_pickaxe_breaks_a_rock_in_two_blows_for_a_stone() -> void:
 	assert_object(farm.rock_in_front()).is_same(rock)
 	assert_bool(farm.use_item()).is_true()
 	assert_bool(rock.broken).override_failure_message("one blow doesn't break it").is_false()
+	# The sound comes when the tool lands (tool polish).
+	Steps.to_the_blow(farm)
 	assert_array(_heard).contains([&"pick"])
 	assert_float(GameState.energy).is_equal(98.0)
 	_finish(farm)
 	# The left click is the pickaxe's when he faces a rock.
 	assert_bool(farm.use_hand()).is_true()
 	assert_bool(rock.broken).is_true()
+	Steps.to_the_blow(farm)
 	assert_array(_heard).contains([&"rock_break"])
 	assert_float(GameState.energy).override_failure_message("two energy a blow, as in the quarry").is_equal(96.0)
 	assert_bool(farm.terrain.is_occupied(rock.cell())).is_false()

@@ -173,6 +173,8 @@ func test_the_pickaxe_breaks_a_plain_rock_in_two_blows_for_two_energy_each() -> 
 	assert_bool(rock.broken).override_failure_message("one blow doesn't break it").is_false()
 	assert_int(rock.blows_left).is_equal(1)
 	assert_float(GameState.energy).is_equal(98.0)
+	# The sound comes when the tool lands (tool polish).
+	Steps.to_the_blow(floor)
 	assert_array(_heard).contains([&"pick"])
 	assert_bool(floor.player.motor.is_attacking()).override_failure_message("he stands still for the blow").is_true()
 	assert_bool(floor.use_item()).override_failure_message("not again until the blow is done").is_false()
@@ -182,6 +184,7 @@ func test_the_pickaxe_breaks_a_plain_rock_in_two_blows_for_two_energy_each() -> 
 	assert_bool(rock.broken).is_true()
 	assert_float(GameState.energy).is_equal(96.0)
 	assert_int(GameState.health).override_failure_message("mining never costs a heart").is_equal(hearts)
+	Steps.to_the_blow(floor)
 	assert_array(_heard).contains([&"rock_break"])
 	assert_bool(floor.terrain.is_occupied(rock.cell())).override_failure_message("its cell is free").is_false()
 	assert_bool(GameState.is_rock_broken(floor.area_id, rock.cell())).is_true()

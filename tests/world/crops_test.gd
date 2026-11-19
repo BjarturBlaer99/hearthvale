@@ -71,6 +71,8 @@ func test_a_seed_is_planted_from_the_item_button_in_tilled_soil() -> void:
 	assert_int(GameState.item_count(&"turnip_seeds")).override_failure_message("one seed").is_equal(1)
 	assert_float(GameState.energy).override_failure_message("planting costs no energy").is_equal(100.0)
 	assert_int(GameState.health).is_equal(hearts)
+	# The sound comes when the tool lands (tool polish).
+	Steps.to_the_blow(farm)
 	assert_array(_heard).contains([&"plant"])
 	assert_bool(farm.player.motor.is_attacking()).override_failure_message("it takes a moment").is_true()
 	assert_that(farm.player.work_stroke()).override_failure_message("sown by hand").is_equal(ToolStroke.SOW)

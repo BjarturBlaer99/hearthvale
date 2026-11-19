@@ -243,3 +243,24 @@ the sprinkler), `ToolStroke`, `HeldTools`, `HeldTool`, the animator's `WORK` pos
 - **The sprinkler leaves his hands at the blow**, so it is never shown twice (in his hands and on
   the plot); until step 2 it is on the plot from the press.
 - **A seed is sown by hand:** the reach, with nothing in it (the seeds that fall are step 2's).
+
+## Step 2 — built (2026-11-19)
+
+The blow (D3 to D6). The motor says when a stroke's blow comes (`struck`, at 0.35 of the stroke, or
+as it ends early); the area keeps each stroke's sound, bursts and new look for it. What building it
+decided:
+- **The blow is the motor's signal, not the animator's:** tests that step the motor see it, and a
+  hit before the blow still shows the cell and plays the sound.
+- **A rock is struck at the press and shown at the blow,** as the soil is: its cell is free and its
+  stone is there at once, but the rock is drawn whole and the stone hidden until the pickaxe lands
+  (the hero cannot move before then). The ladder a rock hid shows at the blow too.
+- **What the sword cuts was always cut at its blow** (the sword's arc touches it mid-swing), so the
+  sword is as it was; a log and a stump now shudder and flash on each blow and throw splinters
+  (their data's burst), as a rock does.
+- **The flash is the white picture laid over at a little over half strength**, for 0.06 s: drawn
+  whole it read as a white blob.
+- **The new bursts fall:** each is thrown up and lies where it lands (its `floor`) before it fades;
+  none is in the air when it ends. The older bursts are drawn as they were.
+- **From behind, the water is hidden:** facing up, only the splash shows on the cell.
+- **Filling the can says so at the press** ("The watering can is full."), with the ring and the sound at the
+  blow.

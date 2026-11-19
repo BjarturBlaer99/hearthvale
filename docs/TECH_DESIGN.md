@@ -159,6 +159,12 @@ res://
   - For show only: the work is done when the stroke begins, as it always was, and its length is the
     tool's. A swing, a shot or a hit ends the work pose. `ToolFlash` is left for a tool with no
     picture in his hands (none now).
+  - **The blow** (step 2): the area starts a stroke with `motor.attack(..., ToolStroke.BLOW)`, and the
+    motor emits `struck` once when the stroke is that far through, or as it ends early (a hit), so
+    nothing waits for ever. What the stroke shows waits for it (`AreaController.at_the_blow()`):
+    its sound, its bursts, the cell's new look (`FarmPlot.hold()` keeps a cell drawn as it was until
+    `let_go()`), a rock's blow (`Rock.strike(fewer, false)`, then `show_blow()`), and what a rock
+    leaves, hidden until then. The motor's time is untouched.
 
   The motor's state machine has one script per state:
   - `ground`: walks at `WALK_SPEED`, or `SPRINT_SPEED` while sprinting, times `speed_scale` (the controller
@@ -638,6 +644,13 @@ run headless; see CLAUDE.md for the command and gotchas.
     - sparks where blows land
     - dust from blasts, pushed blocks and sprinting feet
     - sparkle from pickups and crystals
+    - **the strokes' (tool polish, D5, a bend of "A still world" the user allowed):** clods from the
+      hoe, a splash of water, seeds from the hand, chips and rubble of a rock in its own colours
+      (`Rock.chip_colours()`, read from its picture), splinters of wood. Each is thrown up and comes
+      to rest on the ground (its `floor`) within half a second; none rises or hangs. `Pour` is the
+      water from the can's spout and `Ripple` a ring on the water where the can is dipped.
+    - a blow that doesn't break a rock, a log or a stump shudders it a pixel and lays its white
+      picture over it, half seen, for a moment.
 - **Volume:** `SettingsData` adds music and sound volume (0–10, default 7). `Audio` sets each bus (0 mutes).
 
 ## 14. Sprites

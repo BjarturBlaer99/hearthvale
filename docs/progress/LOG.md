@@ -3081,3 +3081,45 @@ both mended. No save slot was written.
 - **The hero's reflection in water** shows his work pose without the tool.
 - **From the front the can is a plain box** held at his waist, its spout two pixels below.
 - **CLAUDE.md says "Twenty-one frames a row"**; it is twenty-five now (the coordinator's to edit).
+
+## 2026-11-19 — Tool polish, step 2: the blow
+
+D3 to D6 of the approved plan: a stroke's sound, its effects and the new look of what it worked
+come when the tool lands, not at the press. The work itself is still done at the press.
+- **The motor's `struck` signal:** `PlayerMotor.attack()` takes a `blow` (0 to 1); the attack state
+  emits `struck` once when the stroke is that far through (0.35, `ToolStroke.BLOW`), or as it ends
+  early (a hit), so nothing waits for ever. The stroke's length is untouched.
+- **`AreaController.at_the_blow()`** keeps a stroke's sound and effects until `struck`.
+  **`FarmPlot.hold()` / `let_go()`** keep a cell drawn as it was until then (D4): the soil shows
+  tilled when the hoe lands, wet when the water reaches it, the seed when it falls.
+- **Rocks** are struck at the press and shown at the blow (`Rock.strike(fewer, false)`, then
+  `show_blow()`): chips, a spark and a shudder, or rubble when it gives way, in the rock's own
+  colours (`Rock.chip_colours()`, read from its picture), in place of the pot's terracotta. The stone
+  it leaves and the ladder it hid are hidden until the pickaxe lands.
+- **Logs and stumps** shudder and flash on a blow that doesn't break them, and throw splinters
+  (their data's burst: `data/breakables/log`, `farm_stump`, `stump`; the schema and
+  `DataRegistry.BREAK_BURSTS` allow `splinters`). The flash is the white picture laid over at 0.55
+  for 0.06 s: drawn whole it read as a white blob.
+- **New bursts** (D5, the bend of "A still world" the user allowed): clods, splash, seeds, chips,
+  rubble and splinters, each thrown up and lying on its `floor` within half a second; `Pour` (water
+  from the spout) and `Ripple` (a ring where the can is dipped). The older bursts are drawn as they
+  were.
+
+**Verified:** 1163 tests in 154 suites pass, exit 0. New: `tests/core/player/stroke_blow_test.gd`
+(the blow once at its point, a stroke cut short still comes to it, a swing has none, the stroke no
+longer), `tests/gameplay/stroke_bursts_test.gd` (each burst lands within half a second, takes its
+colours; the pour and the ring; a rock's chips are its own colours) and `tests/world/tool_blow_test.gd`
+(the soil, the can, the pond, a seed, a rock, a log, and a stroke cut short by a hit). Sounds now come
+at the blow, so `Steps.to_the_blow()` (`tests/support/area_steps.gd`) is called before the sound
+checks in `mouse_test`, `crops_test`, `debris_test`, `farm_test` (four), `plans_test`, `quarry_test`
+and `upgrades_test`.
+
+**In a window:** the sixteen films, three runs (about a minute each), each looked at. A first look
+found the clods lost against the soil and the flash too strong; both mended. Once a film showed the
+film before it (its scene, its HUD, no hero); filmed again it was right: the window, not the game. No
+save slot was written.
+
+**Known issues and limits**
+- **From behind, the water is hidden** by the hero; only the splash shows on the cell.
+- **The seeds and the clods are small:** two pixels each, best seen up close.
+- **The hero's reflection in water** shows his work pose without the tool (as in step 1).

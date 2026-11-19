@@ -16,7 +16,7 @@
     "hits": { "type": "integer", "minimum": 1, "default": 1, "description": "The blows it takes: a fallen branch one, an old stump three. Each blow before the last plays its sound and throws up a little of its burst." },
     "returns": { "enum": ["daily", "never"], "description": "Left out, it is back on every visit. 'daily': broken, it stays broken until the next morning (the flag cut/<area>/<x>,<y> keeps the day). Wood says so. 'never': cleared, it is gone for good (GameState.clear_debris keeps its cell in the save's 'homestead'): the overgrowth of the hero's land says so, and it means that only there." },
     "sound": { "type": "string", "description": "A sound id (audio/sfx) played when it breaks." },
-    "burst": { "enum": ["leaves", "shards", "dust", "spark", "sparkle"], "description": "The Burst it throws up." },
+    "burst": { "enum": ["leaves", "shards", "dust", "spark", "sparkle", "splinters"], "description": "The Burst it throws up." },
     "frames": {
       "type": "object",
       "description": "Frames of gameplay/art/breakables.png (Breakable.FRAMES): 'whole', and 'broken' (empty: nothing is left).",

@@ -242,6 +242,8 @@ func test_a_sprinkler_is_set_on_the_plot_waters_each_morning_and_is_taken_up_aga
 	assert_bool(farm.use_hand()).override_failure_message("a left click sets it down too").is_true()
 	assert_bool(GameState.farm().has_sprinkler(Vector2i(1, 1))).is_true()
 	assert_int(GameState.item_count(&"sprinkler")).is_equal(1)
+	# The sound comes when the tool lands (tool polish).
+	Steps.to_the_blow(farm)
 	assert_array(_heard).contains([&"plant"])
 	_finish(farm)
 	assert_bool(farm.use_item()).override_failure_message("not a second in the same cell").is_false()

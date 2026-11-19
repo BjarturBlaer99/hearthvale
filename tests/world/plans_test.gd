@@ -247,6 +247,8 @@ func test_the_well_fills_the_can_once_it_stands() -> void:
 	_heard.clear()
 	assert_bool(farm.use_item()).is_true()
 	assert_int(GameState.item_count(&"water")).is_equal(10)
+	# The sound comes when the tool lands (tool polish).
+	Steps.to_the_blow(farm)
 	assert_array(_heard).contains([&"fill"])
 	assert_str(farm.hud.message_text()).is_equal(AreaController.CAN_FILLED_WORDS)
 	_rest(farm)

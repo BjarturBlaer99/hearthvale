@@ -13,6 +13,8 @@ extends Node2D
 ## On the hero's land (the Homestead, 2026-11-18: weeds, a bush, a fallen log, an old stump) it
 ## says "returns": "never": cleared, it is gone for good, and GameState keeps its cell
 ## (`clear_debris()`), not a flag.
+## A blow that doesn't break it shows (tool polish, D6): it shudders a pixel and flashes white,
+## as a rock does, and throws a little of its burst (splinters, for wood).
 
 const SHEET: Texture2D = preload("res://gameplay/art/breakables.png")
 ## Frames in the order tools/art/make_sprites.gd paints them (a test checks).
@@ -26,6 +28,9 @@ const SIZE: Vector2i = Vector2i(16, 16)
 const DAILY: String = "daily"
 const NEVER: String = "never"
 const RETURNS: Array[String] = [DAILY, NEVER]
+## How long a blow that doesn't break it shudders it, and flashes it white (s).
+const SHAKE_TIME: float = 0.14
+const FLASH_TIME: float = 0.06
 
 @export var breakable_id: StringName = &"grass"
 
@@ -42,6 +47,8 @@ var roll_drop: Callable
 var hurt_box: HurtBox
 
 var _terrain: TerrainQuery
+var _shake: float = 0.0
+var _flash: float = 0.0
 
 
 func _ready() -> void:
@@ -119,6 +126,9 @@ func _on_hit(hit: Hit) -> void:
 
 ## A blow that doesn't break it yet: its sound, and a little of what it throws up.
 func chip() -> void:
+	_shake = SHAKE_TIME
+	_flash = FLASH_TIME
+	queue_redraw()
 	EventBus.sound.emit(StringName(str(data.get("sound", "cut"))))
 	if get_parent() != null:
 		Burst.spawn(get_parent(), position + Vector2(8, 8), StringName(str(data.get("burst", "leaves"))), 0.5)
@@ -161,6 +171,18 @@ func _drop() -> Node2D:
 	return node
 
 
+## Whether it is flashing white (a blow that didn't break it).
+func is_flashing() -> bool:
+	return _flash > 0.0
+
+
+func _process(delta: float) -> void:
+	if _shake > 0.0 or _flash > 0.0:
+		_shake = maxf(_shake - delta, 0.0)
+		_flash = maxf(_flash - delta, 0.0)
+		queue_redraw()
+
+
 func _draw() -> void:
 	var frames: Dictionary = data.get("frames", {})
 	var frame: StringName = StringName(str(frames.get("broken" if broken else "whole", "")))
@@ -168,4 +190,8 @@ func _draw() -> void:
 		return
 	if not broken:
 		SoftShadow.draw(self, Vector2(8, 14), Vector2(5, 1.5), 0.8)
-	SpriteSheet.draw(self, SHEET, FRAMES[frame], SIZE, Vector2.ZERO)
+	# A blow that doesn't break it knocks it a pixel sideways and back.
+	var nudge: Vector2 = Vector2(1, 0) if _shake > SHAKE_TIME * 0.5 else (Vector2(-1, 0) if _shake > 0.0 else Vector2.ZERO)
+	SpriteSheet.draw(self, SHEET, FRAMES[frame], SIZE, nudge if not broken else Vector2.ZERO)
+	if _flash > 0.0 and not broken:
+		SpriteSheet.draw(self, SHEET, FRAMES[frame], SIZE, nudge, false, true, Rock.FLASH_TINT)

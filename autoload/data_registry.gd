@@ -85,7 +85,7 @@ const DROP_TYPES: Array[String] = ["heart", "item", "nothing"]
 ## cut or break a breakable.
 const WEAK_POINTS: Array[String] = ["sword", "arrow", "bomb"]
 ## The bursts a breakable can throw up (Burst kinds).
-const BREAK_BURSTS: Array[String] = ["leaves", "shards", "dust", "spark", "sparkle"]
+const BREAK_BURSTS: Array[String] = ["leaves", "shards", "dust", "spark", "sparkle", "splinters"]
 ## What a breakable's "returns" may say (Breakable.RETURNS): back the next morning, or never.
 const BREAKABLE_RETURNS: Array[String] = ["daily", "never"]
 

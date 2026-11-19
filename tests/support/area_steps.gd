@@ -31,3 +31,13 @@ static func stand_before(area: AreaController, node_name: String) -> Talkable:
 	area.player.motor.place(talkable.cell() + Vector2i.DOWN)
 	area.player.face(Vector2.UP)
 	return talkable
+
+
+## Steps the hero's stroke of work until its blow has come (tool polish): a stroke's sound, its
+## effects and the new look of what it worked wait for the blow, though the work is done at once.
+## Leaves him mid-stroke, standing still.
+static func to_the_blow(area: AreaController) -> void:
+	var motor: PlayerMotor = area.player.motor
+	while motor.is_attacking() and (motor.state as PlayerAttackState).progress() < ToolStroke.BLOW:
+		motor.step(Vector2.ZERO, 1.0 / 60.0)
+	area.player.sync_from_motor()

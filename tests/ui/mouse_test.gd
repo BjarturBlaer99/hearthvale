@@ -230,6 +230,8 @@ func test_a_left_click_works_the_plot_with_a_tool_and_swings_the_sword_elsewhere
 	assert_bool(farm.faces_farm_work()).is_true()
 	farm._unhandled_input(_click(MOUSE_BUTTON_LEFT))
 	assert_bool(GameState.farm().is_tilled(Vector2i(2, 0))).override_failure_message("a left click hoes").is_true()
+	# The sound comes when the tool lands (tool polish).
+	Steps.to_the_blow(farm)
 	assert_array(_heard).contains([&"hoe"])
 	assert_array(_heard).not_contains([&"sword"])
 	# The same cell again: the hoe says why not, and he doesn't hack at his plot.

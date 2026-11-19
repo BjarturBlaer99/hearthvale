@@ -5,6 +5,9 @@ extends Node2D
 ## top-left corner of its first cell; its size is the farm rules'. It is ground to walk on: it
 ## blocks nothing, crops and all. The area works its cells with the tools and seeds
 ## (AreaController.use_item) and picks what is ripe (interact).
+## A cell worked by a stroke is drawn as it was until the stroke's blow (tool polish, D4): the
+## area holds it (hold()) as the work is done and lets go at the blow (let_go()). For show only:
+## the farm is changed at once.
 
 const SHEET: Texture2D = preload("res://gameplay/art/soil.png")
 ## Frames in the order the tool paints them (a test checks).
@@ -21,6 +24,9 @@ const CROP_FRAMES: Dictionary = {
 }
 ## The bed's rim: a dark shade of the soil, a pixel wide, so it reads as dug and not as a path.
 const RIM: Color = Color(0.30, 0.20, 0.13)
+
+## The cells (the plot's own) drawn as they were, each { "soil", "crop", "phase", "sprinkler" }.
+var _held: Dictionary = {}
 
 
 func _ready() -> void:
@@ -66,6 +72,35 @@ func soil_at(at: Vector2i) -> StringName:
 	return GameState.farm().state_of(plot_cell(at)) if covers(at) else &""
 
 
+## Keeps drawing each of `at` (map cells) as it is now, whatever happens to it, until let_go().
+func hold(at: Array[Vector2i]) -> void:
+	var farm: Farm = GameState.farm()
+	for map: Vector2i in at:
+		if not covers(map):
+			continue
+		var cell: Vector2i = plot_cell(map)
+		if _held.has(cell):
+			continue
+		_held[cell] = {"soil": farm.state_of(cell), "crop": farm.crop_at(cell) if farm.has_crop(cell) else "",
+			"phase": GameState.crop_phase(cell) if farm.has_crop(cell) else &"", "sprinkler": farm.has_sprinkler(cell)}
+
+
+## Draws every cell as it is again.
+func let_go() -> void:
+	_held.clear()
+	queue_redraw()
+
+
+## What the map cell `at` is drawn as: { "soil", "crop", "phase", "sprinkler" } (for tests).
+func shown_at(at: Vector2i) -> Dictionary:
+	var cell: Vector2i = plot_cell(at)
+	if _held.has(cell):
+		return _held[cell]
+	var farm: Farm = GameState.farm()
+	return {"soil": farm.state_of(cell), "crop": farm.crop_at(cell) if farm.has_crop(cell) else "",
+		"phase": GameState.crop_phase(cell) if farm.has_crop(cell) else &"", "sprinkler": farm.has_sprinkler(cell)}
+
+
 ## Takes whatever grows on the plot's cells off `layer` (flowers and tufts on the Decor layer):
 ## it is a bed of soil. For show: those tiles block nothing.
 func clear_ground(layer: TileMapLayer) -> void:
@@ -95,12 +130,15 @@ static func crop_frame(crop: String, phase: StringName) -> StringName:
 
 
 func _draw() -> void:
-	var farm: Farm = GameState.farm()
 	var size: Vector2i = plot_size()
+	var shown: Dictionary = {}
+	for y: int in size.y:
+		for x: int in size.x:
+			shown[Vector2i(x, y)] = shown_at(map_cell(Vector2i(x, y)))
 	for y: int in size.y:
 		for x: int in size.x:
 			var cell: Vector2i = Vector2i(x, y)
-			SpriteSheet.draw(self, SHEET, FRAMES[frame_for(farm.state_of(cell), cell)], CELL, Vector2(cell * CELL))
+			SpriteSheet.draw(self, SHEET, FRAMES[frame_for(shown[cell]["soil"], cell)], CELL, Vector2(cell * CELL))
 	var bed: Vector2 = Vector2(size * CELL)
 	draw_rect(Rect2(0.0, 0.0, bed.x, 1.0), RIM)
 	draw_rect(Rect2(0.0, bed.y - 1.0, bed.x, 1.0), RIM)
@@ -110,7 +148,7 @@ func _draw() -> void:
 	for y: int in size.y:
 		for x: int in size.x:
 			var cell: Vector2i = Vector2i(x, y)
-			if farm.has_crop(cell):
-				SpriteSheet.draw(self, CROPS, CROP_FRAMES[crop_frame(farm.crop_at(cell), GameState.crop_phase(cell))], CELL, Vector2(cell * CELL))
-			elif farm.has_sprinkler(cell):
+			if not str(shown[cell]["crop"]).is_empty():
+				SpriteSheet.draw(self, CROPS, CROP_FRAMES[crop_frame(str(shown[cell]["crop"]), shown[cell]["phase"])], CELL, Vector2(cell * CELL))
+			elif shown[cell]["sprinkler"]:
 				SpriteSheet.draw(self, Furnishing.SHEET, int(Furnishing.FRAMES[&"sprinkler"]), CELL, Vector2(cell * CELL))

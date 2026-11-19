@@ -200,6 +200,10 @@ var _travel_due: Dictionary = {}
 ## and the ladder once its rock is broken.
 var _ladder_cell: Vector2i = MineRolls.NO_CELL
 var _ladder: LadderHole
+## What waits for the blow of the stroke under way (tool polish, D3): its sound, its effects and
+## the new look of what it worked. Run by `_on_struck()` when the motor says the blow has come.
+var _at_blow: Array[Callable] = []
+var _blow_waits: bool = false
 ## The tune this area last asked for.
 var _tune: StringName = &""
 ## Where the hero arrived in this area, facing which way: where they come back after falling.
@@ -259,6 +263,7 @@ func _ready() -> void:
 	player.held_back = -_entrance_facing if arrival["through_entry"] else Vector2.ZERO
 	_safe_cell = _entrance_cell
 	player.motor.cell_changed.connect(_on_cell_changed)
+	player.motor.struck.connect(_on_struck)
 	rng.randomize()
 	ambience = Ambience.kind_of(height_layer, dungeon_id, underground)
 	for enemy: Enemy in enemies():
@@ -541,14 +546,18 @@ func _swing_pick(item: Dictionary) -> bool:
 		EventBus.sound.emit(&"nope")
 		hud.show_message(str(use["says"]))
 		return false
-	if not player.motor.attack(player.facing_direction(), ToolUse.time_of(item)):
+	if not player.motor.attack(player.facing_direction(), ToolUse.time_of(item), ToolStroke.BLOW):
 		return false
+	_blow_waits = true
 	GameState.spend_energy(GameState.energy_cost(EnergyRules.MINE))
 	_show_stroke(item, ToolStroke.PICK, rock.position)
-	if rock.strike(ToolUse.fewer_blows(item)):
+	# Struck now, shown at the blow (with its sound): the chips, or the rock giving way.
+	var broke: bool = rock.strike(ToolUse.fewer_blows(item), false)
+	at_the_blow(rock.show_blow)
+	if broke:
 		_on_rock_broken(rock)
 	else:
-		EventBus.sound.emit(&"pick")
+		at_the_blow(func() -> void: EventBus.sound.emit(&"pick"))
 	player.sync_from_motor()
 	return true
 
@@ -565,10 +574,10 @@ func _on_rock_broken(rock: Rock) -> void:
 	var extra: bool = rules.is_ore(rock.kind) and float(roll_extra_ore.call()) < GameState.extra_ore_chance()
 	GameState.break_rock(area_id, rock.cell())
 	GameState.practise(Skills.MINING, Skills.ORE if rules.is_ore(rock.kind) else Skills.ROCK)
-	EventBus.sound.emit(&"rock_break")
+	at_the_blow(func() -> void: EventBus.sound.emit(&"rock_break"))
 	if rock.cell() == _ladder_cell:
 		_show_ladder()
-		EventBus.sound.emit(&"secret")
+		at_the_blow(func() -> void: EventBus.sound.emit(&"secret"))
 		hud.show_message(LADDER_WORDS)
 		return
 	_leave_lying(rules.gives(rock.kind), 2 if extra else 1, rock.position)
@@ -580,7 +589,7 @@ func _on_land_rock_broken(rock: Rock) -> void:
 	var rules: HomesteadRules = GameState.homestead_rules()
 	GameState.clear_debris(area_id, rock.cell())
 	GameState.practise(Skills.MINING, Skills.ROCK)
-	EventBus.sound.emit(&"rock_break")
+	at_the_blow(func() -> void: EventBus.sound.emit(&"rock_break"))
 	_leave_lying(rules.gives(rock.kind), rules.count(rock.kind), rock.position)
 
 
@@ -593,6 +602,7 @@ func _leave_lying(item_id: StringName, count: int, at: Vector2) -> void:
 	drop.count = count
 	drop.position = at
 	interactables.add_child(drop)
+	_hide_until_the_blow(drop)
 
 
 ## Puts the ladder down where its rock stood: a way to the floor below.
@@ -607,6 +617,7 @@ func _show_ladder() -> void:
 	_ladder.target_entry = MineRules.ARRIVAL
 	_ladder.position = Vector2(_ladder_cell * GreyboxTiles.TILE_SIZE)
 	interactables.add_child(_ladder)
+	_hide_until_the_blow(_ladder)
 
 
 ## Coming to one of the lift's floors opens the lift to it, for good, and says so once.
@@ -1239,42 +1250,102 @@ func _use_tool(item: Dictionary) -> bool:
 		EventBus.sound.emit(&"nope")
 		hud.show_message(str(use["says"]))
 		return false
-	if not player.motor.attack(player.facing_direction(), ToolUse.time_of(item)):
+	if not player.motor.attack(player.facing_direction(), ToolUse.time_of(item), ToolStroke.BLOW):
 		return false
+	_blow_waits = true
 	match use["does"]:
 		ToolUse.TILL:
 			# Paid before the cell is tilled: the stroke that raises his farming costs the old price.
 			GameState.spend_energy(GameState.energy_cost(EnergyRules.HOE))
-			# A better hoe tills the cells beyond it in the same stroke, for the same energy.
-			for cell: Vector2i in _cells_worked(item, front, ToolUse.TILL):
+			# A better hoe tills the cells beyond it in the same stroke, for the same energy. The
+			# soil shows tilled when the hoe comes down (D4).
+			var tilled: Array[Vector2i] = _cells_worked(item, front, ToolUse.TILL)
+			plot.hold(tilled)
+			for cell: Vector2i in tilled:
 				GameState.till_soil(plot.plot_cell(cell))
-				Burst.spawn(interactables, GridBody.cell_center(cell), &"dust")
-			EventBus.sound.emit(&"hoe")
+			at_the_blow(func() -> void:
+				plot.let_go()
+				for cell: Vector2i in tilled:
+					Burst.spawn(interactables, GridBody.cell_center(cell), &"clods")
+				EventBus.sound.emit(&"hoe"))
 		ToolUse.WATER:
 			# A better can waters the cells beyond it with the same pour, for the same energy.
-			for cell: Vector2i in _cells_worked(item, front, ToolUse.WATER):
+			var watered: Array[Vector2i] = _cells_worked(item, front, ToolUse.WATER)
+			plot.hold(watered)
+			for cell: Vector2i in watered:
 				GameState.water_soil(plot.plot_cell(cell))
-				Burst.spawn(interactables, GridBody.cell_center(cell), &"drops")
 			GameState.add_item(held, -1)
 			GameState.spend_energy(GameState.energy_cost(EnergyRules.WATER))
-			EventBus.sound.emit(&"pour")
+			at_the_blow(func() -> void:
+				plot.let_go()
+				_pour_onto(watered[0])
+				for cell: Vector2i in watered:
+					Burst.spawn(interactables, GridBody.cell_center(cell), &"splash")
+				EventBus.sound.emit(&"pour"))
 		ToolUse.FILL:
 			GameState.add_item(held, Inventory.room_for(GameState.item_count(held), holds))
-			EventBus.sound.emit(&"fill")
 			hud.show_message(CAN_FILLED_WORDS)
+			at_the_blow(func() -> void:
+				Ripple.spawn(interactables, GridBody.cell_center(front))
+				Burst.spawn(interactables, GridBody.cell_center(front), &"splash", 0.8)
+				EventBus.sound.emit(&"fill"))
 		ToolUse.PLANT:
+			plot.hold([front])
 			GameState.plant_crop(plot.plot_cell(front), StringName(Crops.crop_of_seed(item)))
 			GameState.add_item(held, -1)
-			EventBus.sound.emit(&"plant")
-			Burst.spawn(interactables, GridBody.cell_center(front), &"dust", 0.6)
+			at_the_blow(func() -> void:
+				plot.let_go()
+				Burst.spawn(interactables, GridBody.cell_center(front) + Vector2(0, -10), &"seeds")
+				EventBus.sound.emit(&"plant"))
 		ToolUse.PLACE:
+			plot.hold([front])
 			GameState.place_sprinkler(plot.plot_cell(front))
 			GameState.add_item(held, -1)
-			EventBus.sound.emit(&"plant")
-			Burst.spawn(interactables, GridBody.cell_center(front), &"dust", 0.6)
+			at_the_blow(func() -> void:
+				plot.let_go()
+				Burst.spawn(interactables, GridBody.cell_center(front), &"dust", 0.6)
+				EventBus.sound.emit(&"plant"))
 	_show_stroke(item, ToolStroke.of_use(use["does"]), Vector2(front) * GridBody.TILE)
 	player.sync_from_motor()
 	return true
+
+
+## Runs `then` at the blow of the stroke under way (tool polish, D3), or now if no stroke waits
+## for one: a sound, an effect, the new look of what was worked. For show only.
+func at_the_blow(then: Callable) -> void:
+	if _blow_waits:
+		_at_blow.append(then)
+	else:
+		then.call()
+
+
+## The blow has come (or the stroke ended before it): what waited for it, in order.
+func _on_struck() -> void:
+	_blow_waits = false
+	var waiting: Array[Callable] = _at_blow
+	_at_blow = []
+	for then: Callable in waiting:
+		then.call()
+
+
+## Keeps `node` out of sight until the blow (what a rock left, or the ladder it hid).
+func _hide_until_the_blow(node: Node2D) -> void:
+	if not _blow_waits:
+		return
+	node.visible = false
+	_at_blow.append(func() -> void:
+		if is_instance_valid(node):
+			node.visible = true)
+
+
+## Water from the spout onto `cell` (the first one worked), as the hero holds the can: from the
+## side and the front. From behind it is hidden by him, and only the splash shows.
+func _pour_onto(cell: Vector2i) -> void:
+	var facing: Vector2i = player.facing_direction()
+	if facing == Vector2i.UP:
+		return
+	var spout: Vector2 = player.position + (Vector2(0, -4) if facing == Vector2i.DOWN else Vector2(17 * facing.x, -12))
+	Pour.spawn(interactables, spout, GridBody.cell_center(cell))
 
 
 ## Shows the stroke of `item` that has just begun (for show only): the hero works it with the

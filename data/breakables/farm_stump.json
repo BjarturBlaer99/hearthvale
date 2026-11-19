@@ -8,7 +8,7 @@
 	"hits": 3,
 	"returns": "never",
 	"sound": "cut",
-	"burst": "dust",
+	"burst": "splinters",
 	"frames": {
 		"whole": "stump",
 		"broken": ""

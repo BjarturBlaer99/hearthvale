@@ -1601,3 +1601,9 @@ the plan's four steps, each stopping for the user's review.
   facing up, the blow, the can and the sprinkler are hidden by him; the sprinkler leaves his hands
   at the blow; a seed is sown by an empty hand (the seeds are step 2's). See
   `docs/progress/tool-polish-plan.md`, "Step 1 — built".
+- 2026-11-19 — **Tool polish, step 2 (the blow): what building it decided.** The motor emits
+  `struck` at a stroke's blow (or as it ends early), and the area shows the stroke's sound, bursts and
+  new look then; a rock is struck at the press and shown at the blow, with what it leaves hidden
+  until then; logs and stumps throw splinters (data) and shudder and flash like rocks; the flash is
+  the white picture at a little over half strength. See `docs/progress/tool-polish-plan.md`,
+  "Step 2 — built".

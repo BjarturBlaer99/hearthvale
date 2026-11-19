@@ -7,6 +7,9 @@ extends GridBody
 ## draws it. Call place() before the first step().
 
 signal state_changed(state_name: StringName)
+## A stroke given a blow (attack()'s `blow`) has come to it, or ended before it: once a stroke.
+## For show only (tool polish): what the stroke does was done when it began.
+signal struck
 
 const WALK_SPEED: float = 72.0
 ## Holding sprint. (Whether he may, and what it costs, are the energy rules': the controller
@@ -74,10 +77,12 @@ func step(input: Vector2, delta: float) -> void:
 
 ## Starts a sword swing toward `direction` lasting `duration` s. Only on foot; returns whether
 ## the swing started.
-func attack(direction: Vector2i, duration: float) -> bool:
+## `blow` (0 to 1, or -1 for none) is how far through the stroke `struck` is emitted; it doesn't
+## change how long the stroke lasts.
+func attack(direction: Vector2i, duration: float, blow: float = -1.0) -> bool:
 	if state_name != GROUND:
 		return false
-	change_state(ATTACK, {"direction": direction, "time": duration})
+	change_state(ATTACK, {"direction": direction, "time": duration, "blow": blow})
 	return true
 
 
