@@ -6,7 +6,9 @@ extends Control
 ## the thing under it; Tab or Esc leaves. The mouse points: at a line to put the cursor there.
 ## The list has tabs, as Tilda's counter has (the Homestead, phase 2): "Make", the list as it
 ## always was, and "Place", what is made to be set down on his land. Left and right turn from
-## one to the other, and so does a click on a tab's name.
+## one to the other, and so does a click on a tab's name. Phase 3 adds "Build": the plans of the
+## buildings, each with its materials and coins (a plan bought is a kit in the pack), and the
+## upgrades.
 ## It stays open for as many things as he likes, and a line says what was made, or why not.
 ## Crafting (pure) says what is known and what is missing; GameState makes it. The area opens it
 ## and keeps the hero still while it is open.
@@ -21,7 +23,10 @@ const NOTHING_WORDS: String = "You know nothing to make yet."
 ## The heading over what the thing under the cursor needs: each need has a line of its own.
 const NEEDS_WORDS: String = "Needs:"
 ## The tabs as they are named, and what stands between the names.
-const TAB_NAMES: Dictionary = {Crafting.TAB_MAKE: "Make", Crafting.TAB_PLACE: "Place"}
+const TAB_NAMES: Dictionary = {Crafting.TAB_MAKE: "Make", Crafting.TAB_PLACE: "Place", Crafting.TAB_BUILD: "Build"}
+## What buying a plan, and an upgrade, is announced with.
+const KIT_WORDS: String = "Bought: %s. Set it down in build mode."
+const UPGRADE_WORDS: String = "Bought: %s. It is finished tomorrow."
 const TAB_GAP: String = "  "
 
 var selected: int = 0
@@ -136,6 +141,10 @@ func confirm() -> bool:
 	if why_not.is_empty():
 		EventBus.sound.emit(&"craft")
 		_note.text = Crafting.MADE_WORDS % words
+		if not Crafting.upgrade_made(recipe).is_empty():
+			_note.text = UPGRADE_WORDS % words
+		elif Buildings.is_kit(DataRegistry.get_item(StringName(Crafting.item_made(recipe)))):
+			_note.text = KIT_WORDS % str(DataRegistry.get_item(StringName(Crafting.item_made(recipe))).get("name", words))
 	else:
 		EventBus.sound.emit(&"nope")
 		_note.text = why_not
@@ -235,11 +244,9 @@ func point_at(event: InputEvent) -> void:
 	_refresh()
 
 
+## The names of what a recipe needs and makes: each item's, and "Coins" for coins.
 func _names() -> Dictionary:
-	var names: Dictionary = {}
-	for item: Dictionary in DataRegistry.entries(&"items"):
-		names[str(item["id"])] = str(item.get("name", item["id"]))
-	return names
+	return GameState.need_names()
 
 
 func _refresh() -> void:

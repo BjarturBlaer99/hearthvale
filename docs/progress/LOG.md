@@ -2814,3 +2814,30 @@ The second of phase 2's two steps (`docs/progress/homestead-plan.md`).
 - **CLAUDE.md is as it was:** its words for phase 2 (the plan's R10 to R14) are the coordinator's to write, and the phase's report proposes them as built.
 
 **Approved (phase 2).** The coordinator ran the full suite again (1038 tests in 134 suites pass), confirmed the two commits and looked at the pictures; shown the summary and the pictures, the user approved phase 2 on 2026-11-19 ("Approve Phase 2"), as built. Nobody has played it by hand. CLAUDE.md's rules now describe build mode and the placeables. Phase 3 is next, stopping at its end.
+
+## 2026-11-19 — The Homestead, phase 3, step 3a: plans, kits, sites, the Well, the Silo and hay
+
+The first of phase 3's three steps (`docs/progress/homestead-plan.md`).
+
+**Built**
+- **The workbench's third tab, "Build",** lists the plans with their materials and coins ("Coins 0 of 80"). A plan refused says what is short, by name ("You are short of 40 Stone, 10 Wood and 80 Coins."). Bought, it is a kit in the pack.
+- **A kit** (an item of type `kit`) never stacks, never goes in a chest and is never on the item bar; the build bar shows it. One of each building: a plan is refused while its kit is in the pack, its site is set down or its building stands.
+- **In build mode a kit's ghost** covers every cell of its building and the doorstep before its door, green or red over all of them with the first reason found (D15). Set down, it is a building site today: dug ground pegged out with twine, a stack of timber, its cells filled. **The next morning the building stands** (any morning), and the hero is told with a short sound (`built`), where he is or where he next arrives.
+- **The Well** (2 by 2; 40 stone, 10 wood, a copper bar, 80 coins; known once a copper bar is found): the can fills facing any of its cells once it stands. It wears the village well's own picture.
+- **The Silo** (2 by 2; 30 stone, 10 wood, 2 copper bars, 100 coins; known at Farming 2): a right click puts in the hay he carries, up to 60; what doesn't fit stays in the pack.
+- **The meadow's fourteen tufts of tall grass** (D29): cut, each leaves a hay lying and is back the next morning. Nothing can be set down on a tuft that stands.
+- **A building is drawn as the farmhouse is:** flat tiles on the ground (the village's own house tiles and five new ones at the end of the atlas, with a silo), a house's shadow east and south, and a ridge strip over its roof that the hero walks behind.
+- **Data:** a building is a file in `data/buildings/` (`docs/data/building.schema.json`); the plans are files in `data/crafting/` with `"tab": "build"`. **The save stays version 6:** the section `homestead` gains `buildings` and `hay`, written only when there is something in them.
+
+**What differs from the plan**
+- **Nothing in the approved decisions.** D20, D21 and D29's hay hold as written.
+- **The open point the brief named:** phase 2 left the tufts plain grass, so a save may have something set down on one. **A tuft doesn't grow where something lies or stands, or a building covers it;** taken up again, the tuft is back on the next visit. Nothing is lost.
+- Chosen where the plan was silent (`docs/DECISIONS.md`): the ghost holds a building by its door; the doorstep is asked the plan's table as every cell is; a path may lie under a building; a building's cells say "Nothing can stand there."; the Well casts no shadow; nothing takes hay out of the silo.
+
+**Verified**
+- **1069 tests in 140 suites pass** (1038 in 134 before). New: the buildings' rules (`tests/core/homestead/building_rules_test.gd`), what the homestead keeps of them (`homestead_buildings_test.gd`), the Build tab's rules (`tests/core/crafting/crafting_build_test.gd`), the plans in the world (`tests/world/plans_test.gd`: the tab, the kit, the ghost's refusals, a site through a save and the morning, the well, hay and the silo, a tuft under a phase 2 yard), and a save from phase 2 (`tests/fixtures/saves/v6_a_yard_on_the_farm.json`, written by the game at `57e7d3a`).
+- Older tests brought up to date: the workbench's tabs (three now) and the registry's list of items and breakables.
+- The game boots headless with no script error.
+
+**Known issues**
+- Nobody has played it by hand. The rooms, upgrades, moving and demolishing are steps 3b and 3c.

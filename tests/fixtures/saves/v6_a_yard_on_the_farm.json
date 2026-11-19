@@ -1,0 +1,143 @@
+{
+	"day": 6,
+	"energy": 100.0,
+	"equipped": "",
+	"farm": {
+		"cells": {
+			"0,0": {
+				"watered": false
+			}
+		}
+	},
+	"flag_days": {
+		"home/chest": 6,
+		"home/furnace": 6
+	},
+	"flags": {
+		"home/chest": true,
+		"home/furnace": true,
+		"quest/a_place_of_your_own/entered": "settle"
+	},
+	"found": [
+		"bench",
+		"coin",
+		"copper_bar",
+		"dirt_path",
+		"fence",
+		"fibre",
+		"iron_bar",
+		"lamp_post",
+		"oak_sapling",
+		"stone",
+		"wood"
+	],
+	"friends": {},
+	"health": 6,
+	"heart_pieces": 0,
+	"hearts_max": 3,
+	"home": {
+		"chest": [
+			{
+				"count": 20,
+				"id": "stone"
+			}
+		],
+		"furnace": {
+			"count": 3,
+			"day": 6,
+			"item": "copper_bar"
+		}
+	},
+	"homestead": {
+		"cleared": [
+			"36,5",
+			"35,9",
+			"36,9"
+		],
+		"lying": {
+			"34,13": "dirt_path",
+			"4,3": "dirt_path"
+		},
+		"standing": {
+			"33,12": {
+				"item": "lamp_post"
+			},
+			"34,12": {
+				"item": "fence"
+			},
+			"35,10": {
+				"item": "bench"
+			},
+			"35,12": {
+				"item": "fence"
+			},
+			"6,3": {
+				"item": "fence"
+			},
+			"9,3": {
+				"age": 2,
+				"item": "oak_sapling"
+			}
+		}
+	},
+	"inventory": [
+		{
+			"count": 4,
+			"id": "dirt_path"
+		},
+		{
+			"count": 3,
+			"id": "fence"
+		},
+		{
+			"count": 1,
+			"id": "oak_sapling"
+		},
+		{
+			"count": 24,
+			"id": "wood"
+		},
+		{
+			"count": 40,
+			"id": "stone"
+		},
+		{
+			"count": 12,
+			"id": "fibre"
+		},
+		{
+			"count": 420,
+			"id": "coin"
+		},
+		{
+			"count": 2,
+			"id": "copper_bar"
+		},
+		{
+			"count": 1,
+			"id": "iron_bar"
+		}
+	],
+	"mine": {
+		"broken": {},
+		"day": 6,
+		"number": 3979174835
+	},
+	"minute": 600.0,
+	"play_time": 0.0,
+	"player": {
+		"area": "homestead",
+		"cell": [
+			30,
+			13
+		]
+	},
+	"quests": {
+		"a_place_of_your_own": "settle"
+	},
+	"skills": {
+		"farming": 1
+	},
+	"tally": {},
+	"version": 6
+}

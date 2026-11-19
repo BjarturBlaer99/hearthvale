@@ -580,6 +580,20 @@ func _initialize() -> void:
 	_rubble(GreyboxTiles.coords("rubble"))
 	_crystal_vein(GreyboxTiles.coords("crystal_vein"))
 	_art(GreyboxTiles.coords("prop_timber"), TIMBER_PALETTE, TIMBER_ART)
+	# The Homestead's buildings (phase 3): a building site, the barn's plank walls and doors, and
+	# the silo. The coop and the shed wear the village's own house tiles.
+	_site(GreyboxTiles.coords("site"))
+	_site(GreyboxTiles.coords("site_timber"))
+	_site_timber(GreyboxTiles.coords("site_timber"))
+	_barn_wall(GreyboxTiles.coords("barn_wall"))
+	_barn_wall(GreyboxTiles.coords("barn_loft"))
+	_barn_loft(GreyboxTiles.coords("barn_loft"))
+	_barn_wall(GreyboxTiles.coords("barn_door"))
+	_barn_door(GreyboxTiles.coords("barn_door"))
+	var silo: Array[Vector2i] = []
+	for kind: String in GreyboxTiles.SILO_KINDS:
+		silo.append(GreyboxTiles.coords(kind))
+	_silo(silo)
 	# Art pass 3: warm every colour and soften every outline, tile by tile.
 	PixelGrade.apply(_image, OUTLINE, Rect2i(), Vector2i(T, T))
 	DirAccess.make_dir_recursive_absolute(GreyboxTiles.TEXTURE_PATH.get_base_dir())
@@ -957,7 +971,7 @@ func _ascii(tile: Vector2i, art: String) -> void:
 func _marker(tile: Vector2i, index: int, land: bool = false) -> void:
 	var colors: Array = [Color(0.3, 0.9, 0.3), Color(0.85, 0.5, 0.25), Color(1, 1, 1), Color(1, 0.85, 0.2), Color(0.9, 1, 0.4), Color(0.6, 0.6, 0.65), Color(0.7, 0.5, 0.3), Color(0.5, 0.35, 0.2)]
 	if land:
-		colors = [Color(0.55, 0.8, 0.3), Color(0.2, 0.55, 0.25), Color(0.6, 0.45, 0.3), Color(0.45, 0.3, 0.2), Color(0.5, 0.5, 0.55), Color(0.35, 0.35, 0.4)]
+		colors = [Color(0.55, 0.8, 0.3), Color(0.2, 0.55, 0.25), Color(0.6, 0.45, 0.3), Color(0.45, 0.3, 0.2), Color(0.5, 0.5, 0.55), Color(0.35, 0.35, 0.4), Color(0.85, 0.75, 0.35)]
 	var color: Color = colors[index]
 	_rect(tile, Rect2i(2, 2, T - 4, T - 4), Color(color, 0.55))
 	_rect(tile, Rect2i(2, T - 3 if land else 2, T - 4, 1), OUTLINE)
@@ -2082,6 +2096,134 @@ const TIMBER_ART: Array[String] = [
 	"oooooooooooooooo",
 	".ssssssssssssss.",
 ]
+
+
+# --- The Homestead's buildings (phase 3) -------------------------------------------------------
+
+## The barn's red: its planks, and the white of its trim.
+const BARN_RED: Color = Color(0.64, 0.22, 0.17)
+const BARN_TRIM: Color = Color(0.93, 0.90, 0.82)
+
+
+## A building site: dug, trodden earth with clods, marked out with twine along its top and
+## left edges (so a site of many cells reads as a plot pegged out), a peg where they meet.
+func _site(tile: Vector2i) -> void:
+	var earth: Color = Color(0.58, 0.43, 0.28)
+	_fill(tile, earth)
+	for y: int in T:
+		for x: int in T:
+			var n: int = _hash(x, y, 91) % 100
+			if n < 10:
+				_px(tile, x, y, earth.darkened(0.18))
+			elif n < 16:
+				_px(tile, x, y, earth.lightened(0.12))
+	for clod: Vector2i in [Vector2i(4, 6), Vector2i(10, 11), Vector2i(12, 4), Vector2i(6, 12)]:
+		_rect(tile, Rect2i(clod, Vector2i(2, 1)), earth.lightened(0.2))
+		_rect(tile, Rect2i(clod + Vector2i(0, 1), Vector2i(2, 1)), earth.darkened(0.3))
+	var twine: Color = Color(0.92, 0.86, 0.64)
+	_rect(tile, Rect2i(0, 1, T, 1), twine)
+	_rect(tile, Rect2i(1, 0, 1, T), twine)
+	_rect(tile, Rect2i(0, 0, 3, 3), OUTLINE)
+	_px(tile, 1, 1, Color(0.70, 0.50, 0.28))
+
+
+## A site's stack of timber: three planks laid one on another, their ends showing, with a
+## shadow under them, over the dug earth.
+func _site_timber(tile: Vector2i) -> void:
+	var wood: Color = Color(0.74, 0.54, 0.32)
+	_rect(tile, Rect2i(2, 13, 13, 2), SHADOW)
+	for plank: int in 3:
+		var y: int = 5 + plank * 3
+		var x: int = 2 + (plank % 2)
+		_rect(tile, Rect2i(x, y, 12, 3), OUTLINE)
+		_rect(tile, Rect2i(x + 1, y + 1, 10, 1), wood.lightened(0.1 - plank * 0.05))
+		_px(tile, x + 10, y + 1, wood.darkened(0.3))
+		_px(tile, x + 4, y + 1, wood.darkened(0.15))
+
+
+## The barn's wall: upright red planks with dark seams, the shadow of the eaves along the top
+## and a stone footing along the bottom, as a house's ground floor has.
+func _barn_wall(tile: Vector2i) -> void:
+	_fill(tile, BARN_RED)
+	for x: int in T:
+		var seam: bool = x % 4 == 3
+		for y: int in T:
+			var shade: Color = BARN_RED.darkened(0.32) if seam else BARN_RED
+			if not seam and _hash(x, y, 93) % 9 == 0:
+				shade = BARN_RED.darkened(0.1)
+			if not seam and x % 4 == 0:
+				shade = shade.lightened(0.1)
+			_px(tile, x, y, shade)
+	_rect(tile, Rect2i(0, 0, T, 2), EAVE_SHADOW)
+	var footing: Color = Color(0.52, 0.50, 0.52)
+	_rect(tile, Rect2i(0, 13, T, 3), footing.darkened(0.35))
+	for x: int in range(0, T, 4):
+		_rect(tile, Rect2i(x, 13 + (0 if x % 8 == 0 else 1), 3, 2), footing)
+
+
+## The barn's loft door: a square hatch framed in white with its cross brace, over the wall.
+func _barn_loft(tile: Vector2i) -> void:
+	_rect(tile, Rect2i(3, 3, 10, 9), OUTLINE)
+	_rect(tile, Rect2i(4, 4, 8, 7), BARN_TRIM)
+	_rect(tile, Rect2i(5, 5, 6, 5), BARN_RED.darkened(0.2))
+	for i: int in 5:
+		_px(tile, 5 + i + (1 if i > 2 else 0), 5 + i, BARN_TRIM)
+		_px(tile, 10 - i - (1 if i > 2 else 0), 5 + i, BARN_TRIM)
+
+
+## The barn's door: tall plank leaves framed in white, a white cross brace over them.
+func _barn_door(tile: Vector2i) -> void:
+	_rect(tile, Rect2i(1, 2, 14, 14), OUTLINE)
+	_rect(tile, Rect2i(2, 3, 12, 13), BARN_TRIM)
+	_rect(tile, Rect2i(3, 4, 10, 12), BARN_RED.darkened(0.12))
+	_rect(tile, Rect2i(8, 4, 1, 12), BARN_RED.darkened(0.4))
+	for i: int in 10:
+		_px(tile, 3 + i, 4 + i + (1 if i > 4 else 0), BARN_TRIM)
+		_px(tile, 12 - i, 4 + i + (1 if i > 4 else 0), BARN_TRIM)
+	_px(tile, 7, 10, Color(0.92, 0.80, 0.36))
+	_px(tile, 9, 10, Color(0.92, 0.80, 0.36))
+
+
+## The silo: a round tower of stone courses under a domed copper cap, with a hatch and two
+## iron hoops, two cells by two, painted whole and cut into its quarters.
+func _silo(quarters: Array[Vector2i]) -> void:
+	var size: int = T * 2
+	var art: Image = Image.create(size, size, false, Image.FORMAT_RGBA8)
+	art.fill(Color(0, 0, 0, 0))
+	var stone: Color = Color(0.66, 0.64, 0.62)
+	var cap: Color = Color(0.36, 0.56, 0.52)
+	var iron: Color = Color(0.28, 0.28, 0.33)
+	for y: int in size:
+		for x: int in size:
+			var across: float = (float(x) + 0.5 - 16.0) / 13.0
+			# The body: x 3..28, from under the cap to the ground, lit from the west.
+			if absf(across) <= 1.0 and y >= 9:
+				var edge: bool = absf(across) > 0.92 or y == size - 1
+				var shade: Color = stone.lightened(0.12 - across * 0.22)
+				var course: int = floori(float(y - 9) / 4.0)
+				var joint: bool = (y - 9) % 4 == 3 or posmod(x + (course % 2) * 3, 6) == 0
+				var c: Color = OUTLINE if edge else (shade.darkened(0.25) if joint else shade)
+				if not edge and (y == 15 or y == 26):
+					c = iron.lightened(0.25 if across < 0.0 else 0.0)
+				art.set_pixel(x, y, c)
+			# The cap: a dome over the body, a little wider, with its lit side and seams.
+			var dome: Vector2 = Vector2((float(x) + 0.5 - 16.0) / 14.0, (float(y) + 0.5 - 11.0) / 10.0)
+			if y <= 11 and dome.length_squared() <= 1.0:
+				var rim: bool = dome.length_squared() > 0.82 or y == 11
+				var lit: Color = cap.lightened(0.18 - dome.x * 0.3)
+				var c2: Color = OUTLINE if rim else (lit.darkened(0.2) if posmod(x, 5) == 0 else lit)
+				art.set_pixel(x, y, c2)
+	# The finial on top, and the hatch high on its face.
+	for p: Vector2i in [Vector2i(15, 0), Vector2i(16, 0), Vector2i(15, 1), Vector2i(16, 1)]:
+		art.set_pixel(p.x, p.y, iron)
+	for y: int in range(17, 23):
+		for x: int in range(13, 19):
+			var frame: bool = y == 17 or y == 22 or x == 13 or x == 18
+			art.set_pixel(x, y, OUTLINE if frame else Color(0.48, 0.30, 0.16))
+	art.set_pixel(17, 20, Color(0.92, 0.80, 0.36))
+	var origins: Array[Vector2i] = [Vector2i(0, 0), Vector2i(T, 0), Vector2i(0, T), Vector2i(T, T)]
+	for i: int in 4:
+		_image.blit_rect(art, Rect2i(origins[i], Vector2i(T, T)), quarters[i] * T)
 
 
 func _art(tile: Vector2i, palette: Dictionary, rows: Array[String]) -> void:

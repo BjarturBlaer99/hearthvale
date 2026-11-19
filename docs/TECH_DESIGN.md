@@ -1363,7 +1363,8 @@ in a shop's data, two favours as data, and a tool that plays the game.
 ## 30. The Homestead
 The user's request of 2026-11-17 (`docs/progress/homestead-plan.md`, approved as written), in five phases.
 **Phase 1 is built** (2026-11-18 and 19): the farm and the home's move. **Phase 2 is built**
-(2026-11-19): placing things, under "Placing things" below.
+(2026-11-19): placing things, under "Placing things" below. **Phase 3 is built** (2026-11-19):
+buildings, under "Buildings" below.
 - **The area `homestead`** (`world/areas/homestead/homestead.tscn`, "Your farm") is a map of 40 by 30
   cells, baked by `tools/greybox/build_maps.gd` from a sketch with a legend of its own (below). Woods two
   deep stand all round it; the ground is level (height 0 everywhere).
@@ -1557,6 +1558,59 @@ The user's request of 2026-11-17 (`docs/progress/homestead-plan.md`, approved as
     slot chosen; `yard`, `yard_night` and `yard_hand` show a yard hedged, fenced, gated, floored and
     lit; `saplings`; `place_tab`; `shop_land`). The sprite tool's `"made"` frames may be a `"swap"`
     of another frame's colours.
+- **Buildings** (phase 3; the plan's D20 to D24, and D29's hay):
+  - **A building is a file in `data/buildings/`** (`docs/data/building.schema.json`): its `size`, its
+    `door` (a cell of its bottom row) and `room` (the area that is its inside), what it does
+    (`fills_can`, `holds`, `keeps`), the `animals` it has room for (phase 4's to read), its upgrade
+    (`big`: a name, animals and a look) and its `look`, blocks of the atlas's tiles laid by the map
+    baker's own rules (`Buildings.detail()`: roofs with ridge, eaves and gable ends, walls with a
+    window every third cell, `well` and `silo` as 2 by 2 pictures, a `chimney` over what is under
+    it). **`Buildings`** (`core/homestead/`, pure) reads it: cells, door, doorstep, the cell the ghost
+    holds it by (`anchor_of`: its door, or the middle of its bottom row), the cells it fills (a site
+    all, a building all but its door), whether it fits (`why_not_at`: each cell and then the doorstep
+    asked `Placement.why_not` as a standing thing, the first refusal found), its tiles, and what pulling
+    it down gives back (`refund`). `DataRegistry` checks each as it loads (`Buildings.problems()`), and
+    that every building has one kit and every kit a building. **A new building is data and pictures.**
+  - **A kit** is an item of type `kit` whose stats name its building. It doesn't stack, never goes in a
+    chest (`Store.KEPT_OUT`) and is never on the item bar; the build bar shows it among the placeables.
+  - **The workbench's third tab, "Build"** (`Crafting.TAB_BUILD`): a recipe there makes a kit (a
+    plan) or `{"upgrade": building}`; coins are the need `coin`. `GameState.why_not_craft()` asks
+    `Crafting.why_not(..., is_had)`, which refuses what he has as a whole already ("You have one
+    already.": a kit in the pack, a site or a building, or an upgrade), and on this tab a plan short of
+    something says so by name (`Crafting.short_words()`: "You are short of 40 Stone, 10 Wood and 80
+    Coins."). A recipe's `unlock` may be `{"built": id}`: known while that building stands
+    (`Crafting.is_known(..., has_built)`; `GameState.is_built()`).
+  - **`Homestead` keeps the buildings** (`put_building`, `building_at`, `building_day`, `is_site`,
+    `is_standing`, `upgrade`, `is_big`, `move_building`, `remove_building`, `finished_on`) and the silo's
+    `hay` (`add_hay`). **Go through `GameState.set_down_kit(area, origin, kit_id)`** (a site with its
+    top-left corner at `origin`, today), `GameState.building_covering(area, cell)` and
+    `doorstep_of(area, cell)`. `GameState.start_next_day()` finishes what was set down or bought the day
+    before: `EventBus.building_finished(id, big)`, `GameState.morning_news` ("The Well stands on your
+    farm."), which the area says with the sound `built` where he is or where he next arrives.
+  - **In build mode** a kit's ghost (`BuildMode.building_in_hand()`, `building_origin()`) covers every
+    cell and the doorstep, washed green or red, with the building's picture and outlines; the words are
+    the first refusal. `BuildMode.site_at(cell, except)` says a building's cells are no ground and its
+    doorstep a doorstep (all but `except`'s), and that a whole tuft of tall grass is to be cleared first
+    (`grass_at`).
+  - **`PlacedBuildings`** (`world/areas/placed_buildings.gd`), a node of the homestead's area, keeps the
+    area in step on every `homestead_changed`: it draws each building flat on the ground over what lies
+    there, with a house's shadow east and south (`BuildingArt`, `gameplay/art/`; HeightShading's
+    numbers), raises each roof's ridge as a strip of the area's scenery sorted as the farmhouse's is,
+    makes a `BuildingSpot` (`gameplay/interactables/`) in `Interactables` for what the hero faces, and
+    fills each building's cells. `fills_can_at(cell)` makes a standing Well water to the can
+    (`AreaController.is_water_source`).
+  - **The Silo** (`holds`: 60 hay): a right click facing it (`BuildingSpot.use()`) puts in the hay he
+    carries (`GameState.put_hay()`), as much as there is room for.
+  - **The meadow's tall grass** is the breakable `meadow_grass` (`"returns": "daily"`, one hay lying) on
+    a seventh land marker (`GreyboxTiles.LAND_MARKER_KINDS`); the homestead was re-baked for it. A tuft
+    whose cell has something set down or a building on it is taken away as the land loads
+    (`AreaController._clear_grass_under_things()`).
+  - **Pictures and sound:** atlas rows 28 and 29 (`GreyboxTiles.BUILDING_KINDS`, `SILO_KINDS`: a site, a
+    site's timber, the barn's plank wall, loft door and door, the silo's quarters), painted by
+    `make_tile_texture.gd` and never laid on a Height layer; the icons `hay` and `kit`; the sound `built`.
+  - **The save is still version 6:** `homestead` gains `"buildings"` and `"hay"`, each written only when
+    there is something in it. The fixture `tests/fixtures/saves/v6_a_yard_on_the_farm.json` was written
+    by the game as it stood at the end of phase 2.
 - **Tests:** `tests/world/build_mode_test.gd` (build mode in the world), `tests/world/placeables_test.gd`
   (the lamp post, saplings and trees, the hand, the tabs, Tilda's wares, a whole yard), `tests/core/homestead/`
   (`Placement`, `BuildBar`, what `Homestead` keeps), `tests/world/homestead_test.gd` (the map and the walk), `tests/world/home_move_test.gd` (the

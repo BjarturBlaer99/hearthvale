@@ -799,8 +799,8 @@ const MAPS: Dictionary = {
 	# FarmPlot node in the scene, (22..33, 17..22). "~" is the pond. "T" is the woods round the
 	# edge and "t" an old tree left standing. The other letters are the land's overgrowth,
 	# spawn markers named by "marks": "w" weeds, "b" a bush, "l" a fallen log, "s" an old
-	# stump, "o" a rock, "O" a boulder, "@" a great boulder. The quote marks are the meadow's tall grass, which
-	# is phase 3's: until then they are grass like any other.
+	# stump, "o" a rock, "O" a boulder, "@" a great boulder. The quote marks are the meadow's
+	# tall grass (phase 3): cut, each leaves a hay and is back the next morning.
 	"homestead": {
 		"scene": "res://world/areas/homestead/homestead.tscn",
 		"size": Vector2i(40, 30),
@@ -841,7 +841,7 @@ const MAPS: Dictionary = {
 		},
 		"marks": {
 			"w": "weeds", "b": "bush", "l": "log", "s": "farm_stump",
-			"o": "rock", "O": "boulder", "@": "great_boulder",
+			"o": "rock", "O": "boulder", "@": "great_boulder", "\"": "meadow_grass",
 		},
 		"blocks": [
 			# The farmhouse: thatch over a half-timbered upper floor and a ground floor, as the

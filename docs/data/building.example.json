@@ -1,0 +1,22 @@
+{
+	"id": "coop",
+	"name": "Coop",
+	"size": [4, 3],
+	"door": [2, 2],
+	"room": "coop",
+	"animals": 4,
+	"big": {
+		"name": "Big Coop",
+		"animals": 8,
+		"look": [
+			[0, 0, 4, 2, "roof"],
+			[0, 2, 4, 1, "wall"],
+			[2, 2, 1, 1, "door"]
+		]
+	},
+	"look": [
+		[0, 0, 4, 2, "roof_thatch"],
+		[0, 2, 4, 1, "wall"],
+		[2, 2, 1, 1, "door"]
+	]
+}

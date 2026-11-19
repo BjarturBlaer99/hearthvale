@@ -1,0 +1,15 @@
+{
+	"id": "well",
+	"name": "Well",
+	"station": "workbench",
+	"tab": "build",
+	"order": 1,
+	"needs": [
+		{ "item": "stone", "count": 40 },
+		{ "item": "wood", "count": 10 },
+		{ "item": "copper_bar", "count": 1 },
+		{ "item": "coin", "count": 80 }
+	],
+	"makes": { "item": "well_kit" },
+	"unlock": { "found": "copper_bar" }
+}

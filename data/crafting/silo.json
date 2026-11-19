@@ -1,0 +1,15 @@
+{
+	"id": "silo",
+	"name": "Silo",
+	"station": "workbench",
+	"tab": "build",
+	"order": 2,
+	"needs": [
+		{ "item": "stone", "count": 30 },
+		{ "item": "wood", "count": 10 },
+		{ "item": "copper_bar", "count": 2 },
+		{ "item": "coin", "count": 100 }
+	],
+	"makes": { "item": "silo_kit" },
+	"unlock": { "skill": "farming", "level": 2 }
+}

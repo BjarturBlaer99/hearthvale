@@ -19,7 +19,7 @@ const SFX: Array[StringName] = [
 	&"hoe", &"pour", &"fill", &"plant", &"harvest", &"skill", &"friend",
 	&"wisp_flare", &"wisp_dart",
 	&"pick", &"rock_break", &"lift", &"craft", &"furnace",
-	&"set_down", &"take_up",
+	&"set_down", &"take_up", &"built",
 ]
 const MUSIC: Array[StringName] = [&"village", &"countryside", &"dungeon", &"boss", &"night", &"marsh", &"mine", &"homestead", &"homestead_night"]
 const MUSIC_BUS: StringName = &"Music"

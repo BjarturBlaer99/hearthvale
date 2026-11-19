@@ -17,9 +17,13 @@ extends Node2D
 ## - The wheel steps along the build bar, which takes the item bar's place, and the keys 1 to
 ##   9 choose on it (BuildBar: the hand first, then what he carries).
 ## - Tab, Esc or B leave.
+## - A building's kit (the Homestead, phase 3) is set down the same way: its ghost covers every
+##   cell of the building and the doorstep before its door, held by its door (or the middle of
+##   its bottom row), green or red over all of them with the first reason found (the plan's
+##   D15). Set down, it is a building site today and the building the next morning.
 ## Placement (pure) says what fits; GameState sets down, moves and takes up; PlacedThings
-## shows it. This is the only place anything is set down from: in play the mouse is two
-## buttons, as ever, and where a click lands doesn't matter.
+## and PlacedBuildings show it. This is the only place anything is set down from: in play the
+## mouse is two buttons, as ever, and where a click lands doesn't matter.
 
 signal closed
 
@@ -186,21 +190,34 @@ func cell_under(event: InputEventMouse) -> Vector2i:
 	return PlayerMotor.cell_of((make_input_local(event) as InputEventMouse).position)
 
 
-## What the area knows of `at`, for Placement.why_not.
-func site_at(at: Vector2i) -> Dictionary:
+## What the area knows of `at`, for Placement.why_not. A building's cells (a site's too) are
+## no ground to stand on, as the farmhouse's aren't, and the cell before its door is a
+## doorstep; `except` names a building that is not counted (the one being moved).
+func site_at(at: Vector2i, except: StringName = &"") -> Dictionary:
 	var home: Homestead = GameState.homestead()
 	var on_map: bool = area.grid.in_bounds(at)
+	var covering: StringName = GameState.building_covering(area.area_id, at)
+	var before_door: StringName = GameState.doorstep_of(area.area_id, at)
 	return Placement.site(
 		GameState.homestead_rules().is_land(area.area_id),
-		on_map and not area.grid.is_solid(at),
+		on_map and not area.grid.is_solid(at) and (covering == &"" or covering == except),
 		on_map and is_road(at),
-		on_map and is_doorstep(at),
+		on_map and (is_doorstep(at) or (before_door != &"" and before_door != except)),
 		area.plot != null and area.plot.covers(at),
-		area.debris_at(at) != null,
+		area.debris_at(at) != null or grass_at(at),
 		home.lying_at(at),
 		home.standing_at(at),
 		area.player.motor.cell == at,
 		lies_at(at))
+
+
+## Whether the meadow's tall grass stands uncut in `at` (the Homestead, phase 3): it is cleared
+## first, as debris is.
+func grass_at(at: Vector2i) -> bool:
+	for child: Node in area.interactables.get_children():
+		if child is Breakable and (child as Breakable).is_daily() and not (child as Breakable).broken and (child as Breakable).cell() == at:
+			return true
+	return false
 
 
 ## Whether `at` is the road, the path to the door, or a way out of the area: a path tile of
@@ -232,6 +249,19 @@ func thing_in_hand() -> Dictionary:
 	return lifted_item() if is_hand() else chosen_item()
 
 
+## The building a left click would set down where the ghost is (a building's data entry): the
+## one whose kit is chosen. {} for a placeable, or nothing.
+func building_in_hand() -> Dictionary:
+	var item: Dictionary = thing_in_hand()
+	return DataRegistry.get_building(Buildings.building_of_kit(item)) if Buildings.is_kit(item) else {}
+
+
+## Where the top-left corner of the building in hand is with the ghost where it is: the ghost
+## holds it by its door, or the middle of its bottom row.
+func building_origin() -> Vector2i:
+	return Buildings.origin_at(building_in_hand(), cell)
+
+
 ## Whether the ghost is over the place the lifted thing was lifted from.
 func over_its_own_place() -> bool:
 	return not lifted.is_empty() and cell == lifted["cell"]
@@ -241,7 +271,12 @@ func over_its_own_place() -> bool:
 ## words; "" if it can, with the hand empty, and over the place a lifted thing came from.
 func why_not() -> String:
 	var item: Dictionary = thing_in_hand()
-	return "" if item.is_empty() or over_its_own_place() else Placement.why_not(item, site_at(cell))
+	if item.is_empty() or over_its_own_place():
+		return ""
+	var building: Dictionary = building_in_hand()
+	if not building.is_empty():
+		return Buildings.why_not_at(building, building_origin(), func(at: Vector2i) -> Dictionary: return site_at(at))
+	return Placement.why_not(item, site_at(cell))
 
 
 ## Whether a left click would set a thing down here: there is one in hand, and it fits.
@@ -281,12 +316,20 @@ func set_down() -> bool:
 		return false
 	if is_hand():
 		return _use_hand()
-	if not fits() or not GameState.set_down(area.area_id, cell, chosen):
+	var building: Dictionary = building_in_hand()
+	var origin: Vector2i = building_origin()
+	var done: bool = fits() and (GameState.set_down_kit(area.area_id, origin, chosen) if not building.is_empty()
+		else GameState.set_down(area.area_id, cell, chosen))
+	if not done:
 		EventBus.sound.emit(&"nope")
 		_refresh()
 		return false
 	EventBus.sound.emit(&"set_down")
-	Burst.spawn(area.interactables, GridBody.cell_center(cell), &"dust", 0.6)
+	if building.is_empty():
+		Burst.spawn(area.interactables, GridBody.cell_center(cell), &"dust", 0.6)
+	else:
+		for at: Vector2i in Buildings.cells_of(building, origin):
+			Burst.spawn(area.interactables, GridBody.cell_center(at), &"dust", 0.4)
 	# The last of a thing leaves the bar, and the hand is chosen.
 	chosen = BuildBar.kept(entries(), chosen)
 	_refresh()
@@ -420,6 +463,10 @@ func _draw_ghost() -> void:
 	var size: float = float(GreyboxTiles.TILE_SIZE)
 	var item: Dictionary = thing_in_hand()
 	var colour: Color = ghost_colour()
+	var building: Dictionary = building_in_hand()
+	if not building.is_empty():
+		_draw_building_ghost(building, building_origin(), colour)
+		return
 	# Where a lifted thing came from: it is still there until it is set down.
 	if not lifted.is_empty() and not over_its_own_place():
 		_draw_outline(Vector2(lifted["cell"] as Vector2i) * size, Color(POINTER, EDGE_ALPHA * 0.7))
@@ -429,6 +476,23 @@ func _draw_ghost() -> void:
 		var age: int = GameState.homestead().age_at(lifted["cell"]) if not lifted.is_empty() else 0
 		PlacedArt.draw_thing(_ghost, item, age, origin, PlacedThing.joined_at(cell, item), Color(colour.lerp(Color.WHITE, 0.45), PICTURE_ALPHA))
 	_draw_outline(origin, Color(colour, EDGE_ALPHA))
+
+
+## The ghost of a building: a wash of `colour` over each of its cells and its doorstep, its
+## picture over them, and outlines round it and round the doorstep.
+func _draw_building_ghost(building: Dictionary, origin: Vector2i, colour: Color) -> void:
+	var size: float = float(GreyboxTiles.TILE_SIZE)
+	for at: Vector2i in Buildings.cells_and_doorstep(building, origin):
+		_ghost.draw_rect(Rect2(Vector2(at) * size, Vector2(size, size)), Color(colour, WASH_ALPHA))
+	BuildingArt.draw(_ghost, building, Vector2(origin) * size, false, false, Color(colour.lerp(Color.WHITE, 0.55), PICTURE_ALPHA), false, true)
+	var whole: Rect2 = Rect2(Vector2(origin) * size, Vector2(Buildings.size_of(building)) * size)
+	var edge: Color = Color(colour, EDGE_ALPHA)
+	_ghost.draw_rect(Rect2(whole.position, Vector2(whole.size.x, 1.0)), edge)
+	_ghost.draw_rect(Rect2(whole.position + Vector2(0.0, whole.size.y - 1.0), Vector2(whole.size.x, 1.0)), edge)
+	_ghost.draw_rect(Rect2(whole.position + Vector2(0.0, 1.0), Vector2(1.0, whole.size.y - 2.0)), edge)
+	_ghost.draw_rect(Rect2(whole.position + Vector2(whole.size.x - 1.0, 1.0), Vector2(1.0, whole.size.y - 2.0)), edge)
+	if Buildings.has_door(building):
+		_draw_outline(Vector2(Buildings.doorstep_of(building, origin)) * size, Color(colour, EDGE_ALPHA))
 
 
 ## A one-pixel outline of the cell whose top-left is `origin`.

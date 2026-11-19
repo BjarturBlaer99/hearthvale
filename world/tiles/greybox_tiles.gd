@@ -54,14 +54,20 @@ extends RefCounted
 ##     (walkable looks), and a timber prop
 ##  27 more spawn markers (the Homestead, 2026-11-18): what stands on the hero's land to be
 ##     cleared: weeds, a bush, a fallen log, an old stump, a boulder and a great boulder (a
-##     plain rock of the land grows from row 12's rock marker)
+##     plain rock of the land grows from row 12's rock marker), and (phase 3) the meadow's tall
+##     grass, which leaves hay and is back each morning
+##  28 the buildings the hero sets down on his land (the Homestead, phase 3), never on a map's
+##     Height layer: drawn by BuildingArt over the ground, as the farmhouse's tiles are laid.
+##     A building site (dug ground, and its stack of timber), and the barn's plank wall, its
+##     loft door and its door
+##  29 the silo, a 2 by 2 picture in quarters (north-west, north-east, south-west, south-east)
 
 const TEXTURE_PATH: String = "res://world/tiles/greybox_tiles.png"
 const TILESET_PATH: String = "res://world/tiles/greybox_tiles.tres"
 const SOURCE_ID: int = 0
 const TILE_SIZE: int = 16
 const COLUMNS: int = 8
-const ROWS: int = 28
+const ROWS: int = 30
 
 const ROW_GROUND: int = 0
 const ROW_STAIRS: int = 1
@@ -88,6 +94,11 @@ const ROW_MARSH_DECOR: int = 24
 const ROW_QUARRY: int = 25
 const ROW_QUARRY_DECOR: int = 26
 const ROW_LAND_MARKERS: int = 27
+const ROW_BUILDINGS: int = 28
+const ROW_SILO: int = 29
+## The buildings' own tiles (rows 28 and 29), in atlas order. Never on a Height layer.
+const BUILDING_KINDS: Array[String] = ["site", "site_timber", "barn_wall", "barn_loft", "barn_door"]
+const SILO_KINDS: Array[String] = ["silo_nw", "silo_ne", "silo_sw", "silo_se"]
 ## More trees, all props like "prop_tree". The baker mixes the first three kinds by cell and
 ## uses the canopy where trees stand on all four sides; a "cherry" block is always a cherry.
 const TREE_KINDS: Array[String] = ["prop_tree_b", "prop_tree_c", "prop_canopy", "prop_cherry", "prop_willow"]
@@ -152,14 +163,14 @@ const PROP_DECOR_KINDS: Array[String] = ["bucket", "laundry"]
 const MARKER_KINDS: Array[String] = ["grass", "pot", "chicken", "butterfly", "firefly", "rock", "branch", "stump"]
 ## The markers of what stands on the hero's land to be cleared (the Homestead), in atlas order
 ## on a row of their own: the first row of markers is full.
-const LAND_MARKER_KINDS: Array[String] = ["weeds", "bush", "log", "farm_stump", "boulder", "great_boulder"]
+const LAND_MARKER_KINDS: Array[String] = ["weeds", "bush", "log", "farm_stump", "boulder", "great_boulder", "meadow_grass"]
 ## The marker a rock of the quarry grows from (the area makes a Rock of it), and a plain rock
 ## of the hero's land.
 const ROCK_MARKER: String = "rock"
 ## Every marker the area makes a Rock of: the land's boulders say their kind by their marker.
 const ROCK_MARKERS: Array[String] = ["rock", "boulder", "great_boulder"]
 ## Markers that become breakables (the rest become critters).
-const BREAKABLE_MARKERS: Array[String] = ["grass", "pot", "branch", "stump", "weeds", "bush", "log", "farm_stump"]
+const BREAKABLE_MARKERS: Array[String] = ["grass", "pot", "branch", "stump", "weeds", "bush", "log", "farm_stump", "meadow_grass"]
 ## Water's animation: frames, and how long each shows (seconds).
 const WATER_FRAMES: int = 4
 const WATER_FRAME_TIME: float = 0.4
@@ -269,6 +280,10 @@ static func coords(kind: String, height: int = 0) -> Vector2i:
 		return Vector2i(MARSH_DECOR_KINDS.find(kind), ROW_MARSH_DECOR)
 	if QUARRY_KINDS.has(kind):
 		return Vector2i(QUARRY_KINDS.find(kind), ROW_QUARRY)
+	if BUILDING_KINDS.has(kind):
+		return Vector2i(BUILDING_KINDS.find(kind), ROW_BUILDINGS)
+	if SILO_KINDS.has(kind):
+		return Vector2i(SILO_KINDS.find(kind), ROW_SILO)
 	if QUARRY_DECOR_KINDS.has(kind):
 		return Vector2i(QUARRY_DECOR_KINDS.find(kind), ROW_QUARRY_DECOR)
 	return Vector2i(0, ROW_GROUND)
@@ -301,7 +316,7 @@ static func is_known_kind(kind: String) -> bool:
 		or PROPS_B_KINDS.has(kind) or PROPS_C_KINDS.has(kind) or FURNITURE_B_KINDS.has(kind) \
 		or HOUSE_KINDS.has(kind) or HOUSE_DECOR_KINDS.has(kind) or kind == "smoke" or TREE_KINDS.has(kind) \
 		or MARSH_KINDS.has(kind) or MARSH_DECOR_KINDS.has(kind) or MARSH_BLOCKS.has(kind) \
-		or QUARRY_KINDS.has(kind) or QUARRY_DECOR_KINDS.has(kind)
+		or QUARRY_KINDS.has(kind) or QUARRY_DECOR_KINDS.has(kind) or BUILDING_KINDS.has(kind) or SILO_KINDS.has(kind)
 
 
 static func is_decor(kind: String) -> bool:

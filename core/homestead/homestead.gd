@@ -7,6 +7,10 @@ extends RefCounted
 ## one standing (a fence, a gate, a lamp post, a sapling), each an item's id, and for a sapling
 ## the mornings it has seen. Cells are the map's own (the area `homestead`). It knows nothing
 ## of what an item is: Placement says what fits where, and GameState goes through both.
+## Phase 3: the buildings, one of each at most, each where its top-left corner stands, the day
+## its kit was set down (it is a building site that day, and stands from the next morning) and
+## the day its upgrade was bought (finished the next morning); and the hay the silo holds. It
+## knows nothing of a building's size: Buildings does, and GameState asks both.
 ## GameState keeps one and saves it (the save's section `homestead`); later phases keep more.
 
 ## The cells cleared for good: key ("x,y", as Farm keeps its cells) -> true.
@@ -15,6 +19,11 @@ var _cleared: Dictionary = {}
 var _lying: Dictionary = {}
 ## What stands in a cell: key -> { "item": id (String), "age": mornings seen (a sapling's) }.
 var _standing: Dictionary = {}
+## The buildings: id (String) -> { "at": Vector2i (its top-left corner), "day": the day it was
+## set down, "big_day": the day its upgrade was bought, 0 for none }.
+var _buildings: Dictionary = {}
+## The hay in the silo.
+var hay: int = 0
 
 
 ## Whether what stood in `cell` has been cleared.
@@ -136,11 +145,119 @@ func grow(mornings: Dictionary) -> bool:
 	return grew
 
 
+## Whether `id` stands on the land, or is a site there.
+func has_building(id: StringName) -> bool:
+	return _buildings.has(String(id))
+
+
+## The ids of every building and site, by id.
+func building_ids() -> Array[StringName]:
+	var out: Array[StringName] = []
+	for id: String in _buildings:
+		out.append(StringName(id))
+	out.sort_custom(func(a: StringName, b: StringName) -> bool: return String(a) < String(b))
+	return out
+
+
+## Where building `id`'s top-left corner is (Buildings.NO_CELL for none).
+func building_at(id: StringName) -> Vector2i:
+	return (_buildings.get(String(id), {}) as Dictionary).get("at", Buildings.NO_CELL)
+
+
+## The day building `id`'s kit was set down (0 for none).
+func building_day(id: StringName) -> int:
+	return int((_buildings.get(String(id), {}) as Dictionary).get("day", 0))
+
+
+## Whether building `id` stands on `today`: it was set down on an earlier day.
+func is_standing(id: StringName, today: int) -> bool:
+	return has_building(id) and today > building_day(id)
+
+
+## Whether building `id` is a site on `today`: set down today, standing tomorrow.
+func is_site(id: StringName, today: int) -> bool:
+	return has_building(id) and not is_standing(id, today)
+
+
+## Whether building `id` is its bigger self on `today`: its upgrade was bought on an earlier day.
+func is_big(id: StringName, today: int) -> bool:
+	var big_day: int = int((_buildings.get(String(id), {}) as Dictionary).get("big_day", 0))
+	return big_day > 0 and today > big_day
+
+
+## Whether building `id`'s upgrade is bought and not finished yet on `today`.
+func is_upgrading(id: StringName, today: int) -> bool:
+	var big_day: int = int((_buildings.get(String(id), {}) as Dictionary).get("big_day", 0))
+	return big_day > 0 and today <= big_day
+
+
+## Whether building `id` has its upgrade, finished or on its way.
+func has_upgrade(id: StringName) -> bool:
+	return int((_buildings.get(String(id), {}) as Dictionary).get("big_day", 0)) > 0
+
+
+## A kit is set down: building `id` is a site with its top-left corner at `at`, from `today`.
+## Returns whether it was: false for one that is there already (one of each), and for no cell.
+func put_building(id: StringName, at: Vector2i, today: int) -> bool:
+	if id == &"" or has_building(id) or at.x < 0 or at.y < 0:
+		return false
+	_buildings[String(id)] = {"at": at, "day": maxi(today, 0), "big_day": 0}
+	return true
+
+
+## Building `id`'s upgrade is bought on `today`: it is finished the next morning. Returns
+## whether it was: not for a site, one that has it already, or none.
+func upgrade(id: StringName, today: int) -> bool:
+	if not is_standing(id, today) or has_upgrade(id):
+		return false
+	_buildings[String(id)]["big_day"] = maxi(today, 1)
+	return true
+
+
+## Moves building `id` (or its site) so that its top-left corner is at `to`, as it is: what is
+## in it goes with it. Returns whether it moved.
+func move_building(id: StringName, to: Vector2i) -> bool:
+	if not has_building(id) or to.x < 0 or to.y < 0 or to == building_at(id):
+		return false
+	_buildings[String(id)]["at"] = to
+	return true
+
+
+## Takes building `id` off the land (it is pulled down, or its site taken up). Returns whether
+## it was there.
+func remove_building(id: StringName) -> bool:
+	return _buildings.erase(String(id))
+
+
+## The buildings that a morning of `today` finished: sites set down the day before, and
+## upgrades bought the day before. [{ "id", "big": whether it was the upgrade }]
+func finished_on(today: int) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for id: StringName in building_ids():
+		var entry: Dictionary = _buildings[String(id)]
+		if int(entry["day"]) == today - 1:
+			out.append({"id": id, "big": false})
+		elif int(entry["big_day"]) == today - 1 and int(entry["big_day"]) > 0:
+			out.append({"id": id, "big": true})
+	return out
+
+
+## Puts `count` hay in the silo, up to `most` in all. Returns how many went in.
+func add_hay(count: int, most: int) -> int:
+	var room: int = maxi(most - hay, 0)
+	var added: int = clampi(count, 0, room)
+	hay += added
+	return added
+
+
 ## The homestead as it is saved, each part row by row:
 ##   { "cleared": ["x,y", ...], "lying": { "x,y": item id },
-##     "standing": { "x,y": { "item": id, "age": mornings } } }
+##     "standing": { "x,y": { "item": id, "age": mornings } },
+##     "buildings": { id: { "at": "x,y", "day": n, "big_day": n } }, "hay": n }
 ## "lying" and "standing" are there only when something lies or stands (a homestead with
-## nothing set down is saved as phase 1 saved it), and "age" only for what has seen a morning.
+## nothing set down is saved as phase 1 saved it), and "age" only for what has seen a morning;
+## "buildings" only when one is set down, "big_day" only for one with its upgrade, and "hay"
+## only when the silo holds some.
 func to_dict() -> Dictionary:
 	var cleared: Array = []
 	for cell: Vector2i in cleared_cells():
@@ -159,6 +276,17 @@ func to_dict() -> Dictionary:
 		standing[Farm.key(thing["cell"])] = entry
 	if not standing.is_empty():
 		out["standing"] = standing
+	var buildings: Dictionary = {}
+	for id: StringName in building_ids():
+		var entry: Dictionary = _buildings[String(id)]
+		var saved: Dictionary = {"at": Farm.key(entry["at"]), "day": int(entry["day"])}
+		if int(entry["big_day"]) > 0:
+			saved["big_day"] = int(entry["big_day"])
+		buildings[String(id)] = saved
+	if not buildings.is_empty():
+		out["buildings"] = buildings
+	if hay > 0:
+		out["hay"] = hay
 	return out
 
 
@@ -169,12 +297,27 @@ func to_dict() -> Dictionary:
 ## (String) belongs on (Placement.LYING, STANDING, or &"" for what is no placeable): a thing
 ## saved on another layer than its own, or that the game no longer has, is left out. Without
 ## it, every item is taken at its word.
-func load_saved(saved: Variant, layer_of: Callable = Callable()) -> void:
+func load_saved(saved: Variant, layer_of: Callable = Callable(), is_building: Callable = Callable()) -> void:
 	_cleared.clear()
 	_lying.clear()
 	_standing.clear()
+	_buildings.clear()
+	hay = 0
 	if typeof(saved) != TYPE_DICTIONARY:
 		return
+	# Phase 3's buildings and hay: a save from before them has none (each is read with a
+	# default), and a building the game no longer has is left out (`is_building`).
+	var buildings: Variant = (saved as Dictionary).get("buildings")
+	if typeof(buildings) == TYPE_DICTIONARY:
+		for id: Variant in (buildings as Dictionary):
+			var entry: Variant = buildings[id]
+			if typeof(entry) != TYPE_DICTIONARY or typeof((entry as Dictionary).get("at")) != TYPE_STRING:
+				continue
+			if is_building.is_valid() and not bool(is_building.call(str(id))):
+				continue
+			if put_building(StringName(str(id)), Farm.cell_of(str(entry["at"])), int((entry as Dictionary).get("day", 0))):
+				_buildings[str(id)]["big_day"] = maxi(int((entry as Dictionary).get("big_day", 0)), 0)
+	hay = maxi(int((saved as Dictionary).get("hay", 0)), 0) if typeof((saved as Dictionary).get("hay")) in [TYPE_INT, TYPE_FLOAT] else 0
 	var cleared: Variant = (saved as Dictionary).get("cleared")
 	if typeof(cleared) == TYPE_ARRAY:
 		for cell_key: Variant in (cleared as Array):

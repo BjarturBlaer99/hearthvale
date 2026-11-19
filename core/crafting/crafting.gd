@@ -14,7 +14,12 @@ extends RefCounted
 ## can't be made; GameState makes it. It keeps nothing itself.
 ## The workbench's list has tabs (the Homestead, phase 2): a recipe's `tab` is "make" (what is
 ## made for use: the list as it always was; a recipe that names none is here) or "place" (what
-## is made to be set down on the hero's land).
+## is made to be set down on the hero's land), and (phase 3) "build": the buildings' plans and
+## upgrades. A plan makes a building's kit (an item of type "kit", Buildings); an upgrade makes
+## {"upgrade": building}, which is bought for a building that stands and finished the next
+## morning. A recipe may wait on a building that stands ("unlock": {"built": "shed"}), and a
+## furnishing may belong to a building's room ("makes": {"furnishing": "furnace", "room":
+## "shed"}: the flag "shed/furnace"). Coins are a need like any other: the item "coin".
 
 const WORKBENCH: String = "workbench"
 const FURNACE: String = "furnace"
@@ -22,14 +27,20 @@ const STATIONS: Array[String] = [WORKBENCH, FURNACE]
 ## The workbench's tabs, in the order they are shown.
 const TAB_MAKE: String = "make"
 const TAB_PLACE: String = "place"
-const TABS: Array[String] = [TAB_MAKE, TAB_PLACE]
-## The flag that says a furnishing has been made: "home/furnace".
+const TAB_BUILD: String = "build"
+const TABS: Array[String] = [TAB_MAKE, TAB_PLACE, TAB_BUILD]
+## The flag that says a furnishing has been made: "home/furnace", or for one of a building's
+## room "shed/furnace".
 const FURNISHED_FLAG: String = "home/%s"
+const HOME_ROOM: String = "home"
 ## Why a thing can't be made.
 const LACKING_WORDS: String = "You haven't all it needs."
 const NO_ROOM_WORDS: String = "You have no room to carry that."
 const HAVE_ONE_WORDS: String = "You have one already."
 const UNKNOWN_WORDS: String = "You don't know how to make that."
+## Why a plan can't be bought: what he is short of ("You are short of 20 Stone and 80 Coins.").
+const SHORT_WORDS: String = "You are short of %s."
+const SHORT_PART: String = "%d %s"
 ## What making a thing is announced with.
 const MADE_WORDS: String = "Made: %s."
 ## A need as the workbench shows it: "Stone 12 of 20".
@@ -38,8 +49,10 @@ const NEED_LINE: String = "%s %d of %d"
 const COUNT_WORDS: String = "%s x%d"
 
 
+## The flag of a furnishing: `furnishing` of the hero's home ("furnace": "home/furnace"), or a
+## key that names its room ("shed/furnace": the flag itself).
 static func furnished_flag(furnishing: StringName) -> StringName:
-	return StringName(FURNISHED_FLAG % furnishing)
+	return furnishing if String(furnishing).contains("/") else StringName(FURNISHED_FLAG % furnishing)
 
 
 static func station_of(recipe: Dictionary) -> String:
@@ -75,10 +88,13 @@ static func of_station(recipes: Array, station: String) -> Array[Dictionary]:
 
 ## Whether `recipe` is known. `has_found` says whether an item id has ever been held, and
 ## `level_of` gives a skill id's level.
-static func is_known(recipe: Dictionary, has_found: Callable, level_of: Callable) -> bool:
+## `has_built` says whether a building id stands on his land (none stands without it).
+static func is_known(recipe: Dictionary, has_found: Callable, level_of: Callable, has_built: Callable = Callable()) -> bool:
 	var unlock: Variant = recipe.get("unlock")
 	if typeof(unlock) != TYPE_DICTIONARY:
 		return true
+	if (unlock as Dictionary).has("built"):
+		return has_built.is_valid() and bool(has_built.call(str(unlock["built"])))
 	if (unlock as Dictionary).has("found"):
 		return bool(has_found.call(str(unlock["found"])))
 	if (unlock as Dictionary).has("skill"):
@@ -87,10 +103,10 @@ static func is_known(recipe: Dictionary, has_found: Callable, level_of: Callable
 
 
 ## The recipes of `station` that are known, in their order.
-static func known(recipes: Array, station: String, has_found: Callable, level_of: Callable) -> Array[Dictionary]:
+static func known(recipes: Array, station: String, has_found: Callable, level_of: Callable, has_built: Callable = Callable()) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for recipe: Dictionary in of_station(recipes, station):
-		if is_known(recipe, has_found, level_of):
+		if is_known(recipe, has_found, level_of, has_built):
 			out.append(recipe)
 	return out
 
@@ -107,10 +123,20 @@ static func count_made(recipe: Dictionary) -> int:
 	return maxi(int((makes as Dictionary).get("count", 1)), 1) if typeof(makes) == TYPE_DICTIONARY else 1
 
 
-## The furnishing `recipe` makes, or "" if it makes an item.
+## The furnishing `recipe` makes, or "" if it makes an item: its name, or for one of a
+## building's room "<room>/<name>" (what furnished_flag() and GameState.is_furnished() take).
 static func furnishing_made(recipe: Dictionary) -> String:
 	var makes: Variant = recipe.get("makes", {})
-	return str((makes as Dictionary).get("furnishing", "")) if typeof(makes) == TYPE_DICTIONARY else ""
+	if typeof(makes) != TYPE_DICTIONARY or str((makes as Dictionary).get("furnishing", "")).is_empty():
+		return ""
+	var room: String = str((makes as Dictionary).get("room", HOME_ROOM))
+	return str(makes["furnishing"]) if room == HOME_ROOM else "%s/%s" % [room, makes["furnishing"]]
+
+
+## The building whose upgrade `recipe` is, or "" if it is none.
+static func upgrade_made(recipe: Dictionary) -> String:
+	var makes: Variant = recipe.get("makes", {})
+	return str((makes as Dictionary).get("upgrade", "")) if typeof(makes) == TYPE_DICTIONARY else ""
 
 
 ## What `recipe` is called on the list: its own name, else its item's (`names`: item id ->
@@ -146,9 +172,13 @@ static func missing(recipe: Dictionary, held: Callable) -> Array[Dictionary]:
 ## Why `recipe` can't be made now, in words; "" if it can. `held` gives how many of an item he
 ## carries, `has_room` whether so many more of an item fit, and `is_furnished` whether his
 ## home has a furnishing already. A thing it uses up makes room for a thing of the same kind.
-static func why_not(recipe: Dictionary, held: Callable, has_room: Callable, is_furnished: Callable) -> String:
+## `is_had` (if given) says whether he has what `recipe` makes already, as a whole: a
+## building's kit, the building itself, or its upgrade (one of each).
+static func why_not(recipe: Dictionary, held: Callable, has_room: Callable, is_furnished: Callable, is_had: Callable = Callable()) -> String:
 	var furnishing: String = furnishing_made(recipe)
 	if not furnishing.is_empty() and bool(is_furnished.call(furnishing)):
+		return HAVE_ONE_WORDS
+	if is_had.is_valid() and bool(is_had.call(recipe)):
 		return HAVE_ONE_WORDS
 	if not missing(recipe, held).is_empty():
 		return LACKING_WORDS
@@ -163,6 +193,22 @@ static func why_not(recipe: Dictionary, held: Callable, has_room: Callable, is_f
 	return ""
 
 
+## What he is short of for `recipe`, in words ("You are short of 20 Stone and 80 Coins."), or
+## "" if he has all it needs. `names` maps item ids to the names to use (a single coin is a
+## "Coin").
+static func short_words(recipe: Dictionary, held: Callable, names: Dictionary) -> String:
+	var parts: PackedStringArray = []
+	for short: Dictionary in missing(recipe, held):
+		var words: String = str(names.get(short["item"], short["item"]))
+		if int(short["count"]) == 1 and str(short["item"]) == "coin":
+			words = "Coin"
+		parts.append(SHORT_PART % [int(short["count"]), words])
+	if parts.is_empty():
+		return ""
+	var listed: String = parts[0] if parts.size() == 1 else ", ".join(parts.slice(0, parts.size() - 1)) + " and " + parts[parts.size() - 1]
+	return SHORT_WORDS % listed
+
+
 ## `recipe`'s needs as the workbench shows them, beside what he has: "Stone 12 of 20". What
 ## he has more of than is needed shows as what is needed ("Stone 20 of 20").
 static func need_lines(recipe: Dictionary, held: Callable, names: Dictionary) -> PackedStringArray:
@@ -175,8 +221,9 @@ static func need_lines(recipe: Dictionary, held: Callable, names: Dictionary) ->
 
 ## What is wrong with `recipe`, in words: nothing, if it can be used. `item_of` gives the item
 ## entry for an id (empty if there is none); `furnishings` are the home's, and `skills` the
-## hero's skill ids.
-static func problems(recipe: Dictionary, item_of: Callable, furnishings: Array, skills: Array) -> PackedStringArray:
+## hero's skill ids; `rooms` are the furnishings of buildings' rooms (room -> names), and
+## `buildings` the ids of the buildings (data/buildings).
+static func problems(recipe: Dictionary, item_of: Callable, furnishings: Array, skills: Array, rooms: Dictionary = {}, buildings: Array = []) -> PackedStringArray:
 	var out: PackedStringArray = []
 	if recipe.has("station") and not STATIONS.has(str(recipe["station"])):
 		out.append("'station' must be one of: %s." % ", ".join(PackedStringArray(STATIONS)))
@@ -186,7 +233,15 @@ static func problems(recipe: Dictionary, item_of: Callable, furnishings: Array, 
 		elif station_of(recipe) != WORKBENCH:
 			out.append("only the workbench's list has tabs.")
 	var makes: Variant = recipe.get("makes")
-	if typeof(makes) != TYPE_DICTIONARY or ((makes as Dictionary).has("item") == (makes as Dictionary).has("furnishing")):
+	if typeof(makes) == TYPE_DICTIONARY and (makes as Dictionary).has("upgrade"):
+		# A building's upgrade (the Homestead): it names the building, and nothing else.
+		if (makes as Dictionary).has("item") or (makes as Dictionary).has("furnishing"):
+			out.append("'makes' names an 'upgrade' alone: nothing else.")
+		elif not buildings.has(str(makes["upgrade"])):
+			out.append("'makes' names an unknown building '%s' to upgrade." % makes["upgrade"])
+		elif tab_of(recipe) != TAB_BUILD:
+			out.append("an upgrade is on the workbench's 'build' tab.")
+	elif typeof(makes) != TYPE_DICTIONARY or ((makes as Dictionary).has("item") == (makes as Dictionary).has("furnishing")):
 		out.append("'makes' must name an 'item' or a 'furnishing', one of the two.")
 	elif (makes as Dictionary).has("item"):
 		if (item_of.call(str(makes["item"])) as Dictionary).is_empty():
@@ -194,7 +249,10 @@ static func problems(recipe: Dictionary, item_of: Callable, furnishings: Array, 
 		if int((makes as Dictionary).get("count", 1)) < 1:
 			out.append("'makes' 'count' must be 1 or more.")
 	else:
-		if not furnishings.has(str(makes["furnishing"])):
+		var room: String = str((makes as Dictionary).get("room", HOME_ROOM))
+		if room != HOME_ROOM and not rooms.has(room):
+			out.append("'makes' names an unknown room '%s'." % room)
+		elif not (furnishings if room == HOME_ROOM else (rooms[room] as Array)).has(str(makes["furnishing"])):
 			out.append("'makes' names an unknown furnishing '%s'." % makes["furnishing"])
 		if station_of(recipe) == FURNACE:
 			out.append("the furnace makes items, not furnishings.")
@@ -212,7 +270,13 @@ static func problems(recipe: Dictionary, item_of: Callable, furnishings: Array, 
 				out.append("'needs' wants 1 or more of '%s'." % need["item"])
 	if recipe.has("unlock"):
 		var unlock: Variant = recipe["unlock"]
-		if typeof(unlock) != TYPE_DICTIONARY or ((unlock as Dictionary).has("found") == (unlock as Dictionary).has("skill")):
+		if typeof(unlock) == TYPE_DICTIONARY and (unlock as Dictionary).has("built"):
+			# A building that stands (the Homestead): it names the building, and nothing else.
+			if (unlock as Dictionary).has("found") or (unlock as Dictionary).has("skill"):
+				out.append("'unlock' names a building 'built' alone: nothing else.")
+			elif not buildings.has(str(unlock["built"])):
+				out.append("'unlock' names an unknown building '%s'." % unlock["built"])
+		elif typeof(unlock) != TYPE_DICTIONARY or ((unlock as Dictionary).has("found") == (unlock as Dictionary).has("skill")):
 			out.append("'unlock' must name an item 'found' or a 'skill' and its 'level', one of the two.")
 		elif (unlock as Dictionary).has("found"):
 			if (item_of.call(str(unlock["found"])) as Dictionary).is_empty():
@@ -240,4 +304,13 @@ static func rules_problems(rules: Dictionary) -> PackedStringArray:
 		for furnishing: Variant in furnishings:
 			if typeof(furnishing) != TYPE_STRING or str(furnishing).is_empty():
 				out.append("every entry in 'furnishings' is a name.")
+	# The furnishings of buildings' rooms (the Homestead's shed): room -> its furnishings' names.
+	if rules.has("rooms"):
+		var rooms: Variant = rules["rooms"]
+		if typeof(rooms) != TYPE_DICTIONARY:
+			out.append("'rooms' must name each room and the furnishings it can have.")
+		else:
+			for room: Variant in rooms:
+				if typeof(rooms[room]) != TYPE_ARRAY or str(room) == HOME_ROOM:
+					out.append("room '%s' must list its furnishings' names (and not be the home's)." % room)
 	return out

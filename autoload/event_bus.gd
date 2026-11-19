@@ -93,3 +93,7 @@ signal furnace_changed
 ## Something on the hero's land was cleared for good (GameState.clear_debris; the Homestead).
 signal homestead_changed
 
+## A morning finished a building on the hero's land: a site set down the day before stands, or
+## (`big`) an upgrade bought the day before is done (GameState.start_next_day).
+signal building_finished(building_id: StringName, big: bool)
+

@@ -151,6 +151,8 @@ var plot: FarmPlot
 ## stands, and the mode he sets it down in. Null anywhere else.
 var placed: PlacedThings
 var build: BuildMode
+## The buildings of the hero's land (the Homestead, phase 3): null anywhere else.
+var buildings: PlacedBuildings
 ## Nature that is only for show (P1c): petals lying round the cherry trees; the water's surface
 ## and what it mirrors; mist. The water is the one thing in the scenery that moves (the user's
 ## request, 2026-11-13): grass, trees, petals, mist and smoke are still.
@@ -323,6 +325,9 @@ func _ready() -> void:
 	_update_hud()
 	# A loaded game, or anything changed outside an area: let the quests catch up.
 	Quests.refresh()
+	# What the morning finished on his land (a building), if he has not been told.
+	EventBus.day_started.connect(_on_day_started_news)
+	_tell_morning_news()
 
 
 func _process(delta: float) -> void:
@@ -1037,22 +1042,59 @@ func open_build() -> bool:
 	return true
 
 
-## On the hero's land: what he has set down there is shown, lying and standing, and build
-## mode is ready. (Any other area has neither.)
+## On the hero's land: what he has set down there is shown, lying and standing, and his
+## buildings, and build mode is ready. (Any other area has none of them.)
 func _add_building() -> void:
 	if not GameState.homestead_rules().is_land(area_id):
 		return
+	_clear_grass_under_things()
 	placed = PlacedThings.new()
 	add_child(placed)
 	# Just over the ground and its shading, under everyone who walks on it.
 	move_child(placed, _shading.get_index() + 1)
 	placed.setup(self)
+	buildings = PlacedBuildings.new()
+	add_child(buildings)
+	# Over what lies on the ground (a path under a building is covered), under everyone.
+	move_child(buildings, placed.get_index() + 1)
+	buildings.setup(self)
 	build = BuildMode.new()
 	add_child(build)
 	# Before the HUD, so the ghost is drawn under it.
 	move_child(build, hud.get_index())
 	build.setup(self)
 	build.closed.connect(_on_item_menu_closed)
+
+
+## The meadow's tall grass doesn't grow where something is set down or a building stands (the
+## Homestead, phase 3; a save from phase 2 may have something on a tuft's cell): such a tuft is
+## taken away as the land loads, its cell left to what stands there. Taken up again, the tuft
+## is back on the next visit.
+func _clear_grass_under_things() -> void:
+	var home: Homestead = GameState.homestead()
+	for child: Node in interactables.get_children():
+		if not (child is Breakable and (child as Breakable).is_daily()):
+			continue
+		var cell: Vector2i = (child as Breakable).cell()
+		if home.lying_at(cell) != &"" or home.standing_at(cell) != &"" or GameState.building_covering(area_id, cell) != &"":
+			terrain.set_occupied(cell, false)
+			child.free()
+
+
+## A morning came while he is here: what it finished on his land is said.
+func _on_day_started_news(_day: int) -> void:
+	_tell_morning_news()
+
+
+## Says what the morning finished on his land (GameState.morning_news), once, with the
+## building's sound: here, or in the next area if he is on his way.
+func _tell_morning_news() -> void:
+	if _travelling or GameState.morning_news.is_empty():
+		return
+	EventBus.sound.emit(&"built")
+	for line: String in GameState.morning_news:
+		hud.show_notice(line)
+	GameState.morning_news.clear()
 
 
 ## Opens the storage chest's two lists (crafting, GDD §14). The hero stands still while they
@@ -1293,9 +1335,12 @@ func _tend_crop() -> bool:
 	return true
 
 
-## Whether the watering can fills at `cell`: open water (the pond, a stream) or the well.
+## Whether the watering can fills at `cell`: open water (the pond, a stream), the well, or (the
+## Homestead) a Well he has built.
 func is_water_source(cell: Vector2i) -> bool:
 	if ground_at(cell) == "water":
+		return true
+	if buildings != null and buildings.fills_can_at(cell):
 		return true
 	var decor: TileMapLayer = get_node_or_null(^"Decor") as TileMapLayer
 	if decor == null or decor.get_cell_source_id(cell) == -1:

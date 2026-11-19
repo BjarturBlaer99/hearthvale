@@ -9,6 +9,8 @@ extends GdUnitTestSuite
 const TEST_SLOT: int = 954
 const OLD_SAVES: String = "res://tests/fixtures/saves"
 const V5: String = "v5_in_the_old_cottage.json"
+## Written at the end of the Homestead's phase 2 (57e7d3a): a yard on the farm, no buildings.
+const V6_PHASE_2: String = "v6_a_yard_on_the_farm.json"
 ## The old plot's cells, in the plot's own cells: the field's clear corner.
 const OLD_PLOT: Rect2i = Rect2i(0, 0, 6, 3)
 
@@ -290,3 +292,29 @@ func test_a_saved_thing_the_game_does_not_know_is_left_out() -> void:
 	GameState.from_dict(JSON.parse_string(JSON.stringify(data)))
 	assert_array(GameState.homestead().placed(Placement.LYING)).is_equal([{"cell": Vector2i(30, 12), "item": &"stone_path", "age": 0}])
 	assert_array(GameState.homestead().placed(Placement.STANDING)).is_equal([{"cell": Vector2i(30, 12), "item": &"fence", "age": 0}])
+
+
+func test_a_save_from_phase_2_loads_with_its_yard_and_no_buildings() -> void:
+	# Written by the game as it stood at the end of phase 2 (the Homestead's), with the hero on
+	# his farm: a yard set down (three things on the meadow's tall grass, which was plain grass
+	# then), the furnace burning, the chest filled.
+	var old: Dictionary = _old_save(V6_PHASE_2)
+	assert_int(int(old["version"])).is_equal(6)
+	assert_bool((old["homestead"] as Dictionary).has("buildings")).override_failure_message("phase 2 knew no buildings").is_false()
+	assert_int(_load_old(V6_PHASE_2)).is_equal(OK)
+	assert_int(GameState.day).is_equal(6)
+	assert_array(GameState.homestead().building_ids()).is_empty()
+	assert_int(GameState.homestead().hay).is_equal(0)
+	assert_int(GameState.homestead().placed_count()).is_equal(8)
+	assert_that(GameState.homestead().standing_at(Vector2i(6, 3))).is_equal(&"fence")
+	assert_that(GameState.homestead().lying_at(Vector2i(4, 3))).is_equal(&"dirt_path")
+	assert_int(GameState.homestead().age_at(Vector2i(9, 3))).is_equal(2)
+	assert_int(GameState.homestead().cleared_count()).is_equal(3)
+	assert_bool(GameState.furnace().is_burning(6)).is_true()
+	assert_int(GameState.store().count_of("stone")).is_equal(20)
+	assert_dict(GameState.player).is_equal({"area": "homestead", "cell": [30, 13]})
+	# Saved again, the homestead is as it was, and nothing of phase 3 is written that isn't there.
+	var again: Dictionary = GameState.to_dict()
+	assert_bool((again["homestead"] as Dictionary).has("buildings")).is_false()
+	assert_bool((again["homestead"] as Dictionary).has("hay")).is_false()
+	assert_dict(JSON.parse_string(JSON.stringify(again["homestead"]))).is_equal(old["homestead"])

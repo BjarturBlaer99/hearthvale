@@ -1,0 +1,10 @@
+{
+	"id": "well",
+	"name": "Well",
+	"size": [2, 2],
+	"fills_can": true,
+	"shadow": false,
+	"look": [
+		[0, 0, 2, 2, "well"]
+	]
+}

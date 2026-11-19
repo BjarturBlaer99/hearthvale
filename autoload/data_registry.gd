@@ -24,6 +24,7 @@ const KIND_CROP: StringName = &"crop"
 const KIND_SHOP: StringName = &"shop"
 const KIND_VILLAGER: StringName = &"villager"
 const KIND_CRAFTING: StringName = &"crafting"
+const KIND_BUILDING: StringName = &"building"
 
 ## Directory under DATA_ROOT -> the kind of file it holds.
 const DIRECTORY_KINDS: Dictionary = {
@@ -38,6 +39,7 @@ const DIRECTORY_KINDS: Dictionary = {
 	"shops": KIND_SHOP,
 	"villagers": KIND_VILLAGER,
 	"crafting": KIND_CRAFTING,
+	"buildings": KIND_BUILDING,
 }
 
 const REQUIRED_FIELDS: Dictionary = {
@@ -56,6 +58,7 @@ const REQUIRED_FIELDS: Dictionary = {
 	&"shop": ["id", "name", "sells"],
 	&"villager": ["id", "name", "dialogue", "likes", "thanks"],
 	&"crafting": ["id", "needs", "makes"],
+	&"building": ["id", "name", "size", "look"],
 }
 ## The sets of rules the game knows (data/rules/<id>.json), by id.
 const RULES_TIME: StringName = &"time"
@@ -212,6 +215,12 @@ func get_crafting(id: StringName) -> Dictionary:
 	return get_entry(&"crafting", id)
 
 
+## A building of the hero's land (data/buildings/<id>.json; the Homestead): its size, its
+## door and room, what it does, and how it looks.
+func get_building(id: StringName) -> Dictionary:
+	return get_entry(&"buildings", id)
+
+
 ## The numbers a system runs on (data/rules/<id>.json), e.g. &"time" for the day's clock.
 func get_rules(id: StringName) -> Dictionary:
 	return get_entry(&"rules", id)
@@ -223,7 +232,7 @@ func get_rules(id: StringName) -> Dictionary:
 ## an empty result means every file is valid and every reference resolves.
 func load_all(root: String = DATA_ROOT) -> PackedStringArray:
 	errors = []
-	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}, &"recipes": {}, &"crops": {}, &"shops": {}, &"crafting": {}, &"villagers": {}}
+	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}, &"recipes": {}, &"crops": {}, &"shops": {}, &"crafting": {}, &"villagers": {}, &"buildings": {}}
 	if not DirAccess.dir_exists_absolute(root):
 		errors.append("%s: data directory does not exist." % root)
 		return errors
@@ -278,6 +287,8 @@ func _load_file(path: String, kind: StringName) -> void:
 			_register(path, data, &"villager", &"villagers")
 		KIND_CRAFTING:
 			_register(path, data, &"crafting", &"crafting")
+		KIND_BUILDING:
+			_register(path, data, &"building", &"buildings")
 
 
 ## Registers every object in the array `data[key]`.
@@ -341,14 +352,21 @@ func _validate_references() -> void:
 	for shop: Dictionary in _collections[&"shops"].values():
 		for problem: String in Shop.problems(shop, item_of):
 			errors.append("%s: shop '%s': %s" % [shop["_source"], shop["id"], problem])
-	# Crafting recipes: each can be used, and names only furnishings and skills the game has.
+	# Crafting recipes: each can be used, and names only furnishings, skills and buildings the
+	# game has.
 	var furnishings: Variant = get_rules(RULES_CRAFTING).get("furnishings", [])
+	var rooms: Variant = get_rules(RULES_CRAFTING).get("rooms", {})
 	var skill_ids: Array = []
 	for skill: StringName in Skills.new(get_rules(RULES_SKILLS)).ids():
 		skill_ids.append(String(skill))
+	var building_ids: Array = []
+	for id: StringName in ids(&"buildings"):
+		building_ids.append(String(id))
 	for crafted: Dictionary in _collections[&"crafting"].values():
-		for problem: String in Crafting.problems(crafted, item_of, furnishings if typeof(furnishings) == TYPE_ARRAY else [], skill_ids):
+		for problem: String in Crafting.problems(crafted, item_of, furnishings if typeof(furnishings) == TYPE_ARRAY else [], skill_ids,
+				rooms if typeof(rooms) == TYPE_DICTIONARY else {}, building_ids):
 			errors.append("%s: crafting recipe '%s': %s" % [crafted["_source"], crafted["id"], problem])
+	_check_buildings(item_of)
 	# Villagers: each can be used, and no two share a conversation (it is how one is known).
 	var friendship: Friendship = Friendship.new(get_rules(RULES_FRIENDSHIP))
 	var has_dialogue: Callable = func(id: String) -> bool: return _collections[&"dialogues"].has(StringName(id))
@@ -377,6 +395,33 @@ func _validate_references() -> void:
 		if Placement.is_placeable(item):
 			for problem: String in Placement.problems(item, SceneryAtlas.KINDS):
 				errors.append("%s: item '%s': %s" % [item["_source"], item["id"], problem])
+
+
+## The buildings of the hero's land (the Homestead): each can be used, has its room's scene if
+## it names one, and has one kit that sets it down; and every kit sets down a building.
+func _check_buildings(item_of: Callable) -> void:
+	var is_tile: Callable = func(kind: String) -> bool: return GreyboxTiles.is_known_kind(kind)
+	var is_room: Callable = func(room: String) -> bool: return ResourceLoader.exists(WorldPaths.scene_for(StringName(room)))
+	var kits: Dictionary = {}
+	for item: Dictionary in _collections[&"items"].values():
+		if not Buildings.is_kit(item):
+			continue
+		var building: StringName = Buildings.building_of_kit(item)
+		if not _collections[&"buildings"].has(building):
+			errors.append("%s: item '%s': a kit's stats name its 'building', one of data/buildings (got '%s')." % [item["_source"], item["id"], building])
+		elif kits.has(building):
+			errors.append("%s: item '%s': building '%s' has a kit already ('%s')." % [item["_source"], item["id"], building, kits[building]])
+		kits[building] = item["id"]
+		if bool(item.get("stackable", false)):
+			errors.append("%s: item '%s': a kit doesn't stack (one of each building)." % [item["_source"], item["id"]])
+	for building: Dictionary in _collections[&"buildings"].values():
+		for problem: String in Buildings.problems(building, is_tile, is_room):
+			errors.append("%s: building '%s': %s" % [building["_source"], building["id"], problem])
+		if not kits.has(StringName(str(building["id"]))):
+			errors.append("%s: building '%s' has no kit (an item of type 'kit' naming it) to set it down." % [building["_source"], building["id"]])
+		var held: Dictionary = Buildings.holds(building)
+		if not held.is_empty() and (item_of.call(String(held["item"])) as Dictionary).is_empty():
+			errors.append("%s: building '%s' holds '%s', which is no item." % [building["_source"], building["id"], held["item"]])
 
 
 func _check_quest(quest: Dictionary) -> void:

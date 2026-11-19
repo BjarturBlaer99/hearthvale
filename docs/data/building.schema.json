@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "building.schema.json",
+  "title": "Building file (data/buildings/<id>.json, one building per file)",
+  "description": "A building of the hero's land (the Homestead, phase 3; GDD §15, TECH_DESIGN §30): its size, its door and room, what it does, and how it looks. One of each stands on the land at most. It is set down in build mode from its kit (an item of type 'kit' whose stats name it), bought as a plan at the workbench's 'Build' tab (data/crafting, tab 'build'); set down, it is a building site that day and stands from the next morning. Buildings (core/homestead/buildings.gd) reads it and DataRegistry checks it as it loads. A new building is data and pictures.",
+  "type": "object",
+  "required": ["id", "name", "size", "look"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1, "description": "What the hero is told it is ('The Coop stands on your farm.')." },
+    "size": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "integer", "minimum": 1 }, "description": "Its cells, [width, height]. Every one of them, and its doorstep, must fit as a standing thing would (Placement): on his land, open ground, off the road, the field and every doorstep, clear of debris and tall grass, with nothing standing and nobody there. What lies there (a path) may be built over." },
+    "door": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "integer", "minimum": 0 }, "description": "A building with a room: its door's cell, [x, y] from its top-left corner, in its bottom row. The cell below the door is its doorstep: it must be free when the building is set down and stays free (nothing is set down on it). Standing, the building fills all its cells but its door, which the hero walks into to go in. Build mode's ghost holds a building by its door (one without: the middle of its bottom row)." },
+    "room": { "type": "string", "minLength": 1, "description": "A building with a door: the area that is its inside (world/areas/<room>/<room>.tscn), an 11 by 9 room whose doormat leads out before the door, wherever the building stands (the homestead's entry '<id>_door')." },
+    "fills_can": { "type": "boolean", "default": false, "description": "The watering can fills at any of its cells, once it stands (the Well)." },
+    "holds": {
+      "type": "object",
+      "description": "What it keeps, and how much at the most (the Silo's hay). Interact facing it puts in what he carries, as much as there is room for; what doesn't fit stays in the pack.",
+      "required": ["item", "count"],
+      "properties": { "item": { "type": "string", "minLength": 1 }, "count": { "type": "integer", "minimum": 1 } }
+    },
+    "keeps": {
+      "type": "object",
+      "description": "The furnaces and chests of its room, by the keys GameState keeps them under (GameState.furnace(key), store(key)): it can't be pulled down while any of them holds something.",
+      "properties": {
+        "furnaces": { "type": "array", "items": { "type": "string" } },
+        "chests": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "animals": { "type": "integer", "minimum": 0, "default": 0, "description": "How many animals it has room for. The Homestead's phase 4 reads it; nothing does before then." },
+    "big": {
+      "type": "object",
+      "description": "Its upgrade: the same place and size, bought at the workbench's 'Build' tab ('makes': {'upgrade': id}) once it stands, and finished the next morning.",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "animals": { "type": "integer", "minimum": 0 },
+        "look": { "$ref": "#/$defs/look" }
+      }
+    },
+    "shadow": { "type": "boolean", "default": true, "description": "Whether it casts a tall thing's shadow east and south, as the farmhouse does (the Well, which is low, says false)." },
+    "look": { "$ref": "#/$defs/look" }
+  },
+  "$defs": {
+    "look": {
+      "type": "array",
+      "minItems": 1,
+      "description": "How it is drawn, flat on the ground as the farmhouse's tiles are: blocks [x, y, width, height, kind] from its top-left, later blocks over earlier ones, as the map baker lays a house (tools/greybox/build_maps.gd). 'roof', 'roof_blue' and 'roof_thatch' get their ridge (a strip that rises over the top row), eaves and gable ends; 'wall' a window every third cell; 'wall_upper' its braces; 'well' and 'silo' are 2 by 2 pictures. Any other kind is a tile of the atlas (GreyboxTiles): 'door', 'barn_wall', 'barn_loft', 'barn_door', and a house decoration ('chimney') is laid over what is under it.",
+      "items": {
+        "type": "array", "minItems": 5, "maxItems": 5,
+        "prefixItems": [
+          { "type": "integer", "minimum": 0 }, { "type": "integer", "minimum": 0 },
+          { "type": "integer", "minimum": 1 }, { "type": "integer", "minimum": 1 },
+          { "type": "string", "minLength": 1 }
+        ]
+      }
+    }
+  }
+}

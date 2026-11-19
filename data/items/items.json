@@ -76,6 +76,9 @@
     { "id": "flower_bed_yellow", "name": "Yellow Flower Bed", "type": "placeable", "icon": "flower_bed_yellow", "stackable": true, "max_stack": 30, "stats": { "layer": "lying" } },
     { "id": "flower_bed_blue", "name": "Blue Flower Bed", "type": "placeable", "icon": "flower_bed_blue", "stackable": true, "max_stack": 30, "stats": { "layer": "lying" } },
     { "id": "oak_sapling", "name": "Oak Sapling", "type": "placeable", "icon": "oak_sapling", "stackable": true, "max_stack": 10, "stats": { "layer": "standing", "grows": { "mornings": 4, "tree": "oak" } } },
-    { "id": "cherry_sapling", "name": "Cherry Sapling", "type": "placeable", "icon": "cherry_sapling", "stackable": true, "max_stack": 10, "stats": { "layer": "standing", "grows": { "mornings": 6, "tree": "cherry" } } }
+    { "id": "cherry_sapling", "name": "Cherry Sapling", "type": "placeable", "icon": "cherry_sapling", "stackable": true, "max_stack": 10, "stats": { "layer": "standing", "grows": { "mornings": 6, "tree": "cherry" } } },
+    { "id": "hay", "name": "Hay", "type": "material", "icon": "hay", "stackable": true, "max_stack": 50 },
+    { "id": "well_kit", "name": "Well Kit", "type": "kit", "icon": "kit", "stats": { "building": "well" } },
+    { "id": "silo_kit", "name": "Silo Kit", "type": "kit", "icon": "kit", "stats": { "building": "silo" } }
   ]
 }

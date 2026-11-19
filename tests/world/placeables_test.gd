@@ -512,21 +512,21 @@ func test_the_hand_moves_a_sapling_with_its_mornings_and_a_tree_as_a_tree() -> v
 	assert_bool(GameState.move_placed(&"homestead", Vector2i(1, 1), Vector2i(35, 12), Placement.STANDING)).override_failure_message("nothing there to move").is_false()
 
 
-func test_the_workbench_has_two_tabs_and_place_lists_the_nine() -> void:
+func test_the_workbench_has_three_tabs_and_place_lists_the_nine() -> void:
 	GameState.add_item(&"wood", 5)
 	GameState.add_item(&"stone", 2)
 	var home: AreaController = _load(HOME)
 	assert_bool(home.open_craft()).is_true()
 	var menu: CraftMenu = home.hud.craft_menu
 	assert_str(menu.tab).override_failure_message("it opens on what it always listed").is_equal(Crafting.TAB_MAKE)
-	assert_str(menu.tabs_text()).is_equal("[Make]   Place ")
+	assert_str(menu.tabs_text()).is_equal("[Make]   Place    Build ")
 	var make: Array = menu.entries().map(func(recipe: Dictionary) -> String: return str(recipe["id"]))
 	assert_bool(make.has("fence") or make.has("dirt_path") or make.has("bench")).override_failure_message("nothing to set down is on Make").is_false()
 	# Right turns to "Place": the nine, in the plan's order, six lines at a time.
 	_heard.clear()
 	menu._unhandled_input(_key(&"move_right"))
 	assert_str(menu.tab).is_equal(Crafting.TAB_PLACE)
-	assert_str(menu.tabs_text()).is_equal(" Make   [Place]")
+	assert_str(menu.tabs_text()).is_equal(" Make   [Place]   Build ")
 	assert_array(_heard).contains_exactly([&"menu_move"])
 	assert_array(menu.entries().map(func(recipe: Dictionary) -> StringName: return StringName(str(recipe["id"])))).is_equal(MADE.map(func(row: Array) -> StringName: return row[0]))
 	assert_array(Array(menu.shown_lines())).is_equal([
@@ -555,7 +555,7 @@ func test_the_workbench_has_two_tabs_and_place_lists_the_nine() -> void:
 	assert_str(menu.tab).is_equal(Crafting.TAB_MAKE)
 	assert_int(menu.selected).override_failure_message("a tab starts at its top").is_equal(0)
 	menu._unhandled_input(_key(&"move_left"))
-	assert_str(menu.tab).override_failure_message("round").is_equal(Crafting.TAB_PLACE)
+	assert_str(menu.tab).override_failure_message("round, to the buildings' tab (phase 3)").is_equal(Crafting.TAB_BUILD)
 	var tabs: Label = menu.get_node(^"Panel/Tabs")
 	await await_idle_frame()
 	menu._unhandled_input(_click_at(tabs.get_global_transform_with_canvas() * Vector2(6.0, 5.0)))
@@ -579,10 +579,10 @@ func test_a_recipes_tab_is_checked_as_the_data_loads() -> void:
 	assert_array(Array(Crafting.problems(good, item_of, [], []))).is_empty()
 	assert_str(Crafting.tab_of(good)).is_equal("place")
 	assert_str(Crafting.tab_of({"id": "bombs"})).override_failure_message("a recipe that names no tab is on Make").is_equal("make")
-	assert_array(Crafting.TABS).override_failure_message("phase 3 adds its own").is_equal(["make", "place"])
+	assert_array(Crafting.TABS).override_failure_message("phase 3 added its own").is_equal(["make", "place", "build"])
 	var odd: Dictionary = good.duplicate(true)
 	odd["tab"] = "attic"
-	assert_array(Array(Crafting.problems(odd, item_of, [], []))).contains_exactly(["'tab' must be one of: make, place."])
+	assert_array(Array(Crafting.problems(odd, item_of, [], []))).contains_exactly(["'tab' must be one of: make, place, build."])
 	var smelted: Dictionary = {"id": "bar", "station": "furnace", "tab": "place", "needs": [{"item": "coal", "count": 1}], "makes": {"item": "copper_bar"}}
 	assert_array(Array(Crafting.problems(smelted, item_of, [], []))).contains_exactly(["only the workbench's list has tabs."])
 	assert_array(Crafting.of_tab([good, {"id": "bombs"}, odd, 7], "place")).is_equal([good])

@@ -8,7 +8,7 @@ extends RefCounted
 ## and the pack, and saves it.
 
 ## Item types that stay with the hero.
-const KEPT_OUT: Array[String] = ["currency", "key", "quest"]
+const KEPT_OUT: Array[String] = ["currency", "key", "quest", "kit"]
 ## Why a stack can't be moved.
 const FULL_WORDS: String = "The chest is full."
 const NOT_KEPT_WORDS: String = "That stays with you."

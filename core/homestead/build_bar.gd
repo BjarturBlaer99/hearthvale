@@ -18,11 +18,20 @@ const HAND: StringName = &"hand"
 const HAND_ENTRY: Dictionary = {"id": "hand", "name": "Hand", "icon": "hand"}
 
 
-## The bar's entries: the hand, then the placeables among `stacks` (item data entries), in the
-## stacks' order. `items` are the game's item entries.
+## The bar's entries: the hand, then the placeables and the buildings' kits (phase 3) among
+## `stacks` (item data entries), in the stacks' order. `items` are the game's item entries.
 static func entries(stacks: Array, items: Array) -> Array[Dictionary]:
 	var out: Array[Dictionary] = [HAND_ENTRY]
-	out.append_array(Inventory.held_of_type(stacks, items, Placement.TYPE))
+	var by_id: Dictionary = {}
+	for item: Variant in items:
+		if typeof(item) == TYPE_DICTIONARY:
+			by_id[str((item as Dictionary).get("id", ""))] = item
+	for stack: Variant in stacks:
+		if typeof(stack) != TYPE_DICTIONARY or int((stack as Dictionary).get("count", 0)) <= 0:
+			continue
+		var item: Dictionary = by_id.get(str((stack as Dictionary).get("id", "")), {})
+		if Placement.is_placeable(item) or Buildings.is_kit(item):
+			out.append(item)
 	return out
 
 

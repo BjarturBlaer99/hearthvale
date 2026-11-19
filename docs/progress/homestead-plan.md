@@ -659,8 +659,13 @@ TECH_DESIGN, the roadmap, the README and DECISIONS up to date; CLAUDE.md is the 
   post at night; a sapling at each age and the hero behind a grown tree; the "Place" tab; Tilda's list.
 
 **Phase 3: buildings** *(three commits; the largest phase)*
-- [ ] 3a. **Plans.** The "Build" tab, kits, building sites and the morning that finishes them; the Well;
+- [x] 3a. **Plans.** The "Build" tab, kits, building sites and the morning that finishes them; the Well;
   the Silo, with the meadow's tall grass and hay.
+  *Built 2026-11-19, with D20, D21 and D29's hay as written, and the table's costs and unlocks. A kit is
+  an item of type `kit`; a building is a file in `data/buildings/`. A plan refused says what is short by
+  name. The ghost holds a building by its door (or the middle of its bottom row), and the doorstep is
+  asked the table as every cell is. A tuft of tall grass doesn't grow where something is set down (a
+  save from phase 2 may have one there).*
 - [ ] 3b. **Rooms.** The Coop, the Barn and the Shed with their insides, doors that follow the building,
   the shed's chests and furnace, the two upgrades.
 - [ ] 3c. **Moving and demolishing,** with refunds.

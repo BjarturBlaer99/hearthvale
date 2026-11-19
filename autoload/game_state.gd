@@ -75,6 +75,9 @@ var _store: Store
 ## His homestead (2026-11-17): what he has cleared from the land for good. Saved.
 var _homestead: Homestead
 var _homestead_rules: HomesteadRules
+## What the morning has to say (the Homestead: a building finished), until an area says it.
+## Not saved: it is said as the next area loads, or at once in the area he is in.
+var morning_news: PackedStringArray = []
 ## Where the hero is: { "area", "cell": [x, y] }, or { "area", "entry" } on the way into an
 ## area through one of its entry points (go_to), until the area places them.
 var player: Dictionary = {}
@@ -489,15 +492,42 @@ func is_furnished(furnishing: StringName) -> bool:
 func known_crafts(station: String) -> Array[Dictionary]:
 	return Crafting.known(DataRegistry.entries(&"crafting"), station,
 		func(item_id: String) -> bool: return has_found(StringName(item_id)),
-		func(skill: String) -> int: return skill_level(StringName(skill)))
+		func(skill: String) -> int: return skill_level(StringName(skill)),
+		func(building: String) -> bool: return is_built(StringName(building)))
 
 
 ## Why `recipe` (a crafting data entry) can't be made now, in Crafting's words; "" if it can.
+## A building's plan (the workbench's "Build" tab) says what he is short of, by name.
 func why_not_craft(recipe: Dictionary) -> String:
-	return Crafting.why_not(recipe,
+	var why: String = Crafting.why_not(recipe,
 		func(item_id: String) -> int: return item_count(StringName(item_id)),
 		func(item_id: String, count: int) -> bool: return count <= 0 or has_room_for(StringName(item_id), count),
-		func(furnishing: String) -> bool: return is_furnished(StringName(furnishing)))
+		func(furnishing: String) -> bool: return is_furnished(StringName(furnishing)),
+		func(wanted: Dictionary) -> bool: return _has_whole(wanted))
+	if why == Crafting.LACKING_WORDS and Crafting.tab_of(recipe) == Crafting.TAB_BUILD:
+		return Crafting.short_words(recipe, func(item_id: String) -> int: return item_count(StringName(item_id)), need_names())
+	return why
+
+
+## The names a need goes by on the workbench: each item's, and "Coins" for coins.
+func need_names() -> Dictionary:
+	var names: Dictionary = {}
+	for item: Dictionary in DataRegistry.entries(&"items"):
+		names[str(item["id"])] = str(item.get("name", item["id"]))
+	names[String(COIN)] = "Coins"
+	return names
+
+
+## Whether he has what `recipe` makes as a whole thing, of which there is one of each: a
+## building's kit (in the pack, or set down as a site or a building), or its upgrade.
+func _has_whole(recipe: Dictionary) -> bool:
+	var upgrade: StringName = StringName(Crafting.upgrade_made(recipe))
+	if upgrade != &"":
+		return homestead().has_upgrade(upgrade)
+	var kit: Dictionary = DataRegistry.get_item(StringName(Crafting.item_made(recipe)))
+	if not Buildings.is_kit(kit):
+		return false
+	return item_count(StringName(str(kit["id"]))) > 0 or homestead().has_building(Buildings.building_of_kit(kit))
 
 
 ## Makes `recipe_id` at the workbench: what it needs goes, and what it makes comes, into the
@@ -519,6 +549,10 @@ func craft(recipe_id: StringName) -> String:
 		add_item(made, Crafting.count_made(recipe))
 		if in_hand and equipped == &"" and Inventory.is_equippable(DataRegistry.get_item(made)):
 			equip(made)
+	elif not Crafting.upgrade_made(recipe).is_empty():
+		# A building's upgrade (the Homestead): bought today, finished the next morning.
+		homestead().upgrade(StringName(Crafting.upgrade_made(recipe)), day)
+		EventBus.homestead_changed.emit()
 	else:
 		set_flag(Crafting.furnished_flag(StringName(Crafting.furnishing_made(recipe))), true)
 	EventBus.crafted.emit(recipe_id)
@@ -700,6 +734,83 @@ func growing_things() -> Dictionary:
 	return Placement.growing(DataRegistry.entries(&"items"))
 
 
+# --- The Homestead's buildings (phase 3) -------------------------------------
+
+## The silo's words: what was put in, or why nothing was.
+const HAY_IN_WORDS: String = "You put %d hay in the silo. It holds %d of %d."
+const SILO_FULL_WORDS: String = "The silo is full: it holds %d hay."
+const NO_HAY_WORDS: String = "You carry no hay. The silo holds %d of %d."
+
+
+## Whether building `id` (data/buildings) stands on his land today: its site was set down on
+## an earlier day. A site is not built yet.
+func is_built(id: StringName) -> bool:
+	return homestead().is_standing(id, day)
+
+
+## Whether building `id` stands today as its bigger self (its upgrade was bought on an earlier
+## day).
+func is_big(id: StringName) -> bool:
+	return homestead().is_big(id, day)
+
+
+## The building or site that covers `cell` of `area`, or &"" (none, or not his land).
+func building_covering(area: StringName, cell: Vector2i) -> StringName:
+	if not homestead_rules().is_land(area):
+		return &""
+	for id: StringName in homestead().building_ids():
+		if Buildings.covers(DataRegistry.get_building(id), homestead().building_at(id), cell):
+			return id
+	return &""
+
+
+## The building whose doorstep is `cell` of `area`, or &"" (none, or not his land). A site's
+## doorstep is kept free too: it is where its door will be.
+func doorstep_of(area: StringName, cell: Vector2i) -> StringName:
+	if not homestead_rules().is_land(area):
+		return &""
+	for id: StringName in homestead().building_ids():
+		if Buildings.doorstep_of(DataRegistry.get_building(id), homestead().building_at(id)) == cell:
+			return id
+	return &""
+
+
+## Sets the kit `kit_id` he carries down on `area` with its building's top-left corner at
+## `origin`: it leaves the pack and is a building site today, and the building stands the
+## next morning (the plan's D21). Whether the ground fits is the area's to ask first
+## (Buildings.why_not_at: build mode does). Refused off his land, for what is no kit or isn't
+## carried, and for a building that is there already. Returns whether it was set down.
+func set_down_kit(area: StringName, origin: Vector2i, kit_id: StringName) -> bool:
+	var building: StringName = Buildings.building_of_kit(DataRegistry.get_item(kit_id))
+	if not homestead_rules().is_land(area) or building == &"" or item_count(kit_id) <= 0:
+		return false
+	if not homestead().put_building(building, origin, day):
+		return false
+	add_item(kit_id, -1)
+	EventBus.homestead_changed.emit()
+	return true
+
+
+## Puts the hay he carries in the building `id` that holds it (the Silo, by its data's
+## "holds"), as much as it has room for: what doesn't fit stays in the pack. Returns the words
+## to say ("" if `id` holds nothing, or doesn't stand yet).
+func put_hay(id: StringName) -> String:
+	var held: Dictionary = Buildings.holds(DataRegistry.get_building(id))
+	if held.is_empty() or not is_built(id):
+		return ""
+	var most: int = int(held["count"])
+	var carried: int = item_count(held["item"])
+	if carried <= 0:
+		return NO_HAY_WORDS % [homestead().hay, most]
+	var added: int = homestead().add_hay(carried, most)
+	if added <= 0:
+		return SILO_FULL_WORDS % most
+	add_item(held["item"], -added)
+	EventBus.sound.emit(&"item_get")
+	EventBus.homestead_changed.emit()
+	return HAY_IN_WORDS % [added, homestead().hay, most]
+
+
 # --- The mine (2026-11-17) ---------------------------------------------------
 
 ## The Old Quarry's rules (data/rules/mine.json).
@@ -744,8 +855,15 @@ func start_next_day() -> void:
 	minute = float(day_clock().starts)
 	farm().new_day(Crops.days_by_id(DataRegistry.entries(&"crops")))
 	EventBus.farm_changed.emit()
-	# A sapling on his land is a morning older (the Homestead): no water needed.
-	if homestead().grow(growing_things()):
+	# A sapling on his land is a morning older (the Homestead): no water needed. A site set
+	# down yesterday stands this morning, and an upgrade bought yesterday is finished.
+	var grew: bool = homestead().grow(growing_things())
+	var finished: Array[Dictionary] = homestead().finished_on(day)
+	for done: Dictionary in finished:
+		var building: Dictionary = DataRegistry.get_building(done["id"])
+		morning_news.append((Buildings.BIGGER_WORDS if done["big"] else Buildings.STANDS_WORDS) % Buildings.name_of(building, done["big"]))
+		EventBus.building_finished.emit(done["id"], done["big"])
+	if grew or not finished.is_empty():
 		EventBus.homestead_changed.emit()
 	EventBus.day_started.emit(day)
 	EventBus.time_changed.emit(day, floori(minute))
@@ -1028,6 +1146,7 @@ func clear() -> void:
 	_furnace = null
 	_store = null
 	_homestead = null
+	morning_news.clear()
 	found.clear()
 	flags.clear()
 	flag_days.clear()
@@ -1122,7 +1241,8 @@ func from_dict(data: Dictionary) -> void:
 	_furnace.load_saved(home.get("furnace"))
 	_store = null
 	store().load_saved(home.get("chest"), func(item_id: String) -> int: return Inventory.capacity(DataRegistry.get_item(StringName(item_id))))
-	homestead().load_saved(data.get("homestead"), func(item_id: String) -> StringName: return Placement.layer_of(DataRegistry.get_item(StringName(item_id))))
+	homestead().load_saved(data.get("homestead"), func(item_id: String) -> StringName: return Placement.layer_of(DataRegistry.get_item(StringName(item_id))),
+		func(building: String) -> bool: return DataRegistry.has_entry(&"buildings", StringName(building)))
 	var src_found: Variant = data.get("found")
 	if typeof(src_found) == TYPE_ARRAY:
 		for id: Variant in src_found:

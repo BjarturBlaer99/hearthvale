@@ -1334,3 +1334,52 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
 - 2026-11-19 — **Left for the user, not changed:** a mirrored sprite frame is drawn one frame's width to
   the right in this engine (phase 2's subagent measured it; the chickens, a side-on goblin, the Warden and
   the Shade facing the other way). It is older than the Homestead and outside it.
+- 2026-11-19 — **The Homestead, step 3a (plans, kits, sites, the Well, the Silo, hay): what the plan
+  left open.** D20, D21 and D29's hay are built as written; these are the phase's own choices.
+  - **A kit is an item of type `kit`** whose stats name its building (`{"building": "well"}`); one kit to
+    a building. It doesn't stack (one of each), is kept out of every chest (`Store.KEPT_OUT`), is no
+    `Inventory.EQUIPPABLE_TYPES`, and is on the build bar after the hand, among the placeables in the
+    pack's order. All five kits wear one picture (`kit`: planks bound, a plan rolled on top).
+  - **A building is a file in `data/buildings/`** (size, door, room, what it does, its look as blocks of
+    the atlas's tiles, laid by the baker's own rules). `Buildings` (`core/homestead/`, pure) reads it.
+  - **One of each** is asked of the plan: refused ("You have one already.") with its kit in the pack, its
+    site set down, or the building standing.
+  - **A plan refused for want of something says what is short, by name** ("You are short of 40 Stone,
+    10 Wood and 80 Coins."), on the "Build" tab only: the other tabs keep "You haven't all it needs."
+    (13 tests read those words). On the workbench coins read "Coins" ("Coins 50 of 80"); one coin short
+    is "1 Coin". A plan bought says "Bought: Well Kit. Set it down in build mode."
+  - **The ghost holds a building by its door,** and one without a door by the middle of its bottom row:
+    the cell under the mouse is that cell.
+  - **The doorstep is asked the plan's table as every cell of the building is** ("if any cell under it or
+    its doorstep fails the above"), read to the letter: a doorstep on the road, the field, another
+    doorstep or tall grass is refused. A path lying under a building is allowed (D14: one lying, one
+    standing): it stays under it, covered.
+  - **A building's cells, and a site's, say "Nothing can stand there."** to anything set down on them, as
+    the farmhouse's do.
+  - **Any morning finishes a site** (a night slept, stayed up through, or collapsed in), as any morning
+    grows a sapling. The hero is told at the top of the screen ("The Well stands on your farm.") with
+    the sound `built`, where he is or, if the morning came on his way somewhere, where he arrives.
+  - **The Well is low:** it casts no house's shadow, and it wears the village well's own picture. The can
+    fills facing any of its four cells once it stands; a site is no well.
+  - **The Silo takes all the hay he carries** with one right click, up to its 60; what doesn't fit stays
+    in the pack, and the words say how much it holds. Nothing takes hay out of it in this phase (phase 4
+    feeds from it).
+  - **Hay** is a material, stacks to 50, and may go in a chest like any material; nobody buys it (the
+    plan's "no selling of hay").
+  - **The meadow's tall grass** is a breakable of its own, `meadow_grass`, on a seventh land marker: the
+    village's tall-grass picture, cut by the sword or a bomb, one hay lying in its cell, back the next
+    morning (`"returns": "daily"`, the flag `cut/homestead/x,y`). It is no debris to the farm's tools
+    (it is not on the field), but nothing can be set down on a tuft that stands ("Clear this first.").
+  - **The tall grass and a save from phase 2 (the brief's open point):** phase 2 left the fourteen tufts
+    plain grass, so a save may have a path, a fence or a sapling on one. **A tuft doesn't grow where
+    something lies or stands, or a building covers its cell:** such a tuft is taken away as the land
+    loads, its cell left to what stands there; taken up again, the tuft is back on the next visit.
+    Nothing is lost, and nothing set down moves.
+  - **A building is drawn as the farmhouse is:** its tiles flat on the ground under everyone (the
+    village's own house tiles, and five new ones and a silo at the end of the atlas, rows 28 and 29), the
+    shadow `HeightShading` gives a house east and south, and a ridge strip over its roof among the
+    area's scenery, as `Scenery` stands the farmhouse's. A site is dug ground pegged out with twine
+    over its cells and a stack of timber in the middle of its bottom row.
+  - **The save stays version 6** (D30): the section `homestead` gains `"buildings"` (`{ id: { "at":
+    "x,y", "day": n, "big_day": n } }`, `big_day` only for an upgrade) and `"hay"`, each written only
+    when there is something in it and read with a default. A building the game doesn't know is left out.

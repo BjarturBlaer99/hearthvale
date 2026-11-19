@@ -9,7 +9,7 @@
     "id": { "type": "string", "minLength": 1 },
     "name": { "type": "string", "description": "What the list calls it. Left out, it is the name of the item it makes. A recipe that makes a furnishing needs one." },
     "station": { "enum": ["workbench", "furnace"], "default": "workbench", "description": "Where it is made. A 'furnace' recipe is smelted overnight, several to a load (data/rules/crafting.json: furnace_most), and must make an item." },
-    "tab": { "enum": ["make", "place"], "default": "make", "description": "The tab of the workbench's list it is on (the Homestead, TECH_DESIGN §30): 'make', what is made for use, or 'place', what is made to be set down on the hero's land (it makes a placeable). Only a workbench recipe may name one." },
+    "tab": { "enum": ["make", "place", "build"], "default": "make", "description": "The tab of the workbench's list it is on (the Homestead, TECH_DESIGN §30): 'make', what is made for use, 'place', what is made to be set down on the hero's land (it makes a placeable), or 'build' (phase 3): a building's plan, which makes its kit, or its upgrade. A plan names its coins as a need (the item 'coin'); refused, it says what he is short of by name. Only a workbench recipe may name one." },
     "order": { "type": "integer", "default": 0, "description": "Its place on its station's list (its tab's, at the workbench), lowest first; recipes that share a number are listed by id." },
     "needs": {
       "type": "array", "minItems": 1,
@@ -25,7 +25,7 @@
     },
     "makes": {
       "type": "object",
-      "description": "An item for the pack, or a furnishing of the hero's home: one of the two.",
+      "description": "An item for the pack (which may be a placeable, or a building's kit), a furnishing of the hero's home or of a building's room, or (the 'build' tab) a building's upgrade: one of the three.",
       "oneOf": [
         {
           "required": ["item"],
@@ -38,15 +38,23 @@
         {
           "required": ["furnishing"],
           "properties": {
-            "furnishing": { "type": "string", "minLength": 1, "description": "One of the furnishings in data/rules/crafting.json. It is made once, and stands in its own place in the cottage (a Furnishing node of that id in the home's scene)." }
+            "furnishing": { "type": "string", "minLength": 1, "description": "One of the furnishings in data/rules/crafting.json: the home's 'furnishings', or with 'room' one of that room's ('rooms'). It is made once, and stands in its own place in that room (a Furnishing node in its scene): its flag is 'home/<furnishing>', or '<room>/<furnishing>'." },
+            "room": { "type": "string", "minLength": 1, "default": "home", "description": "The room the furnishing stands in: 'home' (the farmhouse), or a building's room named in data/rules/crafting.json 'rooms' (the shed)." }
           },
           "not": { "required": ["item"] }
+        },
+        {
+          "required": ["upgrade"],
+          "properties": {
+            "upgrade": { "type": "string", "minLength": 1, "description": "A building (data/buildings) with a 'big' form: bought for one that stands, it is finished the next morning, in the same place and of the same size. One upgrade a building." }
+          },
+          "not": { "anyOf": [{ "required": ["item"] }, { "required": ["furnishing"] }] }
         }
       ]
     },
     "unlock": {
       "type": "object",
-      "description": "When the hero knows the recipe. Left out, from the start. One of the two: an item 'found' (ever held, even if he has none now), or a 'skill' at a 'level'.",
+      "description": "When the hero knows the recipe. Left out, from the start. One of the three: an item 'found' (ever held, even if he has none now), a 'skill' at a 'level', or a building 'built' (one that stands on his land today; a site doesn't count).",
       "oneOf": [
         {
           "required": ["found"],
@@ -60,6 +68,11 @@
             "level": { "type": "integer", "minimum": 2, "description": "Every skill begins at level 1, so 2 is the first that waits on anything." }
           },
           "not": { "required": ["found"] }
+        },
+        {
+          "required": ["built"],
+          "properties": { "built": { "type": "string", "minLength": 1, "description": "A building id (data/buildings)." } },
+          "not": { "anyOf": [{ "required": ["found"] }, { "required": ["skill"] }] }
         }
       ]
     }

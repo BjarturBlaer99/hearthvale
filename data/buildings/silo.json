@@ -1,0 +1,9 @@
+{
+	"id": "silo",
+	"name": "Silo",
+	"size": [2, 2],
+	"holds": { "item": "hay", "count": 60 },
+	"look": [
+		[0, 0, 2, 2, "silo"]
+	]
+}

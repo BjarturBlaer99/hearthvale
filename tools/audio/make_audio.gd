@@ -18,7 +18,7 @@ const SFX: Array[String] = [
 	"hoe", "pour", "fill", "plant", "harvest", "skill", "friend",
 	"wisp_flare", "wisp_dart",
 	"pick", "rock_break", "lift", "craft", "furnace",
-	"set_down", "take_up",
+	"set_down", "take_up", "built",
 ]
 
 ## Each song: tempo, bars (4/4; every track must last bars x 8 eighths), and its tracks.
@@ -266,6 +266,14 @@ static func effect(id: String) -> PackedFloat32Array:
 			return Synth.join([
 				Synth.tone(&"noise", 600, 1500, 0.07, 0.16, 0.004, 0.04, 0.5, 83),
 				Synth.mix(Synth.tone(&"square", 240, 330, 0.06, 0.20, 0.001, 0.04, 0.5), Synth.tone(&"noise", 1200, 700, 0.05, 0.12, 0.001, 0.04, 0.5, 84)),
+			])
+		"built":
+			# A building finished on the farm: three knocks of a mallet, then a bright chime.
+			return Synth.join([
+				Synth.mix(Synth.tone(&"square", 200, 140, 0.06, 0.22, 0.001, 0.05, 0.5), Synth.tone(&"noise", 1000, 400, 0.06, 0.16, 0.001, 0.05, 0.5, 85)), Synth.silence(0.06),
+				Synth.mix(Synth.tone(&"square", 210, 150, 0.06, 0.22, 0.001, 0.05, 0.5), Synth.tone(&"noise", 1050, 400, 0.06, 0.16, 0.001, 0.05, 0.5, 86)), Synth.silence(0.06),
+				Synth.mix(Synth.tone(&"square", 230, 160, 0.06, 0.24, 0.001, 0.05, 0.5), Synth.tone(&"noise", 1100, 420, 0.06, 0.18, 0.001, 0.05, 0.5, 87)), Synth.silence(0.05),
+				Synth.mix(Synth.tone(&"sine", 784, 784, 0.30, 0.18, 0.004, 0.26), Synth.tone(&"sine", 1175, 1175, 0.30, 0.12, 0.004, 0.26)),
 			])
 		"whiff":
 			# A blow passing through the Shade: thin air.
