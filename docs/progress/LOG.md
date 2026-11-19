@@ -3123,3 +3123,17 @@ save slot was written.
 - **From behind, the water is hidden** by the hero; only the splash shows on the cell.
 - **The seeds and the clods are small:** two pixels each, best seen up close.
 - **The hero's reflection in water** shows his work pose without the tool (as in step 1).
+
+## 2026-11-19 — Art as PNG, step 1: the plan
+
+The user asked to move the art to PNG as the source of truth (edited in Aseprite, or replaced with
+AI-made pixel art), in two steps with a stop between. The plan is `docs/progress/png-art-plan.md`:
+the inventory (27 PNGs from six painting tools; fonts and sound stay in code), the PNGs kept where
+the game loads them with a new `art/` folder (sheet list, palettes, how-to, `.aseprite` files), the six
+tools retired to `tools/retired/` under `.gdignore` while `build_tileset.gd` and `build_maps.gd` keep
+map work going, `PixelGrade.apply()` retired with them, villager markers, import settings, palettes,
+art tests driven by `art/sheets.json`, the proof (byte-equal PNGs, every shot and film compared against
+two "before" runs), `docs/ASSETS.md`, the exact `CLAUDE.md` wording, a how-to per kind of asset, the
+risks, and eight decisions. **Nothing is changed until it is approved.** No code, art, tests or
+window runs in this step (two read-only scratch scripts listed the PNGs and counted their colours:
+3,771 in all, 1,703 of them in the tile atlas).
