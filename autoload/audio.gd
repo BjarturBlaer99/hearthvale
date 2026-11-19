@@ -20,7 +20,7 @@ const SFX: Array[StringName] = [
 	&"wisp_flare", &"wisp_dart",
 	&"pick", &"rock_break", &"lift", &"craft", &"furnace",
 ]
-const MUSIC: Array[StringName] = [&"village", &"countryside", &"dungeon", &"boss", &"night", &"marsh", &"mine"]
+const MUSIC: Array[StringName] = [&"village", &"countryside", &"dungeon", &"boss", &"night", &"marsh", &"mine", &"homestead", &"homestead_night"]
 const MUSIC_BUS: StringName = &"Music"
 const SFX_BUS: StringName = &"SFX"
 ## Sound effects that can overlap.

@@ -76,7 +76,7 @@ const SCENARIOS: Dictionary = {
 		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"planted_first_crop"],
 	},
 	# By the chapel's door on the day the Warden fell: the bars are down until he has slept (his
-	# cottage is the thatched house at the west end of the lane).
+	# farmhouse is out the lane's west end, on his own land).
 	"rest": {
 		"area": &"village",
 		"cell": Vector2i(23, 8),
@@ -94,13 +94,25 @@ const SCENARIOS: Dictionary = {
 			[&"wheat", 3], [&"potato", 2], [&"pumpkin", 1], [&"mushroom", 2]],
 		"flags": [],
 	},
-	# On the road by the plot, with the hoe, the watering can (empty: the well is to the east),
-	# seeds of every crop and a sword: for trying the farm. The bed at home ends a day.
+	# On the homestead's road above the field's clear corner, with the hoe, the watering can
+	# (empty: the pond is in the south-west corner of the land), seeds of every crop and a sword:
+	# for trying the farm. The bed in the farmhouse, up the path, ends a day.
 	"farm": {
-		"area": &"village",
-		"cell": Vector2i(15, 17),
+		"area": &"homestead",
+		"cell": Vector2i(25, 15),
 		"items": [[&"wooden_sword", 1], [&"hoe", 1], [&"watering_can", 1], [&"turnip_seeds", 5], [&"carrot_seeds", 3],
 			[&"wheat_seeds", 3], [&"potato_seeds", 3], [&"pumpkin_seeds", 2], [&"coin", 30]],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds"],
+	},
+	# Arriving on the homestead by the lane from Hearthvale, with a sword and all three pickaxes
+	# (the plain one for rocks, the Copper for boulders, the Iron for great boulders), the hoe,
+	# the can and a few seeds: for trying the land, clearing it, and the farm's two tunes (add an
+	# hour for the night's: -- homestead 20:30).
+	"homestead": {
+		"area": &"homestead",
+		"cell": Vector2i(37, 14),
+		"items": [[&"wooden_sword", 1], [&"pickaxe", 1], [&"copper_pickaxe", 1], [&"iron_pickaxe", 1], [&"hoe", 1],
+			[&"watering_can", 1], [&"turnip_seeds", 5], [&"bread", 3], [&"coin", 30]],
 		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds"],
 	},
 	# In Tilda's shop at her counter, with coins and a harvest: for trying her list. (Start it by
@@ -157,7 +169,7 @@ const SCENARIOS: Dictionary = {
 	# furnace, ore and coal to smelt, bars for the chest, the lamp, a sprinkler and the first tool
 	# upgrades, wheat and blossoms for the rug, and the Lantern, a gold bar and a crystal for the
 	# Miner's Lantern. Farming 2 and Mining 3, so every recipe is on the list. The furnace takes a
-	# night: the bed is by the west wall. The plot is out of the door and to the east.
+	# night: the bed is by the west wall. The field is out of the door and across the road.
 	"craft": {
 		"area": &"home",
 		"cell": Vector2i(8, 3),

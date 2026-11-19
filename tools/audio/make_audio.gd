@@ -82,6 +82,33 @@ const SONGS: Dictionary = {
 			"R:2 B5:1 R:5 R:6 E6:1 R:1 R:2 G5:1 R:5 R:6 A5:1 R:1 " +
 			"R:2 B5:1 R:5 R:6 D6:1 R:1 R:2 E5:1 R:5 R:6 B5:1 R:1"},
 	]},
+	# The hero's own land (the Homestead), by day: unhurried and at ease, D major:
+	# | D | A | Bm | G | D | G | A | D |. A plain tune over a walking bass and a soft
+	# broken chord, with no drums: slower than the village's and a step lower in the voice.
+	"homestead": {"bpm": 92, "bars": 8, "tracks": [
+		{"wave": "square", "duty": 0.25, "volume": 0.17, "notes":
+			"F#4:2 A4:2 D5:3 E5:1 C#5:2 A4:2 E5:4 D5:2 F#5:2 B4:3 D5:1 B4:2 G4:2 D5:2 R:2 " +
+			"F#4:2 A4:2 D5:2 F#5:2 G5:3 F#5:1 E5:2 D5:2 E5:2 C#5:2 A4:2 E5:2 D5:6 R:2"},
+		{"wave": "triangle", "volume": 0.30, "notes":
+			"D2:4 A2:4 A1:4 E2:4 B1:4 F#2:4 G1:4 D2:4 D2:4 A2:4 G1:4 D2:4 A1:4 E2:4 D2:4 D2:4"},
+		{"wave": "square", "duty": 0.5, "volume": 0.055, "notes":
+			"D4:1 F#4:1 A4:1 F#4:1 D4:1 F#4:1 A4:1 F#4:1 C#4:1 E4:1 A4:1 E4:1 C#4:1 E4:1 A4:1 E4:1 " +
+			"B3:1 D4:1 F#4:1 D4:1 B3:1 D4:1 F#4:1 D4:1 B3:1 D4:1 G4:1 D4:1 B3:1 D4:1 G4:1 D4:1 " +
+			"D4:1 F#4:1 A4:1 F#4:1 D4:1 F#4:1 A4:1 F#4:1 B3:1 D4:1 G4:1 D4:1 B3:1 D4:1 G4:1 D4:1 " +
+			"C#4:1 E4:1 A4:1 E4:1 C#4:1 E4:1 A4:1 E4:1 D4:1 F#4:1 A4:1 F#4:1 D4:4"},
+	]},
+	# The same land after dark: the day's tune in long notes, quieter than the game's own
+	# night tune (every voice is lower in volume), D major: | D | Bm | G | A | D | G | Em A | D |.
+	"homestead_night": {"bpm": 66, "bars": 8, "tracks": [
+		{"wave": "triangle", "volume": 0.16, "notes":
+			"F#4:4 A4:4 D5:6 R:2 B4:4 G4:4 A4:6 R:2 " +
+			"F#4:4 D5:4 B4:6 R:2 G4:4 E4:4 D4:6 R:2"},
+		{"wave": "triangle", "volume": 0.20, "notes":
+			"D2:8 B1:8 G1:8 A1:8 D2:8 G1:8 E2:4 A1:4 D2:8"},
+		{"wave": "square", "duty": 0.125, "volume": 0.025, "notes":
+			"R:5 A5:1 R:2 R:3 F#5:1 R:4 R:5 D6:1 R:2 R:3 E5:1 R:4 " +
+			"R:5 A5:1 R:2 R:3 B5:1 R:4 R:5 G5:1 R:2 R:3 D5:1 R:4"},
+	]},
 	# Sparse and watchful, A minor: | Am | F | G | Em | Am | F | Dm E | Am |
 	"dungeon": {"bpm": 84, "bars": 8, "tracks": [
 		{"wave": "triangle", "volume": 0.24, "notes":

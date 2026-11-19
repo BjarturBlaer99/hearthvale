@@ -1198,3 +1198,20 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
     the woods' edge or behind an old tree, by the rule the wood in the countryside is held to
     (`Scenery.hiding()`). Why: what blocks his way should be in plain sight, and the plan allows a cell
     to shift when baked. Nothing on the field moved; the counts and the field's 54 are as approved.
+- 2026-11-18 — **The Homestead, step 1c: what the plan left open.**
+  - **An area may name its own night tune** (`AreaController.night_music`); only the homestead does.
+    Why: the request asks for "a quieter track for night" of the farm's own, and every other outdoor
+    place keeps the game's.
+  - **The farmhouse plays the farm's day tune,** at every hour. Why: the village's houses play the
+    village's; a tune that changed at his own door each time would grate.
+  - **Capture shot 96 stays in the village** (the plan moves it to the farm with the plot's shots). Why:
+    it is the picture the plan itself asks for as the "after" of the lane's west end, and it shows the
+    locked cottage; the farmhouse's door has shots of its own (160, 165).
+  - **`tools/play_days.gd` works the clear corner only** and does not clear land: the smallest change
+    that keeps it playing. Teaching it the farm is phase 5's.
+  - **The moved shots keep their names as well as their numbers** (2026-11-19, as the step was
+    finished): 97 is still "home" and 151 "the cottage furnished", though the room is the farmhouse's.
+    Why: the before-pictures in `reports/homestead/before/` pair with them by name.
+  - **"Quieter" is tested as the sum of a tune's track volumes** in the audio tool's `SONGS`: the
+    farm's night tune is under its day tune and under the game's own night tune, and slower than the
+    day's. Nobody has listened to either tune: that is the user's to judge.

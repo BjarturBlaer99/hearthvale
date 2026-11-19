@@ -5,8 +5,8 @@ west of Hearthvale, where he now lives, clears and shapes the land, raises build
 five phases with a stop after each. This is phase 0: the plan, and no code.
 
 **Status: approved as written by the user on 2026-11-17 ("Approve as written"). All thirty decisions
-below (D1 to D30) stand as proposed, and each is recorded in `docs/DECISIONS.md`. No phase is built
-yet.** Every number is a first guess, kept in data, to be measured in phase 5. The tables below are as
+below (D1 to D30) stand as proposed, and each is recorded in `docs/DECISIONS.md`. Phase 1 is built
+(2026-11-19) and waits for the user's review; phases 2 to 5 are not built.** Every number is a first guess, kept in data, to be measured in phase 5. The tables below are as
 approved; where a phase builds something differently, it says so under "What the user has decided" and
 in the log.
 
@@ -30,6 +30,16 @@ which does not exist. The coordinator adds to it after each review.
   after step 3a is not decided: the coordinator asks before phase 3 begins.
 - **CLAUDE.md:** the paragraph R1 was added under "Current goal" on approval. R2 to R19 are added by the
   coordinator as each phase is built and reviewed, in the words below unless the phase built otherwise.
+- **2026-11-19, phase 1 is built** (steps 1a and 1b on 2026-11-18, step 1c finished on 2026-11-19;
+  each is ticked below with what was built differently) **and waits for the user's review.** *(Written
+  by the phase's own subagent, for the coordinator to confirm.)* Every approved decision it touches
+  (D1 to D11, D30) held as written. What the plan left open and the phase chose is in `docs/DECISIONS.md` under the three
+  steps; the ones a later phase will meet:
+  - the land's cells cleared for good are `GameState.homestead()`, through `clear_debris(area, cell)`;
+  - "Clear this first." (`ToolUse.CLEAR_FIRST`) is what every tool of the plot says at a cell with
+    something on it, and `AreaController.debris_at(cell)` is how the area asks;
+  - spawn markers for the land are a second row at the end of the atlas (`LAND_MARKER_KINDS`);
+  - an area may name its own night tune (`night_music`).
 
 ## The short of it
 
@@ -569,8 +579,13 @@ TECH_DESIGN, the roadmap, the README and DECISIONS up to date; CLAUDE.md is the 
   south, or behind an old tree), where the hero could not see what blocked him. Each moved a cell or
   two onto open grass; none on the field moved, and every count is the same. The map as baked is the
   sketch in `tools/greybox/build_maps.gd`.*
-- [ ] 1c. **The rest.** The two tunes, playtest scenarios (`homestead`; `farm` moved), capture shots, and
+- [x] 1c. **The rest.** The two tunes, playtest scenarios (`homestead`; `farm` moved), capture shots, and
   `tools/play_days.gd` kept running (the smallest change, tried for two days at four times speed).
+  *Begun 2026-11-18 and finished 2026-11-19 (the step was stopped partway and picked up again). The
+  farmhouse plays the farm's day tune. Of the twelve shots the plan names, ten moved to the farm; 96
+  stays in the village with 115: it is the "after" of the lane's west end and shows the locked cottage.
+  Nine shots were added (159 to 167). `tools/play_days.gd` played its two days at four times speed with
+  nothing left out (134 seconds): it works the field's clear corner and does not clear land.*
 - **Tests:**
   - *the home move:* in and out of the farmhouse door; sleeping, staying up and collapsing each wake him
     in the farmhouse; the cottage's door is shut at every hour and says its words;

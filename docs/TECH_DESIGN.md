@@ -893,7 +893,7 @@ run headless; see CLAUDE.md for the command and gotchas.
   (`GLASS`: each window tile and where its glass is). It draws a warm pane over each, unshaded so the night
   doesn't dim it, over the walls and under everything that stands in front of them. `_update_light()` lights
   it with the lamps (`DayClock.lamps_lit()`). Only the village has windows to light.
-- **The tune:** `AreaController.tune_now()` is the area's `music`, or `NIGHT_TUNE` when `is_night_outdoors()`.
+- **The tune:** `AreaController.tune_now()` is the area's `music`, or when `is_night_outdoors()` the area's own `night_music` if it names one (only the homestead does, §30) and `NIGHT_TUNE` if not.
   `_play_tune()` asks for it at load and on `time_changed`, but only when it is another than the one it last
   asked for, so a boss's tune is left alone.
 - **Sounds:** `eat` (eating), `collapse` (as he falls), `morning` (a cock-crow: after sleeping, and when he
@@ -955,8 +955,8 @@ run headless; see CLAUDE.md for the command and gotchas.
   two of its own for each crop (growing, ripe); `FarmPlot.crop_frame()` picks one, falling back to the shared
   ones for a crop with none. All are 16 by 16 and drawn flat by the plot, under everyone: a crop never
   blocks, hides or is hidden.
-- **Tools:** `tools/playtest.gd -- farm` starts on the road by the plot with both tools and seeds of every
-  crop; `tools/capture.gd` has the actions `farm`, `hoe`, `fill`, `tools_menu`, `crops` (a plot in the
+- **Tools:** `tools/playtest.gd -- farm` starts on the homestead's road above the field's clear corner
+  with both tools and seeds of every crop; `tools/capture.gd` has the actions `farm`, `hoe`, `fill`, `tools_menu`, `crops` (a plot in the
   middle of a season), `plant` and `seeds_menu`.
 
 ## 21. The shop
@@ -1359,7 +1359,7 @@ in a shop's data, two favours as data, and a tool that plays the game.
 
 ## 30. The Homestead
 The user's request of 2026-11-17 (`docs/progress/homestead-plan.md`, approved as written), in five phases.
-**Phase 1 is built** (2026-11-18): the farm and the home's move.
+**Phase 1 is built** (2026-11-18 and 19): the farm and the home's move.
 - **The area `homestead`** (`world/areas/homestead/homestead.tscn`, "Your farm") is a map of 40 by 30
   cells, baked by `tools/greybox/build_maps.gd` from a sketch with a legend of its own (below). Woods two
   deep stand all round it; the ground is level (height 0 everywhere).
@@ -1442,8 +1442,31 @@ The user's request of 2026-11-17 (`docs/progress/homestead-plan.md`, approved as
 - **A sketch with a legend** (`build_maps.gd`): a map's `"legend"` names the characters that lay a tile
   (`[kind, height]`, a cell each) and every other character leaves the base showing; its `"marks"` name
   the characters that are spawn markers. A sketch without one is read as the Old Quarry's are.
+- **Two tunes** (step 1c), made in code by `tools/audio/make_audio.gd` like the rest: `homestead`
+  (D major, 92 beats a minute: a plain tune over a walking bass and a broken chord) and
+  `homestead_night` (the same tune in long notes at 66, every voice quieter than the game's own night
+  tune).
+  - **An area may name its own night tune:** `AreaController.night_music`. `tune_now()` gives it out of
+    doors after nightfall where the area names one, and the game's `night` everywhere else. Only the
+    homestead names one.
+  - **The farmhouse plays `homestead`** at every hour (indoors keeps no night, as in the village's
+    houses), so the tune doesn't change at his own door by day.
+- **Tools** (step 1c):
+  - `tools/playtest.gd -- homestead` arrives on the farm by the lane with a sword, all three pickaxes,
+    the hoe, the can and seeds; `-- farm` starts on the farm's road above the clear corner.
+  - `tools/capture.gd`: the ten shots that stood at the village's plot (110 to 112, 114, 116 to 119,
+    129, 153) stand at the field's clear corner under their old numbers. 96 (the cottage's door, with
+    the lane's west end) and 115 (the well) are still in the village. Nine new shots, 159 to 167: the
+    farm as he arrives, the farmhouse, the locked cottage's words, the pond, a boulder refusing the
+    plain pickaxe, the overgrown land, the farm at night, weeds cut on the field, and the field with
+    its clear corner. The action `boulder` swings the plain Pickaxe at a boulder (the hero stands
+    beside it: from below, he is two cells tall and hides it).
+  - `tools/play_days.gd` knows that home is the farmhouse (`TOWARD_VILLAGE`: home, then the homestead,
+    then the village) and that the plot is on the homestead (`PLOT_AREA`). It works the cells with
+    nothing standing on them, the clear corner, and fills the can at the pond. It does not clear land.
+    Two days at `days=2 speed=4` played through with nothing left out.
 - **Tests:** `tests/world/homestead_test.gd` (the map and the walk), `tests/world/home_move_test.gd` (the
   doors, waking, the locked cottage, the version 5 save in the world), `tests/world/debris_test.gd` (the
-  overgrowth), `tests/autoload/homestead_save_test.gd`, and `tests/core/homestead/` (`Homestead`,
-  `HomesteadRules`). The suites that worked the village's plot work the
+  overgrowth), `tests/world/homestead_tune_test.gd` (the tunes), `tests/autoload/homestead_save_test.gd`,
+  and `tests/core/homestead/` (`Homestead`, `HomesteadRules`). The suites that worked the village's plot work the
   field's clear corner (`PLOT = Vector2i(22, 17)`).

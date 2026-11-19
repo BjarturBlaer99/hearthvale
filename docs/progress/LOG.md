@@ -2669,3 +2669,49 @@ The second of phase 1's three steps (`docs/progress/homestead-plan.md`).
 - **A swing of the sword cuts everything in its arc,** so weeds that stand side by side fall two or three to a blow. The plan's "about 250 energy for the whole land" is by the blow, and will be an overestimate.
 - **Fibre has no use until phase 3,** and Tilda does not buy it (as planned).
 - **The farm still plays the village's tune,** and the tools still take the plot to be in the village (step 1c).
+
+## 2026-11-19 — The Homestead, phase 1, step 1c: the rest, and the phase as a whole
+
+The last of phase 1's three steps (`docs/progress/homestead-plan.md`). **The phase was stopped a second time and picked up again.** The subagent that built step 1b went on to this step and was stopped partway, with nothing committed and no report. A third read what it left, file by file, against the plan, kept it, checked steps 1a and 1b again (nobody had reported on them), and finished. What was found is under "Picked up" below.
+
+**Built**
+- **Two tunes,** made in code by `tools/audio/make_audio.gd` and baked: `homestead` by day (D major, 92 beats a minute, a plain tune over a walking bass and a broken chord, no drums) and `homestead_night` after dark (the same tune in long notes at 66, every voice quieter than the game's own night tune).
+- **The farm plays them:** its own tune by day, and from 20:00 its own night tune in place of the game's (`AreaController.night_music`, which only the homestead names). The farmhouse plays the day's at every hour. Every other place is as it was.
+- **`tools/playtest.gd`:** a new scenario `homestead` (arriving by the lane with a sword, all three pickaxes, the hoe, the can and seeds; `-- homestead 20:30` for its night), and `farm` starts on the farm's road above the field's clear corner.
+- **`tools/capture.gd`:** the ten shots that stood at the village's plot (110 to 112, 114, 116 to 119, 129, 153) stand at the field's clear corner under their old numbers and names. Nine new shots, 159 to 167: arriving on the farm, the farmhouse and its yard, the old cottage's words, the can at the pond, a boulder refusing the plain Pickaxe, the overgrown land, the farm at night, weeds cut on the field, and the field with its clear corner.
+- **`tools/play_days.gd`** knows that his home is the farmhouse (out of its door is the farm, and the lane leads on to the village) and that the plot is on the homestead. It works the cells with nothing standing on them and fills the can at the pond. It does not clear land.
+
+**Picked up**
+- **Found in the tree, uncommitted:** the two songs in the audio tool with their baked files; the two scenes naming them; the game's list of tunes; a test of the tunes; the playtest scenarios; the capture shots; `tools/play_days.gd`'s changes; and this step's words in the README, the GDD, TECH_DESIGN, the roadmap, DECISIONS and the plan. Nothing was cut off mid-file, and the whole suite passed on the tree as found (977 tests in 130 suites). No log entry had been written.
+- **Kept as found:** all of it. Baking the two tunes again gives the same two files, byte for byte, so the files are the tool's own.
+- **Fixed:** capture shot 163 stood the hero below the boulder, where he is two cells tall and hid it: he stands beside it now. A comment in `tools/playtest.gd` still put his cottage at the west end of the lane (the plan lists it), and three comments in `tools/capture.gd` spoke of the cottage.
+- **Nothing of phase 2 or later was found** in the tree: no build mode, placeables, buildings, hay, animals, wares or favours.
+- **A mistake of this session's, undone:** it started, by its name, a bug-planting script the earlier session had left in the shared scratch folder. It was stopped within a minute. It had left one planted bug in `core/homestead/homestead.gd` (the homestead saved with nothing cleared), which was put back from the commit; the tree's whole diff was compared before and after and is the same.
+
+**Steps 1a and 1b, checked again**
+- **Every test the plan lists for phase 1 exists and is a real one:** the home's move (`tests/world/home_move_test.gd`), the save (`tests/autoload/homestead_save_test.gd`), the map (`tests/world/homestead_test.gd`, `farm_test.gd`) and the overgrowth (`tests/world/debris_test.gd`). Each was read.
+- **The tests that step 1a moved to the farm were read against what they were,** change by change (`git show defc6c2 -- tests/`): twenty-three older suites. **No check was deleted or skipped.** The two walks that 1a loosened were made exact again by 1b. One check is different in kind and stays so: the main quest's words were held to 150 letters and are now laid out in the quest log's own label and held to its room, and to 200 letters (the approved words are longer than 150). A stage a page long fails it (planted, below).
+- **The village's map, cell by cell, against the map before the Homestead:** six cells of the Height layer differ, (0..2, 16..17), the lane's west end, and seven of the Decor layer beside them. No spawn marker moved. The scene lost its `FarmPlot` and gained `WestRoad`, its entry, and the cottage door's hours.
+- **Thirteen bugs planted,** one at a time, each file put back and compared: the farmhouse's door opening onto the village; waking outside the old cottage; the step from version 5 adding no homestead; that step emptying the plot; what the sword clears only cut for today; a cleared rock standing again on the next visit; a boulder's refusal spending a blow's energy; the plain pickaxe breaking a boulder; a quest stage a page long; and, for this step, the farm naming no night tune, the farmhouse playing the village's, an area's own night tune never asked for, and the game not knowing the farm's tunes. **All thirteen were caught.** No gap was found, so no test was added.
+
+**What differs from the plan**
+- **Shot 96 stays in the village,** with 115 (the well): the plan moves it to the farm with the plot's shots, but it is the picture the plan asks for as the "after" of the lane's west end, and it shows the locked cottage.
+- **The moved shots keep their names as well as their numbers:** 97 is still "home" and 151 "the cottage furnished", to pair with the before-pictures.
+- **Nothing else.** Every approved decision the phase touches (D1 to D11, D30) held as written, in all three steps.
+
+**Verified**
+- **977 tests in 130 suites, all passing** (974 in 129 after step 1b). Three are new: the farm's two tunes by day and by night, the farmhouse's tune and every other place as it was, and the night tune the quieter of the two.
+- **The game boots headless** with no script error.
+- **In a window, each for a few seconds:** `tools/playtest.gd -- homestead`, `-- homestead 20:30` and `-- farm` start with no error (about four seconds each).
+- **Two days played by `tools/play_days.gd` at four times speed** (`days=2 speed=4`; 134 seconds). It left nothing out and wrote no fault: from the title's "New game" it walked to the farmhouse, took the tools, tilled, sowed and watered five turnips in the clear corner with the can filled at the pond, went on to the village for the sword, the weaver's shuttle and Tilda's Pickaxe, mined the quarry's first floors, and slept in the farmhouse both nights; on day 2 it watered, waited for Tilda to open, mined to floor 4, made the furnace and lit it. Its log and pictures are in `reports/homestead/phase1/play_days/`.
+- **Seventeen pictures,** taken with `tools/capture.gd` from the finished tree and each looked at, in `reports/homestead/phase1/` (which git ignores): the title; the lane's west end and the cottage's door (96); the locked cottage's words (161); arriving on the farm (159); the farmhouse and its yard (160); inside it (97, 113); the field (110, 167) and its clear corner sown (116); the pond (162); a boulder (163); the overgrown land (164); the farm at night (165); weeds cut (166); the quest log (123); Elder Bram's welcome (124). No debris stands on the road, the path, the clear corner or behind a crown, and no crown covers the door.
+- **The player's own save has the same checksum as before.**
+
+**Known issues and limits, for the phase**
+- **Nobody has played any of phase 1 by hand:** not the walk from the square, the farmhouse, the field, the pond, clearing the land, a night on the farm, or an old save opened in the farmhouse. The tests, the script's two days and the pictures are all there is.
+- **Nobody has listened to the two tunes.** That the night tune is quieter is a sum of volumes in the tool, not an ear's judgement.
+- **A swing of the sword cuts everything in its arc** (shot 166 shows three weeds falling to one blow), so the plan's "about 250 energy for the whole land" is an overestimate.
+- **The script's days were played at four times speed and stop at day 2.** It never clears land, so the 54 overgrown cells of the field are not farmed by it: its days 4, 6 and 8, which sow "the whole plot", will sow the clear corner's 18 cells as before. Eight days at life's speed have not been played since the home moved; the walk to the farm costs each of them a few seconds.
+- **Fibre has no use until phase 3.**
+- **`docs/HOMESTEAD.md`,** an untracked copy of the request, was left as it is.
+- **CLAUDE.md is as it was:** its words for phase 1 (the plan's R2 to R8, R18, R19) are the coordinator's to write, and the phase's report proposes them as built.

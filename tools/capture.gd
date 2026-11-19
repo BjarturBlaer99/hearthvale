@@ -33,8 +33,9 @@ extends SceneTree
 ## recipe taught, a present); "long_log" opens the quest log with eight quests, scrolled;
 ## "new_dishes" opens the item menu with the three dishes that are taught. Crafting: "workbench"
 ## opens the workbench's list with some things within reach and some not; "furnished" shows the
-## cottage with every furnishing made and the furnace burning; "chest" opens the chest's two
-## lists; "furnace_talk" asks the cold furnace what to smelt; "sprinkler" shows the plot the
+## farmhouse with every furnishing made and the furnace burning; "chest" opens the chest's two
+## lists; "furnace_talk" asks the cold furnace what to smelt; "boulder" swings the plain Pickaxe at
+## a boulder of the homestead, which wants a better one; "sprinkler" shows the plot the
 ## morning after two sprinklers were set. "shop_ore" opens Tilda's list of what she buys with
 ## a turnip and a pack from the quarry; "favour:<villager>:<points>" talks to a villager who
 ## has taught her recipe already, so that at three marks she asks her favour.
@@ -148,16 +149,16 @@ const SHOTS: Array = [
 	["107_the_shop_is_shut", &"village", Vector2i(8, 25), Vector2.UP, 0, "shut"],
 	["108_monsters_at_night", &"south_field", Vector2i(12, 12), Vector2.LEFT, 0, "time:22:00"],
 	["109_lit_windows", &"village", Vector2i(12, 16), Vector2.UP, 0, "time:21:30"],
-	["110_the_plot", &"village", Vector2i(15, 17), Vector2.DOWN, 0, ""],
-	["111_soil_tilled_and_watered", &"village", Vector2i(14, 20), Vector2.RIGHT, 0, "farm"],
-	["112_the_hoe_at_work", &"village", Vector2i(14, 19), Vector2.RIGHT, 0, "hoe"],
+	["110_the_plot", &"homestead", Vector2i(25, 16), Vector2.DOWN, 0, ""],
+	["111_soil_tilled_and_watered", &"homestead", Vector2i(24, 19), Vector2.RIGHT, 0, "farm"],
+	["112_the_hoe_at_work", &"homestead", Vector2i(24, 18), Vector2.RIGHT, 0, "hoe"],
 	["113_the_tools_at_home", &"home", Vector2i(6, 6), Vector2.DOWN, 0, ""],
-	["114_tools_on_the_item_bar", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "tools_bar"],
+	["114_tools_on_the_item_bar", &"homestead", Vector2i(25, 16), Vector2.DOWN, 0, "tools_bar"],
 	["115_filling_the_can_at_the_well", &"village", Vector2i(17, 19), Vector2.RIGHT, 0, "fill"],
-	["116_crops_growing_and_ripe", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "crops"],
-	["117_a_ripe_turnip_to_pick", &"village", Vector2i(12, 20), Vector2.UP, 0, "crops"],
-	["118_planting_a_seed", &"village", Vector2i(17, 20), Vector2.UP, 0, "plant"],
-	["119_seeds_on_the_item_bar", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "seeds_bar"],
+	["116_crops_growing_and_ripe", &"homestead", Vector2i(25, 16), Vector2.DOWN, 0, "crops"],
+	["117_a_ripe_turnip_to_pick", &"homestead", Vector2i(22, 19), Vector2.UP, 0, "crops"],
+	["118_planting_a_seed", &"homestead", Vector2i(27, 19), Vector2.UP, 0, "plant"],
+	["119_seeds_on_the_item_bar", &"homestead", Vector2i(25, 16), Vector2.DOWN, 0, "seeds_bar"],
 	["120_tildas_list_to_buy_from", &"shop", Vector2i(5, 4), Vector2.UP, 0, "shop_buy"],
 	["121_selling_the_harvest", &"shop", Vector2i(5, 4), Vector2.UP, 0, "shop_sell"],
 	["122_meals_at_the_hearth", &"home", Vector2i(5, 2), Vector2.UP, 0, "meals"],
@@ -167,7 +168,7 @@ const SHOTS: Array = [
 	["126_the_gate_unchained", &"old_wood", Vector2i(19, 5), Vector2.UP, 0, "flag:keep_gate_open"],
 	["127_the_day_the_warden_fell", &"village", Vector2i(23, 7), Vector2.UP, 0, "flag:keep_warden_beaten"],
 	["128_a_game_begins", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "begin"],
-	["129_a_skill_rises", &"village", Vector2i(14, 19), Vector2.RIGHT, 0, "skill_up"],
+	["129_a_skill_rises", &"homestead", Vector2i(24, 18), Vector2.RIGHT, 0, "skill_up"],
 	["130_skills_in_the_pause_menu", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "skills_pause"],
 	["131_a_good_cooks_dishes", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "cook_menu"],
 	["132_something_to_give", &"village", Vector2i(27, 25), Vector2.UP, 0, "gift_talk"],
@@ -191,13 +192,14 @@ const SHOTS: Array = [
 	["147_quarry_floor_8_dark", &"quarry_8", Vector2i(11, 2), Vector2.DOWN, 0, ""],
 	["148_quarry_floor_8_lantern", &"quarry_8", Vector2i(11, 2), Vector2.DOWN, 0, "lantern"],
 	["149_quarry_floor_9_heart", &"quarry_9", Vector2i(16, 2), Vector2.DOWN, 0, "lantern"],
-	# Crafting (2026-11-17): the workbench's list in the bare cottage; the cottage with all four
+	# Crafting (2026-11-17): the workbench's list in the bare home; the home with all four
 	# furnishings and the furnace burning; the chest's two lists; the plot the morning after two
-	# sprinklers were set; the cold furnace's list; and fallen wood in the Old Wood.
+	# sprinklers were set; the cold furnace's list; and fallen wood in the Old Wood. (The home
+	# is the farmhouse since the Homestead: shot 151 keeps the name it had.)
 	["150_the_workbench_list", &"home", Vector2i(8, 3), Vector2.RIGHT, 0, "workbench"],
 	["151_the_cottage_furnished", &"home", Vector2i(5, 5), Vector2.UP, 0, "furnished"],
 	["152_the_chest_two_lists", &"home", Vector2i(2, 3), Vector2.UP, 0, "chest"],
-	["153_sprinklers_on_the_plot", &"village", Vector2i(15, 17), Vector2.DOWN, 0, "sprinkler"],
+	["153_sprinklers_on_the_plot", &"homestead", Vector2i(25, 16), Vector2.DOWN, 0, "sprinkler"],
 	["154_the_furnace_asks", &"home", Vector2i(6, 3), Vector2.UP, 0, "furnace_talk"],
 	["155_fallen_wood", &"old_wood", Vector2i(24, 8), Vector2.DOWN, 0, ""],
 	# The balance pass (mining and crafting, phase 3): what Tilda buys, and the two favours
@@ -205,10 +207,21 @@ const SHOTS: Array = [
 	["156_tilda_buys_ore_and_bars", &"shop", Vector2i(5, 4), Vector2.UP, 0, "shop_ore"],
 	["157_wenna_asks_for_coal", &"weaver_house", Vector2i(7, 4), Vector2.UP, 0, "favour:wenna:12"],
 	["158_edda_asks_for_iron", &"north_fields", Vector2i(25, 22), Vector2.UP, 0, "favour:shepherd_edda:12"],
-	# The Homestead (2026-11-17), phase 1: the farm as he comes in by the road, and the farmhouse
-	# from its yard.
+	# The Homestead (2026-11-18), phase 1: the farm as he comes in by the road; the farmhouse from
+	# its yard; the old cottage's door tried; the can filled at the pond; the plain pickaxe at a
+	# boulder; the overgrown land west of the house; the farm at night; weeds cut on the field;
+	# and the field with its clear corner. (Shots 110 to 119, 129 and 153, which stood at the
+	# village's plot, stand at the field's clear corner; 96 and 115 are still in the village:
+	# the locked cottage with the lane's west end, and the well.)
 	["159_arriving_on_the_farm", &"homestead", Vector2i(37, 14), Vector2.LEFT, 0, ""],
 	["160_the_farmhouse_and_its_yard", &"homestead", Vector2i(28, 13), Vector2.UP, 0, ""],
+	["161_the_old_cottage_is_locked", &"village", Vector2i(8, 15), Vector2.UP, 0, "try"],
+	["162_filling_the_can_at_the_pond", &"homestead", Vector2i(3, 22), Vector2.RIGHT, 0, "fill"],
+	["163_a_boulder_wants_a_better_pickaxe", &"homestead", Vector2i(13, 7), Vector2.RIGHT, 0, "boulder"],
+	["164_the_overgrown_land", &"homestead", Vector2i(12, 15), Vector2.UP, 0, ""],
+	["165_the_farm_at_night", &"homestead", Vector2i(28, 13), Vector2.DOWN, 0, "time:22:00"],
+	["166_cutting_weeds_on_the_field", &"homestead", Vector2i(27, 18), Vector2.RIGHT, 0, "swing"],
+	["167_the_field_and_its_clear_corner", &"homestead", Vector2i(28, 16), Vector2.DOWN, 0, ""],
 ]
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
@@ -250,7 +263,7 @@ func _capture() -> void:
 		if shot[5] == "tale":
 			game_state.call(&"set_flag", &"keep_warden_beaten", true)
 		if shot[5] in ["furnished", "chest", "furnace_talk"]:
-			# Everything the workbench makes for the cottage, each in its own place.
+			# Everything the workbench makes for the home, each in its own place.
 			for furnishing: String in ["furnace", "chest", "rug", "lamp"]:
 				game_state.call(&"set_flag", StringName("home/%s" % furnishing), true)
 		if shot[5] == "furnished":
@@ -386,6 +399,10 @@ func _capture() -> void:
 					for y: int in 2:
 						game_state.call(&"till_soil", Vector2i(x, y))
 					game_state.call(&"water_soil", Vector2i(x, 0))
+		if shot[5] == "boulder":
+			# The plain Pickaxe in hand, at a boulder that wants the Copper one.
+			game_state.call(&"add_item", &"pickaxe", 1)
+			game_state.call(&"equip", &"pickaxe")
 		if shot[5] == "workbench":
 			# Nine recipes known (Farming and Mining at their second level), six of them within
 			# reach: the list scrolls, and the rest are greyed.
@@ -525,7 +542,7 @@ func _capture() -> void:
 			scene.get(&"hud").get(&"store_menu").call(&"move_cursor", 3)
 			scene.get(&"hud").get(&"store_menu").call(&"confirm")
 			await _frames(2)
-		elif shot[5] in ["hoe", "fill", "plant"]:
+		elif shot[5] in ["hoe", "fill", "plant", "boulder"]:
 			scene.call(&"use_item")
 			await _frames(7)
 		elif shot[5] == "skill_up":

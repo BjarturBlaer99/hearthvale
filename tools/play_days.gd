@@ -21,10 +21,16 @@ const TITLE_SCENE: String = "res://ui/title_screen.tscn"
 const TILE: int = 16
 const KEYS: Dictionary = {Vector2i.LEFT: KEY_A, Vector2i.RIGHT: KEY_D, Vector2i.UP: KEY_W, Vector2i.DOWN: KEY_S}
 const SIDES: Array[Vector2i] = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
-## Each area and the one it is left for on the way to the village.
+## Each area and the one it is left for on the way to the village. (His home is the farmhouse
+## on the homestead since 2026-11-18: out of its door is the farm, and the lane leads on to the
+## village.)
 const TOWARD_VILLAGE: Dictionary = {
-	&"home": &"village", &"shop": &"village", &"weaver_house": &"village", &"north_fields": &"village", &"quarry": &"north_fields",
+	&"home": &"homestead", &"homestead": &"village", &"shop": &"village", &"weaver_house": &"village", &"north_fields": &"village",
+	&"quarry": &"north_fields",
 }
+## Where his plot lies: the field on the homestead. The script works its clear corner and
+## leaves the overgrown cells alone (clearing land is not taught to it yet).
+const PLOT_AREA: StringName = &"homestead"
 ## What he eats when he tires, in this order.
 const FOODS: Array[StringName] = [&"bread", &"shepherds_pie", &"blossom_tea"]
 ## His pickaxes, the best first.
@@ -170,9 +176,10 @@ func _day_1() -> void:
 	for thing: String in ["TurnipSeeds", "Hoe", "WateringCan"]:
 		await _pick_up(thing)
 	_shot("d1_01_tools_taken")
-	await _travel_to(&"village")
+	await _travel_to(PLOT_AREA)
 	await _tend_plot()
 	_shot("d1_02_five_turnips")
+	await _travel_to(&"village")
 	await _pick_up("WoodenSword")
 	# The weaver's shuttle: the game's first coins.
 	_ctx = "quest"
@@ -218,7 +225,7 @@ func _day_3() -> void:
 func _day_4() -> void:
 	_plan("the plot: harvest, sell, sow the whole plot")
 	await _morning_at_home()
-	await _travel_to(&"village")
+	await _travel_to(PLOT_AREA)
 	await _harvest()
 	# The harvest raises his farming: back to the workbench for what that opens (a sprinkler).
 	await _travel_to(&"home")
@@ -245,7 +252,7 @@ func _day_6() -> void:
 	_plan("the plot and the workbench")
 	await _morning_at_home()
 	await _make_things([&"copper_watering_can", &"copper_hoe"])
-	await _travel_to(&"village")
+	await _travel_to(PLOT_AREA)
 	await _harvest()
 	await _shop_for_seeds()
 	await _tend_plot()
@@ -277,7 +284,7 @@ func _day_7() -> void:
 func _day_8() -> void:
 	_plan("the plot, late: harvest, sell everything, sow again")
 	await _morning_at_home()
-	await _travel_to(&"village")
+	await _travel_to(PLOT_AREA)
 	await _harvest()
 	await _shop_for_seeds(true)
 	_shot("d8_everything_sold")
@@ -416,7 +423,7 @@ func _has_furnace() -> bool:
 
 ## Picks every ripe crop, and clears what has withered.
 func _harvest() -> void:
-	if _area_id() != &"village":
+	if _area_id() != PLOT_AREA:
 		return
 	_ctx = "harvest"
 	for cell: Vector2i in _plot_cells():
@@ -433,7 +440,7 @@ func _harvest() -> void:
 
 ## Tills as many cells as he has seeds for, sows them, and waters every crop that is dry.
 func _tend_plot() -> void:
-	if not await _travel_to(&"village"):
+	if not await _travel_to(PLOT_AREA):
 		return
 	_ctx = "farm"
 	var hoe: StringName = _best(HOES)
@@ -504,7 +511,7 @@ func _set_sprinklers(hoe: StringName) -> void:
 			_shot("d%d_sprinkler" % _today)
 
 
-## Fills the can at the nearest water (the well by the plot).
+## Fills the can at the nearest water (the pond in the corner of the farm).
 func _fill_the_can(can: StringName) -> bool:
 	var spots: Array[Vector2i] = []
 	var size: Vector2i = _area().get(&"grid").get(&"size")
@@ -526,11 +533,15 @@ func _fill_the_can(can: StringName) -> bool:
 	return false
 
 
+## The cells of the plot he can work: those with nothing standing on them (the field's clear
+## corner, until the land is cleared).
 func _plot_cells() -> Array[Vector2i]:
 	var plot: Node = _area().get(&"plot")
 	var out: Array[Vector2i] = []
 	if plot != null:
-		out.assign(plot.call(&"cells"))
+		for cell: Vector2i in plot.call(&"cells"):
+			if _area().call(&"debris_at", cell) == null:
+				out.append(cell)
 	return out
 
 
@@ -574,8 +585,8 @@ func _seeds_held() -> Array[StringName]:
 ## empty cell the coins reach (ore and bars he has no use for are sold for it, if the crops
 ## don't pay for it all). On the last day (`all`) the ore, bars and crystals all go.
 func _shop_for_seeds(all: bool = false) -> void:
-	# The plot is in the village: he looks at it there.
-	if not await _travel_to(&"village"):
+	# The plot is on the homestead: he looks at it there.
+	if not await _travel_to(PLOT_AREA):
 		return
 	var empty: int = 0
 	for cell: Vector2i in _plot_cells():

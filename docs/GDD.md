@@ -423,6 +423,8 @@ balance, are planned and not built.)*
   - **A cell with something on it can't be tilled:** "Clear this first."
   - **In all** the land gives 102 fibre, 58 wood and 80 stone. Fibre is a new material; the buildings of
     phase 3 are thatched with it.
+- **It has music of its own:** an easy tune by day, and after dark a quieter one of its own in place of
+  the night tune the rest of the countryside has. The farmhouse plays the day's.
 - **The story's words** say so: the title ("An old farm, a field gone wild, and lights over the old
   keep."), the main quest's first three stages and its last, Elder Bram's welcome and his tale of Sir
   Aldric, whose farm it was. Nothing else in the story changed.

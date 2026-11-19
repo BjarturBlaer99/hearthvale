@@ -276,13 +276,17 @@ three phases with a stop after each:
 At the user's request of 2026-11-17 (`docs/progress/homestead-request.md`; the plan,
 `docs/progress/homestead-plan.md`, approved as written), a farm of the hero's own west of the village, in
 five phases with a stop after each:
-- **Phase 1 — The homestead and the home's move.** *Built 2026-11-18, in three steps.*
+- **Phase 1 — The homestead and the home's move.** *Built 2026-11-18 and 19, in three steps.*
   - **1a, the move:** the lane's west end opened, the farm's map (40 by 30), the farmhouse as the hero's
     home (the same room the cottage was), the old cottage locked, the field of 12 by 6 with the old plot
     as its clear corner, a pond, save version 6, and the story's words.
   - **1b, the overgrowth:** 145 weeds, bushes, logs, stumps, rocks, boulders and great boulders, as data;
     cleared for good by the sword and the pickaxe; fibre; boulders that want a better pickaxe; no tilling
     under any of it.
+  - **1c, the rest:** the farm's two tunes; the playtest scenarios `homestead` and `farm`; the capture
+    shots moved and nine added; `tools/play_days.gd` taught where home and the plot are.
+  - **Not played by a person:** by the tests, and for two days by `tools/play_days.gd` at four times
+    speed. The user reviews before phase 2.
 - **Phase 2 — Placing things.** *Not built.* Build mode and fifteen things to set down.
 - **Phase 3 — Buildings.** *Not built.* A Well, a Silo, a Coop, a Barn and a Shed.
 - **Phase 4 — Animals.** *Not built.* Chickens, sheep and cows.

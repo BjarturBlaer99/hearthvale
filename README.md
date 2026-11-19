@@ -159,6 +159,7 @@ Beaten enemies sometimes drop hearts or coins.
     the Copper Pickaxe and a great boulder the Iron one. Soil can't be tilled until it is cleared.
   - **An older save loads as it was:** a game saved in the old cottage opens in the farmhouse, and its
     soil and crops are in the field's clear corner.
+  - **The farm has its own tune,** and a quieter one after dark.
 - **Willowmere:** a marsh east of the village. Climb the stairs at the south end of the east meadow and
   follow the planks through the gap in the trees. Boardwalks cross the water between its banks and islets;
   cattail root, marsh berries and bog mushrooms grow there, and two of them make Marsh Stew at your hearth.
@@ -218,11 +219,13 @@ quests finished. From there you can keep exploring or save and go back to the ti
 
 To try one part without playing up to it: `godot --path . -s res://tools/playtest.gd -- crypt` (the top of the
 crypt's stairs, equipped as after the keep), `-- shade` (outside the Shade's hall), `-- ending` (one step from
-the ending), `-- warden`, `-- quarry` (the mine's entrance hall with a Pickaxe) or `-- craft` (at home by the
-workbench, with ore, bars and wood for most of its list). Saving in a scenario goes to a slot of its own, so it never replaces your own game.
+the ending), `-- warden`, `-- quarry` (the mine's entrance hall with a Pickaxe), `-- craft` (at home by the
+workbench, with ore, bars and wood for most of its list), `-- homestead` (arriving on your farm with a sword
+and all three pickaxes; add `20:30` for its night) or `-- farm` (on the farm's road above the field, with the
+hoe, the can and seeds). Saving in a scenario goes to a slot of its own, so it never replaces your own game.
 
-To have a script play eight days by pressing real keys (the balance pass's run: the plot, Tilda's counter,
-the quarry, the furnace and the workbench): `godot --path . -s res://tools/play_days.gd -- <folder>`. It
+To have a script play eight days by pressing real keys (the balance pass's run: the field's clear corner,
+Tilda's counter, the quarry, the furnace and the workbench): `godot --path . -s res://tools/play_days.gd -- <folder>`. It
 takes about 35 minutes, uses a save slot of its own, and writes what each day cost and paid to the folder.
 
 Running a playtest with someone new? `docs/progress/H15-playtest.md` says how, and what to write down.
