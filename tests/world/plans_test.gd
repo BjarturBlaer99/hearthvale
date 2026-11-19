@@ -111,6 +111,7 @@ func test_a_plan_bought_is_a_kit_one_of_each_and_never_in_a_chest() -> void:
 	# A kit stays with him: never in a chest, never on the item bar, always on the build bar.
 	GameState.add_item(&"silo_kit")
 	assert_str(GameState.store_put(&"silo_kit")).is_equal(Store.NOT_KEPT_WORDS)
+	assert_bool(Store.can_hold({"id": "kit", "type": Buildings.KIT_TYPE, "stackable": true})).override_failure_message("a kit is kept out by its type, whether it stacks or not").is_false()
 	assert_bool(GameState.storable_stacks().any(func(stack: Dictionary) -> bool: return str(stack["id"]) == "silo_kit")).is_false()
 	assert_bool(GameState.hand_entries().any(func(entry: Dictionary) -> bool: return str(entry["id"]) == "silo_kit")).is_false()
 	assert_that(GameState.equipped).is_equal(&"")
@@ -292,6 +293,9 @@ func test_the_silo_takes_the_hay_he_carries_and_a_full_one_leaves_it_in_the_pack
 	assert_str(farm.buildings.spot(&"silo").prompt()).override_failure_message("a site takes nothing").is_empty()
 	assert_bool(farm.interact()).is_false()
 	assert_int(GameState.item_count(&"hay")).is_equal(14)
+	# Asked of GameState itself, a site takes nothing either.
+	assert_str(GameState.put_hay(&"silo")).is_empty()
+	assert_int(GameState.homestead().hay).is_equal(0)
 	GameState.start_next_day()
 	farm = _farm()
 	_stand(farm, SILO_CORNER + Vector2i(0, 2), Vector2.UP)

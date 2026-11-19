@@ -51,6 +51,10 @@ func test_the_ghost_holds_it_by_its_door_or_the_middle_of_its_bottom_row() -> vo
 	assert_that(Buildings.anchor_of(WELL)).is_equal(Vector2i(1, 1))
 	assert_that(Buildings.origin_at(WELL, Vector2i(5, 5))).is_equal(Vector2i(4, 4))
 	assert_that(Buildings.anchor_of({"size": [6, 4]})).is_equal(Vector2i(3, 3))
+	# A door off the middle: the ghost holds it by its door, not by the middle of its row.
+	var lopsided: Dictionary = {"size": [5, 3], "door": [0, 2], "room": "coop"}
+	assert_that(Buildings.anchor_of(lopsided)).is_equal(Vector2i(0, 2))
+	assert_that(Buildings.origin_at(lopsided, Vector2i(10, 10))).is_equal(Vector2i(10, 8))
 
 
 func test_a_site_fills_every_cell_and_a_building_all_but_its_door() -> void:

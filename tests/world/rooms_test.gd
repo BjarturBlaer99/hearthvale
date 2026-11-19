@@ -233,6 +233,10 @@ func test_the_seven_plans_cost_what_the_plan_says_and_are_known_when_it_says() -
 	# The plan's sum of all seven.
 	assert_dict(totals).is_equal({"wood": 160, "stone": 180, "fibre": 65, "copper_bar": 5, "iron_bar": 6, "gold_bar": 2, "coin": 2380})
 	assert_int(Buildings.animals_of(DataRegistry.get_building(&"coop"))).is_equal(4)
+	# The doors: in the middle of the Coop's and the Shed's bottom row, the Barn's a cell right of it.
+	for door: Array in [[&"coop", Vector2i(2, 2)], [&"shed", Vector2i(2, 2)], [&"barn", Vector2i(3, 3)]]:
+		assert_that(Buildings.door_of(DataRegistry.get_building(door[0]))).override_failure_message(String(door[0])).is_equal(door[1])
+	assert_bool(Buildings.has_door(DataRegistry.get_building(&"well")) or Buildings.has_door(DataRegistry.get_building(&"silo"))).is_false()
 	assert_int(Buildings.animals_of(DataRegistry.get_building(&"barn"))).is_equal(4)
 
 
