@@ -1583,3 +1583,21 @@ On the balance report (`docs/progress/homestead-balance-report.md`) the user cho
 coins (was 250), so a player who saves a little can keep hens in the first ten days; wood stacks to 50
 (was 30), as stone and fibre do, so one stack covers the Coop or the Barn and a pen; the Well keeps its
 copper bar, so the first building stays tied to the quarry.
+
+## 2026-11-19 — Tool polish: the plan approved
+The user approved `docs/progress/tool-polish-plan.md` as written ("Approve as written"): all thirteen
+decisions as recommended. D1 the hero's four work poses (raise, strike, pour, reach); D2 the tool drawn
+in his hands, the floating icon retired; D3 the blow's effects and sound at the blow; D4 the cell's new
+look at the blow too; D5 the stroke bursts, **a bend of "A still world" the user has allowed:** each
+tied to a stroke or a touch, half a second or less, falling to the ground or fading where it is; D6
+rocks, logs and stumps flash and shake on a blow, with chips in the rock's colours and splinters from
+wood; D7 a crop or a product held up, a reach for the Silo; D8 a heart over a petted animal (the one
+effect that rises); D9 mirrored frames drawn in their own place; D10 a site's twine round its outside;
+D11 the Coop's, the Barn's and the Shed's windows lit at night; D12 film shots in `tools/capture.gd`;
+D13 the bow, the furnace, build mode, the plain pickaxe at a boulder and new sounds left out. Built in
+the plan's four steps, each stopping for the user's review.
+- 2026-11-19 — **Tool polish, step 1: what building it decided.** The work poses are made from the
+  hero's own parts (so his hands are where a swing's are, and the held tools take hold there);
+  facing up, the blow, the can and the sprinkler are hidden by him; the sprinkler leaves his hands
+  at the blow; a seed is sown by an empty hand (the seeds are step 2's). See
+  `docs/progress/tool-polish-plan.md`, "Step 1 — built".

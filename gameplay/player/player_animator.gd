@@ -13,13 +13,14 @@ extends RefCounted
 ## - Standing: idle, breathing out every BREATH_EVERY seconds, with a blink every BLINK_EVERY.
 ## - A pose overrides both: ATTACK (a wind-up, the slash, then the follow-through, by
 ##   `attack_progress`), HURT (flinching), HOLD (an item held overhead, always seen from the
-##   front), LAND (knees bent after a hop) or FALLEN (out of hearts).
+##   front), LAND (knees bent after a hop), FALLEN (out of hearts) or WORK (a tool at work: its
+##   `work_pose`, one of raise, strike, pour or reach, which ToolStroke chooses).
 ## It only picks pictures: how fast the hero moves, when a swing hits and how long anything
 ## lasts are the motor's business.
 
 ## Rows of the sheet.
 enum Facing { DOWN, UP, SIDE }
-enum Pose { NONE, ATTACK, HOLD, FALLEN, HURT, LAND }
+enum Pose { NONE, ATTACK, HOLD, FALLEN, HURT, LAND, WORK }
 
 const FRAME_SIZE: Vector2i = Vector2i(16, 32)
 ## Pixels travelled per animation step; six steps make one walk cycle (28 px, as it was when
@@ -51,7 +52,14 @@ const RUN_3: int = 17
 const RUN_4: int = 18
 const RUN_5: int = 19
 const RUN_6: int = 20
-const COLUMNS: int = 21
+## The work poses (tool polish): a tool raised, the blow, the can held out, a reach down.
+const RAISE: int = 21
+const STRIKE: int = 22
+const POUR: int = 23
+const REACH: int = 24
+const COLUMNS: int = 25
+## The work poses by name (ToolStroke.hero_pose()).
+const WORK_COLUMNS: Dictionary = {&"raise": RAISE, &"strike": STRIKE, &"pour": POUR, &"reach": REACH}
 ## Walk order from standing: legs passing first, then a step, so setting off doesn't jump.
 const CYCLE: Array[int] = [WALK_6, WALK_1, WALK_2, WALK_3, WALK_4, WALK_5]
 const RUN_CYCLE: Array[int] = [RUN_6, RUN_1, RUN_2, RUN_3, RUN_4, RUN_5]
@@ -75,6 +83,8 @@ var pose: Pose = Pose.NONE
 ## Whether the hero is sprinting (the run frames) and how far through a swing they are (0-1).
 var sprinting: bool = false
 var attack_progress: float = 0.5
+## Which work pose WORK shows (a key of WORK_COLUMNS).
+var work_pose: StringName = &"raise"
 
 var _step: int = 0
 var _travel: float = 0.0
@@ -119,6 +129,8 @@ func frame() -> int:
 			return HOLD
 		Pose.FALLEN:
 			return FALLEN
+		Pose.WORK:
+			return int(WORK_COLUMNS.get(work_pose, RAISE))
 	if _moving:
 		return RUN_CYCLE[_step] if sprinting else CYCLE[_step]
 	if fmod(_clock, BLINK_EVERY) >= BLINK_EVERY - BLINK_TIME:

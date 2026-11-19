@@ -27,6 +27,9 @@ extends SceneTree
 ## - hurt: the blink frame sunk a pixel: flinching, eyes shut
 ## - run_1 to run_6: the walk cycle leaning into a sprint (side view: the body above the belt a
 ##   pixel forward; front and back: as walking)
+## The work poses (worked(), tool polish): raise (a tool up beside the head), strike (the blow,
+## arms forward and down), pour (the can held out) and reach (a hand down before him, a pixel
+## lower). The tool itself is not in these: the game lays it over them from held_tools.png.
 ## Edit the art here, never the PNG.
 
 const OUT_PATH: String = "res://gameplay/player/player_sheet.png"
@@ -37,10 +40,14 @@ const COLUMNS: Array[String] = [
 	"idle", "blink", "walk_1", "walk_2", "walk_3", "walk_4", "walk_5", "walk_6",
 	"windup", "slash", "follow", "hold", "fallen",
 	"breathe", "hurt", "run_1", "run_2", "run_3", "run_4", "run_5", "run_6",
+	"raise", "strike", "pour", "reach",
 ]
-## How many of COLUMNS are put together from the parts (drawn()); the rest are made from those
-## (derived()).
+## How many of COLUMNS are put together from the parts (drawn()); the eight after them are made
+## from those (derived()), and the last four are the work poses (worked()).
 const DRAWN: int = 13
+## The work poses (tool polish, 2026-11-19), at the end of COLUMNS: the hands are where the
+## held tools of gameplay/art/held_tools.png (tools/art/make_sprites.gd) take hold.
+const WORK: Array[String] = ["raise", "strike", "pour", "reach"]
 ## Where the parts meet: the head's rows, then the body's, then the legs'.
 const HEAD_ROWS: int = 12
 const BODY_ROWS: int = 11
@@ -546,6 +553,12 @@ const EXTRAS: Dictionary = {
 		"up": [[8, 0, "ooo"], [9, 0, "os"], [10, 0, "ovo"], [11, 0, "omo"]],
 		"side": [[11, 12, "ooo"]],
 	},
+	# A tool raised: the hand up beside the head, as for a swing.
+	"raise": {
+		"down": [[8, 13, "ooo"], [9, 14, "so"], [10, 13, "ovo"], [11, 13, "omo"]],
+		"up": [[8, 0, "ooo"], [9, 0, "os"], [10, 0, "ovo"], [11, 0, "omo"]],
+		"side": [[11, 12, "ooo"]],
+	},
 }
 ## What each drawn frame is put together from: [body pose, legs, whether the legs are the other
 ## side's (mirrored from the front and back, the near and far leg swapped from the side),
@@ -562,6 +575,12 @@ const RECIPES: Dictionary = {
 	"windup": ["windup", "lunge", false, false, false],
 	"slash": ["slash", "lunge", false, false, false],
 	"follow": ["follow", "lunge", false, false, false],
+	# The work poses: the sword stays on his back. Raised, then the blow, feet apart; the can
+	# held out before him; and a reach down (made a pixel lower by worked()).
+	"raise": ["windup", "lunge", false, false, true],
+	"strike": ["slash", "lunge", false, false, true],
+	"pour": ["slash", "stand", false, false, true],
+	"reach": ["follow", "stand", false, false, true],
 }
 
 
@@ -571,6 +590,7 @@ func _initialize() -> void:
 	for row: int in ROWS.size():
 		var frames: Array = drawn(ROWS[row])
 		frames.append_array(derived(ROWS[row]))
+		frames.append_array(worked(ROWS[row]))
 		if frames.size() != COLUMNS.size():
 			push_error("tools/art: row '%s' has %d frames, expected %d" % [ROWS[row], frames.size(), COLUMNS.size()])
 			quit(1)
@@ -656,6 +676,16 @@ static func derived(facing: String) -> Array:
 	for step: int in range(1, 7):
 		var walk: Array = frame(facing, "walk_%d" % step)
 		out.append(lean(walk) if facing == "side" else walk)
+	return out
+
+
+## The work poses of `facing`, in COLUMNS order after the derived ones: put together from the
+## parts like the drawn ones; the reach settles a pixel, as a breath does.
+static func worked(facing: String) -> Array:
+	var out: Array = []
+	for column: String in WORK:
+		var rows: Array = frame(facing, column)
+		out.append(sink(rows) if column == "reach" else rows)
 	return out
 
 

@@ -3044,3 +3044,40 @@ collision changes: the frames read the motor's progress, and only when pictures 
 **In a window:** the capture shots, about half a minute; the scratch film script and a probe, a few
 seconds a run, about twenty runs. No Godot process was left running; no save slot but the capture's own
 (994) was touched. No tests were run (no code changed).
+
+## 2026-11-19 — Tool polish, step 1: the hero at work, with the tool in his hands
+
+The user approved the plan as written ("Approve as written": all thirteen decisions). Step 1 is D1,
+D2 and D12: a stroke of a tool no longer plays the sword's swing beside a floating icon.
+- **Four work poses** in `tools/art/make_player_sprite.gd` (`worked()`, columns 21 to 24 of 25):
+  raise, strike, pour and reach, put together from his own parts (the swing's wind-up, slash and
+  follow-through bodies, the reach a pixel lower), the sword on his back in all four.
+- **The tools in his hands:** `gameplay/art/held_tools.png`, painted by `make_sprites.gd`
+  (`HELD`, `held_sprite()`): the hoe, the pickaxe and the can drawn plain and made again in copper
+  and iron, and the sprinkler; 57 frames of 40x56, the fists painted over the handle.
+- **`ToolStroke`** (`core/player/`, pure) chooses the pose by the motor's progress (the blow at
+  0.35); **`HeldTools`** names the frames; **`HeldTool`** (a `Sprite2D` on the hero) draws the tool,
+  mirrored in place, behind him facing up. `PlayerController.work()` is told by the area
+  (`_show_stroke()`), and the animator's `WORK` pose shows the column. The floating `ToolFlash` is
+  kept only for a tool without a picture (none).
+- **Film shots:** `tools/capture.gd -- <dir> film [names]`, sixteen strokes on the homestead.
+
+**Timing:** the motor is untouched; a test steps the hero's stroke beside a bare motor given the
+same stroke and both end on the same frame. The work is still done at the press.
+
+**Verified:** 1150 tests in 151 suites pass, exit 0 (the villager-colour test passed in this run's
+order too). New: `tests/core/player/tool_stroke_test.gd`, `tests/gameplay/held_tools_test.gd`,
+`tests/world/tool_strokes_test.gd`, and a work-poses test in `player_animator_test.gd`; `farm_test`
+and `crops_test` now look for the tool in his hands where they looked for the floating icon.
+
+**In a window:** the sixteen films, twice (about a minute each), each looked at; a first look
+found the tipped can reading as a slab and the sprinkler shown twice (in his hands and on the plot),
+both mended. No save slot was written.
+
+**Known issues and limits**
+- **The cell still changes at the press:** the soil is tilled, wet or sown as the hoe is raised, and
+  the old dust and drops come then too. Step 2 moves both to the blow (D3, D4).
+- **Facing up, the blow, the can and the sprinkler are hidden** behind him.
+- **The hero's reflection in water** shows his work pose without the tool.
+- **From the front the can is a plain box** held at his waist, its spout two pixels below.
+- **CLAUDE.md says "Twenty-one frames a row"**; it is twenty-five now (the coordinator's to edit).

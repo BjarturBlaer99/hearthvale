@@ -64,6 +64,35 @@ extends SceneTree
 ## Farmer Oda at three marks, what each teaches or asks at two already done: "ask" talks to them
 ## as they ask their favour; "done" hands over the six eggs (Tilda), or tells of the coop that
 ## stands since this morning (Oda), and is caught as they give the reward.
+## Film shots (tool polish, 2026-11-19): `-- <output_dir> film [names]` films strokes of work on
+## the homestead instead, each a grid of FILM_PICTURES pictures FILM_EVERY seconds apart, cropped
+## round the hero and enlarged (a stroke of several blows takes a row of pictures a blow). A film
+## is [name, hero cell, facing, what he carries ("hoe", "can", "can_empty", "seed", "sprinkler",
+## "pick", "copper_pick", "sword", "ripe"), what he does ("use", "swing" or "interact"), blows].
+const FILMS: Array = [
+	["hoe_side", Vector2i(24, 18), Vector2.RIGHT, "hoe", "use", 1],
+	["hoe_left", Vector2i(26, 18), Vector2.LEFT, "hoe", "use", 1],
+	["hoe_down", Vector2i(24, 16), Vector2.DOWN, "hoe", "use", 1],
+	["hoe_up", Vector2i(24, 19), Vector2.UP, "hoe", "use", 1],
+	["can_pour_side", Vector2i(24, 18), Vector2.RIGHT, "can", "use", 1],
+	["can_pour_down", Vector2i(24, 16), Vector2.DOWN, "can", "use", 1],
+	["can_pour_up", Vector2i(26, 19), Vector2.UP, "can", "use", 1],
+	["can_fill_pond", Vector2i(3, 22), Vector2.RIGHT, "can_empty", "use", 1],
+	["seed_plant", Vector2i(24, 18), Vector2.RIGHT, "seed", "use", 1],
+	["sprinkler_set", Vector2i(24, 18), Vector2.RIGHT, "sprinkler", "use", 1],
+	["sprinkler_down", Vector2i(24, 16), Vector2.DOWN, "sprinkler", "use", 1],
+	["pick_rock", Vector2i(34, 9), Vector2.RIGHT, "pick", "use", 2],
+	["pick_boulder_copper", Vector2i(13, 7), Vector2.RIGHT, "copper_pick", "use", 3],
+	["sword_log", Vector2i(6, 4), Vector2.RIGHT, "sword", "swing", 3],
+	["sword_stump", Vector2i(25, 2), Vector2.LEFT, "sword", "swing", 3],
+	["harvest", Vector2i(24, 18), Vector2.RIGHT, "ripe", "interact", 1],
+]
+const FILM_PICTURES: int = 12
+const FILM_EVERY: float = 0.04
+## How much of the area round the hero a film's picture shows (px), and how much bigger.
+const FILM_CROP: int = 72
+const FILM_ZOOM: int = 4
+const FILM_COLUMNS: int = 6
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -360,6 +389,10 @@ func _capture() -> void:
 	var out_dir: String = args[0] if args.size() > 0 else "user://captures"
 	DirAccess.make_dir_recursive_absolute(out_dir)
 	var game_state: Node = root.get_node("GameState")
+	if args.size() > 1 and args[1] == "film":
+		await _film(out_dir, args.slice(2))
+		quit()
+		return
 	for shot: Array in SHOTS:
 		# Shot numbers after the folder take only those shots: -- <output_dir> 1 30 71
 		if args.size() > 1 and not args.slice(1).has(str(shot[0]).get_slice("_", 0)):
@@ -1021,6 +1054,95 @@ func _point(mode: Node, cell: Vector2i) -> void:
 	var screen: Vector2 = (mode as Node2D).get_global_transform_with_canvas() * (Vector2(cell * 16) + Vector2(8, 8))
 	root.warp_mouse(screen)
 	mode.call(&"point_at", cell)
+
+
+## The film shots (FILMS), or only those named.
+func _film(out_dir: String, names: PackedStringArray) -> void:
+	var game_state: Node = root.get_node("GameState")
+	for film: Array in FILMS:
+		if not names.is_empty() and not names.has(film[0]):
+			continue
+		game_state.call(&"clear")
+		game_state.call(&"new_game")
+		(game_state.call(&"mine") as RefCounted).set(&"number", 1)
+		game_state.call(&"set_time", NOON)
+		root.get_node("Quests").call(&"refresh")
+		_set_up_film(game_state, str(film[3]))
+		var scene: Node = (load(WorldPaths.scene_for(&"homestead")) as PackedScene).instantiate()
+		root.add_child(scene)
+		var player: Node2D = scene.get(&"player")
+		(player.get(&"motor") as PlayerMotor).place(film[1])
+		player.call(&"face", film[2])
+		# The new hero's camera is the one that shows, whatever was there before.
+		player.get_node("Camera2D").call(&"make_current")
+		await _frames(30)
+		var pictures: Array[Image] = []
+		for blow: int in int(film[5]):
+			match str(film[4]):
+				"use":
+					scene.call(&"use_item")
+				"swing":
+					player.call(&"swing")
+				"interact":
+					scene.call(&"interact")
+			for i: int in FILM_PICTURES:
+				await create_timer(FILM_EVERY).timeout
+				pictures.append(_film_picture(player))
+			await create_timer(0.15).timeout
+		_save_film(pictures, out_dir.path_join("film_%s.png" % film[0]))
+		scene.queue_free()
+		await _frames(3)
+
+
+## What a film's hero carries and the plot he works: the plot's clear corner tilled where he
+## faces it, a ripe turnip for "ripe".
+func _set_up_film(game_state: Node, what: String) -> void:
+	match what:
+		"hoe":
+			game_state.call(&"add_item", &"hoe", 1)
+			game_state.call(&"equip", &"hoe")
+		"pick", "copper_pick":
+			var pick: StringName = &"pickaxe" if what == "pick" else &"copper_pickaxe"
+			game_state.call(&"add_item", pick, 1)
+			game_state.call(&"equip", pick)
+		"sword":
+			game_state.call(&"add_item", &"wooden_sword", 1)
+			game_state.call(&"set_flag", &"took_wooden_sword", true)
+		_:
+			for item: Array in [[&"hoe", 1], [&"watering_can", 1], [&"turnip_seeds", 3], [&"sprinkler", 1]]:
+				game_state.call(&"add_item", item[0], item[1])
+			if what == "can":
+				game_state.call(&"add_item", &"water", 5)
+			for cell: Vector2i in [Vector2i(3, 1), Vector2i(2, 0), Vector2i(2, 1), Vector2i(4, 1), Vector2i(4, 2)]:
+				game_state.call(&"till_soil", cell)
+			if what == "ripe":
+				(game_state.call(&"farm") as Farm).load_saved({"cells": {"3,1": {"watered": true, "crop": "turnip", "stage": 3}}})
+				root.get_node("EventBus").emit_signal(&"farm_changed")
+			var equip: Dictionary = {"can": &"watering_can", "can_empty": &"watering_can", "seed": &"turnip_seeds", "sprinkler": &"sprinkler", "ripe": &"hoe"}
+			game_state.call(&"equip", equip[what])
+
+
+## The picture on screen round the hero, enlarged FILM_ZOOM times.
+func _film_picture(player: Node2D) -> Image:
+	var image: Image = root.get_texture().get_image()
+	var scale: int = maxi(1, image.get_width() / 640)
+	var size: int = FILM_CROP * scale
+	var corner: Vector2i = Vector2i(player.get_global_transform_with_canvas().origin * scale) - Vector2i(size / 2, size * 5 / 8)
+	corner.x = clampi(corner.x, 0, image.get_width() - size)
+	corner.y = clampi(corner.y, 0, image.get_height() - size)
+	var part: Image = image.get_region(Rect2i(corner, Vector2i(size, size)))
+	part.resize(FILM_CROP * FILM_ZOOM, FILM_CROP * FILM_ZOOM, Image.INTERPOLATE_NEAREST)
+	part.convert(Image.FORMAT_RGBA8)
+	return part
+
+
+func _save_film(pictures: Array[Image], path: String) -> void:
+	var side: int = FILM_CROP * FILM_ZOOM
+	var grid: Image = Image.create(FILM_COLUMNS * (side + 4), ceili(pictures.size() / float(FILM_COLUMNS)) * (side + 4), false, Image.FORMAT_RGBA8)
+	grid.fill(Color(0.1, 0.1, 0.1))
+	for i: int in pictures.size():
+		grid.blit_rect(pictures[i], Rect2i(Vector2i.ZERO, Vector2i(side, side)), Vector2i((i % FILM_COLUMNS) * (side + 4), (i / FILM_COLUMNS) * (side + 4)))
+	print("tools/capture: %s (%s)" % [path, error_string(grid.save_png(path))])
 
 
 func _save(out_dir: String, shot_name: String) -> void:

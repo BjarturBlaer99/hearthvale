@@ -73,7 +73,8 @@ func test_a_seed_is_planted_from_the_item_button_in_tilled_soil() -> void:
 	assert_int(GameState.health).is_equal(hearts)
 	assert_array(_heard).contains([&"plant"])
 	assert_bool(farm.player.motor.is_attacking()).override_failure_message("it takes a moment").is_true()
-	assert_that(_flashes(farm)[0].icon).is_equal(&"turnip_seeds")
+	assert_that(farm.player.work_stroke()).override_failure_message("sown by hand").is_equal(ToolStroke.SOW)
+	assert_array(_flashes(farm)).override_failure_message("no seed bag floats over the cell").is_empty()
 	# Not twice in one cell, not in bare soil, not off the plot: none of it costs a seed.
 	_rest(farm)
 	_heard.clear()

@@ -4,7 +4,8 @@ extends CharacterBody2D
 ## takes hits, and draws the sprite (docs/TECH_DESIGN.md §4). Position comes from the motor,
 ## not from physics. The HurtBox child is where the hero can be hit; the Sword child is the
 ## swing's HitBox. PlayerAnimator picks the sprite's frame: walking, blinking, swinging the
-## sword, holding up an item just taken (hold_up), or fallen.
+## sword, working with a tool (work(): the tool in his hands is the HeldTool child), holding up
+## an item just taken (hold_up), or fallen.
 
 const HOP_TIME: float = 0.22
 const HOP_HEIGHT: float = 4.0
@@ -42,6 +43,11 @@ var _falling: bool = false
 var _fall_left: float = 0.0
 var _fall_time: float = 1.0
 var _lying: bool = false
+## The stroke of work under way (ToolStroke's kind; "" for a swing or none) and its item.
+var _work_stroke: StringName = &""
+var _work_item: StringName = &""
+## Made in _ready(), so a hero who is never put in a scene leaves nothing behind.
+var _held: HeldTool
 
 @onready var hurt_box: HurtBox = $HurtBox
 @onready var sword: Sword = $Sword
@@ -51,6 +57,8 @@ var _lying: bool = false
 
 
 func _ready() -> void:
+	_held = HeldTool.new()
+	add_child(_held)
 	hurt_box.hit_taken.connect(_on_hit_taken)
 	EventBus.shake.connect(shake)
 
@@ -116,11 +124,33 @@ func swing() -> bool:
 	var energy: EnergyRules = GameState.energy_rules()
 	if not motor.attack(direction, float(stats["cooldown"]) * energy.cooldown_factor(GameState.energy)):
 		return false
+	_work_stroke = &""
 	GameState.spend_energy(GameState.energy_cost(EnergyRules.SWING))
 	sword.swing(Vector2(direction), stats, ItemIcons.name_for(StringName(str(weapon.get("id", "")))))
 	EventBus.sound.emit(&"sword")
 	sync_from_motor()
 	return true
+
+
+## Shows the stroke the motor has just begun as work of `kind` (a ToolStroke kind) with
+## `item_id` in his hands, in place of a swing: the area calls it once the motor's attack has
+## started. For show only: how long it lasts is the motor's.
+func work(item_id: StringName, kind: StringName) -> void:
+	if motor == null or not motor.is_attacking():
+		return
+	_work_item = item_id
+	_work_stroke = kind
+	sync_from_motor()
+
+
+## The kind of stroke of work under way (ToolStroke), or "" (a swing, or none).
+func work_stroke() -> StringName:
+	return _work_stroke
+
+
+## The tool in his hands (shown only while he works).
+func held_tool() -> HeldTool:
+	return _held
 
 
 ## Moves the node to the motor's position and redraws (after anything outside the
@@ -292,6 +322,9 @@ func _update_visuals() -> void:
 	_animator.update(motor.facing, moved)
 	if motor.state_name == PlayerMotor.DEAD or _lying:
 		_animator.pose = PlayerAnimator.Pose.FALLEN
+	elif motor.is_attacking() and _work_stroke != &"":
+		_animator.pose = PlayerAnimator.Pose.WORK
+		_animator.work_pose = ToolStroke.hero_pose(ToolStroke.pose(_work_stroke, (motor.state as PlayerAttackState).progress()))
 	elif motor.is_attacking():
 		_animator.pose = PlayerAnimator.Pose.ATTACK
 		_animator.attack_progress = (motor.state as PlayerAttackState).progress()
@@ -314,6 +347,26 @@ func _update_visuals() -> void:
 	_sprite.modulate = HURT_TINT if motor.state_name == PlayerMotor.HURT else Color.WHITE
 	var blinking: bool = motor.is_invincible() and motor.state_name != PlayerMotor.DEAD
 	_sprite.visible = not blinking or fmod(motor.invincible_left, BLINK_PERIOD) < BLINK_PERIOD / 2.0
+	_update_held()
+
+
+## The tool in his hands: shown while a stroke of work lasts, in the pose ToolStroke gives, under
+## the hero when he faces up and over him otherwise. A stroke over, the work is forgotten.
+func _update_held() -> void:
+	if not motor.is_attacking():
+		_work_stroke = &""
+		_work_item = &""
+	var frame: int = -1
+	if _work_stroke != &"" and _animator.pose == PlayerAnimator.Pose.WORK and not _falling:
+		var progress: float = (motor.state as PlayerAttackState).progress()
+		if ToolStroke.holds(_work_stroke, progress):
+			frame = HeldTools.frame_of(_work_item, HeldTools.FACINGS[int(_animator.facing)], ToolStroke.pose(_work_stroke, progress))
+	if _held == null:
+		return
+	_held.show_frame(frame, _animator.shows_flipped())
+	var behind: bool = _animator.facing == PlayerAnimator.Facing.UP
+	if behind != (_held.get_index() < _sprite.get_index()):
+		move_child(_held, _sprite.get_index() if behind else -1)
 
 
 ## Shows everything `times` bigger than life: 1 outdoors, 2 in houses and dungeons, whose rooms

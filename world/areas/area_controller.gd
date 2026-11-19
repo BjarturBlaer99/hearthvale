@@ -544,7 +544,7 @@ func _swing_pick(item: Dictionary) -> bool:
 	if not player.motor.attack(player.facing_direction(), ToolUse.time_of(item)):
 		return false
 	GameState.spend_energy(GameState.energy_cost(EnergyRules.MINE))
-	ToolFlash.spawn(interactables, rock.position, ItemIcons.name_for(StringName(str(item.get("id", "")))), ToolUse.time_of(item))
+	_show_stroke(item, ToolStroke.PICK, rock.position)
 	if rock.strike(ToolUse.fewer_blows(item)):
 		_on_rock_broken(rock)
 	else:
@@ -1272,9 +1272,19 @@ func _use_tool(item: Dictionary) -> bool:
 			GameState.add_item(held, -1)
 			EventBus.sound.emit(&"plant")
 			Burst.spawn(interactables, GridBody.cell_center(front), &"dust", 0.6)
-	ToolFlash.spawn(interactables, Vector2(front) * GridBody.TILE, ItemIcons.name_for(StringName(str(item.get("id", "")))), ToolUse.time_of(item))
+	_show_stroke(item, ToolStroke.of_use(use["does"]), Vector2(front) * GridBody.TILE)
 	player.sync_from_motor()
 	return true
+
+
+## Shows the stroke of `item` that has just begun (for show only): the hero works it with the
+## tool in his hands, in the stroke's poses. A tool with no picture in his hands floats over the
+## cell (`at`, its corner) as before; a seed is sown by hand.
+func _show_stroke(item: Dictionary, kind: StringName, at: Vector2) -> void:
+	var item_id: StringName = StringName(str(item.get("id", "")))
+	player.work(item_id, kind)
+	if not HeldTools.has_item(item_id) and kind != ToolStroke.SOW:
+		ToolFlash.spawn(interactables, at, ItemIcons.name_for(item_id), ToolUse.time_of(item))
 
 
 ## The cells one use of the hoe or the can `item` works for `what` (ToolUse.TILL or WATER):

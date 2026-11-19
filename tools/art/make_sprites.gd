@@ -3995,12 +3995,373 @@ const SPRITES: Dictionary = {
 }
 
 
+## The tools in the hero's hands (tool polish, 2026-11-19), painted to
+## gameplay/art/held_tools.png by held_sprite(): each frame is 40x56 with the hero's feet at
+## (20, 40), drawn over (or, facing up, under) his work poses of tools/art/make_player_sprite.gd,
+## whose hands are where these take hold (the fists are painted here, over the handle). A frame
+## is "<item>_<facing>_<pose>", given here as a block and the corner it is laid at. The plain
+## tools are drawn; their copper and iron ones are made by swapping the head's colours (METALS).
+## HeldTools (gameplay/art/) names the same frames in the same order, and a test checks.
+const HELD: Dictionary = {
+	"size": Vector2i(40, 56),
+	"palette": {
+		"w": Color(0.84, 0.66, 0.42), "W": Color(0.62, 0.45, 0.25), "b": Color(0.45, 0.28, 0.14),
+		"h": Color(0.76, 0.79, 0.84), "H": Color(0.48, 0.50, 0.62),
+		"c": Color(0.93, 0.52, 0.20), "C": Color(0.74, 0.36, 0.14),
+		"i": Color(0.93, 0.91, 0.85), "I": Color(0.76, 0.79, 0.84),
+		"s": Color(0.97, 0.80, 0.64), "S": Color(0.83, 0.61, 0.47),
+		"m": Color(0.76, 0.79, 0.84), "O": Color(0.93, 0.52, 0.20), "Q": Color(0.74, 0.36, 0.14),
+	},
+	## The tools made in three metals, and the head's colours of each made one.
+	"metalled": ["hoe", "pickaxe", "watering_can"],
+	"metals": {"copper": {"h": "c", "H": "C"}, "iron": {"h": "i", "H": "I"}},
+	"blocks": {
+		"hoe_down_raise": [Vector2i(23, 0), [
+			".ooooo.",
+			"ohhhhho",
+			"ohhhhHo",
+			".oHHHo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..obbo.",
+			".ossbo.",
+			".osSo..",
+			"..oo...",
+		]],
+		"hoe_down_strike": [Vector2i(18, 26), [
+			".oo.....",
+			"osso....",
+			"osSo....",
+			"obbo....",
+			"owWo....",
+			".owWo...",
+			".owWo...",
+			".owWo...",
+			".owWo...",
+			".owWo...",
+			".owWo...",
+			".owWo...",
+			"..owWo..",
+			"..owWo..",
+			"..owWo..",
+			"..owWo..",
+			"..owWo..",
+			"...owWo.",
+			"...owWo.",
+			".ooowWo.",
+			"ohhhhhho",
+			"ohhhhhHo",
+			".oHHHHo.",
+			"..oooo..",
+		]],
+		"hoe_up_raise": [Vector2i(10, 0), [
+			".ooooo.",
+			"ohhhhho",
+			"ohhhhHo",
+			".oHHHo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..owWo.",
+			"..obbo.",
+			".ossbo.",
+			".osSo..",
+			"..oo...",
+		]],
+		"hoe_up_strike": [Vector2i(0, 0), [
+			".",
+		]],
+		"hoe_side_raise": [Vector2i(24, 4), [
+			"........oo..",
+			".......ohho.",
+			"......owhhHo",
+			"......owhHHo",
+			".....owWhHHo",
+			".....owWoHHo",
+			"....owWo.oo.",
+			"....owWo....",
+			"....owWo....",
+			"...owWo.....",
+			"...owWo.....",
+			"...owWo.....",
+			"..owWo......",
+			"..owWo......",
+			".obbo.......",
+			"ossbo.......",
+			"osSo........",
+			".oo.........",
+		]],
+		"hoe_side_strike": [Vector2i(2, 22), [
+			"...........oo.",
+			"..........osso",
+			"..........osSo",
+			".........obbo.",
+			".........owWo.",
+			"........owWo..",
+			".......owWo...",
+			"......owWo....",
+			"......owWo....",
+			".....owWo.....",
+			"....owWo......",
+			"...owWo.......",
+			".ooowWo.......",
+			"ohhhWo........",
+			"ohhHo.........",
+			"ohHHo.........",
+			".oHHo.........",
+			"..oo..........",
+		]],
+		"pickaxe_down_raise": [Vector2i(20, 1), [
+			"..ooooooooo..",
+			".ohhhhhhhhho.",
+			"ohhhhhhhhhhHo",
+			"oHooooooooHHo",
+			".o...owWo.oo.",
+			".....owWo....",
+			".....owWo....",
+			".....owWo....",
+			".....owWo....",
+			".....owWo....",
+			".....owWo....",
+			".....owWo....",
+			".....owWo....",
+			".....owWo....",
+			".....obbo....",
+			"....ossbo....",
+			"....osSo.....",
+			".....oo......",
+		]],
+		"pickaxe_down_strike": [Vector2i(16, 26), [
+			"...oo........",
+			"..osso.......",
+			"..osSo.......",
+			"..obbo.......",
+			"..owWo.......",
+			"...owWo......",
+			"...owWo......",
+			"...owWo......",
+			"...owWo......",
+			"...owWo......",
+			"...owWo......",
+			"....owWo.....",
+			"....owWo.....",
+			"....owWo.....",
+			"....owWo.....",
+			"....owWo.....",
+			"....owWo.....",
+			".....owWo....",
+			".o...owWo.oo.",
+			"oHoooowWooHHo",
+			"ohhhhhhhhhhHo",
+			".ohhhhhhhhHo.",
+			"..ooooooooo..",
+		]],
+		"pickaxe_up_raise": [Vector2i(7, 1), [
+			"..ooooooooo..",
+			".ohhhhhhhhho.",
+			"ohhhhhhhhhhHo",
+			"oHooooooooHHo",
+			".o...owWo.oo.",
+			".....owWo....",
+			".....owWo....",
+			".....owWo....",
+			".....owWo....",
+			".....owWo....",
+			".....owWo....",
+			".....owWo....",
+			".....owWo....",
+			".....owWo....",
+			".....obbo....",
+			"....ossbo....",
+			"....osSo.....",
+			".....oo......",
+		]],
+		"pickaxe_up_strike": [Vector2i(0, 0), [
+			".",
+		]],
+		"pickaxe_side_raise": [Vector2i(24, 1), [
+			"....o.......",
+			"...oho......",
+			"...oHho.....",
+			"....ohho....",
+			"....oHHhoo..",
+			".....ooHhho.",
+			"......owHho.",
+			".....owWoHho",
+			".....owWooHo",
+			"....owWo..o.",
+			"....owWo....",
+			"....owWo....",
+			"...owWo.....",
+			"...owWo.....",
+			"...owWo.....",
+			"..owWo......",
+			"..owWo......",
+			".obbo.......",
+			"ossbo.......",
+			"osSo........",
+			".oo.........",
+		]],
+		"pickaxe_side_strike": [Vector2i(2, 22), [
+			"...........oo.",
+			"..........osso",
+			"..........osSo",
+			".........obbo.",
+			".........owWo.",
+			"........owWo..",
+			".......owWo...",
+			".......owWo...",
+			".o....owWo....",
+			"oho..owWo.....",
+			"oHhoowWo......",
+			".oHhowWo......",
+			"..oHhWo.......",
+			"...oHho.......",
+			"....oHho......",
+			".....oHho.....",
+			"......oHo.....",
+			".......o......",
+		]],
+		"watering_can_down_pour": [Vector2i(14, 26), [
+			"....oo.....",
+			"..oossooo..",
+			".ohhsShhho.",
+			"ohhhhhhhhHo",
+			"ohhhhhhhhHo",
+			"ohhhhhhhhHo",
+			"ohhhhhhhhHo",
+			"oHHHHHHHHHo",
+			".ooohHoooo.",
+			"...ohHo....",
+			"...oHHo....",
+			"....oo.....",
+		]],
+		"watering_can_down_dip": [Vector2i(9, 26), [
+			"....oo.......",
+			"..oossooo....",
+			".ohhsShhho...",
+			"ohhhhhhhhHoo.",
+			"ohhhhhhhhHhho",
+			"ohhhhhhhhHHho",
+			"ohhhhhhhhHoo.",
+			"oHHHHHHHHHo..",
+			".ooooooooo...",
+		]],
+		"watering_can_up_pour": [Vector2i(0, 0), [
+			".",
+		]],
+		"watering_can_up_dip": [Vector2i(0, 0), [
+			".",
+		]],
+		"watering_can_side_pour": [Vector2i(1, 19), [
+			".....ooooooo...",
+			"....ohhhhhhhoo.",
+			"....ohhhhhhhHHo",
+			"....ohhhhhhHsso",
+			"....ohhhhhhHsSo",
+			"...ohhhhhhhHHHo",
+			"..ohHhhhhhhHoo.",
+			".ohHohhhhhhHo..",
+			"ohHoohHHHHHHo..",
+			"oHHo.ooooooo...",
+			".oo............",
+		]],
+		"watering_can_side_dip": [Vector2i(0, 25), [
+			".............oo.",
+			"......ooooooosso",
+			".oo..ohhhhhhhsSo",
+			"ohho.ohhhhhhhHo.",
+			"hhhhoohhhhhhHoHo",
+			"HHhhhohhhhhhHoHo",
+			"oohHhhhhhhhhHoHo",
+			"..oHhhhhhhhhHHHo",
+			"...ooohhhhhhHoo.",
+			".....ohhhhhhHo..",
+			".....ohHHHHHHo..",
+			"......ooooooo...",
+		]],
+		"sprinkler_down_reach": [Vector2i(11, 26), [
+			"..oo....",
+			".ossoo..",
+			".osSooo.",
+			".oommoo.",
+			"ooOQQOoo",
+			".ooOOoo.",
+			"..ohHo..",
+			"..ohHo..",
+			".oohhoo.",
+			"oohhhHoo",
+			".oooooo.",
+		]],
+		"sprinkler_up_reach": [Vector2i(0, 0), [
+			".",
+		]],
+		"sprinkler_side_reach": [Vector2i(4, 23), [
+			"..oooo......",
+			".oooooo.....",
+			".oommoo..oo.",
+			"ooOQQOooosso",
+			".ooOOoo.osSo",
+			"..ohHo...oo.",
+			"..ohHo......",
+			".oohhoo.....",
+			"oohhhHoo....",
+			".oooooo.....",
+		]],
+	},
+}
+
 func _initialize() -> void:
 	DirAccess.make_dir_recursive_absolute(OUT_DIR)
 	var failed: bool = false
 	for sprite_name: String in SPRITES:
 		failed = _paint(sprite_name, SPRITES[sprite_name]) != OK or failed
+	failed = _paint("held_tools", held_sprite()) != OK or failed
 	quit(1 if failed else 0)
+
+
+## The held tools as a sprite like those of SPRITES: every block laid on a frame of HELD's size,
+## and the copper and iron ones made from the plain ones by swapping the head's colours.
+static func held_sprite() -> Dictionary:
+	var size: Vector2i = HELD["size"]
+	var frames: Dictionary = {}
+	for frame_name: String in HELD["blocks"]:
+		var at: Vector2i = HELD["blocks"][frame_name][0]
+		var rows: Array = []
+		for y: int in size.y:
+			rows.append(".".repeat(size.x))
+		var block: Array = HELD["blocks"][frame_name][1]
+		for y: int in block.size():
+			var line: String = rows[at.y + y]
+			var text: String = block[y]
+			for x: int in text.length():
+				if text[x] != ".":
+					line = line.substr(0, at.x + x) + text[x] + line.substr(at.x + x + 1)
+			rows[at.y + y] = line
+		frames[frame_name] = rows
+	var made: Dictionary = {}
+	for metal: String in HELD["metals"]:
+		for base: String in HELD["metalled"]:
+			for frame_name: String in HELD["blocks"]:
+				if frame_name.begins_with(base + "_"):
+					made["%s_%s" % [metal, frame_name]] = [frame_name, "swap", HELD["metals"][metal]]
+	return {"size": size, "palette": HELD["palette"], "frames": frames, "made": made}
 
 
 ## Every frame of `sprite` by name, in the order they are painted: the drawn ones, then the

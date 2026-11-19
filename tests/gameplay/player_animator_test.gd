@@ -180,7 +180,7 @@ func test_the_made_frames_come_from_the_drawn_ones() -> void:
 	for facing: String in constants["ROWS"]:
 		var drawn: Array = tool.call(&"drawn", facing)
 		var made: Array = tool.call(&"derived", facing)
-		assert_int(drawn.size() + made.size()).is_equal(columns.size())
+		assert_int(drawn.size() + made.size() + (tool.call(&"worked", facing) as Array).size()).is_equal(columns.size())
 		var idle: Array = drawn[PlayerAnimator.IDLE]
 		var breathe: Array = made[PlayerAnimator.BREATHE - drawn.size()]
 		assert_int(breathe.size()).is_equal(H)
@@ -302,3 +302,32 @@ func test_the_columns_are_the_ones_the_tool_paints() -> void:
 						soles += 1 if y == H - 1 else 0
 			assert_int(painted).override_failure_message("row %d column %d is painted" % [row, column]).is_greater(40)
 			assert_int(soles).override_failure_message("row %d column %d stands on the frame's last row" % [row, column]).is_greater(0)
+
+
+func test_the_work_poses_are_the_last_four_columns_and_keep_the_sword_on_his_back() -> void:
+	var tool: GDScript = load(TOOL)
+	var constants: Dictionary = tool.get_script_constant_map()
+	var columns: Array = constants["COLUMNS"]
+	for pose: StringName in PlayerAnimator.WORK_COLUMNS:
+		assert_int(columns.find(String(pose))).override_failure_message(String(pose)).is_equal(int(PlayerAnimator.WORK_COLUMNS[pose]))
+	assert_int(PlayerAnimator.REACH).override_failure_message("the last column").is_equal(PlayerAnimator.COLUMNS - 1)
+	for facing: String in constants["ROWS"]:
+		var worked: Array = tool.call(&"worked", facing)
+		assert_int(worked.size()).is_equal(4)
+		var idle: Array = tool.call(&"frame", facing, "idle")
+		var reach: Array = worked[3]
+		assert_that(reach[3]).override_failure_message("%s: a reach is a pixel lower" % facing).is_equal(tool.call(&"frame", facing, "follow")[2])
+		for frame: Array in worked:
+			assert_int(frame.size()).is_equal(H)
+		# The hilt over his shoulder (from the side the hood hides it): as idle, not as a swing.
+		for mark: Array in (constants["HILTS"] as Dictionary)[facing]:
+			if int(mark[0]) < 8:
+				continue
+			assert_str(str(worked[1][mark[0]])[mark[1]]).override_failure_message("%s strike: the sword stays on his back" % facing).is_equal(str(idle[mark[0]])[mark[1]])
+	_anim.update(Vector2.LEFT, 0.0)
+	_anim.pose = PlayerAnimator.Pose.WORK
+	_anim.work_pose = &"strike"
+	assert_that(_anim.region()).is_equal(Rect2(PlayerAnimator.STRIKE * W, 2 * H, W, H))
+	_anim.work_pose = &"reach"
+	assert_int(_anim.frame()).is_equal(PlayerAnimator.REACH)
+	assert_int(_anim.bob()).is_equal(0)

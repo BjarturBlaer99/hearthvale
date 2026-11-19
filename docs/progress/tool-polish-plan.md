@@ -2,8 +2,8 @@
 
 The user's words, 2026-11-19: "now polish the graphics and all animations when using tools".
 
-This is phase 0: what is there today, what I propose, the decisions for the user, and the steps. Nothing
-is built until the user has approved it. Each step then ends with all tests passing, new logic tested,
+This is phase 0: what is there today, what I propose, the decisions for the user, and the steps.
+**Approved as written by the user on 2026-11-19** (all thirteen decisions as recommended). Each step then ends with all tests passing, new logic tested,
 the work committed, and before-and-after pictures for the user to review.
 
 **The before-pictures** are outside the repo, in the session group's notes folder
@@ -227,3 +227,19 @@ both ways, before and after; a site; the farm at night with its buildings.
 
 After the last step: the coordinator is told what `CLAUDE.md` should say (the poses, the held tools,
 the blow, the bend of "A still world" as approved), since `CLAUDE.md` is the coordinator's to edit.
+
+## Step 1 — built (2026-11-19)
+
+The hero's four work poses (`make_player_sprite.gd`, columns 21 to 24, from his own parts), the
+tools in his hands (`held_tools.png`, 57 frames: the hoe, the pickaxe and the can in three metals and
+the sprinkler), `ToolStroke`, `HeldTools`, `HeldTool`, the animator's `WORK` pose, and film shots in
+`tools/capture.gd` (`-- <dir> film [names]`). What was decided in building it:
+- **The poses are made from his existing parts:** raise is the swing's wind-up body, strike and
+  pour the slash's, reach the follow-through's a pixel lower, so his hands are where the swing's
+  are and the held tools take hold there (the fists are painted in the tool's picture).
+- **From behind, the blow and the can are hidden by him** (he is two cells tall and the cell he
+  works is behind his back): the hoe and the pickaxe show raised over his head, then nothing; the
+  can and the sprinkler show nothing.
+- **The sprinkler leaves his hands at the blow**, so it is never shown twice (in his hands and on
+  the plot); until step 2 it is on the plot from the press.
+- **A seed is sown by hand:** the reach, with nothing in it (the seeds that fall are step 2's).

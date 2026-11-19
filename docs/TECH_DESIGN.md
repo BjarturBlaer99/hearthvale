@@ -145,6 +145,21 @@ res://
   it when the hero picks up an item, opens a chest or takes a heart container. It's for show only: moving or
   swinging ends it at once.
 
+  **Work** (tool polish, 2026-11-19): a stroke of a tool, a seed or the sprinkler is the motor's attack
+  state as before (it stands him still for the tool's time), but the area tells the hero what it is
+  (`PlayerController.work(item_id, kind)`), and he shows it in place of the sword's swing:
+  - `ToolStroke` (`core/player/`, pure) says, by the motor's progress, which pose (the hoe and the
+    pickaxe raised until `BLOW`, 0.35 of the stroke, then struck; the can tipped, or dipped to fill; a
+    seed and the sprinkler reached down), and whether the tool is still in his hands (the sprinkler
+    leaves them at the blow).
+  - The animator's `WORK` pose shows one of four columns: raise, strike, pour, reach.
+  - The tool is a `HeldTool` (a `Sprite2D` child of the hero, made in `_ready()`): a frame of
+    `HeldTools.SHEET` (`gameplay/art/held_tools.png`), laid from his feet, mirrored with him in place,
+    behind him when he faces up. Facing up, the blow and the can are hidden by him.
+  - For show only: the work is done when the stroke begins, as it always was, and its length is the
+    tool's. A swing, a shot or a hit ends the work pose. `ToolFlash` is left for a tool with no
+    picture in his hands (none now).
+
   The motor's state machine has one script per state:
   - `ground`: walks at `WALK_SPEED`, or `SPRINT_SPEED` while sprinting, times `speed_scale` (the controller
     sets both from the energy rules, §17)
@@ -628,7 +643,7 @@ run headless; see CLAUDE.md for the command and gotchas.
 ## 14. Sprites
 - **Every actor is pixel art painted in code**, like the hero. The art lives as ASCII in `tools/art/`:
   - `make_player_sprite.gd`: the hero, brown-haired with his blue hood down, a blue tunic with a gold hem and a
-    red scarf. Three rows (down, up, side; right is the side row mirrored) of twenty-one 16x32 frames.
+    red scarf. Three rows (down, up, side; right is the side row mirrored) of twenty-five 16x32 frames (twenty-one until the tool polish added four work poses).
     - **He is put together from parts** (P1e), so every frame of a facing has the same head and clothes:
       `HEADS` (rows 0-11), `BODIES` (a pose, rows 12-22) and legs (`LEGS_FRONT`, `LEGS_SIDE`, rows 23-31), joined
       by `frame()` as `RECIPES` says. The second half of the walk is the first on the other foot: the legs
@@ -644,6 +659,14 @@ run headless; see CLAUDE.md for the command and gotchas.
     small pack behind.
   - `make_sprites.gd`: everything else, namely slime, bat, goblin archer, the Iron Warden, the Crypt Shade,
     villagers, items and pickups, the crystal switch, the torch, the training dummy and brambles
+    - and the tools in his hands (`HELD`, painted by `held_sprite()` to `held_tools.png`): 40x56
+      frames with his feet at (20, 40), each a block laid at a corner and named
+      `<item>_<facing>_<pose>`, the fists painted over the handle where his work poses' hands are.
+      The copper and iron tools are made from the plain ones by swapping the head's colours.
+      `HeldTools` names them in the same order (a test checks).
+  - The hero's work poses (`worked()` in `make_player_sprite.gd`) are columns 21 to 24, put together
+    from his parts like the rest: raise (the swing's wind-up body), strike and pour (the slash's), and
+    reach (the follow-through's, a pixel lower), all with the sword on his back.
 
   Each sprite becomes `gameplay/art/<name>.png`. Its frames sit side by side in the order the tool lists them, and
   below them the same frames as white silhouettes for hit flashes. Edit the art in the tool, never the PNGs.
