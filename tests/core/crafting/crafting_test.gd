@@ -161,7 +161,7 @@ func test_the_games_recipes_load_clean() -> void:
 	var rules: Dictionary = DataRegistry.get_rules(DataRegistry.RULES_CRAFTING)
 	assert_int(int(rules["furnace_most"])).is_equal(5)
 	assert_int(int(rules["chest_slots"])).is_equal(24)
-	assert_array(rules["furnishings"]).is_equal(["furnace", "chest", "rug", "lamp"])
+	assert_array(rules["furnishings"]).override_failure_message("the wool blanket since the Homestead's phase 4").is_equal(["furnace", "chest", "rug", "lamp", "blanket"])
 
 
 func test_recipes_that_cant_be_used_say_why() -> void:

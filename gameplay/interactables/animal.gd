@@ -28,8 +28,10 @@ const PET_PROMPT: String = "Pet the %s"
 const TAKE_PROMPT: String = "Take the %s"
 ## How far from where it stands it can be reached (px).
 const REACH: float = 12.0
-## The bubble over its head: what it has ready, or that it is hungry.
-const BUBBLE: Color = Color(0.98, 0.96, 0.90, 0.92)
+## Where the top of its head is, above where it stands (px): what it has ready shows over it.
+const HEAD_TOP: Dictionary = {&"chicken": -10, &"sheep": -14, &"cow": -16}
+## The bubble over the head of one that went hungry this morning.
+const BUBBLE: Color = Color(0.98, 0.96, 0.90, 0.80)
 const BUBBLE_EDGE: Color = Color(0.25, 0.20, 0.22, 0.9)
 
 ## Its place in the herd (GameState.homestead().animal(index)).
@@ -116,17 +118,20 @@ func frame() -> StringName:
 func _draw() -> void:
 	SoftShadow.draw(self, Vector2.ZERO, SHADOW.get(kind_id, Vector2(6, 2)))
 	var mirrored: bool = motion != null and motion.facing_x > 0.0
-	var top: float = -14.0
 	if kind_id == &"chicken":
 		_draw_frame(HENS, int(Critter.FRAMES[frame()]), Critter.SIZE, Vector2(-8, -14), mirrored)
 	else:
 		_draw_frame(SHEET, int(FRAMES.get(frame(), 0)), SIZE, Vector2(-12, -18), mirrored)
-		top = -18.0
+	# Over its head: what it has ready, or that it went hungry.
+	var head: float = float(HEAD_TOP.get(kind_id, -14))
 	if has_ready():
-		_draw_bubble(Vector2(0, top - 3))
-		ItemIcons.draw(self, ItemIcons.name_for(Herd.gives(kind())), Vector2(-8, top - 19))
+		# On a soft round badge, so it reads as something to take and not as a thing lying there.
+		var middle: Vector2 = Vector2(0, head - 10)
+		draw_circle(middle, 9.5, BUBBLE_EDGE)
+		draw_circle(middle, 8.5, BUBBLE)
+		ItemIcons.draw(self, ItemIcons.name_for(Herd.gives(kind())), middle - Vector2(8, 8))
 	elif is_hungry():
-		_draw_bubble(Vector2(0, top - 3), true)
+		_draw_hungry(Vector2(0, head - 2))
 
 
 ## Draws a frame with its top-left at `origin`, mirrored in place with `mirrored` (as PlacedArt
@@ -140,13 +145,11 @@ func _draw_frame(texture: Texture2D, frame_index: int, size: Vector2i, origin: V
 		draw_texture_rect_region(texture, Rect2(origin.round(), Vector2(size)), source)
 
 
-## A small round bubble whose foot is at `foot`: for what is ready (the icon is drawn over it), or
-## with three dots for a hungry animal.
-func _draw_bubble(foot: Vector2, hungry: bool = false) -> void:
-	var box: Rect2 = Rect2(foot + Vector2(-9, -18), Vector2(18, 16)) if not hungry else Rect2(foot + Vector2(-6, -9), Vector2(12, 7))
+## A small bubble with three dots whose foot is at `foot`: a hungry animal.
+func _draw_hungry(foot: Vector2) -> void:
+	var box: Rect2 = Rect2(foot + Vector2(-6, -9), Vector2(12, 7))
 	draw_rect(box.grow(1), BUBBLE_EDGE)
 	draw_rect(box, BUBBLE)
 	draw_rect(Rect2(foot + Vector2(-1, -2), Vector2(2, 2)), BUBBLE)
-	if hungry:
-		for x: int in [-3, 0, 3]:
-			draw_rect(Rect2(foot + Vector2(x - 0.5, -6), Vector2(1, 1)), BUBBLE_EDGE)
+	for x: int in [-3, 0, 3]:
+		draw_rect(Rect2(foot + Vector2(x - 0.5, -6), Vector2(1, 1)), BUBBLE_EDGE)

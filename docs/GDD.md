@@ -323,8 +323,7 @@ under thatch, red clay tiles or blue slate, with smoking chimneys, and a stone c
   on his back, and his hood worn down so his hair shows *(P1; today the hood is up)*.
 
 ## 13. Out of scope (unless asked)
-Multiplayer, procedural generation, 3D, voice acting, swimming, climbing, seasons, weather, livestock of your
-own, crafting beyond cooking, the workbench and the furnace (§14), placing furniture by hand indoors (out of doors on the homestead things are set down by hand: §15), fishing, an inventory limit, an open world, new areas
+Multiplayer, procedural generation, 3D, voice acting, swimming, climbing, seasons, weather, crafting beyond cooking, the workbench and the furnace (§14), placing furniture by hand indoors (out of doors on the homestead things are set down by hand: §15), fishing, an inventory limit, an open world, new areas
 beyond the hero's homestead (§15: the farm and the farmhouse's inside; the user asked for it on 2026-11-17).
 
 ## 14. Mining and crafting *(2026-11-17)*
@@ -396,8 +395,8 @@ beyond the hero's homestead (§15: the farm and the farmhouse's inside; the user
   and reached its top level on the second day); floors 4 to 6 have two coal rocks each, not four.
 
 ## 15. The Homestead *(2026-11-17; `docs/progress/homestead-plan.md`)*
-*(Built: phase 1, the farm and the home's move, phase 2, placing things, and phase 3, buildings. Phases 4
-and 5, animals and the balance, are planned and not built.)*
+*(Built: phase 1, the farm and the home's move, phase 2, placing things, phase 3, buildings, and phase 4,
+animals. Phase 5, the balance, is planned and not built.)*
 - **The farm** is an old farmstead on the road west of Hearthvale, left to the hero: the lane through the
   village runs on through the west woods and comes in at the farm's east edge. It is a map of its own, 40
   by 30 cells, with woods all round.
@@ -446,7 +445,7 @@ and 5, animals and the balance, are planned and not built.)*
   - **Never on** trees, water or the house; the road, the path to the door or the way out; a
     doorstep; the field; anything that still wants clearing; and, for a standing thing, the cell he
     stands in.
-  - **A fence blocks.** A gate lets the hero through (and will keep animals in). A path is walked on.
+  - **A fence blocks.** A gate lets the hero through and keeps animals in (phase 4). A path is walked on.
     He walks before a fence and behind it.
 - **Buildings** *(phase 3)*: five, one of each, bought as plans at the workbench's "Build" tab with
   materials and coins, and set down in build mode.
@@ -462,7 +461,8 @@ and 5, animals and the balance, are planned and not built.)*
     site that day, and **the building stands the next morning,** with a word and a sound.
   - **A plan refused says what is short** ("You are short of 40 Stone, 10 Wood and 80 Coins.").
   - **The Coop, the Barn and the Shed have rooms** of their own, entered by their doors; coming out, he
-    is before the door, wherever the building stands. The rooms stand empty until the animals come.
+    is before the door, wherever the building stands. The Coop's and the Barn's are where the animals
+    live.
   - **The Shed** takes two more chests and a second furnace, made at the workbench once it stands (at
     the farmhouse's own costs), each in its own place; each furnace takes one load a night.
   - **The Big Coop** (20 wood, 10 fibre, 2 iron bars, 350 coins) **and the Big Barn** (30 wood, 30
@@ -477,6 +477,33 @@ and 5, animals and the balance, are planned and not built.)*
   - **A building looks of a piece with the farmhouse:** the village's own house tiles, a house's shadow
     and a ridge he walks behind.
   - **What is set down:** fifteen things, each taking one cell.
+- **Animals** *(phase 4)*: chickens, sheep and cows, bought from Farmer Oda.
+  | Animal | Lives in | At Oda's | Gives | Fed and petted | Tilda pays | Grass it eats |
+  |---|---|---|---|---|---|---|
+  | Chicken | the Coop | 60 coins | an egg | every morning | 8 | 4 cells |
+  | Sheep | the Barn | 180 coins | wool | every third morning | 40 | 6 cells |
+  | Cow | the Barn | 240 coins | milk | every second morning | 30 | 8 cells |
+  - **Farmer Oda's stall** stands beside her by her field. "Have you any animals to sell?" opens her
+    list. An animal is refused without its building standing on the farm, or with the building full (4,
+    or 8 in the big one; sheep and cows share the barn); bought, it is in its building.
+  - **Each morning each animal is fed,** in turn: by the grass of its building's pasture while there is
+    enough, else by a hay from the silo; else it goes hungry that day, and shows it.
+  - **A pasture** is the grass the animals can reach from their building's door without crossing a
+    fence, a gate, a hedge or anything that stands. Ground that runs on to the road is no pasture. A
+    path, a floor or a flower bed, and the field, are walked over and not grazed.
+  - **Fed and petted the day before, it comes a whole morning nearer** its egg, fleece or pail; fed and
+    not petted, half a morning; hungry, none. A product waiting stops the next. Nothing dies or runs
+    off.
+  - **By day (06:00 to 20:00)** the animals of a building with a pasture are out in it; the rest stay in
+    their room. **By night** all are in. They wander, block nobody and never use a door.
+  - **One right click pets an animal,** with its cluck, bleat or low, **and takes what it has ready**
+    (it shows over its head). With a full pack the product waits. Each product taken is a point of
+    Farming.
+  - **What the products are for:** eaten raw (an egg 6 energy, milk 18), given as gifts, sold to Tilda,
+    cooked at the hearth (all known from the start: a Fried Egg, one egg, 20 energy; an Omelette, two
+    eggs and a mushroom, 50 energy and half a heart; a Custard, an egg and milk, 65 energy and a heart),
+    and woven at the workbench: Cloth (2 wool, which Tilda buys for 100) and a Wool Blanket (2 cloth),
+    which lies on the bed, for show.
 
     | Thing | Lies or stands | From | Cost |
     |---|---|---|---|

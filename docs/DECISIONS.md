@@ -1529,3 +1529,19 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   - **`tools/playtest.gd -- animals`:** the Coop and the Barn west of the farmhouse, each with a fenced
     pasture and a gate, the Silo east with hay, four hens, two sheep and two cows. A scenario may name
     `pens`, `animals`, `ready` and `hay`.
+- 2026-11-19 — **The Homestead, step 4c (into the rest): what the plan left open.** The products' prices,
+  the three dishes and cloth are the plan's table as written, and Farming's point for a product taken is
+  D30's.
+  - **The three dishes are cooking recipes known from the start** (`data/recipes/`, no `taught`): the
+    hearth lists ten dishes now. Their names in the list follow the old rule of an item's own name
+    ("Omelette (2 Egg, 1 Mushrooms)", as "Carrot Cake (2 Carrot, 1 Wheat)" was).
+  - **Cloth and the Wool Blanket are on the workbench's "Make" tab,** after the lamp: cloth known once
+    wool is found, the blanket once cloth is found, as every recipe there waits on what it needs.
+  - **The Wool Blanket is a furnishing of the farmhouse** (`home/blanket`), a `Furnishing` node that lies
+    over the bed's own cell (1, 3), not solid (the bed fills the cell), with no prompt: the bed is still
+    the bed. One, like every furnishing. Nothing in the room moved.
+  - **Cloth stacks to 30, as wool does;** the dishes to 10, as every dish.
+  - **"Farming gains a point for each product taken"** is the deed `tend` (1 point), counted when an
+    egg, a fleece or a pail goes into the pack; petting with nothing to take, or with no room, is none.
+  - **Tilda's four new lines are her `buys`,** after the bars; the egg and the milk are the first food on
+    that list (what she buys was all material until now).

@@ -1,0 +1,7 @@
+{
+	"id": "fried_egg",
+	"makes": { "item": "fried_egg", "count": 1 },
+	"needs": [
+		{ "item": "egg", "count": 1 }
+	]
+}

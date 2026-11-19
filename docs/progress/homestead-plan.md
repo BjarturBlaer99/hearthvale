@@ -725,8 +725,12 @@ TECH_DESIGN, the roadmap, the README and DECISIONS up to date; CLAUDE.md is the 
   day, its room's floor by night), so it blocks nobody and never passes a gate; build mode holds the
   animals still. What one has ready shows over its head; a hungry one shows it too. The hen is the
   village's chicken; the sheep and the cow are a new sheet.*
-- [ ] 4c. **Into the rest.** The products, the three dishes, Tilda's prices, cloth and the blanket,
+- [x] 4c. **Into the rest.** The products, the three dishes, Tilda's prices, cloth and the blanket,
   Farming's points.
+  *Built 2026-11-19, with the table's dishes, prices and cloth, and D30's point a product. The dishes
+  are known from the start; cloth and the blanket are on the workbench's "Make" tab, known once their
+  makings are found; the blanket is a furnishing of the farmhouse that lies over the bed. Capture shots
+  192 to 203.*
 - **Tests:**
   - *needs and production:* each row of the morning's table; a product waits and stops the next; pasture
     before hay before hunger; a full building; a bigger one holds eight;

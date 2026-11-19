@@ -85,6 +85,10 @@
     { "id": "shed_kit", "name": "Shed Kit", "type": "kit", "icon": "kit", "stats": { "building": "shed" } },
     { "id": "egg", "name": "Egg", "type": "food", "icon": "egg", "stackable": true, "max_stack": 30, "stats": { "energy": 6 } },
     { "id": "wool", "name": "Wool", "type": "material", "icon": "wool", "stackable": true, "max_stack": 30 },
-    { "id": "milk", "name": "Milk", "type": "food", "icon": "milk", "stackable": true, "max_stack": 30, "stats": { "energy": 18 } }
+    { "id": "milk", "name": "Milk", "type": "food", "icon": "milk", "stackable": true, "max_stack": 30, "stats": { "energy": 18 } },
+    { "id": "cloth", "name": "Cloth", "type": "material", "icon": "cloth", "stackable": true, "max_stack": 30 },
+    { "id": "fried_egg", "name": "Fried Egg", "type": "food", "icon": "fried_egg", "stackable": true, "max_stack": 10, "stats": { "energy": 20 } },
+    { "id": "omelette", "name": "Omelette", "type": "food", "icon": "omelette", "stackable": true, "max_stack": 10, "stats": { "energy": 50, "hearts": 0.5 } },
+    { "id": "custard", "name": "Custard", "type": "food", "icon": "custard", "stackable": true, "max_stack": 10, "stats": { "energy": 65, "hearts": 1 } }
   ]
 }

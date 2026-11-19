@@ -71,6 +71,11 @@ func test_tilda_buys_ore_bars_and_crystals_at_her_own_prices_after_the_crops() -
 		{"item": "copper_bar", "price": 8},
 		{"item": "iron_bar", "price": 12},
 		{"item": "gold_bar", "price": 25},
+		# And what the animals give, and cloth (the Homestead, phase 4).
+		{"item": "egg", "price": 8},
+		{"item": "milk", "price": 30},
+		{"item": "wool", "price": 40},
+		{"item": "cloth", "price": 100},
 	])
 	var pack: Array = [{"id": &"gold_bar", "count": 1}, {"id": &"coal", "count": 9}, {"id": &"copper_ore", "count": 12}, {"id": &"stone", "count": 30},
 		{"id": &"wood", "count": 4}, {"id": &"turnip", "count": 2}, {"id": &"crystal", "count": 3}, {"id": &"iron_bar", "count": 2},
@@ -87,8 +92,10 @@ func test_tilda_buys_ore_bars_and_crystals_at_her_own_prices_after_the_crops() -
 	])
 	assert_array(Shop.offers(_tilda, _crops, [{"id": &"stone", "count": 50}, {"id": &"wood", "count": 30}, {"id": &"coal", "count": 30}])).override_failure_message("stone, wood and coal are not bought").is_empty()
 	assert_array(Shop.offers(_tilda, _crops, [{"id": &"iron_ore", "count": 0}])).override_failure_message("no ore he hasn't got").is_empty()
-	# Everything she buys is a material.
+	# Everything she buys is a material, but the egg and the milk, which are food.
 	for bought: Dictionary in Shop.bought_things(_tilda):
+		if bought["item"] in ["egg", "milk"]:
+			continue
 		assert_str(str(DataRegistry.get_item(StringName(str(bought["item"])))["type"])).override_failure_message(str(bought["item"])).is_equal("material")
 	# Three ore and a coal make a bar: smelting never loses coins.
 	var price: Dictionary = {}

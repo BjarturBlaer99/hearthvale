@@ -52,6 +52,9 @@ func test_everything_on_the_list_is_made_from_what_the_mine_and_the_fields_give(
 	assert_int(GameState.skill_level(Skills.FARMING)).is_equal(2)
 	var home: AreaController = _load(HOME)
 	var all: Array = _ids(Crafting.of_tab(Crafting.of_station(DataRegistry.entries(&"crafting"), Crafting.WORKBENCH), Crafting.TAB_MAKE))
+	# Cloth and the wool blanket are woven from what the animals give (the Homestead, phase 4:
+	# tests/world/animal_products_test.gd): known once wool is found, so not here.
+	all = all.filter(func(id: String) -> bool: return not id in ["cloth", "wool_blanket"])
 	assert_int(all.size()).is_equal(13)
 
 	# Day 1. Stone and ore make the furnace; nothing of metal can be made before it has burned.
@@ -106,6 +109,8 @@ func test_everything_on_the_list_is_made_from_what_the_mine_and_the_fields_give(
 	all.sort()
 	assert_array(made).is_equal(all)
 	for furnishing: String in GameState.crafting_rules()["furnishings"]:
+		if furnishing == "blanket":
+			continue
 		assert_bool(GameState.is_furnished(StringName(furnishing))).override_failure_message(furnishing).is_true()
 		assert_bool((home.interactables.get_node(NodePath(furnishing.capitalize())) as Furnishing).is_there()).override_failure_message("%s stands in the cottage" % furnishing).is_true()
 	# What he holds at the end: the best of each tool, and the things made to be used.
@@ -148,6 +153,9 @@ func test_all_that_the_list_is_made_of_comes_from_the_mine_the_fields_or_the_ben
 			given[String((child as ItemPickup).item_id)] = "lying at home"
 	for lying: String in ["cherry_blossom", "lantern"]:
 		given[lying] = "lying in the world"
+	# ...and what the animals give (the Homestead, phase 4).
+	for kind: Dictionary in DataRegistry.entries(&"animals"):
+		given[str(kind["gives"])] = "the %s" % kind["id"]
 	for raw: String in ["stone", "copper_ore", "coal", "iron_ore", "gold_ore", "crystal", "wood", "wheat", "hoe", "watering_can", "pickaxe"]:
 		assert_bool(given.has(raw)).override_failure_message("%s is given by the world" % raw).is_true()
 	# What the bench and the furnace make.

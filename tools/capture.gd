@@ -52,6 +52,14 @@ extends SceneTree
 ## pulled down with a full stack of wood: half its materials back, what doesn't fit at his feet),
 ## "b:moved" (the Shed moved west, the hero just out of its door) and "b:big" (the Big Coop and
 ## the Big Barn); "b:room" shows a room bare and "b:shed" the shed furnished, its furnace burning.
+## The Homestead's animals (phase 4), "a:<what>", each on the farm of ANIMALS (a coop and a barn
+## west of the farmhouse with fenced pastures, the silo east of it, four hens, two sheep and two
+## cows, one of each with its product ready): "a:farm" the animals out by day; "a:night" the same
+## after dark (in their rooms); "a:oda" Oda's list, a hen just bought; "a:sheep" the hero facing a
+## sheep with wool to give; "a:silo" hay put in the silo; "a:hearth" the hearth's list with the
+## makings of the three dishes; "a:dishes" the item menu with the three; "a:tilda" Tilda's list of
+## what she buys, with the products and cloth; "a:blanket" the wool blanket on the bed;
+## "a:weave" the workbench's "Make" tab with wool to weave.
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -265,6 +273,19 @@ const SHOTS: Array = [
 	["189_the_big_coop_and_the_big_barn", &"homestead", Vector2i(28, 13), Vector2.DOWN, 0, "b:big"],
 	["190_the_shed_moved_and_its_door", &"homestead", Vector2i(15, 18), Vector2.DOWN, 0, "b:moved"],
 	["191_a_demolition_and_its_refund", &"homestead", Vector2i(30, 13), Vector2.RIGHT, 0, "b:demolish"],
+	# The Homestead's animals (phase 4).
+	["192_odas_list", &"village", Vector2i(15, 32), Vector2.UP, 0, "a:oda"],
+	["193_hens_in_their_pasture", &"homestead", Vector2i(16, 15), Vector2.UP, 0, "a:farm"],
+	["194_sheep_and_cows_in_theirs", &"homestead", Vector2i(12, 16), Vector2.LEFT, 0, "a:farm"],
+	["195_inside_the_coop_at_night", &"coop", Vector2i(5, 6), Vector2.UP, 0, "a:night"],
+	["196_inside_the_barn_at_night", &"barn", Vector2i(5, 6), Vector2.UP, 0, "a:night"],
+	["197_a_sheep_with_wool_to_give", &"homestead", Vector2i(6, 13), Vector2.RIGHT, 0, "a:sheep"],
+	["198_the_silo_takes_hay_for_the_herd", &"homestead", Vector2i(35, 11), Vector2.RIGHT, 0, "a:silo"],
+	["199_the_hearth_and_the_three_dishes", &"home", Vector2i(5, 2), Vector2.UP, 0, "a:hearth"],
+	["200_the_three_dishes", &"home", Vector2i(5, 5), Vector2.UP, 0, "a:dishes"],
+	["201_tildas_list_of_what_she_buys", &"shop", Vector2i(5, 4), Vector2.UP, 0, "a:tilda"],
+	["202_the_wool_blanket_on_the_bed", &"home", Vector2i(2, 3), Vector2.LEFT, 0, "a:blanket"],
+	["203_cloth_at_the_workbench", &"home", Vector2i(8, 3), Vector2.RIGHT, 0, "a:weave"],
 ]
 ## What a build shot carries: enough of each thing for a yard, in the order of the build bar.
 const BUILD_STOCK: Array = [[&"fence", 30], [&"gate", 3], [&"dirt_path", 12], [&"stone_path", 20], [&"wood_path", 12],
@@ -303,6 +324,16 @@ const SAPLINGS: Array = [
 const BUILT: Dictionary = {&"coop": Vector2i(3, 12), &"silo": Vector2i(34, 10), &"barn": Vector2i(8, 7),
 	&"shed": Vector2i(16, 7), &"well": Vector2i(21, 11)}
 const BUILT_CLEARED: Array = [Rect2i(29, 8, 9, 6), Rect2i(3, 6, 23, 8), Rect2i(3, 14, 17, 6)]
+## The farm of the "a:" shots: where each building stands, the ground cleared for them, each
+## pasture (its ground, and the gate in its fence), the herd in the order bought, and which of
+## them has its product ready (the same farm as tools/playtest.gd -- animals).
+const ANIMALS: Dictionary = {
+	"standing": {&"coop": Vector2i(14, 7), &"barn": Vector2i(4, 7), &"silo": Vector2i(36, 10)},
+	"cleared": [Rect2i(29, 8, 9, 6), Rect2i(2, 6, 18, 11), Rect2i(20, 16, 18, 1)],
+	"pens": [[Rect2i(13, 10, 6, 4), Vector2i(16, 14)], [Rect2i(3, 11, 8, 5), Vector2i(7, 16)]],
+	"herd": [&"chicken", &"chicken", &"chicken", &"chicken", &"sheep", &"sheep", &"cow", &"cow"],
+	"ready": [0, 2, 4, 6],
+}
 ## Where "b:moved" moves the Shed.
 const SHED_MOVED: Vector2i = Vector2i(13, 15)
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
@@ -390,6 +421,8 @@ func _capture() -> void:
 			continue
 		if str(shot[5]).begins_with("b:"):
 			_set_up_buildings(game_state, str(shot[5]))
+		if str(shot[5]).begins_with("a:"):
+			_set_up_animals(game_state, str(shot[5]))
 		var scene: Node = (load(WorldPaths.scene_for(shot[1])) as PackedScene).instantiate()
 		root.add_child(scene)
 		var player: Node = scene.get(&"player")
@@ -657,6 +690,8 @@ func _capture() -> void:
 			await _frames(3)
 		elif str(shot[5]).begins_with("b:"):
 			await _act_on_buildings(scene, str(shot[5]))
+		elif str(shot[5]).begins_with("a:"):
+			await _act_on_animals(scene, str(shot[5]))
 		elif shot[5] == "place_tab":
 			# The "Place" tab, the cursor on the fence and one made, so the line that says so shows.
 			scene.call(&"open_craft")
@@ -840,6 +875,104 @@ func _act_on_buildings(scene: Node, action: String) -> void:
 		await _frames(3)
 	else:
 		await _frames(2)
+
+
+## What an "a:" shot needs before its area loads: the farm of ANIMALS, its herd and what each
+## has ready, the hour, and what he carries.
+func _set_up_animals(game_state: Node, action: String) -> void:
+	for patch: Rect2i in ANIMALS["cleared"]:
+		for x: int in range(patch.position.x, patch.end.x):
+			for y: int in range(patch.position.y, patch.end.y):
+				game_state.call(&"clear_debris", &"homestead", Vector2i(x, y))
+	var standing: Dictionary = ANIMALS["standing"]
+	for building: StringName in standing:
+		var kit: StringName = StringName("%s_kit" % building)
+		game_state.call(&"add_item", kit, 1)
+		game_state.call(&"set_down_kit", &"homestead", standing[building], kit)
+	game_state.call(&"start_next_day")
+	game_state.set(&"morning_news", PackedStringArray())
+	var homestead: RefCounted = game_state.call(&"homestead")
+	for pen: Array in ANIMALS["pens"]:
+		var ground: Rect2i = pen[0]
+		var ring: Rect2i = ground.grow(1)
+		for x: int in range(ring.position.x, ring.end.x):
+			for y: int in range(ring.position.y, ring.end.y):
+				var at: Vector2i = Vector2i(x, y)
+				if not ground.has_point(at) and game_state.call(&"building_covering", &"homestead", at) == &"":
+					homestead.call(&"set_down", at, &"standing", &"gate" if at == pen[1] else &"fence")
+	# Oda's list buys a hen: the coop has room for one more.
+	for kind: StringName in (ANIMALS["herd"] as Array).slice(1 if action == "a:oda" else 0):
+		homestead.call(&"add_animal", kind)
+	for index: int in ANIMALS["ready"]:
+		(homestead.call(&"animal", index) as Dictionary)["ready"] = true
+	homestead.set(&"hay", 24)
+	var clock: RefCounted = game_state.call(&"day_clock")
+	game_state.call(&"set_time", float(clock.call(&"in_day", "21:00" if action == "a:night" else "12:00")))
+	match action:
+		"a:oda":
+			game_state.call(&"add_item", &"coin", 300)
+		"a:silo":
+			game_state.call(&"add_item", &"hay", 12)
+		"a:hearth":
+			for item: Array in [[&"egg", 4], [&"milk", 1], [&"mushroom", 1]]:
+				game_state.call(&"add_item", item[0], item[1])
+		"a:dishes":
+			for item: Array in [[&"fried_egg", 2], [&"omelette", 1], [&"custard", 1], [&"egg", 3], [&"milk", 1]]:
+				game_state.call(&"add_item", item[0], item[1])
+			game_state.call(&"set_energy", 40.0)
+		"a:tilda":
+			for item: Array in [[&"coin", 20], [&"egg", 6], [&"milk", 2], [&"wool", 3], [&"cloth", 2], [&"turnip", 2]]:
+				game_state.call(&"add_item", item[0], item[1])
+		"a:blanket":
+			game_state.call(&"set_flag", &"home/blanket", true)
+			game_state.call(&"set_flag", &"home/rug", true)
+		"a:weave":
+			game_state.call(&"add_item", &"wool", 5)
+
+
+## What an "a:" shot does once its area has loaded.
+func _act_on_animals(scene: Node, action: String) -> void:
+	if action == "a:oda":
+		scene.call(&"open_shop", &"oda", &"buy")
+		scene.get(&"hud").get(&"shop_menu").call(&"confirm")
+		await _frames(2)
+	elif action in ["a:farm", "a:night"]:
+		# Long enough for some of them to wander off where they were put.
+		await create_timer(2.5).timeout
+	elif action == "a:sheep":
+		var herd: Node = scene.get(&"animals")
+		var sheep: Node2D = herd.call(&"animal", 4)
+		var motion: RefCounted = sheep.get(&"motion")
+		motion.set(&"position", Vector2(7 * 16 + 8, 13 * 16 + 8))
+		sheep.position = motion.get(&"position")
+		herd.set_process(false)
+		await _frames(3)
+	elif action == "a:silo":
+		scene.call(&"interact")
+		await _frames(3)
+	elif action == "a:hearth":
+		scene.call(&"interact")
+		# The cursor on the Custard, so the Fried Egg shows beneath it.
+		scene.get(&"hud").get(&"dialogue").call(&"move_cursor", 2)
+		await _frames(2)
+	elif action == "a:dishes":
+		scene.call(&"open_item_menu")
+		await _frames(2)
+	elif action == "a:tilda":
+		scene.call(&"open_shop", &"tilda", &"sell")
+		var counter: Node = scene.get(&"hud").get(&"shop_menu")
+		# A bolt of cloth sold, so the line that says so shows.
+		counter.call(&"move_cursor", 4)
+		counter.call(&"confirm")
+		await _frames(2)
+	elif action == "a:weave":
+		scene.call(&"open_craft")
+		var bench: Node = scene.get(&"hud").get(&"craft_menu")
+		bench.call(&"move_cursor", 13)
+		bench.call(&"confirm")
+		await _frames(2)
+	else:
+		await _frames(3)
 
 
 ## Puts build mode's ghost on `cell`, and the window's own mouse pointer there too: in a window

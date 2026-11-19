@@ -963,7 +963,9 @@ run headless; see CLAUDE.md for the command and gotchas.
 - **A shop is data** (P3c; `data/shops/<id>.json`, schema `docs/data/shop.schema.json`): `name`, `sells` (its
   own wares: an item, how many a deal gives, the price), `sells_seeds`, `buys_crops`, and `buys` (the other
   things it pays for: an item and the price of one). Seed prices and what a crop sells for are in
-  `data/crops`, so a new crop is on both lists without touching the shop. There is one shop, `tilda`.
+  `data/crops`, so a new crop is on both lists without touching the shop. There was one shop, `tilda`, until the Homestead's phase 4 added a
+  second, `oda` (Farmer Oda's stall, §30), whose wares are animals: a ware may be `{ "animal", "price" }`
+  in place of an item.
   (Since the Homestead's phase 2 she also sells fibre five at a time, hedges, flower beds and
   saplings: seven more lines of `sells`, §30.)
 - **What Tilda buys from the quarry** (mining and crafting, phase 3a) is her `buys` list: copper ore 2,
@@ -1044,7 +1046,8 @@ P4b (`docs/progress/P4-plan.md` section 11). Three skills that rise with use and
   `food_energy()` are what the rest of the game asks.
 - **Where points come from:**
   - combat: `AreaController._on_enemy_died()` (a `monster`, or a `boss` for an `ArenaBoss`)
-  - farming: `GameState.till_soil()` (`till`) and `harvest()` (`harvest`)
+  - farming: `GameState.till_soil()` (`till`) and `harvest()` (`harvest`), and since the Homestead's
+    phase 4 `pet_animal()` when it takes a product (`tend`, §30)
   - cooking: the effect `practise`, which `Cooking.dialogue()` gives each dish's answer after its `give_item`
 - **What a level does:**
   - combat eases `swing` and `shot`; farming eases `hoe` and `water`. The hoe is paid before the cell is
@@ -1364,7 +1367,7 @@ in a shop's data, two favours as data, and a tool that plays the game.
 The user's request of 2026-11-17 (`docs/progress/homestead-plan.md`, approved as written), in five phases.
 **Phase 1 is built** (2026-11-18 and 19): the farm and the home's move. **Phase 2 is built**
 (2026-11-19): placing things, under "Placing things" below. **Phase 3 is built** (2026-11-19):
-buildings, under "Buildings" below.
+buildings, under "Buildings" below. **Phase 4 is built** (2026-11-19): animals, under "Animals" below.
 - **The area `homestead`** (`world/areas/homestead/homestead.tscn`, "Your farm") is a map of 40 by 30
   cells, baked by `tools/greybox/build_maps.gd` from a sketch with a legend of its own (below). Woods two
   deep stand all round it; the ground is level (height 0 everywhere).
@@ -1642,7 +1645,73 @@ buildings, under "Buildings" below.
   - **The save is still version 6:** `homestead` gains `"buildings"` and `"hay"`, each written only when
     there is something in it. The fixture `tests/fixtures/saves/v6_a_yard_on_the_farm.json` was written
     by the game as it stood at the end of phase 2.
-- **Tests:** phase 3's `tests/core/homestead/building_rules_test.gd` (`Buildings`),
+- **Animals** (phase 4; the plan's D25 to D28, D30):
+  - **A kind of animal is a file in `data/animals/`** (`docs/data/animal.schema.json`): `lives_in` (a
+    building with room for animals), `gives` (an item), `every` (mornings between products, fed and
+    petted), `grazes` (cells of pasture grass a morning), `sound`. `DataRegistry.get_animal()`;
+    `Herd.problems()` checks each as it loads. **A new animal is data and pictures.**
+  - **`Herd`** (`core/homestead/`, pure): an animal on the land is `Herd.new_animal(kind)`, `{ "kind",
+    "petted", "progress", "ready", "hungry" }`. `Herd.feed(animals, kinds, pastures, hay)` feeds the
+    herd in the order bought, each from its building's pasture while the grass holds, else a hay, else
+    nothing (D25); `Herd.morning(animal, kind, fed)` brings a fed one two halves of a morning nearer its
+    product if it was petted the day before, one if not, none unfed (and `hungry`), and nothing while a
+    product waits (D27). `Herd.why_not_buy()` says why one can't be bought.
+  - **`Pasture`** (`core/homestead/`, pure): `Pasture.reach(doorstep, size, kind_of)` is the ground
+    reached from a building's doorstep, cell to cell, through `GRASS` and `BARE` cells, stopped by
+    `WALL`s; reaching an `OPEN` cell (the road, the path, a way out, off the map) means it isn't
+    fenced. `is_pasture()` is fenced with grass in it.
+  - **`LandMap`** (pure) is the land as it was: its solid cells, its road, its field and where the
+    overgrowth stood. **`LandSurvey.survey()`** (`world/areas/`) reads it from the homestead's scene,
+    made and freed out of the tree, once a run (`GameState.land_map()`). `GameState.pasture_kind(cell)`
+    lays what he has cleared, set down and built over it: the road is open; what is solid, anything
+    standing (a gate too), a building or site, and debris not cleared are walls; the field and what
+    lies on the grass are bare; the rest, the meadow's tall grass with it, is grass.
+  - **`Homestead` keeps the herd** in the order bought (`add_animal()`, `animals()`, `animal(index)`,
+    `animal_count()`); none is ever taken away, so an animal's place in the herd is its name. An animal
+    lives in its kind's building, so it goes wherever that building goes.
+  - **`GameState`:** `pasture_of(id)`, `has_pasture(id)`, `pastures()` (each pasture with the buildings
+    whose doors open on it, so two share one), `animals_in(id)`, `why_not_buy_animal()`,
+    `buy_animal()` (and `buy()` of a ware that is an animal), `pet_animal(index)` (petted today, its
+    sound, `EventBus.animal_petted`, the product taken if there is room, and the deed `tend` of Farming).
+    `start_next_day()` runs the herd's morning (`_herd_morning()`) after the saplings grow, and the
+    silo's hay is what is left. `why_not_demolish()` refuses a building with animals.
+  - **Oda's stall** is `data/shops/oda.json`, a shop whose wares are `{ "animal", "price" }`
+    (`Shop.wares()` gives them with `"animal"`, `Shop.is_animal()`), opened by her conversation's `shop`
+    effect; `ShopMenu` names them by the kind and says where one went. The village was re-baked once
+    more for it: the market stall's six tiles at (16..18, 30..31), solid, beside her.
+  - **In the world:** `PlacedAnimals` (`world/areas/placed_animals.gd`), a node of the homestead and of
+    a room whose building has room for animals (the coop, the barn; `AreaController.animals`, null
+    elsewhere). On the land, while `Hours.villagers_out()` (06:00 to 20:00), it shows the animals of
+    each building with a pasture, among its cells; in a room, the animals living there that are not out
+    (all of them by night), among the room's floor (not the doormat or the cell before it). It follows
+    `homestead_changed` and `time_changed`, and moves them each frame but while build mode is open.
+  - **`Animal`** (`gameplay/interactables/`): its place in the herd, an `AnimalMotion` (`core/homestead/`,
+    pure: rest or graze, then walk straight toward a cell within three, never leaving its cells), its
+    pictures (the hen is the village's chicken in `critters.png`; the sheep and the cow are
+    `animals.png`, 24 by 20, mirrored in place facing right), what it has ready on a round badge over
+    its head, three dots in a bubble when it is hungry. It fills no cell. `reached_from(cell)`: it
+    stands in the cell, or within 12 px of its middle.
+  - **A right click** (`AreaController.interact()`) on the animal the hero faces (`animal_in_front()`,
+    after a person and before a door, a chest or a crop) pets it: `GameState.pet_animal()`. The prompt
+    is "Pet the Chicken", or "Take the Egg" when one waits.
+  - **Build mode** counts an animal's cell as someone's (`Placement.SOMEONE_WORDS`).
+  - **Into the rest** (step 4c): the egg and the milk are food (6 and 18 energy), the wool and cloth
+    materials; three cooking recipes, known from the start (`fried_egg`, `omelette`, `custard`); Tilda
+    buys the egg, the milk, the wool and cloth (8, 30, 40, 100: four lines of her `buys`); two crafting
+    recipes on the "Make" tab, `cloth` (2 wool; known once wool is found) and `wool_blanket` (2 cloth;
+    known once cloth is found), which makes the furnishing `blanket`, a `Furnishing` that lies over the
+    bed (1, 3) in the farmhouse, for show, not solid; and Farming's deed `tend` (1 point a product taken).
+  - **Pictures and sound:** seven icons in `items.png` (the egg, wool, milk, cloth and the three
+    dishes), `animals.png`, the blanket in `crafted.png`, from `tools/art/make_sprites.gd`; the sounds
+    `cluck`, `bleat`, `low` (`make_audio.gd`).
+  - **Tools:** `tools/playtest.gd -- animals` (a scenario may name `pens`, `animals`, `ready` and `hay`);
+    capture shots 192 to 203 (`a:<what>`, on the farm of `ANIMALS`).
+  - **The save is still version 6:** `homestead` gains `"animals"` (a list, in the order bought), written
+    only when there is one; a kind the game doesn't know is left out. The fixture
+    `tests/fixtures/saves/v6_buildings_before_animals.json` was written by the game at the end of phase 3.
+- **Tests:** phase 4's `tests/core/homestead/herd_test.gd`, `pasture_test.gd` and
+  `animal_motion_test.gd`, `tests/autoload/animals_state_test.gd`, `tests/world/oda_stall_test.gd`,
+  `animals_test.gd` and `animal_products_test.gd`; phase 3's `tests/core/homestead/building_rules_test.gd` (`Buildings`),
   `homestead_buildings_test.gd` (what `Homestead` keeps of them), `tests/core/crafting/crafting_build_test.gd`
   (the "Build" tab's rules), `tests/world/plans_test.gd` (step 3a), `rooms_test.gd` (3b) and
   `building_moves_test.gd` (3c); `tests/world/build_mode_test.gd` (build mode in the world), `tests/world/placeables_test.gd`

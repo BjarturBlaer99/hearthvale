@@ -1,0 +1,19 @@
+{
+	"id": "cloth",
+	"name": "Cloth",
+	"station": "workbench",
+	"order": 14,
+	"needs": [
+		{
+			"item": "wool",
+			"count": 2
+		}
+	],
+	"makes": {
+		"item": "cloth",
+		"count": 1
+	},
+	"unlock": {
+		"found": "wool"
+	}
+}

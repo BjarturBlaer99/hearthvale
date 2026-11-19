@@ -1,0 +1,18 @@
+{
+	"id": "wool_blanket",
+	"name": "Wool Blanket",
+	"station": "workbench",
+	"order": 15,
+	"needs": [
+		{
+			"item": "cloth",
+			"count": 2
+		}
+	],
+	"makes": {
+		"furnishing": "blanket"
+	},
+	"unlock": {
+		"found": "cloth"
+	}
+}

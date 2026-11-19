@@ -10,7 +10,7 @@
 		},
 		"farming": {
 			"name": "Farming",
-			"gains": { "till": 1, "harvest": 2 },
+			"gains": { "till": 1, "harvest": 2, "tend": 1 },
 			"eases": ["hoe", "water"]
 		},
 		"cooking": {

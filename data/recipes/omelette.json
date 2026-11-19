@@ -1,0 +1,8 @@
+{
+	"id": "omelette",
+	"makes": { "item": "omelette", "count": 1 },
+	"needs": [
+		{ "item": "egg", "count": 2 },
+		{ "item": "mushroom", "count": 1 }
+	]
+}

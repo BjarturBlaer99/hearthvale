@@ -55,8 +55,10 @@ func test_the_five_meals_are_recipes_that_give_what_the_gdd_says() -> void:
 		assert_int(Food.halves_of(dish)).override_failure_message("%s's hearts" % id).is_equal(int(meal["halves"]))
 		assert_float(Food.energy_of(dish)).override_failure_message("%s is worth more cooked than its makings raw (%s)" % [id, raw]).is_greater(raw)
 		assert_bool(ItemIcons.FRAMES.has(ItemIcons.name_for(meal["dish"])) and ItemIcons.name_for(meal["dish"]) != &"gem").override_failure_message("%s has a picture of its own" % meal["dish"]).is_true()
-	# These, with the tea, are what he knows from the start; three more are taught (P4d).
-	assert_array(GameState.known_recipes().map(func(recipe: Dictionary) -> String: return str(recipe["id"]))).is_equal(["blossom_tea", "bread", "marsh_stew", "mushroom_soup", "pumpkin_pie", "roast_turnip", "vegetable_stew"])
+	# These, with the tea, Marsh Stew and the three of eggs and milk (the Homestead's phase 4,
+	# tests/world/animal_products_test.gd), are what he knows from the start; three more are
+	# taught (P4d).
+	assert_array(GameState.known_recipes().map(func(recipe: Dictionary) -> String: return str(recipe["id"]))).is_equal(["blossom_tea", "bread", "custard", "fried_egg", "marsh_stew", "mushroom_soup", "omelette", "pumpkin_pie", "roast_turnip", "vegetable_stew"])
 	assert_str(Food.gives_text(DataRegistry.get_item(&"vegetable_stew"))).is_equal("+60 energy, +1 heart")
 	assert_str(Food.gives_text(DataRegistry.get_item(&"mushroom_soup"))).is_equal("+35 energy, +half a heart")
 	assert_str(Food.gives_text(DataRegistry.get_item(&"pumpkin_pie"))).is_equal("+80 energy, +2 hearts")
@@ -118,20 +120,20 @@ func test_a_long_list_of_answers_scrolls_to_keep_the_cursor_in_view() -> void:
 	assert_bool(home.interact()).is_true()
 	var box: DialogueBox = home.hud.dialogue
 	var all: PackedStringArray = box.shown_options()
-	assert_int(all.size()).override_failure_message("seven dishes and the way out").is_equal(8)
+	assert_int(all.size()).override_failure_message("ten dishes (three of eggs and milk since the Homestead's phase 4) and the way out").is_equal(11)
 	assert_int(DialogueBox.OPTION_ROWS).is_equal(4)
 	assert_array(Array(box.shown_option_lines())).is_equal(["> " + all[0], "  " + all[1], "  " + all[2], "  " + all[3]])
-	assert_str(box.corner_text()).is_equal("  1/8 v")
+	assert_str(box.corner_text()).is_equal("  1/11 v")
 	for i: int in range(1, all.size()):
 		box.move_cursor(1)
 		assert_int(box.shown_option_lines().size()).override_failure_message("four lines, never more").is_equal(DialogueBox.OPTION_ROWS)
 		assert_bool(Array(box.shown_option_lines()).has("> " + all[i])).override_failure_message("the cursor on '%s' is in view" % all[i]).is_true()
-	assert_str(box.corner_text()).is_equal("^ 8/8  ")
+	assert_str(box.corner_text()).is_equal("^ 11/11  ")
 	assert_str(box.shown_option_lines()[3]).is_equal("> " + Cooking.LEAVE_WORDS)
 	box.move_cursor(1)
 	assert_str(box.shown_option_lines()[0]).override_failure_message("past the end it wraps to the top").is_equal("> " + all[0])
 	box.move_cursor(-3)
-	assert_str(box.corner_text()).is_equal("^ 6/8 v")
+	assert_str(box.corner_text()).is_equal("^ 9/11 v")
 	# The next words start from the top again.
 	box.confirm()
 	assert_int(box.top).is_equal(0)

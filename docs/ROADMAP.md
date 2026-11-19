@@ -308,7 +308,14 @@ five phases with a stop after each:
   - **3c, moving and pulling down:** the hand moves a building with what is in it; an empty one is
     pulled down for half its materials.
   - **Not played by a person:** by the tests and the pictures. The user reviews before phase 4.
-- **Phase 4 — Animals.** *Not built.* Chickens, sheep and cows.
+- **Phase 4 — Animals.** *Built 2026-11-19, in three steps.* Chickens, sheep and cows.
+  - **4a, the rules:** animals as data; the herd's morning and pastures; Farmer Oda's stall and list;
+    the save (still version 6).
+  - **4b, in the world:** the three animals out in their pastures by day and in their rooms by night;
+    one right click pets and takes; their sounds.
+  - **4c, into the rest:** the egg, the wool and the milk sold, cooked (three dishes), given and woven
+    (cloth, a wool blanket); Farming rises by tending.
+  - **Not played by a person:** by the tests and the pictures. The user reviews before phase 5.
 - **Phase 5 — Balance.** *Not built.* Two favours, ten days played, and the numbers settled.
 
 ---

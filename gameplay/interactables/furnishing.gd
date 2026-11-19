@@ -2,7 +2,8 @@ class_name Furnishing
 extends Talkable
 ## Something that stands in the hero's home (crafting, 2026-11-17, docs/TECH_DESIGN.md §28):
 ## the workbench, which is there from the start, and what the workbench makes for the house:
-## the furnace, the storage chest, the standing lamp and the woven rug. Each has its own place
+## the furnace, the storage chest, the standing lamp and the woven rug, and (the Homestead, phase
+## 4) the wool blanket over the bed. Each has its own place
 ## (the scene says where); until it is made it isn't there at all: not seen, not in the way,
 ## not faced. The workbench opens the crafting list and the chest its stacks (the area does
 ## both); the furnace talks (GameState.furnace_dialogue: what it holds, or what to smelt); the
@@ -13,7 +14,7 @@ const SHEET: Texture2D = preload("res://gameplay/art/crafted.png")
 ## Frames in the order tools/art/make_sprites.gd paints them (a test checks).
 const FRAMES: Dictionary = {
 	&"workbench": 0, &"furnace": 1, &"furnace_lit": 2, &"chest": 3, &"lamp": 4, &"rug_l": 5, &"rug_r": 6,
-	&"sprinkler": 7,
+	&"sprinkler": 7, &"blanket": 8,
 }
 const SIZE: Vector2i = Vector2i(16, 16)
 const WORKBENCH: StringName = &"workbench"
@@ -21,6 +22,8 @@ const FURNACE: StringName = &"furnace"
 const CHEST: StringName = &"chest"
 const LAMP: StringName = &"lamp"
 const RUG: StringName = &"rug"
+## The wool blanket (the Homestead, phase 4): it lies over the bed, for show.
+const BLANKET: StringName = &"blanket"
 ## What facing one and interacting opens: the crafting list, the chest's stacks, or nothing
 ## (the furnace talks; the lamp and the rug do nothing).
 const CRAFT: StringName = &"craft"
@@ -61,9 +64,10 @@ func furnished_key() -> StringName:
 	return StringName("%s/%s" % [room, piece if piece != &"" else furnishing_id])
 
 
-## Whether it fills its cell. The rug lies flat: it is walked over.
+## Whether it fills its cell. The rug lies flat: it is walked over. The blanket lies on the bed,
+## which fills its cell itself.
 func is_solid() -> bool:
-	return furnishing_id != RUG
+	return furnishing_id != RUG and furnishing_id != BLANKET
 
 
 ## What interacting with it opens (CRAFT, STORE), or &"".

@@ -2935,3 +2935,16 @@ The first of phase 4's three steps (`docs/progress/homestead-plan.md`).
 **What differs from the plan:** nothing in D26 or D28. Chosen where the plan was silent: an animal's cells (its pasture, or its room's floor) rather than the terrain; build mode holding them still; what is ready shown in a bubble (`docs/DECISIONS.md`).
 
 **Verified:** 1111 tests in 146 suites pass but the known one. New: `tests/world/animals_test.gd` (out by day with a pasture and in without; in at 20:00, out at 06:00; each within its pasture for twenty seconds and blocking nobody; build mode holds them still; nothing set down on one; a right click pets and takes, a full pack leaves the egg; a sheep and a cow in the barn at night, with their sounds; a hungry one shows it) and `tests/core/homestead/animal_motion_test.gd`. The scenario was started in a window with no error.
+
+## 2026-11-19 — The Homestead, phase 4, step 4c: into the rest (products, three dishes, Tilda's prices, cloth and the blanket, Farming)
+
+**Built**
+- **The three dishes** (`data/recipes/`), known from the start and cooked at the hearth: a Fried Egg (an egg: 20 energy), an Omelette (two eggs and a mushroom: 50 energy and half a heart) and a Custard (an egg and milk: 65 energy and a heart). An egg and milk are eaten raw (6 and 18) and given as gifts like any food.
+- **Tilda buys** the egg (8), the milk (30), the wool (40) and cloth (100): four lines of her data.
+- **Woven at the workbench** ("Make"): Cloth (2 wool; known once wool is found), which is worth more than its wool, and a Wool Blanket (2 cloth), a furnishing that lies over the bed in the farmhouse, for show.
+- **Farming rises by tending:** the deed `tend`, a point for each product taken (ten raise a level).
+- **Pictures:** seven icons (the egg, wool, milk, cloth, the three dishes), the blanket; **shots** 192 to 203 in `tools/capture.gd`.
+
+**What differs from the plan:** nothing in the table or D30. Chosen where the plan was silent: the blanket a furnishing of the farmhouse over the bed's cell; cloth and the blanket known once their makings are found; the deed's name (`docs/DECISIONS.md`).
+
+**Verified:** 1117 tests in 147 suites pass but the known one. New: `tests/world/animal_products_test.gd` (the egg and the milk raw and as a gift; the three dishes known and cooked at the hearth; Tilda's four prices and cloth worth more than its wool, at her counter; cloth and the blanket woven, the blanket on the bed and the bed still the bed; ten eggs taken raise Farming; and the plan's "done when": a hen, a sheep and a cow bought from Oda's list, fed by hay and by pasture, petted, each ready on its morning, the products cooked, sold and given). Older tests brought up to date: the hearth's list (ten dishes), Tilda's list of what she buys, the workbench's "Make" tab (fifteen), the furnishings (five), the registry's items.

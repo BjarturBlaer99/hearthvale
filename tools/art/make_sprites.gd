@@ -2957,6 +2957,26 @@ const SPRITES: Dictionary = {
 			"................",
 			"................",
 			],
+			# The Homestead, phase 4: the wool blanket, woven of cloth, spread over the foot of
+			# the bed (the bed is a tile of the room; this lies over it, cream with red bands).
+			"blanket": [
+			"................",
+			"................",
+			"................",
+			"................",
+			"................",
+			"..oooooooooooo..",
+			"..oyyyyyyyyyyo..",
+			"..oRRRRRRRRRRo..",
+			"..oyyyyyyyyyyo..",
+			"..oyyyyyyyyyyo..",
+			"..oRRRRRRRRRRo..",
+			"..oyyyyyyyyyyo..",
+			"..oyyyyyyyyyyo..",
+			"..oRRRRRRRRRRo..",
+			"..oyoyoyoyoyoo..",
+			"...o.o.o.o.o....",
+			],
 		},
 	},
 	"breakables": {

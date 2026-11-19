@@ -23,6 +23,10 @@
 		{ "item": "crystal", "price": 10 },
 		{ "item": "copper_bar", "price": 8 },
 		{ "item": "iron_bar", "price": 12 },
-		{ "item": "gold_bar", "price": 25 }
+		{ "item": "gold_bar", "price": 25 },
+		{ "item": "egg", "price": 8 },
+		{ "item": "milk", "price": 30 },
+		{ "item": "wool", "price": 40 },
+		{ "item": "cloth", "price": 100 }
 	]
 }

@@ -92,6 +92,11 @@ position = Vector2(32, 64)
 script = ExtResource("m2_furnishing")
 furnishing_id = &"rug"
 
+[node name="Blanket" type="Node2D" parent="Interactables"]
+position = Vector2(16, 48)
+script = ExtResource("m2_furnishing")
+furnishing_id = &"blanket"
+
 [node name="Entries" type="Node2D" parent="." unique_id=99726273]
 
 [node name="door" type="Marker2D" parent="Entries" unique_id=2049002410]
