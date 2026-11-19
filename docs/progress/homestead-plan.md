@@ -32,7 +32,9 @@ which does not exist. The coordinator adds to it after each review.
   coordinator as each phase is built and reviewed, in the words below unless the phase built otherwise.
 - **2026-11-19, phase 1 is built** (steps 1a and 1b on 2026-11-18, step 1c finished on 2026-11-19;
   each is ticked below with what was built differently) **and waits for the user's review.** *(Written
-  by the phase's own subagent, for the coordinator to confirm.)* Every approved decision it touches
+  by the phase's subagent; the coordinator ran the full suite again, 977 tests in 130 suites, and
+  confirmed the commits and the pictures. The phase was stopped by the user twice and picked up again
+  each time.)* Every approved decision it touches
   (D1 to D11, D30) held as written. What the plan left open and the phase chose is in `docs/DECISIONS.md` under the three
   steps; the ones a later phase will meet:
   - the land's cells cleared for good are `GameState.homestead()`, through `clear_debris(area, cell)`;

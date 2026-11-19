@@ -50,7 +50,11 @@ played again with them. The plan is finished.
 **The Homestead (the user's request, 2026-11-17; `docs/progress/homestead-request.md`; the plan,
 `docs/progress/homestead-plan.md`, approved as written on 2026-11-17):** a farm of the hero's own west
 of the village, in five phases with a stop after each for the user to review: 1 the homestead and the
-home's move, 2 placing things, 3 buildings, 4 animals, 5 balance. **No phase is built yet.** The plan's
+home's move, 2 placing things, 3 buildings, 4 animals, 5 balance. **Phase 1 is built (2026-11-19) and
+waits for the user's review:** the lane's west end, the farm's map, the farmhouse as the hero's home,
+the old cottage locked, the field 12 by 6, a pond, save version 6, the story's words, the overgrowth
+(145 things cleared for good, fibre) and the farm's two tunes. Nobody has played it by hand: only the
+tests, and two days by `tools/play_days.gd` at four times speed. Phases 2 to 5 are not built. The plan's
 thirty numbered decisions are the approved ones: they are at the head of the plan ("What the user has
 decided", which stands in for the `docs/HOMESTEAD-NOTES.md` the request names) and in
 `docs/DECISIONS.md`. Each phase is built by a subagent with a fresh context; **CLAUDE.md is the
