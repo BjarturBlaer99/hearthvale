@@ -31,6 +31,21 @@
         }
       ],
       "node": "teach"
+    },
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "tilda",
+          "marks": 3
+        },
+        {
+          "type": "quest_status",
+          "quest": "market_day",
+          "status": "not_started"
+        }
+      ],
+      "node": "favour"
     }
   ],
   "speakers": {
@@ -41,6 +56,45 @@
       "speaker": "tilda",
       "text": "Seeds, bread, arrows and bombs, the best in Hearthvale. Well, the only ones. And I'll buy what you grow, and what you dig out of the quarry.",
       "options": [
+        {
+          "text": "Six eggs, Tilda.",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "market_day",
+              "stage": "bring"
+            },
+            {
+              "type": "has_item",
+              "item": "egg",
+              "count": 6
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "egg",
+              "count": 6
+            },
+            {
+              "type": "set_flag",
+              "flag": "market_eggs_given",
+              "value": true
+            }
+          ],
+          "next": "favour_done"
+        },
+        {
+          "text": "About those eggs...",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "market_day",
+              "stage": "bring"
+            }
+          ],
+          "next": "favour_hint"
+        },
         {
           "text": "Eggs from Farmer Oda.",
           "conditions": [
@@ -145,6 +199,57 @@
       "options": [
         {
           "text": "Thank you.",
+          "next": null
+        }
+      ]
+    },
+    "favour": {
+      "speaker": "tilda",
+      "text": "Market day's coming, and folk ask me for eggs I haven't got. Could you bring me six from hens of your own?",
+      "options": [
+        {
+          "text": "I'll bring them.",
+          "effects": [
+            {
+              "type": "set_quest_stage",
+              "quest": "market_day",
+              "stage": "bring"
+            }
+          ],
+          "next": "favour_go"
+        },
+        {
+          "text": "Not just now.",
+          "next": "greet"
+        }
+      ]
+    },
+    "favour_go": {
+      "speaker": "tilda",
+      "text": "Lovely. Oda sells hens, if you've a coop to keep them in. Six eggs, mind, not five.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_hint": {
+      "speaker": "tilda",
+      "text": "Six eggs for market day. Hens in a coop on your farm will lay them, and Oda sells hens.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "favour_done": {
+      "speaker": "tilda",
+      "text": "Six, and every one whole! Here: fifty coins, and two carrot cakes from my own oven.",
+      "options": [
+        {
+          "text": "Goodbye.",
           "next": null
         }
       ]

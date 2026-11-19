@@ -1368,6 +1368,8 @@ The user's request of 2026-11-17 (`docs/progress/homestead-plan.md`, approved as
 **Phase 1 is built** (2026-11-18 and 19): the farm and the home's move. **Phase 2 is built**
 (2026-11-19): placing things, under "Placing things" below. **Phase 3 is built** (2026-11-19):
 buildings, under "Buildings" below. **Phase 4 is built** (2026-11-19): animals, under "Animals" below.
+**Phase 5, steps 5a and 5b** (2026-11-19): two favours, under "Balance" below, and ten days played by
+`tools/play_days.gd` (`docs/progress/homestead-balance-report.md`).
 - **The area `homestead`** (`world/areas/homestead/homestead.tscn`, "Your farm") is a map of 40 by 30
   cells, baked by `tools/greybox/build_maps.gd` from a sketch with a legend of its own (below). Woods two
   deep stand all round it; the ground is level (height 0 everywhere).
@@ -1709,7 +1711,18 @@ buildings, under "Buildings" below. **Phase 4 is built** (2026-11-19): animals, 
   - **The save is still version 6:** `homestead` gains `"animals"` (a list, in the order bought), written
     only when there is one; a kind the game doesn't know is left out. The fixture
     `tests/fixtures/saves/v6_buildings_before_animals.json` was written by the game at the end of phase 3.
-- **Tests:** phase 4's `tests/core/homestead/herd_test.gd`, `pasture_test.gd` and
+- **Balance (phase 5).**
+  - **Two favours at three marks, data only:** Tilda's "Market Day" (`data/quests/market_day.json`: six
+    eggs; 50 coins and 2 Carrot Cakes) after her carrot cake at two marks, and Farmer Oda's "A Roof for
+    the Flock" (`a_roof_for_the_flock.json`: a coop standing; 60 coins and 5 hay) after his seed wheat at
+    two. Each is an opening on `friendship` 3 and four nodes in the villager's conversation, of the shape
+    of Wenna's and Edda's. The rewards are `give_item`. There are thirteen quests.
+  - **The flag `built/<id>`** (`GameState.built_flag(id)`) is true while building `id` stands
+    (`is_built`): set at the morning a site stands (`start_next_day()`), erased when it is pulled down
+    (`demolish()`), and put right by `from_dict()` (an older save's buildings get theirs; a flag with no
+    building behind it goes). A site never has one, and moving changes nothing. Oda's quest and his
+    answer "My coop is built." ask `built/coop`; no new condition type was needed.
+- **Tests:** phase 5's `tests/world/homestead_favours_test.gd`; phase 4's `tests/core/homestead/herd_test.gd`, `pasture_test.gd` and
   `animal_motion_test.gd`, `tests/autoload/animals_state_test.gd`, `tests/world/oda_stall_test.gd`,
   `animals_test.gd` and `animal_products_test.gd`; phase 3's `tests/core/homestead/building_rules_test.gd` (`Buildings`),
   `homestead_buildings_test.gd` (what `Homestead` keeps of them), `tests/core/crafting/crafting_build_test.gd`

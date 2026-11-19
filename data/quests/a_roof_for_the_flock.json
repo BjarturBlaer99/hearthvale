@@ -1,0 +1,69 @@
+{
+  "id": "a_roof_for_the_flock",
+  "title": "A Roof for the Flock",
+  "giver": "farmer_oda",
+  "start_stage": "build",
+  "stages": {
+    "build": {
+      "journal": "Farmer Oda would like to see hens kept on your farm, and they want a coop. Its plan is on the Build tab of your workbench.",
+      "objectives": [
+        {
+          "id": "stands",
+          "text": "Have a coop standing on your farm",
+          "complete_when": {
+            "type": "any",
+            "of": [
+              {
+                "type": "flag",
+                "flag": "built/coop",
+                "value": true
+              },
+              {
+                "type": "flag",
+                "flag": "coop_shown_oda",
+                "value": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "tell",
+          "text": "Tell Farmer Oda",
+          "complete_when": {
+            "type": "flag",
+            "flag": "coop_shown_oda",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "coop_shown_oda",
+            "value": true
+          },
+          "to": "done"
+        }
+      ]
+    },
+    "done": {
+      "journal": "Oda is glad your hens have a roof. He gave you sixty coins and five hay to start them on.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "coin",
+          "count": 60
+        },
+        {
+          "type": "give_item",
+          "item": "hay",
+          "count": 5
+        },
+        {
+          "type": "complete_quest"
+        }
+      ]
+    }
+  }
+}

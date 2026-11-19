@@ -60,6 +60,10 @@ extends SceneTree
 ## makings of the three dishes; "a:dishes" the item menu with the three; "a:tilda" Tilda's list of
 ## what she buys, with the products and cloth; "a:blanket" the wool blanket on the bed;
 ## "a:weave" the workbench's "Make" tab with wool to weave.
+## The Homestead's favours (phase 5), "f:ask:<villager>" and "f:done:<villager>", for Tilda and
+## Farmer Oda at three marks, what each teaches or asks at two already done: "ask" talks to them
+## as they ask their favour; "done" hands over the six eggs (Tilda), or tells of the coop that
+## stands since this morning (Oda), and is caught as they give the reward.
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -286,6 +290,11 @@ const SHOTS: Array = [
 	["201_tildas_list_of_what_she_buys", &"shop", Vector2i(5, 4), Vector2.UP, 0, "a:tilda"],
 	["202_the_wool_blanket_on_the_bed", &"home", Vector2i(2, 3), Vector2.LEFT, 0, "a:blanket"],
 	["203_cloth_at_the_workbench", &"home", Vector2i(8, 3), Vector2.RIGHT, 0, "a:weave"],
+	# The Homestead's two favours (phase 5).
+	["204_tilda_asks_for_six_eggs", &"shop", Vector2i(5, 4), Vector2.UP, 0, "f:ask:tilda"],
+	["205_tilda_has_her_eggs", &"shop", Vector2i(5, 4), Vector2.UP, 0, "f:done:tilda"],
+	["206_oda_asks_for_a_coop", &"village", Vector2i(15, 32), Vector2.UP, 0, "f:ask:farmer_oda"],
+	["207_oda_hears_the_coop_stands", &"village", Vector2i(15, 32), Vector2.UP, 0, "f:done:farmer_oda"],
 ]
 ## What a build shot carries: enough of each thing for a yard, in the order of the build bar.
 const BUILD_STOCK: Array = [[&"fence", 30], [&"gate", 3], [&"dirt_path", 12], [&"stone_path", 20], [&"wood_path", 12],
@@ -423,6 +432,8 @@ func _capture() -> void:
 			_set_up_buildings(game_state, str(shot[5]))
 		if str(shot[5]).begins_with("a:"):
 			_set_up_animals(game_state, str(shot[5]))
+		if str(shot[5]).begins_with("f:"):
+			_set_up_favour(game_state, str(shot[5]))
 		var scene: Node = (load(WorldPaths.scene_for(shot[1])) as PackedScene).instantiate()
 		root.add_child(scene)
 		var player: Node = scene.get(&"player")
@@ -585,6 +596,11 @@ func _capture() -> void:
 			scene.call(&"interact")
 		if shot[5] in ["talk", "accept", "tale", "lantern_talk", "cook", "lights", "try", "gift_talk", "gift_list", "gift_given", "furnace_talk"] or str(shot[5]).begins_with("friend:") or str(shot[5]).begins_with("favour:"):
 			scene.call(&"interact")
+		if str(shot[5]).begins_with("f:"):
+			scene.call(&"interact")
+			if str(shot[5]).begins_with("f:done:"):
+				# Handing over, or telling, is the first answer.
+				scene.get(&"hud").get(&"dialogue").call(&"confirm")
 		if shot[5] in ["gift_talk", "gift_list", "gift_given"]:
 			# The answer that gives is the second of Pip's three.
 			scene.get(&"hud").get(&"dialogue").call(&"move_cursor", 1)
@@ -875,6 +891,29 @@ func _act_on_buildings(scene: Node, action: String) -> void:
 		await _frames(3)
 	else:
 		await _frames(2)
+
+
+## What an "f:" shot needs before its area loads: three marks with Tilda or Oda, what each
+## teaches or asks at two done with, and for "done" the favour taken and its want met (six eggs;
+## a coop set down yesterday, standing this morning), at noon.
+func _set_up_favour(game_state: Node, action: String) -> void:
+	var parts: PackedStringArray = action.split(":")
+	var who: StringName = StringName(parts[2])
+	game_state.call(&"add_friendship", who, 12)
+	game_state.call(&"set_flag", &"recipe/carrot_cake", true)
+	# Oda's wheat was brought long ago: finished, and nothing said of it now.
+	(game_state.get(&"quests") as Dictionary)[&"seed_stock"] = &"done"
+	(game_state.get(&"flags") as Dictionary)[&"quest/seed_stock/complete"] = true
+	if parts[1] == "done" and who == &"tilda":
+		(game_state.get(&"quests") as Dictionary)[&"market_day"] = &"bring"
+		game_state.call(&"add_item", &"egg", 6)
+	if parts[1] == "done" and who == &"farmer_oda":
+		(game_state.get(&"quests") as Dictionary)[&"a_roof_for_the_flock"] = &"build"
+		game_state.call(&"add_item", &"coop_kit", 1)
+		game_state.call(&"set_down_kit", &"homestead", Vector2i(32, 10), &"coop_kit")
+		game_state.call(&"start_next_day")
+	var clock: Object = game_state.call(&"day_clock")
+	game_state.call(&"set_time", float(clock.call(&"in_day", "12:00")))
 
 
 ## What an "a:" shot needs before its area loads: the farm of ANIMALS, its herd and what each

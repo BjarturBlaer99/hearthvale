@@ -771,6 +771,24 @@ func is_big(id: StringName) -> bool:
 	return homestead().is_big(id, day)
 
 
+## The flag that is true while building `id` stands (phase 5): a quest or a conversation asks
+## it ("A Roof for the Flock" waits on `built/coop`). It follows is_built(): set the morning a
+## site stands, cleared when the building is pulled down, and put right as a save is read.
+static func built_flag(id: StringName) -> StringName:
+	return StringName("built/%s" % id)
+
+
+## Puts every building's `built/<id>` flag right by is_built(). A building that never stood
+## leaves no flag behind.
+func _sync_built_flags() -> void:
+	for id: StringName in DataRegistry.ids(&"buildings"):
+		var flag: StringName = built_flag(id)
+		if is_built(id):
+			set_flag(flag, true)
+		elif flags.has(flag):
+			erase_flag(flag)
+
+
 ## The building or site that covers `cell` of `area`, or &"" (none, or not his land).
 func building_covering(area: StringName, cell: Vector2i) -> StringName:
 	if not homestead_rules().is_land(area):
@@ -901,6 +919,7 @@ func demolish(area: StringName, id: StringName) -> Array[Dictionary]:
 		return []
 	var back: Array[Dictionary] = demolish_refund(id)
 	homestead().remove_building(id)
+	_sync_built_flags()
 	EventBus.homestead_changed.emit()
 	for thing: Dictionary in back:
 		give_item(StringName(str(thing["item"])), int(thing["count"]))
@@ -1129,6 +1148,7 @@ func start_next_day() -> void:
 		var building: Dictionary = DataRegistry.get_building(done["id"])
 		morning_news.append((Buildings.BIGGER_WORDS if done["big"] else Buildings.STANDS_WORDS) % Buildings.name_of(building, done["big"]))
 		EventBus.building_finished.emit(done["id"], done["big"])
+	_sync_built_flags()
 	if grew or not finished.is_empty() or homestead().animal_count() > 0:
 		EventBus.homestead_changed.emit()
 	EventBus.day_started.emit(day)
@@ -1515,6 +1535,16 @@ func from_dict(data: Dictionary) -> void:
 		func(building: String) -> bool: return DataRegistry.has_entry(&"buildings", StringName(building)),
 		func(kind: String) -> bool: return DataRegistry.has_entry(&"animals", StringName(kind)))
 	_load_rooms(_dictionary(data.get("homestead")))
+	# A save from before phase 5 has its buildings and none of their flags.
+	for id: StringName in DataRegistry.ids(&"buildings"):
+		var flag: StringName = built_flag(id)
+		if is_built(id):
+			flags[flag] = true
+			if not flag_days.has(flag):
+				flag_days[flag] = homestead().building_day(id) + 1
+		else:
+			flags.erase(flag)
+			flag_days.erase(flag)
 	var src_found: Variant = data.get("found")
 	if typeof(src_found) == TYPE_ARRAY:
 		for id: Variant in src_found:

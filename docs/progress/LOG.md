@@ -2982,3 +2982,17 @@ the animal (`Animal._draw_ready()`), where it was a round badge of 19 pixels wit
 196 and 197 were taken again and looked at, and the suite is as it was. Known: when animals crowd together,
 a bubble can still be hard to tie to its animal; nobody has played phase 4 by hand. CLAUDE.md has phase 4's
 words.
+
+## 2026-11-19 — The Homestead, phase 5, step 5a: two favours
+
+Tilda's "Market Day" (six eggs; 50 coins and 2 Carrot Cakes) and Farmer Oda's "A Roof for the Flock" (a coop standing on the farm; 60 coins and 5 hay), both at three marks, both data: a quest each in `data/quests/`, and an opening on `friendship` 3 and four nodes in each conversation, of the shape of Wenna's and Edda's. Tilda's comes after her carrot cake (taught at two marks since P4d); Oda's after his seed wheat of two marks. The rewards are `give_item`, so a full pack loses none of them.
+
+**One piece of code:** the flag `built/<id>` (`GameState.built_flag()`), true while a building stands: set by `start_next_day()` the morning a site stands, erased by `demolish()`, and put right by `from_dict()`. Oda's quest and his answer "My coop is built." ask `built/coop`. No new condition type, no save version.
+
+**The quest count is thirteen:** `quests_test` (the list), `friends_open_test` (the quest log: fourteen lines with Back, walked again), `whole_story_test` (the ending's "2 of 13"). Recipes are fourteen, as phase 4 left them.
+
+**Verified:** 1129 tests in 148 suites pass but the known `sprites_test.gd` run-order failure. New: `tests/world/homestead_favours_test.gd` (11 tests: each favour asked at three marks, put off, taken, reminded, handed over and never again; the lesson, the wheat and the present first; a site is no coop, a coop pulled down undoes it, a coop built before the asking counts; the flag through moves, a demolition beside a site and a save; older saves; a full pack; the quests' shape and the count).
+
+**Planted bugs:** 19, one at a time, in `game_state.gd`'s flag code and the four data files, each put back byte for byte (compared), against the new suite. 17 caught at the first try; 2 were not (a site counted as built by the flag's sync; the day a loaded flag came true), each closed by a test, and caught when planted again.
+
+**Pictures:** shots 204 to 207 (`f:ask:` and `f:done:`), each looked at. In Oda's two the hero is under the conversation's box, as in shot 192.

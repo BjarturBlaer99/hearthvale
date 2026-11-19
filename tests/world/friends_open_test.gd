@@ -299,25 +299,31 @@ func test_the_quest_log_shows_five_quests_at_a_time_and_scrolls() -> void:
 	village.open_pause_menu()
 	village.hud.pause_menu.choose(PauseMenu.QUESTS)
 	var quest_log: QuestLog = village.hud.pause_menu.quest_log
-	assert_int(quest_log.all_lines().size()).override_failure_message("eleven quests (Henrik's since Willowmere, Wenna's and Edda's favours since the quarry) and Back").is_equal(12)
+	assert_int(quest_log.all_lines().size()).override_failure_message("thirteen quests (Henrik's since Willowmere, Wenna's and Edda's favours since the quarry, Tilda's and Oda's since the Homestead's phase 5) and Back").is_equal(14)
 	assert_array(Array(quest_log.shown_lines())).is_equal([
-		"> A Pie for Pip", "  A Place of Your Own", "  Black for the Loom", "  Eggs for Tilda", "  Lights on the Marsh",
+		"> A Pie for Pip", "  A Place of Your Own", "  A Roof for the Flock", "  Black for the Loom", "  Eggs for Tilda",
 	])
-	assert_str(quest_log.corner_text()).is_equal("  1/12 v")
+	assert_str(quest_log.corner_text()).is_equal("  1/14 v")
 	quest_log.move_cursor(4)
-	assert_str(quest_log.shown_lines()[4]).override_failure_message("still in view").is_equal("> Lights on the Marsh")
+	assert_str(quest_log.shown_lines()[4]).override_failure_message("still in view").is_equal("> Eggs for Tilda")
 	quest_log.move_cursor(1)
 	assert_array(Array(quest_log.shown_lines())).override_failure_message("the list moves up a line").is_equal([
-		"  A Place of Your Own", "  Black for the Loom", "  Eggs for Tilda", "  Lights on the Marsh", "> New Shears",
+		"  A Place of Your Own", "  A Roof for the Flock", "  Black for the Loom", "  Eggs for Tilda", "> Lights on the Marsh",
 	])
-	assert_str(quest_log.corner_text()).is_equal("^ 6/12 v")
+	assert_str(quest_log.corner_text()).is_equal("^ 6/14 v")
+	assert_str(quest_log.shown_detail()).contains("wisp embers")
+	quest_log.move_cursor(1)
+	assert_str(quest_log.shown_lines()[4]).is_equal("> Market Day")
+	assert_str(quest_log.shown_detail()).contains("six eggs")
+	quest_log.move_cursor(1)
+	assert_str(quest_log.shown_lines()[4]).is_equal("> New Shears")
 	assert_str(quest_log.shown_detail()).contains("iron bars")
 	quest_log.move_cursor(2)
 	assert_str(quest_log.shown_lines()[4]).is_equal("> Seed Stock")
 	assert_str(quest_log.shown_detail()).contains("wheat")
 	quest_log.move_cursor(4)
 	assert_str(quest_log.shown_lines()[4]).is_equal("> Back")
-	assert_str(quest_log.corner_text()).is_equal("^ 12/12  ")
+	assert_str(quest_log.corner_text()).is_equal("^ 14/14  ")
 	quest_log.move_cursor(1)
 	assert_str(quest_log.shown_lines()[0]).override_failure_message("round to the top").is_equal("> A Pie for Pip")
 	quest_log.close()

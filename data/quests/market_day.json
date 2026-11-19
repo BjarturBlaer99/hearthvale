@@ -1,0 +1,69 @@
+{
+  "id": "market_day",
+  "title": "Market Day",
+  "giver": "tilda",
+  "start_stage": "bring",
+  "stages": {
+    "bring": {
+      "journal": "Tilda wants six eggs to sell on market day. Hens kept in a coop on your farm lay them; Farmer Oda sells hens.",
+      "objectives": [
+        {
+          "id": "have",
+          "text": "Have six eggs",
+          "complete_when": {
+            "type": "any",
+            "of": [
+              {
+                "type": "has_item",
+                "item": "egg",
+                "count": 6
+              },
+              {
+                "type": "flag",
+                "flag": "market_eggs_given",
+                "value": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "bring",
+          "text": "Bring them to Tilda",
+          "complete_when": {
+            "type": "flag",
+            "flag": "market_eggs_given",
+            "value": true
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "when": {
+            "type": "flag",
+            "flag": "market_eggs_given",
+            "value": true
+          },
+          "to": "done"
+        }
+      ]
+    },
+    "done": {
+      "journal": "Tilda has her eggs for market day. She gave you fifty coins and two carrot cakes.",
+      "on_enter": [
+        {
+          "type": "give_item",
+          "item": "coin",
+          "count": 50
+        },
+        {
+          "type": "give_item",
+          "item": "carrot_cake",
+          "count": 2
+        },
+        {
+          "type": "complete_quest"
+        }
+      ]
+    }
+  }
+}

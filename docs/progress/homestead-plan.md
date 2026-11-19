@@ -769,10 +769,13 @@ TECH_DESIGN, the roadmap, the README and DECISIONS up to date; CLAUDE.md is the 
   give; the silo; the three dishes; Tilda's list.
 
 **Phase 5: balance** *(two commits, and a third for the tuning)*
-- [ ] 5a. **Two favours,** both at three marks:
+- [x] 5a. **Two favours,** both at three marks:
   - **Tilda, "Market Day":** 6 eggs. 50 coins and 2 Carrot Cakes. (She teaches at two marks, as Wenna and
     Edda do.)
   - **Farmer Oda, "A Roof for the Flock":** a Coop standing on the farm. 60 coins and 5 hay.
+  - *Built (2026-11-19) as written:* both are data (`market_day`, `a_roof_for_the_flock`), Tilda's after
+    her carrot cake of two marks, Oda's after his seed wheat of two; "a Coop standing" is the flag
+    `built/coop`, which GameState keeps by `is_built()`. Thirteen quests. Shots 204 to 207.
 - [ ] 5b. **Ten days played** by `tools/play_days.gd`, taught the farm: the walk, the field, clearing,
   the workbench's new tabs, setting a building down, buying and tending animals. A report,
   `docs/progress/homestead-balance-report.md`, with coins, materials, buildings and animals for each day,

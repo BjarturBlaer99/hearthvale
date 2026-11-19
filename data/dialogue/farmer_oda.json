@@ -31,6 +31,21 @@
         }
       ],
       "node": "favour"
+    },
+    {
+      "conditions": [
+        {
+          "type": "friendship",
+          "villager": "farmer_oda",
+          "marks": 3
+        },
+        {
+          "type": "quest_status",
+          "quest": "a_roof_for_the_flock",
+          "status": "not_started"
+        }
+      ],
+      "node": "roof"
     }
   ],
   "speakers": {
@@ -41,6 +56,40 @@
       "speaker": "oda",
       "text": "My chickens won't keep to the field, and the tall grass by the woods grows back faster than I can cut it.",
       "options": [
+        {
+          "text": "My coop is built.",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "a_roof_for_the_flock",
+              "stage": "build"
+            },
+            {
+              "type": "flag",
+              "flag": "built/coop",
+              "value": true
+            }
+          ],
+          "effects": [
+            {
+              "type": "set_flag",
+              "flag": "coop_shown_oda",
+              "value": true
+            }
+          ],
+          "next": "roof_done"
+        },
+        {
+          "text": "About that coop...",
+          "conditions": [
+            {
+              "type": "quest_stage",
+              "quest": "a_roof_for_the_flock",
+              "stage": "build"
+            }
+          ],
+          "next": "roof_hint"
+        },
         {
           "text": "Five sheaves of wheat.",
           "conditions": [
@@ -268,6 +317,57 @@
     "favour_done": {
       "speaker": "oda",
       "text": "Good heavy heads, these. Here's the pumpkin seed. Give them eight days and plenty of water.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "roof": {
+      "speaker": "oda",
+      "text": "You've land of your own now. A farm wants hens, and hens want a roof over them. Will you build a coop out there?",
+      "options": [
+        {
+          "text": "I'll build one.",
+          "effects": [
+            {
+              "type": "set_quest_stage",
+              "quest": "a_roof_for_the_flock",
+              "stage": "build"
+            }
+          ],
+          "next": "roof_go"
+        },
+        {
+          "text": "Not just now.",
+          "next": "hello"
+        }
+      ]
+    },
+    "roof_go": {
+      "speaker": "oda",
+      "text": "Good lad. Wood, stone and fibre, and a few coins. Tell me when it stands.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "roof_hint": {
+      "speaker": "oda",
+      "text": "A coop standing on your farm. The plan's on the Build tab of your workbench, and it stands the morning after you set it down.",
+      "options": [
+        {
+          "text": "Goodbye.",
+          "next": null
+        }
+      ]
+    },
+    "roof_done": {
+      "speaker": "oda",
+      "text": "A coop of your own! Here: sixty coins, and five hay to start your hens on.",
       "options": [
         {
           "text": "Goodbye.",

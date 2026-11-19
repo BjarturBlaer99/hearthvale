@@ -1545,3 +1545,17 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
     egg, a fleece or a pail goes into the pack; petting with nothing to take, or with no room, is none.
   - **Tilda's four new lines are her `buys`,** after the bars; the egg and the milk are the first food on
     that list (what she buys was all material until now).
+- 2026-11-19 — **The Homestead, step 5a (two favours): what the plan left open.** The favours, their wants
+  and their rewards are the plan's as written; Tilda teaches the carrot cake at two marks (she did since
+  P4d), so no recipe was added.
+  - **"A Coop standing" is the flag `built/<id>`,** as R17 names it, kept by GameState from
+    `is_built()` (set the morning a site stands, erased when the building is pulled down, put right as a
+    save is read). A flag, not a new condition type: the quest and the conversation stay data. A coop
+    pulled down before Oda is told undoes the first objective; once told, the quest is done for good.
+  - **Oda's coop comes after his seed wheat,** as Tilda's favour comes after her lesson: his openings are
+    the present (four marks), the wheat (two), the coop (three), the first that is met. Put off, the wheat
+    is asked again at the next talk, and the coop waits behind it.
+  - **A coop that stands before he is asked counts:** the first objective is done as he takes the
+    favour, and he can tell Oda at once.
+  - **Their words:** Tilda's ask names hens of his own and Oda's stall; Oda's reminder names the Build
+    tab and that a site stands the next morning.
