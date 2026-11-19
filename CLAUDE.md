@@ -58,7 +58,11 @@ farm's two tunes. Nobody has played it by hand: only the tests, and two days by 
 at four times speed. **Phase 2 is built (2026-11-19) and the user approved it the same day** ("Approve
 Phase 2", shown the summary and the pictures): build mode (B, on the homestead only), fifteen
 placeables on a build bar of their own, the hand, the workbench's "Make" and "Place" tabs, and Tilda's
-seven wares for the land. Nobody has played it by hand. Phases 3 to 5 are not built. The plan's
+seven wares for the land. Nobody has played it by hand. **Phase 3 is built (2026-11-19) and waits for
+the user's review:** the workbench's "Build" tab, kits and sites, the Well, the Silo and hay from the
+meadow, the Coop, the Barn and the Shed with their rooms, the shed's chests and furnace, the two
+upgrades, and moving and pulling down; nobody has played it by hand, and its rules are in the plan and
+TECH_DESIGN §30 until that review. Phases 4 and 5 are not built. The plan's
 thirty numbered decisions are the approved ones: they are at the head of the plan ("What the user has
 decided", which stands in for the `docs/HOMESTEAD-NOTES.md` the request names) and in
 `docs/DECISIONS.md`. Each phase is built by a subagent with a fresh context; **CLAUDE.md is the
