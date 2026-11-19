@@ -81,6 +81,13 @@ which does not exist. The coordinator adds to it after each review.
   are phase 4's to read); `GameState.is_built(id)`, `is_big(id)`, `homestead().hay`; a building with a
   room has a door and the homestead's entry `<id>_door`; `GameState.why_not_demolish()` is where "no
   animals" goes.
+- **2026-11-19, the user approved phase 3** ("Approve, fix looks first", shown the summary and seven
+  pictures in a cloud session; nobody has played it by hand). First, three looks changed at the user's
+  word: the Coop wears wooden shingles, the Big Barn green boards, and the shed's bookshelves became a
+  tool rack and sacks (commit `3d99550`). Of the two readings: **a silo with hay stays one that can't be
+  pulled down** ("Keep as built"); the tall grass reading was approved with the phase as built. R4, R7's
+  hay, R8's shed, R9 and R10's `build` tab are in CLAUDE.md, with a block of phase 3's rules. R15 to R17
+  wait for phases 4 and 5.
 
 ## The short of it
 
