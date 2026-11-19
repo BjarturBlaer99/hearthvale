@@ -1446,3 +1446,9 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the small Barn and the Big Coop. For show only.
 - **The Shed's two bookshelves became a rack of tools and sacks on a crate,** two new furniture
   tiles as solid and as tall as the shelves (height 2), so nothing changed but the pictures.
+
+## 2026-11-19 — The user's review of the Homestead's phase 3
+- **A silo with hay in it can't be pulled down** (the user: "Keep as built"). Nothing takes hay out of
+  the silo until phase 4's animals eat it; pulling it down does not give the hay back.
+- **The Coop's room keeps its shelves** (as perches and nesting boxes) for now: the user named only
+  the shed's bookshelves.
