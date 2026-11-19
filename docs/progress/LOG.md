@@ -2812,3 +2812,5 @@ The second of phase 2's two steps (`docs/progress/homestead-plan.md`).
 - **`SpriteSheet.draw()` puts a mirrored frame a frame's width to the right** (step 2a's entry). Left alone: it needs the user's word.
 - **Placeables can be put in the storage chest,** like anything that stacks, and can't be sold: Tilda buys none of them.
 - **CLAUDE.md is as it was:** its words for phase 2 (the plan's R10 to R14) are the coordinator's to write, and the phase's report proposes them as built.
+
+**Approved (phase 2).** The coordinator ran the full suite again (1038 tests in 134 suites pass), confirmed the two commits and looked at the pictures; shown the summary and the pictures, the user approved phase 2 on 2026-11-19 ("Approve Phase 2"), as built. Nobody has played it by hand. CLAUDE.md's rules now describe build mode and the placeables. Phase 3 is next, stopping at its end.

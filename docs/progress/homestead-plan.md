@@ -28,12 +28,14 @@ which does not exist. The coordinator adds to it after each review.
   4. No hay for sale (as written: it is under "Not in this plan").
   5. The welcome sign in the square is left alone (as written).
 - **The stops are after each phase,** as the user's instructions say. The plan's suggestion of a look
-  after step 3a is not decided: the coordinator asks before phase 3 begins.
+  after step 3a was put to the user with phase 2's summary and not answered; phase 3 stops at its end,
+  by the user's own rule, and commits after each step so it can be stopped between them.
 - **CLAUDE.md:** the paragraph R1 was added under "Current goal" on approval. R2 to R19 are added by the
   coordinator as each phase is built and reviewed, in the words below unless the phase built otherwise.
   **R2 to R8, R18 and R19 went in on 2026-11-19, after phase 1's approval, in the words of what was
   built** (baked cells and real names; the phase's report gave them and the coordinator checked the
-  names against the code). R9 to R17 wait for phases 2 to 5.
+  names against the code). R10 to R14 went in the same way after phase 2's approval (R10 without
+  its `build` tab, which is phase 3's). R9 and R15 to R17 wait for phases 3 to 5.
 - **2026-11-19, phase 1 is built** (steps 1a and 1b on 2026-11-18, step 1c finished on 2026-11-19;
   each is ticked below with what was built differently) **and the user approved it on 2026-11-19** ("Approve Phase 1", shown the summary and the pictures; nobody has played it by hand). *(Written
   by the phase's subagent; the coordinator ran the full suite again, 977 tests in 130 suites, and
@@ -47,8 +49,11 @@ which does not exist. The coordinator adds to it after each review.
   - spawn markers for the land are a second row at the end of the atlas (`LAND_MARKER_KINDS`);
   - an area may name its own night tune (`night_music`).
 - **2026-11-19, phase 2 is built** (steps 2a and 2b, each ticked below with what was built
-  differently) **and waits for the user's review.** *(Written by the phase's subagent, for the
-  coordinator to confirm.)* Every approved decision it touches (D12 to D19, D30) held as written.
+  differently) **and the user approved it on 2026-11-19** ("Approve Phase 2", shown the summary and the
+  pictures; nobody has played it by hand). *(Written by the phase's subagent; the coordinator ran the
+  full suite again, 1038 tests in 134 suites, and confirmed the commits and the pictures. The
+  approval was of the phase as built, so the hand's reading of D16 below stands: the user did not
+  speak to it apart.)* Every approved decision it touches (D12 to D19, D30) held as written.
   One reading wants the user's word: **D16 says moving "is taking up and setting down in one go";
   the hand as built moves a thing as it is,** so a moved sapling keeps its mornings, a moved tree
   stays a tree, and a full pack is no hindrance. Taking a tree up (a right click) gives back its

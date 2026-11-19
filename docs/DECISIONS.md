@@ -1320,3 +1320,17 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
     and blinking: the dark lamp, two flower beds and the cherry sapling are made so.
   - **Older tests that counted Tilda's wares or the workbench's list were brought up to date,** each
     keeping its checks: the shop's carry sixteen wares, and the workbench's ask for the "Make" tab.
+- 2026-11-19 — **The Homestead's phase 2 was approved by the user** ("Approve Phase 2"), shown the
+  summary and nine pictures; nobody has played it by hand. It was approved as built, so the choices the
+  phase made where the plan was silent (above, under steps 2a and 2b) stand, among them **the hand's
+  reading of D16:** a moved sapling keeps its mornings and a moved tree stays a tree, and only taking a
+  tree up gives back its sapling. The user did not speak to that reading apart; the coordinator had
+  recommended it.
+- 2026-11-19 — **CLAUDE.md's rules were brought up to date for phase 2 after that approval** (the plan's
+  R10 to R14 and a block for phase 2), in the words of what was built, with the names checked against
+  the code. R10's `build` tab, R9 and R15 to R17 wait for their phases.
+- 2026-11-19 — **No look after step 3a.** The plan suggested one; put to the user with phase 2's summary,
+  it was not answered, so phase 3 stops at its end by the user's own rule, committing after each step.
+- 2026-11-19 — **Left for the user, not changed:** a mirrored sprite frame is drawn one frame's width to
+  the right in this engine (phase 2's subagent measured it; the chickens, a side-on goblin, the Warden and
+  the Shade facing the other way). It is older than the Homestead and outside it.

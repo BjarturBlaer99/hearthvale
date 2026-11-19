@@ -55,19 +55,18 @@ the user approved it the same day** (shown the summary and the pictures: "Approv
 west end, the farm's map, the farmhouse as the hero's home, the old cottage locked, the field 12 by 6,
 a pond, save version 6, the story's words, the overgrowth (145 things cleared for good, fibre) and the
 farm's two tunes. Nobody has played it by hand: only the tests, and two days by `tools/play_days.gd`
-at four times speed. **Phase 2 is built (2026-11-19) and waits for the user's review:** build mode (B,
-on the homestead only), fifteen placeables on a build bar of their own, the hand, the workbench's
-"Make" and "Place" tabs, and Tilda's seven wares for the land; nobody has played it by hand, and its
-rules are in the plan and TECH_DESIGN §30 until that review (the plan's R10 to R14). Phases 3 to 5 are
-not built. The plan's
+at four times speed. **Phase 2 is built (2026-11-19) and the user approved it the same day** ("Approve
+Phase 2", shown the summary and the pictures): build mode (B, on the homestead only), fifteen
+placeables on a build bar of their own, the hand, the workbench's "Make" and "Place" tabs, and Tilda's
+seven wares for the land. Nobody has played it by hand. Phases 3 to 5 are not built. The plan's
 thirty numbered decisions are the approved ones: they are at the head of the plan ("What the user has
 decided", which stands in for the `docs/HOMESTEAD-NOTES.md` the request names) and in
 `docs/DECISIONS.md`. Each phase is built by a subagent with a fresh context; **CLAUDE.md is the
 coordinator's to edit, not a phase's** (a phase says in its report what should change here). The rules
-below describe the game as it stands, with phase 1 built: where the plan changes one for a later phase
-(the mouse in build mode, what a crafting recipe may make, a second furnace and more chests, a second
-shop, the count of quests), **the plan's approved decision is the rule for the phase that builds it,**
-and the words here follow once that phase is reviewed (the plan's R9 to R17). Build nothing beyond the
+below describe the game as it stands, with phases 1 and 2 built: where the plan changes one for a later
+phase (a workbench tab for buildings, a second furnace and more chests, a second shop, the count of
+quests), **the plan's approved decision is the rule for the phase that builds it,** and the words here
+follow once that phase is reviewed (the plan's R9 and R15 to R17, and R10's `build` tab). Build nothing beyond the
 plan's list, and nothing of a later phase early. Nothing beyond it is planned: ask before building more.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
@@ -155,8 +154,8 @@ godot --headless --path . --quit-after 30
 godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
-# Start partway through to try one part by hand (scenarios in the script: late, gifts, bram, gate, rest, kitchen, farm, homestead, market, home,
-# village, marsh, quarry, deep, craft, warden, crypt, shade, ending). An hour after the name starts at that time of day, energy=<n> with that
+# Start partway through to try one part by hand (scenarios in the script: late, gifts, bram, gate, rest, kitchen, farm, homestead, build, market,
+# home, village, marsh, quarry, deep, craft, warden, crypt, shade, ending; `build` is the farm with a stock of every placeable). An hour after the name starts at that time of day, energy=<n> with that
 # much energy, and skills=<level> with every skill at that level. `farm` starts on the homestead's road above the field; `homestead` arrives
 # by the lane with all three pickaxes (`-- homestead 20:30` for its night tune).
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
@@ -269,13 +268,26 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   hold-to-sprint. Since P2c sprint costs **energy**, which the user asked for on 2026-11-12 in place of the
   old "no stamina" rule. Hearts are life in combat only: energy never costs hearts.
 - Do not let art or animation change gameplay timing, hit detection or collisions, unless a step says so.
+  **What the player sets down is not art:** a fence, a hedge, a bench, a lamp post or a sapling fills its
+  cell because `GameState.homestead()` says it stands there (`PlacedThings` tells the terrain), and nothing
+  else in the game changes for it. A gate, and everything that lies, never blocks.
 - Do not add motion to the scenery (wind, drifting petals or mist, smoke, specks): only the water moves, at
-  the user's request of 2026-11-13.
+  the user's request of 2026-11-13. **On the homestead the same holds:** a sapling changes its picture at
+  dawn and never sways, a lamp post's light is steady, and no petals lie or drift round a planted cherry.
 - Do not make the mouse a pointer **in play**, and keep its two buttons as the user set them on 2026-11-13,
   as in farming games: **left click uses what is in hand** (`AreaController.use_hand()`: the lit slot of the
   item bar) and answers in a conversation; **right click interacts** with people and things. Moving stays on
   the keys; Space and Q still do the sword and the item. A bow with no arrows gives the left click back to
   the sword (`GameState.is_out_of_ammo()`), so running out is no dead end.
+- **In build mode the mouse points at a cell** (approved with the Homestead's plan, D12). Build mode is a
+  screen, as a menu is: B opens it (the action `build`; a pad's left stick), on the homestead only and only
+  when he is free to act; anywhere else he is told "You can only build on your own land." The hero stands
+  still and the clock with him (`is_in_menu()`, `is_building()`). The thing chosen shows as a ghost on the
+  cell under the mouse (the movement keys move it a cell at a time, no further than the screen shows),
+  green where it fits and red where it doesn't, with the reason in words. A left click sets it down (and
+  the sword's key); a right click takes up what is there (and the item's key); the wheel and the keys 1 to
+  9 choose on the build bar; Tab, Esc or B leave. **Nothing is ever set down with the mouse in play,** and
+  where a click lands in play still doesn't matter.
 - **In menus the mouse points** (the user's request, 2026-11-15): the line under it is highlighted and a
   click chooses that line; a click on no line chooses the highlighted one, as before. Every new menu or list
   does the same (`MenuInput.line_under()`, `MenuPointer`, and `MenuCursor.select()` / `take_click()`), takes
@@ -284,7 +296,10 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   steps through it, the keys 1 to 9 choose a slot (`HandBar`, pure; `GameState.take_in_hand()`,
   `step_hand()`; `ItemBar` draws it). The Tab menu lists food only. `GameState.equipped` is always something
   he carries: the last bomb or seed empties the item button. Do not put food, or anything that isn't held in
-  the hand, in the bar without asking.
+  the hand, in the bar without asking. **What is set down in build mode is chosen on the build bar, never
+  the item bar:** an item of type `placeable` is not in `Inventory.EQUIPPABLE_TYPES`. The build bar's first
+  slot is the hand, which lifts a thing and sets it down elsewhere. The sprinkler is as it was: on the item
+  bar, set on the plot.
 - Do not let a full pack lose things: what can't be carried whole stays where it is and the hero is told
   (`GameState.has_room_for()`; a pickup, a forage spot and a chest each have `has_room()`). **A test that
   fills a stack and then takes more of it sees a refusal,** not a silent loss. What is *given* (the
@@ -462,8 +477,9 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
 - **Crafting (2026-11-17; `docs/progress/mining-crafting-plan.md`, TECH_DESIGN §28):** made at home, in
   the farmhouse.
   - **A crafting recipe is a file in `data/crafting/`** (cooking keeps `data/recipes/`): its `station`
-    (`workbench` or `furnace`), `order`, `needs`, `makes` (an item, or a `furnishing`) and an optional
-    `unlock` (an item `found`, or a `skill` and `level`). `Crafting` (`core/crafting/`, pure) says what
+    (`workbench` or `furnace`), its `tab` at the workbench (`make` or `place`; `make` if it names none;
+    the Homestead's phase 3 adds `build`), `order`, `needs`, `makes` (an item, which may be a placeable,
+    or a `furnishing`) and an optional `unlock` (an item `found`, or a `skill` and `level`). `Crafting` (`core/crafting/`, pure) says what
     is known and why a thing can't be made; **go through `GameState.craft(recipe_id)`**, which returns
     "" or the reason. **A new recipe is data only.**
   - **What he has ever held is `GameState.found`:** `add_item()` marks it whenever a count goes up, so
@@ -477,7 +493,12 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     the old cottage's room, cell for cell. **A furnishing is never set down by hand.**
   - **The workbench's list** is `hud.craft_menu` (`AreaController.open_craft()`): `entries()`,
     `shown_lines()`, `greyed_lines()`, `need_lines()`, `confirm()`. Greyed lines are on a second label
-    in the same place (`bright_lines()` is what the bright one shows).
+    in the same place (`bright_lines()` is what the bright one shows). **It has two tabs:** "Make"
+    (thirteen recipes) and "Place" (nine, known from the first day). `hud.craft_menu.tab` is the one
+    showing (`Crafting.TAB_MAKE` each time it opens); `switch_tab()` and `show_tab(Crafting.TAB_PLACE)`
+    turn it, and `entries()`, `shown_lines()` and `confirm()` are the showing tab's.
+    **`GameState.known_crafts(Crafting.WORKBENCH)` gives both tabs' recipes:** a test that counts the
+    workbench's list asks for one tab (`Crafting.of_tab(..., Crafting.TAB_MAKE)`).
   - **The furnace** (`GameState.furnace()`, a pure `Furnace`) is lit today and ready from the next
     morning: **a test lights it, calls `GameState.start_next_day()`, and takes the bars out through its
     conversation** (`home.interact()`, then `hud.dialogue.confirm()`). One load, five bars at the most
@@ -561,10 +582,65 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     (`tests/world/story_days_test.gd`), not counted to 150 letters: a stage must end above the line of
     help and be no longer than 200.
   - **In a capture shot the hero hides anything in the cell north of him:** he is two cells tall.
-    `tools/capture.gd`'s shots end at 167; its title shot reads (only reads) the player's slot 1 for its
+    `tools/capture.gd`'s shots end at 176 (168 to 176 are phase 2's); its title shot reads (only reads) the player's slot 1 for its
     "Continue" line.
   - **A subagent's scratch folder may hold an earlier subagent's files:** work in a subfolder of your
     own, and never run a script there you did not just write.
   - **Do not** let anything cleared come back, put debris on the field's clear corner, the road, the
     path or the row before the farmhouse, change a count, a blow or a drop of the overgrowth without the
     user's word, or add monsters, villagers or forage to the homestead: each was decided with the plan.
+
+- **The Homestead, phase 2 (2026-11-19; `docs/progress/homestead-plan.md`, TECH_DESIGN §30): placing things.**
+  - **A placeable is an item of type `placeable`** (fifteen). Its stats: `layer` (`lying`/`standing`),
+    `fills` (paths and floors), `blocks` (a gate says false), `joins` (fence, gate), `light` (lamp post),
+    `grows` (`mornings`, `tree`). `Placement` (`core/homestead/`, pure) reads them (`layer_of`, `blocks`,
+    `joins`, `fills`, `light_of`, `mornings_of`, `is_grown`, `stage_of`, `frame_of`) and says whether one
+    fits: `Placement.why_not(item, Placement.site(...))`, the plan's table in its order. **A new placeable
+    is data and a frame of `placed.png`** (`PlacedArt.FRAMES`; its `icon` is its picture on the ground too).
+  - **`GameState.homestead()` keeps two layers,** a cell to one of each: `lying_at(cell)`,
+    `standing_at(cell)`, `age_at(cell)`, `placed(layer)`, `placed_count()`. **Go through
+    `GameState.set_down(area, cell, item_id)`, `take_up(area, cell, layer)` and
+    `move_placed(area, from, to, layer)`.** They refuse off his land and emit `EventBus.homestead_changed`,
+    but **they don't ask whether the ground fits** (build mode asks `Placement` first): a test or tool that
+    calls `set_down()` itself picks a cell that is open ground, and play never calls it but through build
+    mode.
+  - **In the area** (both null off the land): `farm.placed` (`PlacedThings`: `standing_node(cell)`,
+    `standing_nodes()`, `has_tree(cell)`) and `farm.build` (`BuildMode`, `world/areas/build_mode.gd`). A
+    standing thing is a `PlacedThing` in `Interactables` (`item_id`, `age`, `blocks()`, `joined()`,
+    `is_lit()`, `glow_now()`, `is_grown()`); what blocks is `farm.terrain.is_occupied(cell)` at once. A
+    grown sapling is `farm.scenery.by_cell[cell]`, stood by `Scenery.stand()` like the map's trees.
+  - **A test builds like this:** `farm.open_build()`; choose with `farm.build.step(1)` until
+    `farm.build.chosen` is the id (`BuildBar.HAND` for the hand; `choose_slot(0)` is the hand only while he
+    carries eight kinds or fewer); `farm.build.point_at(cell)`, which is clamped to `view_cells()`;
+    `farm.build.set_down()`; `farm.build.take_up()`. Ask `why_not()`, `fits()`, `words()`; on the HUD
+    `hud.build_bar.shown_ids()`, `shown_counts()`, `lit_slot()`, `hud.build_words()`,
+    `hud.build_refused()`. **After loading the farm or moving the hero, `await await_idle_frame()` before
+    trusting the view.** A mouse event's `position` is
+    `farm.build.get_global_transform_with_canvas() * GridBody.cell_center(cell)`, handed to
+    `farm.build._unhandled_input()`.
+  - **Open ground for tests:** east of the farmhouse, columns 32 to 37, rows 10 to 13, and (29..37,
+    12..13). (35, 9) is a rock, (36, 9) and (36, 7) weeds, (36, 5) weeds that stand alone, (34, 8) an old
+    tree; (31, 11) is the house's wall. With the hero at (30, 13) the view is rows 2 to 24.
+  - **The mode opens on the first thing he carries** (else the hand), and remembers the choice; **the last
+    of a thing set down leaves the hand chosen.** With the hand, `set_down()` lifts (`farm.build.lifted`)
+    and the next `set_down()` moves it as it is (a sapling keeps its mornings, a tree stays a tree: the
+    user approved this reading of D16 with the phase); `take_up()`, another choice or `close()` lets go. A
+    right click on a grown tree gives back its sapling.
+  - **The farmhouse's doorstep says "That is the road."** (it is the path's end); no cell of the land says
+    "That is a doorstep." until a building stands.
+  - **The meadow's fourteen tall-grass cells are plain grass until phase 3,** so things can be set down
+    there now: phase 3 says what becomes of a thing standing on a tuft's cell.
+  - **A lamp post is lit from 18:30 to 06:30** (`DayClock.lamps_lit`): a new morning at 06:00 still finds
+    it lit; set 07:00 for dark. Each lit lamp post is two of the area's engine lights.
+  - **Saplings grow by `GameState.start_next_day()`** (and `sleep()`): oak 4 mornings, cherry 6.
+  - **The save is still version 6:** `homestead` has `lying` and `standing` only when something is set
+    down, so **a save with nothing set down still reads `{"cleared": [...]}`.**
+  - **Tilda sells sixteen wares** (her four, seven for the land, five seeds): turnip seeds are her twelfth
+    line (`move_cursor(11)`), and one of everything costs 153 coins. A test that lists every item carries
+    the fifteen; `Audio.SFX` and the audio tool list `set_down` and `take_up`.
+  - **`SpriteSheet.draw()` with `flip_h` draws a frame's width to the right in this engine** (measured by
+    phase 2's subagent, not fixed: it is older than the Homestead and wants the user's word). `PlacedArt`
+    mirrors in place itself; the creatures are as they were.
+  - **Do not** put a placeable on the item bar, call `GameState.set_down()` from play, make a lamp post
+    flicker or a sapling sway, bump the save's version for what is set down, or change a cost or price of
+    the fifteen without the user's word.
