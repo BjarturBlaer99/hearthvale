@@ -1607,3 +1607,16 @@ the plan's four steps, each stopping for the user's review.
   until then; logs and stumps throw splinters (data) and shudder and flash like rocks; the flash is
   the white picture at a little over half strength. See `docs/progress/tool-polish-plan.md`,
   "Step 2 — built".
+
+## 2026-11-19 — Art as PNG: the plan approved
+The user approved `docs/progress/png-art-plan.md` as written ("Approve as written"): A1 the PNGs stay
+where the game loads them, `art/` holds the sheet list, palettes, how-to and `.aseprite` files; A2 the
+six painting tools move to `tools/retired/` under `.gdignore`; A3 `PixelGrade` keeps `INK` and `warm()`,
+`apply()` retires; A4 the white flash rows stay in the PNGs; A5 a 256-colour master palette, one per
+sheet and the villager markers; A6 `art/sheets.json` drives the art tests; A7 the proof is byte-equal
+PNGs and every shot and film compared against two "before" runs; A8 the tool polish's steps 3 and 4
+are built first, then the switch.
+- 2026-11-19 — **Tool polish, step 3 (work by hand): what building it decided.** A reach of 0.15 s,
+  then a hold-up of 0.6 s for a crop or a product; nothing held up and no heart when the pack has no
+  room; the heart is a child of the animal, drawn in code; chaff only when hay goes in. See
+  `docs/progress/tool-polish-plan.md`, "Step 3 — built".

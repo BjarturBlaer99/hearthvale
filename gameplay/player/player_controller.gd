@@ -20,6 +20,10 @@ const DUST_EVERY: float = 0.16
 const HOLD_TIME: float = 1.1
 ## Where a held item's picture is drawn, from the hero's feet: just above the raised hands.
 const HOLD_OFFSET: Vector2 = Vector2(-8.0, -47.0)
+## Work by hand (tool polish, D7): how long he reaches before him, and how long he then holds up
+## what he took (a crop, an egg). Moving ends either at once.
+const REACH_TIME: float = 0.15
+const HAND_UP_TIME: float = 0.6
 
 var motor: PlayerMotor
 ## Whether input moves the hero (off while talking, going through a door, or down).
@@ -38,6 +42,7 @@ var _shake_time: float = 0.0
 var _shake_strength: float = 0.0
 var _dust_left: float = 0.0
 var _hold_left: float = 0.0
+var _reach_left: float = 0.0
 var _hold_icon: StringName = &""
 var _falling: bool = false
 var _fall_left: float = 0.0
@@ -188,6 +193,11 @@ func _physics_process(delta: float) -> void:
 	_land_left = LAND_TIME if was_in_the_air and _hop_left <= 0.0 else maxf(0.0, _land_left - delta)
 	_animator.tick(delta)
 	_fall_left = maxf(0.0, _fall_left - delta)
+	if _reach_left > 0.0:
+		_reach_left = maxf(0.0, _reach_left - delta)
+		if _reach_left <= 0.0:
+			# The reach is over: what he took is up in his hands now.
+			queue_redraw()
 	if _hold_left > 0.0:
 		_hold_left -= delta
 		if _hold_left <= 0.0:
@@ -200,9 +210,34 @@ func _physics_process(delta: float) -> void:
 func hold_up(icon: StringName) -> void:
 	_hold_icon = icon
 	_hold_left = HOLD_TIME
+	_reach_left = 0.0
 	queue_redraw()
 	if motor != null:
 		sync_from_motor()
+
+
+## He reaches down before him for a moment (tool polish, D7: a crop cleared, an animal petted,
+## hay put in the silo). For show only: he is free to move, and moving ends it.
+func reach() -> void:
+	_end_hold()
+	_reach_left = REACH_TIME
+	if motor != null:
+		sync_from_motor()
+
+
+## He reaches before him, then holds `icon` (ItemIcons) up over his head for HAND_UP_TIME: what
+## his hands just took (a crop, an egg, wool). For show only: moving ends it.
+func hand_up(icon: StringName) -> void:
+	_hold_icon = icon
+	_reach_left = REACH_TIME
+	_hold_left = REACH_TIME + HAND_UP_TIME
+	queue_redraw()
+	if motor != null:
+		sync_from_motor()
+
+
+func is_reaching() -> bool:
+	return _reach_left > 0.0
 
 
 ## The hero drops out of sight (into a pit) over `seconds`, and stays gone until end_fall().
@@ -260,7 +295,7 @@ func _end_hold() -> void:
 
 
 func _draw() -> void:
-	if _hold_left > 0.0:
+	if _hold_left > 0.0 and _reach_left <= 0.0:
 		ItemIcons.draw(self, _hold_icon, HOLD_OFFSET)
 
 
@@ -316,8 +351,9 @@ func _update_sword() -> void:
 func _update_visuals() -> void:
 	var moved: float = motor.position.distance_to(_last_position)
 	_last_position = motor.position
-	if _hold_left > 0.0 and (moved > 0.0 or motor.is_attacking()):
+	if (_hold_left > 0.0 or _reach_left > 0.0) and (moved > 0.0 or motor.is_attacking()):
 		_end_hold()
+		_reach_left = 0.0
 	_animator.sprinting = motor.sprinting and moved > 0.0
 	_animator.update(motor.facing, moved)
 	if motor.state_name == PlayerMotor.DEAD or _lying:
@@ -330,6 +366,9 @@ func _update_visuals() -> void:
 		_animator.attack_progress = (motor.state as PlayerAttackState).progress()
 	elif motor.state_name == PlayerMotor.HURT:
 		_animator.pose = PlayerAnimator.Pose.HURT
+	elif _reach_left > 0.0:
+		_animator.pose = PlayerAnimator.Pose.WORK
+		_animator.work_pose = ToolStroke.REACH
 	elif _hold_left > 0.0:
 		_animator.pose = PlayerAnimator.Pose.HOLD
 	elif _land_left > 0.0:

@@ -4,7 +4,7 @@ extends GdUnitTestSuite
 ## the ground: nothing is left in the air, nothing rises. The pour falls to where it lands and
 ## the ring on the water stays flat where it is.
 
-const STROKE_KINDS: Array[StringName] = [&"clods", &"splash", &"seeds", &"chips", &"rubble", &"splinters"]
+const STROKE_KINDS: Array[StringName] = [&"clods", &"splash", &"seeds", &"chips", &"rubble", &"splinters", &"chaff"]
 const FRAME: float = 1.0 / 60.0
 
 

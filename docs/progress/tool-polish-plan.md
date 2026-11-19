@@ -264,3 +264,16 @@ decided:
 - **From behind, the water is hidden:** facing up, only the splash shows on the cell.
 - **Filling the can says so at the press** ("The watering can is full."), with the ring and the sound at the
   blow.
+
+## Step 3 — built (2026-11-19)
+
+Work by hand (D7, D8): `PlayerController.reach()` and `hand_up(icon)`, `HeartPop`, the `chaff` burst,
+and three films (`take_wool`, `pet_hen`, `silo_hay`). What building it decided:
+- **The reach is the work pose's reach column** (step 1's), for 0.15 s; the hold-up is the found-item
+  pose for 0.6 s after it (a found item's is 1.1 s, as before).
+- **A product the pack has no room for** is neither taken nor held up: he reaches, and no heart shows
+  (the words say why).
+- **The heart is a child of the animal,** so it rises over the animal even as it walks; it is drawn in
+  code, five pixels wide, outlined in `PixelGrade.INK`.
+- **Hay put in the silo** reaches and throws chaff only when hay went in; a full silo or an empty
+  pack is words only.

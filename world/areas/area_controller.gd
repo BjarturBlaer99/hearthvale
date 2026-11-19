@@ -725,11 +725,16 @@ func interact() -> bool:
 		return talk_to(talkable)
 	var animal: Animal = animal_in_front()
 	if animal != null:
-		hud.show_message(GameState.pet_animal(animal.index))
+		_pet(animal)
 		return true
 	var usable: Node2D = usable_in_front()
 	if usable != null:
+		var hay: int = GameState.item_count(&"hay")
 		var message: String = usable.call(&"use")
+		# Hay put in the silo (the Homestead): he reaches to its door, and a little chaff falls.
+		if usable is BuildingSpot and GameState.item_count(&"hay") < hay:
+			player.reach()
+			Burst.spawn(interactables, GridBody.cell_center(player.front_cell()), &"chaff")
 		if not message.is_empty():
 			hud.show_message(message)
 			# A chest that opened (not one too full to empty): what was in it is held up.
@@ -744,6 +749,19 @@ func interact() -> bool:
 		_say_shut(shut_door_in_front())
 		return true
 	return false
+
+
+## Pets `animal` (the Homestead, phase 4) and shows it (tool polish, D7 and D8): what it had
+## ready, taken, is held up over his head; petted with nothing to take, a heart rises over it.
+func _pet(animal: Animal) -> void:
+	var had: bool = bool(GameState.homestead().animal(animal.index).get("ready", false))
+	hud.show_message(GameState.pet_animal(animal.index))
+	if had and not bool(GameState.homestead().animal(animal.index).get("ready", false)):
+		player.hand_up(ItemIcons.name_for(Herd.gives(animal.kind())))
+		return
+	player.reach()
+	if not had:
+		HeartPop.spawn(animal, Vector2(0, float(Animal.HEAD_TOP.get(animal.kind_id, -14)) - 2.0))
 
 
 ## The animal the hero faces (the Homestead, phase 4), or null.
@@ -1430,6 +1448,7 @@ func _tend_crop() -> bool:
 		return false
 	var front: Vector2i = player.front_cell()
 	if crop["phase"] == Farm.WITHERED:
+		player.reach()
 		GameState.clear_crop(crop["cell"])
 		EventBus.sound.emit(&"plant")
 		Burst.spawn(interactables, GridBody.cell_center(front), &"dust", 0.6)
@@ -1442,6 +1461,8 @@ func _tend_crop() -> bool:
 		return true
 	EventBus.sound.emit(&"harvest")
 	Burst.spawn(interactables, GridBody.cell_center(front), &"leaves")
+	# He pulls it up and holds it up (tool polish, D7).
+	player.hand_up(ItemIcons.name_for(StringName(str(given["item"]))))
 	var item_name: String = str(DataRegistry.get_item(StringName(str(given["item"]))).get("name", given["item"]))
 	hud.show_message(PICKED_WORDS % (item_name if int(given["count"]) == 1 else "%s x%d" % [item_name, int(given["count"])]))
 	return true

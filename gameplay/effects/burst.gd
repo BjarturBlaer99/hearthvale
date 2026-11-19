@@ -4,7 +4,8 @@ extends Node2D
 ## themselves: sparks where a blow lands, dust from blasts, pushes and running feet, sparkle
 ## from pickups, leaves from cut grass and shards from broken pots. Drawn in code.
 ## The bursts of a stroke (tool polish, 2026-11-19, D5): clods from the hoe, a splash of water,
-## seeds from the hand, chips and rubble of a rock in its own colours, splinters of wood. They
+## seeds from the hand, chips and rubble of a rock in its own colours, splinters of wood, chaff
+## from hay put in the silo. They
 ## are thrown up and fall back to rest on the ground (`floor`), half a second at the most:
 ## none of them rises or hangs in the air ("A still world", bent for strokes by the user).
 
@@ -29,6 +30,8 @@ const KINDS: Dictionary = {
 		"color": Color(0.62, 0.60, 0.58)},
 	&"rubble": {"count": 10, "speed": 50.0, "life": 0.45, "size": 2.0, "drift": 420.0, "up": 46.0, "floor": 5.0,
 		"color": Color(0.62, 0.60, 0.58)},
+	&"chaff": {"count": 7, "speed": 28.0, "life": 0.35, "size": 2.0, "drift": 420.0, "up": 30.0, "floor": 3.0,
+		"color": Color(0.92, 0.80, 0.46), "colors": [Color(0.92, 0.80, 0.46), Color(0.78, 0.62, 0.30)]},
 	&"splinters": {"count": 5, "speed": 38.0, "life": 0.4, "size": 2.0, "drift": 420.0, "up": 38.0, "floor": 4.0,
 		"color": Color(0.84, 0.66, 0.42), "colors": [Color(0.84, 0.66, 0.42), Color(0.62, 0.45, 0.25), Color(0.92, 0.80, 0.58)]},
 }

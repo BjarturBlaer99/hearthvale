@@ -4,7 +4,8 @@ The user's request, 2026-11-19: move Hearthvale's art to PNG as the source of tr
 edited in Aseprite or replaced with AI-made pixel art (for example PixelLab). Bake every art asset one
 last time, keep those PNGs as the editable source, retire the art tools, and keep the game looking
 exactly the same. Sound and fonts stay made in code. Two steps: this plan (no code or art changes),
-then the switch, each stopping for the user's approval.
+then the switch, each stopping for the user's approval. **The plan was approved as written on
+2026-11-19** (all eight decisions as recommended: the tool polish's steps 3 and 4 come first).
 
 ## 0. In short
 

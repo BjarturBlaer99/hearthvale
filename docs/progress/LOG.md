@@ -3137,3 +3137,31 @@ two "before" runs), `docs/ASSETS.md`, the exact `CLAUDE.md` wording, a how-to pe
 risks, and eight decisions. **Nothing is changed until it is approved.** No code, art, tests or
 window runs in this step (two read-only scratch scripts listed the PNGs and counted their colours:
 3,771 in all, 1,703 of them in the tile atlas).
+
+## 2026-11-19 — Art as PNG: the plan approved; tool polish, step 3: work by hand
+
+**The PNG plan was approved as written** ("Approve as written": all eight decisions). Its A8 puts the
+tool polish's steps 3 and 4 before the switch, so step 3 was built next (the step-2 session was told
+not to start it).
+
+**Step 3 (D7, D8):** what his hands do shows, for show only.
+- **Picking a crop, taking an egg, wool or milk:** he reaches (the work pose's reach, 0.15 s), then
+  holds it up over his head (the found-item pose, 0.6 s): `PlayerController.hand_up(icon)`.
+- **Clearing a withered crop, petting an animal with nothing to take, hay into the silo:** a reach
+  (`reach()`). A petted animal with nothing ready shows a `HeartPop` over its head (rises six pixels,
+  gone in half a second: the one effect allowed to rise); hay that goes in throws a little `chaff`.
+- **Never held:** neither stands him still; a step or a swing ends it at once. A product with no room
+  in the pack is not held up and shows no heart.
+- **Films:** `take_wool`, `pet_hen`, `silo_hay` in `tools/capture.gd` (the farm of the "a:" shots,
+  an animal put before him).
+
+**Verified:** 1168 tests in 156 suites pass, exit 0. New: `tests/world/hand_work_test.gd` (a crop
+pulled and held up, walking ends it and he moves on the next frame, an egg held up and a heart over a
+hen with nothing, the heart's rise and life, hay and chaff); `chaff` joins the stroke bursts' test.
+
+**In a window:** the four hand-work films, twice (about twenty seconds each), each looked at; the
+chaff was too faint the first time and is two pixels now. No save slot was written.
+
+**Known issues and limits**
+- **Seen from the side, the reach is small:** the hand comes down a few pixels.
+- **The hen's heart can overlap another animal's badge** when they crowd together.

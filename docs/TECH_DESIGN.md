@@ -144,6 +144,12 @@ res://
   `hold_up(icon)` shows that last pose, with the item's picture above the hands, for `HOLD_TIME`. The area calls
   it when the hero picks up an item, opens a chest or takes a heart container. It's for show only: moving or
   swinging ends it at once.
+  **Work by hand** (tool polish, step 3): `reach()` shows the reach pose for `REACH_TIME` (a withered crop
+  cleared, an animal petted with nothing to take, hay put in the silo); `hand_up(icon)` reaches, then holds
+  `icon` up for `HAND_UP_TIME` (a crop picked, an egg, wool or milk taken). Both are for show only: they
+  never stand him still, and moving or swinging ends them at once. A petted animal with nothing to give
+  shows a `HeartPop` (a small heart that rises six pixels and fades in half a second, the one effect
+  allowed to rise); hay put in the silo throws a little `chaff`.
 
   **Work** (tool polish, 2026-11-19): a stroke of a tool, a seed or the sprinkler is the motor's attack
   state as before (it stands him still for the tool's time), but the area tells the hero what it is

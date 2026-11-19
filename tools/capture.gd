@@ -68,7 +68,9 @@ extends SceneTree
 ## the homestead instead, each a grid of FILM_PICTURES pictures FILM_EVERY seconds apart, cropped
 ## round the hero and enlarged (a stroke of several blows takes a row of pictures a blow). A film
 ## is [name, hero cell, facing, what he carries ("hoe", "can", "can_empty", "seed", "sprinkler",
-## "pick", "copper_pick", "sword", "ripe"), what he does ("use", "swing" or "interact"), blows].
+## "pick", "copper_pick", "sword", "ripe"; or the farm of the "a:" shots: "a:sheep" with a sheep
+## that has wool before him, "a:hen" with a hen that has nothing, "a:silo" with hay in his pack),
+## what he does ("use", "swing" or "interact"), blows].
 const FILMS: Array = [
 	["hoe_side", Vector2i(24, 18), Vector2.RIGHT, "hoe", "use", 1],
 	["hoe_left", Vector2i(26, 18), Vector2.LEFT, "hoe", "use", 1],
@@ -86,6 +88,9 @@ const FILMS: Array = [
 	["sword_log", Vector2i(6, 4), Vector2.RIGHT, "sword", "swing", 3],
 	["sword_stump", Vector2i(25, 2), Vector2.LEFT, "sword", "swing", 3],
 	["harvest", Vector2i(24, 18), Vector2.RIGHT, "ripe", "interact", 1],
+	["take_wool", Vector2i(6, 13), Vector2.RIGHT, "a:sheep", "interact", 1],
+	["pet_hen", Vector2i(6, 13), Vector2.RIGHT, "a:hen", "interact", 1],
+	["silo_hay", Vector2i(35, 11), Vector2.RIGHT, "a:silo", "interact", 1],
 ]
 const FILM_PICTURES: int = 12
 const FILM_EVERY: float = 0.04
@@ -1075,6 +1080,14 @@ func _film(out_dir: String, names: PackedStringArray) -> void:
 		player.call(&"face", film[2])
 		# The new hero's camera is the one that shows, whatever was there before.
 		player.get_node("Camera2D").call(&"make_current")
+		# An animal of the herd put before him (a sheep with wool, a hen with nothing), held still.
+		if str(film[3]) in ["a:sheep", "a:hen"]:
+			var herd: Node = scene.get(&"animals")
+			var animal: Node2D = herd.call(&"animal", 4 if film[3] == "a:sheep" else 1)
+			var motion: RefCounted = animal.get(&"motion")
+			motion.set(&"position", Vector2((film[1] + Vector2i(1, 0)) * 16) + Vector2(8, 8))
+			animal.position = motion.get(&"position")
+			herd.set_process(false)
 		await _frames(30)
 		var pictures: Array[Image] = []
 		for blow: int in int(film[5]):
@@ -1097,6 +1110,9 @@ func _film(out_dir: String, names: PackedStringArray) -> void:
 ## What a film's hero carries and the plot he works: the plot's clear corner tilled where he
 ## faces it, a ripe turnip for "ripe".
 func _set_up_film(game_state: Node, what: String) -> void:
+	if what.begins_with("a:"):
+		_set_up_animals(game_state, "a:silo" if what == "a:silo" else "a:farm")
+		return
 	match what:
 		"hoe":
 			game_state.call(&"add_item", &"hoe", 1)
