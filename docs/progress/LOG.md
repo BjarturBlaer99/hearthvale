@@ -3017,3 +3017,30 @@ tenth day's picture looked at. The user settled the numbers: the Coop 150 coins 
 sum 2280; `wood_test`; `crafting_chain_test`; `building_moves_test`'s full stack). The suite is as it
 was. Known: the ten days were not played again with the new numbers; nobody has played phase 5 by hand,
 and no run has reached the favours or the Silo, sheep and cows.
+
+## 2026-11-19 — Tool polish, phase 0: the plan
+
+The user's words: "now polish the graphics and all animations when using tools". The plan is
+`docs/progress/tool-polish-plan.md`: what each tool looks like in use today, what is proposed (four work
+poses for the hero, the tool drawn in his hands in its three metals, the blow's effects and sound at the
+moment the tool lands, rocks, logs and stumps that show each blow, work by hand shown, and three
+unfinished things: mirrored frames drawn a frame's width to the right, a building site's twine that reads
+as a grid, and the buildings' dark windows at night), thirteen decisions for the user, and four steps.
+**Nothing is built until it is approved.**
+
+**Seen in the before-pictures** (films of each stroke, twelve pictures 0.04 s apart, from a scratch
+script; and 26 shots of `tools/capture.gd`): every tool, seed and the sprinkler plays the sword's three
+swing frames with nothing in his hands, while the tool's icon bobs over the cell (`ToolFlash`); facing
+up, the icon is drawn on his back; the can neither tips nor splashes; a rock breaks into the pot's
+terracotta shards; a log or a stump shows nothing until its last blow; picking a crop and taking from an
+animal don't move him at all.
+
+**Where it bends a rule:** the new bursts (clods, drops, a ring on the water, seeds, chips, splinters,
+chaff, a heart) are small things that fly, against "A still world"; each is tied to a stroke or a touch,
+half a second or less, falling or fading where it is, and is put to the user (D5, D8). No timing, hit or
+collision changes: the frames read the motor's progress, and only when pictures and sounds show moves
+(D3, D4).
+
+**In a window:** the capture shots, about half a minute; the scratch film script and a probe, a few
+seconds a run, about twenty runs. No Godot process was left running; no save slot but the capture's own
+(994) was touched. No tests were run (no code changed).
