@@ -55,7 +55,11 @@ the user approved it the same day** (shown the summary and the pictures: "Approv
 west end, the farm's map, the farmhouse as the hero's home, the old cottage locked, the field 12 by 6,
 a pond, save version 6, the story's words, the overgrowth (145 things cleared for good, fibre) and the
 farm's two tunes. Nobody has played it by hand: only the tests, and two days by `tools/play_days.gd`
-at four times speed. Phases 2 to 5 are not built. The plan's
+at four times speed. **Phase 2 is built (2026-11-19) and waits for the user's review:** build mode (B,
+on the homestead only), fifteen placeables on a build bar of their own, the hand, the workbench's
+"Make" and "Place" tabs, and Tilda's seven wares for the land; nobody has played it by hand, and its
+rules are in the plan and TECH_DESIGN §30 until that review (the plan's R10 to R14). Phases 3 to 5 are
+not built. The plan's
 thirty numbered decisions are the approved ones: they are at the head of the plan ("What the user has
 decided", which stands in for the `docs/HOMESTEAD-NOTES.md` the request names) and in
 `docs/DECISIONS.md`. Each phase is built by a subagent with a fresh context; **CLAUDE.md is the
