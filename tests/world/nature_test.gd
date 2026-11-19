@@ -95,8 +95,9 @@ func test_hearthvale_has_cherry_trees_in_the_eight_approved_cells_and_no_other_c
 	var reachable: Dictionary = _reachable(TerrainQuery.new(village.grid), SQUARE)
 	# (And one more since P2b: the doorway of the hero's cottage, tests/world/home_test.gd; two
 	# since Willowmere: the way out through the east tree line, tests/world/willowmere_test.gd;
-	# and four since the Homestead: the lane's west end, tests/world/homestead_test.gd.)
-	assert_int(reachable.size()).is_equal(REACHABLE_BEFORE - NEW_CHERRY_CELLS.size() + 1 + 2 + 4)
+	# four since the Homestead: the lane's west end, tests/world/homestead_test.gd; and six fewer
+	# since its phase 4: Farmer Oda's stall, tests/world/oda_stall_test.gd.)
+	assert_int(reachable.size()).is_equal(REACHABLE_BEFORE - NEW_CHERRY_CELLS.size() + 1 + 2 + 4 - 6)
 	for must: Vector2i in [Vector2i(10, 4), Vector2i(42, 20), Vector2i(23, 35), Vector2i(36, 1), Vector2i(16, 15), Vector2i(30, 15), Vector2i(8, 25), Vector2i(23, 6), Vector2i(0, 30)]:
 		assert_bool(reachable.has(must)).override_failure_message("%s can still be walked to" % must).is_true()
 	var fields: AreaController = _load(NORTH_FIELDS)

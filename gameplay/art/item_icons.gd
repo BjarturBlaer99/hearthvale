@@ -24,6 +24,7 @@ const FRAMES: Dictionary = {
 	&"copper_watering_can": 62, &"iron_watering_can": 63,
 	&"fibre": 64,
 	&"hay": 65, &"kit": 66,
+	&"egg": 67, &"wool": 68, &"milk": 69, &"cloth": 70, &"fried_egg": 71, &"omelette": 72, &"custard": 73,
 }
 
 

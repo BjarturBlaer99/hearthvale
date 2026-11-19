@@ -1,0 +1,9 @@
+{
+	"id": "chicken",
+	"name": "Chicken",
+	"lives_in": "coop",
+	"gives": "egg",
+	"every": 1,
+	"grazes": 4,
+	"sound": "cluck"
+}

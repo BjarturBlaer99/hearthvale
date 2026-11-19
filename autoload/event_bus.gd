@@ -97,3 +97,6 @@ signal homestead_changed
 ## (`big`) an upgrade bought the day before is done (GameState.start_next_day).
 signal building_finished(building_id: StringName, big: bool)
 
+
+## An animal of the hero's land was petted (the Homestead, phase 4): its place in the herd.
+signal animal_petted(index: int)

@@ -121,6 +121,17 @@
           "next": "eggs_done"
         },
         {
+          "text": "Have you any animals to sell?",
+          "effects": [
+            {
+              "type": "shop",
+              "shop": "oda",
+              "mode": "buy"
+            }
+          ],
+          "next": null
+        },
+        {
           "text": "Anything else?",
           "next": "more"
         },

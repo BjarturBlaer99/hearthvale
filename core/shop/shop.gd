@@ -9,8 +9,10 @@ extends RefCounted
 ## crop's seed price, and with `buys_crops` it buys what every crop gives at the crop's sale
 ## price (data/crops), so a new crop is on both lists without touching the shop. `buys` are the
 ## other things it pays for (ore, bars, crystals), each at its own price, so a new thing to buy
-## is a line of data. This says what is on each list, what a deal costs and gives, and why one
-## can't be made; GameState makes it.
+## is a line of data. A ware may be an `animal` in place of an item (Farmer Oda's stall, the
+## Homestead's phase 4): { "animal": "chicken", "price": 60 } is a kind of data/animals, which
+## goes to its building, not into the pack (Herd says why one can't be bought). This says what
+## is on each list, what a deal costs and gives, and why one can't be made; GameState makes it.
 
 ## The two lists.
 const BUY: StringName = &"buy"
@@ -24,11 +26,16 @@ const NONE_LEFT: String = "You have none of that left."
 
 
 ## What the shop sells: its own wares in their order, then a seed of every crop, cheapest
-## first. Each is { "item": id, "count": how many a deal gives, "price": coins }.
+## first. Each is { "item": id, "count": how many a deal gives, "price": coins }; an animal is
+## { "item": "", "animal": its kind, "count": 1, "price": coins }.
 static func wares(shop: Dictionary, crops: Array) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for ware: Variant in shop.get("sells", []):
-		if typeof(ware) == TYPE_DICTIONARY:
+		if typeof(ware) != TYPE_DICTIONARY:
+			continue
+		if (ware as Dictionary).has("animal"):
+			out.append({"item": "", "animal": str(ware["animal"]), "count": 1, "price": maxi(int(ware.get("price", 0)), 0)})
+		else:
 			out.append({"item": str(ware.get("item", "")), "count": maxi(int(ware.get("count", 1)), 1), "price": maxi(int(ware.get("price", 0)), 0)})
 	if bool(shop.get("sells_seeds", false)):
 		for crop: Dictionary in _by_seed_price(crops):
@@ -74,6 +81,11 @@ static func bought_things(shop: Dictionary) -> Array[Dictionary]:
 	return out
 
 
+## Whether `ware` (a line of wares()) is an animal.
+static func is_animal(ware: Dictionary) -> bool:
+	return not str(ware.get("animal", "")).is_empty()
+
+
 ## Why `ware` can't be bought with `coins` in the purse and `held` of it carried already (of
 ## an item whose data entry is `item`): NO_COINS, NO_ROOM, or "" if it can.
 static func why_not_buy(ware: Dictionary, coins: int, held: int, item: Dictionary) -> String:
@@ -109,8 +121,9 @@ static func offer_line(offer: Dictionary, item_name: String) -> String:
 
 
 ## What is wrong with `shop`, in words: nothing, if it can be used. `item_of` gives the item
-## entry for an id (empty if there is none).
-static func problems(shop: Dictionary, item_of: Callable) -> PackedStringArray:
+## entry for an id (empty if there is none), and `animal_of` a kind of animal's (without it, no
+## ware may be an animal).
+static func problems(shop: Dictionary, item_of: Callable, animal_of: Callable = Callable()) -> PackedStringArray:
 	var out: PackedStringArray = []
 	if typeof(shop.get("name")) != TYPE_STRING or str(shop.get("name", "")).is_empty():
 		out.append("'name' must be what the shop is called.")
@@ -119,6 +132,14 @@ static func problems(shop: Dictionary, item_of: Callable) -> PackedStringArray:
 		out.append("'sells' must list the shop's wares (it may be empty).")
 		return out
 	for ware: Variant in sells:
+		if typeof(ware) == TYPE_DICTIONARY and (ware as Dictionary).has("animal"):
+			if (ware as Dictionary).has("item") or (ware as Dictionary).has("count"):
+				out.append("an animal in 'sells' has no 'item' or 'count': one is bought at a time.")
+			if not animal_of.is_valid() or (animal_of.call(str(ware["animal"])) as Dictionary).is_empty():
+				out.append("'sells' names an unknown animal '%s'." % ware["animal"])
+			if not _is_whole((ware as Dictionary).get("price"), 0):
+				out.append("the price of '%s' must be a whole number of coins, 0 or more." % ware["animal"])
+			continue
 		if typeof(ware) != TYPE_DICTIONARY or not (ware as Dictionary).has("item") or not (ware as Dictionary).has("price"):
 			out.append("every entry in 'sells' has an 'item' and a 'price'.")
 			continue

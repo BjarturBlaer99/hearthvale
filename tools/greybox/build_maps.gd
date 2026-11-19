@@ -167,6 +167,10 @@ const MAPS: Dictionary = {
 			# on the lane's rows, and the lane run on to the edge, approved by the user (the
 			# Homestead's plan, D1; tests/world/homestead_test.gd).
 			[0, 16, 3, 2, 0, "path"],
+			# Farmer Oda's stall (the Homestead, phase 4): beside her by her field, where she
+			# sells hens, sheep and cows. The plan's one more small re-bake of the village
+			# (tests/world/homestead_test.gd holds its six cells).
+			[16, 30, 3, 2, 0, "stall"],
 		],
 		"spawns": [
 			# Tall grass (one tuft hides the heart piece's nook), pots, chickens in and by the field, butterflies over flowers.

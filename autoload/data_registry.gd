@@ -25,6 +25,7 @@ const KIND_SHOP: StringName = &"shop"
 const KIND_VILLAGER: StringName = &"villager"
 const KIND_CRAFTING: StringName = &"crafting"
 const KIND_BUILDING: StringName = &"building"
+const KIND_ANIMAL: StringName = &"animal"
 
 ## Directory under DATA_ROOT -> the kind of file it holds.
 const DIRECTORY_KINDS: Dictionary = {
@@ -40,6 +41,7 @@ const DIRECTORY_KINDS: Dictionary = {
 	"villagers": KIND_VILLAGER,
 	"crafting": KIND_CRAFTING,
 	"buildings": KIND_BUILDING,
+	"animals": KIND_ANIMAL,
 }
 
 const REQUIRED_FIELDS: Dictionary = {
@@ -59,6 +61,7 @@ const REQUIRED_FIELDS: Dictionary = {
 	&"villager": ["id", "name", "dialogue", "likes", "thanks"],
 	&"crafting": ["id", "needs", "makes"],
 	&"building": ["id", "name", "size", "look"],
+	&"animal": ["id", "name", "lives_in", "gives", "every", "grazes"],
 }
 ## The sets of rules the game knows (data/rules/<id>.json), by id.
 const RULES_TIME: StringName = &"time"
@@ -228,11 +231,17 @@ func get_rules(id: StringName) -> Dictionary:
 
 # --- Loading ---------------------------------------------------------------
 
+## A kind of animal of the hero's land (data/animals/<id>.json; the Homestead, phase 4): where
+## it lives, what it gives, how often, and the grass it eats.
+func get_animal(id: StringName) -> Dictionary:
+	return get_entry(&"animals", id)
+
+
 ## Clears everything and loads all JSON under `root`. Returns the problems found;
 ## an empty result means every file is valid and every reference resolves.
 func load_all(root: String = DATA_ROOT) -> PackedStringArray:
 	errors = []
-	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}, &"recipes": {}, &"crops": {}, &"shops": {}, &"crafting": {}, &"villagers": {}, &"buildings": {}}
+	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}, &"recipes": {}, &"crops": {}, &"shops": {}, &"crafting": {}, &"villagers": {}, &"buildings": {}, &"animals": {}}
 	if not DirAccess.dir_exists_absolute(root):
 		errors.append("%s: data directory does not exist." % root)
 		return errors
@@ -289,6 +298,8 @@ func _load_file(path: String, kind: StringName) -> void:
 			_register(path, data, &"crafting", &"crafting")
 		KIND_BUILDING:
 			_register(path, data, &"building", &"buildings")
+		KIND_ANIMAL:
+			_register(path, data, &"animal", &"animals")
 
 
 ## Registers every object in the array `data[key]`.
@@ -349,8 +360,9 @@ func _validate_references() -> void:
 	for crop: Dictionary in _collections[&"crops"].values():
 		for problem: String in Crops.problems(crop, item_of):
 			errors.append("%s: crop '%s': %s" % [crop["_source"], crop["id"], problem])
+	var animal_of: Callable = func(id: String) -> Dictionary: return _collections[&"animals"].get(StringName(id), {})
 	for shop: Dictionary in _collections[&"shops"].values():
-		for problem: String in Shop.problems(shop, item_of):
+		for problem: String in Shop.problems(shop, item_of, animal_of):
 			errors.append("%s: shop '%s': %s" % [shop["_source"], shop["id"], problem])
 	# Crafting recipes: each can be used, and names only furnishings, skills and buildings the
 	# game has.
@@ -367,6 +379,11 @@ func _validate_references() -> void:
 				rooms if typeof(rooms) == TYPE_DICTIONARY else {}, building_ids):
 			errors.append("%s: crafting recipe '%s': %s" % [crafted["_source"], crafted["id"], problem])
 	_check_buildings(item_of)
+	# The animals of the hero's land (the Homestead, phase 4): each can be used.
+	var building_of: Callable = func(id: String) -> Dictionary: return _collections[&"buildings"].get(StringName(id), {})
+	for animal: Dictionary in _collections[&"animals"].values():
+		for problem: String in Herd.problems(animal, item_of, building_of):
+			errors.append("%s: animal '%s': %s" % [animal["_source"], animal["id"], problem])
 	# Villagers: each can be used, and no two share a conversation (it is how one is known).
 	var friendship: Friendship = Friendship.new(get_rules(RULES_FRIENDSHIP))
 	var has_dialogue: Callable = func(id: String) -> bool: return _collections[&"dialogues"].has(StringName(id))

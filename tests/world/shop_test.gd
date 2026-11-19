@@ -300,15 +300,16 @@ func test_the_keys_and_the_clicks_work_her_list() -> void:
 	assert_int((counter.get_node(^"Panel") as PanelFrame).get_child_count()).override_failure_message("a title, the tabs, the coins, the list, a note, a count, the help").is_equal(7)
 
 
-func test_the_shop_effect_asks_for_a_shop_and_only_tilda_has_one() -> void:
+func test_the_shop_effect_asks_for_a_shop_and_a_talk_that_names_none_opens_none() -> void:
 	var asked: Array = []
 	var listen: Callable = func(shop_id: StringName, mode: StringName) -> void: asked.append([shop_id, mode])
 	EventBus.shop_requested.connect(listen)
 	assert_bool(EffectApplier.new(GameState).apply({"type": "shop", "shop": "tilda", "mode": "sell"})).is_true()
 	EventBus.shop_requested.disconnect(listen)
 	assert_array(asked).is_equal([[&"tilda", &"sell"]])
-	# A conversation elsewhere opens no shop, and a request with no conversation is kept for
-	# the next one that closes.
+	# A conversation's answers that name no shop open none (Farmer Oda's first answer; her
+	# stall's list is tests/world/oda_stall_test.gd's), and a request with no conversation is
+	# kept for the next one that closes.
 	var village: AreaController = _load(VILLAGE)
 	Steps.stand_before(village, "FarmerOda")
 	assert_bool(village.interact()).is_true()

@@ -11,6 +11,9 @@ extends RefCounted
 ## its kit was set down (it is a building site that day, and stands from the next morning) and
 ## the day its upgrade was bought (finished the next morning); and the hay the silo holds. It
 ## knows nothing of a building's size: Buildings does, and GameState asks both.
+## Phase 4: the animals, in the order they were bought, each as Herd says (its kind, whether it
+## was petted today, how near its next product is, whether one waits, whether it went hungry);
+## which building one lives in is its kind's, so it goes wherever its building goes.
 ## GameState keeps one and saves it (the save's section `homestead`); later phases keep more.
 
 ## The cells cleared for good: key ("x,y", as Farm keeps its cells) -> true.
@@ -24,6 +27,9 @@ var _standing: Dictionary = {}
 var _buildings: Dictionary = {}
 ## The hay in the silo.
 var hay: int = 0
+## The animals, in the order they were bought (Herd.new_animal's shape). None is ever taken
+## away: nothing dies, runs off or is sold (D27).
+var _animals: Array[Dictionary] = []
 
 
 ## Whether what stood in `cell` has been cleared.
@@ -250,14 +256,39 @@ func add_hay(count: int, most: int) -> int:
 	return added
 
 
+## An animal of kind `kind_id` comes to the land (bought: it is in its building). Returns its
+## place in the herd, or -1 for no kind.
+func add_animal(kind_id: StringName) -> int:
+	if kind_id == &"":
+		return -1
+	_animals.append(Herd.new_animal(kind_id))
+	return _animals.size() - 1
+
+
+## The animals, in the order they were bought: the herd's own records, which Herd and GameState
+## change in place.
+func animals() -> Array[Dictionary]:
+	return _animals
+
+
+## The animal at `index` in the herd, or {} for none.
+func animal(index: int) -> Dictionary:
+	return _animals[index] if index >= 0 and index < _animals.size() else {}
+
+
+func animal_count() -> int:
+	return _animals.size()
+
+
 ## The homestead as it is saved, each part row by row:
 ##   { "cleared": ["x,y", ...], "lying": { "x,y": item id },
 ##     "standing": { "x,y": { "item": id, "age": mornings } },
-##     "buildings": { id: { "at": "x,y", "day": n, "big_day": n } }, "hay": n }
+##     "buildings": { id: { "at": "x,y", "day": n, "big_day": n } }, "hay": n,
+##     "animals": [ { "kind", "petted", "progress", "ready", "hungry" } ] }
 ## "lying" and "standing" are there only when something lies or stands (a homestead with
 ## nothing set down is saved as phase 1 saved it), and "age" only for what has seen a morning;
 ## "buildings" only when one is set down, "big_day" only for one with its upgrade, and "hay"
-## only when the silo holds some.
+## only when the silo holds some; "animals" only when there is one.
 func to_dict() -> Dictionary:
 	var cleared: Array = []
 	for cell: Vector2i in cleared_cells():
@@ -287,6 +318,12 @@ func to_dict() -> Dictionary:
 		out["buildings"] = buildings
 	if hay > 0:
 		out["hay"] = hay
+	if not _animals.is_empty():
+		var herd: Array = []
+		for one: Dictionary in _animals:
+			herd.append({"kind": str(one["kind"]), "petted": bool(one["petted"]), "progress": int(one["progress"]),
+				"ready": bool(one["ready"]), "hungry": bool(one["hungry"])})
+		out["animals"] = herd
 	return out
 
 
@@ -297,14 +334,30 @@ func to_dict() -> Dictionary:
 ## (String) belongs on (Placement.LYING, STANDING, or &"" for what is no placeable): a thing
 ## saved on another layer than its own, or that the game no longer has, is left out. Without
 ## it, every item is taken at its word.
-func load_saved(saved: Variant, layer_of: Callable = Callable(), is_building: Callable = Callable()) -> void:
+func load_saved(saved: Variant, layer_of: Callable = Callable(), is_building: Callable = Callable(), is_animal: Callable = Callable()) -> void:
 	_cleared.clear()
 	_lying.clear()
 	_standing.clear()
 	_buildings.clear()
+	_animals.clear()
 	hay = 0
 	if typeof(saved) != TYPE_DICTIONARY:
 		return
+	# Phase 4's animals: a save from before them has none, and a kind the game no longer has is
+	# left out (`is_animal`).
+	var herd: Variant = (saved as Dictionary).get("animals")
+	if typeof(herd) == TYPE_ARRAY:
+		for one: Variant in (herd as Array):
+			if typeof(one) != TYPE_DICTIONARY or typeof((one as Dictionary).get("kind")) != TYPE_STRING or str(one["kind"]).is_empty():
+				continue
+			if is_animal.is_valid() and not bool(is_animal.call(str(one["kind"]))):
+				continue
+			var kept: Dictionary = Herd.new_animal(StringName(str(one["kind"])))
+			kept["petted"] = bool((one as Dictionary).get("petted", false))
+			kept["progress"] = maxi(int((one as Dictionary).get("progress", 0)), 0)
+			kept["ready"] = bool((one as Dictionary).get("ready", false))
+			kept["hungry"] = bool((one as Dictionary).get("hungry", false))
+			_animals.append(kept)
 	# Phase 3's buildings and hay: a save from before them has none (each is read with a
 	# default), and a building the game no longer has is left out (`is_building`).
 	var buildings: Variant = (saved as Dictionary).get("buildings")

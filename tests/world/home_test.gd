@@ -50,8 +50,9 @@ func test_the_cottage_has_a_door_and_the_doorway_is_the_one_new_cell() -> void:
 	var reachable: Dictionary = _reachable(TerrainQuery.new(village.grid), SQUARE)
 	assert_bool(reachable.has(DOORWAY)).is_true()
 	# (And two more since Willowmere: the way out through the east tree line, tests/world/willowmere_test.gd;
-	# and four since the Homestead: the lane's west end through the west tree line, tests/world/homestead_test.gd.)
-	assert_int(reachable.size()).override_failure_message("one more cell to walk to than before, the doorway").is_equal(REACHABLE_BEFORE + 1 + 2 + 4)
+	# and four since the Homestead: the lane's west end through the west tree line, tests/world/homestead_test.gd;
+	# and six fewer since its phase 4: Farmer Oda's stall, tests/world/oda_stall_test.gd.)
+	assert_int(reachable.size()).override_failure_message("one more cell to walk to than before, the doorway").is_equal(REACHABLE_BEFORE + 1 + 2 + 4 - 6)
 	# The door still stands in the wall, and is locked for good since the Homestead.
 	assert_that(door.hours).is_equal(&"old_cottage")
 	assert_bool(village.is_shut(door)).is_true()

@@ -1,0 +1,153 @@
+{
+	"day": 2,
+	"energy": 100.0,
+	"equipped": "",
+	"farm": {
+		"cells": {}
+	},
+	"flag_days": {},
+	"flags": {
+		"quest/a_place_of_your_own/entered": "settle"
+	},
+	"found": [
+		"barn_kit",
+		"coin",
+		"coop_kit",
+		"fence",
+		"hay",
+		"silo_kit",
+		"stone_path"
+	],
+	"friends": {},
+	"health": 6,
+	"heart_pieces": 0,
+	"hearts_max": 3,
+	"home": {
+		"chest": [],
+		"furnace": {}
+	},
+	"homestead": {
+		"buildings": {
+			"barn": {
+				"at": "32,9",
+				"day": 1
+			},
+			"coop": {
+				"at": "14,10",
+				"day": 1
+			},
+			"silo": {
+				"at": "10,4",
+				"day": 1
+			}
+		},
+		"cleared": [
+			"10,4",
+			"11,4",
+			"10,5",
+			"11,5",
+			"32,9",
+			"33,9",
+			"34,9",
+			"35,9",
+			"36,9",
+			"37,9",
+			"14,10",
+			"15,10",
+			"16,10",
+			"17,10",
+			"32,10",
+			"33,10",
+			"34,10",
+			"35,10",
+			"36,10",
+			"37,10",
+			"14,11",
+			"15,11",
+			"16,11",
+			"17,11",
+			"32,11",
+			"33,11",
+			"34,11",
+			"35,11",
+			"36,11",
+			"37,11",
+			"14,12",
+			"15,12",
+			"16,12",
+			"17,12",
+			"32,12",
+			"33,12",
+			"34,12",
+			"35,12",
+			"36,12",
+			"37,12",
+			"16,13",
+			"35,13",
+			"13,14",
+			"14,14",
+			"15,14",
+			"16,14",
+			"17,14",
+			"18,14"
+		],
+		"hay": 12,
+		"lying": {
+			"16,13": "stone_path"
+		},
+		"standing": {
+			"13,14": {
+				"item": "fence"
+			},
+			"14,14": {
+				"item": "fence"
+			},
+			"15,14": {
+				"item": "fence"
+			},
+			"16,14": {
+				"item": "fence"
+			},
+			"17,14": {
+				"item": "fence"
+			},
+			"18,14": {
+				"item": "fence"
+			}
+		}
+	},
+	"inventory": [
+		{
+			"count": 6,
+			"id": "fence"
+		},
+		{
+			"count": 1,
+			"id": "stone_path"
+		},
+		{
+			"count": 500,
+			"id": "coin"
+		}
+	],
+	"mine": {
+		"broken": {},
+		"day": 2,
+		"number": 2279618190
+	},
+	"minute": 600.0,
+	"play_time": 0.0,
+	"player": {
+		"area": "homestead",
+		"cell": [
+			30,
+			13
+		]
+	},
+	"quests": {
+		"a_place_of_your_own": "settle"
+	},
+	"skills": {},
+	"tally": {},
+	"version": 6
+}

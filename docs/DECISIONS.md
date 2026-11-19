@@ -1452,3 +1452,51 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   the silo until phase 4's animals eat it; pulling it down does not give the hay back.
 - **The Coop's room keeps its shelves** (as perches and nesting boxes) for now: the user named only
   the shed's bookshelves.
+
+## 2026-11-19 — The Homestead, phase 4: animals
+- 2026-11-19 — **The Homestead, step 4a (the rules): what the plan left open.** D25 to D28 and D30 are
+  built as written; the table's prices, products, paces and grass are in data. These are the step's
+  own choices.
+  - **A kind of animal is a file in `data/animals/`** (`docs/data/animal.schema.json`): `lives_in`,
+    `gives`, `every`, `grazes`, `sound`. `Herd` (`core/homestead/`, pure) reads it and does a morning
+    and a petting. Its price is not in it: a price is the shop's, as every price is, so Oda's stall is
+    `data/shops/oda.json` with wares `{ "animal": "chicken", "price": 60 }` (R15).
+  - **A morning goes in steps of half a morning:** fed and petted the day before, two halves nearer;
+    fed only, one; unfed, none. A product is ready when the halves reach twice its `every`, so a hen
+    fed and never petted lays every second morning, a cow every fourth, a sheep every sixth. A product
+    waiting stops the next: nothing is gained while one waits, and nothing is stored up.
+  - **"Unhappy" is the morning's `hungry`:** an animal that went unfed this morning is hungry for the
+    day and is shown so; the next morning that feeds it ends it. Nothing else follows from it (D27).
+  - **The herd is fed in the order it was bought.** Each animal, in turn, eats its `grazes` cells from
+    its building's pasture if that much grass is left, else one hay from the silo, else nothing. Two
+    buildings whose doors open on one fenced ground share its grass.
+  - **A pasture is the ground reached from the building's doorstep, cell to cell, through what can be
+    crossed** (`Pasture`, pure). Anything standing stops it (a fence, a gate, a hedge, a lamp post, a
+    bench, a sapling), as do buildings and sites, debris not cleared, and what was solid on the map (the
+    woods, the trees, the pond, the farmhouse). The meadow's tall grass is grass: it is cut and comes
+    back, and grazing it doesn't stop it growing. Reaching the road, the path to the farmhouse, a way
+    out or the map's edge, it is not fenced. A cell of the field, or one with a path, floor or flower
+    bed lying on it, is crossed and not grazed.
+  - **The land as it was is read from its scene once a run** (`LandSurvey`, a `LandMap`), so a morning
+    knows each pasture while the hero is asleep in the farmhouse, far from the homestead's area: what
+    he has cleared, set down and built is laid over it from `GameState.homestead()`.
+  - **An animal is bought only for a building that stands** (a site is no coop yet), with room: four,
+    or eight once the upgrade is finished; sheep and cows count together in the barn. The words: "A
+    chicken needs a Coop on your farm.", "Your Coop has no room for another.", and the shop's "You
+    haven't the coins for that." Bought, it is in its building at once ("Bought: a chicken. It is in
+    your Coop.").
+  - **No animal is ever taken away:** nothing dies, runs off or is sold, so an animal's place in the herd
+    is its name in the code.
+  - **A building with animals can't be pulled down** ("The Coop still has animals in it. Only an empty
+    building can be pulled down."). Moved, its animals go with it: an animal lives in its kind's
+    building, wherever that stands.
+  - **Oda's stall is the village's market stall again,** the same six tiles, at (16..18, 30..31) beside
+    her: no new pictures. Her list has no "Sell" of its own: the second tab says "You carry nothing she
+    buys."
+  - **The products are items from this step** (the egg and the milk food, 6 and 18 energy; wool a
+    material; each stacks to 30), since the kinds name them; their prices, the dishes and the cloth are
+    step 4c's.
+  - **The save is still version 6:** `homestead` gains `"animals"`, written only when there is one, each
+    `{ "kind", "petted", "progress", "ready", "hungry" }`. A kind the game no longer has is left out.
+    The fixture `tests/fixtures/saves/v6_buildings_before_animals.json` was written by the game at the
+    end of phase 3 (`21199f6`).

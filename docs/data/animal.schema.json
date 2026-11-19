@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "animal.schema.json",
+  "title": "Animal file (data/animals/<id>.json, one kind per file)",
+  "description": "A kind of animal the hero keeps on his land (the Homestead, phase 4; TECH_DESIGN §30): the building it lives in, what it gives and how often, the pasture grass it eats, and its sound. Herd (core/homestead/herd.gd) reads it. Fed and petted it gives every `every` mornings; fed only, at half that pace; unfed, nothing that morning. It is fed each morning by its building's pasture (Pasture), else by one hay from the silo. Farmer Oda sells it (data/shops/oda.json, a ware naming it as `animal`).",
+  "type": "object",
+  "required": ["id", "name", "lives_in", "gives", "every", "grazes"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1, "description": "What it is called: \"Chicken\"." },
+    "lives_in": { "type": "string", "minLength": 1, "description": "The building it lives in (data/buildings), one with room for animals: its `animals`, or its upgrade's. Kinds may share a building (sheep and cows, the barn)." },
+    "gives": { "type": "string", "minLength": 1, "description": "The item it gives (data/items): an egg, wool, milk. Taken with a right click, if the pack has room; else it waits, and stops the next." },
+    "every": { "type": "integer", "minimum": 1, "description": "The mornings between one product and the next when it is fed and petted." },
+    "grazes": { "type": "integer", "minimum": 1, "description": "The cells of pasture grass it eats in a morning." },
+    "sound": { "type": "string", "description": "The sound effect it makes when petted (Audio.SFX): cluck, bleat, low." }
+  }
+}

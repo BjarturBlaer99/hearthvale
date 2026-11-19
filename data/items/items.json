@@ -82,6 +82,9 @@
     { "id": "silo_kit", "name": "Silo Kit", "type": "kit", "icon": "kit", "stats": { "building": "silo" } },
     { "id": "coop_kit", "name": "Coop Kit", "type": "kit", "icon": "kit", "stats": { "building": "coop" } },
     { "id": "barn_kit", "name": "Barn Kit", "type": "kit", "icon": "kit", "stats": { "building": "barn" } },
-    { "id": "shed_kit", "name": "Shed Kit", "type": "kit", "icon": "kit", "stats": { "building": "shed" } }
+    { "id": "shed_kit", "name": "Shed Kit", "type": "kit", "icon": "kit", "stats": { "building": "shed" } },
+    { "id": "egg", "name": "Egg", "type": "food", "icon": "egg", "stackable": true, "max_stack": 30, "stats": { "energy": 6 } },
+    { "id": "wool", "name": "Wool", "type": "material", "icon": "wool", "stackable": true, "max_stack": 30 },
+    { "id": "milk", "name": "Milk", "type": "food", "icon": "milk", "stackable": true, "max_stack": 30, "stats": { "energy": 18 } }
   ]
 }

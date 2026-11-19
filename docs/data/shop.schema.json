@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "shop.schema.json",
   "title": "Shop file (data/shops/<id>.json, one shop per file)",
-  "description": "A shop's buy-and-sell list (GDD §10, TECH_DESIGN §21): its own wares with their prices, whether it sells seeds, whether it buys crops, and what else it buys. Seed prices and what a crop sells for are the crop's own (data/crops), so a new crop is on the lists without touching the shop. A conversation opens the list with the `shop` effect.",
+  "description": "A shop's buy-and-sell list (GDD §10, TECH_DESIGN §21): its own wares with their prices, whether it sells seeds, whether it buys crops, and what else it buys. Seed prices and what a crop sells for are the crop's own (data/crops), so a new crop is on the lists without touching the shop. A conversation opens the list with the `shop` effect. A ware may be an animal in place of an item (Farmer Oda's stall, the Homestead's phase 4): it goes to its building, not into the pack, and is refused without a building for it or with the building full.",
   "type": "object",
   "required": [
     "id",
@@ -24,10 +24,6 @@
       "description": "Its own wares, in the order they are listed. May be empty (a shop that sells only seeds).",
       "items": {
         "type": "object",
-        "required": [
-          "item",
-          "price"
-        ],
         "properties": {
           "item": {
             "type": "string",
@@ -44,8 +40,41 @@
             "type": "integer",
             "minimum": 0,
             "description": "What one deal costs, in coins."
+          },
+          "animal": {
+            "type": "string",
+            "minLength": 1,
+            "description": "A kind of animal from data/animals, sold one at a time (no 'item' or 'count')."
           }
-        }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "item",
+              "price"
+            ]
+          },
+          {
+            "required": [
+              "animal",
+              "price"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "item"
+                  ]
+                },
+                {
+                  "required": [
+                    "count"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
       }
     },
     "sells_seeds": {

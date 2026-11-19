@@ -1,0 +1,9 @@
+{
+	"id": "cow",
+	"name": "Cow",
+	"lives_in": "barn",
+	"gives": "milk",
+	"every": 2,
+	"grazes": 8,
+	"sound": "low"
+}

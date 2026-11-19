@@ -79,6 +79,8 @@ var _store: Store
 ## His homestead (2026-11-17): what he has cleared from the land for good. Saved.
 var _homestead: Homestead
 var _homestead_rules: HomesteadRules
+## The land as it is before he does anything to it (LandSurvey), read once a run.
+var _land_map: LandMap
 ## What the morning has to say (the Homestead: a building finished), until an area says it.
 ## Not saved: it is said as the next area loads, or at once in the area he is in.
 var morning_news: PackedStringArray = []
@@ -846,16 +848,19 @@ const NOT_STANDING_WORDS: String = "There is no building here to pull down."
 const HOLDS_WORDS: String = "The %s still holds %s. Only an empty building can be pulled down."
 const CHEST_FULL_WORDS: String = "There are things in the %s's chests. Only an empty building can be pulled down."
 const FURNACE_FULL_WORDS: String = "The %s's furnace holds a load. Only an empty building can be pulled down."
+const ANIMALS_IN_WORDS: String = "The %s still has animals in it. Only an empty building can be pulled down."
 
 
 ## Why building `id` can't be pulled down, in words; "" if it can. Only an empty building can go
-## (D24): nothing in what it holds (the silo's hay), nothing in its room's chests or furnace. (The
-## animals of phase 4 will be one thing more.)
+## (D24): no animals living in it (phase 4), nothing in what it holds (the silo's hay), nothing
+## in its room's chests or furnace.
 func why_not_demolish(id: StringName) -> String:
 	if not is_built(id):
 		return NOT_STANDING_WORDS
 	var building: Dictionary = DataRegistry.get_building(id)
 	var called: String = Buildings.name_of(building, is_big(id))
+	if not animals_in(id).is_empty():
+		return ANIMALS_IN_WORDS % called
 	var held: Dictionary = Buildings.holds(building)
 	if not held.is_empty() and homestead().hay > 0:
 		return HOLDS_WORDS % [called, str(DataRegistry.get_item(held["item"]).get("name", held["item"])).to_lower()]
@@ -922,6 +927,154 @@ func put_hay(id: StringName) -> String:
 	return HAY_IN_WORDS % [added, homestead().hay, most]
 
 
+# --- The Homestead's animals (phase 4) ----------------------------------------
+
+## What is said when an animal is petted (its kind's name, lower case), and what it gave (the
+## product's name), or that the pack had no room and the product waits.
+const PETTED_WORDS: String = "You pet the %s."
+const TOOK_WORDS: String = "You pet the %s. Taken: %s."
+const NO_ROOM_PRODUCT_WORDS: String = "You pet the %s. Your pack has no room for the %s: it waits."
+
+
+## The land as it was before he did anything to it (the woods, the trees, the pond, the house,
+## the road, the field, where the overgrowth stood), read from its scene once a run.
+func land_map() -> LandMap:
+	if _land_map == null:
+		_land_map = LandSurvey.survey(homestead_rules().area, farm().size)
+	return _land_map
+
+
+## What `cell` of his land is now to a grazing animal (Pasture's kinds): the land as it was,
+## with what he has cleared, set down and built laid over it.
+func pasture_kind(cell: Vector2i) -> StringName:
+	var land: LandMap = land_map()
+	if not land.in_bounds(cell) or land.is_road(cell):
+		return Pasture.OPEN
+	var home: Homestead = homestead()
+	if land.is_solid(cell) or home.standing_at(cell) != &"" or building_covering(homestead_rules().area, cell) != &"":
+		return Pasture.WALL
+	if land.had_debris(cell) and not home.is_cleared(cell):
+		return Pasture.WALL
+	if land.is_field(cell) or home.lying_at(cell) != &"":
+		return Pasture.BARE
+	return Pasture.GRASS
+
+
+## The ground building `id`'s animals reach from its door (Pasture.reach: "fenced", "cells",
+## "grass"), or {} for a building that doesn't stand or has no door.
+func pasture_of(id: StringName) -> Dictionary:
+	var building: Dictionary = DataRegistry.get_building(id)
+	if not is_built(id) or not Buildings.has_door(building):
+		return {}
+	return Pasture.reach(Buildings.doorstep_of(building, homestead().building_at(id)), land_map().size, pasture_kind)
+
+
+## Whether building `id` has a pasture: fenced all round from its door, with grass in it.
+func has_pasture(id: StringName) -> bool:
+	return Pasture.is_pasture(pasture_of(id))
+
+
+## Today's pastures, for a morning (Herd.feed): [{ "buildings": the ids of the buildings with
+## animals whose door opens on it, "grass": its cells of grass }]. Two doors on one pasture
+## share it.
+func pastures() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for id: StringName in homestead().building_ids():
+		if animals_in(id).is_empty():
+			continue
+		var reached: Dictionary = pasture_of(id)
+		if not Pasture.is_pasture(reached):
+			continue
+		var doorstep: Vector2i = Buildings.doorstep_of(DataRegistry.get_building(id), homestead().building_at(id))
+		var shared: bool = false
+		for pasture: Dictionary in out:
+			if (pasture["cells"] as Array).has(doorstep):
+				(pasture["buildings"] as Array).append(String(id))
+				shared = true
+				break
+		if not shared:
+			out.append({"buildings": [String(id)], "grass": int(reached["grass"]), "cells": reached["cells"]})
+	return out
+
+
+## The kinds of animal, by id (String), as Herd wants them.
+func animal_kinds() -> Dictionary:
+	var out: Dictionary = {}
+	for kind: Dictionary in DataRegistry.entries(&"animals"):
+		out[str(kind["id"])] = kind
+	return out
+
+
+## The places in the herd of the animals that live in building `id`, in the order they came.
+func animals_in(id: StringName) -> Array[int]:
+	var out: Array[int] = []
+	var herd: Array[Dictionary] = homestead().animals()
+	for i: int in herd.size():
+		if Herd.lives_in(DataRegistry.get_animal(StringName(str(herd[i]["kind"])))) == id:
+			out.append(i)
+	return out
+
+
+## Why an animal of kind `kind_id` can't be bought for `price` coins, in words; "" if it can:
+## its building must stand with room for one more, and the purse must hold the price.
+func why_not_buy_animal(kind_id: StringName, price: int) -> String:
+	var kind: Dictionary = DataRegistry.get_animal(kind_id)
+	if kind.is_empty():
+		return Shop.NO_COINS if item_count(COIN) < price else ""
+	var home: StringName = Herd.lives_in(kind)
+	return Herd.why_not_buy(kind, DataRegistry.get_building(home), is_built(home), is_big(home), animals_in(home).size(), item_count(COIN), price)
+
+
+## Buys an animal of kind `kind_id` for `price` coins: the coins go, and it is in its building at
+## once (Farmer Oda's stall; D29). Returns "" if it was bought, or why not.
+func buy_animal(kind_id: StringName, price: int) -> String:
+	var why: String = why_not_buy_animal(kind_id, price)
+	if not why.is_empty() or DataRegistry.get_animal(kind_id).is_empty():
+		return why if not why.is_empty() else Shop.NO_COINS
+	add_item(COIN, -price)
+	homestead().add_animal(kind_id)
+	EventBus.homestead_changed.emit()
+	return ""
+
+
+## Pets the animal at `index` in the herd (D26): it is petted today, it says so, and what it has
+## ready is taken, if the pack has room (else it waits). A product taken is a deed of Farming
+## (`tend`). Returns the words to say ("" for no animal).
+func pet_animal(index: int) -> String:
+	var animal: Dictionary = homestead().animal(index)
+	if animal.is_empty():
+		return ""
+	var kind: Dictionary = DataRegistry.get_animal(StringName(str(animal["kind"])))
+	var called: String = Herd.name_of(kind).to_lower()
+	animal["petted"] = true
+	EventBus.sound.emit(Herd.sound_of(kind))
+	EventBus.animal_petted.emit(index)
+	if not bool(animal["ready"]):
+		return PETTED_WORDS % called
+	var product: StringName = Herd.gives(kind)
+	var product_name: String = str(DataRegistry.get_item(product).get("name", product))
+	if not has_room_for(product):
+		return NO_ROOM_PRODUCT_WORDS % [called, product_name]
+	add_item(product, 1)
+	animal["ready"] = false
+	practise(Skills.FARMING, &"tend")
+	return TOOK_WORDS % [called, product_name]
+
+
+## A morning comes to the herd (D25, D27): each animal in turn is fed from its building's pasture
+## while the grass holds out, then by a hay from the silo, else goes hungry; each fed one comes
+## nearer its next product. Nothing happens with no animals.
+func _herd_morning() -> void:
+	var herd: Array[Dictionary] = homestead().animals()
+	if herd.is_empty():
+		return
+	var kinds: Dictionary = animal_kinds()
+	var fed: Dictionary = Herd.feed(herd, kinds, pastures(), homestead().hay)
+	homestead().hay = int(fed["hay"])
+	for i: int in herd.size():
+		Herd.morning(herd[i], kinds.get(str(herd[i]["kind"]), {}), bool(fed["fed"][i]))
+
+
 # --- The mine (2026-11-17) ---------------------------------------------------
 
 ## The Old Quarry's rules (data/rules/mine.json).
@@ -969,12 +1122,14 @@ func start_next_day() -> void:
 	# A sapling on his land is a morning older (the Homestead): no water needed. A site set
 	# down yesterday stands this morning, and an upgrade bought yesterday is finished.
 	var grew: bool = homestead().grow(growing_things())
+	# The herd is fed (pasture, then hay) and comes nearer its eggs, fleeces and pails.
+	_herd_morning()
 	var finished: Array[Dictionary] = homestead().finished_on(day)
 	for done: Dictionary in finished:
 		var building: Dictionary = DataRegistry.get_building(done["id"])
 		morning_news.append((Buildings.BIGGER_WORDS if done["big"] else Buildings.STANDS_WORDS) % Buildings.name_of(building, done["big"]))
 		EventBus.building_finished.emit(done["id"], done["big"])
-	if grew or not finished.is_empty():
+	if grew or not finished.is_empty() or homestead().animal_count() > 0:
 		EventBus.homestead_changed.emit()
 	EventBus.day_started.emit(day)
 	EventBus.time_changed.emit(day, floori(minute))
@@ -1120,6 +1275,8 @@ func add_item(item_id: StringName, count: int = 1) -> int:
 ## Buys one of a shop's wares (Shop.wares: { "item", "count", "price" }): the coins go and the
 ## ware comes. Returns "" if it was bought, or why not in Shop's words; then nothing changed.
 func buy(ware: Dictionary) -> String:
+	if Shop.is_animal(ware):
+		return buy_animal(StringName(str(ware["animal"])), int(ware.get("price", 0)))
 	var item_id: StringName = StringName(str(ware.get("item", "")))
 	var why_not: String = Shop.why_not_buy(ware, item_count(COIN), item_count(item_id), DataRegistry.get_item(item_id))
 	if why_not.is_empty():
@@ -1355,7 +1512,8 @@ func from_dict(data: Dictionary) -> void:
 	_store = null
 	store().load_saved(home.get("chest"), func(item_id: String) -> int: return Inventory.capacity(DataRegistry.get_item(StringName(item_id))))
 	homestead().load_saved(data.get("homestead"), func(item_id: String) -> StringName: return Placement.layer_of(DataRegistry.get_item(StringName(item_id))),
-		func(building: String) -> bool: return DataRegistry.has_entry(&"buildings", StringName(building)))
+		func(building: String) -> bool: return DataRegistry.has_entry(&"buildings", StringName(building)),
+		func(kind: String) -> bool: return DataRegistry.has_entry(&"animals", StringName(kind)))
 	_load_rooms(_dictionary(data.get("homestead")))
 	var src_found: Variant = data.get("found")
 	if typeof(src_found) == TYPE_ARRAY:

@@ -1,0 +1,9 @@
+{
+	"id": "oda",
+	"name": "Oda's Stall",
+	"sells": [
+		{ "animal": "chicken", "price": 60 },
+		{ "animal": "sheep", "price": 180 },
+		{ "animal": "cow", "price": 240 }
+	]
+}

@@ -17,6 +17,8 @@ const ROWS: int = 5
 const NOTHING_TO_BUY: String = "She has nothing to sell today."
 const NOTHING_TO_SELL: String = "You carry nothing she buys."
 const BOUGHT_WORDS: String = "Bought: %s."
+## An animal bought (Farmer Oda's stall): its name, and the building it is in now.
+const ANIMAL_BOUGHT_WORDS: String = "Bought: a %s. It is in your %s."
 const SOLD_WORDS: String = "Sold: %s, for %s."
 ## The two lists as their tabs name them.
 const TAB_NAMES: Dictionary = {Shop.BUY: "Buy", Shop.SELL: "Sell"}
@@ -98,6 +100,10 @@ func confirm() -> bool:
 	elif mode == Shop.SELL:
 		EventBus.sound.emit(&"coin")
 		_note.text = SOLD_WORDS % [item_name, Shop.coins_text(int(entry["price"]))]
+	elif Shop.is_animal(entry):
+		EventBus.sound.emit(&"coin")
+		var home: StringName = Herd.lives_in(DataRegistry.get_animal(StringName(str(entry["animal"]))))
+		_note.text = ANIMAL_BOUGHT_WORDS % [item_name.to_lower(), Buildings.name_of(DataRegistry.get_building(home), GameState.is_big(home))]
 	else:
 		EventBus.sound.emit(&"coin")
 		_note.text = BOUGHT_WORDS % (item_name if int(entry["count"]) == 1 else "%s x%d" % [item_name, int(entry["count"])])
@@ -187,6 +193,8 @@ func tab_under(event: InputEvent) -> StringName:
 
 
 func _name_of(entry: Dictionary) -> String:
+	if Shop.is_animal(entry):
+		return Herd.name_of(DataRegistry.get_animal(StringName(str(entry["animal"]))))
 	return str(DataRegistry.get_item(StringName(str(entry["item"]))).get("name", entry["item"]))
 
 

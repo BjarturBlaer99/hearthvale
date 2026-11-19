@@ -145,7 +145,7 @@ func test_the_lists_say_what_a_deal_is() -> void:
 func test_the_games_shop_is_sound_and_bad_ones_are_named() -> void:
 	var item_of: Callable = func(id: String) -> Dictionary: return DataRegistry.get_item(StringName(id))
 	assert_array(Array(Shop.problems(_tilda, item_of))).is_empty()
-	assert_array(DataRegistry.ids(&"shops")).is_equal([&"tilda"])
+	assert_array(DataRegistry.ids(&"shops")).override_failure_message("Tilda's, and Farmer Oda's stall (the Homestead, phase 4)").contains_exactly_in_any_order([&"tilda", &"oda"])
 	assert_array(Array(Shop.problems({"id": "kiosk", "name": "", "sells": [
 		{"item": "gem", "price": 3}, {"item": "bread", "price": -2, "count": 0}, {"item": "arrow"}, "bombs",
 	]}, item_of))).contains_exactly([
@@ -171,6 +171,19 @@ func test_the_games_shop_is_sound_and_bad_ones_are_named() -> void:
 		"'buys' names 'coal' twice.",
 		"what is paid for 'coal' must be a whole number of coins, 1 or more.",
 	])
+	# A ware may be an animal (Oda's stall): one at a time, of a kind the game has.
+	var animal_of: Callable = func(id: String) -> Dictionary: return DataRegistry.get_animal(StringName(id))
+	assert_array(Array(Shop.problems(DataRegistry.get_shop(&"oda"), item_of, animal_of))).is_empty()
+	assert_array(Array(Shop.problems({"id": "stall", "name": "Stall", "sells": [
+		{"animal": "goat", "price": 50}, {"animal": "cow", "price": -1}, {"animal": "sheep", "item": "wool", "price": 9},
+	]}, item_of, animal_of))).contains_exactly([
+		"'sells' names an unknown animal 'goat'.",
+		"the price of 'cow' must be a whole number of coins, 0 or more.",
+		"an animal in 'sells' has no 'item' or 'count': one is bought at a time.",
+	])
+	assert_array(Array(Shop.problems(DataRegistry.get_shop(&"oda"), item_of))).override_failure_message("no animals to ask of: none may be sold").has_size(3)
+	assert_bool(Shop.is_animal({"item": "", "animal": "cow", "count": 1, "price": 240})).is_true()
+	assert_bool(Shop.is_animal({"item": "bread", "count": 1, "price": 6})).is_false()
 	# The registry runs them on every shop, and checks every conversation that opens one.
 	var registry: Node = auto_free(DataRegistryScript.new())
 	var errors: String = "\n".join(registry.load_all("res://tests/fixtures/bad_shops"))

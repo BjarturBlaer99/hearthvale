@@ -711,8 +711,14 @@ TECH_DESIGN, the roadmap, the README and DECISIONS up to date; CLAUDE.md is the 
   furnished; the well filling the can; a demolition's refund.
 
 **Phase 4: animals** *(three commits)*
-- [ ] 4a. **The rules.** Animals as data, the herd's and the pasture's rules, Oda's stall and list, the
+- [x] 4a. **The rules.** Animals as data, the herd's and the pasture's rules, Oda's stall and list, the
   save.
+  *Built 2026-11-19, with D25 to D28 and the table's prices, paces and grass as written. A kind is a file
+  in `data/animals/`; its price is Oda's shop's (`data/shops/oda.json`, a ware `{"animal": ...}`). A
+  morning goes in halves of a morning; the herd is fed in the order bought; a pasture is what the
+  doorstep reaches through what can be crossed, and the land as it was is read from its scene once a
+  run, so a morning knows each pasture while he sleeps. Oda's stall is the village's market stall
+  again, beside her at (16..18, 30..31). The egg, the wool and the milk came with this step.*
 - [ ] 4b. **In the world.** The three animals as creatures, out by day and in by night, petting and
   taking, their sounds.
 - [ ] 4c. **Into the rest.** The products, the three dishes, Tilda's prices, cloth and the blanket,
