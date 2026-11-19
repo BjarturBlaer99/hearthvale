@@ -72,8 +72,8 @@ res://
   - from the Height layer (`find_ground_edges`, tested), **soft edges**: grass frays over the edge of a path
     where the two meet on the same level, and water gets a dark line under its bank and foam beside it. No
     transition tiles: any map gets them.
-- **Tiles** are pixel art painted in code by `tools/greybox/make_tile_texture.gd`; `GreyboxTiles` has the atlas
-  layout. `build_maps.gd` lays out each area's `Height` layer and adds some details by itself:
+- **Tiles** are pixel art in `world/tiles/greybox_tiles.png` (painted in code until the art became PNG,
+  2026-11-19; §14); `GreyboxTiles` has the atlas layout. `build_maps.gd` lays out each area's `Height` layer and adds some details by itself:
   - **house fronts** (`GreyboxTiles.HOUSE_KINDS`, all solid at height 3). A map gives a house as three blocks: a
     roof two rows deep (`roof` clay tiles, `roof_blue` slate or `roof_thatch`), a `wall_upper` row and a `wall`
     row. The baker picks each cell's tile:
@@ -660,7 +660,15 @@ run headless; see CLAUDE.md for the command and gotchas.
 - **Volume:** `SettingsData` adds music and sound volume (0–10, default 7). `Audio` sets each bus (0 mutes).
 
 ## 14. Sprites
-- **Every actor is pixel art painted in code**, like the hero. The art lives as ASCII in `tools/art/`:
+- **The art is PNG (since 2026-11-19, `docs/progress/png-art-plan.md`).** Every picture the game shows
+  is a PNG where the game loads it, and is its own source: edited in Aseprite or replaced (`art/README.md`).
+  `art/sheets.json` lists each PNG's size, frames in order, rows, flash row and pivot, and
+  `tests/art/art_sheets_test.gd` checks every PNG and every script's frame names against it; the
+  palettes are in `art/palettes/`; `docs/ASSETS.md` says where each picture came from. **The tools named
+  below and in later sections painted the art until then;** they are retired to `tools/retired/`
+  (ignored by Godot) with the part of `PixelGrade` that graded a picture as it was baked. What follows
+  is how the art was made and what it is; the frames and their order are the same in the PNGs.
+- **Every actor is pixel art**, painted in code until the switch, like the hero. The art lived as ASCII in `tools/art/`:
   - `make_player_sprite.gd`: the hero, brown-haired with his blue hood down, a blue tunic with a gold hem and a
     red scarf. Three rows (down, up, side; right is the side row mirrored) of twenty-five 16x32 frames (twenty-one until the tool polish added four work poses).
     - **He is put together from parts** (P1e), so every frame of a facing has the same head and clothes:

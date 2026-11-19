@@ -5,7 +5,6 @@ extends GdUnitTestSuite
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 const FontTool: GDScript = preload("res://tools/art/make_font.gd")
-const TitleTool: GDScript = preload("res://tools/art/make_title.gd")
 
 const VILLAGE: String = "res://world/areas/village/village.tscn"
 const TITLE: String = "res://ui/title_screen.tscn"
@@ -140,17 +139,9 @@ func test_the_title_shows_a_painted_evening_with_the_keeps_window_lit() -> void:
 		assert_bool(star.y < TitlePicture.HORIZON - 60 and star.x >= 0 and star.x < TitlePicture.SIZE.x).override_failure_message("a star in the sky: %s" % star).is_true()
 	assert_int(TitlePicture.crowns().size()).is_equal(TitlePicture.CHERRY_FEET.size())
 	for foot_at: Vector2i in TitlePicture.CHERRY_FEET:
-		assert_bool(foot_at.y > TitleTool.ground_top(foot_at.x)).override_failure_message("a cherry tree stands on the village's ground: %s" % foot_at).is_true()
+		assert_bool(foot_at.y > TitlePicture.HORIZON).override_failure_message("a cherry tree stands on the land, below the sky: %s" % foot_at).is_true()
 		var blossom: Color = image.get_pixelv(foot_at - Vector2i(0, TitlePicture.CROWN_RISE))
 		assert_bool(blossom.r > blossom.g).override_failure_message("in blossom: %s" % foot_at).is_true()
-	# Dithering mixes two colours a share at a time.
-	var mixed: int = 0
-	for y: int in 4:
-		for x: int in 4:
-			assert_bool(TitleTool.dithered(x, y, 0.0)).is_false()
-			assert_bool(TitleTool.dithered(x, y, 1.0)).is_true()
-			mixed += 1 if TitleTool.dithered(x, y, 0.5) else 0
-	assert_int(mixed).override_failure_message("half and half").is_equal(8)
 	# On the screen.
 	var title: TitleScreen = (load(TITLE) as PackedScene).instantiate()
 	get_tree().root.add_child(title)

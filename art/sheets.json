@@ -1,0 +1,308 @@
+{
+	"about": "Every art PNG the game shows (the art is PNG since 2026-11-19: docs/progress/png-art-plan.md). A strip's PNG is its frames side by side, frame width x frames wide; with flash_row, a second row of the same frames as white silhouettes (hit flashes). A grid has one row per facing. Frames are named in the order they stand. The pivot is the point of a frame put at its node's position. tests/art/art_sheets_test.gd checks every PNG against this file.",
+	"sheets": [
+		{
+			"path": "res://gameplay/player/player_sheet.png",
+			"what": "the hero",
+			"kind": "grid",
+			"frame": [16, 32],
+			"frames": ["idle", "blink", "walk_1", "walk_2", "walk_3", "walk_4", "walk_5", "walk_6", "windup", "slash", "follow", "hold", "fallen", "breathe", "hurt", "run_1", "run_2", "run_3", "run_4", "run_5", "run_6", "raise", "strike", "pour", "reach"],
+			"rows": ["down", "up", "side"],
+			"flash_row": false,
+			"pivot": [8, 32],
+			"pivot_is": "his feet: soles on the last row, centred; the side row faces left",
+			"names": "PlayerAnimator (columns)"
+		},
+		{
+			"path": "res://gameplay/art/slime.png",
+			"what": "slime",
+			"kind": "strip",
+			"frame": [16, 16],
+			"frames": ["rest", "wide", "hop"],
+			"flash_row": true,
+			"pivot": [8, 15],
+			"pivot_is": "a slime's feet",
+			"names": "Enemy.SLIME_FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/wisp.png",
+			"what": "wisp",
+			"kind": "strip",
+			"frame": [16, 16],
+			"frames": ["a", "b", "flare"],
+			"flash_row": true,
+			"pivot": [8, 18],
+			"pivot_is": "below its middle: it floats",
+			"names": "Enemy.WISP_FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/bat.png",
+			"what": "bat",
+			"kind": "strip",
+			"frame": [16, 16],
+			"frames": ["rest", "up", "down"],
+			"flash_row": true,
+			"pivot": [8, 8],
+			"pivot_is": "its middle: it flies",
+			"names": "Enemy.BAT_FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/goblin.png",
+			"what": "goblin",
+			"kind": "strip",
+			"frame": [16, 24],
+			"frames": ["front", "front_draw", "back", "side", "side_draw"],
+			"flash_row": true,
+			"pivot": [8, 23],
+			"pivot_is": "its feet; the side frames face left",
+			"names": "Enemy.GOBLIN_FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/warden.png",
+			"what": "warden",
+			"kind": "strip",
+			"frame": [32, 40],
+			"frames": ["stand", "step", "gaze", "stunned"],
+			"flash_row": true,
+			"pivot": [16, 39],
+			"pivot_is": "its feet",
+			"names": "Boss.FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/villager.png",
+			"what": "villager",
+			"kind": "strip",
+			"frame": [16, 32],
+			"frames": ["plain", "bearded", "plain_breathe", "bearded_breathe", "plain_blink", "bearded_blink"],
+			"flash_row": true,
+			"pivot": [8, 31],
+			"pivot_is": "feet on the last row, in their cell",
+			"names": "Villager.FRAMES",
+			"markers": {
+				"robe": "ff00ff",
+				"robe_shade": "800080",
+				"hair": "00ffff",
+				"hair_shade": "008080"
+			}
+		},
+		{
+			"path": "res://gameplay/art/items.png",
+			"what": "items",
+			"kind": "strip",
+			"frame": [16, 16],
+			"frames": ["sword", "bow", "arrows", "bomb", "bomb_dim", "key", "coin", "heart", "heart_container", "heart_piece", "gem", "shuttle", "lantern", "iron_sword", "berries", "mushroom", "bread", "blossom", "tea", "hoe", "watering_can", "water", "turnip", "carrot", "wheat", "potato", "pumpkin", "turnip_seeds", "carrot_seeds", "wheat_seeds", "potato_seeds", "pumpkin_seeds", "roast_turnip", "soup", "stew", "pie", "jam", "cake", "shepherds_pie", "cattail_root", "marsh_berries", "bog_mushroom", "marsh_stew", "wisp_ember", "ember_tea", "pickaxe", "stone", "copper_ore", "coal", "iron_ore", "gold_ore", "crystal", "wood", "copper_bar", "iron_bar", "gold_bar", "sprinkler", "miners_lantern", "copper_pickaxe", "iron_pickaxe", "copper_hoe", "iron_hoe", "copper_watering_can", "iron_watering_can", "fibre", "hay", "kit", "egg", "wool", "milk", "cloth", "fried_egg", "omelette", "custard"],
+			"flash_row": true,
+			"pivot": [0, 0],
+			"pivot_is": "the cell's top-left",
+			"names": "ItemIcons.FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/soil.png",
+			"what": "soil",
+			"kind": "strip",
+			"frame": [16, 16],
+			"frames": ["bare", "bare_b", "tilled", "watered"],
+			"flash_row": true,
+			"pivot": [0, 0],
+			"pivot_is": "the cell's top-left",
+			"names": "FarmPlot.FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/crops.png",
+			"what": "crops",
+			"kind": "strip",
+			"frame": [16, 16],
+			"frames": ["seeded", "sprout", "withered", "turnip_growing", "turnip_ripe", "carrot_growing", "carrot_ripe", "wheat_growing", "wheat_ripe", "potato_growing", "potato_ripe", "pumpkin_growing", "pumpkin_ripe"],
+			"flash_row": true,
+			"pivot": [0, 0],
+			"pivot_is": "the cell's top-left",
+			"names": "FarmPlot.CROP_FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/forage.png",
+			"what": "forage",
+			"kind": "strip",
+			"frame": [16, 16],
+			"frames": ["berries", "berries_picked", "mushrooms", "mushrooms_picked", "blossoms", "blossoms_picked", "cattails", "cattails_picked", "marsh_berries", "marsh_berries_picked", "bog_mushrooms", "bog_mushrooms_picked"],
+			"flash_row": true,
+			"pivot": [0, 0],
+			"pivot_is": "the cell's top-left",
+			"names": "ForageSpot.FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/crystal.png",
+			"what": "crystal",
+			"kind": "strip",
+			"frame": [16, 16],
+			"frames": ["red", "blue", "white"],
+			"flash_row": true,
+			"pivot": [0, 1],
+			"pivot_is": "the cell's top-left, a pixel higher",
+			"names": "CrystalSwitch.FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/dummy.png",
+			"what": "dummy",
+			"kind": "strip",
+			"frame": [16, 24],
+			"frames": ["dummy"],
+			"flash_row": true,
+			"pivot": [8, 23],
+			"pivot_is": "its foot",
+			"names": "TrainingDummy"
+		},
+		{
+			"path": "res://gameplay/art/brambles.png",
+			"what": "brambles",
+			"kind": "strip",
+			"frame": [16, 16],
+			"frames": ["brambles"],
+			"flash_row": true,
+			"pivot": [0, 0],
+			"pivot_is": "the cell's top-left",
+			"names": "Brambles"
+		},
+		{
+			"path": "res://gameplay/art/rocks.png",
+			"what": "rocks",
+			"kind": "strip",
+			"frame": [16, 16],
+			"frames": ["stone", "copper_ore", "coal", "iron_ore", "gold_ore", "crystal", "ladder", "lift", "rock", "boulder", "great_boulder"],
+			"flash_row": true,
+			"pivot": [0, 0],
+			"pivot_is": "the cell's top-left",
+			"names": "Rock.FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/crafted.png",
+			"what": "crafted",
+			"kind": "strip",
+			"frame": [16, 16],
+			"frames": ["workbench", "furnace", "furnace_lit", "chest", "lamp", "rug_l", "rug_r", "sprinkler", "blanket"],
+			"flash_row": true,
+			"pivot": [0, 0],
+			"pivot_is": "the cell's top-left",
+			"names": "Furnishing.FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/breakables.png",
+			"what": "breakables",
+			"kind": "strip",
+			"frame": [16, 16],
+			"frames": ["grass", "grass_cut", "pot", "branch", "stump", "weeds", "bush", "log"],
+			"flash_row": true,
+			"pivot": [0, 0],
+			"pivot_is": "the cell's top-left",
+			"names": "Breakable.FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/critters.png",
+			"what": "critters",
+			"kind": "strip",
+			"frame": [16, 16],
+			"frames": ["chicken", "chicken_peck", "chicken_walk", "butterfly_open", "butterfly_closed", "bluefly_open", "bluefly_closed", "chicken_blink"],
+			"flash_row": true,
+			"pivot": [8, 14],
+			"pivot_is": "a hen's feet (butterflies: (8, 8)); faces left",
+			"names": "Critter.FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/animals.png",
+			"what": "animals",
+			"kind": "strip",
+			"frame": [24, 20],
+			"frames": ["sheep", "sheep_walk", "sheep_graze", "cow", "cow_walk", "cow_graze", "sheep_blink", "cow_blink"],
+			"flash_row": true,
+			"pivot": [12, 18],
+			"pivot_is": "its feet; faces left",
+			"names": "Animal.FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/torch.png",
+			"what": "torch",
+			"kind": "strip",
+			"frame": [16, 24],
+			"frames": ["unlit", "flame_a", "flame_b"],
+			"flash_row": true,
+			"pivot": [0, 9],
+			"pivot_is": "the cell's top-left, 9 px into the frame",
+			"names": "Torch.FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/shade.png",
+			"what": "shade",
+			"kind": "strip",
+			"frame": [32, 40],
+			"frames": ["drift_a", "drift_b", "bound"],
+			"flash_row": true,
+			"pivot": [16, 42],
+			"pivot_is": "below its frame: it floats",
+			"names": "ShadeBoss.FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/placed.png",
+			"what": "placed",
+			"kind": "strip",
+			"frame": [16, 16],
+			"frames": ["dirt_path", "stone_path", "wood_path", "fence", "fence_e", "fence_n", "fence_s", "gate", "gate_v", "wooden_flooring", "stone_flooring", "hedge", "bench", "lamp_post_lit", "flower_bed_red", "oak_sapling", "oak_sapling_1", "oak_sapling_2", "hand", "lamp_post", "flower_bed_yellow", "flower_bed_blue", "cherry_sapling", "cherry_sapling_1", "cherry_sapling_2"],
+			"flash_row": true,
+			"pivot": [0, 0],
+			"pivot_is": "the cell's top-left",
+			"names": "PlacedArt.FRAMES"
+		},
+		{
+			"path": "res://gameplay/art/held_tools.png",
+			"what": "held_tools",
+			"kind": "strip",
+			"frame": [40, 56],
+			"frames": ["hoe_down_raise", "hoe_down_strike", "hoe_up_raise", "hoe_up_strike", "hoe_side_raise", "hoe_side_strike", "pickaxe_down_raise", "pickaxe_down_strike", "pickaxe_up_raise", "pickaxe_up_strike", "pickaxe_side_raise", "pickaxe_side_strike", "watering_can_down_pour", "watering_can_down_dip", "watering_can_up_pour", "watering_can_up_dip", "watering_can_side_pour", "watering_can_side_dip", "sprinkler_down_reach", "sprinkler_up_reach", "sprinkler_side_reach", "copper_hoe_down_raise", "copper_hoe_down_strike", "copper_hoe_up_raise", "copper_hoe_up_strike", "copper_hoe_side_raise", "copper_hoe_side_strike", "copper_pickaxe_down_raise", "copper_pickaxe_down_strike", "copper_pickaxe_up_raise", "copper_pickaxe_up_strike", "copper_pickaxe_side_raise", "copper_pickaxe_side_strike", "copper_watering_can_down_pour", "copper_watering_can_down_dip", "copper_watering_can_up_pour", "copper_watering_can_up_dip", "copper_watering_can_side_pour", "copper_watering_can_side_dip", "iron_hoe_down_raise", "iron_hoe_down_strike", "iron_hoe_up_raise", "iron_hoe_up_strike", "iron_hoe_side_raise", "iron_hoe_side_strike", "iron_pickaxe_down_raise", "iron_pickaxe_down_strike", "iron_pickaxe_up_raise", "iron_pickaxe_up_strike", "iron_pickaxe_side_raise", "iron_pickaxe_side_strike", "iron_watering_can_down_pour", "iron_watering_can_down_dip", "iron_watering_can_up_pour", "iron_watering_can_up_dip", "iron_watering_can_side_pour", "iron_watering_can_side_dip"],
+			"flash_row": true,
+			"pivot": [20, 40],
+			"pivot_is": "the hero's feet; the fists where his work pose's hands are",
+			"names": "HeldTools.frame_names()"
+		},
+		{
+			"path": "res://world/tiles/greybox_tiles.png",
+			"what": "the tile atlas",
+			"kind": "atlas",
+			"size": [128, 544],
+			"frame": [16, 16],
+			"columns": 8,
+			"rows": 34,
+			"pivot": [0, 0],
+			"pivot_is": "the cell's top-left; every tile's place is data (GreyboxTiles): repaint in place, add at the end",
+			"names": "GreyboxTiles"
+		},
+		{
+			"path": "res://world/tiles/scenery.png",
+			"what": "the tall trees",
+			"kind": "atlas",
+			"size": [280, 48],
+			"cell": [40, 48],
+			"pad": [4, 4],
+			"frame": [32, 40],
+			"frames": ["broadleaf", "oak", "pine", "cherry", "cherry_b", "willow", "willow_b"],
+			"pivot": [16.0, 37.0],
+			"pivot_is": "the trunk's foot, in the 32x40 picture",
+			"names": "SceneryAtlas.KINDS"
+		},
+		{
+			"path": "res://world/tiles/relief.png",
+			"what": "wall faces and tops, the pillar, roof ridges",
+			"kind": "atlas",
+			"size": [96, 112],
+			"pivot": [0, 0],
+			"pivot_is": "as ReliefAtlas places them",
+			"names": "ReliefAtlas"
+		},
+		{
+			"path": "res://ui/title/backdrop.png",
+			"what": "the title screen's picture",
+			"kind": "picture",
+			"size": [640, 360],
+			"pivot": [0, 0],
+			"pivot_is": "the screen; the keep's window, the stars and the cherry trees are places in TitlePicture",
+			"names": "TitlePicture"
+		}
+	]
+}

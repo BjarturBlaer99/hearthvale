@@ -1,11 +1,11 @@
 extends GdUnitTestSuite
 ## PlayerAnimator: which way the sprite faces, the six-frame walk and run cycles, the blink and
 ## the breath while standing, the poses (a three-frame swing, an item held up, fallen) and the
-## sheet region. Also that its columns are the ones tools/art/make_player_sprite.gd paints, and
-## that the tool puts every frame together from the same parts (P1e).
+## sheet region. Also that its columns are the ones art/sheets.json lists for the hero's sheet,
+## and that every frame of the sheet is painted and stands on its last row.
 
 const DIAGONAL: float = 0.70710678
-const TOOL: String = "res://tools/art/make_player_sprite.gd"
+const ArtSheets: GDScript = preload("res://tests/support/art_sheets.gd")
 const SHEET: String = "res://gameplay/player/player_sheet.png"
 const W: int = 16
 const H: int = 32
@@ -166,83 +166,6 @@ func test_hurt_and_landing_have_poses_of_their_own() -> void:
 	assert_int(_anim.bob()).is_equal(0)
 
 
-func test_the_made_frames_come_from_the_drawn_ones() -> void:
-	var tool: GDScript = load(TOOL)
-	var constants: Dictionary = tool.get_script_constant_map()
-	var columns: Array = constants["COLUMNS"]
-	var named: Dictionary = {
-		"breathe": PlayerAnimator.BREATHE, "hurt": PlayerAnimator.HURT,
-		"run_1": PlayerAnimator.RUN_1, "run_2": PlayerAnimator.RUN_2, "run_3": PlayerAnimator.RUN_3,
-		"run_4": PlayerAnimator.RUN_4, "run_5": PlayerAnimator.RUN_5, "run_6": PlayerAnimator.RUN_6,
-	}
-	for column: String in named:
-		assert_int(columns.find(column)).override_failure_message(column).is_equal(int(named[column]))
-	for facing: String in constants["ROWS"]:
-		var drawn: Array = tool.call(&"drawn", facing)
-		var made: Array = tool.call(&"derived", facing)
-		assert_int(drawn.size() + made.size() + (tool.call(&"worked", facing) as Array).size()).is_equal(columns.size())
-		var idle: Array = drawn[PlayerAnimator.IDLE]
-		var breathe: Array = made[PlayerAnimator.BREATHE - drawn.size()]
-		assert_int(breathe.size()).is_equal(H)
-		assert_that(breathe[H - 1]).override_failure_message("%s: the feet stay on the ground" % facing).is_equal(idle[H - 1])
-		assert_that(breathe[3]).override_failure_message("%s: the head is a pixel lower" % facing).is_equal(idle[2])
-		for step: int in 6:
-			var walk: Array = drawn[PlayerAnimator.WALK_1 + step]
-			var run: Array = made[PlayerAnimator.RUN_1 + step - drawn.size()]
-			assert_that(run[H - 2]).override_failure_message("%s: the feet land where a walking step does" % facing).is_equal(walk[H - 2])
-			if facing == "side":
-				assert_that(run[8]).override_failure_message("the head leans a pixel forward").is_equal(str(walk[8]).substr(1) + ".")
-				assert_that(run[20]).override_failure_message("below the belt nothing leans").is_equal(walk[20])
-			else:
-				assert_array(run).override_failure_message("%s: running is the walk, seen from the front or back" % facing).is_equal(walk)
-		# The sword is on his back until he swings it.
-		var hilt: bool = false
-		for line: String in idle:
-			hilt = hilt or "G" in line
-		assert_bool(hilt).override_failure_message("%s: the hilt shows when standing" % facing).is_equal(facing != "side")
-		for column: int in [PlayerAnimator.WINDUP, PlayerAnimator.ATTACK, PlayerAnimator.FOLLOW]:
-			for line: String in drawn[column]:
-				assert_bool("G" in line).override_failure_message("%s: no hilt on his back mid-swing" % facing).is_false()
-
-
-func test_every_frame_of_a_facing_is_put_together_from_the_same_parts() -> void:
-	var tool: GDScript = load(TOOL)
-	var constants: Dictionary = tool.get_script_constant_map()
-	var head_rows: int = constants["HEAD_ROWS"]
-	var body_rows: int = constants["BODY_ROWS"]
-	assert_int(head_rows + body_rows + int(constants["LEG_ROWS"])).override_failure_message("head, body and legs fill the frame").is_equal(H)
-	var built: Array[int] = [
-		PlayerAnimator.BLINK, PlayerAnimator.WALK_1, PlayerAnimator.WALK_2, PlayerAnimator.WALK_3,
-		PlayerAnimator.WALK_4, PlayerAnimator.WALK_5, PlayerAnimator.WALK_6,
-		PlayerAnimator.WINDUP, PlayerAnimator.ATTACK, PlayerAnimator.FOLLOW,
-	]
-	for facing: String in constants["ROWS"]:
-		var drawn: Array = tool.call(&"drawn", facing)
-		var idle: Array = drawn[PlayerAnimator.IDLE]
-		for column: int in built:
-			# Rows 8 to 11 are where the eyes close, the hilt shows and a raised hand reaches.
-			assert_array((drawn[column] as Array).slice(0, 8)).override_failure_message("%s, column %d: the same head" % [facing, column]).is_equal(idle.slice(0, 8))
-			assert_that(drawn[column][head_rows + body_rows - 1]).override_failure_message("%s, column %d: the same hem" % [facing, column]).is_equal(idle[head_rows + body_rows - 1])
-		# The hood is down: hair on his head, the hood's blue only below it.
-		var hair: bool = false
-		for y: int in 10:
-			var line: String = idle[y]
-			hair = hair or "h" in line
-			assert_bool("m" in line or "D" in line).override_failure_message("%s: no hood on his head (row %d)" % [facing, y]).is_false()
-		assert_bool(hair).override_failure_message("%s: his hair shows" % facing).is_true()
-		# The second half of the walk is the first on the other foot.
-		for step: int in 3:
-			var first: Array = (drawn[PlayerAnimator.WALK_1 + step] as Array).slice(head_rows + body_rows)
-			var second: Array = (drawn[PlayerAnimator.WALK_4 + step] as Array).slice(head_rows + body_rows)
-			for y: int in first.size():
-				var line: String = first[y]
-				var other: String = line.replace("p", "#").replace("P", "p").replace("#", "P") if facing == "side" else line.reverse()
-				assert_that(second[y]).override_failure_message("%s: step %d on the other foot (row %d)" % [facing, step + 1, y]).is_equal(other)
-			assert_array(second).override_failure_message("%s: and it isn't the same picture twice" % facing).is_not_equal(first)
-	var back: Array = tool.call(&"frame", "up", "idle")
-	assert_bool("mmmm" in str(back[head_rows + 1])).override_failure_message("from behind, the hood hangs between his shoulders").is_true()
-
-
 func test_poses_override_walking_and_standing() -> void:
 	_anim.update(Vector2.LEFT, PlayerAnimator.STRIDE)
 	_anim.pose = PlayerAnimator.Pose.ATTACK
@@ -274,9 +197,9 @@ func test_region_picks_the_frame_and_row() -> void:
 	assert_that(_anim.region()).is_equal(Rect2(0, 2 * H, W, H))
 
 
-func test_the_columns_are_the_ones_the_tool_paints() -> void:
-	var tool: Dictionary = (load(TOOL) as GDScript).get_script_constant_map()
-	var columns: Array = tool["COLUMNS"]
+func test_the_columns_are_the_ones_the_sheet_list_names() -> void:
+	var tool: Dictionary = ArtSheets.sheet("player_sheet")
+	var columns: Array = tool["frames"]
 	var named: Dictionary = {
 		"idle": PlayerAnimator.IDLE, "blink": PlayerAnimator.BLINK,
 		"walk_1": PlayerAnimator.WALK_1, "walk_2": PlayerAnimator.WALK_2, "walk_3": PlayerAnimator.WALK_3,
@@ -287,7 +210,7 @@ func test_the_columns_are_the_ones_the_tool_paints() -> void:
 	assert_int(columns.size()).is_equal(PlayerAnimator.COLUMNS)
 	for column: String in named:
 		assert_int(columns.find(column)).override_failure_message(column).is_equal(int(named[column]))
-	assert_array(tool["ROWS"]).override_failure_message("rows in Facing order").is_equal(["down", "up", "side"])
+	assert_array(tool["rows"]).override_failure_message("rows in Facing order").is_equal(["down", "up", "side"])
 	var sheet: Texture2D = load(SHEET)
 	assert_that(Vector2i(sheet.get_size())).is_equal(Vector2i(PlayerAnimator.COLUMNS * W, 3 * H))
 	var image: Image = sheet.get_image()
@@ -304,26 +227,11 @@ func test_the_columns_are_the_ones_the_tool_paints() -> void:
 			assert_int(soles).override_failure_message("row %d column %d stands on the frame's last row" % [row, column]).is_greater(0)
 
 
-func test_the_work_poses_are_the_last_four_columns_and_keep_the_sword_on_his_back() -> void:
-	var tool: GDScript = load(TOOL)
-	var constants: Dictionary = tool.get_script_constant_map()
-	var columns: Array = constants["COLUMNS"]
+func test_the_work_poses_are_the_last_four_columns() -> void:
+	var columns: Array = ArtSheets.frames("player_sheet")
 	for pose: StringName in PlayerAnimator.WORK_COLUMNS:
 		assert_int(columns.find(String(pose))).override_failure_message(String(pose)).is_equal(int(PlayerAnimator.WORK_COLUMNS[pose]))
 	assert_int(PlayerAnimator.REACH).override_failure_message("the last column").is_equal(PlayerAnimator.COLUMNS - 1)
-	for facing: String in constants["ROWS"]:
-		var worked: Array = tool.call(&"worked", facing)
-		assert_int(worked.size()).is_equal(4)
-		var idle: Array = tool.call(&"frame", facing, "idle")
-		var reach: Array = worked[3]
-		assert_that(reach[3]).override_failure_message("%s: a reach is a pixel lower" % facing).is_equal(tool.call(&"frame", facing, "follow")[2])
-		for frame: Array in worked:
-			assert_int(frame.size()).is_equal(H)
-		# The hilt over his shoulder (from the side the hood hides it): as idle, not as a swing.
-		for mark: Array in (constants["HILTS"] as Dictionary)[facing]:
-			if int(mark[0]) < 8:
-				continue
-			assert_str(str(worked[1][mark[0]])[mark[1]]).override_failure_message("%s strike: the sword stays on his back" % facing).is_equal(str(idle[mark[0]])[mark[1]])
 	_anim.update(Vector2.LEFT, 0.0)
 	_anim.pose = PlayerAnimator.Pose.WORK
 	_anim.work_pose = &"strike"

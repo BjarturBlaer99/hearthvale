@@ -1,7 +1,7 @@
 class_name PlacedArt
 extends RefCounted
 ## The pictures of what the hero sets down on his land (the Homestead, phase 2;
-## gameplay/art/placed.png, painted by tools/art/make_sprites.gd): which frame shows what, and
+## gameplay/art/placed.png): which frame shows what, and
 ## drawing a thing as it lies or stands in a cell. A placeable's `icon` names its frame here,
 ## so the same picture is the thing on the ground and its slot on the build bar (ItemIcons
 ## draws these too). A thing that joins its neighbours (Placement.joins) is put together from

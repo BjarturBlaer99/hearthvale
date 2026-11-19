@@ -269,8 +269,7 @@ func test_he_walks_through_his_crops_and_harms_nothing() -> void:
 
 
 func test_crops_have_their_pictures() -> void:
-	var tool: Dictionary = (load("res://tools/art/make_sprites.gd") as GDScript).get_script_constant_map()
-	var painted: Array = (tool["SPRITES"]["crops"]["frames"] as Dictionary).keys()
+	var painted: Array = (preload("res://tests/support/art_sheets.gd") as GDScript).call(&"frames", "crops")
 	assert_int(painted.size()).is_equal(FarmPlot.CROP_FRAMES.size())
 	for i: int in painted.size():
 		assert_int(int(FarmPlot.CROP_FRAMES[StringName(str(painted[i]))])).override_failure_message("%s is frame %d" % [painted[i], i]).is_equal(i)

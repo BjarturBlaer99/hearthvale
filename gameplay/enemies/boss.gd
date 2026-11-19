@@ -98,7 +98,7 @@ func _let_arrows_fall() -> void:
 	get_parent().add_child(arrow_help)
 
 
-# --- Drawing (pixel art painted by tools/art/make_sprites.gd) ------------------
+# --- Drawing (pixel art in gameplay/art/) ---------------------------------------
 
 const SHEET: Texture2D = preload("res://gameplay/art/warden.png")
 ## Frames in the order the tool paints them (a test checks).

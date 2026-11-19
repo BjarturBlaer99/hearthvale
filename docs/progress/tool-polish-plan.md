@@ -277,3 +277,7 @@ and three films (`take_wool`, `pet_hen`, `silo_hay`). What building it decided:
   code, five pixels wide, outlined in `PixelGrade.INK`.
 - **Hay put in the silo** reaches and throws chaff only when hay went in; a full silo or an empty
   pack is words only.
+
+**Step 4 waits for the art switch** (the user, 2026-11-19: "Keep, switch next"): step 3 stays as
+built, the switch to PNG art comes next, and step 4's site twine is then drawn by editing the tile
+atlas PNG, not a tool.

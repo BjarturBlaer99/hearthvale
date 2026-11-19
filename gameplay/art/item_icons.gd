@@ -1,7 +1,7 @@
 class_name ItemIcons
 extends RefCounted
-## The 16x16 pictures of items and pickups (gameplay/art/items.png, painted by
-## tools/art/make_sprites.gd): which frame shows which item, and drawing one.
+## The 16x16 pictures of items and pickups (gameplay/art/items.png): which frame shows which
+## item, and drawing one.
 
 const SHEET: Texture2D = preload("res://gameplay/art/items.png")
 const SIZE: Vector2i = Vector2i(16, 16)

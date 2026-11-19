@@ -1,7 +1,7 @@
 class_name SpriteSheet
 extends RefCounted
-## Draws frames from the sprite strips painted by tools/art/make_sprites.gd (docs/TECH_DESIGN.md
-## §14). A strip holds its frames side by side, in the order the tool lists them, painted on the
+## Draws frames from the sprite strips of gameplay/art/ (docs/TECH_DESIGN.md §14). A strip holds
+## its frames side by side, in the order art/sheets.json lists them, painted on the
 ## top row and as white silhouettes on the bottom row (for hit flashes). It can also swap a
 ## sheet's marker colours (a villager's robe and hair), caching each look.
 

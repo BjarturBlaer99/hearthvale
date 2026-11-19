@@ -1,6 +1,6 @@
 extends SceneTree
-## Fills the Height layer of each greybox area with its layout below. Step 4 of 4 (see
-## make_tile_texture.gd). Bakes every area, or just the ones named:
+## Fills the Height layer of each greybox area with its layout below, after build_tileset.gd
+## (the tile atlas is a PNG since 2026-11-19). Bakes every area, or just the ones named:
 ##   godot --headless --path . -s res://tools/greybox/build_maps.gd [-- village ...]
 ## It OVERWRITES each Height layer, including anything painted in the editor since. The rest
 ## of each scene is hand-written and kept as it is.

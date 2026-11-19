@@ -11,7 +11,7 @@ extends Talkable
 ## Position = the top-left corner of its (first) cell.
 
 const SHEET: Texture2D = preload("res://gameplay/art/crafted.png")
-## Frames in the order tools/art/make_sprites.gd paints them (a test checks).
+## Frames in the order they stand in the sheet (art/sheets.json; a test checks).
 const FRAMES: Dictionary = {
 	&"workbench": 0, &"furnace": 1, &"furnace_lit": 2, &"chest": 3, &"lamp": 4, &"rug_l": 5, &"rug_r": 6,
 	&"sprinkler": 7, &"blanket": 8,

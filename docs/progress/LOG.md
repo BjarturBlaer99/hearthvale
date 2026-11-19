@@ -3165,3 +3165,55 @@ chaff was too faint the first time and is two pixels now. No save slot was writt
 **Known issues and limits**
 - **Seen from the side, the reach is small:** the hand comes down a few pixels.
 - **The hen's heart can overlap another animal's badge** when they crowd together.
+
+## 2026-11-19 — Art as PNG, step 2: the switch
+
+The user: "Keep, switch next" (tool polish step 3 stays as built; the switch comes before step 4).
+Built as the approved plan (`docs/progress/png-art-plan.md`) says:
+- **Baked once:** the six painting tools were run one last time; all 27 PNGs came out byte for byte
+  the ones in the repo (hashes before and after).
+- **`art/`** (ignored by Godot): `sheets.json` (all 27 PNGs: size, frames in order, rows, flash row,
+  pivot, villager markers), `palettes/` (the master `hearthvale.gpl`, the 256 most-used of 3,766
+  colours, near-twins merged; one exact palette per sheet; `villager_markers.gpl`), `README.md` (the
+  how-to), and `aseprite/` for the user's files.
+- **Retired** to `tools/retired/` (`.gdignore`; `README.md` says never run them):
+  `make_player_sprite.gd`, `make_sprites.gd`, `make_scenery.gd`, `make_relief.gd`, `make_title.gd`,
+  `make_tile_texture.gd`, and the grading half of `PixelGrade` (`pixel_grade_bake.gd`). `PixelGrade`
+  keeps `INK`, `warm()` and `same()`. `build_tileset.gd` and `build_maps.gd` stay and paint nothing.
+- **Comments** that named a retired tool name the PNG or `art/sheets.json` now (23 scripts); the
+  design doc's §14 opens with the switch, and its history sections still name the tools that were.
+- **Import:** `importer_defaults` in `project.godot` (lossless, no mipmaps, no 3D detection) for new
+  PNGs; no `.import` file changed.
+- **Tests:** `tests/art/art_sheets_test.gd` (9: every PNG listed and its size; every script's frame
+  names in order; flash rows; no half-clear sprite pixels; the hero's and villagers' feet; villager
+  markers exact and nothing near them; trees inside their padding; lossless import). The suites that
+  read the tools read `art/sheets.json` (`tests/support/art_sheets.gd`). Retired with the tools: 13
+  tests of how a tool painted (the hero's shared parts, made frames, metals swapped, the title's
+  dithering, `PixelGrade.apply()`'s outlines, no old ink, a nature test of outlines). A planted wrong
+  frame size in `sheets.json` fails the size test.
+- **CLAUDE.md** has the approved wording (the art bullet and its passes replaced, the repaint
+  commands gone, an art-check command and the film command added); **`docs/ASSETS.md`** lists every
+  asset with its last commit date; **`docs/DECISIONS.md`** has the entry.
+
+**Verified:** 1164 tests in 156 suites pass, exit 0 (1168 before: 13 retired, 9 added).
+
+**The proof it looks the same:** every capture shot (207) and film (19), twice before the switch and
+once after, compared pixel by pixel (a scratch script). The art cannot differ: the PNGs are byte-equal,
+no `.import` changed, and the code changed only in comments and in `PixelGrade` functions nothing at
+runtime called. The screens differ only where things move by themselves: 36 of 226 pictures are the
+same in all three runs, and in the rest each run differs from the other two by about as much (the first
+"before" run alone in 3.3 million pixels, the second in 6.9 million, "after" in 3.9 million). Looked at:
+the keep's hall (its slimes and knight), the bed (the hearth's flicker), the Old Wood (a bat struck the
+hero in one run and the screen shook), and the other pictures where "after" stood out (fire and lantern
+flicker, a dialogue's timing, the sleep fade). **No difference in any picture of the art.**
+
+**In a window:** three capture runs of every shot and film (about five minutes each), and no save but
+the capture's slot 994. Every capture run prints 30 lines of "Signal 'state_changed' is already
+connected" from the Warden and the Shade: older than this change, and harmless to the pictures.
+
+**Known issues and limits**
+- **The comparison cannot see under moving things:** a change hidden under a creature, a flame or the
+  water would not show. The byte-equal PNGs are the proof there.
+- **Pivots are listed, not tested,** but for the hero's and villagers' feet and the trees' trunks.
+- **The capture runs' "already connected" errors** (the Warden and the Shade) are older than the
+  switch and were left alone.

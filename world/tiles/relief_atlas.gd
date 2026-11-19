@@ -2,8 +2,8 @@ class_name ReliefAtlas
 extends RefCounted
 ## Layout of the relief atlas (P1d): the pictures that give walls and buildings height. A wall
 ## has a front face (seen where the floor lies south of it) and a top; a pillar stands taller
-## than its cell; a roof has a strip of ridge that rises above its top row. Painted by
-## tools/art/make_relief.gd, read by WallRelief and Scenery.
+## than its cell; a roof has a strip of ridge that rises above its top row. Read by WallRelief
+## and Scenery.
 
 const TEXTURE_PATH: String = "res://world/tiles/relief.png"
 const SIZE: Vector2i = Vector2i(96, 112)

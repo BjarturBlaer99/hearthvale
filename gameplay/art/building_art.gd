@@ -3,8 +3,8 @@ extends RefCounted
 ## How a building of the hero's land is drawn (the Homestead, phase 3; docs/TECH_DESIGN.md
 ## §30): as the farmhouse is, which is the village's own house tiles laid on its map. A
 ## building's look (Buildings.look_of) names those tiles, and the few of its own (the site, the
-## barn's planks and doors, the silo), all painted by tools/greybox/make_tile_texture.gd into
-## the one atlas; they are drawn flat on the ground, under everyone, with the shadow a tall
+## barn's planks and doors, the silo), all tiles of the one atlas
+## (world/tiles/greybox_tiles.png); they are drawn flat on the ground, under everyone, with the shadow a tall
 ## thing casts east and south (HeightShading's), and a roof's ridge rises over its top row as a
 ## strip that the hero walks behind (Scenery's, ReliefAtlas). A site is one picture: dug ground
 ## pegged out over its cells, and its stack of timber.

@@ -1,7 +1,7 @@
 class_name TitlePicture
 extends RefCounted
 ## Layout of the title screen's painted picture (P1f): an evening over Hearthvale, with the old
-## keep on its hill. Painted by tools/art/make_title.gd, shown by TitleBackdrop, which draws
+## keep on its hill (ui/title/backdrop.png), shown by TitleBackdrop, which draws
 ## what moves over it (stars, the keep's window, petals) at the places named here.
 
 const TEXTURE_PATH: String = "res://ui/title/backdrop.png"

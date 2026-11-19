@@ -1,6 +1,6 @@
 class_name GreyboxTiles
 extends RefCounted
-## Layout of the generated greybox tile atlas (made by tools/greybox/). Shared by the build
+## Layout of the greybox tile atlas (world/tiles/greybox_tiles.png, the source since 2026-11-19). Shared by the build
 ## tools and the area scripts so atlas coordinates live in one place.
 ##
 ## Atlas rows (16 px tiles, 8 columns):

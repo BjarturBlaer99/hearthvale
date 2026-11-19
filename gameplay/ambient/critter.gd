@@ -2,8 +2,8 @@ class_name Critter
 extends Node2D
 ## A bit of life (docs/TECH_DESIGN.md §15): a chicken, a butterfly or a firefly. It wanders near
 ## where it was put (CritterMotion), never blocks anyone, never fights and is never saved.
-## Chickens and butterflies are drawn from gameplay/art/critters.png (painted by
-## tools/art/make_sprites.gd), fireflies as glowing dots in code. The area spawns critters from the
+## Chickens and butterflies are drawn from gameplay/art/critters.png, fireflies as glowing dots
+## in code. The area spawns critters from the
 ## map's Spawns markers and calls set_terrain(). Position = where it stands, or the spot on the
 ## ground it hovers over.
 

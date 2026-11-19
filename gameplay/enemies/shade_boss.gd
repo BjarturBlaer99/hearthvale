@@ -9,7 +9,7 @@ extends ArenaBoss
 ## How solid it looks while it haunts (bound, it is all there).
 const HAUNT_ALPHA: float = 0.62
 const SHEET: Texture2D = preload("res://gameplay/art/shade.png")
-## Frames in the order tools/art/make_sprites.gd paints them (a test checks).
+## Frames in the order they stand in the sheet (art/sheets.json; a test checks).
 const FRAMES: Dictionary = {&"drift_a": 0, &"drift_b": 1, &"bound": 2}
 const SIZE: Vector2i = Vector2i(32, 40)
 ## Raging, it burns a little red.

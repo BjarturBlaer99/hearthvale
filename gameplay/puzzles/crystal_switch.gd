@@ -8,7 +8,7 @@ extends Node2D
 ## After a hit, more hits are ignored this long (one swing, one change).
 const LOCKOUT: float = 0.4
 const SHEET: Texture2D = preload("res://gameplay/art/crystal.png")
-## Frames in the order tools/art/make_sprites.gd paints them (a test checks).
+## Frames in the order they stand in the sheet (art/sheets.json; a test checks).
 const FRAMES: Dictionary = {&"red": 0, &"blue": 1, &"white": 2}
 const OUTLINE: Color = PixelGrade.INK
 const RED: Color = Color(0.92, 0.28, 0.30)

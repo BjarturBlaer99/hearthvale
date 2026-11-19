@@ -1,9 +1,9 @@
 class_name HeldTools
 extends RefCounted
-## The tools in the hero's hands (tool polish, 2026-11-19): gameplay/art/held_tools.png,
-## painted by tools/art/make_sprites.gd (HELD). Each frame is SIZE, with the hero's feet at FEET,
+## The tools in the hero's hands (tool polish, 2026-11-19): gameplay/art/held_tools.png
+## (art/sheets.json lists its frames). Each frame is SIZE, with the hero's feet at FEET,
 ## and is "<item>_<facing>_<pose>": the plain hoe, pickaxe and can, then the sprinkler, then
-## the copper and iron ones made from the plain. A test checks the order against the tool's.
+## the copper and iron ones. A test checks the order against art/sheets.json.
 
 const SHEET: Texture2D = preload("res://gameplay/art/held_tools.png")
 const SIZE: Vector2i = Vector2i(40, 56)

@@ -1,7 +1,7 @@
 class_name PlayerAnimator
 extends RefCounted
-## Chooses the frame of the hero's sheet to show (gameplay/player/player_sheet.png, painted
-## by tools/art/make_player_sprite.gd). Pure, so it is unit-tested: tell it how the hero
+## Chooses the frame of the hero's sheet to show (gameplay/player/player_sheet.png, its
+## columns listed in art/sheets.json). Pure, so it is unit-tested: tell it how the hero
 ## moved each frame (update), let time pass (tick) and set a pose, then read region(),
 ## shows_flipped() and bob().
 ##

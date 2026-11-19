@@ -389,3 +389,12 @@ using it, and record it in `docs/ASSETS.md`.
 5. Take the "after" shots and films; compare; explain or fix every difference.
 6. `CLAUDE.md` (the approved wording), `docs/DECISIONS.md`, `docs/ASSETS.md`, `LOG.md`.
 7. All tests pass, commit, stop: the `CLAUDE.md` diff and the screenshot comparison for you.
+
+## Step 2 — built (2026-11-19)
+
+As planned, with what building it decided (in `docs/DECISIONS.md`): 13 tests of how a tool painted
+retired with the tools; pivots are listed and only the feet and trunks tested; new PNGs import by
+`importer_defaults`; the master palette is the 256 most-used colours. **The proof:** all 27 PNGs
+byte-equal after the last bake; every shot and film compared against two "before" runs, and the only
+differences are things that move by themselves (creatures, flicker, a screen shake, timing). Results
+and the pictures looked at: `docs/progress/LOG.md`.

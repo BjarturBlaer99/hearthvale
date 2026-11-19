@@ -383,8 +383,7 @@ func test_tilling_the_whole_clear_corner_costs_less_as_his_farming_rises_and_a_t
 
 
 func test_the_soil_has_its_pictures() -> void:
-	var tool: Dictionary = (load("res://tools/art/make_sprites.gd") as GDScript).get_script_constant_map()
-	var painted: Array = (tool["SPRITES"]["soil"]["frames"] as Dictionary).keys()
+	var painted: Array = (preload("res://tests/support/art_sheets.gd") as GDScript).call(&"frames", "soil")
 	assert_int(painted.size()).is_equal(FarmPlot.FRAMES.size())
 	for i: int in painted.size():
 		assert_int(int(FarmPlot.FRAMES[StringName(str(painted[i]))])).override_failure_message("%s is frame %d" % [painted[i], i]).is_equal(i)

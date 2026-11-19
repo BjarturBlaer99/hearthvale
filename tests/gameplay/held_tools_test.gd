@@ -1,20 +1,17 @@
 extends GdUnitTestSuite
-## The tools in the hero's hands (tool polish, 2026-11-19): HeldTools names the frames
-## tools/art/make_sprites.gd paints (HELD), in its order; every tool, and the sprinkler, has a
-## picture for every facing and pose its strokes use; the sheet is painted with its flash row; and
-## a frame's feet are in its middle, so it mirrors in place.
+## The tools in the hero's hands (tool polish, 2026-11-19): HeldTools names the frames of
+## held_tools.png as art/sheets.json lists them; every tool, and the sprinkler, has a picture for
+## every facing and pose its strokes use; the sheet has its flash row; and a frame's feet are in its
+## middle, so it mirrors in place.
 
-const TOOL: String = "res://tools/art/make_sprites.gd"
+const ArtSheets: GDScript = preload("res://tests/support/art_sheets.gd")
 
 
-func test_the_frames_are_the_ones_the_tool_paints_in_its_order() -> void:
-	var tool: GDScript = load(TOOL)
-	var painted: Array = (tool.call(&"frames_of", tool.call(&"held_sprite")) as Dictionary).keys()
-	assert_array(painted).is_equal(Array(HeldTools.frame_names()))
-	var held: Dictionary = tool.get_script_constant_map()["HELD"]
-	assert_that(held["size"]).is_equal(HeldTools.SIZE)
-	assert_array(held["metalled"]).is_equal(Array(HeldTools.METALLED))
-	assert_array((held["metals"] as Dictionary).keys()).is_equal(Array(HeldTools.METALS))
+func test_the_frames_are_the_ones_the_sheet_list_names_in_its_order() -> void:
+	var sheet: Dictionary = ArtSheets.sheet("held_tools")
+	assert_array(sheet["frames"]).is_equal(Array(HeldTools.frame_names()))
+	assert_that(Vector2i(sheet["frame"][0], sheet["frame"][1])).is_equal(HeldTools.SIZE)
+	assert_that(Vector2i(sheet["pivot"][0], sheet["pivot"][1])).is_equal(HeldTools.FEET)
 
 
 func test_the_sheet_is_painted_with_a_flash_row() -> void:
@@ -63,23 +60,6 @@ func test_each_stroke_has_its_pictures_and_shows_something_but_from_behind() -> 
 					if facing != "up":
 						assert_int(painted).override_failure_message("%s %s %s shows" % [item_id, facing, pose]).is_greater(20)
 	assert_int(HeldTools.frame_of(&"wooden_sword", "side", ToolStroke.STRIKE)).override_failure_message("the sword is drawn by Sword").is_equal(-1)
-
-
-func test_the_metals_differ_only_in_the_head() -> void:
-	var image: Image = HeldTools.SHEET.get_image()
-	var plain: int = HeldTools.frame_of(&"hoe", "side", ToolStroke.RAISE)
-	var copper: int = HeldTools.frame_of(&"copper_hoe", "side", ToolStroke.RAISE)
-	var differ: int = 0
-	for x: int in HeldTools.SIZE.x:
-		for y: int in HeldTools.SIZE.y:
-			var a: Color = image.get_pixel(plain * HeldTools.SIZE.x + x, y)
-			var b: Color = image.get_pixel(copper * HeldTools.SIZE.x + x, y)
-			assert_float(a.a).is_equal(b.a)
-			# (A clear pixel's colour is the importer's: only what is painted counts.)
-			if a.a > 0.0 and not a.is_equal_approx(b):
-				differ += 1
-	# The head, and the outline round it (which takes a shade of what it surrounds).
-	assert_int(differ).override_failure_message("the head is copper: %d pixels" % differ).is_between(4, 40)
 
 
 func _painted(image: Image, frame: int) -> int:

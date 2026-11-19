@@ -289,7 +289,7 @@ func _on_shot(direction: Vector2) -> void:
 	EventBus.sound.emit(&"arrow")
 
 
-# --- Drawing (pixel art painted by tools/art/make_sprites.gd) ------------------
+# --- Drawing (pixel art in gameplay/art/) ---------------------------------------
 
 const SLIME_SHEET: Texture2D = preload("res://gameplay/art/slime.png")
 const BAT_SHEET: Texture2D = preload("res://gameplay/art/bat.png")

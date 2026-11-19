@@ -10,7 +10,7 @@ extends Node2D
 ## It stands in its cell. Position = its cell's top-left corner. The area calls set_dungeon().
 
 const SHEET: Texture2D = preload("res://gameplay/art/torch.png")
-## Frames in the order tools/art/make_sprites.gd paints them (a test checks).
+## Frames in the order they stand in the sheet (art/sheets.json; a test checks).
 const FRAMES: Dictionary = {&"unlit": 0, &"flame_a": 1, &"flame_b": 2}
 const SIZE: Vector2i = Vector2i(16, 24)
 ## A timed torch flickers for this long before it goes out.

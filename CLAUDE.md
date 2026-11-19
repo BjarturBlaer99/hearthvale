@@ -95,62 +95,47 @@ in `docs/DECISIONS.md` are superseded.
 - Before a step, write a short plan in `docs/progress/P<n>-plan.md` (`H<n>-plan.md` for the old milestones). After it, append results and known issues to `docs/progress/LOG.md`.
 - A change to the save format needs a new version number and a migration from old saves, with a test.
 - If a design question isn't answered in the docs, pick the simplest option that keeps systems data-driven, note it in `docs/DECISIONS.md`, and continue.
-- Art and sound are made in code (no external art, audio or asset-store dependencies until the roadmap says so).
-  The slice started with placeholder shapes; phase 2 replaced them with pixel art, as below.
-  **Exception (user's request, 2026-11-07; blue suit 2026-11-08):** the hero is a Zelda-style pixel-art sprite in a blue suit, painted from ASCII art by
-  `tools/art/make_player_sprite.gd`. Keep it; edit the art in that tool, never the PNG.
-  **Art pass 2 (user's request, 2026-11-09, between H13 and H14):** the hero has a red scarf and nine frames a row
-  (walk cycle, blink, attack, item held up, fallen); houses are half-timbered with thatch, tile and slate roofs;
-  paths and water have soft edges drawn by `HeightShading`. See `docs/progress/art-pass-2-plan.md`.
-  **Exception (user's request, 2026-11-08):** the environment tiles are proper pixel art (grass, trees, roofs with
-  ridges and eaves, windows, water...) plus a Decor layer of flowers, tufts and the like, all still painted in code by
-  `tools/greybox/make_tile_texture.gd` and placed by `build_maps.gd`. No external assets; edit the art in the tool.
-  **Every other actor (H11)** is pixel art painted from ASCII by `tools/art/make_sprites.gd` into `gameplay/art/`
-  (no placeholder shapes left; effects like shadows and sparks stay drawn in code). Edit the art in the tool.
-  **Art pass 3 (user's request, 2026-11-10, after H15):** a warmer, softer look. Every art tool passes its
-  picture through `PixelGrade` (`core/art/`) as it bakes: warmer colour, and outlines in a dark shade of what they
-  surround. Tune the look there, not picture by picture. It is Hearthvale's own look: do not copy another game's
-  art. See `docs/progress/art-pass-3-plan.md`.
-  **Art pass 4 (user's request, 2026-11-11):** light and lettering. Lamps, hearths, torches and crystals glow
-  (real lights since P1b: `AreaLighting`, `Ambience`), tall things cast shadows east as well as south
-  (`HeightShading`), houses and dungeons are dim away from their lights (for show only; the crypt's dark is the
-  only light that matters to play, and it is drawn by the rule's own lights), and all
-  text is Hearthvale's own pixel font, painted from ASCII by `tools/art/make_font.gd` with the UI theme. Label
-  sizes are whole multiples of 8; boxes wear `PanelFrame`. See `docs/progress/art-pass-4-plan.md`.
-  **Hero pass (user's request, 2026-11-11):** over the blue tunic the hero wears a leather vest, wrist guards, a
-  belt pouch, slate trousers and tall boots, with his sword on his back and a small pack. (Its sixteen 16x24
-  frames were replaced in P1e, below.)
-  The animator only picks pictures; swing timing and hits belong to the motor. See `docs/progress/hero-pass-plan.md`.
-  **Characters (P1e, 2026-11-12):** the hero is two cells tall (16x32) with his hood down, and is put together
-  from parts by the tool (a head, a body pose, a pair of legs per facing), so edit a part and every frame that
-  uses it follows. Twenty-one frames a row: six-frame walk and run, a three-frame swing. Villagers are as tall,
-  and breathe and blink (`Idling`). Feet, collisions and the sword's reach are where they were: `Sword.HAND`
-  only says where the blade is drawn from. See `docs/progress/P1e-plan.md`.
-  **UI polish (P1f, 2026-11-12):** headings are set in a second, larger face (`ui/font/hearth_heading.tres`,
-  size 16, capitals only: a small letter shows as its capital), baked by `tools/art/make_font.gd` and offered by
-  the theme as the `Heading` kind of label. `PanelFrame` draws corner brackets and, with `rule_y`, a rule under
-  a box's heading. The title screen's evening is painted by `tools/art/make_title.gd` (`TitlePicture` has the
-  layout; `TitleBackdrop` draws what moves). The HUD's corner is as wide as its words and hides empty lines.
-  See `docs/progress/P1f-plan.md`.
-  **Nature (P1c, 2026-11-12):** trees are tall pictures painted by `tools/art/make_scenery.gd` and stood up at
-  load by `Scenery` (the hero walks behind them; a crown fades when anything that matters is behind it). A tree
-  still blocks exactly its own cell. Cherry trees are `"cherry"` blocks in `build_maps.gd`; the eight new cells
-  in Hearthvale were approved by the user. Water and its reflections move; the rest of the scenery is still
-  (below). For show only. See `docs/progress/P1c-plan.md`.
-  **A still world (user's request, 2026-11-13):** the scenery doesn't move, except the water (its tile, its
-  surface, its reflections). Grass, flowers, washing and trees stand still, fallen petals lie where they are,
-  the mist doesn't drift, chimney smoke is one picture, and there are no specks in the air (`SwayLayer` and
-  `Motes` are gone). Creatures, people, pickups and the flicker of fires were left as they were.
-  **The marsh (Willowmere, 2026-11-17):** its tiles are two rows at the end of the atlas, painted by
-  `make_tile_texture.gd` (ground, boardwalk, reeds, the ruined hut, cattails, a lantern post), and its
-  willows are tall pictures from `make_scenery.gd`. A map names the ground its props stand on
-  (`"prop_ground"`). New tiles go at the end of the atlas: an older tile never changes place.
-  **Buildings (P1d, 2026-11-12):** walls show a lit front face where the floor lies south of them and a flat top
-  elsewhere (`WallRelief`), pillars stand taller than their cells and roofs have a ridge (`Scenery`), all painted
-  by `tools/art/make_relief.gd` and drawn over the map at load. The Height layer is untouched: no map is re-baked
-  for looks. See `docs/progress/P1d-plan.md`.
-  **Sound (H10):** all sound effects and music are made in code by `tools/audio/make_audio.gd` (Synth) and baked to
-  `audio/`. No external audio; edit the sounds in the tool, never the WAVs.
+- **Art is PNG (the user's switch, 2026-11-19; `docs/progress/png-art-plan.md`):** every picture the
+  game shows is a PNG where the game loads it (`gameplay/art/`, `gameplay/player/`, `world/tiles/`,
+  `ui/title/`), edited by hand (Aseprite, files in `art/aseprite/`) or replaced with art the user
+  brings, AI-made art included; each is listed in `docs/ASSETS.md` with where it came from. **New art
+  fits as the old does:** the size, frames, order, rows and pivot in `art/sheets.json` (tests in
+  `tests/art/` check them), a white flash row under every sheet of `gameplay/art/`, villagers in the
+  marker colours (`art/palettes/villager_markers.gpl`), colours from `art/palettes/hearthvale.gpl`,
+  and tiles in their atlas places (an older tile never changes place; new tiles go at the end).
+  How-to: `art/README.md`. Art never changes timing, hits or collisions. Hearthvale's own look: never
+  another game's art. The six tools that painted the art until then are retired in `tools/retired/`
+  (Godot ignores it): never run them, they would paint over the PNGs.
+- **Drawn in code, and kept in code:** shadows, cast shadows and soft edges (`HeightShading`), bursts
+  and sparks, the sword's blade, lights and darkness (`AreaLighting`, `Ambience`), the water's movement
+  and reflections, mist, the boxes' frames (`PanelFrame`), villager recolouring, the title's stars,
+  window and petals, and the things outlined in `PixelGrade.INK` (chests, doors, pickups). Two colours
+  in code match the art and change with it: the grass's fringe (`HeightShading.fringe_color()`) and
+  the title's sky (`TitlePicture.SKY_TOP`).
+- **Sound and fonts are made in code:** `tools/audio/make_audio.gd` bakes `audio/` (edit the tool,
+  never the WAVs); `tools/art/make_font.gd` bakes the two pixel faces and the theme. No external audio
+  or fonts.
+- **What the art passes left, still true:** the hero is two cells tall (16x32), 25 frames a row (walk
+  and run of six, a three-frame swing, four work poses), his feet, collisions and the sword's reach
+  where they always were (`Sword.HAND` only says where the blade is drawn from); the animator only picks
+  pictures, and swing timing and hits belong to the motor. Villagers are as tall, and breathe and blink
+  (`Idling`). Trees stand up from their cell (`Scenery`, the hero walks behind them, a crown fades when
+  anything that matters is behind it) and block only that cell; cherry trees are `"cherry"` blocks in
+  `build_maps.gd`. Walls have faces and tops (`WallRelief`), pillars stand taller, roofs have a ridge;
+  no map is re-baked for looks. Lamps, hearths, torches and crystals glow (`AreaLighting`); houses and
+  dungeons are dim away from their lights (for show only; the crypt's dark is the only light that
+  matters to play). Labels are whole multiples of 8, boxes wear `PanelFrame`, headings use the
+  `Heading` face (`ui/font/hearth_heading.tres`). The marsh's tiles are two rows at the end of the
+  atlas, and a map names the ground its props stand on (`"prop_ground"`). The plans of each pass are
+  in `docs/progress/` (`art-pass-2-plan.md` to `art-pass-4-plan.md`, `hero-pass-plan.md`, `P1c` to
+  `P1f`).
+- **A still world (user's request, 2026-11-13):** the scenery doesn't move, except the water (its tile,
+  its surface, its reflections). Grass, flowers, washing and trees stand still, fallen petals lie where
+  they are, the mist doesn't drift, chimney smoke is one picture, and there are no specks in the air
+  (`SwayLayer` and `Motes` are gone). Creatures, people, pickups and the flicker of fires were left as
+  they were. **Since the tool polish (2026-11-19, the user's word):** a stroke or a touch may throw a
+  short burst (clods, drops, seeds, chips, splinters, chaff), half a second at the most, that falls to
+  the ground; a petted animal's heart is the one thing that rises.
 
 ## Commands
 ```bash
@@ -164,6 +149,8 @@ godot --headless --path . --import
 godot --headless --path . --quit-after 30
 # Screenshots for review (needs a window, not --headless)
 godot --path . -s res://tools/capture.gd -- <output_dir>
+# ...or films of the strokes of work, each a grid of pictures 0.04 s apart (or only those named)
+godot --path . -s res://tools/capture.gd -- <output_dir> film
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
 # Start partway through to try one part by hand (scenarios in the script: late, gifts, bram, gate, rest, kitchen, farm, homestead, build, buildings, built, animals, market,
@@ -185,33 +172,19 @@ godot --path . -s res://tools/playtest.gd -- full
 # quickest); "deep" tries the dark floors alone, "farm" the farm alone (five days, its makings handed over).
 godot --path . -s res://tools/play_days.gd -- <output_dir>
 godot --path . -s res://tools/play_days.gd -- <output_dir> speed=4
-# Repaint the hero's sprite sheet after editing its ASCII art (optional 8x preview), then re-import
-godot --headless --path . -s res://tools/art/make_player_sprite.gd -- <preview.png>
+# After adding or editing an art PNG (an Aseprite export), let Godot import it, then check the art
 godot --headless --path . --import
-# Repaint the other actors' sprites after editing tools/art/make_sprites.gd, then re-import
-godot --headless --path . -s res://tools/art/make_sprites.gd
-godot --headless --path . --import
-# Repaint the tall trees after editing tools/art/make_scenery.gd (optional 4x preview), then re-import
-godot --headless --path . -s res://tools/art/make_scenery.gd -- <preview.png>
-godot --headless --path . --import
-# Repaint the wall faces, the pillar and the roof ridges after editing tools/art/make_relief.gd, then re-import
-godot --headless --path . -s res://tools/art/make_relief.gd -- <preview.png>
-godot --headless --path . --import
+godot --headless --path . -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add res://tests/art --ignoreHeadlessMode --continue
 # Re-bake both pixel fonts (the small face and the heading face) and the UI theme after editing
 # tools/art/make_font.gd (optional previews of the glyphs: <preview>.png and <preview>_heading.png)
 godot --headless --path . -s res://tools/art/make_font.gd -- <preview.png>
-# Repaint the title screen's picture after editing tools/art/make_title.gd, then re-import
-godot --headless --path . -s res://tools/art/make_title.gd
-godot --headless --path . --import
 # Re-bake sound effects and music after editing tools/audio/make_audio.gd (or just some: -- sword boss), then re-import
 godot --headless --path . -s res://tools/audio/make_audio.gd
 godot --headless --path . --import
 # Rewrite the input map after editing tools/setup_input_map.gd
 godot --headless --path . -s res://tools/setup_input_map.gd
-# Greybox: regenerate the tiles and re-bake the areas' Height layers (OVERWRITES editor painting of those layers).
-# build_maps.gd bakes every area, or only those named: -- village
-godot --headless --path . -s res://tools/greybox/make_tile_texture.gd
-godot --headless --path . --import
+# Maps: rebuild the TileSet from the tile atlas PNG, then re-bake the areas' Height layers
+# (OVERWRITES editor painting of those layers). build_maps.gd bakes every area, or only those named: -- village
 godot --headless --path . -s res://tools/greybox/build_tileset.gd
 godot --headless --path . -s res://tools/greybox/build_maps.gd
 ```
@@ -723,8 +696,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **The save is still version 6:** `homestead` gains `buildings`, `hay`, `furnaces` and `chests`, each
     written only when there is something in it. The fixture `tests/fixtures/saves/v6_a_yard_on_the_farm.json`
     was written by the game at the end of phase 2.
-  - **Pictures:** atlas rows 28 and 29 (`GreyboxTiles.BUILDING_KINDS`, `SILO_KINDS`), painted by
-    `make_tile_texture.gd`; `tools/playtest.gd -- buildings` and `-- built`; capture shots 177 to 191.
+  - **Pictures:** atlas rows 28 and 29 (`GreyboxTiles.BUILDING_KINDS`, `SILO_KINDS`) of
+    `world/tiles/greybox_tiles.png`; `tools/playtest.gd -- buildings` and `-- built`; capture shots 177 to 191.
   - **Do not** let a building stand the day its kit is set down, sell two of one building, build on a
     doorstep, give coins back for a building pulled down, pull down one that holds anything, or change a
     building's cost, size or unlock without the user's word: each was decided with the plan.

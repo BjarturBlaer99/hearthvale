@@ -17,7 +17,7 @@ extends Node2D
 ## as a rock does, and throws a little of its burst (splinters, for wood).
 
 const SHEET: Texture2D = preload("res://gameplay/art/breakables.png")
-## Frames in the order tools/art/make_sprites.gd paints them (a test checks).
+## Frames in the order they stand in the sheet (art/sheets.json; a test checks).
 const FRAMES: Dictionary = {
 	&"grass": 0, &"grass_cut": 1, &"pot": 2, &"branch": 3, &"stump": 4,
 	# The hero's land (the Homestead): weeds, a bush and a fallen log (its stumps wear "stump").

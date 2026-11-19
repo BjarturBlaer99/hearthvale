@@ -1,7 +1,7 @@
 class_name TitleBackdrop
 extends Control
-## The title screen's picture (P1f): an evening over Hearthvale, painted by
-## tools/art/make_title.gd (TitlePicture has the layout), with what moves drawn over it: stars
+## The title screen's picture (P1f): an evening over Hearthvale (ui/title/backdrop.png;
+## TitlePicture has the layout), with what moves drawn over it: stars
 ## that twinkle, the light in the old keep's window, and cherry petals on the wind. The ending
 ## screen shows the same picture with the window dark.
 

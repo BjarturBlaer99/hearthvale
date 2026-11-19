@@ -13,7 +13,7 @@ extends Node2D
 ## The area makes rocks from the map's Spawns markers. Position = the cell's top-left corner.
 
 const SHEET: Texture2D = preload("res://gameplay/art/rocks.png")
-## Frames in the order tools/art/make_sprites.gd paints them (a test checks).
+## Frames in the order they stand in the sheet (art/sheets.json; a test checks).
 const FRAMES: Dictionary = {
 	&"stone": 0, &"copper_ore": 1, &"coal": 2, &"iron_ore": 3, &"gold_ore": 4, &"crystal": 5,
 	&"ladder": 6, &"lift": 7,

@@ -5,8 +5,7 @@ extends GdUnitTestSuite
 ## and nothing else about where the hero can go has changed. Petals lie only on open ground and
 ## water; water has a moving surface and mirrors the hero and the trees on its bank; the Old
 ## Wood has mist. Nothing else in the scenery moves (the user's request, 2026-11-13): grass,
-## flowers, washing, trees, petals, mist and chimney smoke are still. Outlines are dark on the
-## edge of a shape and soft inside it.
+## flowers, washing, trees, petals, mist and chimney smoke are still.
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
@@ -250,28 +249,6 @@ func test_the_old_wood_has_mist_and_nowhere_else() -> void:
 	assert_bool(Ambience.has_mist(&"old_wood")).is_true()
 	assert_bool(Ambience.has_mist(&"crypt")).is_false()
 	assert_str(Mist.CODE).override_failure_message("it lies still").not_contains("TIME")
-
-
-func test_outlines_are_dark_on_the_edge_of_a_shape_and_soft_inside_it() -> void:
-	var ink: Color = Color(0.10, 0.08, 0.12)
-	var green: Color = Color(0.3, 0.6, 0.3)
-	var image: Image = Image.create(7, 7, false, Image.FORMAT_RGBA8)
-	image.fill(Color(0, 0, 0, 0))
-	for y: int in range(1, 6):
-		for x: int in range(1, 6):
-			image.set_pixel(x, y, ink if (x == 1 or y == 1 or x == 5 or y == 5 or x == 3) else green)
-	PixelGrade.apply(image, ink)
-	var edge: Color = image.get_pixel(1, 3)
-	var inner: Color = image.get_pixel(3, 3)
-	var fill: Color = image.get_pixel(2, 3)
-	assert_float(edge.v).override_failure_message("the edge of the shape is dark").is_less(fill.v * 0.6)
-	assert_float(inner.v).override_failure_message("a line inside it is lighter than its edge").is_greater(edge.v + 0.08)
-	assert_float(inner.v).override_failure_message("but still darker than what it runs through").is_less(fill.v)
-	assert_float(inner.g).override_failure_message("and still green").is_greater(inner.r)
-	var beside: Array[Color] = [green]
-	assert_float(PixelGrade.outline_for(beside, false).v).is_greater(PixelGrade.outline_for(beside, true).v)
-	assert_that(PixelGrade.outline_for(beside)).override_failure_message("an outline is an edge unless told otherwise").is_equal(PixelGrade.outline_for(beside, true))
-	assert_float(PixelGrade.SATURATION).override_failure_message("a softer picture than art pass 3's").is_less(1.1)
 
 
 func _reachable(query: TerrainQuery, start: Vector2i) -> Dictionary:

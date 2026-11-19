@@ -1,8 +1,7 @@
 class_name SceneryAtlas
 extends RefCounted
 ## Layout of the tall scenery atlas (P1c): trees that stand up from the ground, taller and
-## wider than a cell, so the hero can walk behind them. Painted by tools/art/make_scenery.gd,
-## read by Scenery. Each picture sits in its own cell with clear padding round it, so a
+## wider than a cell, so the hero can walk behind them. Read by Scenery. Each picture sits in its own cell with clear padding round it, so a
 ## picture swaying in the wind never shows its neighbour.
 
 const TEXTURE_PATH: String = "res://world/tiles/scenery.png"

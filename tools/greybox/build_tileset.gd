@@ -1,5 +1,6 @@
 extends SceneTree
-## Builds the greybox TileSet from the imported atlas. Step 3 of 4 (see make_tile_texture.gd).
+## Builds the greybox TileSet from the imported atlas PNG (world/tiles/greybox_tiles.png, the
+## source since 2026-11-19), before build_maps.gd.
 ## Every tile carries the custom data HeightGridBuilder reads (TECH_DESIGN §3):
 ## height (int), ramp (bool: stairs), solid (bool: never entered).
 

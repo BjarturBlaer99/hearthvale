@@ -1620,3 +1620,25 @@ are built first, then the switch.
   then a hold-up of 0.6 s for a crop or a product; nothing held up and no heart when the pack has no
   room; the heart is a child of the animal, drawn in code; chaff only when hay goes in. See
   `docs/progress/tool-polish-plan.md`, "Step 3 — built".
+
+## 2026-11-19 — Art is PNG (the user's request)
+Every art asset was baked one last time by its tool (each PNG byte for byte the one in the repo) and
+the PNGs became the source, edited in Aseprite or replaced with art the user brings (AI-made art
+allowed, each recorded in `docs/ASSETS.md`). The six painting tools are retired to `tools/retired/`
+(ignored by Godot; kept as a record), with the part of `PixelGrade` that graded a picture as it was
+baked; `PixelGrade` keeps `INK`, `warm()` and `same()` for what is drawn in code. The PNGs stay where
+the game loads them; `art/` holds the sheet list (`sheets.json`, which `tests/art/` checks every PNG
+and every script's frame names against), the palettes, the how-to and `.aseprite` files. Sound and
+fonts are still made in code. Supersedes "art is made in code" and every "edit the tool, never the
+PNG". What building it decided:
+- **The tests that checked how a tool painted retire with it:** the hero's frames being put together
+  from the same parts, a villager's breath being its frame a pixel lower, the copper tools being the
+  plain ones with another head, the title's dithering, `PixelGrade.apply()`'s outlines, "no old ink in
+  the baked art". What the game needs of a picture (size, frames, order, flash row, feet, markers,
+  padding, import settings) is tested from `art/sheets.json`.
+- **Pivots are listed, not tested,** except the feet of the hero and the villagers (on the last row)
+  and the trees' trunks (at their foot): where a picture is drawn is in each script.
+- **New PNGs import as the old ones do** by `importer_defaults` in `project.godot` (lossless, no
+  mipmaps, no 3D detection); the existing `.import` files already match and were not edited.
+- **The master palette is the 256 most-used colours** of all the art (near-twins within two steps
+  merged), named by family and by the sheet that uses each most; every sheet has its own exact palette.

@@ -1,8 +1,8 @@
 class_name Villager
 extends Talkable
 ## A villager who stands in one spot and talks. Their name comes from their conversation (the
-## start node's speaker, through the dialogue's "speakers" map). Pixel art painted by
-## tools/art/make_sprites.gd in marker colours, swapped for this villager's robe and hair; feet
+## start node's speaker, through the dialogue's "speakers" map). Pixel art
+## (gameplay/art/villager.png) in marker colours, swapped for this villager's robe and hair; feet
 ## in the middle of the cell like the hero's, and as tall as he is, two cells (P1e). They
 ## breathe and blink in their own time (Idling), for show only.
 
