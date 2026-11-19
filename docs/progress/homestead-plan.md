@@ -666,8 +666,12 @@ TECH_DESIGN, the roadmap, the README and DECISIONS up to date; CLAUDE.md is the 
   name. The ghost holds a building by its door (or the middle of its bottom row), and the doorstep is
   asked the table as every cell is. A tuft of tall grass doesn't grow where something is set down (a
   save from phase 2 may have one there).*
-- [ ] 3b. **Rooms.** The Coop, the Barn and the Shed with their insides, doors that follow the building,
+- [x] 3b. **Rooms.** The Coop, the Barn and the Shed with their insides, doors that follow the building,
   the shed's chests and furnace, the two upgrades.
+  *Built 2026-11-19, with D22 and D23 as written and the table's costs, sizes and unlocks. The doormat
+  of each room leads to an entry the homestead puts on the building's doorstep as it loads. The shed's
+  chests and furnace are three "Build" recipes known once it stands, with flags `shed/...`; they are
+  kept by key (`GameState.furnace(&"shed")`, `store(&"shed_a")`). The big forms wear another roof.*
 - [ ] 3c. **Moving and demolishing,** with refunds.
 - **Tests:**
   - *construction:* a kit set down is a site today and a building at dawn, through a save; one of each;

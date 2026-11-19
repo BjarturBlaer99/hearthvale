@@ -1,0 +1,35 @@
+{
+	"id": "shed",
+	"name": "Shed",
+	"station": "workbench",
+	"tab": "build",
+	"order": 7,
+	"needs": [
+		{
+			"item": "wood",
+			"count": 30
+		},
+		{
+			"item": "stone",
+			"count": 20
+		},
+		{
+			"item": "fibre",
+			"count": 15
+		},
+		{
+			"item": "copper_bar",
+			"count": 2
+		},
+		{
+			"item": "coin",
+			"count": 200
+		}
+	],
+	"makes": {
+		"item": "shed_kit"
+	},
+	"unlock": {
+		"found": "copper_bar"
+	}
+}

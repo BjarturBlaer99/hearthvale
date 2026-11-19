@@ -41,10 +41,17 @@ func apply(effect: Dictionary) -> bool:
 			_state.call(&"learn_recipe", StringName(str(effect["recipe"])))
 		"travel":
 			_state.call(&"request_travel", StringName(str(effect["area"])), StringName(str(effect["entry"])))
+		# A furnace of a building's room names itself ("furnace": its key); the farmhouse's doesn't.
 		"light_furnace":
-			_state.call(&"light_furnace", StringName(str(effect["item"])), int(effect["count"]))
+			if effect.has("furnace"):
+				_state.call(&"light_furnace", StringName(str(effect["item"])), int(effect["count"]), StringName(str(effect["furnace"])))
+			else:
+				_state.call(&"light_furnace", StringName(str(effect["item"])), int(effect["count"]))
 		"empty_furnace":
-			_state.call(&"empty_furnace")
+			if effect.has("furnace"):
+				_state.call(&"empty_furnace", StringName(str(effect["furnace"])))
+			else:
+				_state.call(&"empty_furnace")
 		_:
 			return false
 	return true

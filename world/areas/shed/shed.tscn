@@ -1,0 +1,72 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://world/areas/area_controller.gd" id="1_area"]
+[ext_resource type="TileSet" path="res://world/tiles/greybox_tiles.tres" id="2_tiles"]
+[ext_resource type="Script" path="res://world/areas/height_shading.gd" id="3_shading"]
+[ext_resource type="PackedScene" path="res://gameplay/player/player.tscn" id="4_player"]
+[ext_resource type="PackedScene" path="res://ui/area_hud.tscn" id="5_hud"]
+[ext_resource type="Script" path="res://gameplay/interactables/area_exit.gd" id="6_exit"]
+[ext_resource type="Script" path="res://gameplay/interactables/furnishing.gd" id="m2_furnishing"]
+
+[node name="Shed" type="Node2D" unique_id=1881385257]
+script = ExtResource("1_area")
+area_id = &"shed"
+area_name = "Your shed"
+music = &"homestead"
+
+[node name="Height" type="TileMapLayer" parent="." unique_id=1823724488]
+tile_map_data = PackedByteArray("AAAAAAAAAAAAAAUAAAABAAAAAAAAAAUAAAACAAAAAAAAAAUAAAADAAAAAAAAAAUAAAAEAAAAAAAAAAUAAAAFAAAAAAAAAAUAAAAGAAAAAAAAAAUAAAAHAAAAAAAAAAUAAAAIAAAAAAAAAAUAAAAJAAAAAAAAAAUAAAAKAAAAAAAAAAUAAAAAAAEAAAAAAAUAAAABAAEAAAAAAAUAAAACAAEAAAAAAAUAAAADAAEAAAAAAAUAAAAEAAEAAAAAAAUAAAAFAAEAAAAAAAUAAAAGAAEAAAAAAAUAAAAHAAEAAAAAAAUAAAAIAAEAAAAAAAUAAAAJAAEAAAAAAAUAAAAKAAEAAAAAAAUAAAAAAAIAAAAAAAUAAAABAAIAAAABAAQAAAACAAIAAAABAAQAAAADAAIAAAADAAUAAAAEAAIAAAABAAQAAAAFAAIAAAABAAQAAAAGAAIAAAABAAQAAAAHAAIAAAADAAUAAAAIAAIAAAABAAQAAAAJAAIAAAAEAAUAAAAKAAIAAAAAAAUAAAAAAAMAAAAAAAUAAAABAAMAAAABAAQAAAACAAMAAAABAAQAAAADAAMAAAABAAQAAAAEAAMAAAABAAQAAAAFAAMAAAABAAQAAAAGAAMAAAABAAQAAAAHAAMAAAABAAQAAAAIAAMAAAABAAQAAAAJAAMAAAABAAQAAAAKAAMAAAAAAAUAAAAAAAQAAAAAAAUAAAABAAQAAAABAAQAAAACAAQAAAABAAQAAAADAAQAAAABAAQAAAAEAAQAAAABAAQAAAAFAAQAAAABAAQAAAAGAAQAAAABAAQAAAAHAAQAAAABAAQAAAAIAAQAAAABAAQAAAAJAAQAAAABAAQAAAAKAAQAAAAAAAUAAAAAAAUAAAAAAAUAAAABAAUAAAABAAQAAAACAAUAAAABAAQAAAADAAUAAAABAAQAAAAEAAUAAAACAAQAAAAFAAUAAAACAAQAAAAGAAUAAAACAAQAAAAHAAUAAAABAAQAAAAIAAUAAAABAAQAAAAJAAUAAAABAAQAAAAKAAUAAAAAAAUAAAAAAAYAAAAAAAUAAAABAAYAAAABAAQAAAACAAYAAAABAAQAAAADAAYAAAABAAQAAAAEAAYAAAABAAQAAAAFAAYAAAABAAQAAAAGAAYAAAABAAQAAAAHAAYAAAABAAQAAAAIAAYAAAABAAQAAAAJAAYAAAABAAQAAAAKAAYAAAAAAAUAAAAAAAcAAAAAAAUAAAABAAcAAAAEAAUAAAACAAcAAAABAAQAAAADAAcAAAABAAQAAAAEAAcAAAABAAQAAAAFAAcAAAABAAQAAAAGAAcAAAABAAQAAAAHAAcAAAABAAQAAAAIAAcAAAABAAQAAAAJAAcAAAAGAA8AAAAKAAcAAAAAAAUAAAAAAAgAAAAAAAUAAAABAAgAAAAAAAUAAAACAAgAAAAAAAUAAAADAAgAAAAAAAUAAAAEAAgAAAAAAAUAAAAFAAgAAAADAAQAAAAGAAgAAAAAAAUAAAAHAAgAAAAAAAUAAAAIAAgAAAAAAAUAAAAJAAgAAAAAAAUAAAAKAAgAAAAAAAUAAAA=")
+tile_set = ExtResource("2_tiles")
+
+[node name="Decor" type="TileMapLayer" parent="." unique_id=2111717587]
+tile_set = ExtResource("2_tiles")
+
+[node name="Spawns" type="TileMapLayer" parent="." unique_id=1903250397]
+tile_set = ExtResource("2_tiles")
+
+[node name="HeightShading" type="Node2D" parent="." unique_id=206001874]
+script = ExtResource("3_shading")
+
+[node name="Interactables" type="Node2D" parent="." unique_id=47476707]
+
+[node name="Doormat" type="Node2D" parent="Interactables" unique_id=945782334]
+position = Vector2(80, 128)
+script = ExtResource("6_exit")
+target_area = &"homestead"
+target_entry = &"shed_door"
+
+[node name="Furnace" type="Node2D" parent="Interactables" unique_id=1624804818]
+position = Vector2(80, 32)
+script = ExtResource("m2_furnishing")
+furnishing_id = &"furnace"
+room = &"shed"
+keeps = &"shed"
+
+[node name="ChestA" type="Node2D" parent="Interactables" unique_id=1384422384]
+position = Vector2(32, 32)
+script = ExtResource("m2_furnishing")
+furnishing_id = &"chest"
+room = &"shed"
+piece = &"chest_a"
+keeps = &"shed_a"
+
+[node name="ChestB" type="Node2D" parent="Interactables" unique_id=111565472]
+position = Vector2(128, 32)
+script = ExtResource("m2_furnishing")
+furnishing_id = &"chest"
+room = &"shed"
+piece = &"chest_b"
+keeps = &"shed_b"
+
+[node name="Entries" type="Node2D" parent="." unique_id=926619238]
+
+[node name="door" type="Marker2D" parent="Entries" unique_id=2088215037]
+position = Vector2(88, 120)
+rotation = -1.5707964
+
+[node name="PlayerSpawn" type="Marker2D" parent="." unique_id=1086669272]
+position = Vector2(88, 120)
+
+[node name="Player" parent="." unique_id=1416415645 instance=ExtResource("4_player")]
+
+[node name="HUD" parent="." unique_id=1646056480 instance=ExtResource("5_hud")]

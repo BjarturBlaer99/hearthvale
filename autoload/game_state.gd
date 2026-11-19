@@ -70,6 +70,10 @@ var _mine_rules: MineRules
 var found: Dictionary[StringName, bool] = {}
 ## The furnace in his home: what it holds and the day it was lit. Saved.
 var _furnace: Furnace
+## The furnaces and chests of buildings' rooms (the Homestead's shed), by their keys ("shed",
+## "shed_a", "shed_b"). The farmhouse's are `_furnace` and `_store`.
+var _room_furnaces: Dictionary[StringName, Furnace] = {}
+var _room_stores: Dictionary[StringName, Store] = {}
 ## The storage chest in his home: its stacks. Saved.
 var _store: Store
 ## His homestead (2026-11-17): what he has cleared from the land for good. Saved.
@@ -559,17 +563,23 @@ func craft(recipe_id: StringName) -> String:
 	return ""
 
 
-## The furnace in his home: what it holds, and the day it was lit.
-func furnace() -> Furnace:
+## The furnace in his home: what it holds, and the day it was lit. With `key`, the furnace of a
+## building's room of that key (the shed's: &"shed"), each with its own load.
+func furnace(key: StringName = &"") -> Furnace:
+	if key != &"":
+		if not _room_furnaces.has(key):
+			_room_furnaces[key] = Furnace.new()
+		return _room_furnaces[key]
 	if _furnace == null:
 		_furnace = Furnace.new()
 	return _furnace
 
 
-## Lights the furnace with what makes `count` of `item_id` (the `light_furnace` effect: the
-## ore and the coal are taken by the conversation's own effects). Returns whether it was lit.
-func light_furnace(item_id: StringName, count: int) -> bool:
-	var lit: bool = furnace().light(item_id, count, day)
+## Lights the furnace (`key`'s, or the farmhouse's) with what makes `count` of `item_id` (the
+## `light_furnace` effect: the ore and the coal are taken by the conversation's own effects).
+## Returns whether it was lit.
+func light_furnace(item_id: StringName, count: int, key: StringName = &"") -> bool:
+	var lit: bool = furnace(key).light(item_id, count, day)
 	if lit:
 		EventBus.sound.emit(&"furnace")
 		EventBus.furnace_changed.emit()
@@ -578,8 +588,8 @@ func light_furnace(item_id: StringName, count: int) -> bool:
 
 ## Takes out what the furnace made (the `empty_furnace` effect). It is given, not just added:
 ## what a full pack can't take is laid at his feet. Returns what came out ({} if nothing).
-func empty_furnace() -> Dictionary:
-	var out: Dictionary = furnace().take()
+func empty_furnace(key: StringName = &"") -> Dictionary:
+	var out: Dictionary = furnace(key).take()
 	if not out.is_empty():
 		give_item(out["item"], int(out["count"]))
 		EventBus.sound.emit(&"item_get")
@@ -588,17 +598,22 @@ func empty_furnace() -> Dictionary:
 
 
 ## The furnace's conversation as of now (Furnace.dialogue): what it holds, or what he can smelt.
-func furnace_dialogue() -> Dictionary:
+func furnace_dialogue(key: StringName = &"") -> Dictionary:
 	var names: Dictionary = {}
 	for item: Dictionary in DataRegistry.entries(&"items"):
 		names[str(item["id"])] = str(item.get("name", item["id"]))
-	return furnace().dialogue(day, known_crafts(Crafting.FURNACE),
+	return furnace(key).dialogue(day, known_crafts(Crafting.FURNACE),
 		func(item_id: String) -> int: return item_count(StringName(item_id)),
-		int(crafting_rules().get("furnace_most", 1)), names)
+		int(crafting_rules().get("furnace_most", 1)), names, String(key))
 
 
-## The storage chest in his home: its stacks (it is there to open once it has been made).
-func store() -> Store:
+## The storage chest in his home: its stacks (it is there to open once it has been made). With
+## `key`, the chest of a building's room of that key (the shed's: &"shed_a", &"shed_b").
+func store(key: StringName = &"") -> Store:
+	if key != &"":
+		if not _room_stores.has(key):
+			_room_stores[key] = Store.new(int(crafting_rules().get("chest_slots", 24)))
+		return _room_stores[key]
 	if _store == null:
 		_store = Store.new(int(crafting_rules().get("chest_slots", 24)))
 	return _store
@@ -617,14 +632,14 @@ func storable_stacks() -> Array[Dictionary]:
 
 ## Puts his stack of `item_id` in the chest: as much of it as goes in. Returns "" if any of it
 ## moved, or why not in Store's words; then nothing changed.
-func store_put(item_id: StringName) -> String:
+func store_put(item_id: StringName, key: StringName = &"") -> String:
 	var item: Dictionary = DataRegistry.get_item(item_id)
 	var held: int = item_count(item_id)
 	if held <= 0:
 		return Store.NOTHING_WORDS
 	if not Store.can_hold(item) or Inventory.held_in_tools(DataRegistry.entries(&"items")).has(String(item_id)):
 		return Store.NOT_KEPT_WORDS
-	var moved: int = store().put(String(item_id), held, Inventory.capacity(item))
+	var moved: int = store(key).put(String(item_id), held, Inventory.capacity(item))
 	if moved <= 0:
 		return Store.FULL_WORDS
 	add_item(item_id, -moved)
@@ -633,15 +648,15 @@ func store_put(item_id: StringName) -> String:
 
 ## Takes stack `index` out of the chest: as much of it as he has room for. Returns "" if any of
 ## it moved, or why not in Store's words; then nothing changed.
-func store_take(index: int) -> String:
-	var stacks: Array[Dictionary] = store().stacks()
+func store_take(index: int, key: StringName = &"") -> String:
+	var stacks: Array[Dictionary] = store(key).stacks()
 	if index < 0 or index >= stacks.size():
 		return Store.NOTHING_WORDS
 	var item_id: StringName = StringName(str(stacks[index]["id"]))
 	var room: int = Inventory.room_for(item_count(item_id), DataRegistry.get_item(item_id))
 	if room <= 0:
 		return Store.NO_ROOM_WORDS
-	add_item(item_id, store().take(index, mini(room, int(stacks[index]["count"]))))
+	add_item(item_id, store(key).take(index, mini(room, int(stacks[index]["count"]))))
 	return ""
 
 
@@ -1145,6 +1160,8 @@ func clear() -> void:
 	_mine = null
 	_furnace = null
 	_store = null
+	_room_furnaces.clear()
+	_room_stores.clear()
 	_homestead = null
 	morning_news.clear()
 	found.clear()
@@ -1182,7 +1199,7 @@ func to_dict() -> Dictionary:
 		"farm": farm().to_dict(),
 		"mine": mine().to_dict(),
 		"home": {"furnace": furnace().to_dict(), "chest": store().to_list()},
-		"homestead": homestead().to_dict(),
+		"homestead": _homestead_saved(),
 		"found": _found_list(),
 		"skills": _json_safe(skill_points),
 		"friends": _json_safe(friends),
@@ -1243,6 +1260,7 @@ func from_dict(data: Dictionary) -> void:
 	store().load_saved(home.get("chest"), func(item_id: String) -> int: return Inventory.capacity(DataRegistry.get_item(StringName(item_id))))
 	homestead().load_saved(data.get("homestead"), func(item_id: String) -> StringName: return Placement.layer_of(DataRegistry.get_item(StringName(item_id))),
 		func(building: String) -> bool: return DataRegistry.has_entry(&"buildings", StringName(building)))
+	_load_rooms(_dictionary(data.get("homestead")))
 	var src_found: Variant = data.get("found")
 	if typeof(src_found) == TYPE_ARRAY:
 		for id: Variant in src_found:
@@ -1251,6 +1269,37 @@ func from_dict(data: Dictionary) -> void:
 	# What he carries, he has found: a save from before this was kept says nothing of it.
 	for stack: Dictionary in inventory:
 		found[stack["id"]] = true
+
+
+## The save's section `homestead`: what Homestead keeps, and (the Homestead, phase 3) the
+## furnaces and chests of buildings' rooms, by key: "furnaces": { "shed": {...} }, "chests": {
+## "shed_a": [...] }, each written only when one holds something.
+func _homestead_saved() -> Dictionary:
+	var out: Dictionary = homestead().to_dict()
+	var furnaces: Dictionary = {}
+	for key: StringName in _room_furnaces:
+		if not _room_furnaces[key].is_empty():
+			furnaces[String(key)] = _room_furnaces[key].to_dict()
+	if not furnaces.is_empty():
+		out["furnaces"] = furnaces
+	var chests: Dictionary = {}
+	for key: StringName in _room_stores:
+		if _room_stores[key].used_slots() > 0:
+			chests[String(key)] = _room_stores[key].to_list()
+	if not chests.is_empty():
+		out["chests"] = chests
+	return out
+
+
+## Takes up the rooms' furnaces and chests from a saved `homestead` section (none in a save
+## from before them).
+func _load_rooms(saved: Dictionary) -> void:
+	var furnaces: Dictionary = _dictionary(saved.get("furnaces"))
+	for key: Variant in furnaces:
+		furnace(StringName(str(key))).load_saved(furnaces[key])
+	var chests: Dictionary = _dictionary(saved.get("chests"))
+	for key: Variant in chests:
+		store(StringName(str(key))).load_saved(chests[key], func(item_id: String) -> int: return Inventory.capacity(DataRegistry.get_item(StringName(item_id))))
 
 
 ## The ids of what he has found, in order, for a save.

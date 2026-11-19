@@ -1,0 +1,24 @@
+{
+	"id": "barn",
+	"name": "Barn",
+	"size": [6, 4],
+	"door": [3, 3],
+	"room": "barn",
+	"animals": 4,
+	"big": {
+		"name": "Big Barn",
+		"animals": 8,
+		"look": [
+			[0, 0, 6, 2, "roof_blue"],
+			[0, 2, 6, 2, "barn_wall"],
+			[3, 2, 1, 1, "barn_loft"],
+			[3, 3, 1, 1, "barn_door"]
+		]
+	},
+	"look": [
+		[0, 0, 6, 2, "roof"],
+		[0, 2, 6, 2, "barn_wall"],
+		[3, 2, 1, 1, "barn_loft"],
+		[3, 3, 1, 1, "barn_door"]
+	]
+}

@@ -244,6 +244,9 @@ func _ready() -> void:
 	_refresh_doors()
 	_shading.stone_faces = dungeon_id != &""
 	_shading.show_grid(grid, height_layer)
+	# The doors of his buildings are where they stand today (the Homestead): coming out of one,
+	# he arrives before its door.
+	PlacedBuildings.mark_doors(self)
 	var arrival: Dictionary = _arrival()
 	_entrance_cell = arrival["cell"]
 	_entrance_facing = arrival["facing"]
@@ -869,7 +872,7 @@ func talk_to(talkable: Talkable) -> bool:
 	if talkable is Furnishing and (talkable as Furnishing).opens() == Furnishing.CRAFT:
 		return open_craft()
 	if talkable is Furnishing and (talkable as Furnishing).opens() == Furnishing.STORE:
-		return open_store()
+		return open_store((talkable as Furnishing).keeps)
 	var data: Dictionary = talkable.dialogue()
 	var villager: Dictionary = villager_of(talkable)
 	if not villager.is_empty() and not data.is_empty():
@@ -1099,12 +1102,12 @@ func _tell_morning_news() -> void:
 
 ## Opens the storage chest's two lists (crafting, GDD §14). The hero stands still while they
 ## are open, and the clock with him. Returns whether they opened.
-func open_store() -> bool:
+func open_store(chest: StringName = &"") -> bool:
 	if _busy():
 		return false
 	player.controls_enabled = false
 	hud.set_prompt("")
-	hud.store_menu.open()
+	hud.store_menu.open(chest)
 	return true
 
 

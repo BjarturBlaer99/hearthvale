@@ -1,0 +1,31 @@
+{
+	"id": "big_coop",
+	"name": "Big Coop",
+	"station": "workbench",
+	"tab": "build",
+	"order": 4,
+	"needs": [
+		{
+			"item": "wood",
+			"count": 20
+		},
+		{
+			"item": "fibre",
+			"count": 10
+		},
+		{
+			"item": "iron_bar",
+			"count": 2
+		},
+		{
+			"item": "coin",
+			"count": 350
+		}
+	],
+	"makes": {
+		"upgrade": "coop"
+	},
+	"unlock": {
+		"built": "coop"
+	}
+}

@@ -1,0 +1,13 @@
+{
+	"id": "shed_chest_2",
+	"name": "Second Shed Chest",
+	"station": "workbench",
+	"tab": "build",
+	"order": 10,
+	"needs": [
+		{ "item": "wood", "count": 10 },
+		{ "item": "copper_bar", "count": 1 }
+	],
+	"makes": { "furnishing": "chest_b", "room": "shed" },
+	"unlock": { "built": "shed" }
+}

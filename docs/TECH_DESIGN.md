@@ -1605,6 +1605,23 @@ buildings, under "Buildings" below.
     a seventh land marker (`GreyboxTiles.LAND_MARKER_KINDS`); the homestead was re-baked for it. A tuft
     whose cell has something set down or a building on it is taken away as the land loads
     (`AreaController._clear_grass_under_things()`).
+  - **Rooms** (step 3b): the Coop (4 by 3), the Barn (6 by 4) and the Shed (4 by 3) have a `door` and a
+    `room`, the areas `coop`, `barn` and `shed` (11 by 9, baked by `build_maps.gd` like every house's
+    inside). Standing, each has an `AreaExit` on its door's cell into its room's entry `door`
+    (`PlacedBuildings.door(id)`), and its room's doormat leads to the homestead's entry `<id>_door`, a
+    marker `PlacedBuildings.mark_doors()` puts on the doorstep before the hero is placed, and moves with
+    the building. A site has neither.
+  - **The shed's furnishings** are `Furnishing` nodes of `shed.tscn` with a `room` (`shed`), a `piece`
+    (its own name: `chest_a`, `chest_b`) and `keeps` (the key of its furnace or chest): their flags are
+    `shed/furnace`, `shed/chest_a`, `shed/chest_b`, made by recipes whose `makes` names a `room`
+    (`data/rules/crafting.json` lists each room's furnishings under `rooms`) and which wait on
+    `{"built": "shed"}`. `GameState.furnace(key)`, `store(key)`, `light_furnace(item, count, key)`,
+    `empty_furnace(key)`, `furnace_dialogue(key)`, `store_put(item, key)`, `store_take(index, key)` take
+    an optional key; none is the farmhouse's. `StoreMenu.open(key)`. The furnace's conversation puts
+    its key in its effects. Saved in `homestead` as `"furnaces"` and `"chests"`, by key.
+  - **Upgrades:** a "Build" recipe making `{"upgrade": id}` (the Big Coop, the Big Barn) calls
+    `Homestead.upgrade(id, day)`; the next morning `is_big()` is true, its look is `big`'s, and its
+    `animals` are `big`'s (8).
   - **Pictures and sound:** atlas rows 28 and 29 (`GreyboxTiles.BUILDING_KINDS`, `SILO_KINDS`: a site, a
     site's timber, the barn's plank wall, loft door and door, the silo's quarters), painted by
     `make_tile_texture.gd` and never laid on a Height layer; the icons `hay` and `kit`; the sound `built`.

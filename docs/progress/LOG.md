@@ -2835,9 +2835,21 @@ The first of phase 3's three steps (`docs/progress/homestead-plan.md`).
 - Chosen where the plan was silent (`docs/DECISIONS.md`): the ghost holds a building by its door; the doorstep is asked the plan's table as every cell is; a path may lie under a building; a building's cells say "Nothing can stand there."; the Well casts no shadow; nothing takes hay out of the silo.
 
 **Verified**
-- **1069 tests in 140 suites pass** (1038 in 134 before). New: the buildings' rules (`tests/core/homestead/building_rules_test.gd`), what the homestead keeps of them (`homestead_buildings_test.gd`), the Build tab's rules (`tests/core/crafting/crafting_build_test.gd`), the plans in the world (`tests/world/plans_test.gd`: the tab, the kit, the ghost's refusals, a site through a save and the morning, the well, hay and the silo, a tuft under a phase 2 yard), and a save from phase 2 (`tests/fixtures/saves/v6_a_yard_on_the_farm.json`, written by the game at `57e7d3a`).
+- **1069 tests in 138 suites pass** (1038 in 134 before). New: the buildings' rules (`tests/core/homestead/building_rules_test.gd`), what the homestead keeps of them (`homestead_buildings_test.gd`), the Build tab's rules (`tests/core/crafting/crafting_build_test.gd`), the plans in the world (`tests/world/plans_test.gd`: the tab, the kit, the ghost's refusals, a site through a save and the morning, the well, hay and the silo, a tuft under a phase 2 yard), and a save from phase 2 (`tests/fixtures/saves/v6_a_yard_on_the_farm.json`, written by the game at `57e7d3a`).
 - Older tests brought up to date: the workbench's tabs (three now) and the registry's list of items and breakables.
 - The game boots headless with no script error.
 
 **Known issues**
 - Nobody has played it by hand. The rooms, upgrades, moving and demolishing are steps 3b and 3c.
+
+## 2026-11-19 — The Homestead, phase 3, step 3b: rooms, the shed's chests and furnace, the upgrades
+
+**Built**
+- **The Coop** (4 by 3; 30 wood, 20 stone, 15 fibre, 250 coins; known once wood is found), **the Barn** (6 by 4; 30 wood, 40 stone, 25 fibre, 4 iron bars, 600 coins; Farming 3) and **the Shed** (4 by 3; 30 wood, 20 stone, 15 fibre, 2 copper bars, 200 coins; a copper bar found), each with its own small room (`coop`, `barn`, `shed`, 11 by 9) entered by its door, whose doormat leads out before the door wherever the building stands. The rooms stand empty of animals.
+- **The Shed's two chests and second furnace,** made at the workbench once it stands, for what their like costs in the farmhouse, each in its own place in the shed; each furnace one load a night. `GameState.furnace()` and `store()` are still the farmhouse's; the shed's are `furnace(&"shed")`, `store(&"shed_a")`, `store(&"shed_b")`.
+- **The Big Coop** (20 wood, 10 fibre, 2 iron bars, 350 coins) **and the Big Barn** (30 wood, 30 stone, 2 gold bars, 800 coins), bought like a plan once the building stands and finished the next morning, the same place and size, room for 8 animals (data that phase 4 will read). Each wears a different roof.
+- **The save is still version 6:** the shed's furnace and chests are kept in `homestead` by key, written only when they hold something.
+
+**What differs from the plan:** nothing in D20 to D23. Chosen where the plan was silent: the doors' cells and the rooms' furniture, the shed's three recipes on "Build", the big forms' roofs (`docs/DECISIONS.md`).
+
+**Verified:** 1075 tests in 139 suites pass, with the new `tests/world/rooms_test.gd` (in and out of each room in two places, a site without a door, the doorstep kept free, the shed's chests and furnace through a save, the two upgrades, the seven plans' costs and unlocks against the plan's table and its sums, the rooms' size and names). Nobody has played it by hand.

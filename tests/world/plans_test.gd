@@ -67,14 +67,14 @@ func test_the_build_tab_lists_the_plans_with_their_materials_and_coins() -> void
 	assert_array(menu.entries()).override_failure_message("a new game knows no plan yet").is_empty()
 	assert_array(Array(menu.shown_lines())).is_equal([CraftMenu.NOTHING_WORDS])
 	menu.close()
-	# A copper bar found, the Well is known; Farming 2, the Silo.
+	# A copper bar found, the Well and the Shed are known; Farming 2, the Silo.
 	GameState.add_item(&"copper_bar", 1)
 	GameState.skill_points[Skills.FARMING] = 10
 	home.open_craft()
 	menu.show_tab(Crafting.TAB_BUILD)
-	assert_array(menu.entries().map(func(recipe: Dictionary) -> String: return str(recipe["id"]))).is_equal(["well", "silo"])
-	assert_array(Array(menu.shown_lines())).is_equal(["> Well", "  Silo"])
-	assert_array(menu.greyed_lines()).is_equal([true, true])
+	assert_array(menu.entries().map(func(recipe: Dictionary) -> String: return str(recipe["id"]))).is_equal(["well", "silo", "shed"])
+	assert_array(Array(menu.shown_lines())).is_equal(["> Well", "  Silo", "  Shed"])
+	assert_array(menu.greyed_lines()).is_equal([true, true, true])
 	assert_array(Array(menu.need_lines())).is_equal(["Stone 0 of 40", "Wood 0 of 10", "Copper Bar 1 of 1", "Coins 0 of 80"])
 	# Refused, it says what he is short of.
 	assert_bool(menu.confirm()).is_false()

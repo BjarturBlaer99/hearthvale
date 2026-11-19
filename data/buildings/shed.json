@@ -1,0 +1,14 @@
+{
+	"id": "shed",
+	"name": "Shed",
+	"size": [4, 3],
+	"door": [2, 2],
+	"room": "shed",
+	"keeps": { "furnaces": ["shed"], "chests": ["shed_a", "shed_b"] },
+	"look": [
+		[0, 0, 4, 2, "roof_blue"],
+		[0, 2, 4, 1, "wall"],
+		[2, 2, 1, 1, "door"],
+		[3, 0, 1, 1, "chimney"]
+	]
+}

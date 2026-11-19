@@ -267,6 +267,64 @@ const MAPS: Dictionary = {
 			[9, 7, 1, 1, 0, "stool"],
 		],
 	},
+	# The insides of the Homestead's buildings (phase 3): 11 by 9 like every house's, the way out
+	# a doormat in the middle of the bottom wall, which leads out before the building's door
+	# wherever it stands. They stand empty of animals (phase 4's). The coop has perches and
+	# nesting boxes along its back wall, the barn its troughs and feed, the shed its shelves
+	# and the places of its two chests and its furnace (2, 2), (8, 2) and (5, 2), left clear.
+	"coop": {
+		"scene": "res://world/areas/coop/coop.tscn",
+		"size": Vector2i(11, 9),
+		"base": "floor",
+		"blocks": [
+			[0, 0, 11, 2, 0, "inner_wall"],
+			[0, 0, 1, 9, 0, "inner_wall"],
+			[10, 0, 1, 9, 0, "inner_wall"],
+			[0, 8, 11, 1, 0, "inner_wall"],
+			[5, 8, 1, 1, 0, "doormat"],
+			[1, 2, 3, 1, 0, "shelf"],
+			[7, 2, 3, 1, 0, "shelf"],
+			[1, 7, 1, 1, 0, "barrel"],
+			[9, 7, 1, 1, 0, "barrel"],
+			[4, 4, 3, 2, 0, "rug"],
+		],
+	},
+	"barn": {
+		"scene": "res://world/areas/barn/barn.tscn",
+		"size": Vector2i(11, 9),
+		"base": "floor",
+		"blocks": [
+			[0, 0, 11, 2, 0, "inner_wall"],
+			[0, 0, 1, 9, 0, "inner_wall"],
+			[10, 0, 1, 9, 0, "inner_wall"],
+			[0, 8, 11, 1, 0, "inner_wall"],
+			[5, 8, 1, 1, 0, "doormat"],
+			[2, 2, 3, 1, 0, "table"],
+			[6, 2, 3, 1, 0, "table"],
+			[1, 2, 1, 1, 0, "barrel"],
+			[9, 2, 1, 1, 0, "barrel"],
+			[1, 6, 1, 2, 0, "barrel"],
+			[9, 7, 1, 1, 0, "stool"],
+		],
+	},
+	"shed": {
+		"scene": "res://world/areas/shed/shed.tscn",
+		"size": Vector2i(11, 9),
+		"base": "floor",
+		"blocks": [
+			[0, 0, 11, 2, 0, "inner_wall"],
+			[0, 0, 1, 9, 0, "inner_wall"],
+			[10, 0, 1, 9, 0, "inner_wall"],
+			[0, 8, 11, 1, 0, "inner_wall"],
+			[5, 8, 1, 1, 0, "doormat"],
+			[3, 2, 1, 1, 0, "shelf"],
+			[7, 2, 1, 1, 0, "shelf"],
+			[9, 2, 1, 1, 0, "barrel"],
+			[1, 7, 1, 1, 0, "barrel"],
+			[9, 7, 1, 1, 0, "stool"],
+			[4, 5, 3, 1, 0, "rug"],
+		],
+	},
 	"weaver_house": {
 		"scene": "res://world/areas/weaver_house/weaver_house.tscn",
 		"size": Vector2i(11, 9),

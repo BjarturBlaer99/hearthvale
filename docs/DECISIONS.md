@@ -1383,3 +1383,32 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   - **The save stays version 6** (D30): the section `homestead` gains `"buildings"` (`{ id: { "at":
     "x,y", "day": n, "big_day": n } }`, `big_day` only for an upgrade) and `"hay"`, each written only
     when there is something in it and read with a default. A building the game doesn't know is left out.
+- 2026-11-19 — **The Homestead, step 3b (the rooms, the shed's furnishings, the upgrades): what the plan
+  left open.** D20, D22 and D23 are built as written; these are the phase's own choices.
+  - **The Coop and the Shed are 4 by 3 with their door in the middle of the bottom row (column 2); the
+    Barn is 6 by 4 with its door at column 3.** Their looks: the Coop thatched like the farmhouse, the
+    Shed slate-roofed with a chimney (it has a furnace), the Barn a red-tiled roof over two rows of red
+    planks with a loft door above its door. **The Big Coop** wears clay tiles in place of thatch and
+    **the Big Barn** slate in place of tiles: the same size and place, so the bigger form shows.
+  - **Each room is an 11 by 9 area** (`coop`, `barn`, `shed`) baked like every house's inside, named
+    "Your coop", "Your barn", "Your shed", playing the farm's tune. Its doormat leads to the homestead's
+    entry `<id>_door`, which the area puts on the building's doorstep (facing south) each time it loads
+    and whenever the building changes, so the door leads the right way wherever the building stands.
+    The rooms stand empty of animals: perches and nest boxes, troughs and barrels, shelves.
+  - **A building's door is an `AreaExit` on its door's cell,** made by the area: the building fills all
+    its cells but that one, which the hero walks into from the doorstep. A site has no door.
+  - **The shed's furnishings are three recipes on the "Build" tab (after the seven plans), known once
+    the shed stands,** so the farmhouse's "Make" list is as it was: Shed
+    Furnace (20 stone, 5 copper ore), Shed Chest and Second Shed Chest (10 wood and a copper bar each),
+    the farmhouse's own costs. Their flags are `shed/furnace`, `shed/chest_a`, `shed/chest_b`; their
+    places in the shed are (5, 2), (2, 2) and (8, 2). The crafting rules name the shed's room and its
+    three furnishings (`"rooms"`).
+  - **The furnaces and chests are kept by key:** `GameState.furnace()` and `store()` are the
+    farmhouse's, as before; `furnace(&"shed")`, `store(&"shed_a")` and `store(&"shed_b")` the shed's,
+    each with one load or 24 stacks of its own. The furnace's conversation carries its key in its
+    effects (`"furnace": "shed"`), and the farmhouse's carries none, as before. They are saved in the
+    section `homestead` (`"furnaces"`, `"chests"`), written only when one holds something; the
+    farmhouse's stay in `home`.
+  - **An upgrade is a recipe of the "Build" tab that makes `{"upgrade": id}`,** known once that building
+    stands (`"unlock": {"built": id}`), bought with its materials and coins, and finished the next
+    morning ("The Big Coop is finished."). One upgrade a building. Its room is the room it had.

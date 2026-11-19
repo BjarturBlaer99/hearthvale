@@ -1,0 +1,31 @@
+{
+	"id": "big_barn",
+	"name": "Big Barn",
+	"station": "workbench",
+	"tab": "build",
+	"order": 6,
+	"needs": [
+		{
+			"item": "wood",
+			"count": 30
+		},
+		{
+			"item": "stone",
+			"count": 30
+		},
+		{
+			"item": "gold_bar",
+			"count": 2
+		},
+		{
+			"item": "coin",
+			"count": 800
+		}
+	],
+	"makes": {
+		"upgrade": "barn"
+	},
+	"unlock": {
+		"built": "barn"
+	}
+}

@@ -25,6 +25,8 @@ const TOOK_WORDS: String = "Took out: %s."
 const STACK_LINE: String = "%s x%d"
 
 var side: StringName = PACK
+## Which chest it shows: &"" the farmhouse's, else the key of a building room's (&"shed_a").
+var key: StringName = &""
 var selected: int = 0
 ## The first entry shown of each list.
 var tops: Dictionary = {PACK: 0, CHEST: 0}
@@ -41,8 +43,9 @@ func _ready() -> void:
 	hide()
 
 
-func open() -> void:
+func open(chest: StringName = &"") -> void:
 	# It opens on the pack; with nothing there to put away, _refresh turns to the chest.
+	key = chest
 	side = PACK
 	selected = 0
 	tops = {PACK: 0, CHEST: 0}
@@ -57,7 +60,7 @@ func is_open() -> bool:
 
 ## The stacks of list `which` (PACK or CHEST): [{ "id", "count" }].
 func entries(which: StringName = side) -> Array[Dictionary]:
-	return GameState.store().stacks() if which == CHEST else GameState.storable_stacks()
+	return GameState.store(key).stacks() if which == CHEST else GameState.storable_stacks()
 
 
 func move_cursor(step: int) -> void:
@@ -87,7 +90,7 @@ func confirm() -> bool:
 	var stack: Dictionary = list[index]
 	var item_id: StringName = StringName(str(stack["id"]))
 	var before: int = GameState.item_count(item_id)
-	var why_not: String = GameState.store_take(index) if side == CHEST else GameState.store_put(item_id)
+	var why_not: String = GameState.store_take(index, key) if side == CHEST else GameState.store_put(item_id, key)
 	if not why_not.is_empty():
 		EventBus.sound.emit(&"nope")
 		_note.text = why_not
@@ -191,5 +194,5 @@ func _refresh() -> void:
 	_pack.text = "\n".join(_lines(PACK))
 	_chest.text = "\n".join(_lines(CHEST))
 	_pack_title.text = PACK_TITLE
-	_chest_title.text = CHEST_TITLE % [GameState.store().used_slots(), GameState.store().slots]
+	_chest_title.text = CHEST_TITLE % [GameState.store(key).used_slots(), GameState.store(key).slots]
 	_count.text = MenuCursor.count_text(int(tops[side]), selected, entries().size(), ROWS)

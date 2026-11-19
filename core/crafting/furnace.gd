@@ -98,14 +98,17 @@ static func load_size(recipe: Dictionary, held: Callable, most: int) -> int:
 ## Cold and empty, it lists `recipes` (the furnace's, known to him): an answer for each, which
 ## loads as many as he can make (`most` at the most) with the shared `take_item` effects and
 ## `light_furnace`, or says he hasn't the makings. `names` maps item ids to their names.
-func dialogue(today: int, recipes: Array, held: Callable, most: int, names: Dictionary) -> Dictionary:
+## `key` names this furnace when it is not the farmhouse's (a building's room's: "shed"): its
+## effects carry it ("furnace": key), so they light and empty this one.
+func dialogue(today: int, recipes: Array, held: Callable, most: int, names: Dictionary, key: String = "") -> Dictionary:
 	var nodes: Dictionary = {}
+	var mine: Dictionary = {} if key.is_empty() else {"furnace": key}
 	if is_burning(today):
 		nodes[ASK] = {"speaker": "", "text": BURNING_WORDS % _load_words(item, count, names).to_lower(), "options": [{"text": LEAVE_WORDS, "next": null}]}
 		return {"id": "furnace", "start": ASK, "nodes": nodes}
 	if is_ready(today):
 		nodes[ASK] = {"speaker": "", "text": READY_WORDS % _load_words(item, count, names).to_lower(), "options": [
-			{"text": TAKE_WORDS, "effects": [{"type": "empty_furnace"}], "next": null},
+			{"text": TAKE_WORDS, "effects": [_with({"type": "empty_furnace"}, mine)], "next": null},
 			{"text": LEAVE_WORDS, "next": null},
 		]}
 		return {"id": "furnace", "start": ASK, "nodes": nodes}
@@ -123,7 +126,7 @@ func dialogue(today: int, recipes: Array, held: Callable, most: int, names: Dict
 		var effects: Array = []
 		for need: Dictionary in Crafting.needs_of(recipe):
 			effects.append({"type": "take_item", "item": str(need["item"]), "count": int(need["count"]) * size})
-		effects.append({"type": "light_furnace", "item": made, "count": size})
+		effects.append(_with({"type": "light_furnace", "item": made, "count": size}, mine))
 		var lit: String = "%s_%s" % [LIT, str(recipe.get("id", made))]
 		answers.append({"text": words, "effects": effects, "next": lit})
 		nodes[lit] = {"speaker": "", "text": LIT_WORDS % _load_words(StringName(made), size, names).to_lower(), "options": [{"text": LEAVE_WORDS, "next": null}]}
@@ -131,6 +134,12 @@ func dialogue(today: int, recipes: Array, held: Callable, most: int, names: Dict
 	nodes[ASK] = {"speaker": "", "text": COLD_WORDS if not recipes.is_empty() else NOTHING_WORDS, "options": answers}
 	nodes[LACKING] = {"speaker": "", "text": LACKING_WORDS, "options": [{"text": OTHER_WORDS, "next": ASK}, {"text": LEAVE_WORDS, "next": null}]}
 	return {"id": "furnace", "start": ASK, "nodes": nodes}
+
+
+## `effect` with `extra`'s keys added.
+static func _with(effect: Dictionary, extra: Dictionary) -> Dictionary:
+	effect.merge(extra)
+	return effect
 
 
 ## "Copper Bar x3", or "Copper Bar" for one.

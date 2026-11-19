@@ -1,0 +1,31 @@
+{
+	"id": "coop",
+	"name": "Coop",
+	"station": "workbench",
+	"tab": "build",
+	"order": 3,
+	"needs": [
+		{
+			"item": "wood",
+			"count": 30
+		},
+		{
+			"item": "stone",
+			"count": 20
+		},
+		{
+			"item": "fibre",
+			"count": 15
+		},
+		{
+			"item": "coin",
+			"count": 250
+		}
+	],
+	"makes": {
+		"item": "coop_kit"
+	},
+	"unlock": {
+		"found": "wood"
+	}
+}

@@ -27,6 +27,9 @@ const SIZES: Dictionary = {
 	&"crypt": Vector2i(45, 44),
 	# P2b: the inside of the hero's cottage (decision 4 of the pivot), the size of the other houses.
 	&"home": Vector2i(11, 9),
+	# The Homestead's phase 3: the insides of the Coop, the Barn and the Shed, the size of the
+	# other houses.
+	&"coop": Vector2i(11, 9), &"barn": Vector2i(11, 9), &"shed": Vector2i(11, 9),
 	# Willowmere (2026-11-17, the user's request): a marsh east of the village, the size of the
 	# North Fields. No other area grew to make room for it.
 	&"willowmere": Vector2i(40, 30),

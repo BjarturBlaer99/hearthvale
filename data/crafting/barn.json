@@ -1,0 +1,36 @@
+{
+	"id": "barn",
+	"name": "Barn",
+	"station": "workbench",
+	"tab": "build",
+	"order": 5,
+	"needs": [
+		{
+			"item": "wood",
+			"count": 30
+		},
+		{
+			"item": "stone",
+			"count": 40
+		},
+		{
+			"item": "fibre",
+			"count": 25
+		},
+		{
+			"item": "iron_bar",
+			"count": 4
+		},
+		{
+			"item": "coin",
+			"count": 600
+		}
+	],
+	"makes": {
+		"item": "barn_kit"
+	},
+	"unlock": {
+		"skill": "farming",
+		"level": 3
+	}
+}

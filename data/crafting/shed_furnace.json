@@ -1,0 +1,13 @@
+{
+	"id": "shed_furnace",
+	"name": "Shed Furnace",
+	"station": "workbench",
+	"tab": "build",
+	"order": 8,
+	"needs": [
+		{ "item": "stone", "count": 20 },
+		{ "item": "copper_ore", "count": 5 }
+	],
+	"makes": { "furnishing": "furnace", "room": "shed" },
+	"unlock": { "built": "shed" }
+}

@@ -34,6 +34,14 @@ const FIRE_AT: Vector2 = Vector2(8, 9)
 @export var furnishing_id: StringName = WORKBENCH
 ## There from the start (the workbench), not made.
 @export var always: bool = false
+## The room it stands in (the Homestead, phase 3): empty for the farmhouse ("home/<id>"), or a
+## building's ("shed"): then its flag is "<room>/<piece>".
+@export var room: StringName = &""
+## Its own name in its room, if it is not its kind's (the shed's two chests: chest_a, chest_b).
+@export var piece: StringName = &""
+## The key of the furnace or chest it is (GameState.furnace(key), store(key)): empty for the
+## farmhouse's.
+@export var keeps: StringName = &""
 
 
 func _ready() -> void:
@@ -43,7 +51,14 @@ func _ready() -> void:
 
 ## Whether it stands in the house: the workbench always, the rest once made.
 func is_there() -> bool:
-	return always or GameState.is_furnished(furnishing_id)
+	return always or GameState.is_furnished(furnished_key())
+
+
+## What GameState.is_furnished() is asked: its kind, or in a building's room "<room>/<piece>".
+func furnished_key() -> StringName:
+	if room == &"":
+		return furnishing_id
+	return StringName("%s/%s" % [room, piece if piece != &"" else furnishing_id])
 
 
 ## Whether it fills its cell. The rug lies flat: it is walked over.
@@ -77,12 +92,12 @@ func prompt() -> String:
 
 ## The furnace's words; nothing for the rest (the area opens their lists).
 func dialogue() -> Dictionary:
-	return GameState.furnace_dialogue() if furnishing_id == FURNACE else {}
+	return GameState.furnace_dialogue(keeps) if furnishing_id == FURNACE else {}
 
 
 ## Whether the furnace is burning: lit today, its bars not ready yet.
 func is_burning() -> bool:
-	return furnishing_id == FURNACE and is_there() and GameState.furnace().is_burning(GameState.day)
+	return furnishing_id == FURNACE and is_there() and GameState.furnace(keeps).is_burning(GameState.day)
 
 
 ## The light it gives now (an Ambience.glow), or {}: the lamp's, and the furnace's while it
