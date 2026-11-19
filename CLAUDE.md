@@ -58,19 +58,20 @@ farm's two tunes. Nobody has played it by hand: only the tests, and two days by 
 at four times speed. **Phase 2 is built (2026-11-19) and the user approved it the same day** ("Approve
 Phase 2", shown the summary and the pictures): build mode (B, on the homestead only), fifteen
 placeables on a build bar of their own, the hand, the workbench's "Make" and "Place" tabs, and Tilda's
-seven wares for the land. Nobody has played it by hand. **Phase 3 is built (2026-11-19) and waits for
-the user's review:** the workbench's "Build" tab, kits and sites, the Well, the Silo and hay from the
-meadow, the Coop, the Barn and the Shed with their rooms, the shed's chests and furnace, the two
-upgrades, and moving and pulling down; nobody has played it by hand, and its rules are in the plan and
-TECH_DESIGN §30 until that review. Phases 4 and 5 are not built. The plan's
+seven wares for the land. Nobody has played it by hand. **Phase 3 is built (2026-11-19) and the user
+approved it the same day** ("Approve, fix looks first", shown the summary and the pictures): the
+workbench's "Build" tab, kits and sites, the Well, the Silo and hay from the meadow, the Coop, the Barn
+and the Shed with their rooms, the shed's chests and furnace, the two upgrades, and moving and pulling
+down. The user asked for three looks to change before phase 4 (the Coop's roof, the Big Barn's roof,
+the shed's bookshelves), and kept a silo with hay as one that can't be pulled down. Nobody has played
+it by hand. Phases 4 and 5 are not built. The plan's
 thirty numbered decisions are the approved ones: they are at the head of the plan ("What the user has
 decided", which stands in for the `docs/HOMESTEAD-NOTES.md` the request names) and in
 `docs/DECISIONS.md`. Each phase is built by a subagent with a fresh context; **CLAUDE.md is the
 coordinator's to edit, not a phase's** (a phase says in its report what should change here). The rules
-below describe the game as it stands, with phases 1 and 2 built: where the plan changes one for a later
-phase (a workbench tab for buildings, a second furnace and more chests, a second shop, the count of
-quests), **the plan's approved decision is the rule for the phase that builds it,** and the words here
-follow once that phase is reviewed (the plan's R9 and R15 to R17, and R10's `build` tab). Build nothing beyond the
+below describe the game as it stands, with phases 1 to 3 built: where the plan changes one for a later
+phase (animals, a second shop, the count of quests), **the plan's approved decision is the rule for the phase that builds it,** and the words here
+follow once that phase is reviewed (the plan's R15 to R17). Build nothing beyond the
 plan's list, and nothing of a later phase early. Nothing beyond it is planned: ask before building more.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
@@ -158,8 +159,9 @@ godot --headless --path . --quit-after 30
 godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
-# Start partway through to try one part by hand (scenarios in the script: late, gifts, bram, gate, rest, kitchen, farm, homestead, build, market,
-# home, village, marsh, quarry, deep, craft, warden, crypt, shade, ending; `build` is the farm with a stock of every placeable). An hour after the name starts at that time of day, energy=<n> with that
+# Start partway through to try one part by hand (scenarios in the script: late, gifts, bram, gate, rest, kitchen, farm, homestead, build, buildings, built, market,
+# home, village, marsh, quarry, deep, craft, warden, crypt, shade, ending; `build` is the farm with a stock of every placeable,
+# `buildings` the coins, materials and skill for every plan, `built` every building standing). An hour after the name starts at that time of day, energy=<n> with that
 # much energy, and skills=<level> with every skill at that level. `farm` starts on the homestead's road above the field; `homestead` arrives
 # by the lane with all three pickaxes (`-- homestead 20:30` for its night tune).
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
@@ -319,7 +321,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   0 or the area leaves half a second later. A closing window saves only `get_tree().current_scene`: call
   `SaveSystem.close_requested()` with the area made the current scene to test it.
 - Do not add areas beyond the homestead (`homestead`) and the insides of its buildings (`coop`, `barn`,
-  `shed`, from the Homestead's phase 3) unless the user asks.
+  `shed`) unless the user asks.
 - Do not add a dependency/addon without noting why in `docs/DECISIONS.md`. Allowed now: gdUnit4.
 - Do not write story, dialogue or quest content beyond what the current milestone needs.
 
@@ -479,11 +481,12 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     `tests/fixtures/saves/v4_before_the_mine.json` was written by the game as it stood before the mine.
 
 - **Crafting (2026-11-17; `docs/progress/mining-crafting-plan.md`, TECH_DESIGN §28):** made at home, in
-  the farmhouse.
+  the farmhouse (and, once the shed stands, its furnishings in the shed).
   - **A crafting recipe is a file in `data/crafting/`** (cooking keeps `data/recipes/`): its `station`
-    (`workbench` or `furnace`), its `tab` at the workbench (`make` or `place`; `make` if it names none;
-    the Homestead's phase 3 adds `build`), `order`, `needs`, `makes` (an item, which may be a placeable,
-    or a `furnishing`) and an optional `unlock` (an item `found`, or a `skill` and `level`). `Crafting` (`core/crafting/`, pure) says what
+    (`workbench` or `furnace`), its `tab` at the workbench (`make`, `place` or `build`; `make` if it names
+    none), `order`, `needs` (coins are a need like any other: the item `coin`), `makes` (an item, which
+    may be a placeable or a building's kit, `{"upgrade": building}`, or a `furnishing`) and an optional
+    `unlock` (an item `found`, a `skill` and `level`, or a building `built`). `Crafting` (`core/crafting/`, pure) says what
     is known and why a thing can't be made; **go through `GameState.craft(recipe_id)`**, which returns
     "" or the reason. **A new recipe is data only.**
   - **What he has ever held is `GameState.found`:** `add_item()` marks it whenever a count goes up, so
@@ -494,27 +497,36 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     furnace (6, 2), the chest (2, 2), the lamp (4, 2), the rug (2..3, 4). **A test that wants one sets
     `Crafting.furnished_flag(&"furnace")` or crafts it,** and stands at it with
     `Steps.stand_before(home, "Furnace")`. Do not move one, or anything that stood in that room: it is
-    the old cottage's room, cell for cell. **A furnishing is never set down by hand.**
+    the old cottage's room, cell for cell. **A furnishing is never set down by hand:** what is set down
+    by hand is a placeable, out of doors on the homestead. In the shed (`shed.tscn`, flags
+    `shed/<piece>`): two chests (`chest_a`, `chest_b`) and a furnace, each at its own cell, made on the
+    "Build" tab once the shed stands (`{"built": "shed"}`).
   - **The workbench's list** is `hud.craft_menu` (`AreaController.open_craft()`): `entries()`,
     `shown_lines()`, `greyed_lines()`, `need_lines()`, `confirm()`. Greyed lines are on a second label
-    in the same place (`bright_lines()` is what the bright one shows). **It has two tabs:** "Make"
-    (thirteen recipes) and "Place" (nine, known from the first day). `hud.craft_menu.tab` is the one
+    in the same place (`bright_lines()` is what the bright one shows). **It has three tabs:** "Make"
+    (thirteen recipes), "Place" (nine, known from the first day) and "Build" (ten: five plans, two
+    upgrades, the shed's two chests and furnace). `hud.craft_menu.tab` is the one
     showing (`Crafting.TAB_MAKE` each time it opens); `switch_tab()` and `show_tab(Crafting.TAB_PLACE)`
     turn it, and `entries()`, `shown_lines()` and `confirm()` are the showing tab's.
-    **`GameState.known_crafts(Crafting.WORKBENCH)` gives both tabs' recipes:** a test that counts the
+    **`GameState.known_crafts(Crafting.WORKBENCH)` gives every tab's recipes:** a test that counts the
     workbench's list asks for one tab (`Crafting.of_tab(..., Crafting.TAB_MAKE)`).
   - **The furnace** (`GameState.furnace()`, a pure `Furnace`) is lit today and ready from the next
     morning: **a test lights it, calls `GameState.start_next_day()`, and takes the bars out through its
     conversation** (`home.interact()`, then `hud.dialogue.confirm()`). One load, five bars at the most
     (`data/rules/crafting.json`). The bars are given: what doesn't fit is a `LeftItem` at his feet.
-  - **The chest** (`GameState.store()`, a pure `Store`) holds 24 stacks and several of one thing. Move
+    **There are two once the shed has its own:** `GameState.furnace()` is the farmhouse's and
+    `GameState.furnace(&"shed")` the shed's, each with one load.
+  - **The chest** (`GameState.store()`, a pure `Store`) holds 24 stacks and several of one thing.
+    **There are three once the shed has its two:** `GameState.store()`, `store(&"shed_a")` and
+    `store(&"shed_b")`; `store_put()`, `store_take()` and `StoreMenu.open()` take the key. Move
     stacks with `GameState.store_put(item_id)` and `store_take(index)`; its lists are
     `hud.store_menu` (`AreaController.open_store()`). It never holds coins, keys, quest things, or what
     a tool holds.
   - **Wood:** branches and stumps are breakables with `"returns": "daily"`; a stump has `"hits": 3`.
     Cut, a flag `cut/<area>/<x>,<y>` keeps the day: **a test that wants it back sets the next day
     (`GameState.start_next_day()`) and loads the area again.** Grass and pots are back on every visit,
-    as before. **On the homestead what the sword clears is gone for good** (the breakables `weeds`,
+    as before. **The meadow's tall grass on the homestead** (`meadow_grass`, fourteen tufts) is
+    `"returns": "daily"` and leaves a hay lying. **On the homestead what the sword clears is gone for good** (the breakables `weeds`,
     `bush`, `log` and `farm_stump`, whose data says `"returns": "never"`; their cells are kept in
     `GameState.homestead()`, not in flags). **A test that wants one back starts a new game.** A swing
     cuts everything in its arc, so **a test that counts blows uses one that stands alone:** weeds
@@ -529,8 +541,9 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     waters the tilled cells among the four beside it in `Farm.new_day()`, after the soil has dried:
     **set down today, a test sees wet soil only after `start_next_day()`.**
   - **Do not** bump the save's version for crafting's fields (`home`, `found`, a cell's `sprinkler`:
-    each is read with a default), let the furnace hold two loads, let the chest take coins, keys or
-    quest things, or put a furnishing anywhere but its own place: each was decided with the plan.
+    each is read with a default), let a furnace hold two loads, let a chest take coins, keys,
+    quest things or a kit, or put a furnishing anywhere but its own place: each was decided with the
+    plan (the shed's furnace and chests with the Homestead's).
 
 - **The balance pass (2026-11-17; `docs/progress/mining-crafting-plan.md` phase 3, TECH_DESIGN §21, §25, §29):**
   - **A shop's data may list what it buys besides crops** (`buys`: an item and what is paid for one).
@@ -586,7 +599,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     (`tests/world/story_days_test.gd`), not counted to 150 letters: a stage must end above the line of
     help and be no longer than 200.
   - **In a capture shot the hero hides anything in the cell north of him:** he is two cells tall.
-    `tools/capture.gd`'s shots end at 176 (168 to 176 are phase 2's); its title shot reads (only reads) the player's slot 1 for its
+    `tools/capture.gd`'s shots end at 191 (168 to 176 are phase 2's, 177 to 191 phase 3's); its title shot reads (only reads) the player's slot 1 for its
     "Continue" line.
   - **A subagent's scratch folder may hold an earlier subagent's files:** work in a subfolder of your
     own, and never run a script there you did not just write.
@@ -632,8 +645,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     right click on a grown tree gives back its sapling.
   - **The farmhouse's doorstep says "That is the road."** (it is the path's end); no cell of the land says
     "That is a doorstep." until a building stands.
-  - **The meadow's fourteen tall-grass cells are plain grass until phase 3,** so things can be set down
-    there now: phase 3 says what becomes of a thing standing on a tuft's cell.
+  - **The meadow's fourteen tufts of tall grass** can't be built on while they stand; a tuft doesn't
+    grow where something lies or stands or a building covers it (phase 3).
   - **A lamp post is lit from 18:30 to 06:30** (`DayClock.lamps_lit`): a new morning at 06:00 still finds
     it lit; set 07:00 for dark. Each lit lamp post is two of the area's engine lights.
   - **Saplings grow by `GameState.start_next_day()`** (and `sleep()`): oak 4 mornings, cherry 6.
@@ -648,3 +661,45 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **Do not** put a placeable on the item bar, call `GameState.set_down()` from play, make a lamp post
     flicker or a sapling sway, bump the save's version for what is set down, or change a cost or price of
     the fifteen without the user's word.
+
+- **The Homestead, phase 3 (2026-11-19; `docs/progress/homestead-plan.md`, TECH_DESIGN §30): buildings.**
+  - **A building is a file in `data/buildings/`** (`docs/data/building.schema.json`): `size`, `door` (a
+    cell of its bottom row), `room`, what it does (`fills_can`, `holds`, `keeps`), `animals` (phase 4's
+    to read), its upgrade (`big`) and its `look` (blocks of the atlas's tiles). `Buildings`
+    (`core/homestead/`, pure) reads it: cells, door, doorstep (the cell below the door, which must be
+    free and stays free), `anchor_of` (the cell the ghost holds it by: its door), `why_not_at`, `refund`.
+    **A new building is data and pictures.** The five: Well, Silo, Coop, Barn, Shed; the Big Coop and
+    the Big Barn are upgrades.
+  - **A plan is a "Build" recipe whose `makes` is a kit** (an item of type `kit`: never stacks, never in
+    a chest, never on the item bar; the build bar shows it). One of each: a plan is refused while its kit
+    is in the pack, its site is set down or its building stands ("You have one already."), and one short
+    of something names what ("You are short of 40 Stone, 10 Wood and 80 Coins.").
+  - **Go through `GameState.set_down_kit(area, origin, kit_id)`** (a site today; play calls it only
+    through build mode), `move_building()`, `take_up_site()`, `why_not_demolish()` and `demolish()`;
+    ask `building_covering(area, cell)`, `doorstep_of()`, `is_built(id)`. **A site stands as its building
+    at the next `GameState.start_next_day()`** (any morning; an upgrade too), which says so in
+    `GameState.morning_news` and the area says it with the sound `built`. **A test that wants a building
+    standing sets its kit down and calls `start_next_day()`.**
+  - **In the area** `PlacedBuildings` draws each building flat, as the farmhouse is, with a roof's ridge
+    the hero walks behind, fills its cells (all but its door; a site all of them) and makes a
+    `BuildingSpot` for what he faces. A standing Well fills the can; the Silo takes the hay he carries
+    with a right click (`GameState.put_hay()`, 60 at most; what doesn't fit stays in the pack), and
+    nothing takes it out until phase 4's animals eat it.
+  - **Rooms:** the Coop, the Barn and the Shed have rooms (`coop`, `barn`, `shed`, 11 by 9). The door's
+    cell is an `AreaExit` into the room; its doormat leads to the homestead's entry `<id>_door`, on the
+    doorstep wherever the building stands, moved with it. A site has neither. **A test that walks into
+    a room** stands the building first, then loads the homestead (as `tests/world/rooms_test.gd` does).
+  - **Moving** (build mode's hand): lifted from any of its cells, set down where it fits, at once and for
+    nothing, with what it holds (hay, the shed's chests and furnace, its upgrade); its own cells are no
+    hindrance to it. **Pulling down:** a right click asks, a second pulls it down, only if empty (no hay,
+    nothing in the shed's chests or furnace; from phase 4, no animals); half of each material of the plan
+    and its upgrade comes back, rounded down, through `give_item()`, and no coins. A site taken up gives
+    its kit back whole.
+  - **The save is still version 6:** `homestead` gains `buildings`, `hay`, `furnaces` and `chests`, each
+    written only when there is something in it. The fixture `tests/fixtures/saves/v6_a_yard_on_the_farm.json`
+    was written by the game at the end of phase 2.
+  - **Pictures:** atlas rows 28 and 29 (`GreyboxTiles.BUILDING_KINDS`, `SILO_KINDS`), painted by
+    `make_tile_texture.gd`; `tools/playtest.gd -- buildings` and `-- built`; capture shots 177 to 191.
+  - **Do not** let a building stand the day its kit is set down, sell two of one building, build on a
+    doorstep, give coins back for a building pulled down, pull down one that holds anything, or change a
+    building's cost, size or unlock without the user's word: each was decided with the plan.
