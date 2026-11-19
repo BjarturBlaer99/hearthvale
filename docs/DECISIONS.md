@@ -1500,3 +1500,32 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
     `{ "kind", "petted", "progress", "ready", "hungry" }`. A kind the game no longer has is left out.
     The fixture `tests/fixtures/saves/v6_buildings_before_animals.json` was written by the game at the
     end of phase 3 (`21199f6`).
+- 2026-11-19 — **The Homestead, step 4b (in the world): what the plan left open.** D26 and D28 are built as
+  written.
+  - **An animal is a node of its own (`Animal`), made by `PlacedAnimals`,** a node that the homestead
+    and the rooms of the coop and the barn have. On the land it shows, by day, the animals of each
+    building that has a pasture; in a room, the animals living there that are not out (all of them by
+    night). The hours are the villagers' (`Hours.villagers_out`, 06:00 to 20:00), checked on every
+    `time_changed`, so at 20:00 they are simply in and at 06:00 out (R5).
+  - **An animal walks among its own cells** (`AnimalMotion`, pure): its pasture's by day, its room's
+    floor by night (open floor, not the doormat or the cell before it). The cells decide where it may
+    be, not the terrain: it never fills a cell, so it blocks nobody, and a gate (which lets the hero by)
+    is no cell of a pasture, so no animal walks through one.
+  - **Build mode holds the animals still,** as it holds the hero and the clock, so the cell an animal
+    is in stays the cell it is in while the ghost is over it ("Someone is standing there."). A path
+    can still be laid under one.
+  - **A right click reaches the animal in the cell he faces, or one within 12 pixels of its middle**
+    (they straddle cells as they walk), the nearest first, after a person and before a door, a chest or
+    a crop. The prompt says "Pet the Chicken", or "Take the Egg" when one waits. The words after it:
+    "You pet the chicken.", "You pet the chicken. Taken: Egg.", or with no room "Your pack has no room
+    for the Egg: it waits."
+  - **What an animal has ready shows over its head** in a little bubble with the product's icon; an
+    animal that went hungry this morning shows a bubble with three dots. Nothing else changes in its
+    looks.
+  - **The hen of the farm is the village's chicken** (critters.png); the sheep and the cow are a new
+    sheet, `animals.png` (24 by 20), from `tools/art/make_sprites.gd`: standing, walking, grazing, and
+    blinking. Each is mirrored in place when it faces right (as `PlacedArt` does).
+  - **Sounds:** `cluck`, `bleat` and `low`, made in code; each kind's data names its own.
+  - **`tools/playtest.gd -- animals`:** the Coop and the Barn west of the farmhouse, each with a fenced
+    pasture and a gate, the Silo east with hay, four hens, two sheep and two cows. A scenario may name
+    `pens`, `animals`, `ready` and `hay`.

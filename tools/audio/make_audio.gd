@@ -19,6 +19,7 @@ const SFX: Array[String] = [
 	"wisp_flare", "wisp_dart",
 	"pick", "rock_break", "lift", "craft", "furnace",
 	"set_down", "take_up", "built",
+	"cluck", "bleat", "low",
 ]
 
 ## Each song: tempo, bars (4/4; every track must last bars x 8 eighths), and its tracks.
@@ -275,6 +276,23 @@ static func effect(id: String) -> PackedFloat32Array:
 				Synth.mix(Synth.tone(&"square", 230, 160, 0.06, 0.24, 0.001, 0.05, 0.5), Synth.tone(&"noise", 1100, 420, 0.06, 0.18, 0.001, 0.05, 0.5, 87)), Synth.silence(0.05),
 				Synth.mix(Synth.tone(&"sine", 784, 784, 0.30, 0.18, 0.004, 0.26), Synth.tone(&"sine", 1175, 1175, 0.30, 0.12, 0.004, 0.26)),
 			])
+		"cluck":
+			# A hen petted: two quick clucks, each a short pinched note falling, with a breath of grain.
+			return Synth.join([
+				Synth.mix(Synth.tone(&"square", 720, 420, 0.06, 0.20, 0.003, 0.04, 0.25), Synth.tone(&"noise", 2600, 1800, 0.04, 0.06, 0.002, 0.03, 0.5, 91)), Synth.silence(0.05),
+				Synth.mix(Synth.tone(&"square", 780, 400, 0.09, 0.22, 0.003, 0.06, 0.25), Synth.tone(&"noise", 2400, 1600, 0.05, 0.06, 0.002, 0.04, 0.5, 92)),
+			])
+		"bleat":
+			# A sheep petted: a wavering "baa", a reedy note that shakes as it falls.
+			var baa: Array = []
+			for i: int in 7:
+				var high: float = 390.0 - i * 9.0
+				baa.append(Synth.tone(&"square", high + (14.0 if i % 2 == 0 else -14.0), high - (14.0 if i % 2 == 0 else -14.0), 0.05, 0.16, 0.004 if i == 0 else 0.0, 0.03 if i == 6 else 0.0, 0.35))
+			return Synth.mix(Synth.join(baa), Synth.tone(&"triangle", 195, 170, 0.35, 0.12, 0.02, 0.12))
+		"low":
+			# A cow petted: a long, low "moo" that rises a little and sinks away.
+			return Synth.mix(Synth.join([Synth.tone(&"triangle", 110, 140, 0.22, 0.34, 0.06, 0.0), Synth.tone(&"triangle", 140, 98, 0.42, 0.34, 0.0, 0.3)]),
+				Synth.join([Synth.tone(&"square", 220, 280, 0.22, 0.06, 0.06, 0.0, 0.2), Synth.tone(&"square", 280, 196, 0.42, 0.06, 0.0, 0.3, 0.2)]))
 		"whiff":
 			# A blow passing through the Shade: thin air.
 			return Synth.tone(&"noise", 9000, 2500, 0.12, 0.16, 0.02, 0.08, 0.5, 33)

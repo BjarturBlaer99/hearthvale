@@ -153,6 +153,9 @@ var placed: PlacedThings
 var build: BuildMode
 ## The buildings of the hero's land (the Homestead, phase 3): null anywhere else.
 var buildings: PlacedBuildings
+## The animals here (the Homestead, phase 4): on his land those out in their pastures, in a
+## building's room those at home in it. Null anywhere else.
+var animals: PlacedAnimals
 ## Nature that is only for show (P1c): petals lying round the cherry trees; the water's surface
 ## and what it mirrors; mist. The water is the one thing in the scenery that moves (the user's
 ## request, 2026-11-13): grass, trees, petals, mist and smoke are still.
@@ -275,6 +278,7 @@ func _ready() -> void:
 	update_room(true)
 	_add_ambience()
 	_add_building()
+	_add_animals()
 	_update_light()
 	hud.dialogue.closed.connect(_on_dialogue_closed)
 	hud.item_menu.chosen.connect(_on_item_chosen)
@@ -708,6 +712,10 @@ func interact() -> bool:
 	var talkable: Talkable = talkable_in_front()
 	if talkable != null:
 		return talk_to(talkable)
+	var animal: Animal = animal_in_front()
+	if animal != null:
+		hud.show_message(GameState.pet_animal(animal.index))
+		return true
 	var usable: Node2D = usable_in_front()
 	if usable != null:
 		var message: String = usable.call(&"use")
@@ -725,6 +733,11 @@ func interact() -> bool:
 		_say_shut(shut_door_in_front())
 		return true
 	return false
+
+
+## The animal the hero faces (the Homestead, phase 4), or null.
+func animal_in_front() -> Animal:
+	return animals.animal_at(player.front_cell()) if animals != null else null
 
 
 ## The door or chest in the cell the hero faces (anything with use() and prompt()), or null.
@@ -1067,6 +1080,21 @@ func _add_building() -> void:
 	move_child(build, hud.get_index())
 	build.setup(self)
 	build.closed.connect(_on_item_menu_closed)
+
+
+## The animals of his land (the Homestead, phase 4): on the land, those out in their pastures; in
+## the room of a building that has animals, those at home there. (Anywhere else, none.)
+func _add_animals() -> void:
+	var building: StringName = &""
+	if not GameState.homestead_rules().is_land(area_id):
+		for id: StringName in DataRegistry.ids(&"buildings"):
+			if Buildings.room_of(DataRegistry.get_building(id)) == area_id and Buildings.animals_of(DataRegistry.get_building(id), true) > 0:
+				building = id
+		if building == &"":
+			return
+	animals = PlacedAnimals.new()
+	add_child(animals)
+	animals.setup(self, building)
 
 
 ## The meadow's tall grass doesn't grow where something is set down or a building stands (the
@@ -2220,6 +2248,10 @@ func _update_hud() -> void:
 	var talkable: Talkable = talkable_in_front()
 	if talkable != null:
 		hud.set_prompt(MenuInput.prompt(talkable.prompt()))
+		return
+	var animal: Animal = animal_in_front()
+	if animal != null:
+		hud.set_prompt(MenuInput.prompt(animal.prompt()))
 		return
 	var usable: Node2D = usable_in_front()
 	var text: String = str(usable.call(&"prompt")) if usable != null else ""

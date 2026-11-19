@@ -165,6 +165,24 @@ const SCENARIOS: Dictionary = {
 		"cleared": [Rect2i(29, 8, 9, 6), Rect2i(3, 6, 23, 8), Rect2i(3, 14, 17, 6), Rect2i(20, 16, 18, 1)],
 		"standing": {&"coop": Vector2i(32, 9), &"silo": Vector2i(36, 10), &"barn": Vector2i(8, 7), &"shed": Vector2i(16, 7), &"well": Vector2i(21, 11)},
 	},
+	# On a farm with animals (the Homestead, phase 4): the Coop and the Barn west of the farmhouse,
+	# each with a fenced pasture before its door and a gate in it, the Silo east of the house with
+	# hay in it. Four hens, two sheep and two cows, out in their pastures by day and in their
+	# rooms from 20:00 (-- animals 21:00); one of each kind has its egg, wool or milk ready. A
+	# right click pets an animal and takes what it has. Farmer Oda's stall (in the village, by
+	# her field) sells more; the hearth cooks the eggs and milk, and Tilda buys them.
+	"animals": {
+		"area": &"homestead",
+		"cell": Vector2i(16, 15),
+		"items": [[&"wooden_sword", 1], [&"hay", 12], [&"mushroom", 4], [&"fence", 10], [&"gate", 2], [&"coin", 600]],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds"],
+		"cleared": [Rect2i(29, 8, 9, 6), Rect2i(2, 6, 18, 11), Rect2i(20, 16, 18, 1)],
+		"standing": {&"coop": Vector2i(14, 7), &"barn": Vector2i(4, 7), &"silo": Vector2i(36, 10)},
+		"pens": [[Rect2i(13, 10, 6, 4), Vector2i(16, 14)], [Rect2i(3, 11, 8, 5), Vector2i(7, 16)]],
+		"animals": [&"chicken", &"chicken", &"chicken", &"chicken", &"sheep", &"sheep", &"cow", &"cow"],
+		"ready": [0, 4, 6],
+		"hay": 30,
+	},
 	# In Tilda's shop at her counter, with coins and a harvest: for trying her list. (Start it by
 	# day: the shop is shut from 18:00 to 08:00, and he could not get back in.)
 	"market": {
@@ -324,6 +342,25 @@ func _start() -> void:
 	if not standing.is_empty():
 		game_state.call(&"start_next_day")
 		game_state.set(&"morning_news", PackedStringArray())
+	# Pastures fenced before he came, each a ring of fences round its ground (but where a
+	# building stands) with a gate; the animals, the silo's hay, and what each has ready (the
+	# Homestead, phase 4).
+	var homestead: RefCounted = game_state.call(&"homestead")
+	for pen: Array in scenario.get("pens", []):
+		var ground: Rect2i = pen[0]
+		var ring: Rect2i = ground.grow(1)
+		for x: int in range(ring.position.x, ring.end.x):
+			for y: int in range(ring.position.y, ring.end.y):
+				var at: Vector2i = Vector2i(x, y)
+				if ground.has_point(at) or game_state.call(&"building_covering", scenario["area"], at) != &"":
+					continue
+				homestead.call(&"set_down", at, &"standing", &"gate" if at == pen[1] else &"fence")
+	for kind: StringName in scenario.get("animals", []):
+		homestead.call(&"add_animal", kind)
+	for index: int in scenario.get("ready", []):
+		(homestead.call(&"animal", index) as Dictionary)["ready"] = true
+	if scenario.has("hay"):
+		homestead.set(&"hay", int(scenario["hay"]))
 	# Those came true long ago: no day is kept for them, so nothing waits a day on them.
 	(game_state.get(&"flag_days") as Dictionary).clear()
 	for flag: StringName in scenario.get("today", []):

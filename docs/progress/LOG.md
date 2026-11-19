@@ -2921,3 +2921,17 @@ The first of phase 4's three steps (`docs/progress/homestead-plan.md`).
 **What differs from the plan:** nothing in D25 to D28 or D30. Chosen where the plan was silent (`docs/DECISIONS.md`): steps of half a morning; "unhappy" as the morning's hungry; the herd fed in the order bought; what stops a pasture; the land read from its scene; the price in the shop's data; Oda's stall the village's stall tiles again.
 
 **Verified:** 1102 tests in 144 suites pass but the one known on this machine (`sprites_test.gd`'s villagers' colours, which fails only when Linux runs `tests/world` first). New: `tests/core/homestead/herd_test.gd` (every row of the morning's table, a waiting product, pasture before hay before hunger, a shared pasture, a full building and a big one of eight, the herd through a save), `pasture_test.gd` (a pen, a gap, the road, a floor), `tests/autoload/animals_state_test.gd` (Oda's list, buying refused and bought, a pen on the land with a gate, a gap and a floor, a morning's feeding, petting and a full pack, pulling down, a save, the phase 3 fixture `v6_buildings_before_animals.json`, the land read from its scene), `tests/world/oda_stall_test.gd` (the stall's cells, her list opened from her conversation). The village's reachable cells are six fewer (`home_test`, `nature_test`).
+
+## 2026-11-19 — The Homestead, phase 4, step 4b: in the world (out by day, in by night, petting, sounds)
+
+**Built**
+- **The three animals as creatures** (`Animal`, `gameplay/interactables/`): the hen is the village's chicken, the sheep and the cow a new sheet (`animals.png`, 24 by 20: standing, walking, grazing, blinking), all from `tools/art/make_sprites.gd`. Each wanders among its own cells (`AnimalMotion`, pure), blocks nobody and is never in the way.
+- **Out by day, in by night** (D28, R5): `PlacedAnimals` (on the homestead and in the coop's and the barn's rooms) shows, on the land by day, the animals of each building with a pasture, wandering in it; in a room, those living there that are not out (all of them from 20:00 to 06:00). Nobody walks them: at the hour they are where they belong.
+- **One right click pets and takes** (D26): "Pet the Chicken", or "Take the Egg" when one waits over her head; her cluck; a full pack leaves the egg waiting. An animal that went hungry this morning shows it.
+- **Build mode** sets nothing standing on an animal's cell ("Someone is standing there.") and holds the animals still while it is open.
+- **Sounds:** `cluck`, `bleat`, `low`, made in code.
+- **`tools/playtest.gd -- animals`:** a coop and a barn with fenced pastures, a silo with hay, four hens, two sheep, two cows, one of each kind with its product ready.
+
+**What differs from the plan:** nothing in D26 or D28. Chosen where the plan was silent: an animal's cells (its pasture, or its room's floor) rather than the terrain; build mode holding them still; what is ready shown in a bubble (`docs/DECISIONS.md`).
+
+**Verified:** 1111 tests in 146 suites pass but the known one. New: `tests/world/animals_test.gd` (out by day with a pasture and in without; in at 20:00, out at 06:00; each within its pasture for twenty seconds and blocking nobody; build mode holds them still; nothing set down on one; a right click pets and takes, a full pack leaves the egg; a sheep and a cow in the barn at night, with their sounds; a hungry one shows it) and `tests/core/homestead/animal_motion_test.gd`. The scenario was started in a window with no error.

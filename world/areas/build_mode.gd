@@ -223,7 +223,7 @@ func site_at(at: Vector2i, except: StringName = &"") -> Dictionary:
 		area.debris_at(at) != null or grass_at(at),
 		home.lying_at(at),
 		home.standing_at(at),
-		area.player.motor.cell == at,
+		area.player.motor.cell == at or (area.animals != null and area.animals.stands_in(at)),
 		lies_at(at))
 
 

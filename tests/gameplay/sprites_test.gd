@@ -14,7 +14,7 @@ func test_frame_names_match_the_order_the_tool_paints_them() -> void:
 		["warden", Boss.FRAMES], ["villager", Villager.FRAMES], ["items", ItemIcons.FRAMES], ["torch", Torch.FRAMES], ["shade", ShadeBoss.FRAMES],
 		["crystal", CrystalSwitch.FRAMES], ["breakables", Breakable.FRAMES], ["critters", Critter.FRAMES],
 		["forage", ForageSpot.FRAMES], ["rocks", Rock.FRAMES], ["crafted", Furnishing.FRAMES],
-		["placed", PlacedArt.FRAMES],
+		["placed", PlacedArt.FRAMES], ["animals", Animal.FRAMES],
 	]
 	for case: Array in cases:
 		var painted: Array = _frames_of(sprites[case[0]]).keys()

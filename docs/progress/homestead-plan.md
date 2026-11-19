@@ -719,8 +719,12 @@ TECH_DESIGN, the roadmap, the README and DECISIONS up to date; CLAUDE.md is the 
   doorstep reaches through what can be crossed, and the land as it was is read from its scene once a
   run, so a morning knows each pasture while he sleeps. Oda's stall is the village's market stall
   again, beside her at (16..18, 30..31). The egg, the wool and the milk came with this step.*
-- [ ] 4b. **In the world.** The three animals as creatures, out by day and in by night, petting and
+- [x] 4b. **In the world.** The three animals as creatures, out by day and in by night, petting and
   taking, their sounds.
+  *Built 2026-11-19, with D26 and D28 as written. An animal walks among its own cells (its pasture by
+  day, its room's floor by night), so it blocks nobody and never passes a gate; build mode holds the
+  animals still. What one has ready shows over its head; a hungry one shows it too. The hen is the
+  village's chicken; the sheep and the cow are a new sheet.*
 - [ ] 4c. **Into the rest.** The products, the three dishes, Tilda's prices, cloth and the blanket,
   Farming's points.
 - **Tests:**
