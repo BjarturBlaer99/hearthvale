@@ -2996,3 +2996,16 @@ Tilda's "Market Day" (six eggs; 50 coins and 2 Carrot Cakes) and Farmer Oda's "A
 **Planted bugs:** 19, one at a time, in `game_state.gd`'s flag code and the four data files, each put back byte for byte (compared), against the new suite. 17 caught at the first try; 2 were not (a site counted as built by the flag's sync; the day a loaded flag came true), each closed by a test, and caught when planted again.
 
 **Pictures:** shots 204 to 207 (`f:ask:` and `f:done:`), each looked at. In Oda's two the hero is under the conversation's box, as in shot 192.
+
+## 2026-11-19 — The Homestead, phase 5, step 5b: ten days played
+
+`tools/play_days.gd` plays ten days now (`days=` up to 10), and is taught the farm: the field cleared with the sword and the pickaxe, wood, stone and fibre gathered off the field, the workbench's three tabs (D turns them), kits set down in build mode by the keys (B, the wheel, the movement keys for the ghost, Space), a pen of six fences and a gate before the Coop, hens bought at Oda's stall, and every animal petted with a right click. Days 4, 6, 8 and 10 are farm days; 5, 7 and 9 the quarry (the Lantern on day 9). `farm` is a five-day trial of the farm alone, its makings handed over. The day's record (`days.json`) carries the farm at dawn and dusk: buildings, animals, materials, the field's clear cells, the pen.
+
+**The report** is `docs/progress/homestead-balance-report.md`. Played at life's speed from the title, 2325 seconds; the animals in a second life-speed run of five days (`-- farm`). In short: the field was cleared on day 4 for 30 energy; the Well stood on day 8 (its copper bar waits on coal); the Coop was not reached in ten days (the purse never passed 165, as every harvest is sown again); four hens give four eggs a morning on a pen of sixteen cells. Three numbers are proposed for 5c, none changed: the Coop's coins (250 to about 150), the Well without its copper bar, wood to stack to 50.
+
+**Verified:** 1129 tests in 148 suites pass but the known `sprites_test.gd` run-order failure (the tool has no tests, as before). Runs: two at life's speed (the second is the report's; the first had a fault of the last day since mended: the bars were sold before the Well was made), four ten-day trials and two `farm` trials at four times speed, each a slot of its own (956), emptied. Pictures looked at: the pen, the Well set down, the workbench's "Build" tab, the field on day 10.
+
+**Known issues and limits**
+- **One life run is one roll of the quarry:** coal came on day 3 in the report's run and on day 9 in the other, and the Well's day follows it.
+- **The sites of the buildings and the pen are fixed cells** chosen from this map's overgrowth; a change to the farm's map would want them chosen again (the script says "!!" when a ghost doesn't fit).
+- **Nobody has played the Homestead by hand;** the script never reached a favour (three marks), a sheep, a cow, the Silo or hay.

@@ -776,10 +776,14 @@ TECH_DESIGN, the roadmap, the README and DECISIONS up to date; CLAUDE.md is the 
   - *Built (2026-11-19) as written:* both are data (`market_day`, `a_roof_for_the_flock`), Tilda's after
     her carrot cake of two marks, Oda's after his seed wheat of two; "a Coop standing" is the flag
     `built/coop`, which GameState keeps by `is_built()`. Thirteen quests. Shots 204 to 207.
-- [ ] 5b. **Ten days played** by `tools/play_days.gd`, taught the farm: the walk, the field, clearing,
+- [x] 5b. **Ten days played** by `tools/play_days.gd`, taught the farm: the walk, the field, clearing,
   the workbench's new tabs, setting a building down, buying and tending animals. A report,
   `docs/progress/homestead-balance-report.md`, with coins, materials, buildings and animals for each day,
   set beside this plan's guesses, and the numbers it would change.
+  - *Played (2026-11-19)* at life's speed, ten days from the title (39 minutes), and the animals in a
+    second run of five days with the makings handed over (`play_days.gd -- farm`): the ten days reached
+    the Well (day 8), not the Coop. The report proposes three numbers for 5c (the Coop's coins, the
+    Well's copper bar, wood's stack); none is changed.
 - [ ] 5c. **The tuning,** in data, on the user's word.
 - **Done when** the report is in hand, the numbers are settled with the user, and all tests pass.
 

@@ -1,18 +1,22 @@
 extends SceneTree
-## Plays eight days of Hearthvale in a real window, by pressing real keys and mouse buttons
+## Plays ten days of Hearthvale in a real window, by pressing real keys and mouse buttons
 ## while the game runs as it does for a player (mining and crafting, phase 3b:
-## docs/progress/mining-crafting-plan.md). It starts at the title screen, takes "New game",
-## and lives eight days: the plot, Tilda's counter, the Old Quarry, the furnace and the
-## workbench. It looks at the game only to decide what to press (where the rocks, the
+## docs/progress/mining-crafting-plan.md; taught the farm by the Homestead's phase 5b:
+## docs/progress/homestead-plan.md). It starts at the title screen, takes "New game",
+## and lives ten days: the plot, Tilda's counter, the Old Quarry, the furnace and the
+## workbench, and on the homestead the field cleared, the workbench's "Place" and "Build"
+## tabs, buildings set down in build mode, a pen fenced, hens bought from Oda and tended. It looks at the game only to decide what to press (where the rocks, the
 ## monsters and the walls are, what a list shows: as a player's eyes would), and changes the
 ## game's state only where its log says SETUP. What it left out is logged as SKIP.
 ## What it did each day is written to <output dir>/days.json, its log to play_log.txt, and
 ## pictures beside them. Its save is slot 956, emptied before and after: never the player's
 ## own game.
-##   godot --path . -s res://tools/play_days.gd -- <output dir> [days=8] [speed=1] [deep] [verbose]
+##   godot --path . -s res://tools/play_days.gd -- <output dir> [days=10] [speed=1] [deep] [farm] [verbose]
 ## Needs a window. `speed` runs the game faster than life, for trying the script out; the
 ## report's run is at 1. `deep` is a trial of the dark floors alone: a hero handed an Iron
 ## Pickaxe, a sword, the Lantern, bread and the lift's stops goes straight down to floor 7.
+## `farm` is a trial of the farm alone: a hero handed the makings of the Well, the Coop and a
+## pen clears the field, makes and sets them down, buys hens and tends them for four days.
 ## A -s script compiles before the autoloads exist, so they are looked up at runtime, and the
 ## game's nodes are told apart by what they have, never by their classes.
 
@@ -26,7 +30,7 @@ const SIDES: Array[Vector2i] = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vecto
 ## village.)
 const TOWARD_VILLAGE: Dictionary = {
 	&"home": &"homestead", &"homestead": &"village", &"shop": &"village", &"weaver_house": &"village", &"north_fields": &"village",
-	&"quarry": &"north_fields",
+	&"quarry": &"north_fields", &"coop": &"homestead", &"barn": &"homestead", &"shed": &"homestead",
 }
 ## Where his plot lies: the field on the homestead. The script works its clear corner and
 ## leaves the overgrown cells alone (clearing land is not taught to it yet).
@@ -89,17 +93,21 @@ func _run() -> void:
 		quit(1)
 		return
 	_out = args[0]
-	var days: int = 8
+	var days: int = 10
 	var speed: float = 1.0
+	var farm_alone: bool = false
 	for arg: String in args.slice(1):
 		if arg.begins_with("days="):
-			days = clampi(int(arg.trim_prefix("days=")), 1, 8)
+			days = clampi(int(arg.trim_prefix("days=")), 1, 10)
 		elif arg.begins_with("speed="):
 			speed = clampf(float(arg.trim_prefix("speed=")), 1.0, 8.0)
 		elif arg == "verbose":
 			_verbose = true
 		elif arg == "deep":
 			days = 0
+		elif arg == "farm":
+			days = 0
+			farm_alone = true
 	DirAccess.make_dir_recursive_absolute(_out)
 	_gs = root.get_node("GameState")
 	_bus = root.get_node("EventBus")
@@ -141,9 +149,13 @@ func _run() -> void:
 			6: await _day_6()
 			7: await _day_7()
 			8: await _day_8()
+			9: await _day_9()
+			10: await _day_10()
 		await _go_to_bed()
 		_end_day()
-	if days == 0:
+	if days == 0 and farm_alone:
+		await _the_farm_alone()
+	elif days == 0:
 		await _the_deep_floors_alone()
 	_write_out()
 	_saves.call(&"erase_slot", SLOT)
@@ -220,20 +232,12 @@ func _day_3() -> void:
 	await _evening_at_home()
 
 
-## A day on the plot: the first turnips are ripe. They are sold, the whole plot is tilled
-## and sown with what the coins buy, and everything is watered.
+## A day on the farm: the first turnips are ripe. They are sold, the field is cleared as far
+## as his energy goes, the whole of what is clear is tilled and sown, and the Well is made and
+## set down if he has its makings.
 func _day_4() -> void:
-	_plan("the plot: harvest, sell, sow the whole plot")
-	await _morning_at_home()
-	await _travel_to(PLOT_AREA)
-	await _harvest()
-	# The harvest raises his farming: back to the workbench for what that opens (a sprinkler).
-	await _travel_to(&"home")
-	await _make_things()
-	await _shop_for_seeds()
-	await _tend_plot()
-	_shot("d4_plot_sown")
-	await _evening_at_home()
+	_plan("the farm: harvest, clear the field, sell, sow, the Well")
+	await _farm_day()
 
 
 ## The quarry again with whatever pickaxe he has made by now: from the top down to the last
@@ -241,56 +245,613 @@ func _day_4() -> void:
 func _day_5() -> void:
 	_plan("the quarry: floors 1 to 6 with a better pickaxe")
 	await _morning_at_home()
+	await _tend_animals()
 	await _tend_plot()
 	await _shop([], 4, _keep())
 	await _mine(1, 6, false)
 	await _evening_at_home()
 
 
-## A day on the plot and at the workbench: a better can and hoe, if there are bars to spare.
+## A day on the farm: wood and fibre gathered for the Coop, which is made and set down with a
+## pen before its door, if the purse reaches; a better can and hoe, if there are bars to spare.
 func _day_6() -> void:
-	_plan("the plot and the workbench")
+	_plan("the farm: wood and fibre, the Coop and its pen, the plot")
+	await _farm_day(false, [&"copper_watering_can", &"copper_hoe"])
+
+
+## Hens for the coop, if it stands, then the quarry's safe floors.
+func _day_7() -> void:
+	_plan("hens from Oda, then the quarry: floors 1 to 6")
 	await _morning_at_home()
-	await _make_things([&"copper_watering_can", &"copper_hoe"])
-	await _travel_to(PLOT_AREA)
-	await _harvest()
-	await _shop_for_seeds()
+	await _tend_animals()
 	await _tend_plot()
-	_shot("d6_plot")
+	await _shop([], 4, _keep())
+	await _buy_hens()
+	await _mine(1, 6, false)
 	await _evening_at_home()
+
+
+## A day on the farm: the eggs, the field, whatever building comes next.
+func _day_8() -> void:
+	_plan("the farm: animals, harvest, clear, sell, build, sow")
+	await _farm_day()
 
 
 ## The whole quarry late in the game: the best pickaxe he has made, a high skill, and the
 ## Lantern (which the story gives him in the crypt).
-func _day_7() -> void:
+func _day_9() -> void:
 	_plan("the quarry, late: all nine floors with the Lantern")
 	await _morning_at_home()
 	if _count(&"lantern") == 0 and _count(&"miners_lantern") == 0:
-		_set_up("the Lantern is put in his pack on day 7 (in the story it comes from the crypt, the last dungeon)")
+		_set_up("the Lantern is put in his pack on day 9 (in the story it comes from the crypt, the last dungeon)")
 		_gs.call(&"add_item", &"lantern", 1)
 	if _count(&"iron_pickaxe") == 0:
-		_set_up("the Iron Pickaxe is put in his pack on day 7 (he had not made one: %s)" % _carrying())
+		_set_up("the Iron Pickaxe is put in his pack on day 9 (he had not made one: %s)" % _carrying())
 		for old: StringName in [&"copper_pickaxe", &"pickaxe"]:
 			if _count(old) > 0:
 				_gs.call(&"add_item", old, -1)
 		_gs.call(&"add_item", &"iron_pickaxe", 1)
+	await _tend_animals()
 	await _tend_plot()
 	await _shop([], 4, _keep())
 	await _mine(1, 9, false)
 	await _evening_at_home()
 
 
-## The last day: the plot's harvest, and everything he has left sold at Tilda's.
-func _day_8() -> void:
-	_plan("the plot, late: harvest, sell everything, sow again")
+## The last day: the animals, the harvest, and everything he has left sold at Tilda's.
+func _day_10() -> void:
+	_plan("the farm, late: animals, harvest, build, sell everything, sow again")
+	await _farm_day(true)
+
+
+## A day on the farm: the furnace and the workbench at dawn, the animals, the harvest, the
+## field cleared as far as energy allows, the makings of the next building gathered, Tilda's
+## counter (and Oda's stall for hens), the next building made and set down, and the plot sown
+## and watered. On the last day (`all`) the ore and bars are sold as well.
+func _farm_day(all: bool = false, tools: Array[StringName] = []) -> void:
 	await _morning_at_home()
+	if not tools.is_empty():
+		await _make_things(tools)
+	await _tend_animals()
 	await _travel_to(PLOT_AREA)
 	await _harvest()
-	await _shop_for_seeds(true)
-	_shot("d8_everything_sold")
+	await _clear_land(true, {}, 45.0)
+	await _gather_makings()
+	# The harvest and the clearing raise his farming: back to the workbench (a sprinkler).
+	await _travel_to(&"home")
+	await _make_things()
+	# On the last day everything is sold: what a building wants is made first.
+	if all:
+		await _build_what_he_can()
+	await _shop_for_seeds(all, _next_goal_coins())
+	await _buy_hens()
+	await _build_what_he_can()
 	await _tend_plot()
-	_shot("d8_plot")
+	_shot("d%d_the_farm" % _today)
 	await _evening_at_home()
+
+
+## A trial of the farm alone, for trying the script out: not one of the ten days. Five days:
+## the makings handed over, a little of the field cleared, the Well, the Coop and a pen made
+## and set down; then hens bought and tended.
+func _the_farm_alone() -> void:
+	_begin_day(1)
+	_set_up("a trial of the farm: a sword, the Copper Pickaxe, a hoe and a can, 700 coins, 30 wood, 50 stone, 20 fibre and 2 copper bars were handed to him")
+	for item: Array in [[&"wooden_sword", 1], [&"copper_pickaxe", 1], [&"hoe", 1], [&"watering_can", 1], [&"coin", 700], [&"wood", 30],
+			[&"stone", 50], [&"fibre", 20], [&"copper_bar", 2], [&"turnip_seeds", 5]]:
+		_gs.call(&"add_item", item[0], item[1])
+	await _travel_to(PLOT_AREA)
+	await _clear_land(true, {}, 60.0)
+	await _build_what_he_can()
+	await _gather_makings()
+	await _build_what_he_can()
+	await _tend_plot()
+	await _go_to_bed()
+	_end_day()
+	for day: int in [2, 3, 4, 5]:
+		if int(_gs.get(&"day")) != day:
+			break
+		_begin_day(day)
+		await _tend_animals()
+		await _buy_hens()
+		await _tend_animals()
+		await _go_to_bed()
+		_end_day()
+
+
+# --- The farm (the Homestead, phase 5b) ---------------------------------------------------
+
+## The buildings the script makes, in the order it wants them, and where each is set down (its
+## top-left corner): the Well beside the field, where it fills the can; the Coop against the
+## north woods, where the overgrowth on either side closes most of a pen before its door; the
+## Silo east of the farmhouse.
+const BUILD_ORDER: Array[StringName] = [&"well", &"coop", &"silo"]
+const SITES: Dictionary = {&"well": Vector2i(20, 17), &"coop": Vector2i(17, 2), &"silo": Vector2i(34, 11)}
+## Where he stands to set each down: near enough that the ghost can reach it.
+const STAND_FOR: Dictionary = {&"well": Vector2i(20, 16), &"coop": Vector2i(22, 8), &"silo": Vector2i(33, 13)}
+## The pen before the Coop's door: the cells fenced (the overgrowth closes the rest), and the
+## gate he goes in by. Inside are sixteen cells of grass: four hens' worth (a hen grazes four).
+const PEN_FENCES: Array[Vector2i] = [Vector2i(24, 3), Vector2i(24, 5), Vector2i(20, 6), Vector2i(21, 6), Vector2i(22, 6), Vector2i(23, 6)]
+const PEN_GATE: Vector2i = Vector2i(24, 4)
+## The overgrowth that closes the pen: never cleared for its wood or fibre.
+const PEN_WALLS: Array[Vector2i] = [Vector2i(16, 5), Vector2i(17, 6), Vector2i(18, 6), Vector2i(19, 6), Vector2i(24, 2)]
+## The field (cells of the map), and its clear corner's count of cells.
+const FIELD: Rect2i = Rect2i(22, 17, 12, 6)
+## What clearing gives, by the kind of debris: the item, so that he goes after what he needs.
+const DEBRIS_GIVES: Dictionary = {&"weeds": &"fibre", &"bush": &"fibre", &"log": &"wood", &"farm_stump": &"wood", &"rock": &"stone"}
+## The hens he keeps (the Coop holds four).
+const HENS: int = 4
+
+
+## Clears the debris of his land: on the field (`on_field`) everything he has a tool for, the
+## nearest first; off it, only what gives something `wanted` still wants ({item: count}), and
+## never the overgrowth that closes the pen. He stops when he is down to `reserve` energy and
+## has nothing to eat (the plot still wants tilling and watering), or when it is late.
+func _clear_land(on_field: bool, wanted: Dictionary = {}, reserve: float = 40.0) -> void:
+	if not await _travel_to(&"homestead"):
+		return
+	_ctx = "clear"
+	var gave_up: Dictionary = {}
+	var cleared: int = 0
+	for turn: int in 200:
+		if not _day_is_on() or _area_id() != &"homestead" or float(_gs.get(&"minute")) > HOME_BY - 180.0:
+			break
+		if not on_field and _short_of(wanted).is_empty():
+			break
+		var target: Node2D = _next_debris(on_field, _short_of(wanted), gave_up)
+		if target == null:
+			break
+		if float(_gs.get(&"energy")) < reserve + BLOW * 2.0 and not await _keep_fit(reserve + BLOW * 2.0):
+			_note("clearing stops: energy %.0f, kept for the plot" % float(_gs.get(&"energy")))
+			break
+		var cell: Vector2i = _cell_of(target)
+		if await _clear_one(target, reserve):
+			cleared += 1
+			await _gather(true)
+		else:
+			gave_up[cell] = true
+	_ctx = "walk"
+	_note("cleared %d on the %s: %d of the field's cells clear, %d cleared on the land in all; %s" % [
+		cleared, "field" if on_field else "land", _field_clear(), int(_gs.call(&"homestead").call(&"cleared_count")), _materials_text()])
+
+
+## The debris to clear next: the nearest he can get to and has a tool for.
+func _next_debris(on_field: Variant, wanted: Dictionary, gave_up: Dictionary) -> Node2D:
+	var steps: Dictionary = _steps_from(_cell())
+	var best: Node2D = null
+	var fewest: int = 1 << 30
+	for thing: Node2D in _area().call(&"debris"):
+		var cell: Vector2i = _cell_of(thing)
+		if gave_up.has(cell) or PEN_WALLS.has(cell) or FIELD.has_point(cell) != bool(on_field):
+			continue
+		var kind: StringName = _debris_kind(thing)
+		if not bool(on_field) and not wanted.has(DEBRIS_GIVES.get(kind, &"")):
+			continue
+		if _tool_for(thing) == &"":
+			continue
+		var near: int = _steps_to_side(steps, cell)
+		if near >= 0 and near < fewest:
+			fewest = near
+			best = thing
+	return best
+
+
+func _debris_kind(thing: Node2D) -> StringName:
+	return StringName(thing.get(&"breakable_id")) if &"breakable_id" in thing else StringName(thing.get(&"kind"))
+
+
+## What clears `thing`: the sword for what grows and lies, a pickaxe good enough for a rock
+## (a boulder wants the copper one, a great boulder the iron one). "" for nothing he has.
+func _tool_for(thing: Node2D) -> StringName:
+	if &"breakable_id" in thing:
+		return &"sword" if _armed() else &""
+	match _debris_kind(thing):
+		&"boulder":
+			return _best([&"iron_pickaxe", &"copper_pickaxe"])
+		&"great_boulder":
+			return _best([&"iron_pickaxe"])
+	return _best(PICKAXES)
+
+
+## Clears one thing: blows of the sword (Space) or the pickaxe (a left click) until it is gone.
+func _clear_one(thing: Node2D, reserve: float) -> bool:
+	var here: StringName = _area_id()
+	var cell: Vector2i = _cell_of(thing)
+	var tool: StringName = _tool_for(thing)
+	for blow: int in 10:
+		if _area_id() != here or not is_instance_valid(thing) or bool(thing.get(&"broken")):
+			break
+		if tool != &"sword" and not await _keep_fit(minf(reserve, 20.0) + BLOW):
+			return false
+		if _front() != cell and not await _stand_by(cell):
+			return false
+		if tool == &"sword":
+			_release_all()
+			_key(KEY_SPACE, true)
+			await physics_frame
+			_key(KEY_SPACE, false)
+		else:
+			if not await _take_in_hand(tool):
+				return false
+			await _click(MOUSE_BUTTON_LEFT)
+		for frame: int in 40:
+			await physics_frame
+			if frame > 4 and not bool(_motor().call(&"is_attacking")):
+				break
+		await _wait(4)
+	var gone: bool = _area_id() == here and (not is_instance_valid(thing) or bool(thing.get(&"broken")))
+	if gone:
+		var kind: String = String(_debris_kind(thing)) if is_instance_valid(thing) else "?"
+		(_cur["cleared"] as Dictionary)[kind] = int((_cur["cleared"] as Dictionary).get(kind, 0)) + 1
+	return gone
+
+
+## What of `wanted` ({item: count}) he is still short of: {item: how many more}.
+func _short_of(wanted: Dictionary) -> Dictionary:
+	var out: Dictionary = {}
+	for item: StringName in wanted:
+		if _count(item) < int(wanted[item]):
+			out[item] = int(wanted[item]) - _count(item)
+	return out
+
+
+## The field's cells that are clear: its clear corner and what has been cleared of the rest.
+func _field_clear() -> int:
+	var home: RefCounted = _gs.call(&"homestead")
+	var clear: int = 18
+	for cell: Vector2i in home.call(&"cleared_cells"):
+		if FIELD.has_point(cell):
+			clear += 1
+	return clear
+
+
+## The materials of the next building he wants (and the pen's wood with the Coop), gathered
+## from the land off the field: wood from logs and stumps, fibre from weeds and bushes, stone
+## from rocks.
+func _gather_makings() -> void:
+	var wanted: Dictionary = {}
+	var next: StringName = _next_building()
+	if next == &"":
+		return
+	# The next building's makings, and the one after's as far as a stack holds them.
+	for id: StringName in _next_buildings(2):
+		for need: Dictionary in _recipe(id).get("needs", []):
+			var item: StringName = StringName(str(need["item"]))
+			if item in [&"wood", &"fibre", &"stone"]:
+				var most: int = int(_data.call(&"get_item", item).get("max_stack", 99))
+				wanted[item] = mini(int(wanted.get(item, 0)) + int(need["count"]), most)
+	if _short_of(wanted).is_empty():
+		return
+	_note("gathering for the %s: short of %s" % [next, _short_of(wanted)])
+	await _clear_land(false, wanted, 30.0)
+
+
+## The next building he wants: the first of BUILD_ORDER that is neither standing, nor a site,
+## nor a kit in his pack, whose plan he knows. "" when there is none.
+func _next_building() -> StringName:
+	var home: RefCounted = _gs.call(&"homestead")
+	for id: StringName in BUILD_ORDER:
+		if bool(home.call(&"has_building", id)) or _count(_kit_of(id)) > 0:
+			continue
+		if _recipe(id).is_empty():
+			continue
+		return id
+	return &""
+
+
+## The next `many` buildings he wants, in order.
+func _next_buildings(many: int) -> Array[StringName]:
+	var out: Array[StringName] = []
+	var home: RefCounted = _gs.call(&"homestead")
+	for id: StringName in BUILD_ORDER:
+		if out.size() >= many:
+			break
+		if bool(home.call(&"has_building", id)) or _count(_kit_of(id)) > 0 or _recipe(id).is_empty():
+			continue
+		out.append(id)
+	return out
+
+
+## The coins he wants at Tilda's for the next building, once the coins are all it still wants
+## (its bars and materials are in his pack), and for hens once the Coop stands: ore and bars
+## beyond what he keeps are sold toward them, after the seed is paid for.
+func _next_goal_coins() -> int:
+	var goal: int = 0
+	var next: StringName = _next_building()
+	if next != &"":
+		var coins: int = 0
+		var ready: bool = true
+		for need: Dictionary in _recipe(next).get("needs", []):
+			if str(need["item"]) == "coin":
+				coins += int(need["count"])
+			elif _count(StringName(str(need["item"]))) < int(need["count"]):
+				ready = false
+		goal += coins if ready else 0
+	if bool(_gs.call(&"is_built", &"coop")):
+		goal += maxi(HENS - _hens(), 0) * _animal_price(&"chicken")
+	return goal
+
+
+## The workbench recipe that makes building `id` (its kit), if he knows it; else {}.
+func _recipe(id: StringName) -> Dictionary:
+	for recipe: Dictionary in _gs.call(&"known_crafts", "workbench"):
+		if str(recipe.get("makes", {}).get("item", "")) == String(_kit_of(id)):
+			return recipe
+	return {}
+
+
+func _kit_of(id: StringName) -> StringName:
+	return StringName("%s_kit" % id)
+
+
+## At home, the kit of each building he wants and has the makings for is made (the "Build"
+## tab), with the pen's fences and gate for the Coop (the "Place" tab); then, on the farm, each
+## kit he carries is set down at its site in build mode, and the pen laid.
+func _build_what_he_can() -> void:
+	var making: Array[StringName] = []
+	for id: StringName in BUILD_ORDER:
+		var recipe: Dictionary = _recipe(id)
+		if recipe.is_empty() or bool(_gs.call(&"homestead").call(&"has_building", id)) or _count(_kit_of(id)) > 0:
+			continue
+		if _can_make(StringName(str(recipe["id"]))):
+			making.append(StringName(str(recipe["id"])))
+	if not making.is_empty() and await _travel_to(&"home"):
+		await _make_things(making)
+	for id: StringName in BUILD_ORDER:
+		if _count(_kit_of(id)) > 0:
+			await _set_down_kit(id)
+	if not bool(_gs.call(&"homestead").call(&"has_building", &"coop")):
+		return
+	# The pen: its fences (two to a wood) and its gate (three wood), the wood gathered first
+	# (the pack holds thirty, and the Coop took a full stack).
+	var fences: int = maxi(PEN_FENCES.size() - _pen_laid(&"fence") - _count(&"fence"), 0)
+	var gate: int = 1 if _pen_laid(&"gate") == 0 and _count(&"gate") == 0 else 0
+	var list: Array[StringName] = []
+	for pair: int in ceili(fences / 2.0):
+		list.append(&"fence")
+	for one: int in gate:
+		list.append(&"gate")
+	if not list.is_empty():
+		var wood: int = ceili(fences / 2.0) + 3 * gate
+		if _count(&"wood") < wood:
+			_note("gathering for the pen: %d wood wanted" % wood)
+			await _clear_land(false, {&"wood": wood}, 20.0)
+		if await _travel_to(&"home"):
+			await _make_things(list)
+	if _count(&"fence") > 0 or _count(&"gate") > 0:
+		await _lay_pen()
+
+
+## How many of the pen's cells have `item` (a fence or the gate) standing on them.
+func _pen_laid(item: StringName) -> int:
+	var home: RefCounted = _gs.call(&"homestead")
+	var cells: Array[Vector2i] = [PEN_GATE]
+	if item == &"fence":
+		cells = PEN_FENCES
+	var laid: int = 0
+	for cell: Vector2i in cells:
+		if StringName(home.call(&"standing_at", cell)) == item:
+			laid += 1
+	return laid
+
+
+## Sets the kit of building `id` down at its site: build mode (B), the kit chosen on the build
+## bar (the wheel), the ghost moved a cell at a time (the movement keys) to where the kit holds
+## the building (its door, or the middle of its bottom row), and the sword's key to set it down.
+func _set_down_kit(id: StringName) -> bool:
+	var building: Dictionary = _data.call(&"get_building", id)
+	var at: Vector2i = SITES[id] + Buildings.anchor_of(building)
+	if not await _open_build(STAND_FOR[id]):
+		return false
+	var done: bool = await _set_down_in_build(_kit_of(id), at)
+	_shot("d%d_build_%s" % [_today, id])
+	await _close_build()
+	if done:
+		(_cur["set_down"] as Array).append(String(id))
+	_note("the %s's kit set down at %s: %s ('%s')" % [id, SITES[id], done, _build_words()])
+	return done
+
+
+## Lays the pen before the Coop's door: a fence on each of its fence cells, the gate on its own.
+func _lay_pen() -> void:
+	if not await _open_build(STAND_FOR[&"coop"]):
+		return
+	var home: RefCounted = _gs.call(&"homestead")
+	for cell: Vector2i in PEN_FENCES:
+		if _count(&"fence") == 0:
+			break
+		if StringName(home.call(&"standing_at", cell)) == &"":
+			await _set_down_in_build(&"fence", cell)
+	if _count(&"gate") > 0 and StringName(home.call(&"standing_at", PEN_GATE)) == &"":
+		await _set_down_in_build(&"gate", PEN_GATE)
+	_shot("d%d_build_pen" % _today)
+	await _close_build()
+	_note("the pen: %d of %d fences and %d gate laid" % [_pen_laid(&"fence"), PEN_FENCES.size(), _pen_laid(&"gate")])
+
+
+## Walks to `stand` on the farm and opens build mode there (B).
+func _open_build(stand: Vector2i) -> bool:
+	if not await _travel_to(&"homestead"):
+		return false
+	_ctx = "build"
+	await _walk_to(stand)
+	await _face(Vector2i.UP)
+	await _wait(10)
+	await _tap(KEY_B)
+	var build: Node = _area().get(&"build")
+	if build == null or not await _until(func() -> bool: return bool(build.call(&"is_open")), 60):
+		_note("!! build mode did not open")
+		_ctx = "walk"
+		return false
+	return true
+
+
+## In build mode: chooses `item` on the build bar, moves the ghost to `at` and sets it down.
+func _set_down_in_build(item: StringName, at: Vector2i) -> bool:
+	var build: Node = _area().get(&"build")
+	for turn: int in 20:
+		if StringName(build.get(&"chosen")) == item:
+			break
+		await _wheel()
+		await _wait(2)
+	if StringName(build.get(&"chosen")) != item:
+		_note("!! %s is not on the build bar" % item)
+		return false
+	for step: int in 60:
+		var cell: Vector2i = build.get(&"cell")
+		if cell == at:
+			break
+		var way: Vector2i = Vector2i(signi(at.x - cell.x), 0) if cell.x != at.x else Vector2i(0, signi(at.y - cell.y))
+		await _tap(KEY_D if way == Vector2i.RIGHT else (KEY_A if way == Vector2i.LEFT else (KEY_S if way == Vector2i.DOWN else KEY_W)))
+		if Vector2i(build.get(&"cell")) == cell:
+			_note("!! the ghost will go no nearer %s than %s" % [at, cell])
+			return false
+	if not bool(build.call(&"fits")):
+		_note("!! the %s does not fit at %s: '%s'" % [item, at, build.call(&"why_not")])
+		return false
+	var before: int = _count(item)
+	await _tap(KEY_SPACE)
+	await _wait(6)
+	return _count(item) < before
+
+
+func _close_build() -> void:
+	var build: Node = _area().get(&"build") if _in_area() else null
+	if build != null and bool(build.call(&"is_open")):
+		await _tap(KEY_B)
+		await _wait(10)
+	_ctx = "walk"
+
+
+func _build_words() -> String:
+	return str(_hud().call(&"build_words")) if _in_area() and _hud().has_method(&"build_words") else ""
+
+
+## The hens he has.
+func _hens() -> int:
+	var count: int = 0
+	for animal: Dictionary in _gs.call(&"homestead").call(&"animals"):
+		if str(animal.get("kind", "")) == "chicken":
+			count += 1
+	return count
+
+
+func _animal_price(kind: StringName) -> int:
+	for ware: Dictionary in _data.call(&"get_shop", &"oda").get("sells", []):
+		if str(ware.get("animal", "")) == String(kind):
+			return int(ware["price"])
+	return 0
+
+
+## Buys hens at Oda's stall, up to the Coop's four, with what the purse holds beyond a little
+## for seed, if the Coop stands.
+func _buy_hens() -> void:
+	if not bool(_gs.call(&"is_built", &"coop")) or _hens() >= HENS:
+		return
+	var price: int = _animal_price(&"chicken")
+	var wanted: int = mini(HENS - _hens(), (_count(&"coin") - 20) / price)
+	if wanted <= 0:
+		_note("no hens today: %d coins" % _count(&"coin"))
+		return
+	if not await _travel_to(&"village"):
+		return
+	_ctx = "buy"
+	if not await _talk_to("FarmerOda"):
+		_ctx = "walk"
+		return
+	if not await _say("Have you any animals to sell?"):
+		_note("Oda: '%s'" % _words())
+		await _end_talk()
+		_ctx = "walk"
+		return
+	var stall: Node = _hud().get(&"shop_menu")
+	if not await _until(func() -> bool: return bool(stall.call(&"is_open")), 60):
+		_ctx = "walk"
+		return
+	var index: int = -1
+	var entries: Array = stall.call(&"entries")
+	for i: int in entries.size():
+		if str((entries[i] as Dictionary).get("animal", "")) == "chicken":
+			index = i
+	for step: int in 10:
+		if int(stall.get(&"selected")) == index or index == -1:
+			break
+		await _tap(KEY_S if index > int(stall.get(&"selected")) else KEY_W)
+	for hen: int in wanted:
+		var had: int = _hens()
+		await _tap(KEY_ENTER)
+		await _wait(4)
+		if _hens() == had:
+			_note("Oda's stall: '%s'" % stall.call(&"note_text"))
+			break
+	_shot("d%d_odas_stall" % _today)
+	await _tap(KEY_TAB)
+	await _wait(10)
+	_ctx = "walk"
+	_note("hens: %d; coins %d" % [_hens(), _count(&"coin")])
+
+
+## Pets every animal he has and takes what each has ready: out in their pasture by day, at home
+## in their building's room when they have none.
+func _tend_animals() -> void:
+	var home: RefCounted = _gs.call(&"homestead")
+	if int(home.call(&"animal_count")) == 0:
+		return
+	var where: StringName = &"homestead" if bool(_gs.call(&"has_pasture", &"coop")) else &"coop"
+	if not await _travel_to(where):
+		return
+	_ctx = "tend"
+	await _wait(20)
+	var placed: Node = _area().get(&"animals")
+	if placed == null:
+		_ctx = "walk"
+		return
+	for turn: int in 30:
+		var next: Node2D = null
+		for animal: Node2D in placed.call(&"shown"):
+			if not bool((home.call(&"animal", int(animal.get(&"index"))) as Dictionary).get("petted", false)):
+				next = animal
+				break
+		if next == null or not _day_is_on():
+			break
+		var index: int = int(next.get(&"index"))
+		if not await _stand_by(Vector2i(next.call(&"cell"))):
+			await _wait(30)
+			continue
+		await _click(MOUSE_BUTTON_RIGHT)
+		await _wait(20)
+		if bool((home.call(&"animal", index) as Dictionary).get("petted", false)):
+			_note("tended: '%s'" % _hud().call(&"message_text"))
+	_ctx = "walk"
+	var petted: int = 0
+	for animal: Dictionary in home.call(&"animals"):
+		petted += 1 if bool(animal.get("petted", false)) else 0
+	_note("animals tended in the %s: %d of %d petted; eggs %d" % [where, petted, int(home.call(&"animal_count")), _count(&"egg")])
+
+
+## "wood 12, stone 30, fibre 4": the materials of the Homestead he carries.
+func _materials_text() -> String:
+	var parts: PackedStringArray = []
+	for item: StringName in [&"wood", &"stone", &"fibre", &"hay", &"copper_bar", &"iron_bar"]:
+		parts.append("%s %d" % [item, _count(item)])
+	return ", ".join(parts)
+
+
+## The farm as it stands, for the day's record.
+func _farm_record() -> Dictionary:
+	var home: RefCounted = _gs.call(&"homestead")
+	var buildings: Dictionary = {}
+	for id: StringName in home.call(&"building_ids"):
+		buildings[String(id)] = "standing" if bool(_gs.call(&"is_built", id)) else "site"
+	var animals: Dictionary = {}
+	for animal: Dictionary in home.call(&"animals"):
+		animals[str(animal["kind"])] = int(animals.get(str(animal["kind"]), 0)) + 1
+	var materials: Dictionary = {}
+	for item: StringName in [&"wood", &"stone", &"fibre", &"hay", &"copper_bar", &"iron_bar", &"egg"]:
+		materials[String(item)] = _count(item)
+	return {"buildings": buildings, "animals": animals, "materials": materials, "cleared_on_land": int(home.call(&"cleared_count")),
+		"field_clear": _field_clear(), "pen": {"fences": _pen_laid(&"fence"), "gate": _pen_laid(&"gate")},
+		"coop_pasture": bool(_gs.call(&"has_pasture", &"coop")), "hay_in_silo": int(home.get(&"hay")), "placed": int(home.call(&"placed_count"))}
 
 
 # --- Mornings and evenings at home ------------------------------------------------------
@@ -318,7 +879,7 @@ func _make_things(wanted: Array[StringName] = [&"furnace", &"copper_pickaxe", &"
 		return
 	var makeable: Array[StringName] = []
 	for recipe: StringName in wanted:
-		if _can_make(recipe) and not (recipe == &"sprinkler" and _sprinklers() >= 2):
+		if _can_make(recipe) and not (recipe == &"sprinkler" and _no_sprinkler()) and not _takes_the_wells_bar(recipe):
 			makeable.append(recipe)
 	if makeable.is_empty():
 		return
@@ -328,18 +889,26 @@ func _make_things(wanted: Array[StringName] = [&"furnace", &"copper_pickaxe", &"
 		return
 	for recipe: StringName in wanted:
 		var menu: Node = _hud().get(&"craft_menu")
+		# Its tab first: "Make", "Place" or "Build" (D turns to the next).
+		var tab: String = _tab_of(recipe)
+		for turn: int in 4:
+			if str(menu.get(&"tab")) == tab:
+				break
+			await _tap(KEY_D)
+			await _wait(4)
 		var entries: Array = menu.call(&"entries")
 		var index: int = -1
 		for i: int in entries.size():
 			if StringName(str((entries[i] as Dictionary).get("id", ""))) == recipe:
 				index = i
-		if index == -1 or not bool(menu.call(&"can_make", index)) or (recipe == &"sprinkler" and _sprinklers() >= 2):
+		if index == -1 or not bool(menu.call(&"can_make", index)) or (recipe == &"sprinkler" and _no_sprinkler()) or _takes_the_wells_bar(recipe):
 			continue
 		for step: int in 20:
 			var selected: int = menu.get(&"selected")
 			if selected == index:
 				break
 			await _tap(KEY_S if index > selected else KEY_W)
+		await _wait(4)
 		_shot("d%d_workbench_%s" % [_today, recipe])
 		await _tap(KEY_ENTER)
 		await _wait(12)
@@ -347,6 +916,34 @@ func _make_things(wanted: Array[StringName] = [&"furnace", &"copper_pickaxe", &"
 	await _tap(KEY_TAB)
 	await _wait(10)
 	_ctx = "walk"
+
+
+## The workbench tab recipe `recipe_id` is on ("make" if it names none).
+func _tab_of(recipe_id: StringName) -> String:
+	for recipe: Dictionary in _gs.call(&"known_crafts", "workbench"):
+		if StringName(str(recipe.get("id", ""))) == recipe_id:
+			return str(recipe.get("tab", "make"))
+	return "make"
+
+
+## Whether making `recipe` would take the copper bar the Well still wants (a tool or a
+## sprinkler, while he has only the one).
+func _takes_the_wells_bar(recipe_id: StringName) -> bool:
+	if recipe_id == &"well" or not _wants_well() or _count(&"copper_bar") > 1:
+		return false
+	for recipe: Dictionary in _gs.call(&"known_crafts", "workbench"):
+		if StringName(str(recipe.get("id", ""))) == recipe_id:
+			for need: Dictionary in recipe.get("needs", []):
+				if str(need["item"]) == "copper_bar":
+					return true
+	return false
+
+
+## Whether a sprinkler is not to be made: he has two, or its copper bar is the one the Well
+## still wants.
+func _no_sprinkler() -> bool:
+	var well_wants: bool = not bool(_gs.call(&"homestead").call(&"has_building", &"well")) and _count(&"well_kit") == 0
+	return _sprinklers() >= 2 or (well_wants and _count(&"copper_bar") <= 1)
 
 
 ## The sprinklers he has, carried or set on the plot: two are all the plot's middle row takes.
@@ -584,7 +1181,7 @@ func _seeds_held() -> Array[StringName]:
 ## A plot day's trade: every crop he carries is sold, and turnip seed is bought for every
 ## empty cell the coins reach (ore and bars he has no use for are sold for it, if the crops
 ## don't pay for it all). On the last day (`all`) the ore, bars and crystals all go.
-func _shop_for_seeds(all: bool = false) -> void:
+func _shop_for_seeds(all: bool = false, save: int = 0) -> void:
 	# The plot is on the homestead: he looks at it there.
 	if not await _travel_to(PLOT_AREA):
 		return
@@ -596,16 +1193,21 @@ func _shop_for_seeds(all: bool = false) -> void:
 	empty = maxi(empty - _seed_count() - mini(_count(&"sprinkler"), 2), 0)
 	var selling: Array[StringName] = []
 	selling.assign(CROPS)
+	selling.append(&"egg")
 	if all:
 		selling.append_array(SELLABLE)
 	var keep: Dictionary = _keep()
+	# Seed first: the crops are what pay. The coins saved for the farm are made up by selling
+	# ore and bars beyond what he keeps, after the seed.
 	var worth: int = _count(&"coin")
-	for item: StringName in CROPS:
+	for item: StringName in CROPS + [&"egg"]:
 		worth += _count(item) * _price_of(item)
 	for item: StringName in SELLABLE:
 		worth += maxi(_count(item) - (0 if all else int(keep.get(item, 0))), 0) * _price_of(item)
-	var seeds: int = mini(empty, worth / 5)
-	await _shop([[&"turnip_seeds", seeds]] if seeds > 0 else [], 0, keep, selling)
+	var seeds: int = clampi(worth / 5, 0, empty)
+	if save > 0:
+		_note("seed for %d of %d empty cells, then ore sold toward the farm's %d coins" % [seeds, empty, save])
+	await _shop([[&"turnip_seeds", seeds]] if seeds > 0 else [], 0, keep, selling, save)
 
 
 func _seed_count() -> int:
@@ -624,10 +1226,14 @@ func _keep() -> Dictionary:
 	var sprinkler: int = maxi(2 - _sprinklers(), 0)
 	return {
 		&"copper_ore": 0 if _has_furnace() else 5,
-		&"copper_bar": (0 if copper_pick else 3) + sprinkler,
+		&"copper_bar": (0 if copper_pick else 3) + sprinkler + (1 if _wants_well() else 0),
 		&"iron_bar": (0 if iron_pick else 3) + sprinkler,
 		&"iron_ore": 0 if iron_pick else 9,
 	}
+
+
+func _wants_well() -> bool:
+	return not bool(_gs.call(&"homestead").call(&"has_building", &"well")) and _count(&"well_kit") == 0
 
 
 ## What Tilda pays for one `item` (her list shows it).
@@ -642,12 +1248,12 @@ func _price_of(item: StringName) -> int:
 ## item; then, to carry `loaves` loaves of bread, sells ore and bars, the cheapest first and
 ## never below what `keep` says of each, until the coins are enough; then buys `buy`
 ## ([item, times]) and the bread.
-func _shop(buy: Array, loaves: int, keep: Dictionary, sell_all: Array[StringName] = []) -> void:
+func _shop(buy: Array, loaves: int, keep: Dictionary, sell_all: Array[StringName] = [], save: int = 0) -> void:
 	var bread: int = maxi(loaves - _count(&"bread"), 0)
 	var selling: bool = false
 	for item: StringName in sell_all:
 		selling = selling or _count(item) > 0
-	if buy.is_empty() and bread == 0 and not selling:
+	if buy.is_empty() and bread == 0 and not selling and _count(&"coin") >= save:
 		return
 	if not await _travel_to(&"village"):
 		return
@@ -674,8 +1280,8 @@ func _shop(buy: Array, loaves: int, keep: Dictionary, sell_all: Array[StringName
 	_shot("d%d_tilda_buys" % _today)
 	for item: StringName in sell_all:
 		await _sell(item, 0)
-	# Ore and bars for bread, as far as it is needed.
-	var cost: int = bread * 6
+	# Ore and bars for bread (and the coins saved for the farm), as far as it is needed.
+	var cost: int = bread * 6 + save
 	for ware: Array in buy:
 		cost += _ware_price(ware[0]) * int(ware[1])
 	for item: StringName in SELLABLE:
@@ -1017,8 +1623,8 @@ func _deepest_today() -> int:
 
 ## Walks onto everything that lies on this floor to be picked up and that he can get to: what
 ## monsters dropped, and ore he was knocked away from.
-func _gather() -> void:
-	if not _in_area() or _floor() == 0:
+func _gather(anywhere: bool = false) -> void:
+	if not _in_area() or (_floor() == 0 and not anywhere):
 		return
 	var here: StringName = _area_id()
 	for turn: int in 12:
@@ -1975,7 +2581,8 @@ func _begin_day(day: int) -> void:
 	_cur = {
 		"day": day, "plan": "", "woke": _clock(), "coins_at_dawn": _count(&"coin"), "energy_at_dawn": snappedf(_energy_was, 0.1),
 		"energy_spent": 0.0, "energy_by": {}, "energy_eaten": 0.0, "flows": [], "crafted": [], "rocks": {}, "floors": [],
-		"blows": 0, "touches": 0, "beaten": 0, "falls": 0, "hearts_lost": 0, "news": [], "frames": _frame,
+		"blows": 0, "touches": 0, "beaten": 0, "falls": 0, "hearts_lost": 0, "news": [], "frames": _frame, "cleared": {}, "set_down": [],
+		"farm_at_dawn": _farm_record(),
 		"skills_at_dawn": _skills(),
 	}
 	_note("=== DAY %d begins: coins %d, energy %.0f, %s" % [day, _count(&"coin"), _energy_was, _carrying()])
@@ -1993,6 +2600,7 @@ func _end_day() -> void:
 	_cur["coins_at_dusk"] = _count(&"coin")
 	_cur["skills_at_dusk"] = _skills()
 	_cur["pack_at_dusk"] = _carrying()
+	_cur["farm_at_dusk"] = _farm_record()
 	_cur["energy_spent"] = snappedf(float(_cur["energy_spent"]), 0.1)
 	_cur["energy_eaten"] = snappedf(float(_cur["energy_eaten"]), 0.1)
 	for key: String in (_cur["energy_by"] as Dictionary).keys():

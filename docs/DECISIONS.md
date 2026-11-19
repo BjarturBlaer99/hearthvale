@@ -1559,3 +1559,21 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
     favour, and he can tell Oda at once.
   - **Their words:** Tilda's ask names hens of his own and Oda's stall; Oda's reminder names the Build
     tab and that a site stands the next morning.
+- 2026-11-19 — **The Homestead, step 5b (ten days played): how the script plays the farm.** The plan
+  names what it is taught; how it plays was left open.
+  - **Days 1 to 3 are the old script's** (the plot's corner, the shuttle, the quarry, the furnace);
+    **days 4, 6, 8 and 10 are farm days** (the animals, the harvest, the field cleared, the next
+    building's makings gathered, Tilda's, Oda's, the building made and set down, the plot sown);
+    **days 5, 7 and 9 are quarry days** (day 9 with the Lantern and the Iron Pickaxe handed over if
+    missing, as day 7 had them before).
+  - **The buildings it wants, in order: the Well, the Coop, the Silo.** Their sites are fixed: the Well
+    at (20, 17) beside the field (a standing Well fills the can), the Coop at (17, 2) against the north
+    woods, the Silo at (34, 11). **The pen** before the Coop's door is six fences and a gate at fixed
+    cells; the overgrowth on either side closes the rest, so the script never clears it.
+  - **Seed first:** the turnips are what pay; ore and bars beyond what he keeps are sold toward a
+    building once the coins are all it still lacks. It keeps a copper bar back for the Well (no
+    sprinkler or tool takes it).
+  - **It sets things down as a player does:** B, the wheel on the build bar, the movement keys a cell at
+    a time for the ghost, and the sword's key to set down; the workbench's tabs are turned with D.
+  - **`farm`** is a trial of the farm alone (five days, the makings handed over: SETUP), for the
+    animals the ten days don't reach.
