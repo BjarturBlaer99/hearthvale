@@ -7,7 +7,7 @@ five phases with a stop after each. This is phase 0: the plan, and no code.
 **Status: approved as written by the user on 2026-11-17 ("Approve as written"). All thirty decisions
 below (D1 to D30) stand as proposed, and each is recorded in `docs/DECISIONS.md`. Phase 1 is built and
 approved (2026-11-19); phase 2 is built and approved (2026-11-19); phase 3 is built and approved (2026-11-19);
-phase 4 is built (2026-11-19) and waits for the user's review; phase 5 is not built.** Every number is a first guess, kept in data, to be measured in phase 5. The tables below are as
+phase 4 is built and approved (2026-11-19); phase 5 is not built.** Every number is a first guess, kept in data, to be measured in phase 5. The tables below are as
 approved; where a phase builds something differently, it says so under "What the user has decided" and
 in the log.
 
@@ -89,6 +89,13 @@ which does not exist. The coordinator adds to it after each review.
   hay, R8's shed, R9 and R10's `build` tab are in CLAUDE.md, with a block of phase 3's rules. R15 to R17
   wait for phases 4 and 5.
 
+- **2026-11-19, phase 4 approved:** shown the summary and the pictures, the user answered "Approve, fix
+  looks first". They kept a pasture as built (anything standing closes one, a bench or a sapling as a
+  fence does, and the meadow's tall grass is grass), and asked for smaller badges over the animals: done
+  the same day, a small bubble with the thing at half size that points down at its animal. The coop's
+  shelves, Oda's borrowed stall, the animals' random start and the hearth's singular names stay as they
+  are (the user did not choose to change them). R5's sentence, R13's animals, R15, R16 and R18's
+  `animals` are in CLAUDE.md, with a block of phase 4's rules. R17 waits for phase 5.
 - *(Written by phase 4's subagent, for the coordinator to confirm with the user.)* **2026-11-19, phase 4
   is built** (steps 4a, 4b and 4c, each ticked below with what was built differently). Every approved
   decision it touches (D25 to D28, D29's stall, D30's point for a product) held as written, with the

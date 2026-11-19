@@ -125,11 +125,7 @@ func _draw() -> void:
 	# Over its head: what it has ready, or that it went hungry.
 	var head: float = float(HEAD_TOP.get(kind_id, -14))
 	if has_ready():
-		# On a soft round badge, so it reads as something to take and not as a thing lying there.
-		var middle: Vector2 = Vector2(0, head - 10)
-		draw_circle(middle, 9.5, BUBBLE_EDGE)
-		draw_circle(middle, 8.5, BUBBLE)
-		ItemIcons.draw(self, ItemIcons.name_for(Herd.gives(kind())), middle - Vector2(8, 8))
+		_draw_ready(Vector2(0, head - 2))
 	elif is_hungry():
 		_draw_hungry(Vector2(0, head - 2))
 
@@ -143,6 +139,19 @@ func _draw_frame(texture: Texture2D, frame_index: int, size: Vector2i, origin: V
 		draw_texture_rect_region(texture, Rect2(origin.round(), Vector2(-size.x, size.y)), source)
 	else:
 		draw_texture_rect_region(texture, Rect2(origin.round(), Vector2(size)), source)
+
+
+## A small bubble whose foot is at `foot`, with what it has ready drawn at half size: small
+## enough to sit over its own head, and pointing down at it, so it is plain whose it is.
+func _draw_ready(foot: Vector2) -> void:
+	var box: Rect2 = Rect2(foot + Vector2(-5, -12), Vector2(10, 10))
+	draw_rect(box.grow(1), BUBBLE_EDGE)
+	draw_rect(box, BUBBLE)
+	draw_rect(Rect2(foot + Vector2(-1, -2), Vector2(2, 2)), BUBBLE)
+	var icon: StringName = ItemIcons.name_for(Herd.gives(kind()))
+	var index: int = int(ItemIcons.FRAMES.get(icon, ItemIcons.FRAMES[&"gem"]))
+	var source: Rect2 = Rect2(Vector2(index * ItemIcons.SIZE.x, 0), Vector2(ItemIcons.SIZE))
+	draw_texture_rect_region(ItemIcons.SHEET, Rect2(box.position + Vector2(1, 1), Vector2(8, 8)), source)
 
 
 ## A small bubble with three dots whose foot is at `foot`: a hungry animal.

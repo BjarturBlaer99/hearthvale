@@ -2972,3 +2972,13 @@ The three steps of phase 4 (`docs/progress/homestead-plan.md`), committed one by
 - **The village's chickens are drawn a frame's width to the right when they face right** (`SpriteSheet.draw`, older than the Homestead and left alone); the farm's hens, sheep and cows are mirrored in place.
 - **The hearth's list reads "Omelette (2 Egg, 1 Mushrooms)"**: it uses each item's own name, as "Carrot Cake (2 Carrot, 1 Wheat)" did before.
 - **CLAUDE.md is as it was:** its words for phase 4 (the plan's R5's second sentence, R13's animals, R15, R16, R18's `animals`) are the coordinator's to write; the phase's report proposes them as built.
+
+**Approved (phase 4), 2026-11-19.** Checked in the cloud container before the review: the full suite,
+1118 tests in 147 suites, with only `sprites_test.gd`'s run-order failure (it passes with `tests/gameplay`
+alone); the twelve capture shots looked at. The user answered "Approve, fix looks first": a pasture stays as
+built (anything standing closes one; the meadow's tall grass is grass), and the badges over the animals are
+smaller. The badge is now a 10-pixel bubble with the product drawn at half size and a tail pointing down at
+the animal (`Animal._draw_ready()`), where it was a round badge of 19 pixels with the full icon; shots 193,
+196 and 197 were taken again and looked at, and the suite is as it was. Known: when animals crowd together,
+a bubble can still be hard to tie to its animal; nobody has played phase 4 by hand. CLAUDE.md has phase 4's
+words.

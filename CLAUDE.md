@@ -64,14 +64,19 @@ workbench's "Build" tab, kits and sites, the Well, the Silo and hay from the mea
 and the Shed with their rooms, the shed's chests and furnace, the two upgrades, and moving and pulling
 down. The user asked for three looks to change before phase 4 (the Coop's roof, the Big Barn's roof,
 the shed's bookshelves), and kept a silo with hay as one that can't be pulled down. Nobody has played
-it by hand. Phases 4 and 5 are not built. The plan's
+it by hand. **Phase 4 is built (2026-11-19) and the user approved it the same day** ("Approve, fix
+looks first", shown the summary and the pictures): animals as data, the herd's mornings, fenced
+pastures, Farmer Oda's stall, hens, sheep and cows in the world, and eggs, milk, wool, cloth, the
+blanket and three dishes. The user kept a pasture as built (anything standing closes it, the meadow's
+tall grass is grass) and asked for smaller badges over the animals, which were made the same day.
+Nobody has played it by hand. Phase 5 is not built. The plan's
 thirty numbered decisions are the approved ones: they are at the head of the plan ("What the user has
 decided", which stands in for the `docs/HOMESTEAD-NOTES.md` the request names) and in
 `docs/DECISIONS.md`. Each phase is built by a subagent with a fresh context; **CLAUDE.md is the
 coordinator's to edit, not a phase's** (a phase says in its report what should change here). The rules
-below describe the game as it stands, with phases 1 to 3 built: where the plan changes one for a later
-phase (animals, a second shop, the count of quests), **the plan's approved decision is the rule for the phase that builds it,** and the words here
-follow once that phase is reviewed (the plan's R15 to R17). Build nothing beyond the
+below describe the game as it stands, with phases 1 to 4 built: where the plan changes one for a later
+phase (the count of quests), **the plan's approved decision is the rule for the phase that builds it,** and the words here
+follow once that phase is reviewed (the plan's R17). Build nothing beyond the
 plan's list, and nothing of a later phase early. Nothing beyond it is planned: ask before building more.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
@@ -159,9 +164,10 @@ godot --headless --path . --quit-after 30
 godot --path . -s res://tools/capture.gd -- <output_dir>
 # ...or only some shots, by number
 godot --path . -s res://tools/capture.gd -- <output_dir> 1 30 71
-# Start partway through to try one part by hand (scenarios in the script: late, gifts, bram, gate, rest, kitchen, farm, homestead, build, buildings, built, market,
+# Start partway through to try one part by hand (scenarios in the script: late, gifts, bram, gate, rest, kitchen, farm, homestead, build, buildings, built, animals, market,
 # home, village, marsh, quarry, deep, craft, warden, crypt, shade, ending; `build` is the farm with a stock of every placeable,
-# `buildings` the coins, materials and skill for every plan, `built` every building standing). An hour after the name starts at that time of day, energy=<n> with that
+# `buildings` the coins, materials and skill for every plan, `built` every building standing, `animals` the farm with a coop
+# and a barn west of the farmhouse, their pastures fenced, the silo with hay, four hens, two sheep and two cows). An hour after the name starts at that time of day, energy=<n> with that
 # much energy, and skills=<level> with every skill at that level. `farm` starts on the homestead's road above the field; `homestead` arrives
 # by the lane with all three pickaxes (`-- homestead 20:30` for its night tune).
 # Saving in a scenario goes to its own slot (900), emptied at each start, never the player's game.
@@ -280,6 +286,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
 - Do not add motion to the scenery (wind, drifting petals or mist, smoke, specks): only the water moves, at
   the user's request of 2026-11-13. **On the homestead the same holds:** a sapling changes its picture at
   dawn and never sways, a lamp post's light is steady, and no petals lie or drift round a planted cherry.
+  The animals are creatures, like the village's chickens, and move.
 - Do not make the mouse a pointer **in play**, and keep its two buttons as the user set them on 2026-11-13,
   as in farming games: **left click uses what is in hand** (`AreaController.use_hand()`: the lit slot of the
   item bar) and answers in a conversation; **right click interacts** with people and things. Moving stays on
@@ -356,7 +363,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
 - **Hours and night (P2e):** who is where when is in `data/rules/hours.json`, read by `Hours` (`core/time/`,
   pure). A door keeps hours by naming its place (`AreaExit.hours`; the shop's is `&"shop"`): shut, its cell is
   solid and the area says the place's words. Villagers who stand outdoors are away from 20:00 to 06:00
-  (`Villager.present`), so **a test that talks to one sets the hour itself.** Monsters met outdoors at night
+  (`Villager.present`), so **a test that talks to one sets the hour itself.** Animals keep the villagers'
+  hours (`Hours.villagers_out`): in their building from 20:00 to 06:00, and nobody walks them there. Monsters met outdoors at night
   are set up from `NightRules.strengthen()` (`data/rules/night.json`), decided once as the area loads; never
   in dungeons, never bosses. Windows are lit with the lamps (`WindowGlow`), and outdoors at night the tune is
   `night`, or the area's own `night_music` where it names one (only the homestead does: `homestead_night`;
@@ -387,6 +395,10 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   is the counter. A conversation opens it with the effect `shop`, when its words are done. Seeds and crop
   prices come from `data/crops`, so **a new crop needs no change to the shop.** The meals are recipes and food
   items only. Long lists scroll through `MenuCursor.window_top()`: use it, don't grow a box.
+  **There are two shops:** `tilda`, and `oda` (Farmer Oda's stall, opened from her conversation's "Have
+  you any animals to sell?"). A ware may be an `animal` in place of an item (`{ "animal": "chicken",
+  "price": 60 }`, `Shop.is_animal()`): it is refused without a building for it or with the building
+  full, and bought, it is in its building.
 - **The story over days (P4a; `docs/progress/P4-plan.md` has P4's four steps):** the main quest
   (`data/quests/a_place_of_your_own.json`) begins by itself (a quest's `auto_start`) and its journal is the
   new player's guide. Four flags gate the story (`StoryGates`, `core/story/`): `planted_first_crop` (set by
@@ -406,6 +418,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   dish (anything a recipe makes) gives a better cook more. A skill changes energy only: never hearts, damage,
   speed or timing. Cooking is counted by the effect `practise`, which the hearth's conversation gives each
   dish. **A test that tills ten cells, or beats ten monsters, has raised a level:** work is cheaper after it.
+  **Farming also rises by tending animals** (the deed `tend`: an egg, a fleece or a pail taken, through
+  `GameState.pet_animal()`): a test that takes ten has raised a level.
 - **Friendship (P4c):** the numbers are in `data/rules/friendship.json`, read by `Friendship`
   (`core/friendship/`, pure); a villager is a file in `data/villagers/` naming their conversation, what they
   like and their words of thanks (three lines: `liked`, `other`, and `full` for a gift to a friendship
@@ -494,7 +508,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     away again. A skill recipe wants the level: `GameState.skill_points[Skills.MINING] = 10` is level 2.
   - **A furnishing is a flag and a `Furnishing` node with a fixed place** in a room's scene. In the
     farmhouse (`home.tscn`, flags `home/<id>`): the workbench (always there) at cell (9, 3), the
-    furnace (6, 2), the chest (2, 2), the lamp (4, 2), the rug (2..3, 4). **A test that wants one sets
+    furnace (6, 2), the chest (2, 2), the lamp (4, 2), the rug (2..3, 4), the wool blanket over the bed (1, 3; flag `home/blanket`, not solid). **A test that wants one sets
     `Crafting.furnished_flag(&"furnace")` or crafts it,** and stands at it with
     `Steps.stand_before(home, "Furnace")`. Do not move one, or anything that stood in that room: it is
     the old cottage's room, cell for cell. **A furnishing is never set down by hand:** what is set down
@@ -504,7 +518,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **The workbench's list** is `hud.craft_menu` (`AreaController.open_craft()`): `entries()`,
     `shown_lines()`, `greyed_lines()`, `need_lines()`, `confirm()`. Greyed lines are on a second label
     in the same place (`bright_lines()` is what the bright one shows). **It has three tabs:** "Make"
-    (thirteen recipes), "Place" (nine, known from the first day) and "Build" (ten: five plans, two
+    (thirteen, and cloth and the wool blanket once wool and cloth are found), "Place" (nine, known from the first day) and "Build" (ten: five plans, two
     upgrades, the shed's two chests and furnace). `hud.craft_menu.tab` is the one
     showing (`Crafting.TAB_MAKE` each time it opens); `switch_tab()` and `show_tab(Crafting.TAB_PLACE)`
     turn it, and `entries()`, `shown_lines()` and `confirm()` are the showing tab's.
@@ -549,7 +563,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **A shop's data may list what it buys besides crops** (`buys`: an item and what is paid for one).
     `Shop.offers()` lists the harvest first, then `buys` in its own order; `Shop.bought_things()` is the
     list as read. Tilda pays 2, 3 and 7 for copper, iron and gold ore, 10 for a crystal, and 8, 12 and
-    25 for the bars (a bar is worth more than its three ore: a test holds that); stone, wood and coal are not bought. **A new thing to buy is a line of data.**
+    25 for the bars (a bar is worth more than its three ore: a test holds that), and 8, 30, 40 and 100 for
+    the egg, the milk, the wool and cloth; stone, wood and coal are not bought. **A new thing to buy is a line of data.**
   - **Tilda's answer reads "I have things to sell."** (not "crops"), and a test that sells ore opens
     her list with `open_shop(&"tilda", Shop.SELL)`: the lines are "Copper Ore x2: 3 coins each".
   - **There are eleven quests.** A test that lists them, counts the quest log's lines, or reads the
@@ -684,7 +699,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     the hero walks behind, fills its cells (all but its door; a site all of them) and makes a
     `BuildingSpot` for what he faces. A standing Well fills the can; the Silo takes the hay he carries
     with a right click (`GameState.put_hay()`, 60 at most; what doesn't fit stays in the pack), and
-    nothing takes it out until phase 4's animals eat it.
+    each morning an animal its pasture can't feed eats one.
   - **Rooms:** the Coop, the Barn and the Shed have rooms (`coop`, `barn`, `shed`, 11 by 9). The door's
     cell is an `AreaExit` into the room; its doormat leads to the homestead's entry `<id>_door`, on the
     doorstep wherever the building stands, moved with it. A site has neither. **A test that walks into
@@ -692,7 +707,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **Moving** (build mode's hand): lifted from any of its cells, set down where it fits, at once and for
     nothing, with what it holds (hay, the shed's chests and furnace, its upgrade); its own cells are no
     hindrance to it. **Pulling down:** a right click asks, a second pulls it down, only if empty (no hay,
-    nothing in the shed's chests or furnace; from phase 4, no animals); half of each material of the plan
+    nothing in the shed's chests or furnace, no animals); half of each material of the plan
     and its upgrade comes back, rounded down, through `give_item()`, and no coins. A site taken up gives
     its kit back whole.
   - **The save is still version 6:** `homestead` gains `buildings`, `hay`, `furnaces` and `chests`, each
@@ -703,3 +718,47 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **Do not** let a building stand the day its kit is set down, sell two of one building, build on a
     doorstep, give coins back for a building pulled down, pull down one that holds anything, or change a
     building's cost, size or unlock without the user's word: each was decided with the plan.
+
+- **The Homestead, phase 4 (2026-11-19; `docs/progress/homestead-plan.md`, TECH_DESIGN §30): animals.**
+  - **A kind of animal is a file in `data/animals/`** (`docs/data/animal.schema.json`): `lives_in`
+    (`coop`; sheep and cows share the `barn`), `gives` (`egg`, `wool`, `milk`), `every` (1, 3, 2 mornings
+    fed and petted), `grazes` (4, 6, 8 cells) and `sound` (`cluck`, `bleat`, `low`). `Herd`
+    (`core/homestead/`, pure) reads it. **A new animal is data and pictures.**
+  - **The herd** is `GameState.homestead().animals()`, in the order bought; `animal(index)` is
+    `{ "kind", "petted", "progress", "ready", "hungry" }`, and an animal's place in the herd is its name
+    (none is ever taken away). It lives in its kind's building wherever that stands (4, or 8 upgraded).
+    Go through `GameState.buy()` of Oda's ware or `buy_animal(kind, price)`, `pet_animal(index)`,
+    `animals_in(id)`. **A test that buys one stands its building first** (a site is no home).
+  - **A morning** (`start_next_day()`): each animal in turn eats its grass from its building's pasture
+    while there is enough, else one hay from `homestead().hay`, else is hungry today; fed, it is two
+    halves of a morning nearer its product if petted the day before, one if not; a product waiting
+    stops the next. **A test that wants a product sets the hay or fences a pasture, pets, and calls
+    `start_next_day()`.**
+  - **A pasture** is `GameState.pasture_of(id)` (`Pasture.reach` from the doorstep): anything standing
+    stops it (a gate, a bench or a sapling as a fence does: the user kept this at the review), as do
+    buildings, sites, debris and the map's solid cells; ground that reaches the road or a way out is no
+    pasture; what lies on the grass and the field are crossed and not grazed; the meadow's tall grass is
+    grass. `has_pasture(id)`; `pastures()` shares one pasture between doors that open on it. The land as
+    it was is `GameState.land_map()`, read from the scene once a run.
+  - **In the world:** `AreaController.animals` (`PlacedAnimals`, on the homestead and in the coop's and
+    barn's rooms; null elsewhere) shows each `Animal` out in its pasture from 06:00 to 20:00 if its
+    building has one, else in its room, on a random cell of its ground each time an area loads. An
+    animal fills no cell and walks only among its own cells; build mode holds them still and refuses a
+    cell one stands in ("Someone is standing there."). **A right click on the animal he faces
+    (`animal_in_front()`) pets it and takes what it has ready**; a full pack leaves it waiting. What is
+    ready shows over its head as a small bubble with the thing at half size, pointing down at it (the
+    user asked for smaller badges); a hungry one shows three dots. **A test that pets one puts it with
+    `animal.motion.position` in the cell he faces**, as `tests/world/animals_test.gd` does.
+  - **The products:** the egg and the milk are food (6, 18), wool and cloth materials; the hearth's
+    Fried Egg, Omelette and Custard are known from the start (ten dishes from the start, fourteen with
+    the four taught); Tilda buys the four; cloth (2 wool) and the Wool Blanket (2 cloth, the furnishing
+    `blanket`) are made at the workbench's "Make" tab.
+  - **The save is still version 6:** `homestead` gains `"animals"`, written only when there is one. The
+    fixture `tests/fixtures/saves/v6_buildings_before_animals.json` was written by the game at the end
+    of phase 3.
+  - **Pictures and tools:** `animals.png` (the sheep and the cow; the hen is `critters.png`'s chicken),
+    seven icons, the blanket in `crafted.png`; Oda's stall is the market stall's tiles, re-baked in the
+    village at (16..18, 30..31); `tools/playtest.gd -- animals`; capture shots 192 to 203.
+  - **Do not** let an animal die, run off, block anyone or use a door, sell one back, give a product the
+    pack has no room for, or change a price, a pace or a pasture's grass without the user's word: each
+    was decided with the plan.
