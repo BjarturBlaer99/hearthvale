@@ -2853,3 +2853,15 @@ The first of phase 3's three steps (`docs/progress/homestead-plan.md`).
 **What differs from the plan:** nothing in D20 to D23. Chosen where the plan was silent: the doors' cells and the rooms' furniture, the shed's three recipes on "Build", the big forms' roofs (`docs/DECISIONS.md`).
 
 **Verified:** 1075 tests in 139 suites pass, with the new `tests/world/rooms_test.gd` (in and out of each room in two places, a site without a door, the doorstep kept free, the shed's chests and furnace through a save, the two upgrades, the seven plans' costs and unlocks against the plan's table and its sums, the rooms' size and names). Nobody has played it by hand.
+
+## 2026-11-19 — The Homestead, phase 3, step 3c: moving and pulling down
+
+**Built**
+- **Moving** (D24): in build mode the hand lifts a building (or a site) from any of its cells and sets it down elsewhere, at once and for nothing, as it is: the silo's hay, the shed's chests and furnace, its upgrade, its door and the entry before it go with it. It is refused where it doesn't fit, with the first reason found; its own cells are no hindrance to it.
+- **Pulling down:** a right click on a building asks first ("Pull down the Coop? Right click again. Back: 15 Wood, 10 Stone and 7 Fibre."), and a second pulls it down. Only an empty building goes: no hay in the silo, nothing in the shed's chests or furnace, each refusal saying why. Half of each material that went into it comes back, rounded down, its upgrade's too; no coins; what the pack can't take is laid at his feet.
+- **A site taken up** (a right click) gives its kit back whole.
+- **Tools:** `tools/playtest.gd -- buildings` and `-- built`; capture shots 177 to 191.
+
+**What differs from the plan:** nothing in D24. Chosen where the plan was silent: the second right click as the asking, a site taken up for its kit, the shed's furnishings staying with its room, and (to put to the user) that nothing takes hay out of the silo, so a silo with hay can't be pulled down until phase 4 (`docs/DECISIONS.md`).
+
+**Verified:** 1080 tests in 140 suites pass, with the new `tests/world/building_moves_test.gd` (a building moved with what is in it and refused where it doesn't fit, a site moved and taken up, the question and the pulling down, only an empty building, an upgrade's refund and what doesn't fit at his feet). The two scenarios were started in a window for four seconds each, with no error.

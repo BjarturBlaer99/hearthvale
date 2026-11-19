@@ -1622,13 +1622,30 @@ buildings, under "Buildings" below.
   - **Upgrades:** a "Build" recipe making `{"upgrade": id}` (the Big Coop, the Big Barn) calls
     `Homestead.upgrade(id, day)`; the next morning `is_big()` is true, its look is `big`'s, and its
     `animals` are `big`'s (8).
+  - **Moving and pulling down** (step 3c; D24): in build mode the hand lifts a building from any of its
+    cells (`BuildMode.lifted` has `"building"`), and a left click where it fits moves it
+    (`GameState.move_building(area, id, origin)`): at once, for nothing, as it is.
+    `BuildMode.site_at(cell, except)` doesn't count the building being moved. A right click on a site
+    gives its kit back (`GameState.take_up_site()`); on a building it asks (`BuildMode.asked`) and a
+    second pulls it down if `GameState.why_not_demolish(id)` is empty: `GameState.demolish(area, id)`
+    gives back `demolish_refund(id)`, half of `building_costs(id)` (the plan's needs, and the
+    upgrade's), through `give_item()`.
+  - **Tools:** `tools/playtest.gd -- buildings` (the coins, materials and skill for every plan, the
+    ground cleared, the farmhouse's chest full of wood and stone) and `-- built` (every building standing
+    the morning after); capture shots 177 to 191 (`b:<what>`: the Build tab, a kit's ghost green and
+    red, a site, the farm with every building, the coop's doorstep, the well, the silo, the three rooms,
+    the shed furnished, the big forms, the shed moved, a demolition and its refund). A shot that points
+    in build mode warps the window's own mouse there (`_point`).
   - **Pictures and sound:** atlas rows 28 and 29 (`GreyboxTiles.BUILDING_KINDS`, `SILO_KINDS`: a site, a
     site's timber, the barn's plank wall, loft door and door, the silo's quarters), painted by
     `make_tile_texture.gd` and never laid on a Height layer; the icons `hay` and `kit`; the sound `built`.
   - **The save is still version 6:** `homestead` gains `"buildings"` and `"hay"`, each written only when
     there is something in it. The fixture `tests/fixtures/saves/v6_a_yard_on_the_farm.json` was written
     by the game as it stood at the end of phase 2.
-- **Tests:** `tests/world/build_mode_test.gd` (build mode in the world), `tests/world/placeables_test.gd`
+- **Tests:** phase 3's `tests/core/homestead/building_rules_test.gd` (`Buildings`),
+  `homestead_buildings_test.gd` (what `Homestead` keeps of them), `tests/core/crafting/crafting_build_test.gd`
+  (the "Build" tab's rules), `tests/world/plans_test.gd` (step 3a), `rooms_test.gd` (3b) and
+  `building_moves_test.gd` (3c); `tests/world/build_mode_test.gd` (build mode in the world), `tests/world/placeables_test.gd`
   (the lamp post, saplings and trees, the hand, the tabs, Tilda's wares, a whole yard), `tests/core/homestead/`
   (`Placement`, `BuildBar`, what `Homestead` keeps), `tests/world/homestead_test.gd` (the map and the walk), `tests/world/home_move_test.gd` (the
   doors, waking, the locked cottage, the version 5 save in the world), `tests/world/debris_test.gd` (the

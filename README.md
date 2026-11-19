@@ -150,7 +150,7 @@ Beaten enemies sometimes drop hearts or coins.
   you; the Old Wood has mist. Only the water moves.
 - **Walls with height** (the pivot, step 1d): dungeon and house walls show a lit front and a dark top, pillars
   stand tall, and roofs have a ridge you walk behind.
-- **The Homestead** (asked for on 2026-11-17; phases 1 and 2 of five are built): an old farmstead of your own.
+- **The Homestead** (asked for on 2026-11-17; phases 1 to 3 of five are built): an old farmstead of your own.
   Follow the lane west out of Hearthvale, past the last cottage and through the trees: it is a few
   seconds' walk. The farmhouse there is your home (the bed, the hearth and the workbench are inside), your
   field lies below it across the road, and a pond in the south-west corner fills the watering can.
@@ -170,6 +170,12 @@ Beaten enemies sometimes drop hearts or coins.
     saplings.
   - **The hand,** the build bar's first slot, moves things: click a thing to lift it, click again to
     set it down. Not on trees, water, the house, the road, the field, or anything still to be cleared.
+  - **Buildings** (phase 3): at the workbench's **"Build"** tab buy a plan (materials and coins) for a
+    Well (the can fills at it), a Silo (it keeps hay: cut the tall grass in the meadow, then right
+    click the silo), a Coop, a Barn or a Shed (each with a room of its own; the shed takes two more
+    chests and a second furnace). The plan is a kit: set it down in build mode, and the building stands
+    the next morning. Later the Coop and the Barn can be made bigger. With the hand, click a building to
+    move it; right click it twice to pull it down (it must be empty) for half its materials back.
   - **An older save loads as it was:** a game saved in the old cottage opens in the farmhouse, and its
     soil and crops are in the field's clear corner.
   - **The farm has its own tune,** and a quieter one after dark.
@@ -236,7 +242,9 @@ the ending), `-- warden`, `-- quarry` (the mine's entrance hall with a Pickaxe),
 workbench, with ore, bars and wood for most of its list), `-- homestead` (arriving on your farm with a sword
 and all three pickaxes; add `20:30` for its night), `-- farm` (on the farm's road above the field, with the
 hoe, the can and seeds) or `-- build` (on the farm by the farmhouse, the ground cleared, with a stock of
-all fifteen things to set down, and wood, stone and coins: press B). Saving in a scenario goes to a slot of its own, so it never replaces your own game.
+all fifteen things to set down, and wood, stone and coins: press B), `-- buildings` (on the farm with the
+coins, materials and skill for every building's plan, the ground cleared) or `-- built` (the farm with every
+building standing). Saving in a scenario goes to a slot of its own, so it never replaces your own game.
 
 To have a script play eight days by pressing real keys (the balance pass's run: the field's clear corner,
 Tilda's counter, the quarry, the furnace and the workbench): `godot --path . -s res://tools/play_days.gd -- <folder>`. It

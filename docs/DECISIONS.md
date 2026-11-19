@@ -1412,3 +1412,28 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
   - **An upgrade is a recipe of the "Build" tab that makes `{"upgrade": id}`,** known once that building
     stands (`"unlock": {"built": id}`), bought with its materials and coins, and finished the next
     morning ("The Big Coop is finished."). One upgrade a building. Its room is the room it had.
+- 2026-11-19 — **The Homestead, step 3c (moving and pulling down): what the plan left open.** D24 is
+  built as written; these are the phase's own choices.
+  - **The hand lifts a building from any of its cells,** and the ghost then holds it where it stands (by
+    its door, or the middle of its bottom row); a click where it fits moves it at once, for nothing, as
+    it is. Its own cells and its own doorstep are no hindrance to itself, so it can be moved a cell.
+    What is in it goes with it because nothing of it is kept by place: the silo's hay, the shed's
+    chests and furnace (by key), its upgrade, its door and the entry before it.
+  - **A site can be moved like a building** (it stays a site, with the day it was set down), **and a
+    right click on a site takes it up and gives its kit back whole,** if there is room for it: nothing
+    was built, so nothing is lost. A right click on a standing building is what pulls one down.
+  - **"Asks first" is a second right click:** the first says "Pull down the Coop? Right click again.
+    Back: 15 Wood, 10 Stone and 7 Fibre." and washes the building red; moving the ghost off it, choosing
+    on the bar or leaving lets the question go. No dialogue box is opened over build mode.
+  - **"Only an empty building can go" is asked before the question,** with the reason: "The Silo still
+    holds hay.", "There are things in the Shed's chests.", "The Shed's furnace holds a load." (each
+    followed by "Only an empty building can be pulled down."). Animals are phase 4's to add.
+  - **Nothing takes hay out of the silo in this phase,** so a silo with hay in it can't be pulled down
+    until phase 4's animals eat it. Left so on purpose (the plan has no way out for hay); the user may
+    want one. *(For the coordinator to put to the user.)*
+  - **Half of each material is counted over the plan and, for a big building, its upgrade together,**
+    then halved and rounded down (the Big Coop: 50 wood gives 25). Coins never come back. It is given:
+    what the pack can't take lies at his feet as a `LeftItem`, as a reward's does.
+  - **A pulled-down shed's furnishings stay with the room** (their flags are kept): a shed built again
+    has its chests and furnace, empty. Nothing is lost, and no refund is given for them.
+  - **A building pulled down can be bought again:** one of each is one that stands, or is a site or kit.

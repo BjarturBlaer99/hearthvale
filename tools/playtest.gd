@@ -134,6 +134,37 @@ const SCENARIOS: Dictionary = {
 		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds"],
 		"cleared": [Rect2i(29, 8, 9, 6), Rect2i(20, 16, 18, 1)],
 	},
+	# On the homestead with the coins, materials and skill to buy every building's plan at the
+	# workbench (in the farmhouse, up the path), and the yard east of the house and the land west
+	# of it cleared for them (the Homestead, phase 3). A pack's stack holds only so much (wood 30,
+	# stone and fibre 50): the farmhouse's chest holds the rest. Bought, a plan is a kit: B opens
+	# build mode, where it is set down; the bed brings the morning that finishes it. The hand
+	# lifts a building to move it; a right click on one asks, and a second pulls it down. A sword,
+	# and the hay the Silo takes, from the meadow's tall grass in the north-west.
+	"buildings": {
+		"area": &"homestead",
+		"cell": Vector2i(30, 13),
+		"items": [[&"wooden_sword", 1], [&"wood", 30], [&"stone", 50], [&"fibre", 50], [&"copper_bar", 10], [&"iron_bar", 10],
+			[&"gold_bar", 4], [&"copper_ore", 10], [&"coin", 999]],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"home/chest"],
+		"chest": [[&"wood", 30], [&"wood", 30], [&"wood", 30], [&"wood", 30], [&"stone", 50], [&"stone", 50], [&"stone", 50], [&"fibre", 20]],
+		"skills": {&"farming": 3},
+		"cleared": [Rect2i(29, 8, 9, 6), Rect2i(3, 6, 23, 8), Rect2i(3, 14, 17, 6), Rect2i(20, 16, 18, 1)],
+	},
+	# The same farm the morning after every building was set down: the Coop and the Silo east of
+	# the farmhouse, the Barn, the Shed and the Well west of it (the Homestead, phase 3). Their
+	# doors lead into their rooms; the shed's chests and furnace are on the workbench's "Build"
+	# tab; the can fills at the Well and the Silo takes hay. Materials and coins for the two
+	# upgrades and the shed's furnishings.
+	"built": {
+		"area": &"homestead",
+		"cell": Vector2i(28, 13),
+		"items": [[&"wooden_sword", 1], [&"watering_can", 1], [&"hay", 12], [&"wood", 30], [&"stone", 50], [&"fibre", 20],
+			[&"copper_bar", 4], [&"iron_bar", 4], [&"gold_bar", 2], [&"copper_ore", 10], [&"coin", 999]],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds"],
+		"cleared": [Rect2i(29, 8, 9, 6), Rect2i(3, 6, 23, 8), Rect2i(3, 14, 17, 6), Rect2i(20, 16, 18, 1)],
+		"standing": {&"coop": Vector2i(32, 9), &"silo": Vector2i(36, 10), &"barn": Vector2i(8, 7), &"shed": Vector2i(16, 7), &"well": Vector2i(21, 11)},
+	},
 	# In Tilda's shop at her counter, with coins and a harvest: for trying her list. (Start it by
 	# day: the shop is shut from 18:00 to 08:00, and he could not get back in.)
 	"market": {
@@ -281,6 +312,18 @@ func _start() -> void:
 		for x: int in range(patch.position.x, patch.end.x):
 			for y: int in range(patch.position.y, patch.end.y):
 				game_state.call(&"clear_debris", scenario["area"], Vector2i(x, y))
+	# What the farmhouse's chest holds, and buildings that stood before he came (the Homestead):
+	# each set down, and a morning come.
+	for stack: Array in scenario.get("chest", []):
+		(game_state.call(&"store") as RefCounted).call(&"put", String(stack[0]), int(stack[1]), int(stack[1]))
+	var standing: Dictionary = scenario.get("standing", {})
+	for building: StringName in standing:
+		var kit: StringName = StringName("%s_kit" % building)
+		game_state.call(&"add_item", kit, 1)
+		game_state.call(&"set_down_kit", scenario["area"], standing[building], kit)
+	if not standing.is_empty():
+		game_state.call(&"start_next_day")
+		game_state.set(&"morning_news", PackedStringArray())
 	# Those came true long ago: no day is kept for them, so nothing waits a day on them.
 	(game_state.get(&"flag_days") as Dictionary).clear()
 	for flag: StringName in scenario.get("today", []):

@@ -806,6 +806,102 @@ func set_down_kit(area: StringName, origin: Vector2i, kit_id: StringName) -> boo
 	return true
 
 
+## Moves building `id` (or its site) on `area` so that its top-left corner is at `origin`, as it
+## is, at once and for nothing (D24): what is in it goes with it (the silo's hay, the shed's
+## chests and furnace), and its door with it. Whether the ground fits is the area's to ask first
+## (Buildings.why_not_at: build mode does, not counting the building itself). Returns whether it
+## moved: never off his land, for none, or to where it stands already.
+func move_building(area: StringName, id: StringName, origin: Vector2i) -> bool:
+	if not homestead_rules().is_land(area) or not homestead().move_building(id, origin):
+		return false
+	EventBus.homestead_changed.emit()
+	return true
+
+
+## Why building `id`'s site can't be taken up on `area` (it is undone, and its kit comes back):
+## it isn't a site, or the pack has no room for the kit. "" if it can.
+func why_not_take_up_site(area: StringName, id: StringName) -> String:
+	if not homestead_rules().is_land(area) or not homestead().is_site(id, day):
+		return Placement.NOTHING_WORDS
+	var kit: StringName = Buildings.kit_for(id, DataRegistry.entries(&"items"))
+	if not has_room_for(kit):
+		return Placement.NO_ROOM_WORDS % str(DataRegistry.get_item(kit).get("name", kit))
+	return ""
+
+
+## Takes up building `id`'s site on `area`: nothing was built, so its kit comes back whole.
+## Returns the kit, or &"" if it was refused (why_not_take_up_site).
+func take_up_site(area: StringName, id: StringName) -> StringName:
+	if not why_not_take_up_site(area, id).is_empty():
+		return &""
+	var kit: StringName = Buildings.kit_for(id, DataRegistry.entries(&"items"))
+	homestead().remove_building(id)
+	add_item(kit, 1)
+	EventBus.homestead_changed.emit()
+	return kit
+
+
+## Why a building can't be pulled down.
+const NOT_STANDING_WORDS: String = "There is no building here to pull down."
+const HOLDS_WORDS: String = "The %s still holds %s. Only an empty building can be pulled down."
+const CHEST_FULL_WORDS: String = "There are things in the %s's chests. Only an empty building can be pulled down."
+const FURNACE_FULL_WORDS: String = "The %s's furnace holds a load. Only an empty building can be pulled down."
+
+
+## Why building `id` can't be pulled down, in words; "" if it can. Only an empty building can go
+## (D24): nothing in what it holds (the silo's hay), nothing in its room's chests or furnace. (The
+## animals of phase 4 will be one thing more.)
+func why_not_demolish(id: StringName) -> String:
+	if not is_built(id):
+		return NOT_STANDING_WORDS
+	var building: Dictionary = DataRegistry.get_building(id)
+	var called: String = Buildings.name_of(building, is_big(id))
+	var held: Dictionary = Buildings.holds(building)
+	if not held.is_empty() and homestead().hay > 0:
+		return HOLDS_WORDS % [called, str(DataRegistry.get_item(held["item"]).get("name", held["item"])).to_lower()]
+	for key: StringName in Buildings.kept_in(building, true):
+		if store(key).used_slots() > 0:
+			return CHEST_FULL_WORDS % called
+	for key: StringName in Buildings.kept_in(building, false):
+		if not furnace(key).is_empty():
+			return FURNACE_FULL_WORDS % called
+	return ""
+
+
+## What went into building `id`: the needs of its plan and, if it has its upgrade, of that.
+func building_costs(id: StringName) -> Array[Dictionary]:
+	var plan: Array[Dictionary] = []
+	var upgrade: Array[Dictionary] = []
+	var kit: String = String(Buildings.kit_for(id, DataRegistry.entries(&"items")))
+	for recipe: Dictionary in DataRegistry.entries(&"crafting"):
+		if Crafting.item_made(recipe) == kit and not kit.is_empty():
+			plan.append_array(Crafting.needs_of(recipe))
+		elif Crafting.upgrade_made(recipe) == String(id) and homestead().has_upgrade(id):
+			upgrade.append_array(Crafting.needs_of(recipe))
+	return plan + upgrade
+
+
+## What pulling building `id` down gives back: half of each material that went into it, rounded
+## down, and no coins (D24). [{ "item", "count" }]
+func demolish_refund(id: StringName) -> Array[Dictionary]:
+	return Buildings.refund(building_costs(id), String(COIN))
+
+
+## Pulls building `id` down on `area`, if it can go (why_not_demolish): it is gone, and half of
+## each material comes back, given: what the pack can't take is laid at his feet. Its room's
+## furnishings stay with the room (a shed built again has them). Returns what came back, or []
+## if it was refused.
+func demolish(area: StringName, id: StringName) -> Array[Dictionary]:
+	if not homestead_rules().is_land(area) or not why_not_demolish(id).is_empty():
+		return []
+	var back: Array[Dictionary] = demolish_refund(id)
+	homestead().remove_building(id)
+	EventBus.homestead_changed.emit()
+	for thing: Dictionary in back:
+		give_item(StringName(str(thing["item"])), int(thing["count"]))
+	return back
+
+
 ## Puts the hay he carries in the building `id` that holds it (the Silo, by its data's
 ## "holds"), as much as it has room for: what doesn't fit stays in the pack. Returns the words
 ## to say ("" if `id` holds nothing, or doesn't stand yet).

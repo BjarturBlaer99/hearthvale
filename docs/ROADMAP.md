@@ -299,7 +299,15 @@ five phases with a stop after each:
     tabs; Tilda's hedges, flower beds, saplings and fibre.
   - **Not played by a person:** by the tests, the pictures, and a second of real keys and mouse sent
     by a script. The user reviews before phase 3.
-- **Phase 3 — Buildings.** *Not built.* A Well, a Silo, a Coop, a Barn and a Shed.
+- **Phase 3 — Buildings.** *Built 2026-11-19, in three steps.* A Well, a Silo, a Coop, a Barn and a
+  Shed, and the Big Coop and the Big Barn.
+  - **3a, plans:** the workbench's "Build" tab; kits; building sites that stand the next morning; the
+    Well; the Silo; the meadow's tall grass and hay.
+  - **3b, rooms:** the Coop, the Barn and the Shed with their insides and doors that follow them; the
+    shed's two chests and second furnace; the two upgrades.
+  - **3c, moving and pulling down:** the hand moves a building with what is in it; an empty one is
+    pulled down for half its materials.
+  - **Not played by a person:** by the tests and the pictures. The user reviews before phase 4.
 - **Phase 4 — Animals.** *Not built.* Chickens, sheep and cows.
 - **Phase 5 — Balance.** *Not built.* Two favours, ten days played, and the numbers settled.
 

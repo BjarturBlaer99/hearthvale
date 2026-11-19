@@ -45,6 +45,13 @@ extends SceneTree
 ## lamp post lit; "yard_hand": in build mode, the hand moving its bench); "saplings" shows an
 ## oak and a cherry sapling at each age and the hero behind a grown oak; "place_tab" opens the
 ## workbench's "Place" tab; "shop_land" opens Tilda's list on what she sells for the land.
+## The Homestead's buildings (phase 3), "b:<what>": "b:tab" opens the workbench's "Build" tab;
+## "b:ghost:<x>,<y>" opens build mode with the Coop's kit and its ghost held at that cell; "b:site"
+## shows the Coop's site set down; "b:farm" the farm with every building standing (BUILT), as do
+## "b:fill" (the can filled at the Well), "b:hay" (hay put in the Silo), "b:demolish" (the Coop
+## pulled down with a full stack of wood: half its materials back, what doesn't fit at his feet),
+## "b:moved" (the Shed moved west, the hero just out of its door) and "b:big" (the Big Coop and
+## the Big Barn); "b:room" shows a room bare and "b:shed" the shed furnished, its furnace burning.
 const SHOTS: Array = [
 	["1_village_square", &"village", Vector2i(23, 20), Vector2.DOWN, 0, ""],
 	["2_village_north_rise", &"village", Vector2i(24, 9), Vector2.UP, 0, ""],
@@ -242,6 +249,22 @@ const SHOTS: Array = [
 	["174_the_hand_moves_a_bench", &"homestead", Vector2i(37, 13), Vector2.LEFT, 0, "yard_hand"],
 	["175_the_workbench_place_tab", &"home", Vector2i(8, 3), Vector2.RIGHT, 0, "place_tab"],
 	["176_tilda_sells_for_the_land", &"shop", Vector2i(5, 4), Vector2.UP, 0, "shop_land"],
+	# The Homestead, phase 3: buildings.
+	["177_the_workbench_build_tab", &"home", Vector2i(8, 3), Vector2.RIGHT, 0, "b:tab"],
+	["178_a_kits_ghost_green", &"homestead", Vector2i(30, 13), Vector2.RIGHT, 0, "b:ghost:35,12"],
+	["179_a_kits_ghost_red_on_the_road", &"homestead", Vector2i(30, 13), Vector2.RIGHT, 0, "b:ghost:34,15"],
+	["180_a_building_site", &"homestead", Vector2i(30, 13), Vector2.RIGHT, 0, "b:site"],
+	["181_the_farm_with_every_building", &"homestead", Vector2i(28, 13), Vector2.DOWN, 0, "b:farm"],
+	["182_before_the_coops_door", &"homestead", Vector2i(5, 15), Vector2.DOWN, 0, "b:farm"],
+	["183_the_well_fills_the_can", &"homestead", Vector2i(21, 13), Vector2.UP, 0, "b:fill"],
+	["184_the_silo_takes_hay", &"homestead", Vector2i(34, 12), Vector2.UP, 0, "b:hay"],
+	["185_inside_the_coop", &"coop", Vector2i(5, 6), Vector2.UP, 0, "b:room"],
+	["186_inside_the_barn", &"barn", Vector2i(5, 6), Vector2.UP, 0, "b:room"],
+	["187_inside_the_shed", &"shed", Vector2i(5, 6), Vector2.UP, 0, "b:room"],
+	["188_the_shed_furnished", &"shed", Vector2i(5, 5), Vector2.UP, 0, "b:shed"],
+	["189_the_big_coop_and_the_big_barn", &"homestead", Vector2i(28, 13), Vector2.DOWN, 0, "b:big"],
+	["190_the_shed_moved_and_its_door", &"homestead", Vector2i(15, 18), Vector2.DOWN, 0, "b:moved"],
+	["191_a_demolition_and_its_refund", &"homestead", Vector2i(30, 13), Vector2.RIGHT, 0, "b:demolish"],
 ]
 ## What a build shot carries: enough of each thing for a yard, in the order of the build bar.
 const BUILD_STOCK: Array = [[&"fence", 30], [&"gate", 3], [&"dirt_path", 12], [&"stone_path", 20], [&"wood_path", 12],
@@ -274,6 +297,14 @@ const SAPLINGS: Array = [
 	[&"cherry_sapling", Vector2i(30, 16), 0], [&"cherry_sapling", Vector2i(31, 16), 2], [&"cherry_sapling", Vector2i(32, 16), 4],
 	[&"cherry_sapling", Vector2i(36, 13), 6],
 ]
+## Where every building stands in the "b:" shots (its top-left corner), on ground cleared for
+## them (BUILT_CLEARED): the Silo east of the farmhouse, the Coop, the Barn, the Shed and the
+## Well on the land west of it.
+const BUILT: Dictionary = {&"coop": Vector2i(3, 12), &"silo": Vector2i(34, 10), &"barn": Vector2i(8, 7),
+	&"shed": Vector2i(16, 7), &"well": Vector2i(21, 11)}
+const BUILT_CLEARED: Array = [Rect2i(29, 8, 9, 6), Rect2i(3, 6, 23, 8), Rect2i(3, 14, 17, 6)]
+## Where "b:moved" moves the Shed.
+const SHED_MOVED: Vector2i = Vector2i(13, 15)
 ## The hour every shot is taken at unless it says another: noon, in minutes since midnight.
 const NOON: float = 720.0
 ## The save slot the "finished" title uses, so the player's own save is left alone.
@@ -357,6 +388,8 @@ func _capture() -> void:
 				saves.call(&"erase_slot", CAPTURE_SLOT)
 				saves.set(&"current_slot", own_slot)
 			continue
+		if str(shot[5]).begins_with("b:"):
+			_set_up_buildings(game_state, str(shot[5]))
 		var scene: Node = (load(WorldPaths.scene_for(shot[1])) as PackedScene).instantiate()
 		root.add_child(scene)
 		var player: Node = scene.get(&"player")
@@ -622,6 +655,8 @@ func _capture() -> void:
 			hand_mode.call(&"set_down")
 			hand_mode.call(&"point_at", Vector2i(34, 12))
 			await _frames(3)
+		elif str(shot[5]).begins_with("b:"):
+			await _act_on_buildings(scene, str(shot[5]))
 		elif shot[5] == "place_tab":
 			# The "Place" tab, the cursor on the fence and one made, so the line that says so shows.
 			scene.call(&"open_craft")
@@ -712,6 +747,108 @@ func _capture() -> void:
 		scene.queue_free()
 		await _frames(2)
 	quit()
+
+
+## What a "b:" shot needs before its area loads: ground cleared, materials, the buildings set
+## down (and a morning, so they stand), and what is in them.
+func _set_up_buildings(game_state: Node, action: String) -> void:
+	for patch: Rect2i in BUILT_CLEARED:
+		for x: int in range(patch.position.x, patch.end.x):
+			for y: int in range(patch.position.y, patch.end.y):
+				game_state.call(&"clear_debris", &"homestead", Vector2i(x, y))
+	if action == "b:tab":
+		# Farming 3 and a copper bar found: every plan is known; enough for the Well and the Silo.
+		(game_state.get(&"skill_points") as Dictionary)[&"farming"] = 25
+		for item: Array in [[&"stone", 50], [&"wood", 30], [&"fibre", 20], [&"copper_bar", 3], [&"coin", 300]]:
+			game_state.call(&"add_item", item[0], item[1])
+		return
+	if action.begins_with("b:ghost"):
+		game_state.call(&"add_item", &"coop_kit", 1)
+		return
+	if action == "b:site":
+		game_state.call(&"add_item", &"coop_kit", 1)
+		game_state.call(&"set_down_kit", &"homestead", Vector2i(33, 10), &"coop_kit")
+		return
+	if action == "b:room":
+		return
+	if action == "b:shed":
+		for flag: StringName in [&"shed/furnace", &"shed/chest_a", &"shed/chest_b"]:
+			game_state.call(&"set_flag", flag, true)
+		game_state.call(&"light_furnace", &"iron_bar", 3, &"shed")
+		return
+	for id: StringName in BUILT:
+		var kit: StringName = StringName("%s_kit" % id)
+		game_state.call(&"add_item", kit, 1)
+		game_state.call(&"set_down_kit", &"homestead", BUILT[id], kit)
+	game_state.call(&"start_next_day")
+	game_state.call(&"set_time", NOON)
+	if action == "b:big":
+		var land: RefCounted = game_state.call(&"homestead")
+		for id: StringName in [&"coop", &"barn"]:
+			land.call(&"upgrade", id, game_state.get(&"day"))
+		game_state.call(&"start_next_day")
+		game_state.call(&"set_time", NOON)
+	if action == "b:moved":
+		game_state.call(&"move_building", &"homestead", &"shed", SHED_MOVED)
+	if action == "b:fill":
+		for item: Array in [[&"watering_can", 1], [&"water", 2]]:
+			game_state.call(&"add_item", item[0], item[1])
+		game_state.call(&"equip", &"watering_can")
+	if action == "b:hay":
+		game_state.call(&"add_item", &"hay", 12)
+	if action == "b:demolish":
+		game_state.call(&"add_item", &"wood", 30)
+	# The morning's news is not what these shots show.
+	game_state.set(&"morning_news", PackedStringArray())
+
+
+## What a "b:" shot does once its area has loaded.
+func _act_on_buildings(scene: Node, action: String) -> void:
+	if action == "b:tab":
+		# The "Build" tab, the cursor on the Coop, whose needs show what is short.
+		scene.call(&"open_craft")
+		var bench: Node = scene.get(&"hud").get(&"craft_menu")
+		bench.call(&"show_tab", "build")
+		bench.call(&"move_cursor", 2)
+		await _frames(2)
+	elif action.begins_with("b:ghost"):
+		var at: PackedStringArray = action.trim_prefix("b:ghost:").split(",")
+		scene.call(&"open_build")
+		var mode: Node = scene.get(&"build")
+		while mode.get(&"chosen") != &"coop_kit":
+			mode.call(&"step", 1)
+		_point(mode, Vector2i(int(at[0]), int(at[1])))
+		await _frames(3)
+		_point(mode, Vector2i(int(at[0]), int(at[1])))
+		await _frames(1)
+	elif action == "b:fill":
+		scene.call(&"use_item")
+		await _frames(7)
+	elif action == "b:hay":
+		scene.call(&"interact")
+		await _frames(3)
+	elif action == "b:demolish":
+		scene.call(&"open_build")
+		var hand: Node = scene.get(&"build")
+		while hand.get(&"chosen") != &"hand":
+			hand.call(&"step", 1)
+		_point(hand, BUILT[&"coop"] + Vector2i(1, 1))
+		await _frames(2)
+		_point(hand, BUILT[&"coop"] + Vector2i(1, 1))
+		hand.call(&"take_up")
+		hand.call(&"take_up")
+		await _frames(3)
+	else:
+		await _frames(2)
+
+
+## Puts build mode's ghost on `cell`, and the window's own mouse pointer there too: in a window
+## the pointer is real, and wherever it is over the game the ghost goes.
+func _point(mode: Node, cell: Vector2i) -> void:
+	mode.call(&"point_at", cell)
+	var screen: Vector2 = (mode as Node2D).get_global_transform_with_canvas() * (Vector2(cell * 16) + Vector2(8, 8))
+	root.warp_mouse(screen)
+	mode.call(&"point_at", cell)
 
 
 func _save(out_dir: String, shot_name: String) -> void:

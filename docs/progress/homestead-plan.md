@@ -6,8 +6,8 @@ five phases with a stop after each. This is phase 0: the plan, and no code.
 
 **Status: approved as written by the user on 2026-11-17 ("Approve as written"). All thirty decisions
 below (D1 to D30) stand as proposed, and each is recorded in `docs/DECISIONS.md`. Phase 1 is built and
-approved (2026-11-19); phase 2 is built (2026-11-19) and waits for the user's review; phases 3 to 5 are
-not built.** Every number is a first guess, kept in data, to be measured in phase 5. The tables below are as
+approved (2026-11-19); phase 2 is built and approved (2026-11-19); phase 3 is built (2026-11-19) and
+waits for the user's review; phases 4 and 5 are not built.** Every number is a first guess, kept in data, to be measured in phase 5. The tables below are as
 approved; where a phase builds something differently, it says so under "What the user has decided" and
 in the log.
 
@@ -69,6 +69,18 @@ which does not exist. The coordinator adds to it after each review.
   - a crafting recipe has a `tab` (`make` or `place`): "Build" is one more name in `Crafting.TABS`;
   - `SpriteSheet.draw()` draws a mirrored frame a frame's width to the right in this engine: found,
     measured, and left alone (it is older than the Homestead).
+- *(Written by phase 3's subagent, for the coordinator to confirm with the user.)* **2026-11-19, phase 3
+  is built** (steps 3a, 3b and 3c, each ticked below with what was built differently). Every approved
+  decision it touches (D20 to D24, D29's hay, D30) held as written. What the plan left open and the phase
+  chose is in `docs/DECISIONS.md` under the three steps. Two readings want the user's word:
+  - **the tall grass and a phase 2 save** (the brief's open point): a tuft doesn't grow where something
+    is set down or a building stands; taken up, it is back on the next visit;
+  - **nothing takes hay out of the silo,** so a silo with hay can't be pulled down until phase 4's
+    animals eat it.
+  What a later phase will meet: a building is a file in `data/buildings/` (its `animals`, and `big`'s,
+  are phase 4's to read); `GameState.is_built(id)`, `is_big(id)`, `homestead().hay`; a building with a
+  room has a door and the homestead's entry `<id>_door`; `GameState.why_not_demolish()` is where "no
+  animals" goes.
 
 ## The short of it
 
@@ -672,7 +684,11 @@ TECH_DESIGN, the roadmap, the README and DECISIONS up to date; CLAUDE.md is the 
   of each room leads to an entry the homestead puts on the building's doorstep as it loads. The shed's
   chests and furnace are three "Build" recipes known once it stands, with flags `shed/...`; they are
   kept by key (`GameState.furnace(&"shed")`, `store(&"shed_a")`). The big forms wear another roof.*
-- [ ] 3c. **Moving and demolishing,** with refunds.
+- [x] 3c. **Moving and demolishing,** with refunds.
+  *Built 2026-11-19, with D24 as written. The hand lifts a building and sets it down elsewhere, at once,
+  with what is in it; a right click asks, and a second pulls an empty building down for half of each
+  material (its upgrade's too), what doesn't fit laid at his feet. A right click on a site gives its
+  kit back. Nothing takes hay out of the silo yet, so a silo with hay stays.*
 - **Tests:**
   - *construction:* a kit set down is a site today and a building at dawn, through a save; one of each;
     the doorstep stays free; a plan is refused without its coins or materials and says what is short;

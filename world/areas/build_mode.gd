@@ -21,6 +21,10 @@ extends Node2D
 ##   cell of the building and the doorstep before its door, held by its door (or the middle of
 ##   its bottom row), green or red over all of them with the first reason found (the plan's
 ##   D15). Set down, it is a building site today and the building the next morning.
+## - The hand lifts a building (or a site) from any of its cells and sets it down elsewhere, at
+##   once and for nothing, refused where it doesn't fit (D24); what is in it goes with it. A right
+##   click on a site takes it up and gives its kit back; on a building it asks first, and a second
+##   right click pulls it down, if it is empty: half of each material back, no coins.
 ## Placement (pure) says what fits; GameState sets down, moves and takes up; PlacedThings
 ## and PlacedBuildings show it. This is the only place anything is set down from: in play the
 ## mouse is two buttons, as ever, and where a click lands doesn't matter.
@@ -55,8 +59,15 @@ var area: AreaController
 var chosen: StringName = &""
 ## The cell the ghost is on.
 var cell: Vector2i = Vector2i.ZERO
-## What the hand has lifted: { "cell": where it is, "layer", "item": its id }, or {}.
+## What the hand has lifted: { "cell": where it is, "layer", "item": its id }, or {}. A building:
+## { "cell": the cell the ghost holds it by, where it stands, "building": its id, "item": its kit }.
 var lifted: Dictionary = {}
+## The building a right click has asked about pulling down, or &"": a second one pulls it down.
+var asked: StringName = &""
+## What the ghost says over a building it asks about pulling down, and when it is pulled down
+## (its name, what comes back).
+const ASK_WORDS: String = "Pull down the %s? Right click again. Back: %s."
+const PULLED_WORDS: String = "The %s is pulled down. Back: %s."
 
 var _open: bool = false
 var _layer: CanvasLayer
@@ -101,6 +112,7 @@ func close() -> void:
 		return
 	_open = false
 	lifted = {}
+	asked = &""
 	_ghost.visible = false
 	area.hud.hide_build()
 	EventBus.sound.emit(&"menu_select")
@@ -151,6 +163,7 @@ func _choose(id: StringName) -> bool:
 		return false
 	chosen = id
 	lifted = {}
+	asked = &""
 	EventBus.sound.emit(&"menu_move")
 	_refresh()
 	return true
@@ -181,6 +194,9 @@ func point_at(at: Vector2i) -> bool:
 	if to == cell:
 		return false
 	cell = to
+	# The question of pulling a building down is about the building under the ghost.
+	if asked != &"" and GameState.building_covering(area.area_id, cell) != asked:
+		asked = &""
 	_refresh()
 	return true
 
@@ -252,8 +268,15 @@ func thing_in_hand() -> Dictionary:
 ## The building a left click would set down where the ghost is (a building's data entry): the
 ## one whose kit is chosen. {} for a placeable, or nothing.
 func building_in_hand() -> Dictionary:
+	if not lifted.is_empty() and lifted.has("building"):
+		return DataRegistry.get_building(lifted["building"])
 	var item: Dictionary = thing_in_hand()
 	return DataRegistry.get_building(Buildings.building_of_kit(item)) if Buildings.is_kit(item) else {}
+
+
+## The building (or site) that covers `at`, or &"".
+func building_under(at: Vector2i) -> StringName:
+	return GameState.building_covering(area.area_id, at)
 
 
 ## Where the top-left corner of the building in hand is with the ghost where it is: the ghost
@@ -275,7 +298,8 @@ func why_not() -> String:
 		return ""
 	var building: Dictionary = building_in_hand()
 	if not building.is_empty():
-		return Buildings.why_not_at(building, building_origin(), func(at: Vector2i) -> Dictionary: return site_at(at))
+		var moving: StringName = lifted.get("building", &"")
+		return Buildings.why_not_at(building, building_origin(), func(at: Vector2i) -> Dictionary: return site_at(at, moving))
 	return Placement.why_not(item, site_at(cell))
 
 
@@ -300,10 +324,16 @@ func words() -> String:
 	var why: String = why_not()
 	if not why.is_empty():
 		return why
+	var building: StringName = building_under(cell)
+	if asked != &"" and building == asked:
+		return ASK_WORDS % [_building_name(asked), _refund_words(GameState.demolish_refund(asked))]
 	if not is_hand():
 		return CHOSEN_WORDS % [str(chosen_item().get("name", chosen)), GameState.item_count(chosen)]
 	if not lifted.is_empty():
-		return (BACK_WORDS if over_its_own_place() else MOVE_WORDS) % _name_of(lifted["item"])
+		var lifted_name: String = _building_name(lifted["building"]) if lifted.has("building") else _name_of(lifted["item"])
+		return (BACK_WORDS if over_its_own_place() else MOVE_WORDS) % lifted_name
+	if building != &"":
+		return LIFT_WORDS % _building_name(building)
 	var under: StringName = thing_under(cell)
 	return LIFT_WORDS % _name_of(under) if under != &"" else HAND_WORDS
 
@@ -314,6 +344,7 @@ func words() -> String:
 func set_down() -> bool:
 	if not _open:
 		return false
+	asked = &""
 	if is_hand():
 		return _use_hand()
 	var building: Dictionary = building_in_hand()
@@ -339,6 +370,18 @@ func set_down() -> bool:
 ## The hand's click: lifts what is under the ghost; or, with a thing lifted, sets it down
 ## here (where it came from: it is simply put back). Returns whether anything was done.
 func _use_hand() -> bool:
+	if lifted.is_empty() and building_under(cell) != &"":
+		# A building is lifted whole: the ghost holds it where it stands.
+		var id: StringName = building_under(cell)
+		var standing: Dictionary = DataRegistry.get_building(id)
+		var held_by: Vector2i = GameState.homestead().building_at(id) + Buildings.anchor_of(standing)
+		lifted = {"cell": held_by, "building": id, "item": Buildings.kit_for(id, DataRegistry.entries(&"items")), "layer": &""}
+		cell = held_by
+		EventBus.sound.emit(&"take_up")
+		_refresh()
+		return true
+	if not lifted.is_empty() and lifted.has("building"):
+		return _move_building()
 	if lifted.is_empty():
 		var layer: StringName = layer_to_take(cell)
 		var under: StringName = GameState.homestead().thing_at(cell, layer)
@@ -365,9 +408,86 @@ func _use_hand() -> bool:
 	return true
 
 
+## The hand sets the building it lifted down where the ghost is: moved at once, as it is, or put
+## back over its own place; refused where it doesn't fit. Returns whether it was set down.
+func _move_building() -> bool:
+	var id: StringName = lifted["building"]
+	if over_its_own_place():
+		lifted = {}
+		EventBus.sound.emit(&"set_down")
+		_refresh()
+		return true
+	var building: Dictionary = building_in_hand()
+	var origin: Vector2i = building_origin()
+	if not fits() or not GameState.move_building(area.area_id, id, origin):
+		EventBus.sound.emit(&"nope")
+		_refresh()
+		return false
+	lifted = {}
+	EventBus.sound.emit(&"set_down")
+	for at: Vector2i in Buildings.cells_of(building, origin):
+		Burst.spawn(area.interactables, GridBody.cell_center(at), &"dust", 0.4)
+	_refresh()
+	return true
+
+
+## A right click on a building or its site: a site is taken up and its kit comes back; a
+## building is asked about first, and pulled down at the second click if it can go. Returns
+## whether anything was taken up or pulled down.
+func _take_up_building(id: StringName) -> bool:
+	if not GameState.is_built(id):
+		var why_site: String = GameState.why_not_take_up_site(area.area_id, id)
+		if not why_site.is_empty():
+			EventBus.sound.emit(&"nope")
+			area.hud.show_message(why_site)
+			return false
+		var kit: StringName = GameState.take_up_site(area.area_id, id)
+		EventBus.sound.emit(&"take_up")
+		area.hud.show_message(TAKEN_UP_WORDS % _name_of(kit))
+		_refresh()
+		return true
+	var why: String = GameState.why_not_demolish(id)
+	if not why.is_empty():
+		EventBus.sound.emit(&"nope")
+		area.hud.show_message(why)
+		asked = &""
+		_refresh()
+		return false
+	if asked != id:
+		asked = id
+		EventBus.sound.emit(&"menu_move")
+		_refresh()
+		return false
+	asked = &""
+	var called: String = _building_name(id)
+	var cells: Array[Vector2i] = Buildings.cells_of(DataRegistry.get_building(id), GameState.homestead().building_at(id))
+	var back: Array[Dictionary] = GameState.demolish(area.area_id, id)
+	EventBus.sound.emit(&"rock_break")
+	for at: Vector2i in cells:
+		Burst.spawn(area.interactables, GridBody.cell_center(at), &"dust", 0.6)
+	area.hud.show_message(PULLED_WORDS % [called, _refund_words(back)])
+	_refresh()
+	return true
+
+
+## "15 Wood, 10 Stone and 7 Fibre", or "nothing".
+static func _refund_words(back: Array) -> String:
+	var parts: PackedStringArray = []
+	for thing: Variant in back:
+		parts.append("%d %s" % [int(thing["count"]), str(DataRegistry.get_item(StringName(str(thing["item"]))).get("name", thing["item"]))])
+	if parts.is_empty():
+		return "nothing"
+	return parts[0] if parts.size() == 1 else ", ".join(parts.slice(0, parts.size() - 1)) + " and " + parts[parts.size() - 1]
+
+
+func _building_name(id: StringName) -> String:
+	return Buildings.name_of(DataRegistry.get_building(id), GameState.is_big(id))
+
+
 ## A right click where the ghost is: takes up what is there into the pack. With a thing
 ## lifted it lets that go instead (it is where it was). Returns whether a thing was taken up;
-## with nothing there, or no room for it, he is told and nothing changes.
+## with nothing there, or no room for it, he is told and nothing changes. On a building (phase
+## 3) it takes up a site, or asks about pulling a building down and then does it.
 func take_up() -> bool:
 	if not _open:
 		return false
@@ -376,6 +496,9 @@ func take_up() -> bool:
 		EventBus.sound.emit(&"menu_move")
 		_refresh()
 		return false
+	if building_under(cell) != &"":
+		return _take_up_building(building_under(cell))
+	asked = &""
 	var layer: StringName = layer_to_take(cell)
 	var why: String = GameState.why_not_take_up(area.area_id, cell, layer)
 	if not why.is_empty():
@@ -454,8 +577,10 @@ func _refresh() -> void:
 func ghost_colour() -> Color:
 	if not why_not().is_empty():
 		return REFUSED
+	if asked != &"" and building_under(cell) == asked:
+		return REFUSED
 	if thing_in_hand().is_empty():
-		return FITS if thing_under(cell) != &"" else POINTER
+		return FITS if thing_under(cell) != &"" or building_under(cell) != &"" else POINTER
 	return POINTER if over_its_own_place() else FITS
 
 
@@ -466,6 +591,15 @@ func _draw_ghost() -> void:
 	var building: Dictionary = building_in_hand()
 	if not building.is_empty():
 		_draw_building_ghost(building, building_origin(), colour)
+		return
+	# The hand over a building: a wash over all of it (red while it asks about pulling it down).
+	var under: StringName = building_under(cell)
+	if item.is_empty() and under != &"":
+		var standing: Dictionary = DataRegistry.get_building(under)
+		var corner: Vector2i = GameState.homestead().building_at(under)
+		for at: Vector2i in Buildings.cells_of(standing, corner):
+			_ghost.draw_rect(Rect2(Vector2(at) * size, Vector2(size, size)), Color(colour, WASH_ALPHA))
+		_draw_outline(Vector2(cell) * size, Color(colour, EDGE_ALPHA))
 		return
 	# Where a lifted thing came from: it is still there until it is set down.
 	if not lifted.is_empty() and not over_its_own_place():

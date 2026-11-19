@@ -350,7 +350,7 @@ beyond the hero's homestead (§15: the farm and the farmhouse's inside; the user
 - **What he can't carry stays lying:** stone stacks to 50, ores and coal to 30, crystals to 10.
 
 **Crafting** *(built 2026-11-17)*
-- **The workbench** stands in the hero's home (the farmhouse, since the Homestead) from the first day. Its list (two tabs since the Homestead's phase 2: "Make", and "Place" for what is set down on the farm, §15) shows what he knows how to make,
+- **The workbench** stands in the hero's home (the farmhouse, since the Homestead) from the first day. Its list (three tabs since the Homestead: "Make"; "Place" for what is set down on the farm; "Build" for the buildings' plans, §15) shows what he knows how to make,
   what the thing under the cursor needs beside what he has ("Stone 12 of 20"), and greys out what he
   can't make now. A recipe is known once the thing it waits on has been found (held even once), or once
   a skill has risen; the Woven Rug is known from the start.
@@ -396,8 +396,8 @@ beyond the hero's homestead (§15: the farm and the farmhouse's inside; the user
   and reached its top level on the second day); floors 4 to 6 have two coal rocks each, not four.
 
 ## 15. The Homestead *(2026-11-17; `docs/progress/homestead-plan.md`)*
-*(Built: phase 1, the farm and the home's move, and phase 2, placing things. Phases 3 to 5, buildings,
-animals and the balance, are planned and not built.)*
+*(Built: phase 1, the farm and the home's move, phase 2, placing things, and phase 3, buildings. Phases 4
+and 5, animals and the balance, are planned and not built.)*
 - **The farm** is an old farmstead on the road west of Hearthvale, left to the hero: the lane through the
   village runs on through the west woods and comes in at the farm's east edge. It is a map of its own, 40
   by 30 cells, with woods all round.
@@ -408,7 +408,7 @@ animals and the balance, are planned and not built.)*
   until 02:00 or collapsing. Its door opens onto the farm. The tools and the first seeds lie inside it.
 - **The old cottage** in Hearthvale stands empty: "The cottage stands empty, and its door is locked."
 - **The field** lies below the farmhouse across the road (§7), and **a pond** in the south-west corner
-  fills the watering can. There is no well on the farm.
+  fills the watering can. There is no well on the farm until one is built (phase 3).
 - **Nobody lives there, nothing hunts there, and nothing grows to be gathered.**
 - **The land starts overgrown.** The field's corner by the house (18 cells) is clear; the other 54 cells
   of it, and about ninety places round the land, carry something: 145 in all.
@@ -448,6 +448,34 @@ animals and the balance, are planned and not built.)*
     stands in.
   - **A fence blocks.** A gate lets the hero through (and will keep animals in). A path is walked on.
     He walks before a fence and behind it.
+- **Buildings** *(phase 3)*: five, one of each, bought as plans at the workbench's "Build" tab with
+  materials and coins, and set down in build mode.
+  | Building | Cells | Costs | Known once | What it does |
+  |---|---|---|---|---|
+  | Well | 2 by 2 | 40 stone, 10 wood, a copper bar, 80 coins | a copper bar is found | the can fills at it |
+  | Silo | 2 by 2 | 30 stone, 10 wood, 2 copper bars, 100 coins | Farming 2 | holds 60 hay |
+  | Coop | 4 by 3 | 30 wood, 20 stone, 15 fibre, 250 coins | wood is found | a room (room for 4 animals) |
+  | Barn | 6 by 4 | 30 wood, 40 stone, 25 fibre, 4 iron bars, 600 coins | Farming 3 | a room (4 animals) |
+  | Shed | 4 by 3 | 30 wood, 20 stone, 15 fibre, 2 copper bars, 200 coins | a copper bar is found | a room for two chests and a furnace |
+  - **A plan bought is a kit** in the pack (never in a chest). In build mode its ghost covers the
+    building and the doorstep before its door, green or red with the reason; set down, it is a building
+    site that day, and **the building stands the next morning,** with a word and a sound.
+  - **A plan refused says what is short** ("You are short of 40 Stone, 10 Wood and 80 Coins.").
+  - **The Coop, the Barn and the Shed have rooms** of their own, entered by their doors; coming out, he
+    is before the door, wherever the building stands. The rooms stand empty until the animals come.
+  - **The Shed** takes two more chests and a second furnace, made at the workbench once it stands (at
+    the farmhouse's own costs), each in its own place; each furnace takes one load a night.
+  - **The Big Coop** (20 wood, 10 fibre, 2 iron bars, 350 coins) **and the Big Barn** (30 wood, 30
+    stone, 2 gold bars, 800 coins) are bought like plans once their building stands, and finished the
+    next morning, in the same place: room for 8 animals.
+  - **The meadow's fourteen tufts of tall grass** leave a hay each when cut and are back the next
+    morning; a right click puts the hay he carries in the Silo, as much as it holds.
+  - **Moving is free and at once:** the hand lifts a building and sets it down elsewhere, with what is
+    in it. **Pulling one down** asks first, and only an empty building goes: half of each material that
+    went into it comes back (no coins), and what the pack can't take lies at his feet. A site taken up
+    gives its kit back.
+  - **A building looks of a piece with the farmhouse:** the village's own house tiles, a house's shadow
+    and a ridge he walks behind.
   - **What is set down:** fifteen things, each taking one cell.
 
     | Thing | Lies or stands | From | Cost |
