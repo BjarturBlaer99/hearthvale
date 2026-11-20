@@ -3343,3 +3343,9 @@ edge covered, nothing off the box's edge); the art tests list 28 sheets. Capture
 - **CLAUDE.md still says the boxes' frames are drawn in code** (the coordinator's to change):
   the frame is `ui/art/ui_parts.png` now, and `ui/art/` is a folder of art PNGs.
 - **The new-art plan is finished:** all four steps built. Nobody has played any of it by hand.
+
+## 2026-11-20 — The new art played by hand
+
+The user played the game with all four steps of the new art in it (nature, houses, the hero, the
+UI and the clock's dial) and said "it feels good". What was tried in that session was not reported
+in detail.
