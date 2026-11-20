@@ -15,11 +15,16 @@ const HEART: Array[String] = [
 ]
 const SPACING: Vector2 = Vector2(9, 9)
 const PER_ROW: int = 10
-const FULL: Color = Color(0.89, 0.18, 0.20)
-const EMPTY: Color = Color(0.22, 0.12, 0.14)
-const OUTLINE: Color = Color(0.08, 0.05, 0.07)
-const PIECE: Color = Color(0.98, 0.78, 0.30)
-const PIECE_EMPTY: Color = Color(0.30, 0.24, 0.12)
+## The colours of PixelLab's UI sheet (new art, step 4): a red heart lit at its top left, an
+## empty one in dark wood.
+const FULL: Color = Color("e14a3d")
+const SHINE: Color = Color("f88783")
+const EMPTY: Color = Color("593a2a")
+const OUTLINE: Color = Color("392015")
+const PIECE: Color = Color("e7c072")
+const PIECE_EMPTY: Color = Color("5b5035")
+## The pixel of a heart that catches the light (its left lobe), when that half is full.
+const SHINE_AT: Vector2i = Vector2i(1, 1)
 
 var _halves: int = 0
 var _max_halves: int = 0
@@ -84,6 +89,8 @@ func _draw() -> void:
 				if pixel == "r":
 					var lit: bool = filled == 2 or (filled == 1 and x <= 3)
 					color = FULL if lit else EMPTY
+					if lit and Vector2i(x, y) == SHINE_AT:
+						color = SHINE
 				draw_rect(Rect2(origin + Vector2(x, y), Vector2.ONE), color)
 	if _pieces > 0:
 		_draw_pieces(Vector2(hearts % PER_ROW, hearts / PER_ROW) * SPACING)

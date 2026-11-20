@@ -303,6 +303,15 @@
 			"pivot": [0, 0],
 			"pivot_is": "the screen; the keep's window, the stars and the cherry trees are places in TitlePicture",
 			"names": "TitlePicture"
+		},
+		{
+			"path": "res://ui/art/ui_parts.png",
+			"what": "the boxes' frame and the clock's dial (new art, step 4)",
+			"kind": "atlas",
+			"size": [104, 32],
+			"pivot": [0, 0],
+			"pivot_is": "each piece's top-left; their places are in UiParts: four gold corners of 7, the top, bottom, left and right edges (6 deep, 16 long, outline outermost), the dial 32x32",
+			"names": "UiParts"
 		}
 	]
 }

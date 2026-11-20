@@ -153,3 +153,26 @@ tools sit in his hands where they sat:
   place, so bare arms want drawing by hand frame by frame), and the sword on the pack (the sword is
   drawn in code when it swings).
 - Palettes made again (the master palette, `player_sheet`).
+
+## Step 4 built (2026-11-20): the UI and the clock (N5, N6)
+
+The UI sheet is drawn at about the game's own scale but for its hearts (three times the game's 7
+pixels), and its boxes are parchment with a frame 8 pixels deep. What came into the game:
+- **The boxes' frame** (every box: the HUD's corner, the dialogue, the menus, the title): a wooden
+  frame 6 deep cut from the sheet's dialogue box (its outline, lit wood, wood, shade and inner line)
+  with a gold cap in each corner, in `ui/art/ui_parts.png`, drawn by `PanelFrame` a pixel outside
+  the box so it covers the old gold Border. A box's inside is the sheet's dark wood, keeping each
+  box's own see-through; the text stays light on it, as before.
+- **The hearts, the energy bar and the item bar** keep their sizes and are drawn in the sheet's
+  colours: red hearts lit on their left lobe and empty ones in dark wood; the energy bar's leaf is
+  the sheet's gold bolt, its bar wood and green, in segments of 8; the slots dark wood with a wooden
+  rim, the one in hand rimmed in pale gold.
+- **The clock's dial (N6)**, new: `ClockDial` stands beside the HUD's corner box and moves along
+  with it. Day (a sun, the sky, sunlit fields) on its left, night (a moon, stars, purple hills) on
+  its right, a gold ring; its hand points down at dawn, into the sun at noon, up at dusk and into the
+  night at midnight, in the clock's steps of ten minutes. The face is drawn in the sheet's watch
+  colours (shrunk, the sheet's own face lost its sun).
+- **Not taken:** the parchment inside of the boxes (every menu's text would change colour), the
+  "STATUS" and "HP"/"ENERGY" labels, the day's ribbon and "12:00 PM / NOON" (the corner's line
+  says the day and the hour), the menu's tabs and grid, and the speaker's portrait (N7, later).
+- Palettes made again (the master palette, and `ui_parts` new).

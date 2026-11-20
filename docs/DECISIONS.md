@@ -1659,3 +1659,9 @@ PNG". What building it decided:
 - 2026-11-20 — **New art, step 3: the hero redrawn from his own frames.** The new look is put on the
   old frames (colours by part and rank, the hair's spikes and fringe, the scarf), not drawn anew, so no
   pose, foot or hand moves and the held tools still fit. Bare arms are left for drawing by hand.
+- 2026-11-20 — **New art, step 4: the UI.** The boxes take the sheet's wooden frame and gold corners
+  but keep a dark inside (dark wood), so no text changes colour; the frame is a nine-piece PNG drawn a
+  pixel outside each box, over the old Border, so no scene changed. Hearts, bars and slots keep their
+  sizes and take the sheet's colours. The clock's dial stands beside the corner box (not in it, so the
+  box keeps its tested sizes); its hand puts noon in the sun, midnight in the night, dawn at the
+  bottom and dusk at the top.

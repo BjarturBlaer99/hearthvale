@@ -12,8 +12,8 @@ func test_the_list_names_every_art_png_in_the_game() -> void:
 	var listed: Array = []
 	for entry: Dictionary in ArtSheets.all():
 		listed.append(str(entry["path"]))
-	assert_int(listed.size()).override_failure_message("art/sheets.json is read").is_equal(27)
-	for dir: String in ["res://gameplay/art", "res://gameplay/player", "res://world/tiles", "res://ui/title"]:
+	assert_int(listed.size()).override_failure_message("art/sheets.json is read").is_equal(28)
+	for dir: String in ["res://gameplay/art", "res://gameplay/player", "res://world/tiles", "res://ui/title", "res://ui/art"]:
 		for file: String in DirAccess.get_files_at(dir):
 			if file.ends_with(".png"):
 				assert_array(listed).override_failure_message("%s is listed" % dir.path_join(file)).contains([dir.path_join(file)])

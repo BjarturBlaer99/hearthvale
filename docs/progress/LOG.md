@@ -3321,3 +3321,25 @@ The user said the sheets were made on PixelLab's free plan (the downloads' names
 give the maker the copyright and allow commercial use with no attribution, on any plan, short of
 training other models and within the Open RAIL-M licence. `docs/ASSETS.md` records it in a section of
 its own, and its rows no longer wait for it.
+
+## 2026-11-20 — New art, step 4: the UI and the clock's dial
+
+The user said "Go on". Every box wears the UI sheet's wooden frame with gold corners
+(`ui/art/ui_parts.png`, drawn by `PanelFrame`), on dark wood; the hearts, the energy bar (now with
+a bolt) and the item bar's slots are in the sheet's colours; and the clock's dial (N6) stands beside
+the HUD's corner box, its hand going round once a day (`docs/progress/new-art-plan.md`, "Step 4
+built"). Nothing in play changed; the corner box keeps its sizes.
+
+**Verified:** the whole suite passes, 1171 tests in 158 suites, exit 0. New: `tests/ui/clock_dial_test.gd` (where the hand
+points at dawn, noon, dusk and midnight, its ten-minute steps, that it stays on the dial, and that
+the dial stands beside the corner box, level with it, and moves with it); the frame's test in
+`tests/ui/polish_test.gd` now checks the frame's pieces (a cap in each corner, every pixel of the
+edge covered, nothing off the box's edge); the art tests list 28 sheets. Capture shots 16, 92, 114,
+120, 124 and 130, before and after (about a minute in a window, the capture's slot 994).
+
+**Known issues and limits**
+- **The boxes are dark wood, not the sheet's parchment.**
+- **No portraits (N7) and no day ribbon;** the dial is 32 pixels, the sheet's watch 64.
+- **CLAUDE.md still says the boxes' frames are drawn in code** (the coordinator's to change):
+  the frame is `ui/art/ui_parts.png` now, and `ui/art/` is a folder of art PNGs.
+- **The new-art plan is finished:** all four steps built. Nobody has played any of it by hand.

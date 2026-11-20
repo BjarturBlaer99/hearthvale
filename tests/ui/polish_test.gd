@@ -86,17 +86,29 @@ func test_every_heading_is_set_in_the_heading_face() -> void:
 		_area = null
 
 
-func test_the_frame_has_a_bracket_in_each_corner_and_a_rule_under_a_heading() -> void:
+func test_the_frame_has_a_gold_cap_in_each_corner_wood_all_round_and_a_rule_under_a_heading() -> void:
 	var box: Vector2 = Vector2(220.0, 204.0)
-	var arms: Array[Rect2] = PanelFrame.bracket_arms(box)
-	assert_int(arms.size()).override_failure_message("two arms to a corner").is_equal(8)
-	var whole: Rect2 = Rect2(Vector2.ZERO, box)
-	for corner: Vector2 in [Vector2.ZERO, Vector2(box.x - 1.0, 0.0), Vector2(0.0, box.y - 1.0), box - Vector2.ONE]:
-		var touching: int = 0
-		for arm: Rect2 in arms:
-			assert_bool(whole.encloses(arm)).override_failure_message("an arm stays inside the box: %s" % arm).is_true()
-			touching += 1 if arm.has_point(corner) else 0
-		assert_int(touching).override_failure_message("both arms meet at the corner %s" % corner).is_equal(2)
+	var pieces: Array[Array] = PanelFrame.pieces(box)
+	# The frame starts a pixel outside the box, over its Border.
+	var whole: Rect2 = Rect2(Vector2(-1.0, -1.0), box + Vector2(2.0, 2.0))
+	var corners: Array[Vector2] = [whole.position, Vector2(whole.end.x - 1.0, whole.position.y), Vector2(whole.position.x, whole.end.y - 1.0), whole.end - Vector2.ONE]
+	for i: int in 4:
+		var target: Rect2 = pieces[i][1]
+		assert_that(pieces[i][0]).override_failure_message("corner %d is its own gold cap" % i).is_equal(UiParts.CORNERS[i])
+		assert_bool(target.has_point(corners[i])).override_failure_message("a cap in the corner %s" % corners[i]).is_true()
+	for piece: Array in pieces:
+		var source: Rect2 = piece[0]
+		var target: Rect2 = piece[1]
+		assert_bool(whole.encloses(target)).override_failure_message("the frame stays on the box's edge: %s" % target).is_true()
+		assert_that(source.size).override_failure_message("a piece is drawn at its own size").is_equal(target.size)
+	# Every pixel of each side is covered, all the way round.
+	for x: int in range(int(whole.position.x), int(whole.end.x)):
+		for y: float in [whole.position.y, whole.end.y - 1.0]:
+			assert_bool(_covered(pieces, Vector2(x + 0.5, y + 0.5))).override_failure_message("the frame covers (%d, %d)" % [x, y]).is_true()
+	for y: int in range(int(whole.position.y), int(whole.end.y)):
+		for x: float in [whole.position.x, whole.end.x - 1.0]:
+			assert_bool(_covered(pieces, Vector2(x + 0.5, y + 0.5))).override_failure_message("the frame covers (%d, %d)" % [x, y]).is_true()
+	assert_array(PanelFrame.pieces(Vector2(8.0, 8.0))).override_failure_message("a box too small has none").is_empty()
 	var parts: Array[Rect2] = PanelFrame.rule_parts(box, 25.0)
 	assert_int(parts.size()).override_failure_message("the rule runs either side of its diamond").is_equal(2)
 	assert_float(parts[0].position.x).is_equal(PanelFrame.RULE_MARGIN)
@@ -207,3 +219,10 @@ func _assert_heading(heading: Label, size: int) -> void:
 func _load(path: String) -> AreaController:
 	_area = Steps.load_area(path, _area)
 	return _area
+
+
+func _covered(pieces: Array[Array], point: Vector2) -> bool:
+	for piece: Array in pieces:
+		if (piece[1] as Rect2).has_point(point):
+			return true
+	return false

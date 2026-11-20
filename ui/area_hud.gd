@@ -25,6 +25,10 @@ const VIGNETTE_START: float = 0.58
 
 ## The shading of the screen's corners.
 var vignette: TextureRect
+## The clock's dial (new art, step 4), beside the corner's box. Made in _ready.
+var dial: ClockDial
+## How far right of the corner's box the dial stands (px).
+const DIAL_GAP: float = 5.0
 
 var _message_left: float = 0.0
 var _notice_left: float = 0.0
@@ -71,6 +75,10 @@ func _ready() -> void:
 	_play_hint = _hint.text
 	_show_settings()
 	EventBus.settings_changed.connect(_show_settings)
+	dial = ClockDial.new()
+	dial.name = "Dial"
+	add_child(dial)
+	move_child(dial, _panel.get_index() + 1)
 	_box.minimum_size_changed.connect(_fit_panel)
 	_fit_panel()
 
@@ -108,6 +116,8 @@ func _fit_panel() -> void:
 	_box.custom_minimum_size.x = minf(wide, BOX_MAX)
 	_box.size = _box.get_combined_minimum_size()
 	_panel.size = _box.position * 2.0 + _box.size
+	if dial != null:
+		dial.position = Vector2(_panel.position.x + _panel.size.x + DIAL_GAP, _panel.position.y)
 
 
 ## How wide `line`'s words are in its own face (px), with room for the shadow under them.
@@ -156,6 +166,11 @@ func set_pieces(pieces: int) -> void:
 ## The day and the hour ("Day 3  14:20"), under the hearts.
 func set_clock(text: String) -> void:
 	_set_line(_clock, text)
+
+
+## The time on the dial (GameState.minute).
+func set_time(minute: float) -> void:
+	dial.set_minute(minute)
 
 
 func set_area(text: String) -> void:

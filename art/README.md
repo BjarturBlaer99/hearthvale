@@ -61,7 +61,8 @@ art/
 | Items | `items.png` 16x16 x74 | + flash row; one icon per item | the cell's top-left |
 | Placed things, furnishings, rocks, breakables, forage | `placed`, `crafted`, `rocks`, `breakables`, `forage`, 16x16 | + flash row | the cell's top-left |
 | Title | `ui/title/backdrop.png` 640x360 | the keep's window, the stars and the cherry trees must stay where `ui/title_picture.gd` says | the screen |
-| UI | boxes, bars, the energy bar and the fonts are made in code | | |
+| UI: frames, dial | `ui/art/ui_parts.png` 104x32: four gold corners of 7, the top, bottom, left and right edges (6 deep, 16 long, outline outermost), the dial 32x32; places in `ui/ui_parts.gd` | each piece's top-left |
+| UI: the rest | the hearts, bars, slots and the dial's hand are drawn in code, in the UI sheet's colours; the fonts are made in code | | |
 
 **Villager markers** (`palettes/villager_markers.gpl`), recoloured for each villager by the game:
 robe `#FF00FF`, robe shade `#800080`, hair `#00FFFF`, hair shade `#008080`. Use them exactly, and no
@@ -69,7 +70,7 @@ colour within two steps of them anywhere else on the sheet.
 
 **Drawn in code, not in a PNG:** shadows and soft edges, sparks, bursts, the pour and the ring, the
 sword's blade, lights and darkness, the water's movement and reflections, mist, fireflies, chests,
-dungeon doors, pickups, signposts, plates and push blocks, the boxes' frames, the title's stars and
+dungeon doors, pickups, signposts, plates and push blocks, the hearts, the energy bar, the item bar's slots, the dial's hand, the title's stars and
 window, a building site's string and pegs, and lit windows. Their colours are in the code.
 
 **Two colours in code match the art:** the grass's soft fringe (`HeightShading.fringe_color()`) and

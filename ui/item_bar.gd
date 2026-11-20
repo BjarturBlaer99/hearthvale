@@ -15,13 +15,15 @@ const SLOT: int = 20
 const GAP: int = 2
 ## How far the bar sits from the bottom of the screen (px).
 const MARGIN: int = 4
-const BACK: Color = Color(0.04, 0.06, 0.08, 0.62)
-const EDGE: Color = Color(0.85, 0.74, 0.48, 0.40)
-const LIT_BACK: Color = Color(0.34, 0.27, 0.12, 0.90)
-const LIT_EDGE: Color = Color(1.0, 0.93, 0.70)
+## PixelLab's UI sheet's slots (new art, step 4): dark wood with a wooden rim, the one in hand
+## rimmed in pale gold.
+const BACK: Color = Color(0.35, 0.23, 0.16, 0.85)
+const EDGE: Color = Color("a7744a")
+const LIT_BACK: Color = Color(0.42, 0.27, 0.19, 0.95)
+const LIT_EDGE: Color = Color("f2da96")
 const COUNT: Color = Color(1.0, 1.0, 1.0)
 const COUNT_SHADE: Color = Color(0.05, 0.03, 0.09, 0.95)
-const MORE: Color = Color(0.85, 0.74, 0.48, 0.9)
+const MORE: Color = Color("e7c072")
 const FONT_SIZE: int = 8
 
 ## What can be in hand (item data entries, HandBar's order), which of them is (HandBar.NONE:

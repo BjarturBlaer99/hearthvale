@@ -1,7 +1,7 @@
 class_name EnergyBar
 extends Control
-## The hero's energy as a bar (GDD §5), under the hearts in the HUD's corner: a small leaf, then
-## a framed bar that empties from the right and turns from green to amber to red as it runs
+## The hero's energy as a bar (GDD §5), under the hearts in the HUD's corner: a gold bolt, then
+## a framed bar (new art, step 4: PixelLab's UI sheet's bolt, wood and green, cut in segments) that empties from the right and turns from green to amber to red as it runs
 ## low. Drawn in whole pixels. It only shows what it is told; the energy rules come in P2, and
 ## until then the HUD keeps it hidden.
 
@@ -12,22 +12,25 @@ const HEIGHT: int = 5
 const BAR_X: float = 9.0
 ## At or under this share of the whole, energy counts as low.
 const LOW: float = 0.25
-const FULL_COLOR: Color = Color(0.47, 0.80, 0.38)
-const MID_COLOR: Color = Color(0.93, 0.78, 0.33)
-const LOW_COLOR: Color = Color(0.90, 0.38, 0.26)
+const FULL_COLOR: Color = Color("6cb055")
+const MID_COLOR: Color = Color("e7c072")
+const LOW_COLOR: Color = Color("e14a3d")
 const SHINE: Color = Color(1.0, 1.0, 1.0, 0.28)
-const BACK: Color = Color(0.13, 0.10, 0.15)
-const FRAME: Color = Color(0.85, 0.74, 0.48)
-const LEAF: Array[String] = [
-	"...gg..",
-	"..gGGg.",
-	".gGGGg.",
-	".gGGg..",
-	"sgGg...",
-	".s.....",
-	"s......",
+const BACK: Color = Color("593a2a")
+const FRAME: Color = Color("c79357")
+## The line between two segments of the bar, darker than what fills it.
+const SEGMENT: int = 8
+const SEGMENT_LINE: Color = Color(0.0, 0.0, 0.0, 0.22)
+const BOLT: Array[String] = [
+	"....oo.",
+	"...oYo.",
+	"..oYo..",
+	".oYYYo.",
+	"..oYo..",
+	".oYo...",
+	".oo....",
 ]
-const LEAF_COLORS: Dictionary = {"g": Color(0.30, 0.58, 0.26), "G": Color(0.52, 0.82, 0.40), "s": Color(0.45, 0.32, 0.18)}
+const BOLT_COLORS: Dictionary = {"o": Color("4e2e1f"), "Y": Color("e7c072")}
 
 var _current: float = 0.0
 var _maximum: float = 1.0
@@ -71,14 +74,16 @@ static func color_for(share: float) -> Color:
 
 
 func _draw() -> void:
-	for y: int in LEAF.size():
-		for x: int in LEAF[y].length():
-			var pixel: String = LEAF[y][x]
+	for y: int in BOLT.size():
+		for x: int in BOLT[y].length():
+			var pixel: String = BOLT[y][x]
 			if pixel != ".":
-				draw_rect(Rect2(x, y, 1, 1), LEAF_COLORS[pixel])
+				draw_rect(Rect2(x, y, 1, 1), BOLT_COLORS[pixel])
 	draw_rect(Rect2(BAR_X, 0.0, WIDTH + 2.0, HEIGHT + 2.0), FRAME)
 	draw_rect(Rect2(BAR_X + 1.0, 1.0, WIDTH, HEIGHT), BACK)
 	var filled: int = filled_pixels(fraction(), WIDTH)
 	if filled > 0:
 		draw_rect(Rect2(BAR_X + 1.0, 1.0, filled, HEIGHT), color_for(fraction()))
 		draw_rect(Rect2(BAR_X + 1.0, 1.0, filled, 1.0), SHINE)
+		for at: int in range(SEGMENT, filled, SEGMENT):
+			draw_rect(Rect2(BAR_X + 1.0 + at, 1.0, 1.0, HEIGHT), SEGMENT_LINE)

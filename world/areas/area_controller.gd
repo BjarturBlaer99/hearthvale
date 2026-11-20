@@ -2338,6 +2338,7 @@ func _on_enemy_died(enemy: Enemy) -> void:
 
 func _update_hud() -> void:
 	hud.set_clock(GameState.time_text())
+	hud.set_time(GameState.minute)
 	hud.set_area(area_text())
 	# The corner says only what there is to say: nothing carried, no line.
 	hud.set_items(carrying_text() if not GameState.inventory.is_empty() else "")

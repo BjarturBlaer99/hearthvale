@@ -41,6 +41,7 @@ painted each picture from ASCII art written for this game (no outside art) and a
 | `world/tiles/scenery.png` | tall trees | PixelLab (`art/incoming/nature.png`), fitted to size by a script (new-art plan, step 1); the soft shadows kept from `make_scenery.gd` | 2026-11-20 | PixelLab, free plan, made 2026-11-20: see "PixelLab" below |
 | `world/tiles/relief.png` | wall faces and tops, pillar, ridges | code: `make_relief.gd`; the red, blue, thatch and shingle ridges recoloured in `art/incoming/houses.png`'s colours (new-art plan, step 2) | 2026-11-20 | Hearthvale's own; PixelLab, free plan, made 2026-11-20: see "PixelLab" below |
 | `ui/title/backdrop.png` | the title screen's picture | code: `make_title.gd` | 2026-11-12 | Hearthvale's own |
+| `ui/art/ui_parts.png` | the boxes' wooden frame (nine pieces) and the clock's dial | drawn by a script from PixelLab's `art/incoming/ui.png`: the frame's rows cut from its dialogue box, the gold caps, the dial's ring and face in its watch's colours (new-art plan, step 4) | 2026-11-20 | PixelLab, free plan, made 2026-11-20: see "PixelLab" below |
 
 The dates are each PNG's last commit before the switch; the PNGs are the ones the tools baked at
 the switch (each byte for byte what was in the repo).
@@ -66,7 +67,7 @@ Every PNG that holds PixelLab's pictures, or is drawn in their colours, says so 
 |---|---|---|
 | `ui/font/hearth_font.tres`, `ui/font/hearth_heading.tres`, `ui/theme.tres` | `tools/art/make_font.gd` | Hearthvale's own |
 | `audio/sfx/*.wav`, `audio/music/*.wav` | `tools/audio/make_audio.gd` | Hearthvale's own |
-| shadows, bursts, lights, water, mist, UI frames and the rest drawn at runtime | the game's code | Hearthvale's own |
+| shadows, bursts, lights, water, mist, the hearts, the energy bar, the item bar's slots, the dial's hand and the rest drawn at runtime (since step 4 of the new art, in the colours of PixelLab's UI sheet) | the game's code | Hearthvale's own |
 
 ## Outside code
 
