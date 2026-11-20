@@ -1665,3 +1665,7 @@ PNG". What building it decided:
   sizes and take the sheet's colours. The clock's dial stands beside the corner box (not in it, so the
   box keeps its tested sizes); its hand puts noon in the sun, midnight in the night, dawn at the
   bottom and dusk at the top.
+- 2026-11-20 — **The trees of a wood come in groves.** At the user's word ("not so random"), the
+  baker picks broadleaf, pine or oak for a grove of 6 by 6 cells, not for each cell; the shares are
+  as they were (half broadleaf, a third pine, a sixth oak). Only which tree changes: where trees stand
+  and the closed canopy are the same.

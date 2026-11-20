@@ -1484,9 +1484,14 @@ func _spawns(root: Node, map: Dictionary) -> Error:
 	return OK
 
 
+## How many cells across a grove is: the trees of a wood's edge come in stretches of one kind
+## this long (the user found one kind to a cell too random, 2026-11-20).
+const GROVE: int = 6
+
+
 ## Which tree stands at `cell`: a closed canopy where trees (or the map's edge) stand on all
-## four sides of it, else one of three kinds, picked by the cell so a wood is never a grid of
-## one tree.
+## four sides of it, else one of three kinds, picked by the grove the cell is in, so a wood's
+## edge runs in stretches of broadleaf, pine or oak and never in a grid of one tree.
 func _tree_kind(cell: Vector2i, props: Dictionary, size: Vector2i) -> String:
 	var hemmed_in: bool = true
 	for side: Vector2i in [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
@@ -1495,7 +1500,8 @@ func _tree_kind(cell: Vector2i, props: Dictionary, size: Vector2i) -> String:
 			hemmed_in = false
 	if hemmed_in:
 		return "prop_canopy"
-	var roll: int = _cell_hash(cell, 29) % 6
+	var grove: Vector2i = Vector2i(floori(float(cell.x) / GROVE), floori(float(cell.y) / GROVE))
+	var roll: int = _cell_hash(grove, 29) % 6
 	return "prop_tree" if roll < 3 else ("prop_tree_b" if roll < 5 else "prop_tree_c")
 
 

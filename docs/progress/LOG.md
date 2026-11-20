@@ -3349,3 +3349,18 @@ edge covered, nothing off the box's edge); the art tests list 28 sheets. Capture
 The user played the game with all four steps of the new art in it (nature, houses, the hero, the
 UI and the clock's dial) and said "it feels good". What was tried in that session was not reported
 in detail.
+
+## 2026-11-20 — The trees round the maps in groves
+
+The user found the trees round the maps "horrible" and "so random". The map baker picked each tree
+of a wood (broadleaf, pine or oak) cell by cell, so every edge was a speckle of all three. It now
+picks by grove (`GROVE`, 6 cells square, in `tools/greybox/build_maps.gd`): each stretch of a
+wood's edge is one kind, in the same shares as before. Re-baked; a cell-by-cell comparison of every
+area's tile layers before and after found only tree cells changed, each one kind of tree for
+another, on the six outdoor maps (homestead, north fields, old wood, south field, village,
+willowmere: 76 to 104 cells each). The closed canopy, and where trees stand, are as they were.
+A plain re-bake first reproduced every tile, and rewrote the crypt, the keep and the farmhouse's
+room only in the order of their lines and Godot's IDs; those three were put back.
+
+**Verified:** the whole suite passes, exit 0. Capture shots 1, 4, 44, 46, 141 and 164, before and
+after (about half a minute in a window, the capture's slot 994).
