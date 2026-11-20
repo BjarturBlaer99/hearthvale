@@ -1647,3 +1647,8 @@ PNG". What building it decided:
   mirror themselves, are left as they are. A site's string is drawn in code once round its outside (any
   size of site), and the tiles lost theirs by an edit of the atlas PNG (the art is PNG now). Which
   buildings light their windows is data (`lit_at_night`), and the barn's loft counts as a window.
+- 2026-11-20 — **New art, step 1: how a large sheet is fitted.** Pieces drawn larger than the game's
+  sizes are shrunk by averaging, their colours snapped to the piece's own, and their edge pixels given
+  the darkest colour beneath (the outline survives); pieces already at the game's scale (grass,
+  flowers) are taken whole. The decoration tuft stays smaller than the grass that can be cut, so the
+  two are told apart. The trees keep the old soft shadow, since the new sheet has none.

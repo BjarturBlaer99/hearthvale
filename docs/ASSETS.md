@@ -30,15 +30,15 @@ painted each picture from ASCII art written for this game (no outside art) and a
 | `gameplay/art/crystal.png` | crystal switches | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
 | `gameplay/art/dummy.png` | the training dummy | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
 | `gameplay/art/brambles.png` | brambles | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
-| `gameplay/art/rocks.png` | rocks, ladder, lift, boulders | code: `make_sprites.gd` | 2026-11-18 | Hearthvale's own |
+| `gameplay/art/rocks.png` | rocks, ladder, lift, boulders | code: `make_sprites.gd`; the boulder and the great boulder: PixelLab (`art/incoming/nature.png`), fitted to size by a script (new-art plan, step 1) | 2026-11-20 | Hearthvale's own; the two boulders PixelLab: the user's plan, the date made and the terms on that date **not yet recorded** (asked 2026-11-20) |
 | `gameplay/art/crafted.png` | furnishings | code: `make_sprites.gd` | 2026-11-19 | Hearthvale's own |
-| `gameplay/art/breakables.png` | grass, pots, wood, weeds, bushes, logs | code: `make_sprites.gd` | 2026-11-18 | Hearthvale's own |
+| `gameplay/art/breakables.png` | grass, pots, wood, weeds, bushes, logs | code: `make_sprites.gd`; grass, cut grass, the stump and the bush: PixelLab (`art/incoming/nature.png`), fitted to size by a script (new-art plan, step 1) | 2026-11-20 | Hearthvale's own; those four PixelLab: the user's plan, the date made and the terms on that date **not yet recorded** (asked 2026-11-20) |
 | `gameplay/art/critters.png` | hens, butterflies | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
 | `gameplay/art/animals.png` | sheep, cows | code: `make_sprites.gd` | 2026-11-19 | Hearthvale's own |
 | `gameplay/art/torch.png` | torches | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
 | `gameplay/art/placed.png` | things set down on the homestead | code: `make_sprites.gd` | 2026-11-19 | Hearthvale's own |
-| `world/tiles/greybox_tiles.png` | the tile atlas | code: `make_tile_texture.gd`; the two site tiles (row 28) edited by hand, the string and peg taken out (a script, the tool polish) | 2026-11-19 | Hearthvale's own |
-| `world/tiles/scenery.png` | tall trees | code: `make_scenery.gd` | 2026-11-16 | Hearthvale's own |
+| `world/tiles/greybox_tiles.png` | the tile atlas | code: `make_tile_texture.gd`; the two site tiles (row 28) edited by hand, the string and peg taken out (a script, the tool polish); the three flowers and the tuft (row 6) and the closed canopy (row 22): PixelLab (`art/incoming/nature.png`), fitted to size by a script (new-art plan, step 1) | 2026-11-20 | Hearthvale's own; those five tiles PixelLab: the user's plan, the date made and the terms on that date **not yet recorded** (asked 2026-11-20) |
+| `world/tiles/scenery.png` | tall trees | PixelLab (`art/incoming/nature.png`), fitted to size by a script (new-art plan, step 1); the soft shadows kept from `make_scenery.gd` | 2026-11-20 | PixelLab: the user's plan, the date made and the terms on that date **not yet recorded** (asked 2026-11-20) |
 | `world/tiles/relief.png` | wall faces and tops, pillar, ridges | code: `make_relief.gd` | 2026-11-19 | Hearthvale's own |
 | `ui/title/backdrop.png` | the title screen's picture | code: `make_title.gd` | 2026-11-12 | Hearthvale's own |
 

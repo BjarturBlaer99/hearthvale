@@ -98,3 +98,24 @@ dialogue box (the sheet has the Elder's; every villager would need one).
 
 Each step: the art tests and the whole suite pass, `docs/ASSETS.md` and the palettes are updated, and I
 stop with before-and-after pictures.
+
+## Approved, and step 1 built (2026-11-20)
+
+The user approved the plan as written ("Approve as written"). **Step 1, nature:**
+- **Trees** (`scenery.png`): each tree shrunk to fit 32x40, its outline kept (a pixel on the edge
+  takes the darkest colour under it), its colours snapped to the piece's own, its foot centred on
+  (16, 37); the old soft shadow kept under it. Broadleaf from the round broadleaf, the oak the same
+  mirrored, a little darker and warmer; the pine from the taller pine; the cherry and the willow, and
+  their second pictures the same mirrored. The cherry is 32x32 now (its sheet picture is as wide as
+  it is tall), the others fill the 40.
+- **Stump and bush** (`breakables.png`, `stump` and `bush`), **boulder and great boulder**
+  (`rocks.png`): shrunk the same way into 16x16. The farm's stumps are the same picture.
+- **Grass, flowers, tuft:** the sheet draws these at the game's own scale, so they are taken whole
+  (1:1), not shrunk: the grass to cut (`grass`, and `grass_cut` its bottom four rows), the red,
+  yellow and blue flowers of the atlas (row 6). The decoration tuft is the smallest tuft shrunk to
+  8x6, so the grass that can be cut stays the larger one.
+- **The closed canopy** (N2, row 22): a 16x16 piece of the new broadleaf's crown, made to repeat (near
+  the tile's edges it is the same piece moved half a tile, mixed in by a dither).
+- The tile atlas's other trees (rows 3, 9, 22) are never seen: Scenery stands each as a tall
+  picture. The field stone `rock` and the quarry's rocks are as they were.
+- Palettes made again (the master palette, `scenery`, `breakables`, `rocks`, `greybox_tiles`).

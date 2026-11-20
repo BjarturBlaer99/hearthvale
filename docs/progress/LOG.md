@@ -3258,3 +3258,23 @@ goes, what it touches, the risks, eight decisions and four steps (nature, houses
 An automatic shrink of a few pieces (a scratch script, not kept) shows the trees, stumps and rocks
 fit well and the hero does not: at 16x32 he is drawn by hand from the new look. **Nothing is built
 until the plan is approved.**
+
+## 2026-11-20 — New art, step 1: nature
+
+The user approved the new-art plan as written. Step 1 puts PixelLab's nature sheet into the game:
+the seven tall trees, the stump, the bush, the boulder and great boulder, the grass to cut, the three
+flowers, the decoration tuft and the closed canopy (`docs/progress/new-art-plan.md`, "Approved, and
+step 1 built"). Sizes, frames, flash rows and atlas places are as `art/sheets.json` says; nothing in
+play changed.
+
+**Verified:** the whole suite passes, 1168 tests in 157 suites, exit 0 (run before the tuft was made
+smaller, a change of one decoration tile's pixels), and the art tests (9) after it. Capture shots 1, 4, 43, 44, 46, 141,
+163, 164 and 173, before and after (about a minute in a window, the capture's slot 994).
+
+**Known issues and limits**
+- **The canopy shows faint rows** where it covers a wide wood: the new crown is drawn in tiers.
+- **The cherry is shorter** (32x32 of its 32x40).
+- **Old art beside new:** the field stone, the quarry's rocks, weeds, logs and branches are the old
+  look beside mossy boulders and darker stumps, until a later step or the user's art covers them.
+- **`docs/ASSETS.md` waits for the user's PixelLab plan and the date the sheets were made.**
+- Nobody has played it by hand.
