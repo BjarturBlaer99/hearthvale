@@ -136,3 +136,20 @@ from it; each material is drawn into the tiles in its colours (the sheet's own p
   stone, door wood and chimney stone by rank. The glass stays blue, so `WindowGlow` lights the same
   pixels; the chapel and the barn's red planks are as they were.
 - Palettes made again (the master palette, `greybox_tiles`, `relief`).
+
+## Step 3 built (2026-11-20): the hero
+
+The new look is carried through all 75 frames of `player_sheet.png` from the frames themselves, so
+every walk, run, swing, work pose, the hurt and the fallen frame move exactly as they did and the held
+tools sit in his hands where they sat:
+- **Colours:** each part takes the sheet's colours by rank (darkest to darkest): the hair, the leather
+  vest and pack, the boots (brown parts told apart by where they are in the frame, the hair followed
+  down from the top of the head), the skin, the red scarf, the navy tunic, the grey-blue trousers and
+  the gold trim. Outlines stay.
+- **Hair:** a jagged top with three spikes swept to one side, and on a face seen from the front a
+  ragged fringe.
+- **Scarf:** a second, shaded row under it.
+- **Not carried:** his bare arms with bracers (he keeps navy sleeves; each pose has its arm in another
+  place, so bare arms want drawing by hand frame by frame), and the sword on the pack (the sword is
+  drawn in code when it swings).
+- Palettes made again (the master palette, `player_sheet`).

@@ -1656,3 +1656,6 @@ PNG". What building it decided:
   the houses sheet; its palette and its materials' shapes are drawn into the tiles by a script: roof
   surfaces as new repeating patterns, everything else recoloured by rank (darkest old colour to darkest
   new), so every tile keeps its place, its shape and its window glass.
+- 2026-11-20 — **New art, step 3: the hero redrawn from his own frames.** The new look is put on the
+  old frames (colours by part and rank, the hair's spikes and fringe, the scarf), not drawn anew, so no
+  pose, foot or hand moves and the held tools still fit. Bare arms are left for drawing by hand.

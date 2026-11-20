@@ -3295,3 +3295,18 @@ in the colours of PixelLab's houses sheet; the roofs have new patterns, the rest
 - **The big barn's green roof, the barn's red planks and the chapel** are the old look.
 - **`docs/ASSETS.md` waits for the user's PixelLab plan and the date the sheets were made.**
 - Nobody has played it by hand.
+
+## 2026-11-20 — New art, step 3: the hero
+
+The user said "Go on". The hero's 75 frames are in the new look of PixelLab's hero sheet: its colours,
+spiky hair with a ragged fringe, a deeper scarf; every pixel in its place, so the motion, the feet and
+the held tools are as they were (`docs/progress/new-art-plan.md`, "Step 3 built").
+
+**Verified:** the art tests (9) and the whole suite pass, exit 0. All nineteen films of the strokes and
+capture shots 1 and 17, before and after (about two minutes in a window, the capture's slot 994).
+
+**Known issues and limits**
+- **He keeps his sleeves:** the sheet's bare arms and bracers are not in the frames.
+- **No sword on his back** (the sheet has one strapped to the pack).
+- **`docs/ASSETS.md` waits for the user's PixelLab plan and the date the sheets were made.**
+- Nobody has played it by hand.

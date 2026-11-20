@@ -14,7 +14,7 @@ painted each picture from ASCII art written for this game (no outside art) and a
 
 | File | What it is | Made by | Date | Terms |
 |---|---|---|---|---|
-| `gameplay/player/player_sheet.png` | the hero, 25 frames x 3 facings | code: `make_player_sprite.gd` | 2026-11-19 | Hearthvale's own |
+| `gameplay/player/player_sheet.png` | the hero, 25 frames x 3 facings | code: `make_player_sprite.gd`; redrawn by a script in the look of PixelLab's `art/incoming/hero.png` (its colours, spiky hair, a deeper scarf), every pixel in its place (new-art plan, step 3) | 2026-11-20 | Hearthvale's own; PixelLab: the user's plan, the date made and the terms on that date **not yet recorded** (asked 2026-11-20) |
 | `gameplay/art/held_tools.png` | the tools in his hands | code: `make_sprites.gd` | 2026-11-19 | Hearthvale's own |
 | `gameplay/art/villager.png` | villagers (marker colours) | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
 | `gameplay/art/slime.png` | slime | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
