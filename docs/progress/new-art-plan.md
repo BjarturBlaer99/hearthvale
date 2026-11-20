@@ -119,3 +119,20 @@ The user approved the plan as written ("Approve as written"). **Step 1, nature:*
 - The tile atlas's other trees (rows 3, 9, 22) are never seen: Scenery stands each as a tall
   picture. The field stone `rock` and the quarry's rocks are as they were.
 - Palettes made again (the master palette, `scenery`, `breakables`, `rocks`, `greybox_tiles`).
+
+## Step 2 built (2026-11-20): the houses
+
+The sheet's houses are drawn from an angle and the game's tiles front-on, so (N3) nothing is cut
+from it; each material is drawn into the tiles in its colours (the sheet's own palette):
+- **Roof surfaces** are new repeating 16x16 patterns: clay tiles (squares of four with a dark seam,
+  lit from the top left, each course shifted), blue slate (slates of eight, two tones), thatch (straw
+  in two bands with a lip and its shadow) and mossy shingle (the Coop's: shingles of eight with moss
+  from the sheet's fourth house). A pixel of a roof tile becomes the pattern where it was the old plain
+  roof's colour; every other pixel of the style (its ridge, eave and gable edges) takes the new colour
+  of the same rank, darkest to darkest.
+- **The ridges** in `relief.png` (red, blue, thatch, shingle) are recoloured the same way; the big
+  barn's green boards are as they were (not on the sheet).
+- **Walls, windows, the door and the chimney** keep their shapes and take the sheet's plaster, timber,
+  stone, door wood and chimney stone by rank. The glass stays blue, so `WindowGlow` lights the same
+  pixels; the chapel and the barn's red planks are as they were.
+- Palettes made again (the master palette, `greybox_tiles`, `relief`).

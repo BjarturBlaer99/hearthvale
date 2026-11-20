@@ -1652,3 +1652,7 @@ PNG". What building it decided:
   the darkest colour beneath (the outline survives); pieces already at the game's scale (grass,
   flowers) are taken whole. The decoration tuft stays smaller than the grass that can be cut, so the
   two are told apart. The trees keep the old soft shadow, since the new sheet has none.
+- 2026-11-20 — **New art, step 2: front-on tiles from a sheet drawn at an angle.** Nothing is cut from
+  the houses sheet; its palette and its materials' shapes are drawn into the tiles by a script: roof
+  surfaces as new repeating patterns, everything else recoloured by rank (darkest old colour to darkest
+  new), so every tile keeps its place, its shape and its window glass.

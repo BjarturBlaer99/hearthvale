@@ -3278,3 +3278,20 @@ smaller, a change of one decoration tile's pixels), and the art tests (9) after 
   look beside mossy boulders and darker stumps, until a later step or the user's art covers them.
 - **`docs/ASSETS.md` waits for the user's PixelLab plan and the date the sheets were made.**
 - Nobody has played it by hand.
+
+## 2026-11-20 — New art, step 2: the houses
+
+The user said "Go on to step 2". The roofs (clay, slate, thatch, the Coop's mossy shingle), their
+ridges, eaves and gable boards, the half-timbered walls, windows, the door and the chimney are drawn
+in the colours of PixelLab's houses sheet; the roofs have new patterns, the rest keeps its shapes
+(`docs/progress/new-art-plan.md`, "Step 2 built"). No tile moved; nothing in play changed.
+
+**Verified:** the art tests (9) and the whole suite pass, exit 0. Capture shots 1, 2, 92, 160, 181 and
+208, before and after (about a minute in a window, the capture's slot 994).
+
+**Known issues and limits**
+- **The houses are still the game's shapes:** the sheet's dormers, shutters and brick chimney are not
+  in the tiles (they are drawn from an angle).
+- **The big barn's green roof, the barn's red planks and the chapel** are the old look.
+- **`docs/ASSETS.md` waits for the user's PixelLab plan and the date the sheets were made.**
+- Nobody has played it by hand.
