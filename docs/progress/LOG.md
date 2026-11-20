@@ -3302,8 +3302,11 @@ The user said "Go on". The hero's 75 frames are in the new look of PixelLab's he
 spiky hair with a ragged fringe, a deeper scarf; every pixel in its place, so the motion, the feet and
 the held tools are as they were (`docs/progress/new-art-plan.md`, "Step 3 built").
 
-**Verified:** the art tests (9) and the whole suite pass, exit 0. All nineteen films of the strokes and
-capture shots 1 and 17, before and after (about two minutes in a window, the capture's slot 994).
+**Verified:** the whole suite passes, 1168 tests, exit 0. The first commit of this step went in with
+one test failing (`hero_test.gd`: a hair spike in the hold frame lifted a raised hand two pixels,
+and then rose above the hands); fixed in the next commit (a spike lifts only hair, and never above
+what stands over the head). All nineteen films of the strokes and capture shots 1 and 17, before and
+after (taken before that fix, which changed only the hold frame) (about two minutes in a window, the capture's slot 994).
 
 **Known issues and limits**
 - **He keeps his sleeves:** the sheet's bare arms and bracers are not in the frames.
