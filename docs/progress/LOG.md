@@ -3248,3 +3248,13 @@ and 208 (about twenty seconds). No save but the capture's slot 994.
 - **The windows are lit whenever the lamps are,** whether or not anyone is in the building (the animals
   are, by night).
 - **The tool polish is finished:** all four steps built. Nobody has played any of it by hand.
+
+## 2026-11-20 — New art from PixelLab: the plan
+
+The user brought four sheets made with PixelLab (nature, houses, the hero, a UI) and chose to fit
+them to the game's sizes, to cut the houses into the game's tiles, and to record them as PixelLab's.
+The sheets are kept in `art/incoming/`. The plan is `docs/progress/new-art-plan.md`: where each piece
+goes, what it touches, the risks, eight decisions and four steps (nature, houses, the hero, the UI).
+An automatic shrink of a few pieces (a scratch script, not kept) shows the trees, stumps and rocks
+fit well and the hero does not: at 16x32 he is drawn by hand from the new look. **Nothing is built
+until the plan is approved.**
