@@ -14,7 +14,7 @@ painted each picture from ASCII art written for this game (no outside art) and a
 
 | File | What it is | Made by | Date | Terms |
 |---|---|---|---|---|
-| `gameplay/player/player_sheet.png` | the hero, 25 frames x 3 facings | code: `make_player_sprite.gd`; redrawn by a script in the look of PixelLab's `art/incoming/hero.png` (its colours, spiky hair, a deeper scarf), every pixel in its place (new-art plan, step 3) | 2026-11-20 | Hearthvale's own; PixelLab: the user's plan, the date made and the terms on that date **not yet recorded** (asked 2026-11-20) |
+| `gameplay/player/player_sheet.png` | the hero, 25 frames x 3 facings | code: `make_player_sprite.gd`; redrawn by a script in the look of PixelLab's `art/incoming/hero.png` (its colours, spiky hair, a deeper scarf), every pixel in its place (new-art plan, step 3) | 2026-11-20 | Hearthvale's own; PixelLab, free plan, made 2026-11-20: see "PixelLab" below |
 | `gameplay/art/held_tools.png` | the tools in his hands | code: `make_sprites.gd` | 2026-11-19 | Hearthvale's own |
 | `gameplay/art/villager.png` | villagers (marker colours) | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
 | `gameplay/art/slime.png` | slime | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
@@ -30,20 +30,35 @@ painted each picture from ASCII art written for this game (no outside art) and a
 | `gameplay/art/crystal.png` | crystal switches | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
 | `gameplay/art/dummy.png` | the training dummy | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
 | `gameplay/art/brambles.png` | brambles | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
-| `gameplay/art/rocks.png` | rocks, ladder, lift, boulders | code: `make_sprites.gd`; the boulder and the great boulder: PixelLab (`art/incoming/nature.png`), fitted to size by a script (new-art plan, step 1) | 2026-11-20 | Hearthvale's own; the two boulders PixelLab: the user's plan, the date made and the terms on that date **not yet recorded** (asked 2026-11-20) |
+| `gameplay/art/rocks.png` | rocks, ladder, lift, boulders | code: `make_sprites.gd`; the boulder and the great boulder: PixelLab (`art/incoming/nature.png`), fitted to size by a script (new-art plan, step 1) | 2026-11-20 | Hearthvale's own; the two boulders PixelLab, free plan, made 2026-11-20: see "PixelLab" below |
 | `gameplay/art/crafted.png` | furnishings | code: `make_sprites.gd` | 2026-11-19 | Hearthvale's own |
-| `gameplay/art/breakables.png` | grass, pots, wood, weeds, bushes, logs | code: `make_sprites.gd`; grass, cut grass, the stump and the bush: PixelLab (`art/incoming/nature.png`), fitted to size by a script (new-art plan, step 1) | 2026-11-20 | Hearthvale's own; those four PixelLab: the user's plan, the date made and the terms on that date **not yet recorded** (asked 2026-11-20) |
+| `gameplay/art/breakables.png` | grass, pots, wood, weeds, bushes, logs | code: `make_sprites.gd`; grass, cut grass, the stump and the bush: PixelLab (`art/incoming/nature.png`), fitted to size by a script (new-art plan, step 1) | 2026-11-20 | Hearthvale's own; those four PixelLab, free plan, made 2026-11-20: see "PixelLab" below |
 | `gameplay/art/critters.png` | hens, butterflies | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
 | `gameplay/art/animals.png` | sheep, cows | code: `make_sprites.gd` | 2026-11-19 | Hearthvale's own |
 | `gameplay/art/torch.png` | torches | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
 | `gameplay/art/placed.png` | things set down on the homestead | code: `make_sprites.gd` | 2026-11-19 | Hearthvale's own |
-| `world/tiles/greybox_tiles.png` | the tile atlas | code: `make_tile_texture.gd`; the two site tiles (row 28) edited by hand, the string and peg taken out (a script, the tool polish); the three flowers and the tuft (row 6) and the closed canopy (row 22): PixelLab (`art/incoming/nature.png`), fitted to size by a script (new-art plan, step 1); the roofs, walls, windows, door and chimney (rows 3, 4, 7, 16 to 18, 20, 30 and 31): redrawn by a script in the colours of PixelLab's `art/incoming/houses.png`, the roof surfaces new patterns, the rest the old shapes recoloured (step 2) | 2026-11-20 | Hearthvale's own; those tiles PixelLab's colours and, for the five of step 1, its pictures: the user's plan, the date made and the terms on that date **not yet recorded** (asked 2026-11-20) |
-| `world/tiles/scenery.png` | tall trees | PixelLab (`art/incoming/nature.png`), fitted to size by a script (new-art plan, step 1); the soft shadows kept from `make_scenery.gd` | 2026-11-20 | PixelLab: the user's plan, the date made and the terms on that date **not yet recorded** (asked 2026-11-20) |
-| `world/tiles/relief.png` | wall faces and tops, pillar, ridges | code: `make_relief.gd`; the red, blue, thatch and shingle ridges recoloured in `art/incoming/houses.png`'s colours (new-art plan, step 2) | 2026-11-20 | Hearthvale's own; PixelLab: the user's plan, the date made and the terms on that date **not yet recorded** (asked 2026-11-20) |
+| `world/tiles/greybox_tiles.png` | the tile atlas | code: `make_tile_texture.gd`; the two site tiles (row 28) edited by hand, the string and peg taken out (a script, the tool polish); the three flowers and the tuft (row 6) and the closed canopy (row 22): PixelLab (`art/incoming/nature.png`), fitted to size by a script (new-art plan, step 1); the roofs, walls, windows, door and chimney (rows 3, 4, 7, 16 to 18, 20, 30 and 31): redrawn by a script in the colours of PixelLab's `art/incoming/houses.png`, the roof surfaces new patterns, the rest the old shapes recoloured (step 2) | 2026-11-20 | Hearthvale's own; those tiles PixelLab's colours and, for the five of step 1, its pictures (PixelLab, free plan, made 2026-11-20: see "PixelLab" below) |
+| `world/tiles/scenery.png` | tall trees | PixelLab (`art/incoming/nature.png`), fitted to size by a script (new-art plan, step 1); the soft shadows kept from `make_scenery.gd` | 2026-11-20 | PixelLab, free plan, made 2026-11-20: see "PixelLab" below |
+| `world/tiles/relief.png` | wall faces and tops, pillar, ridges | code: `make_relief.gd`; the red, blue, thatch and shingle ridges recoloured in `art/incoming/houses.png`'s colours (new-art plan, step 2) | 2026-11-20 | Hearthvale's own; PixelLab, free plan, made 2026-11-20: see "PixelLab" below |
 | `ui/title/backdrop.png` | the title screen's picture | code: `make_title.gd` | 2026-11-12 | Hearthvale's own |
 
 The dates are each PNG's last commit before the switch; the PNGs are the ones the tools baked at
 the switch (each byte for byte what was in the repo).
+
+## PixelLab
+
+The four sheets in `art/incoming/` (`nature.png`, `houses.png`, `hero.png`, `ui.png`) were made by the
+user with PixelLab (pixellab.ai) on its **free plan**, on **2026-11-20** (the downloads' own names carry
+the time). PixelLab's Terms of Service, as they stood on that date (https://www.pixellab.ai/termsofservice,
+"Last Updated: 2026-10-30"), make no difference between plans:
+- 1.3: "You own the copyrights to your creations, permitting usage for both commercial and non-commercial
+  purposes with no need for permission."
+- 3.3: the user keeps ownership and may use, modify and distribute the outputs for any purpose but
+  training other models, and is responsible for them not infringing anyone's rights.
+- 4.1: use must also follow the Open RAIL-M licence (its use restrictions).
+- No attribution is asked for.
+
+Every PNG that holds PixelLab's pictures, or is drawn in their colours, says so in its row above.
 
 ## Made in code, and still made in code
 

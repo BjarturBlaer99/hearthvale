@@ -3313,3 +3313,11 @@ after (taken before that fix, which changed only the hold frame) (about two minu
 - **No sword on his back** (the sheet has one strapped to the pack).
 - **`docs/ASSETS.md` waits for the user's PixelLab plan and the date the sheets were made.**
 - Nobody has played it by hand.
+
+## 2026-11-20 — PixelLab's terms recorded
+
+The user said the sheets were made on PixelLab's free plan (the downloads' names date them
+2026-11-20). PixelLab's Terms of Service ("Last Updated: 2026-10-30", read on its site the same day)
+give the maker the copyright and allow commercial use with no attribution, on any plan, short of
+training other models and within the Open RAIL-M licence. `docs/ASSETS.md` records it in a section of
+its own, and its rows no longer wait for it.
