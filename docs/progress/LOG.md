@@ -3364,3 +3364,5 @@ room only in the order of their lines and Godot's IDs; those three were put back
 
 **Verified:** the whole suite passes, exit 0. Capture shots 1, 4, 44, 46, 141 and 164, before and
 after (about half a minute in a window, the capture's slot 994).
+
+The user saw the pictures and said "Looks good" (2026-11-23).
