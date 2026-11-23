@@ -3395,3 +3395,19 @@ from `ShadeBoss.setup()`: `Enemy.setup()` connects the same brain signal to the 
 Harmless (the second connect is refused), and older than this step.
 
 **Not yet played by hand.** Try it with `tools/playtest.gd -- warden` and `-- shade`.
+
+## 2026-11-23 — Harder dungeons, step 2: the new puzzle pieces
+
+Decisions 13 to 15 of `docs/progress/dungeon-difficulty-plan.md`, built and tested, and in no room
+yet (steps 3 and 4 place them):
+- **Crystals that turn back:** `CrystalSwitch.hold_time`. Blue that long after a hit, blinking white
+  in the last second (its own white frame), then red with the snuff's sound; red at every visit.
+- **Plates in an order:** `PressurePlate.order`, a set being the plates sharing a flag;
+  `PlateSequence` (pure) counts, `PlateOrders` (the area's `plate_orders`) feeds it from
+  `update_plates()` and starts unsolved sets over on a room change. Counted plates stay down; a wrong
+  step says "nope" and raises them; the last sets the flag for good.
+- **Shutters that open when off:** `DungeonDoor.opens_when_off` (`PuzzleRules.weighed`); never latched.
+
+**Verified:** the whole suite, 1197 cases, exit 0. New tests: `tests/core/puzzles/plate_sequence_test.gd`
+(5), two in `puzzle_rules_test.gd`, and `tests/world/new_puzzle_pieces_test.gd` (7), which sets each
+piece into the cistern's secret room. No picture: nothing on screen has changed yet.

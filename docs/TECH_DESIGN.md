@@ -322,6 +322,19 @@ res://
   - **Pressure plate:** the hero or a block on it sets its flag, and stepping off clears it unless it `latches`.
   - **Crystal switch:** a sword, arrow or bomb hit sets (or toggles) its flag, with a short lockout; red when
     off, blue when on.
+  - **A crystal that turns back** (harder dungeons, 2026-11-23): with a `hold_time` a hit makes it blue
+    for that long (`PuzzleRules.crystal_holding`), blinking white in its last `WARNING_TIME`
+    (`is_warning()`), then red with the snuff's sound; another hit gives it its whole time again. It
+    starts every visit red. Shutters waiting on several need them blue at the same time.
+  - **Plates in an order** (2026-11-23): a `PressurePlate` with an `order` (1 up) is one of the set
+    sharing its `flag`. `PlateSequence` (`core/puzzles/`, pure) counts the steps: the next in turn moves
+    it on (the plate stays down), one out of turn starts it over ("nope"; plate 1 counts as a new
+    start), the last sets the flag for good. `PlateOrders` (`AreaController.plate_orders`) feeds it the
+    plates stepped onto each frame, from `update_plates()`, and `update_room()` starts unsolved sets
+    over. A set already solved shows every plate down. Nothing of the progress is saved.
+  - **A shutter that opens when off** (2026-11-23): `opens_when_off` weighs its flags turned over
+    (`PuzzleRules.weighed`): a flag anything but true counts as met. It never latches, whatever
+    `stays_open` says. With a toggling crystal, one hit opens one way and shuts another.
   - **Cracked wall:** a `DungeonDoor` kind opened for good only by a bomb's blast.
   - A `Hit` carries its kind (sword, arrow, bomb, contact) so pieces can tell them apart.
   - **Pits:**

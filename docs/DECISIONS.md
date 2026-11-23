@@ -1678,3 +1678,12 @@ PNG". What building it decided:
   rounded up, so a factor of 1 leaves a half-heart touch alone. The bosses' numbers are in their own
   files. The Shade's braziers burn 10 s with the torch's own `burn_time`; one that goes out ends the
   binding early (the brain's rule as it was), so lighting them quickly earns the whole binding.
+- 2026-11-23 — **Harder dungeons, step 2: the new puzzle pieces, as small as they could be.** A
+  crystal that turns back is the old crystal with a `hold_time` (as a torch has a `burn_time`), and it
+  starts each visit red, as a torch that burns out starts unlit; it ends with the snuff's sound, the
+  timers' "time is up". With `toggles` as well, a hit always makes it blue (a timed one is never turned
+  off by hand). Plates in an order are the old plates with an `order`, a set being those sharing a
+  flag; the order is told in words, so no plate needs a mark drawn. A plate stays down while counted,
+  so the player sees how far he has got; a wrong step raises them all, and stepping onto plate 1 is
+  always a start. An unsolved set starts over when he leaves the room, like the blocks. A shutter
+  that opens when off never latches: its flag is off before anything is done.

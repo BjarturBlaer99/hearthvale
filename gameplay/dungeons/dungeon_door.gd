@@ -33,6 +33,10 @@ const CHAINED_WORDS: String = "The gate is chained shut."
 @export var needs_all: bool = false
 ## Shutters only: once its flags have lifted the bars, they stay up for good (a door flag).
 @export var stays_open: bool = false
+## A shutter that waits on its flags being off, not on (dungeon-difficulty-plan.md, decision 15):
+## with a toggling crystal, one hit opens one way and shuts another. It never stays open for
+## good (`stays_open` is ignored), since its flags are off before anything is done.
+@export var opens_when_off: bool = false
 ## Chained gates only: what trying the gate says (who has the say over it).
 @export_multiline var shut_words: String = ""
 ## Cracked walls only: the stone they're made of (dungeon walls; a ruin's lighter stone outdoors).
@@ -93,7 +97,7 @@ func is_open() -> bool:
 		DungeonState.OPEN:
 			return true
 		DungeonState.SHUTTER:
-			if stays_open and GameState.get_flag(DungeonState.door_flag(dungeon_id, door_id)) == true:
+			if stays_open and not opens_when_off and GameState.get_flag(DungeonState.door_flag(dungeon_id, door_id)) == true:
 				return true
 			return PuzzleRules.shutter_open(_shutter_values(), needs_all)
 		DungeonState.CHAINED:
@@ -104,7 +108,7 @@ func is_open() -> bool:
 ## A shutter that `stays_open` and whose flags are met records itself open for good. The area
 ## calls this whenever flags change. Returns whether it just did.
 func latch() -> bool:
-	if kind != DungeonState.SHUTTER or not stays_open:
+	if kind != DungeonState.SHUTTER or not stays_open or opens_when_off:
 		return false
 	var flag: StringName = DungeonState.door_flag(dungeon_id, door_id)
 	if GameState.get_flag(flag) == true or not PuzzleRules.shutter_open(_shutter_values(), needs_all):
@@ -119,7 +123,7 @@ func _shutter_values() -> Array:
 		values.append(GameState.get_flag(open_flag))
 	for flag: StringName in open_flags:
 		values.append(GameState.get_flag(flag))
-	return values
+	return PuzzleRules.weighed(values, opens_when_off)
 
 
 ## What interact does while the hero faces it (the HUD's prompt), or empty for nothing.

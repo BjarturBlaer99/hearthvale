@@ -4,6 +4,9 @@ extends Node2D
 ## it presses it, which sets `flag` (shutters wait on flags). Stepping off clears the flag
 ## again, unless the plate `latches`: then it stays pressed for good. The area checks plates
 ## every physics frame. Position = its cell's top-left corner.
+## A plate with an `order` is one of a set (the plates sharing its `flag`) to be pressed in that
+## order (PlateOrders, PlateSequence): it stays down while it is counted, and the flag is set
+## for good once the last is pressed in turn.
 
 const OUTLINE: Color = PixelGrade.INK
 const PLATE: Color = Color(0.62, 0.58, 0.48)
@@ -11,6 +14,8 @@ const RUNE: Color = Color(0.95, 0.80, 0.35)
 
 @export var flag: StringName
 @export var latches: bool = false
+## Its place in its set's order, 1 up; 0 for a plate of no set.
+@export var order: int = 0
 
 var pressed: bool = false
 
@@ -33,6 +38,14 @@ func set_pressed(down: bool) -> void:
 		EventBus.sound.emit(&"plate")
 	pressed = down
 	GameState.set_flag(flag, down)
+	queue_redraw()
+
+
+## A plate of a set shows down while it is counted (PlateOrders says), whatever stands on it.
+func show_counted(counted: bool) -> void:
+	if counted == pressed:
+		return
+	pressed = counted
 	queue_redraw()
 
 

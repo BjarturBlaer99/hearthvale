@@ -231,6 +231,11 @@ Enemies sometimes drop hearts or coins.
   it. Enemies on foot keep out; bats and arrows cross.
 - **The dark and torches:** in a dark dungeon you see only what light reaches. With the Lantern, a right click lights a
   torch; lit torches open doors. Some burn only for a few seconds, so several must be lit in one go.
+- *(Harder dungeons, 2026-11-23; built, in no room yet until the next steps:)* **crystals that turn
+  back** to red a few seconds after a hit, blinking white in their last second, so several must be
+  blue at once; **plates pressed in an order** (told by an inscription in the room), where a wrong
+  step starts the set over; and **shutters that open while a crystal is red**, so one toggling
+  crystal opens one way and shuts another.
 - Each mechanic is introduced on its own, then combined.
 
 ## 10. Village & economy

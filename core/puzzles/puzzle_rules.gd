@@ -1,8 +1,8 @@
 class_name PuzzleRules
 extends RefCounted
 ## Pure rules for puzzle pieces (docs/TECH_DESIGN.md §6): pushing blocks (onto floor, or into a
-## pit), pressing plates, torches that burn for a while, and shutters that wait on several
-## flags.
+## pit), pressing plates, torches that burn for a while, crystals that turn back, and shutters
+## that wait on several flags (or on flags being off).
 
 
 ## Whether a block in `from` can be pushed one cell along `direction`. The next cell must be
@@ -34,6 +34,25 @@ static func can_sink(terrain: TerrainQuery, from: Vector2i, direction: Vector2i,
 ## for that long.
 static func torch_burning(lit_for: float, burn_time: float) -> bool:
 	return burn_time <= 0.0 or lit_for < burn_time
+
+
+## Whether a crystal hit `on_for` seconds ago is still blue: for good with no `hold_time`,
+## else for that long (then it turns back to red).
+static func crystal_holding(on_for: float, hold_time: float) -> bool:
+	return hold_time <= 0.0 or on_for < hold_time
+
+
+## Whether a crystal that turns back is in its last `warning` seconds (it blinks white).
+static func crystal_warning(on_for: float, hold_time: float, warning: float) -> bool:
+	return hold_time > 0.0 and on_for >= hold_time - warning and on_for < hold_time
+
+
+## The flag values a shutter weighs: as they are, or turned over for one that `opens_when_off`
+## (a flag that is anything but true counts as met).
+static func weighed(values: Array, when_off: bool) -> Array:
+	if not when_off:
+		return values
+	return values.map(func(value: Variant) -> bool: return value != true)
 
 
 ## Whether `cell` is in the wall ring of its room (the first or last row or column).

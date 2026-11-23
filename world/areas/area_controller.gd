@@ -156,6 +156,9 @@ var buildings: PlacedBuildings
 ## The animals here (the Homestead, phase 4): on his land those out in their pastures, in a
 ## building's room those at home in it. Null anywhere else.
 var animals: PlacedAnimals
+## The plates here that are pressed in an order (a set to each flag), and how far each set has
+## got this visit.
+var plate_orders: PlateOrders = PlateOrders.new()
 ## Nature that is only for show (P1c): petals lying round the cherry trees; the water's surface
 ## and what it mirrors; mist. The water is the one thing in the scenery that moves (the user's
 ## request, 2026-11-13): grass, trees, petals, mist and smoke are still.
@@ -650,13 +653,17 @@ func update_pushing(delta: float) -> bool:
 ## Presses or releases every plate for whether the hero or a block stands on it.
 func update_plates() -> void:
 	var block_cells: Array = []
+	var plates: Array = []
 	for child: Node in interactables.get_children():
 		if child is PushBlock:
 			block_cells.append((child as PushBlock).cell())
-	for child: Node in interactables.get_children():
-		if child is PressurePlate:
-			var plate: PressurePlate = child
+		elif child is PressurePlate:
+			plates.append(child)
+	for plate: PressurePlate in plates:
+		if plate.order == 0:
 			plate.set_pressed(not _dying and PuzzleRules.plate_pressed(plate.cell(), player.motor.cell, block_cells))
+	# Plates pressed in an order (one set to each flag) are counted by PlateOrders.
+	plate_orders.update(plates, player.motor.cell, block_cells, _dying)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -804,6 +811,8 @@ func update_room(first: bool = false) -> void:
 	if not first:
 		hud.flash(ROOM_FLASH)
 		reset_blocks()
+		# A set of plates pressed in an order, not yet solved, starts over.
+		plate_orders.reset(interactables.get_children().filter(func(child: Node) -> bool: return child is PressurePlate))
 
 
 ## Puts back every push block outside the hero's room (one jammed in a corner is back in place

@@ -77,3 +77,21 @@ func test_a_torch_burns_for_its_burn_time_or_for_good() -> void:
 	assert_bool(PuzzleRules.torch_burning(1000.0, 0.0)).override_failure_message("no burn time: for good").is_true()
 	assert_bool(PuzzleRules.torch_burning(4.9, 5.0)).is_true()
 	assert_bool(PuzzleRules.torch_burning(5.0, 5.0)).is_false()
+
+
+func test_a_crystal_holds_for_its_hold_time_or_for_good() -> void:
+	assert_bool(PuzzleRules.crystal_holding(1000.0, 0.0)).override_failure_message("no hold time: for good").is_true()
+	assert_bool(PuzzleRules.crystal_holding(3.9, 4.0)).is_true()
+	assert_bool(PuzzleRules.crystal_holding(4.0, 4.0)).is_false()
+	# It blinks in its last second, and not before, and not without a hold time.
+	assert_bool(PuzzleRules.crystal_warning(2.9, 4.0, 1.0)).is_false()
+	assert_bool(PuzzleRules.crystal_warning(3.0, 4.0, 1.0)).is_true()
+	assert_bool(PuzzleRules.crystal_warning(4.0, 4.0, 1.0)).is_false()
+	assert_bool(PuzzleRules.crystal_warning(3.5, 0.0, 1.0)).is_false()
+
+
+func test_a_shutter_that_opens_when_off_weighs_its_flags_turned_over() -> void:
+	assert_array(PuzzleRules.weighed([true, null, false], false)).is_equal([true, null, false])
+	assert_array(PuzzleRules.weighed([true, null, false], true)).is_equal([false, true, true])
+	assert_bool(PuzzleRules.shutter_open(PuzzleRules.weighed([null], true), false)).override_failure_message("a flag never set is off").is_true()
+	assert_bool(PuzzleRules.shutter_open(PuzzleRules.weighed([true], true), false)).is_false()
