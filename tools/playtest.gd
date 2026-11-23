@@ -248,6 +248,14 @@ const SCENARIOS: Dictionary = {
 		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"planted_first_crop"],
 		"skills": {&"farming": 2, &"mining": 3},
 	},
+	# At the keep's entrance, with Elder Bram's word given: the wooden sword and nothing else, as a
+	# hero first walks in (harder dungeons, 2026-11-23: for trying its rooms from the start).
+	"keep": {
+		"area": &"keep",
+		"cell": Vector2i(22, 42),
+		"items": [[&"wooden_sword", 1], [&"bread", 3]],
+		"flags": [&"took_wooden_sword", &"planted_first_crop", &"promised_elder_keep", &"keep_gate_open"],
+	},
 	# Outside the Iron Warden's hall: sword, bow, 20 arrows, the boss door already open.
 	"warden": {
 		"area": &"keep",

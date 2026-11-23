@@ -36,7 +36,7 @@ func test_the_bow_waits_in_the_keep_and_goes_on_the_item_button() -> void:
 		keep.player.face(Vector2.UP)
 		assert_bool(keep.interact()).override_failure_message("open %s" % chest_name).is_true()
 	assert_that(GameState.equipped).override_failure_message("the first item for the button is equipped").is_equal(&"bow")
-	assert_str(AreaController.equipped_text()).is_equal("Item: Bow (Arrows x15)")
+	assert_str(AreaController.equipped_text()).is_equal("Item: Bow (Arrows x25)")
 
 
 func test_arrows_hurt_enemies_and_run_out() -> void:

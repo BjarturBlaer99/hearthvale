@@ -197,6 +197,26 @@ func test_a_game_past_the_reliquarys_door_finds_the_new_pit_filled() -> void:
 	assert_bool(_reachable(crypt, RELIQUARY).has(Vector2i(7, 25))).override_failure_message("the way back from the Reliquary").is_true()
 
 
+func test_the_second_block_can_never_reach_the_trench() -> void:
+	# It starts against the north wall, west of the pit: nobody can stand above it, so it only
+	# slides along the wall, and the one pit it can fall into is the one before the door. (Pushed
+	# south into the trench it would sink there for good, and the door's pit could never be filled.)
+	var crypt: AreaController = _load(CRYPT)
+	var second: PushBlock = crypt.interactables.get_node(^"FloorBlockB")
+	assert_int(second.cell().y).is_equal(23)
+	assert_int(second.cell().x).is_less(7)
+	for x: int in range(1, 8):
+		assert_bool(crypt.grid.is_solid(Vector2i(x, 22)) or x == 7).override_failure_message("(%d, 22) is wall" % x).is_true()
+	assert_bool(crypt.interactables.get_node(^"ReliquaryInscription") is Node2D).is_true()
+	assert_that(GridBody.cell_of((crypt.interactables.get_node(^"ReliquaryInscription") as Node2D).position + Vector2(8, 8))).override_failure_message("the inscription closes the row east of the pit").is_equal(Vector2i(8, 23))
+
+
+func test_a_game_that_took_the_ossuarys_key_keeps_its_bars_open() -> void:
+	GameState.set_flag(DungeonState.chest_flag(&"crypt", &"ossuary_key"), true)
+	var crypt: AreaController = _load(CRYPT)
+	assert_bool((crypt.interactables.get_node(^"OssuaryKeyBars") as DungeonDoor).is_open()).is_true()
+
+
 func test_the_ossuarys_plates_are_one_to_three() -> void:
 	var crypt: AreaController = _load(CRYPT)
 	var places: Array = []
@@ -412,8 +432,7 @@ func test_the_crypt_can_be_finished_start_to_end() -> void:
 	assert_bool(_reachable(crypt, BROKEN_FLOOR).has(Vector2i(7, 24))).is_true()
 	assert_bool(_reachable(crypt, BROKEN_FLOOR).has(Vector2i(7, 23))).override_failure_message("a pit before the door").is_false()
 	var second: PushBlock = crypt.interactables.get_node(^"FloorBlockB")
-	_push(crypt, second, Vector2i(12, 24), Vector2.LEFT, Vector2i(7, 24))
-	_push(crypt, second, Vector2i(7, 25), Vector2.UP, Vector2i(7, 23))
+	_push(crypt, second, Vector2i(2, 23), Vector2.RIGHT, Vector2i(7, 23))
 	assert_bool(second.sunk).is_true()
 	assert_bool(_reachable(crypt, BROKEN_FLOOR).has(Vector2i(7, 23))).is_true()
 	_open(crypt, Vector2i(7, 23), Vector2.UP)

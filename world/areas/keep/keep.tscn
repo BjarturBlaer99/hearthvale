@@ -219,7 +219,7 @@ position = Vector2(80, 224)
 script = ExtResource("8_chest")
 chest_id = &"quiver"
 item_id = &"arrow"
-count = 15
+count = 25
 
 [node name="ArmouryCrystal" type="Node2D" parent="Interactables" unique_id=1155395431]
 position = Vector2(176, 192)
@@ -326,6 +326,7 @@ size = Vector2i(1, 1)
 open_flags = Array[StringName]([&"keep_bigkey_clear", &"keep_bigkey_rounds"])
 needs_all = true
 stays_open = true
+open_if_past = &"dungeon/keep/chest/big_key"
 
 [node name="BigKeyChest" type="Node2D" parent="Interactables" unique_id=1386498937]
 position = Vector2(592, 208)

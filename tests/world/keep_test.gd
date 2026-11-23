@@ -185,7 +185,7 @@ func test_the_keep_can_be_finished_start_to_end() -> void:
 	_open(keep, Vector2i(3, 15), Vector2.UP)
 	_open(keep, Vector2i(5, 15), Vector2.UP)
 	assert_that(GameState.equipped).override_failure_message("the dungeon's item").is_equal(&"bow")
-	assert_int(GameState.item_count(&"arrow")).is_equal(15)
+	assert_int(GameState.item_count(&"arrow")).override_failure_message("25 arrows (15 until the review of the harder dungeons)").is_equal(25)
 	# Two crystals that turn back after 4 s: the high one by arrow, the far one by sword, both
 	# blue at once (harder dungeons, 2026-11-23).
 	var crystal: CrystalSwitch = keep.interactables.get_node(^"ArmouryCrystal")
@@ -272,10 +272,8 @@ func test_the_keep_can_be_finished_start_to_end() -> void:
 	assert_bool(_reachable(keep, HALL).has(WARDENS_HALL)).override_failure_message("the boss door opens").is_true()
 
 	# 8. The Iron Warden (its touch switched off: this is about the way through, not dodging).
-	# The gallery's three archers took nine of the fifteen arrows; in play the archers' drops and
-	# the Warden's own arrows for an empty quiver make up the rest.
-	assert_int(GameState.item_count(&"arrow")).is_less(5)
-	GameState.add_item(&"arrow", 10)
+	# The gallery's three archers took nine of the quiver's arrows, the crystals five: eleven are left.
+	assert_int(GameState.item_count(&"arrow")).is_equal(11)
 	var warden: Boss = keep.interactables.get_node(^"Warden")
 	var heart: HeartContainer = keep.interactables.get_node(^"HeartContainer")
 	warden.hit_box.deactivate()
@@ -321,6 +319,14 @@ func test_the_keep_can_be_finished_start_to_end() -> void:
 	keep.hud.dialogue.confirm()
 	_face(keep, Vector2i(22, 12), Vector2.UP)
 	assert_str(Steps.walk_until_travel(keep, Vector2.UP)).override_failure_message("out to the Old Wood").is_equal(WOOD)
+
+
+func test_a_game_that_took_the_big_key_keeps_its_bars_open() -> void:
+	# The bars want the rounds walked now; a game saved before, beside the open chest, is not shut in.
+	GameState.set_flag(DungeonState.chest_flag(&"keep", &"big_key"), true)
+	var keep: AreaController = _load(KEEP)
+	assert_bool((keep.interactables.get_node(^"BigKeyShutter") as DungeonDoor).is_open()).is_true()
+	assert_bool(keep.terrain.is_occupied(Vector2i(37, 15))).is_false()
 
 
 func test_the_watchs_rounds_are_four_plates_in_the_order_the_plaque_reads() -> void:

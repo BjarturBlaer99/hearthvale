@@ -78,6 +78,12 @@ func test_plate_room_the_hero_and_the_block_on_its_two_plates_lift_the_shutter()
 	assert_bool(shutter.is_open()).override_failure_message("it stays open").is_true()
 
 
+func test_combined_room_a_game_that_took_the_treasure_keeps_its_shutter_open() -> void:
+	GameState.set_flag(DungeonState.chest_flag(&"cistern", &"e_treasure"), true)
+	var cistern: AreaController = _load(CISTERN)
+	assert_bool((cistern.interactables.get_node(^"TreasureShutter") as DungeonDoor).is_open()).is_true()
+
+
 func test_plate_room_a_game_that_opened_the_old_shutter_keeps_it_open() -> void:
 	GameState.set_flag(&"cistern_b_plate", true)
 	var cistern: AreaController = _load(CISTERN)

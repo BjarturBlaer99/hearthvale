@@ -577,7 +577,7 @@ func _check_rules(rules: Dictionary) -> void:
 		RULES_NIGHT:
 			problems = NightRules.problems(rules)
 		RULES_DUNGEON:
-			problems = DungeonRules.problems(rules)
+			problems = DungeonRules.problems(rules, func(place: String) -> bool: return ResourceLoader.exists(WorldPaths.scene_for(StringName(place))))
 		RULES_FARM:
 			problems = Farm.problems(rules)
 		RULES_SKILLS:

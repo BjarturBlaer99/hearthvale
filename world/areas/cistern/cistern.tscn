@@ -105,6 +105,7 @@ size = Vector2i(1, 1)
 open_flags = Array[StringName]([&"cistern_e_plate", &"cistern_e_switch"])
 needs_all = true
 stays_open = true
+open_if_past = &"dungeon/cistern/chest/e_treasure"
 
 [node name="CombinedSlime" parent="Interactables" instance=ExtResource("13_enemy")]
 position = Vector2(136, 104)

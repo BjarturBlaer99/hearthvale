@@ -177,7 +177,7 @@ always_lit = true
 light_radius = 80.0
 
 [node name="HallArcher" parent="Interactables" unique_id=1552053597 instance=ExtResource("9_enemy")]
-position = Vector2(360, 392)
+position = Vector2(424, 440)
 enemy_id = &"goblin_archer"
 
 [node name="TombDoor" type="Node2D" parent="Interactables" unique_id=41988742]
@@ -408,6 +408,7 @@ size = Vector2i(1, 1)
 open_flags = Array[StringName]([&"crypt_ossuary_clear", &"crypt_ossuary_order"])
 needs_all = true
 stays_open = true
+open_if_past = &"dungeon/crypt/chest/ossuary_key"
 
 [node name="OssuaryPlateSouth" type="Node2D" parent="Interactables" unique_id=2047505952]
 position = Vector2(176, 656)
@@ -469,7 +470,7 @@ script = ExtResource("11_block")
 block_id = &"floor"
 
 [node name="FloorBlockB" type="Node2D" parent="Interactables" unique_id=233115696]
-position = Vector2(176, 384)
+position = Vector2(48, 368)
 script = ExtResource("11_block")
 block_id = &"floor_two"
 sunk_if_past = &"dungeon/crypt/door/reliquary_door"

@@ -59,7 +59,9 @@ func strengthen(enemy: Dictionary, place: StringName) -> Dictionary:
 
 
 ## What is wrong with `rules` as the dungeons' rules, in words: nothing, if they can be used.
-static func problems(rules: Dictionary) -> PackedStringArray:
+## `is_place` (given a place's name, whether it is a real one) catches a misspelt place, which
+## would otherwise leave its monsters as in the fields without a word; unset, any name passes.
+static func problems(rules: Dictionary, is_place: Callable = Callable()) -> PackedStringArray:
 	var out: PackedStringArray = []
 	var named: Variant = rules.get("places")
 	if typeof(named) != TYPE_DICTIONARY or (named as Dictionary).is_empty():
@@ -67,6 +69,8 @@ static func problems(rules: Dictionary) -> PackedStringArray:
 		return out
 	for place: Variant in named:
 		var numbers: Variant = named[place]
+		if is_place.is_valid() and not bool(is_place.call(str(place))):
+			out.append("place '%s' is no dungeon or area the game has." % place)
 		if typeof(numbers) != TYPE_DICTIONARY:
 			out.append("place '%s' must be a dictionary of numbers." % place)
 			continue

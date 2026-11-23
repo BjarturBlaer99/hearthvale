@@ -32,7 +32,7 @@ func setup(terrain_query: TerrainQuery, hero: Node2D, rng: RandomNumberGenerator
 		return false
 	warden.arena = arena_pixels()
 	warden.clinked.connect(_on_clinked)
-	warden.state_changed.connect(_on_state_changed)
+	# (Its state_changed is already connected by Enemy.setup(), to this script's own method.)
 	return true
 
 

@@ -240,6 +240,7 @@ Enemies sometimes drop hearts or coins.
   - **The plate room** has three plates to hold at once, two blocks and two pillars. The plates lie in
     the west, the blocks start in the east, and a block pushed against a wall is lost to it until he
     leaves the room. It takes 20 pushes.
+  - **The quiver** in the armoury holds 25 arrows (it held 15).
   - **The armoury's** crystal on the ledge (an arrow) and a second one in the far corner (the sword)
     turn back after 4 s, and must be blue together.
   - **The twin crystals are three:** one on the floor and one on a ledge in each northern corner, all
@@ -262,7 +263,7 @@ Enemies sometimes drop hearts or coins.
   - **The Ossuary's** key wants its guards beaten and three plates visited in the order its
     inscription gives (the south torch, the north torch, the foot of the pillar).
   - **The Broken Floor** has a pit before the Reliquary's door too, and a second block beyond the
-    first trench to fill it. (A game saved past that door finds it filled.)
+    first trench, against the north wall, to fill it. (A game saved past that door finds it filled.)
   - **The Reliquary's** two crystals across its pit turn back after 4 s: both blue at once.
   - **More monsters:** a bat in the Narthex, the Tomb, the Dark Path and the Reliquary, a slime in the
     Trench and the Broken Floor, an archer in the great hall and the Ossuary.

@@ -32,7 +32,7 @@ func setup(terrain_query: TerrainQuery, hero: Node2D, rng: RandomNumberGenerator
 	shade.passed.connect(_on_passed)
 	shade.bound.connect(_on_bound)
 	shade.snuffed.connect(_on_snuffed)
-	shade.state_changed.connect(_on_state_changed)
+	# (Its state_changed is already connected by Enemy.setup(), to this script's own method.)
 	return true
 
 

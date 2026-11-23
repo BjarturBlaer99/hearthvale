@@ -3436,7 +3436,8 @@ before the others are hit, the rounds out of turn) and needed ten more arrows be
 the gallery's three archers take nine of the quiver's fifteen. A new test checks the rounds' four
 plates against the plaque's order. Capture shots 28 to 36, looked at.
 
-**Not yet played by hand.** `tools/playtest.gd -- gate` starts at the keep's gate.
+**Not yet played by hand.** `tools/playtest.gd -- keep` starts at the keep's entrance (added
+with the review's fixes; this line first named `-- gate`, whose gate is chained).
 
 ## 2026-11-23 — Harder dungeons, step 4: the Chapel Crypt
 
@@ -3482,3 +3483,23 @@ the treasure wanting both, and each quarry floor's new monster on open ground. C
 24, 26, 146 and 147, looked at.
 
 **The plan is built:** all five steps, each committed. None of it has been played by hand.
+
+## 2026-11-23 — Harder dungeons: the review's fixes
+
+A review of the five steps found seven things; the user said "Fix all":
+- **A soft-lock in the crypt:** the Broken Floor's second block could be pushed south into the
+  trench and sink there for good, leaving the Reliquary's door pit unfillable. It now starts at
+  (3, 23), against the north wall, where it can only slide along the wall into the door's pit.
+- **Old saves shut in an alcove:** the keep's big key bars, the Ossuary's key bars and the cistern's
+  treasure shutter stay open for a game that took the chest behind them (`open_if_past`).
+- **The `shade` scenario** started the hero inside the crypt hall's new archer; the archer moved to
+  (26, 27). A new `keep` scenario starts at the keep's entrance (the log had named `-- gate`, whose
+  gate is chained).
+- **Arrows:** the keep's quiver holds 25 (it held 15).
+- **A misspelt place** in `data/rules/dungeon.json` is an error at boot.
+- **The "already connected" error** each boss logged on load is gone: its `state_changed` was
+  connected twice.
+
+**Verified:** the whole suite, 1206 cases; the one failure was `items_test` reading the quiver's
+old 15, brought up to date, and passes. The run's output has no "already connected" line. New
+tests: the second block can't reach the trench, the three alcoves' save guards, and a misspelt place.

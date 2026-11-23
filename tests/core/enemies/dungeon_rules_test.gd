@@ -92,6 +92,15 @@ func test_the_dungeons_rules_are_sound_and_bad_ones_are_named() -> void:
 	assert_array(Array(DungeonRules.problems({"places": {"keep": {"health": 0}}}))).has_size(1)
 	assert_array(Array(DungeonRules.problems({"places": {"keep": {"health": "lots"}}}))).has_size(1)
 	assert_array(Array(DungeonRules.problems({"places": {"keep": {"armour": 2}}}))).has_size(1)
+	# A misspelt place is named, when the caller says which places are real.
+	var is_place: Callable = func(place: String) -> bool: return ["keep", "quarry_5"].has(place)
+	assert_array(Array(DungeonRules.problems({"places": {"keep": {"health": 2}}}, is_place))).is_empty()
+	var typo: Array = Array(DungeonRules.problems({"places": {"quary_5": {"health": 2}}}, is_place))
+	assert_array(typo).has_size(1)
+	assert_str(str(typo[0])).contains("quary_5")
+	# The game's own places are all real areas.
+	var real: Callable = func(place: String) -> bool: return ResourceLoader.exists(WorldPaths.scene_for(StringName(place)))
+	assert_array(Array(DungeonRules.problems(_data, real))).is_empty()
 
 
 func _heart_share(drops: Array) -> float:

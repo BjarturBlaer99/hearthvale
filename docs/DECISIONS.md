@@ -1718,3 +1718,19 @@ PNG". What building it decided:
   (`DungeonDoor.open_if_past`). The treasure shutter wants plate and crystal together and stays open
   once lifted. The quarry's new monsters stand on open ground away from the ladder, off every rock
   marker; the dungeon rules make floors 4 to 6's slimes tougher, and the Bogwisps keep their numbers.
+- 2026-11-23 — **Harder dungeons: the review's fixes** (the user: "Fix all").
+  - The Broken Floor's second block starts against the north wall, west of the pit, at (3, 23):
+    from (11, 24) it could be pushed south into the trench, where it would sink for good and the
+    door's pit could never be filled. Against the wall nobody stands above it, and the inscription
+    closes the row east of the pit, so the one pit it can reach is the right one.
+  - The three key alcoves whose bars want more now (the keep's big key, the Ossuary's key, the
+    cistern's treasure) stay open for a game that took what was behind them (`open_if_past` on the
+    chest's flag), so a game saved inside one is never shut in.
+  - The keep's quiver holds 25 arrows (it held 15): the gallery's tougher archers take nine, and the
+    timed crystals two or three a try.
+  - The dungeons' rules name only real places: `DungeonRules.problems()` takes a check, and the
+    registry gives it the areas' scenes, so a misspelt place is an error at boot.
+  - A boss's `state_changed` is connected once (`Enemy.setup()` already connects it to the boss's
+    own method), which ends the "already connected" error on every dungeon load.
+  - The crypt hall's new archer stands at (26, 27), off the `shade` scenario's start; a `keep`
+    scenario starts at the keep's entrance.
