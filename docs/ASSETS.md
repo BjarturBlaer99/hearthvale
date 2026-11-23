@@ -17,9 +17,9 @@ painted each picture from ASCII art written for this game (no outside art) and a
 | `gameplay/player/player_sheet.png` | the hero, 25 frames x 3 facings | code: `make_player_sprite.gd`; redrawn by a script in the look of PixelLab's `art/incoming/hero.png` (its colours, spiky hair, a deeper scarf), every pixel in its place (new-art plan, step 3) | 2026-11-20 | Hearthvale's own; PixelLab, free plan, made 2026-11-20: see "PixelLab" below |
 | `gameplay/art/held_tools.png` | the tools in his hands | code: `make_sprites.gd` | 2026-11-19 | Hearthvale's own |
 | `gameplay/art/villager.png` | villagers (marker colours) | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
-| `gameplay/art/slime.png` | slime | the user's own art (`art/incoming/slime.png`, three frames of 256x256 brought 2026-11-23), fitted to 16x16 by a script: shrunk to about a fifth by the colour covering most of each pixel, its own colours, its outline, a pixel for each eye, the white flash row added | 2026-11-23 | the user's own (the tool it was made with is not recorded) |
+| `gameplay/art/slime.png` | slime | the user's art from PixelLab (`art/incoming/slime.png`, three frames of 256x256 brought 2026-11-23), fitted to 16x16 by a script: shrunk to about a fifth by the colour covering most of each pixel, its own colours, its outline, a pixel for each eye, the white flash row added | 2026-11-23 | PixelLab, made 2026-11-23: see "PixelLab" below |
 | `gameplay/art/wisp.png` | Bogwisp | code: `make_sprites.gd` | 2026-11-17 | Hearthvale's own |
-| `gameplay/art/bat.png` | bat | the user's own art (`art/incoming/bat.png`, three frames of 256x256 brought 2026-11-23), fitted to 16x16 by a script as the slime was, its face's colour and a pixel for each eye kept | 2026-11-23 | the user's own (the tool it was made with is not recorded) |
+| `gameplay/art/bat.png` | bat | the user's art from PixelLab (`art/incoming/bat.png`, three frames of 256x256 brought 2026-11-23), fitted to 16x16 by a script as the slime was, its face's colour and a pixel for each eye kept | 2026-11-23 | PixelLab, made 2026-11-23: see "PixelLab" below |
 | `gameplay/art/goblin.png` | goblin archer | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
 | `gameplay/art/warden.png` | the Iron Warden | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
 | `gameplay/art/shade.png` | the Crypt Shade | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
@@ -58,6 +58,10 @@ the time). PixelLab's Terms of Service, as they stood on that date (https://www.
   training other models, and is responsible for them not infringing anyone's rights.
 - 4.1: use must also follow the Open RAIL-M licence (its use restrictions).
 - No attribution is asked for.
+
+Two more, `art/incoming/slime.png` and `bat.png`, were made by the user with PixelLab on **2026-11-23**,
+at 10:24 and 10:29 (the user's word). The terms above are as they were read on 2026-11-20; they were
+not read again for these two.
 
 Every PNG that holds PixelLab's pictures, or is drawn in their colours, says so in its row above.
 
