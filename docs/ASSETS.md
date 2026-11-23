@@ -17,9 +17,9 @@ painted each picture from ASCII art written for this game (no outside art) and a
 | `gameplay/player/player_sheet.png` | the hero, 25 frames x 3 facings | code: `make_player_sprite.gd`; redrawn by a script in the look of PixelLab's `art/incoming/hero.png` (its colours, spiky hair, a deeper scarf), every pixel in its place (new-art plan, step 3) | 2026-11-20 | Hearthvale's own; PixelLab, free plan, made 2026-11-20: see "PixelLab" below |
 | `gameplay/art/held_tools.png` | the tools in his hands | code: `make_sprites.gd` | 2026-11-19 | Hearthvale's own |
 | `gameplay/art/villager.png` | villagers (marker colours) | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
-| `gameplay/art/slime.png` | slime | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
+| `gameplay/art/slime.png` | slime | the user's own art (`art/incoming/slime.png`, three frames of 256x256 brought 2026-11-23), fitted to 16x16 by a script: shrunk to about a fifth by the colour covering most of each pixel, its own colours, its outline, a pixel for each eye, the white flash row added | 2026-11-23 | the user's own (the tool it was made with is not recorded) |
 | `gameplay/art/wisp.png` | Bogwisp | code: `make_sprites.gd` | 2026-11-17 | Hearthvale's own |
-| `gameplay/art/bat.png` | bat | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
+| `gameplay/art/bat.png` | bat | the user's own art (`art/incoming/bat.png`, three frames of 256x256 brought 2026-11-23), fitted to 16x16 by a script as the slime was, its face's colour and a pixel for each eye kept | 2026-11-23 | the user's own (the tool it was made with is not recorded) |
 | `gameplay/art/goblin.png` | goblin archer | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
 | `gameplay/art/warden.png` | the Iron Warden | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |
 | `gameplay/art/shade.png` | the Crypt Shade | code: `make_sprites.gd` | 2026-11-12 | Hearthvale's own |

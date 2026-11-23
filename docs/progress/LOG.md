@@ -3503,3 +3503,25 @@ A review of the five steps found seven things; the user said "Fix all":
 **Verified:** the whole suite, 1206 cases; the one failure was `items_test` reading the quiver's
 old 15, brought up to date, and passes. The run's output has no "already connected" line. New
 tests: the second block can't reach the trench, the three alcoves' save guards, and a misspelt place.
+
+## 2026-11-23 — New slime and bat
+
+The user brought new pictures of the slime and the bat ("new models for slimes and bats add them to
+the game"), each three creatures in a row on a clear 256x256 picture, kept in `art/incoming/`
+(`slime.png`, `bat.png`). Their frames match the game's one for one: the slime round, squashed and
+stretched tall (rest, wide, hop), the bat with its wings out, raised and down (rest, up, down). Drawn
+at about five times the game's size, they were shrunk by a script to the sheets' 16x16 frames with one
+factor per creature (the slime 0.21, the bat 0.195): each game pixel takes the colour covering most of
+it, from the picture's own colours, the edge takes its outline, each eye is kept as one dark pixel,
+and the slime keeps its highlight and the bat its face's colour. The slime sits on the frame's last
+row; the hop is stretched to the frame's top and the game lifts it as before. The bat's frames share
+one top, its body in the middle. The white flash row is added. Nothing in play changed.
+
+**Verified:** the art tests and the whole suite pass. Capture shots 12 and 14, before and after (the
+capture's slot 994).
+
+**Known issues and limits**
+- **The bat rests with its wings out:** the old one folded them. The user's three frames have no
+  folded pose.
+- **At 16 pixels the bat's face is two dark pixels on a light one,** and the slime is paler than the
+  old one, in the user's own colours.
