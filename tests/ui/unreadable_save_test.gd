@@ -176,6 +176,39 @@ func test_no_save_and_no_backup_leaves_continue_out_of_reach() -> void:
 
 ## Two saves: seven coins in the Old Wood after a minute, then twelve in Hearthvale after two.
 ## The first is the backup. GameState is a new game again when this returns.
+func test_new_game_over_a_saved_game_asks_first() -> void:
+	# The new game would save over the one saved (the review of 2026-11-23): he is asked, and
+	# Back is where the cursor starts.
+	_two_saves()
+	var title: TitleScreen = _title()
+	title.choose(TitleScreen.NEW_GAME)
+	assert_array(_travelled).override_failure_message("not yet").is_empty()
+	assert_bool(title.is_asking_to_start_over()).is_true()
+	assert_array(Array(title.shown_lines())).is_equal(["> Back", "  Start a new game"])
+	assert_str(title.notice()).is_equal(TitleScreen.START_OVER_WORDS % "Hearthvale, 2:00")
+	title._unhandled_input(_key(&"pause"))
+	assert_bool(title.is_asking_to_start_over()).override_failure_message("Esc goes back").is_false()
+	assert_array(Array(title.shown_lines())).is_equal(["> Continue   Hearthvale, 2:00", "  New game", "  Settings", "  Quit"])
+	assert_str(title.notice()).is_empty()
+	title.choose(TitleScreen.NEW_GAME)
+	title.choose(TitleScreen.START_OVER)
+	assert_array(_travelled).is_equal([VILLAGE])
+	assert_int(GameState.item_count(&"coin")).override_failure_message("a new game").is_equal(0)
+
+
+func test_new_game_with_nothing_saved_starts_at_once() -> void:
+	var title: TitleScreen = _title()
+	title.choose(TitleScreen.NEW_GAME)
+	assert_array(_travelled).is_equal([VILLAGE])
+
+
+func _key(action: StringName) -> InputEventAction:
+	var event: InputEventAction = InputEventAction.new()
+	event.action = action
+	event.pressed = true
+	return event
+
+
 func _two_saves() -> void:
 	GameState.add_item(&"coin", 7)
 	GameState.add_play_time(60.0)

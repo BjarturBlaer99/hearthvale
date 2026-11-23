@@ -3525,3 +3525,29 @@ capture's slot 994).
   folded pose.
 - **At 16 pixels the bat's face is two dark pixels on a light one,** and the slime is paler than the
   old one, in the user's own colours.
+
+## 2026-11-23 — A review of the whole codebase, and its fixes
+
+The user asked for the whole codebase reviewed, area by area (core, autoload, gameplay, world,
+ui), and then for every finding fixed:
+- **What lies on the ground is kept** when he leaves an area or the game saves
+  (`AreaController.keep_what_lies()`): a rock's ore, what debris or a monster left becomes a
+  LeftItem in its cell. Until now a full pack, or simply walking away, lost it, and on the
+  homestead the rock or debris never comes back.
+- **"New game" over a saved game asks first** (Back first), since the new game saves over it.
+- **Conditions read `GameState.condition_state()`**, not a copy of the whole save: the quests'
+  checks after every pickup and flag, and the dialogue box's on every mouse move, no longer copy
+  the farm, the homestead and the chests.
+- **Loading is defensive**: sections of the wrong shape are taken as empty, the pack is checked
+  against the items (no unknown things, no empty stacks, no stack over its limit, two of one
+  thing put together), and the silo's hay is capped at 60.
+- **The quarry's seed is the game's own formula** (not the engine's hash()); a save from before
+  rolls today's floors anew once.
+- **The clock never goes back; push blocks going home let go of their cells first; an animal cut
+  off from its pasture is put back on it.**
+
+**Verified:** the whole suite, 1219 cases, exit 0 (a second run; the first had one failure in
+`home_move_test`, a save file found and then not found a moment later, which passed alone and on
+the second run: a file race on this machine, not the code). New tests: `review_fixes_test.gd`
+(10), two in `unreadable_save_test.gd`, one in `animals_test.gd` (checked to fail without its fix).
+Not played by hand.

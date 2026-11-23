@@ -8,6 +8,8 @@ extends RefCounted
 
 ## No cell: a floor with no ladder down.
 const NO_CELL: Vector2i = Vector2i(-1, -1)
+## The 64-bit FNV prime: what seed_for() multiplies by.
+const FNV_PRIME: int = 1099511628211
 
 
 ## Today's rocks for a floor: { "kinds": { cell: kind }, "ladder": cell }.
@@ -48,5 +50,11 @@ static func shuffled(number: int, day: int, floor: int, cells: Array[Vector2i]) 
 
 
 ## The number a floor's shuffle starts from on a day.
+## A fixed formula (FNV-1a's step over the three numbers), not the engine's hash(): that may
+## change between versions of Godot, and a day's floors must not change with it (the review of
+## 2026-11-23).
 static func seed_for(number: int, day: int, floor: int) -> int:
-	return hash([number, day, floor])
+	var mixed: int = number
+	for part: int in [day, floor]:
+		mixed = (mixed ^ part) * FNV_PRIME
+	return mixed

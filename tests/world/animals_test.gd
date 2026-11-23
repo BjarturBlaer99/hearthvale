@@ -127,6 +127,25 @@ func test_each_wanders_within_its_ground_and_blocks_nobody() -> void:
 	farm.build.close()
 
 
+func test_an_animal_cut_off_from_its_pasture_is_put_back_on_it() -> void:
+	# A fence across the pen leaves a hen on the side no longer reached from the coop's door: she
+	# is put back on her ground, or she could never walk again (the review of 2026-11-23).
+	_coop_with_hens(1)
+	_fence_pen()
+	var farm: AreaController = _farm()
+	var hen: Animal = farm.animals.shown()[0]
+	_put(hen, Vector2i(13, 14))
+	for y: int in range(13, 16):
+		GameState.homestead().set_down(Vector2i(15, y), Placement.STANDING, &"fence")
+	EventBus.homestead_changed.emit()
+	var pasture: Array = GameState.pasture_of(&"coop")["cells"]
+	assert_bool(pasture.has(Vector2i(13, 14))).override_failure_message("her side is cut off").is_false()
+	assert_bool(pasture.has(hen.cell())).override_failure_message("she is back on her ground, at %s" % hen.cell()).is_true()
+	for i: int in 240:
+		hen.walk(FRAME)
+	assert_bool(pasture.has(hen.cell())).is_true()
+
+
 func test_nothing_is_set_down_on_an_animals_cell() -> void:
 	_coop_with_hens(1)
 	_fence_pen()

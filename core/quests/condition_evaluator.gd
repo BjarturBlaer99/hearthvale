@@ -19,11 +19,13 @@ func _init(state: Dictionary, friendship: Friendship = null) -> void:
 	_friendship = friendship
 
 
-## An evaluator for `state` as it stands (GameState, or a stand-in with to_dict()): its
-## snapshot, and its rules of friendship if it has any.
+## An evaluator for `state` as it stands (GameState, or a stand-in with to_dict()): what
+## conditions read of it (its condition_state() if it has one, else its whole snapshot), and its
+## rules of friendship if it has any.
 static func for_state(state: Object) -> ConditionEvaluator:
 	var rules: Friendship = state.call(&"friendship") as Friendship if state.has_method(&"friendship") else null
-	return ConditionEvaluator.new(state.call(&"to_dict"), rules)
+	var snapshot: Dictionary = state.call(&"condition_state") if state.has_method(&"condition_state") else state.call(&"to_dict")
+	return ConditionEvaluator.new(snapshot, rules)
 
 
 func is_met(condition: Dictionary) -> bool:

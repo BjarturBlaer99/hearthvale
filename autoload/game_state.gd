@@ -1480,6 +1480,25 @@ func to_dict() -> Dictionary:
 	}
 
 
+## What a condition can ask about (ConditionEvaluator), in to_dict()'s shape: the day, flags and
+## their days, quests, the pack and friends. A conversation, a quest's check and an objective
+## read only these, so they are given only these: the farm, the homestead, the chests and the
+## mine are not copied each time (the review of 2026-11-23: every pickup and every flag made a
+## whole save's copy for the quests).
+func condition_state() -> Dictionary:
+	var stacks: Array = []
+	for stack: Dictionary in inventory:
+		stacks.append({"id": String(stack["id"]), "count": int(stack["count"])})
+	return {
+		"day": day,
+		"flags": _json_safe(flags),
+		"flag_days": _json_safe(flag_days),
+		"quests": _json_safe(quests),
+		"inventory": stacks,
+		"friends": _json_safe(friends),
+	}
+
+
 ## Replaces all state with `data`, which must already be at SAVE_VERSION.
 ## Does not emit signals: the caller reloads the world after loading.
 func from_dict(data: Dictionary) -> void:
@@ -1491,7 +1510,9 @@ func from_dict(data: Dictionary) -> void:
 	day = maxi(int(data.get("day", 1)), 1)
 	minute = clampf(float(data.get("minute", day_clock().starts)), float(day_clock().starts), float(day_clock().ends))
 	energy = clampf(float(data.get("energy", max_energy())), 0.0, max_energy())
-	var src_flags: Dictionary = data.get("flags", {})
+	# Every section is read as what it should be: one of the wrong shape (a save that is JSON but
+	# damaged) is taken as empty, never as a script error halfway through a load.
+	var src_flags: Dictionary = _dictionary(data.get("flags"))
 	for key: Variant in src_flags:
 		flags[StringName(str(key))] = src_flags[key]
 	var src_days: Dictionary = _dictionary(data.get("flag_days"))
@@ -1511,18 +1532,15 @@ func from_dict(data: Dictionary) -> void:
 	var src_tally: Dictionary = _dictionary(data.get("tally"))
 	for key: Variant in src_tally:
 		tally[StringName(str(key))] = maxi(int(src_tally[key]), 0)
-	var src_quests: Dictionary = data.get("quests", {})
+	var src_quests: Dictionary = _dictionary(data.get("quests"))
 	for key: Variant in src_quests:
 		quests[StringName(str(key))] = StringName(str(src_quests[key]))
-	var src_inventory: Array = data.get("inventory", [])
-	for stack: Variant in src_inventory:
-		var entry: Dictionary = stack
-		inventory.append({"id": StringName(str(entry["id"])), "count": int(entry["count"])})
+	_load_inventory(data.get("inventory"))
 	equipped = StringName(str(data.get("equipped", "")))
 	# A save from before the bar could keep bombs on the button with none left.
 	if equipped != &"" and item_count(equipped) <= 0:
 		equipped = &""
-	player = _whole_numbers_as_int(data.get("player", {}))
+	player = _dictionary(_whole_numbers_as_int(data.get("player", {})))
 	farm().load_saved(data.get("farm", {}), DataRegistry.ids(&"crops"))
 	_mine = MineState.new()
 	_mine.load_saved(data.get("mine"))
@@ -1535,6 +1553,8 @@ func from_dict(data: Dictionary) -> void:
 		func(building: String) -> bool: return DataRegistry.has_entry(&"buildings", StringName(building)),
 		func(kind: String) -> bool: return DataRegistry.has_entry(&"animals", StringName(kind)))
 	_load_rooms(_dictionary(data.get("homestead")))
+	# The silo holds so much hay and no more, whatever a save says.
+	homestead().hay = mini(homestead().hay, _most_hay())
 	# A save from before phase 5 has its buildings and none of their flags.
 	for id: StringName in DataRegistry.ids(&"buildings"):
 		var flag: StringName = built_flag(id)
@@ -1553,6 +1573,39 @@ func from_dict(data: Dictionary) -> void:
 	# What he carries, he has found: a save from before this was kept says nothing of it.
 	for stack: Dictionary in inventory:
 		found[stack["id"]] = true
+
+
+## Takes up the pack from a save: stacks of things the game has, each of one or more and no
+## more than a stack of it holds (two stacks of one thing are put together). A stack of a thing
+## the game no longer has, or that isn't a stack at all, is left out.
+func _load_inventory(saved: Variant) -> void:
+	if typeof(saved) != TYPE_ARRAY:
+		return
+	for stack: Variant in (saved as Array):
+		if typeof(stack) != TYPE_DICTIONARY:
+			continue
+		var id: Variant = (stack as Dictionary).get("id")
+		var count: Variant = (stack as Dictionary).get("count")
+		if typeof(id) != TYPE_STRING or str(id).is_empty() or (typeof(count) != TYPE_INT and typeof(count) != TYPE_FLOAT) or int(count) < 1:
+			continue
+		var item: Dictionary = DataRegistry.get_item(StringName(str(id)))
+		if item.is_empty():
+			continue
+		var index: int = _find_stack(StringName(str(id)))
+		if index == -1:
+			inventory.append({"id": StringName(str(id)), "count": mini(int(count), Inventory.capacity(item))})
+		else:
+			inventory[index]["count"] = mini(int(inventory[index]["count"]) + int(count), Inventory.capacity(item))
+
+
+## The most hay any building holds (the silo's 60), or none if no building holds hay.
+func _most_hay() -> int:
+	var most: int = 0
+	for building: Dictionary in DataRegistry.entries(&"buildings"):
+		var held: Dictionary = Buildings.holds(building)
+		if not held.is_empty() and held["item"] == &"hay":
+			most = maxi(most, int(held["count"]))
+	return most
 
 
 ## The save's section `homestead`: what Homestead keeps, and (the Homestead, phase 3) the

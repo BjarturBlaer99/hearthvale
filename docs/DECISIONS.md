@@ -1734,3 +1734,24 @@ PNG". What building it decided:
     own method), which ends the "already connected" error on every dungeon load.
   - The crypt hall's new archer stands at (26, 27), off the `shade` scenario's start; a `keep`
     scenario starts at the keep's entrance.
+- 2026-11-23 — **The review of the whole codebase: what was put right** (the user: "Fix all of
+  them").
+  - **What lies on the ground is kept** when he leaves the area or the game saves: every ItemDrop
+    still lying (a rock's ore, what debris or a monster left) becomes a LeftItem in its cell, the
+    flags `left/<area>/<x>,<y>/<item>` that rewards a full pack couldn't take already use. So it is
+    picked up with a right click from then on, as a LeftItem is; walking over it is for the visit
+    it fell in. Hearts dropped are not kept (they heal on the spot).
+  - **"New game" over a saved game asks first** (Back is where the cursor starts), since the new
+    game saves over the old one; with nothing saved it starts at once, as before.
+  - **Conditions read `GameState.condition_state()`** (the day, flags and their days, quests, the
+    pack and friends), not a copy of the whole save; a stand-in state without it still gives its
+    to_dict().
+  - **Loading reads every section defensively**: one of the wrong shape is taken as empty; the pack
+    keeps only stacks of things the game has, of 1 or more, no bigger than a stack holds, two of
+    one thing put together; the silo's hay is capped at what a building holds (60).
+  - **The quarry's seed is the game's own formula** (FNV-1a's step over the save's number, the
+    day and the floor), not the engine's hash(): a save made before this rolls today's floors
+    anew once.
+  - **The clock never goes back** past where it stands; **push blocks going back let go of their
+    cells first**, so two on each other's starts both go home; **an animal left outside a pasture
+    that something set down has cut** is put back on its ground.

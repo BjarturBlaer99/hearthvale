@@ -141,6 +141,12 @@ func sync() -> void:
 			continue
 		if _shown.has(i):
 			_shown[i].motion.set_cells(cells)
+			# Its ground changed under it (something set down cut the pasture): one left outside
+			# its cells is put back among them, or it could never walk again (the review of
+			# 2026-11-23).
+			if not cells.has(_shown[i].motion.cell()):
+				_shown[i].motion.position = GridBody.cell_center(_start_cell(cells, ground_used))
+				_shown[i].position = _shown[i].motion.position
 			continue
 		var one: Animal = Animal.new()
 		one.setup(i, cells, _start_cell(cells, ground_used), area.rng)

@@ -272,6 +272,10 @@ res://
     - Bound, its touch does no harm, so the hero can close in.
   - The area sets enemies up on load. They're back on every visit, and nothing about them is saved (except
     that a boss stays beaten).
+  - **A drop still lying when he leaves or the game saves** (2026-11-23) is kept:
+    `AreaController.keep_what_lies()` turns every ItemDrop into the LeftItems flag of its cell, on
+    every way out (an exit, the lift, a fall, the day's end, the ending) and before every save
+    (`save_here()`, sleeping, the pause menu's Save through its `saving` signal).
 - **Dungeon rules** (harder dungeons, 2026-11-23): `DungeonRules` (`core/enemies/`, pure) reads
   `data/rules/dungeon.json`, whose `places` name a dungeon's id (or an area's, for the quarry's floors)
   and what a monster there is multiplied by: `health` and `damage` (its touch and its arrows, both

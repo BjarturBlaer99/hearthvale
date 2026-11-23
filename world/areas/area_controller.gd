@@ -304,6 +304,7 @@ func _ready() -> void:
 	EventBus.items_owed.connect(_lay_down_owed)
 	EventBus.friend_mark_gained.connect(_on_friend_mark_gained)
 	hud.pause_menu.quit_to_title.connect(_on_quit_to_title)
+	hud.pause_menu.saving.connect(keep_what_lies)
 	EventBus.hit_stop.connect(hit_stop)
 	EventBus.quest_announced.connect(_on_quest_announced)
 	EventBus.skill_rose.connect(_on_skill_rose)
@@ -818,11 +819,21 @@ func update_room(first: bool = false) -> void:
 ## Puts back every push block outside the hero's room (one jammed in a corner is back in place
 ## on the way back in). Returns how many moved.
 func reset_blocks() -> int:
-	var moved: int = 0
+	var going: Array[PushBlock] = []
 	for child: Node in interactables.get_children():
 		if child is PushBlock and RoomGrid.room_of((child as PushBlock).cell(), room_size) != current_room:
-			if (child as PushBlock).reset(terrain):
-				moved += 1
+			going.append(child as PushBlock)
+	# Every block going back lets go of its cell first, so one standing on another's start (or
+	# two on each other's) is no hindrance to it (the review of 2026-11-23).
+	for block: PushBlock in going:
+		if not block.sunk:
+			terrain.set_occupied(block.cell(), false)
+	var moved: int = 0
+	for block: PushBlock in going:
+		if block.reset(terrain):
+			moved += 1
+		elif not block.sunk:
+			terrain.set_occupied(block.cell(), true)
 	return moved
 
 
@@ -880,6 +891,28 @@ func _lay_down_owed() -> void:
 	for laid: Dictionary in GameState.lay_down_owed(area_id, _safe_cell if is_in_pit() else player.motor.cell):
 		hud.show_notice(LeftItems.words(str(DataRegistry.get_item(laid["item"]).get("name", laid["item"])), int(laid["count"])))
 	_show_left_items()
+
+
+## What lies on the ground here and is kept nowhere yet (an ItemDrop: a rock's ore, what debris
+## or a monster left) is kept in the flags as a LeftItem in its cell, so that leaving the area or
+## saving never loses it (the review of 2026-11-23: a full pack used to lose it on leaving, and
+## on the homestead the rock or debris that left it never comes back). Called on every way out
+## and before every save. Returns how many were kept.
+func keep_what_lies() -> int:
+	var kept: int = 0
+	for child: Node in interactables.get_children():
+		var drop: ItemDrop = child as ItemDrop
+		if drop == null or drop.taken or drop.count <= 0 or drop.is_queued_for_deletion():
+			continue
+		var cell: Vector2i = PlayerMotor.cell_of(drop.position + Vector2(0.5, 0.5))
+		var flag: StringName = LeftItems.lying_flag(area_id, cell, drop.item_id)
+		GameState.set_flag(flag, LeftItems.count_of(GameState.get_flag(flag, 0)) + drop.count)
+		drop.taken = true
+		drop.queue_free()
+		kept += 1
+	if kept > 0 and not _travelling:
+		_show_left_items()
+	return kept
 
 
 ## A LeftItem for everything that lies in this area by the flags: made if there is none yet,
@@ -1572,6 +1605,7 @@ func is_collapsing() -> bool:
 func _wake_at_home(words: String) -> void:
 	if _travelling:
 		return
+	keep_what_lies()
 	_travelling = true
 	player.controls_enabled = false
 	var lost: int = GameState.collapse()
@@ -1595,6 +1629,7 @@ func _on_energy_changed(current: float, maximum: float) -> void:
 ## The hero slept in his bed (GameState.sleep, from the bed's conversation): the morning comes
 ## up out of the dark, and the game is saved.
 func _on_slept(_day: int) -> void:
+	keep_what_lies()
 	GameState.update_player(area_id, player.motor.cell)
 	SaveSystem.save_game()
 	EventBus.sound.emit(&"morning")
@@ -2013,6 +2048,7 @@ func is_dying() -> bool:
 ## else (`fall_area`: a floor of the mine), he wakes there, whole, with what he carries.
 func respawn() -> void:
 	if fall_area != &"":
+		keep_what_lies()
 		_dying = false
 		_travelling = true
 		player.controls_enabled = false
@@ -2042,6 +2078,7 @@ func take_exit(exit: AreaExit) -> void:
 	if is_shut(exit):
 		_say_shut(exit)
 		return
+	keep_what_lies()
 	_travelling = true
 	player.controls_enabled = false
 	GameState.go_to(exit.target_area, exit.target_entry)
@@ -2052,6 +2089,7 @@ func take_exit(exit: AreaExit) -> void:
 func go_to_area(area: StringName, entry: StringName) -> void:
 	if _travelling:
 		return
+	keep_what_lies()
 	_travelling = true
 	player.controls_enabled = false
 	EventBus.sound.emit(&"lift")
@@ -2176,6 +2214,7 @@ func _on_dialogue_closed() -> void:
 ## Leaves for the ending screen (the game's last conversation just closed). The hero's place
 ## is kept, so "Keep exploring" brings them back here.
 func show_ending() -> void:
+	keep_what_lies()
 	_ending_due = false
 	_travelling = true
 	player.controls_enabled = false
@@ -2251,6 +2290,7 @@ func save_and_leave(then: Callable) -> void:
 ## at the entrance and whole; one down a pit, on the ground he fell from; one on his way through
 ## a door, on his way.
 func save_here() -> Error:
+	keep_what_lies()
 	if _dying and fall_area != &"":
 		# Saved as he would wake: whole, on his way to where the fall ends. (No scene is
 		# changed: whoever asked for the save is leaving anyway.)

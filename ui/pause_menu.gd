@@ -9,6 +9,8 @@ extends Control
 
 signal resumed
 signal quit_to_title
+## The game is about to be saved from this menu: the area keeps what lies on its ground first.
+signal saving
 
 const RESUME: StringName = &"resume"
 const SAVE: StringName = &"save"
@@ -88,6 +90,7 @@ func choose(id: StringName = &"") -> void:
 		RESUME:
 			resume()
 		SAVE:
+			saving.emit()
 			var error: Error = SaveSystem.save_game()
 			_note.text = "Saved." if error == OK else "Couldn't save (%s)." % error_string(error)
 		QUESTS:

@@ -18,6 +18,9 @@ const QUIT: StringName = &"quit"
 ## The two lines offered in the menu's place when the save can't be read and its backup can.
 const BACKUP: StringName = &"backup"
 const BACK: StringName = &"back"
+## Starting over when a game is saved: asked first, since the new game saves over it.
+const START_OVER: StringName = &"start_over"
+const START_OVER_WORDS: String = "Start a new game? Your saved game (%s) will be lost once the new one is saved."
 ## What is said under the menu: the save can't be read and the backup is offered (with where and
 ## how long it was), there is no backup, or the backup can't be read either.
 const OFFER_WORDS: String = "Your save can't be read. An earlier save was kept: %s."
@@ -93,6 +96,14 @@ func is_offering_backup() -> bool:
 	return cursor.selected_id() == BACKUP or cursor.selected_id() == BACK
 
 
+## Whether the title is asking before a new game takes the place of the saved one.
+func is_asking_to_start_over() -> bool:
+	for option: Dictionary in cursor.options:
+		if option["id"] == START_OVER:
+			return true
+	return false
+
+
 func shown_lines() -> PackedStringArray:
 	return cursor.lines()
 
@@ -125,8 +136,13 @@ func choose(id: StringName = &"") -> void:
 			refresh()
 			say("")
 		NEW_GAME:
-			GameState.new_game()
-			travel.call(WorldPaths.scene_for(WorldPaths.START_AREA))
+			# A game is saved: the new one would save over it, so he is asked first.
+			if SaveSystem.has_save() or SaveSystem.has_backup():
+				_ask_to_start_over()
+			else:
+				_start_new_game()
+		START_OVER:
+			_start_new_game()
 		SETTINGS:
 			settings_menu.open()
 		QUIT:
@@ -134,6 +150,24 @@ func choose(id: StringName = &"") -> void:
 
 
 ## Goes to the area the game just loaded says the hero is in.
+func _start_new_game() -> void:
+	GameState.new_game()
+	travel.call(WorldPaths.scene_for(WorldPaths.START_AREA))
+
+
+func _ask_to_start_over() -> void:
+	var saved: Dictionary = SaveSystem.summary()
+	if saved.is_empty():
+		saved = SaveSystem.backup_summary()
+	cursor.set_options([
+		MenuCursor.option(BACK, "Back"),
+		MenuCursor.option(START_OVER, "Start a new game"),
+	])
+	_list.text = "
+".join(cursor.lines())
+	say(START_OVER_WORDS % (where_and_when(saved) if not saved.is_empty() else "it can't be read"))
+
+
 func _enter_the_game() -> void:
 	var area: StringName = StringName(str(GameState.player.get("area", WorldPaths.START_AREA)))
 	travel.call(WorldPaths.scene_for(area if ResourceLoader.exists(WorldPaths.scene_for(area)) else WorldPaths.START_AREA))
@@ -179,7 +213,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if cursor.take_click(MenuInput.line_under(_list, event, cursor.options.size())):
 			_list.text = "\n".join(cursor.lines())
 			choose()
-	elif MenuInput.is_back(event) and is_offering_backup():
+	elif MenuInput.is_back(event) and (is_offering_backup() or is_asking_to_start_over()):
 		choose(BACK)
 	else:
 		return

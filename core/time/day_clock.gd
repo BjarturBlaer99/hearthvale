@@ -78,9 +78,10 @@ func length_seconds() -> float:
 	return (ends - starts) / 60.0 * seconds_per_hour
 
 
-## `minute` after `seconds` of real time: it stops at the day's end.
+## `minute` after `seconds` of real time: it stops at the day's end, and never goes back (a
+## minute past the end stays where it is).
 func advance(minute: float, seconds: float) -> float:
-	return minf(minute + maxf(seconds, 0.0) * 60.0 / seconds_per_hour, float(ends))
+	return maxf(minute, minf(minute + maxf(seconds, 0.0) * 60.0 / seconds_per_hour, float(ends)))
 
 
 ## Whether the day has run out at `minute`.
