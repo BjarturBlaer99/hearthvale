@@ -198,10 +198,18 @@ meals in 3c.)*
 | **Slime** | Countryside, dungeons | Hops toward you; weak |
 | **Goblin archer** | Countryside, dungeons | Keeps its distance and shoots arrows |
 | **Bat** | The ruin, dungeons | Erratic flight |
-| **Iron Warden** (keep boss) | The keep | Stomps after you; blows clink off its iron. It opens its eye (the tell): an arrow there stuns it, then the sword hurts it. Rages at half health |
-| **Crypt Shade** (crypt boss) | The crypt | Drifts after you; blows pass through it. Light all four braziers in its hall and the light binds it for a few seconds: now the sword hurts it. Then it snuffs them. Rages at half health: faster, with bolts |
+| **Iron Warden** (keep boss) | The keep | Stomps after you; blows clink off its iron. It opens its eye (the tell): an arrow there stuns it, then the sword hurts it. Rages at half health. *(Harder dungeons, 2026-11-23:)* 18 health, its eye open 1.6 s, stunned 2.4 s, and its touch costs a whole heart |
+| **Crypt Shade** (crypt boss) | The crypt | Drifts after you; blows pass through it. Light all four braziers in its hall and the light binds it for a few seconds: now the sword hurts it. Then it snuffs them. Rages at half health: faster, with bolts. *(Harder dungeons, 2026-11-23:)* 22 health, bound 2.4 s, a bolt every 2 s, its touch a whole heart; a brazier burns only 10 s, so all four are lit in one run, and one that goes out ends the binding |
 
 Enemies sometimes drop hearts or coins.
+- **Monsters in the dungeons are tougher** *(harder dungeons, 2026-11-23;
+  `docs/progress/dungeon-difficulty-plan.md`)*, each dungeon by its own numbers
+  (`data/rules/dungeon.json`). In the ruin's cellar, the cistern and the keep: half as much health again
+  (a slime takes two blows of the wooden sword, an archer three), 10% faster, seeing 20% further,
+  archers shooting a fifth more often, hearts dropped half as often; a touch is still half a heart. In
+  the crypt: twice the health, and a touch or an arrow costs a whole heart. On the quarry's floors 4 to
+  9 as in the keep (from floor 7, a whole heart). Bosses and Bogwisps keep their own numbers, and
+  monsters out of doors are as they were.
 - **Bogwisp** *(Willowmere, 2026-11-17)*: a pale blue-green light over the marsh's pools, there only from
   20:00 until the night ends.
   - It drifts slowly at the hero, flares brighter for half a second, then darts in a straight line the

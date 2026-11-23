@@ -272,6 +272,13 @@ res://
     - Bound, its touch does no harm, so the hero can close in.
   - The area sets enemies up on load. They're back on every visit, and nothing about them is saved (except
     that a boss stays beaten).
+- **Dungeon rules** (harder dungeons, 2026-11-23): `DungeonRules` (`core/enemies/`, pure) reads
+  `data/rules/dungeon.json`, whose `places` name a dungeon's id (or an area's, for the quarry's floors)
+  and what a monster there is multiplied by: `health` and `damage` (its touch and its arrows, both
+  rounded up), `speed`, `sight`, `hearts` (the weight of its heart drops) and `shot_cooldown`. The area
+  sets each enemy's `place` to its `flag_scope()` before setup, and `Enemy.setup()` takes the data
+  through `strengthen(data, place)`. A place not named, a boss, and a monster only there by night are
+  left as they are. Night is outdoors only, so the two rules never meet.
 
 ## 6. Dungeons & puzzles
 - **Rooms:** a dungeon is one area (`dungeon_id` set on its AreaController) cut into equal rooms of `room_size`

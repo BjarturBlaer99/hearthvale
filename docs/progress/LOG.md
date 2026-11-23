@@ -3368,3 +3368,30 @@ after (about half a minute in a window, the capture's slot 994).
 The user saw the pictures and said "Looks good" (2026-11-23).
 The user then played the game with the groves in it, from the title, and said "it feels good"
 (2026-11-23). The game closed cleanly, with nothing in its log.
+
+## 2026-11-23 — Harder dungeons, step 1: tougher monsters and bosses
+
+The user asked for harder dungeons and puzzles; the plan
+(`docs/progress/dungeon-difficulty-plan.md`, 17 decisions in five steps) was approved as written.
+Step 1 is decisions 1, 4 and 5:
+- **Dungeon rules** (`data/rules/dungeon.json`, read by `DungeonRules` in `core/enemies/`, pure): each
+  dungeon, and the quarry's floors 4 to 9, has its own numbers. In the cellar, cistern and keep a slime
+  has 3 health (two wooden-sword blows), a bat 2, an archer 6, all 10% faster, seeing 20% further,
+  archers shooting a fifth more often, hearts dropped half as often. In the crypt health is doubled and
+  a touch or an arrow costs a whole heart. Bosses, Bogwisps and every monster out of doors are as
+  they were. The area tells each enemy its place (`Enemy.place`, its `flag_scope()`) before setup.
+- **The Iron Warden:** 18 health, eye open 1.6 s, stunned 2.4 s, rage at 9, a whole heart a touch.
+- **The Crypt Shade:** 22 health, bound 2.4 s, rage at 11, a bolt every 2 s, a whole heart a touch;
+  its four braziers burn 10 s (`burn_time`), and one going out ends the binding.
+
+**Verified:** the whole suite, 1183 cases; the one failure was `night_test`'s check that the
+cellar's monsters have their field health, now made to compare with the cellar's own numbers (its
+point, that the night adds nothing underground, stands), and passes. New tests:
+`tests/core/enemies/dungeon_rules_test.gd` (8) and `tests/world/dungeon_monsters_test.gd` (4).
+Capture shots 28, 37, 38, 79 and 80 look as before (numbers only).
+
+**Known, not from this step:** loading the crypt logs "Signal 'state_changed' is already connected"
+from `ShadeBoss.setup()`: `Enemy.setup()` connects the same brain signal to the same method first.
+Harmless (the second connect is refused), and older than this step.
+
+**Not yet played by hand.** Try it with `tools/playtest.gd -- warden` and `-- shade`.

@@ -269,6 +269,8 @@ func _ready() -> void:
 	for enemy: Enemy in enemies():
 		# Met outdoors at night, a monster is tougher (P2e). It is decided here, as the area loads.
 		enemy.night = is_night_outdoors()
+		# In a dungeon it is tougher, by the place's numbers (data/rules/dungeon.json).
+		enemy.place = flag_scope()
 		enemy.is_lit_at = holds_at
 		enemy.died.connect(_on_enemy_died)
 		# One that is only there by night (a Bogwisp) lies low by day, and rises if night falls

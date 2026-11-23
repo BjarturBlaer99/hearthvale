@@ -74,7 +74,8 @@ const RULES_FRIENDSHIP: StringName = &"friendship"
 const RULES_MINE: StringName = &"mine"
 const RULES_CRAFTING: StringName = &"crafting"
 const RULES_HOMESTEAD: StringName = &"homestead"
-const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM, RULES_SKILLS, RULES_FRIENDSHIP, RULES_MINE, RULES_CRAFTING, RULES_HOMESTEAD]
+const RULES_DUNGEON: StringName = &"dungeon"
+const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM, RULES_SKILLS, RULES_FRIENDSHIP, RULES_MINE, RULES_CRAFTING, RULES_HOMESTEAD, RULES_DUNGEON]
 
 ## Enemy behaviour ids (EnemyBrains makes one brain per id) and drop-table entry types.
 const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden", "shade", "wisp"]
@@ -575,6 +576,8 @@ func _check_rules(rules: Dictionary) -> void:
 			problems = Hours.problems(rules)
 		RULES_NIGHT:
 			problems = NightRules.problems(rules)
+		RULES_DUNGEON:
+			problems = DungeonRules.problems(rules)
 		RULES_FARM:
 			problems = Farm.problems(rules)
 		RULES_SKILLS:

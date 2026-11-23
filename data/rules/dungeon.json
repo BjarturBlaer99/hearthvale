@@ -1,0 +1,15 @@
+{
+	"id": "dungeon",
+	"places": {
+		"ruin_cellar": { "health": 1.5, "damage": 1, "speed": 1.1, "sight": 1.2, "hearts": 0.5, "shot_cooldown": 0.8 },
+		"cistern": { "health": 1.5, "damage": 1, "speed": 1.1, "sight": 1.2, "hearts": 0.5, "shot_cooldown": 0.8 },
+		"keep": { "health": 1.5, "damage": 1, "speed": 1.1, "sight": 1.2, "hearts": 0.5, "shot_cooldown": 0.8 },
+		"crypt": { "health": 2, "damage": 2, "speed": 1.15, "sight": 1.3, "hearts": 0.5, "shot_cooldown": 0.8 },
+		"quarry_4": { "health": 1.5, "damage": 1, "speed": 1.1, "sight": 1.2, "hearts": 0.5, "shot_cooldown": 0.8 },
+		"quarry_5": { "health": 1.5, "damage": 1, "speed": 1.1, "sight": 1.2, "hearts": 0.5, "shot_cooldown": 0.8 },
+		"quarry_6": { "health": 1.5, "damage": 1, "speed": 1.1, "sight": 1.2, "hearts": 0.5, "shot_cooldown": 0.8 },
+		"quarry_7": { "health": 1.5, "damage": 2, "speed": 1.1, "sight": 1.2, "hearts": 0.5, "shot_cooldown": 0.8 },
+		"quarry_8": { "health": 1.5, "damage": 2, "speed": 1.1, "sight": 1.2, "hearts": 0.5, "shot_cooldown": 0.8 },
+		"quarry_9": { "health": 1.5, "damage": 2, "speed": 1.1, "sight": 1.2, "hearts": 0.5, "shot_cooldown": 0.8 }
+	}
+}

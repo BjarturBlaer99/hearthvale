@@ -38,6 +38,9 @@ var data: Dictionary = {}
 ## Whether it is met out of doors at night (the area says so before setup): it is set up from
 ## its data as the night makes it (NightRules), and tinted so the difference shows.
 var night: bool = false
+## Where it is met (the area says so before setup: its dungeon's id, or the area's own): a
+## place the dungeons' rules name sets it up tougher (DungeonRules).
+var place: StringName = &""
 ## Whether light reaches a point (area px): the area says how (LightRules, the lights that
 ## count for a Bogwisp). Only a Bogwisp asks; unset, nothing is lit.
 var is_lit_at: Callable
@@ -84,6 +87,9 @@ func setup(terrain_query: TerrainQuery, hero: Node2D, rng: RandomNumberGenerator
 		unshaded.light_mode = CanvasItemMaterial.LIGHT_MODE_UNSHADED
 		material = unshaded
 		modulate = NIGHT_TINT
+	# In a dungeon (or a deep floor of the quarry) a monster is tougher, by the place's numbers.
+	if place != &"":
+		data = DungeonRules.new(DataRegistry.get_rules(DataRegistry.RULES_DUNGEON)).strengthen(data, place)
 	terrain = terrain_query
 	target = hero
 	_rng = rng

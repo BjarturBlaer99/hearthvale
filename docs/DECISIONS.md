@@ -1669,3 +1669,12 @@ PNG". What building it decided:
   baker picks broadleaf, pine or oak for a grove of 6 by 6 cells, not for each cell; the shares are
   as they were (half broadleaf, a third pine, a sixth oak). Only which tree changes: where trees stand
   and the closed canopy are the same.
+- 2026-11-23 — **Harder dungeons, step 1: tougher monsters and bosses** (the user approved
+  `docs/progress/dungeon-difficulty-plan.md` as written). Dungeon monsters are made tougher by a rules
+  file read like the night's (`DungeonRules`), not by editing `data/enemies/`, so the fields stay as they
+  were. Each place has its own numbers: the cellar, cistern and keep half as much health again, the crypt
+  twice and a whole heart a touch, the quarry's floors 4 to 9 as the keep (a whole heart from floor 7,
+  which today touches no one: only Bogwisps are there, and they are left as they are). Damage is
+  rounded up, so a factor of 1 leaves a half-heart touch alone. The bosses' numbers are in their own
+  files. The Shade's braziers burn 10 s with the torch's own `burn_time`; one that goes out ends the
+  binding early (the brain's rule as it was), so lighting them quickly earns the whole binding.

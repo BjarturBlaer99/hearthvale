@@ -227,7 +227,9 @@ func test_the_night_changes_nothing_under_the_ground() -> void:
 	assert_int(cellar.enemies().size()).is_greater(0)
 	for enemy: Enemy in cellar.enemies():
 		assert_bool(enemy.night).override_failure_message(String(enemy.name)).is_false()
-		assert_int(enemy.brain.max_health).is_equal(int(DataRegistry.get_enemy(enemy.enemy_id)["health"]))
+		# The cellar's own numbers (data/rules/dungeon.json), and nothing of the night's on top.
+		var underground: Dictionary = DungeonRules.new(DataRegistry.get_rules(DataRegistry.RULES_DUNGEON)).strengthen(DataRegistry.get_enemy(enemy.enemy_id), &"ruin_cellar")
+		assert_int(enemy.brain.max_health).is_equal(int(underground["health"]))
 		assert_object(enemy.material).is_null()
 
 

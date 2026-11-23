@@ -432,21 +432,25 @@ enemy_id = &"goblin_archer"
 position = Vector2(416, 224)
 script = ExtResource("15_torch")
 light_radius = 100.0
+burn_time = 10.0
 
 [node name="ShadeBrazierB" type="Node2D" parent="Interactables" unique_id=2081042949]
 position = Vector2(288, 224)
 script = ExtResource("15_torch")
 light_radius = 100.0
+burn_time = 10.0
 
 [node name="ShadeBrazierC" type="Node2D" parent="Interactables" unique_id=1744968728]
 position = Vector2(416, 288)
 script = ExtResource("15_torch")
 light_radius = 100.0
+burn_time = 10.0
 
 [node name="ShadeBrazierD" type="Node2D" parent="Interactables" unique_id=197236964]
 position = Vector2(288, 288)
 script = ExtResource("15_torch")
 light_radius = 100.0
+burn_time = 10.0
 
 [node name="Shade" parent="Interactables" unique_id=1563435847 instance=ExtResource("16_shade")]
 position = Vector2(360, 248)
