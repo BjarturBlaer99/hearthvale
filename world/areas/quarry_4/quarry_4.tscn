@@ -51,6 +51,10 @@ enemy_id = &"bat"
 position = Vector2(136, 152)
 enemy_id = &"bat"
 
+[node name="SlimeDeep" parent="Interactables" instance=ExtResource("7_enemy")]
+position = Vector2(40, 136)
+enemy_id = &"slime"
+
 [node name="Entries" type="Node2D" parent="." unique_id=461374008]
 
 [node name="ladder" type="Marker2D" parent="Entries" unique_id=1392016952]

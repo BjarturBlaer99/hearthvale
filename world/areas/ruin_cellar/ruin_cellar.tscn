@@ -74,6 +74,10 @@ position = Vector2(200, 312)
 enemy_id = &"slime"
 clear_flag = &"ruin_cellar_hall_cleared"
 
+[node name="HallBat" parent="Interactables" instance=ExtResource("9_enemy")]
+position = Vector2(168, 264)
+enemy_id = &"bat"
+
 [node name="BossDoor" type="Node2D" parent="Interactables" unique_id=337113740]
 position = Vector2(112, 160)
 script = ExtResource("7_door")

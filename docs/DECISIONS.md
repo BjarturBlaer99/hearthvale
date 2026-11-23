@@ -1708,3 +1708,13 @@ PNG". What building it decided:
   Lantern, red again for the torch and the way north. Torches that now burn out (the Narthex's, the
   hall's, the Dark Path's) open bars that stay open, as before. The Ossuary's order is told by its
   torches and pillar, the room's own landmarks, so no plate needs a mark.
+- 2026-11-23 — **Harder dungeons, step 5: the cellar, the cistern and the quarry.** Decision 12 said
+  the cistern's plate room's plate would stop latching and be held by a block. A shutter held open
+  by a block alone would shut behind the hero whenever he left the room (the block goes back), and
+  the cistern's only way out is back through it; so the room has two plates that don't latch, one for
+  the hero and one for a new block, and its shutter stays open once lifted, as the keep's plate room
+  did before. Its first plate has a new flag (`cistern_b_plate_a`), so the old one
+  (`cistern_b_plate`) marks only games that opened the old shutter, which stays open for them
+  (`DungeonDoor.open_if_past`). The treasure shutter wants plate and crystal together and stays open
+  once lifted. The quarry's new monsters stand on open ground away from the ladder, off every rock
+  marker; the dungeon rules make floors 4 to 6's slimes tougher, and the Bogwisps keep their numbers.

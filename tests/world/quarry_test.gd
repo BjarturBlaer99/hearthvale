@@ -15,9 +15,10 @@ const OUTCROP: Rect2i = Rect2i(38, 5, 2, 3)
 const MOUTH_ROW: int = 6
 ## Each floor: how many rocks, and its monsters (enemy id -> how many).
 const FLOORS: Dictionary = {
-	1: [16, {&"slime": 2}], 2: [16, {&"slime": 3}], 3: [16, {&"slime": 4}],
-	4: [16, {&"bat": 3}], 5: [16, {&"bat": 2, &"goblin_archer": 1}], 6: [16, {&"bat": 2, &"goblin_archer": 2}],
-	7: [14, {&"bogwisp": 2}], 8: [14, {&"bogwisp": 3}], 9: [17, {&"bogwisp": 4}],
+	# One more monster on each floor below the first (harder dungeons, 2026-11-23).
+	1: [16, {&"slime": 2}], 2: [16, {&"slime": 3, &"goblin_archer": 1}], 3: [16, {&"slime": 4, &"goblin_archer": 1}],
+	4: [16, {&"bat": 3, &"slime": 1}], 5: [16, {&"bat": 2, &"goblin_archer": 1, &"slime": 1}], 6: [16, {&"bat": 2, &"goblin_archer": 2, &"slime": 1}],
+	7: [14, {&"bogwisp": 3}], 8: [14, {&"bogwisp": 4}], 9: [17, {&"bogwisp": 5}],
 }
 ## The cells the HUD's corner covers at a dungeon's size: nothing he must see is under it.
 const UNDER_THE_HUD: Rect2i = Rect2i(0, 0, 5, 3)
@@ -422,7 +423,7 @@ func test_bogwisps_are_out_at_any_hour_on_the_dark_floors() -> void:
 		GameState.set_time(GameState.day_clock().in_day(hour))
 		var floor: AreaController = _floor(7)
 		assert_bool(floor.dark).is_true()
-		assert_int(floor.enemies().size()).is_equal(2)
+		assert_int(floor.enemies().size()).is_equal(3)
 		for wisp: Enemy in floor.enemies():
 			assert_bool(wisp.waits_for_night()).override_failure_message("the same Bogwisp as the marsh's").is_true()
 			assert_bool(wisp.lying_low).override_failure_message("%s: out, at %s" % [wisp.name, hour]).is_false()

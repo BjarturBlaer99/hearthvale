@@ -87,6 +87,25 @@ func test_the_shades_braziers_burn_ten_seconds() -> void:
 	assert_bool(shade.all_lit()).is_false()
 
 
+func test_each_quarry_floor_below_the_first_has_one_more_monster_on_open_ground() -> void:
+	# Decision 3 of the plan: an archer on floors 2 and 3, a slime on 4 to 6, a Bogwisp on 7 to 9.
+	var deep: Dictionary = {2: &"goblin_archer", 3: &"goblin_archer", 4: &"slime", 5: &"slime", 6: &"slime", 7: &"bogwisp", 8: &"bogwisp", 9: &"bogwisp"}
+	for floor_number: int in deep:
+		var area_id: StringName = StringName("quarry_%d" % floor_number)
+		GameState.go_to(area_id, MineRules.ARRIVAL)
+		var mine_floor: AreaController = _load("res://world/areas/%s/%s.tscn" % [area_id, area_id])
+		var found: Enemy = null
+		for enemy: Enemy in mine_floor.enemies():
+			if String(enemy.name).ends_with("Deep"):
+				found = enemy
+		assert_object(found).override_failure_message("floor %d" % floor_number).is_not_null()
+		assert_that(found.enemy_id).is_equal(deep[floor_number])
+		var cell: Vector2i = GridBody.cell_of(found.position)
+		assert_bool(mine_floor.grid.is_solid(cell)).override_failure_message("floor %d: open ground" % floor_number).is_false()
+		for rock: Rock in mine_floor.rocks():
+			assert_that(rock.cell()).override_failure_message("floor %d: not on a rock" % floor_number).is_not_equal(cell)
+
+
 func _load(path: String) -> AreaController:
 	_area = Steps.load_area(path, _area)
 	return _area

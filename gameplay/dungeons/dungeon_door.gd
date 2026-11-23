@@ -37,6 +37,9 @@ const CHAINED_WORDS: String = "The gate is chained shut."
 ## with a toggling crystal, one hit opens one way and shuts another. It never stays open for
 ## good (`stays_open` is ignored), since its flags are off before anything is done.
 @export var opens_when_off: bool = false
+## A shutter whose puzzle changed after games were saved (harder dungeons, 2026-11-23): a game
+## in which this flag is set had it open before, and it stays open (with `stays_open`). Empty: none.
+@export var open_if_past: StringName
 ## Chained gates only: what trying the gate says (who has the say over it).
 @export_multiline var shut_words: String = ""
 ## Cracked walls only: the stone they're made of (dungeon walls; a ruin's lighter stone outdoors).
@@ -98,6 +101,8 @@ func is_open() -> bool:
 			return true
 		DungeonState.SHUTTER:
 			if stays_open and not opens_when_off and GameState.get_flag(DungeonState.door_flag(dungeon_id, door_id)) == true:
+				return true
+			if stays_open and open_if_past != &"" and GameState.get_flag(open_if_past) == true:
 				return true
 			return PuzzleRules.shutter_open(_shutter_values(), needs_all)
 		DungeonState.CHAINED:

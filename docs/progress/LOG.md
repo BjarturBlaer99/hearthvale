@@ -3463,3 +3463,22 @@ Tomb's gaps both ways); new tests for the save guard and the Ossuary's plates. C
 71, 72 and 74 to 78, looked at.
 
 **Not yet played by hand.** `tools/playtest.gd -- crypt` starts in the crypt.
+
+## 2026-11-23 — Harder dungeons, step 5: the cellar, the cistern and the quarry
+
+Decisions 2, 3 and 12 of `docs/progress/dungeon-difficulty-plan.md`:
+- **The ruin's cellar:** a bat in its hall.
+- **The cistern:** two slimes and a bat (it had no monsters). Its plate room has two plates that
+  don't latch, the hero on one and a new block on the other, and its shutter stays open once lifted:
+  a block alone holding it would let it shut behind him whenever he left the room. A game that opened
+  the old one-plate shutter keeps it open (`DungeonDoor.open_if_past`, tested). Its treasure wants
+  plate and crystal together.
+- **The quarry:** one more monster on each floor below the first (an archer on 2 and 3, a slime on 4
+  to 6, a Bogwisp on 7 to 9), on open ground away from the ladder and off every rock.
+
+**Verified:** the whole suite, 1202 cases; the failures were `quarry_test`'s counts of each floor's
+monsters, brought up to date, and pass. New tests: the cistern's two plates and its old-save guard,
+the treasure wanting both, and each quarry floor's new monster on open ground. Capture shots 22 to
+24, 26, 146 and 147, looked at.
+
+**The plan is built:** all five steps, each committed. None of it has been played by hand.

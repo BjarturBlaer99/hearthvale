@@ -63,6 +63,10 @@ position = Vector2(272, 16)
 script = ExtResource("8_piece")
 taken_flag = &"took_quarry_heart_piece"
 
+[node name="WispDeep" parent="Interactables" instance=ExtResource("7_enemy")]
+position = Vector2(232, 104)
+enemy_id = &"bogwisp"
+
 [node name="Entries" type="Node2D" parent="." unique_id=691475311]
 
 [node name="ladder" type="Marker2D" parent="Entries" unique_id=1796471284]

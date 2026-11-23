@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://gameplay/dungeons/chest.gd" id="11_chest"]
 [ext_resource type="Script" path="res://gameplay/dungeons/dungeon_door.gd" id="v12_door"]
 [ext_resource type="Script" path="res://gameplay/interactables/heart_piece.gd" id="v12_piece"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/enemy.tscn" id="13_enemy"]
 
 [node name="Cistern" type="Node2D" unique_id=195104573]
 script = ExtResource("1_area")
@@ -50,8 +51,16 @@ script = ExtResource("8_block")
 [node name="PlateRoomPlate" type="Node2D" parent="Interactables" unique_id=157435885]
 position = Vector2(32, 208)
 script = ExtResource("9_plate")
-flag = &"cistern_b_plate"
-latches = true
+flag = &"cistern_b_plate_a"
+
+[node name="PlateRoomPlateB" type="Node2D" parent="Interactables"]
+position = Vector2(192, 304)
+script = ExtResource("9_plate")
+flag = &"cistern_b_plate_b"
+
+[node name="PlateRoomBlock" type="Node2D" parent="Interactables"]
+position = Vector2(96, 272)
+script = ExtResource("8_block")
 
 [node name="PlateRoomShutter" type="Node2D" parent="Interactables" unique_id=1235929210]
 position = Vector2(224, 256)
@@ -59,7 +68,14 @@ script = ExtResource("v12_door")
 door_id = &"b_shutter"
 kind = &"shutter"
 size = Vector2i(2, 1)
-open_flag = &"cistern_b_plate"
+open_flags = Array[StringName]([&"cistern_b_plate_a", &"cistern_b_plate_b"])
+needs_all = true
+stays_open = true
+open_if_past = &"cistern_b_plate"
+
+[node name="PlateRoomSlime" parent="Interactables" instance=ExtResource("13_enemy")]
+position = Vector2(136, 216)
+enemy_id = &"slime"
 
 [node name="SwitchRoomSwitch" type="Node2D" parent="Interactables" unique_id=1077580890]
 position = Vector2(352, 240)
@@ -87,6 +103,16 @@ door_id = &"e_shutter"
 kind = &"shutter"
 size = Vector2i(1, 1)
 open_flags = Array[StringName]([&"cistern_e_plate", &"cistern_e_switch"])
+needs_all = true
+stays_open = true
+
+[node name="CombinedSlime" parent="Interactables" instance=ExtResource("13_enemy")]
+position = Vector2(136, 104)
+enemy_id = &"slime"
+
+[node name="SwitchRoomBat" parent="Interactables" instance=ExtResource("13_enemy")]
+position = Vector2(328, 296)
+enemy_id = &"bat"
 
 [node name="TreasureChest" type="Node2D" parent="Interactables" unique_id=2067840883]
 position = Vector2(32, 32)

@@ -266,6 +266,12 @@ Enemies sometimes drop hearts or coins.
   - **The Reliquary's** two crystals across its pit turn back after 4 s: both blue at once.
   - **More monsters:** a bat in the Narthex, the Tomb, the Dark Path and the Reliquary, a slime in the
     Trench and the Broken Floor, an archer in the great hall and the Ossuary.
+- **The ruin's cellar and the cistern, made harder (2026-11-23):** the cellar has a bat in its hall;
+  the cistern, which had no monsters, has two slimes and a bat. The cistern's plate room has two
+  plates that don't latch, one for the hero and one for a block, and its treasure wants both its
+  plate (the block on it) and its crystal (an arrow), where either did.
+- **The quarry, made harder (2026-11-23):** one more monster on each floor below the first: an
+  archer on floors 2 and 3, a slime on 4 to 6, a Bogwisp on 7 to 9.
 - Each mechanic is introduced on its own, then combined.
 
 ## 10. Village & economy

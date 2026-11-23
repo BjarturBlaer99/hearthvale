@@ -53,18 +53,37 @@ func test_push_room_a_block_slides_out_of_the_way() -> void:
 	assert_bool(_reachable(cistern, cistern.player.motor.cell).has(plate_room)).override_failure_message("the way north is open").is_true()
 
 
-func test_plate_room_a_latching_plate_lifts_the_shutter() -> void:
+func test_plate_room_the_hero_and_the_block_on_its_two_plates_lift_the_shutter() -> void:
+	# Two plates that don't latch, one for the hero and one for the block (harder dungeons,
+	# 2026-11-23: it was one plate that latched); lifted, the shutter stays open.
 	var cistern: AreaController = _load(CISTERN)
 	var shutter: DungeonDoor = cistern.interactables.get_node(^"PlateRoomShutter")
+	var block: PushBlock = cistern.interactables.get_node(^"PlateRoomBlock")
 	assert_bool(shutter.is_open()).is_false()
 	assert_bool(cistern.terrain.is_occupied(Vector2i(14, 16))).is_true()
-	cistern.player.motor.place(Vector2i(2, 13))
+	_face(cistern, Vector2i(2, 13), Vector2.UP)
 	cistern.update_plates()
-	assert_bool(shutter.is_open()).is_true()
+	assert_bool(shutter.is_open()).override_failure_message("one plate").is_false()
+	_face(cistern, Vector2i(6, 15), Vector2.UP)
+	cistern.update_plates()
+	assert_bool(GameState.get_flag(&"cistern_b_plate_a") == true).override_failure_message("stepped off, it rises").is_false()
+	_push(cistern, block, Vector2i(5, 17), Vector2.RIGHT, Vector2i(12, 17))
+	_push(cistern, block, Vector2i(12, 16), Vector2.DOWN, Vector2i(12, 19))
+	_face(cistern, Vector2i(2, 13), Vector2.UP)
+	cistern.update_plates()
+	assert_bool(shutter.is_open()).override_failure_message("the hero on one, the block on the other").is_true()
 	assert_bool(cistern.terrain.is_occupied(Vector2i(14, 16))).is_false()
-	cistern.player.motor.place(Vector2i(6, 15))
+	_face(cistern, Vector2i(6, 15), Vector2.UP)
 	cistern.update_plates()
-	assert_bool(shutter.is_open()).override_failure_message("the plate latches").is_true()
+	assert_bool(shutter.is_open()).override_failure_message("it stays open").is_true()
+
+
+func test_plate_room_a_game_that_opened_the_old_shutter_keeps_it_open() -> void:
+	GameState.set_flag(&"cistern_b_plate", true)
+	var cistern: AreaController = _load(CISTERN)
+	cistern.update_plates()
+	assert_bool((cistern.interactables.get_node(^"PlateRoomShutter") as DungeonDoor).is_open()).is_true()
+	assert_bool(cistern.terrain.is_occupied(Vector2i(14, 16))).is_false()
 
 
 func test_switch_room_the_crystal_answers_the_sword_or_an_arrow() -> void:
@@ -112,7 +131,7 @@ func test_cracked_wall_room_only_a_bomb_breaks_it() -> void:
 	assert_bool((cistern.interactables.get_node(^"CrackedWall") as DungeonDoor).is_open()).override_failure_message("it stays broken").is_true()
 
 
-func test_combined_room_a_block_on_the_plate_opens_the_treasure() -> void:
+func test_combined_room_the_block_on_the_plate_alone_is_not_enough() -> void:
 	var cistern: AreaController = _load(CISTERN)
 	var block: PushBlock = cistern.interactables.get_node(^"CombinedBlock")
 	var plate: PressurePlate = cistern.interactables.get_node(^"CombinedPlate")
@@ -124,18 +143,12 @@ func test_combined_room_a_block_on_the_plate_opens_the_treasure() -> void:
 			break
 	cistern.update_plates()
 	assert_that(block.cell()).is_equal(plate.cell())
-	assert_bool(shutter.is_open()).override_failure_message("solution one: a block on the plate").is_true()
-	assert_bool(cistern.terrain.is_occupied(Vector2i(2, 4))).is_false()
-	# The plate doesn't latch: push the block off (the hero, following it, now stands on the
-	# plate and keeps it down), step away, and the shutter drops.
-	_hold(cistern, Vector2.LEFT, 0.8)
-	assert_that(block.cell()).is_not_equal(plate.cell())
-	cistern.player.motor.place(Vector2i(8, 8))
-	cistern.update_plates()
-	assert_bool(shutter.is_open()).override_failure_message("it needs holding down").is_false()
+	assert_bool(GameState.get_flag(&"cistern_e_plate") == true).is_true()
+	assert_bool(shutter.is_open()).override_failure_message("the plate alone: it wants the crystal too (harder dungeons, 2026-11-23)").is_false()
+	assert_bool(cistern.terrain.is_occupied(Vector2i(2, 4))).is_true()
 
 
-func test_combined_room_an_arrow_into_the_high_crystal_opens_the_treasure() -> void:
+func test_combined_room_the_block_on_the_plate_and_an_arrow_in_the_crystal_open_the_treasure() -> void:
 	GameState.add_item(&"wooden_sword")
 	GameState.add_item(&"bow")
 	GameState.add_item(&"arrow", 5)
@@ -150,7 +163,11 @@ func test_combined_room_an_arrow_into_the_high_crystal_opens_the_treasure() -> v
 	assert_bool(cistern.use_item()).is_true()
 	_play(cistern, Vector2.ZERO, 0.6)
 	assert_bool(crystal.is_on()).is_true()
-	assert_bool(shutter.is_open()).override_failure_message("solution two: an arrow").is_true()
+	assert_bool(shutter.is_open()).override_failure_message("the crystal alone").is_false()
+	var block: PushBlock = cistern.interactables.get_node(^"CombinedBlock")
+	_push(cistern, block, Vector2i(7, 8), Vector2.LEFT, (cistern.interactables.get_node(^"CombinedPlate") as PressurePlate).cell())
+	cistern.update_plates()
+	assert_bool(shutter.is_open()).override_failure_message("both").is_true()
 	_face(cistern, Vector2i(2, 3), Vector2.UP)
 	assert_bool(cistern.interact()).is_true()
 	assert_int(GameState.item_count(&"coin")).override_failure_message("the treasure").is_equal(30)
@@ -165,6 +182,16 @@ func _face(area: AreaController, cell: Vector2i, direction: Vector2) -> void:
 	area.player.motor.place(cell)
 	area.player.face(direction)
 	area.update_room()
+
+
+## Holds `direction` from `from` until `block` reaches `target`.
+func _push(area: AreaController, block: PushBlock, from: Vector2i, direction: Vector2, target: Vector2i) -> void:
+	_face(area, from, direction)
+	for i: int in roundi(6.0 / FRAME):
+		_hold(area, direction, FRAME)
+		if block.cell() == target:
+			return
+	assert_that(block.cell()).override_failure_message("pushed to %s" % target).is_equal(target)
 
 
 ## Holds a direction for `seconds`: the hero walks (and pushes), plates update.

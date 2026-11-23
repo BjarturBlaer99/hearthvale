@@ -335,6 +335,9 @@ res://
   - **A shutter that opens when off** (2026-11-23): `opens_when_off` weighs its flags turned over
     (`PuzzleRules.weighed`): a flag anything but true counts as met. It never latches, whatever
     `stays_open` says. With a toggling crystal, one hit opens one way and shuts another.
+  - **A shutter whose puzzle changed after games were saved** (2026-11-23) names `open_if_past`, a
+    flag: with `stays_open`, a game in which it is set had it open and keeps it open (the cistern's
+    plate room: its old plate's flag, `cistern_b_plate`, which the new plates never set).
   - **Cracked wall:** a `DungeonDoor` kind opened for good only by a bomb's blast.
   - A `Hit` carries its kind (sword, arrow, bomb, contact) so pieces can tell them apart.
   - **Pits:**
