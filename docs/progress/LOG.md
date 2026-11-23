@@ -3411,3 +3411,29 @@ yet (steps 3 and 4 place them):
 **Verified:** the whole suite, 1197 cases, exit 0. New tests: `tests/core/puzzles/plate_sequence_test.gd`
 (5), two in `puzzle_rules_test.gd`, and `tests/world/new_puzzle_pieces_test.gd` (7), which sets each
 piece into the cistern's secret room. No picture: nothing on screen has changed yet.
+
+## 2026-11-23 — Harder dungeons, step 3: the Old Keep
+
+Decisions 2, 6, 7, 13 and 14 of `docs/progress/dungeon-difficulty-plan.md`, in the keep:
+- **Plate room:** three plates (`keep_plate_c` is new) held at once, two blocks, two new pillars at
+  (6, 27) and (8, 24); plates in the west, blocks starting in the east. Chosen by a solver over
+  random layouts: 20 pushes (it was 8), and some first pushes lose it until he leaves the room.
+- **Armoury:** two crystals that turn back after 4 s, the ledge's (an arrow) and a new one in the
+  north-west corner (the sword), both needed.
+- **Twin crystals:** three, each turning back after 5 s: a new ledge (31..33, 23..24) holds the third
+  (`TwinWest`), and the low one moved to the middle of the floor (37, 28).
+- **Big key room:** four plates in its corners, walked in the order its new plaque reads
+  (`sign_keep_rounds`: north-east, south-west, north-west, south-east), as well as its guards beaten;
+  the bars now stay open once lifted.
+- **Monsters:** twelve more (30 with the Warden, where there were 18), in every room but the
+  Warden's.
+- The keep's map was re-baked (`build_maps.gd -- keep`): only its tile data changed.
+
+**Verified:** the whole suite, 1198 cases; the two failures were `sound_test`'s plate and armoury
+crystal at their old places, pointed at the new ones, and pass. `keep_test`'s walkthrough plays every
+new puzzle (and the wrong ways: a block lost to the east wall and put back, crystals turning back
+before the others are hit, the rounds out of turn) and needed ten more arrows before the Warden:
+the gallery's three archers take nine of the quiver's fifteen. A new test checks the rounds' four
+plates against the plaque's order. Capture shots 28 to 36, looked at.
+
+**Not yet played by hand.** `tools/playtest.gd -- gate` starts at the keep's gate.

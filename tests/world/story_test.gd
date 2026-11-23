@@ -15,6 +15,7 @@ const NORTH_FIELDS: String = "res://world/areas/north_fields/north_fields.tscn"
 const INSCRIPTIONS: Array = [
 	[VILLAGE, "ChapelPlaque", &"sign_chapel", ["ALDRIC", "SHADE", "Warden"]],
 	[KEEP, "WardenPlaque", &"sign_keep_warden", ["WARDEN", "CHAPEL", "barred"]],
+	[KEEP, "RoundsPlaque", &"sign_keep_rounds", ["ROUNDS", "north-east, south-west, north-west, south-east", "start again"]],
 	[CRYPT, "NarthexInscription", &"sign_crypt_narthex", ["Four flames", "No blade"]],
 	[CRYPT, "TrenchInscription", &"sign_crypt_trench", ["FALLEN IN", "stone"]],
 	[CRYPT, "Epitaph", &"sign_crypt_epitaph", ["ALDRIC", "sword", "all three"]],

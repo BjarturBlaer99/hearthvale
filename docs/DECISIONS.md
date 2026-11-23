@@ -1687,3 +1687,14 @@ PNG". What building it decided:
   so the player sees how far he has got; a wrong step raises them all, and stepping onto plate 1 is
   always a start. An unsolved set starts over when he leaves the room, like the blocks. A shutter
   that opens when off never latches: its flag is off before anything is done.
+- 2026-11-23 — **Harder dungeons, step 3: the keep.** The plate room's layout was chosen by a solver
+  (a breadth-first search over block places, in the step's scratch folder) from random layouts of
+  three plates, two blocks and two pillars: the one taking the most pushes (20) of those where some
+  first pushes already lose the puzzle. Its plates don't latch and its blocks have no `block_id`, so
+  leaving the room is the way to start over, as before. The twin crystals' third sits on a new ledge
+  in the room's north-west corner (a two-row ledge, so the sword can't reach it from below), and the
+  low one moved to the middle of the floor, so the three are far apart. The rounds' plates are the
+  big key room's four open corners, told by compass on a plaque (`sign_keep_rounds`); its bars want
+  the guards beaten as well, and now stay open once lifted. The quiver keeps its 15 arrows: the
+  gallery's three archers take nine, and the archers' drops and the Warden's arrows for an empty
+  quiver make up the rest (a test checks the walkthrough with ten more in hand).

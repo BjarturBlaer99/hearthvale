@@ -236,6 +236,21 @@ Enemies sometimes drop hearts or coins.
   blue at once; **plates pressed in an order** (told by an inscription in the room), where a wrong
   step starts the set over; and **shutters that open while a crystal is red**, so one toggling
   crystal opens one way and shuts another.
+- **The Old Keep, made harder (2026-11-23):**
+  - **The plate room** has three plates to hold at once, two blocks and two pillars. The plates lie in
+    the west, the blocks start in the east, and a block pushed against a wall is lost to it until he
+    leaves the room. It takes 20 pushes.
+  - **The armoury's** crystal on the ledge (an arrow) and a second one in the far corner (the sword)
+    turn back after 4 s, and must be blue together.
+  - **The twin crystals are three:** one on the floor and one on a ledge in each northern corner, all
+    blue at once, each for 5 s.
+  - **The big key room's** bars want its guards beaten *and* the watch's rounds walked: four plates
+    in its corners, stepped onto in the order its plaque reads (north-east, south-west, north-west,
+    south-east).
+  - **More monsters:** a bat at the entrance, an archer among the guards, a slime in the store, a
+    slime and an archer in the great hall, two slimes in the plate room, a bat in the armoury, a
+    third archer and a bat in the gallery, a third bat by the crystals, and a second archer in the
+    big key room: 30 monsters where there were 18.
 - Each mechanic is introduced on its own, then combined.
 
 ## 10. Village & economy

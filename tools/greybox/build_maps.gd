@@ -509,6 +509,9 @@ const MAPS: Dictionary = {
 			[4, 34, 1, 4, 0, "dungeon_wall"],
 			[1, 37, 4, 1, 0, "dungeon_wall"],
 			[2, 37, 1, 1, 0, "dungeon_floor"],
+			# Plate room (harder dungeons, 2026-11-23): two pillars in the blocks' way.
+			[6, 27, 1, 1, 0, "pillar"],
+			[8, 24, 1, 1, 0, "pillar"],
 			# Armoury: a ledge (no stairs) with a crystal on it, out of sword reach; two pillars.
 			[9, 12, 4, 3, 1, "ledge"],
 			[3, 18, 1, 1, 0, "pillar"],
@@ -519,8 +522,10 @@ const MAPS: Dictionary = {
 			[10, 6, 1, 4, 0, "dungeon_wall"],
 			[10, 6, 4, 1, 0, "dungeon_wall"],
 			[10, 8, 1, 1, 0, "dungeon_floor"],
-			# Twin crystals: a ledge in the north-east corner for the high one.
+			# Twin crystals: a ledge in the north-east corner for the high one, and (harder
+			# dungeons, 2026-11-23) one in the north-west corner for the third.
 			[39, 23, 5, 3, 1, "ledge"],
+			[31, 23, 3, 2, 1, "ledge"],
 			# Big key room: the big key's alcove, behind a shutter.
 			[35, 12, 1, 3, 0, "dungeon_wall"],
 			[39, 12, 1, 3, 0, "dungeon_wall"],

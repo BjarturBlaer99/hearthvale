@@ -142,44 +142,81 @@ func test_the_keep_can_be_finished_start_to_end() -> void:
 	assert_bool(_reachable(keep, HALL).has(TWIN_ROOM)).is_false()
 	assert_bool(_reachable(keep, HALL).has(WARDENS_HALL)).is_false()
 
-	# 3. Plate room: one plate isn't enough; the hero on one and the block on the other is.
+	# 3. Plate room: three plates held at once, two by blocks and one by the hero; two pillars
+	# stand in the blocks' way (harder dungeons, 2026-11-23: 20 pushes, where it was 8).
 	var shutter: DungeonDoor = keep.interactables.get_node(^"PlateShutter")
 	var block: PushBlock = keep.interactables.get_node(^"PlateBlock")
-	_face(keep, Vector2i(3, 24), Vector2.UP)
+	var block_b: PushBlock = keep.interactables.get_node(^"PlateBlockB")
+	assert_bool(keep.grid.is_solid(Vector2i(6, 27)) and keep.grid.is_solid(Vector2i(8, 24))).override_failure_message("the pillars").is_true()
+	_face(keep, Vector2i(2, 29), Vector2.UP)
 	keep.update_plates()
 	assert_bool(shutter.is_open()).override_failure_message("one plate").is_false()
-	_push(keep, block, Vector2i(6, 28), Vector2.RIGHT, Vector2i(11, 28))
-	_push(keep, block, Vector2i(11, 29), Vector2.UP, Vector2i(11, 24))
-	_face(keep, Vector2i(3, 24), Vector2.UP)
+	# A block pushed against the east wall is lost to it: leaving the room puts it back.
+	_push(keep, block, Vector2i(11, 25), Vector2.RIGHT, Vector2i(13, 25))
+	_face(keep, HALL, Vector2.UP)
+	_face(keep, Vector2i(12, 27), Vector2.UP)
+	assert_that(block.cell()).override_failure_message("put back").is_equal(Vector2i(12, 25))
+	# The way the solver found.
+	_push(keep, block_b, Vector2i(12, 24), Vector2.LEFT, Vector2i(10, 24))
+	_push(keep, block, Vector2i(13, 25), Vector2.LEFT, Vector2i(10, 25))
+	_push(keep, block_b, Vector2i(11, 24), Vector2.LEFT, Vector2i(9, 24))
+	_push(keep, block_b, Vector2i(9, 23), Vector2.DOWN, Vector2i(9, 26))
+	_push(keep, block_b, Vector2i(10, 26), Vector2.LEFT, Vector2i(4, 26))
+	_push(keep, block_b, Vector2i(4, 25), Vector2.DOWN, Vector2i(4, 29))
 	keep.update_plates()
-	assert_bool(shutter.is_open()).override_failure_message("both plates at once").is_true()
-	_face(keep, Vector2i(7, 26), Vector2.UP)
+	assert_bool(shutter.is_open()).override_failure_message("one block on").is_false()
+	_push(keep, block, Vector2i(11, 25), Vector2.LEFT, Vector2i(5, 25))
+	_push(keep, block, Vector2i(5, 26), Vector2.UP, Vector2i(5, 24))
+	keep.update_plates()
+	assert_bool(shutter.is_open()).override_failure_message("two blocks on, nobody on the third").is_false()
+	_face(keep, Vector2i(2, 29), Vector2.UP)
+	keep.update_plates()
+	assert_bool(shutter.is_open()).override_failure_message("all three at once").is_true()
+	_face(keep, Vector2i(7, 23), Vector2.UP)
 	keep.update_plates()
 	assert_bool(shutter.is_open()).override_failure_message("solved, it stays open").is_true()
 
 	# 4. Armoury: the Bow and arrows, tried on a crystal the sword can't reach. Leaving the
 	# plate room put its block back; the shutter stays open.
 	_face(keep, Vector2i(7, 19), Vector2.UP)
-	assert_that(block.cell()).override_failure_message("the block went back").is_equal(Vector2i(7, 28))
+	assert_that(block.cell()).override_failure_message("the block went back").is_equal(Vector2i(12, 25))
 	keep.update_plates()
 	assert_bool(shutter.is_open()).is_true()
 	_open(keep, Vector2i(3, 15), Vector2.UP)
 	_open(keep, Vector2i(5, 15), Vector2.UP)
 	assert_that(GameState.equipped).override_failure_message("the dungeon's item").is_equal(&"bow")
 	assert_int(GameState.item_count(&"arrow")).is_equal(15)
+	# Two crystals that turn back after 4 s: the high one by arrow, the far one by sword, both
+	# blue at once (harder dungeons, 2026-11-23).
 	var crystal: CrystalSwitch = keep.interactables.get_node(^"ArmouryCrystal")
+	var far_crystal: CrystalSwitch = keep.interactables.get_node(^"ArmouryCrystalB")
+	var way_up: DungeonDoor = keep.interactables.get_node(^"CrystalShutter")
 	_face(keep, Vector2i(11, 15), Vector2.UP)
 	keep.player.swing()
 	_play(keep, 0.4)
 	assert_bool(crystal.is_on()).override_failure_message("out of sword reach").is_false()
 	_shoot(keep, Vector2i(11, 15), Vector2.UP)
 	assert_bool(crystal.is_on()).is_true()
+	assert_bool(way_up.is_open()).override_failure_message("one crystal").is_false()
+	crystal._process(4.1)
+	assert_bool(crystal.is_on()).override_failure_message("it turned back").is_false()
+	_swing(keep, Vector2i(2, 13), Vector2.UP)
+	assert_bool(far_crystal.is_on()).is_true()
+	far_crystal._process(4.1)
+	assert_bool(way_up.is_open()).override_failure_message("one at a time is too slow").is_false()
+	_shoot(keep, Vector2i(11, 15), Vector2.UP)
+	crystal._process(2.5)
+	_swing(keep, Vector2i(2, 13), Vector2.UP)
+	assert_bool(way_up.is_open()).override_failure_message("both blue at once").is_true()
+	crystal._process(4.1)
+	far_crystal._process(4.1)
+	assert_bool(way_up.is_open()).override_failure_message("and it stays open").is_true()
 	assert_bool(_reachable(keep, ARMOURY).has(GALLERY)).override_failure_message("into the gallery").is_true()
 
 	# 5. Gallery: archers on a walkway nobody can climb; shot down, they open the key's alcove,
 	# and what they drop falls to the floor.
 	assert_bool(keep.terrain.check_move(Vector2i(4, 4), Vector2i(4, 3)).is_allowed()).override_failure_message("no way up").is_false()
-	for archer_name: String in ["GalleryArcherA", "GalleryArcherB"]:
+	for archer_name: String in ["GalleryArcherA", "GalleryArcherB", "GalleryArcherC"]:
 		var archer: Enemy = keep.interactables.get_node(NodePath(archer_name))
 		archer.roll_drop = func() -> float: return 0.0
 		_shoot_down(keep, archer)
@@ -189,26 +226,56 @@ func test_the_keep_can_be_finished_start_to_end() -> void:
 	assert_int(_keys()).override_failure_message("small key 2").is_equal(1)
 	assert_bool(_reachable(keep, GALLERY).has(HALL)).override_failure_message("back down to the hall").is_true()
 
-	# 6. Twin crystals: the sword for the low one, an arrow for the high one; both needed.
+	# 6. Three crystals that turn back after 5 s: the sword for the low one, arrows for the two
+	# on the ledges; all three blue at once.
 	_open(keep, Vector2i(28, 27), Vector2.RIGHT)
 	assert_bool(_reachable(keep, HALL).has(TWIN_ROOM)).is_true()
 	var twin: DungeonDoor = keep.interactables.get_node(^"TwinShutter")
-	_face(keep, Vector2i(33, 25), Vector2.UP)
+	var low: CrystalSwitch = keep.interactables.get_node(^"TwinLow")
+	var west: CrystalSwitch = keep.interactables.get_node(^"TwinWest")
+	var high: CrystalSwitch = keep.interactables.get_node(^"TwinHigh")
+	assert_bool(keep.terrain.check_move(Vector2i(32, 25), Vector2i(32, 24)).is_allowed()).override_failure_message("no way up the west ledge").is_false()
+	_face(keep, Vector2i(32, 25), Vector2.UP)
 	keep.player.swing()
 	_play(keep, 0.4)
-	assert_bool((keep.interactables.get_node(^"TwinLow") as CrystalSwitch).is_on()).is_true()
-	assert_bool(twin.is_open()).override_failure_message("one crystal").is_false()
+	assert_bool(west.is_on()).override_failure_message("out of sword reach").is_false()
+	_swing(keep, Vector2i(37, 27), Vector2.DOWN)
+	assert_bool(low.is_on()).is_true()
 	_shoot(keep, Vector2i(42, 26), Vector2.UP)
-	assert_bool(twin.is_open()).override_failure_message("both crystals").is_true()
+	assert_bool(high.is_on()).is_true()
+	assert_bool(twin.is_open()).override_failure_message("two crystals").is_false()
+	for crystal_now: CrystalSwitch in [low, high]:
+		crystal_now._process(5.1)
+	_shoot(keep, Vector2i(32, 25), Vector2.UP)
+	assert_bool(twin.is_open()).override_failure_message("the first two turned back").is_false()
+	west._process(2.0)
+	_swing(keep, Vector2i(37, 27), Vector2.DOWN)
+	_shoot(keep, Vector2i(42, 26), Vector2.UP)
+	assert_bool(twin.is_open()).override_failure_message("all three at once").is_true()
 
-	# 7. Big key room: beat its guards, take the big key, open the boss door.
+	# 7. Big key room: beat its guards and walk the watch's rounds in order, as its plaque says;
+	# then take the big key and open the boss door.
+	var key_bars: DungeonDoor = keep.interactables.get_node(^"BigKeyShutter")
 	_beat_all(keep, &"keep_bigkey_clear")
+	assert_bool(key_bars.is_open()).override_failure_message("the rounds not walked").is_false()
+	_walk_onto(keep, Vector2i(42, 13))
+	_walk_onto(keep, Vector2i(32, 13))
+	assert_bool((keep.interactables.get_node(^"RoundsNorthEast") as PressurePlate).pressed).override_failure_message("out of turn: it starts over").is_false()
+	for corner: Vector2i in [Vector2i(42, 13), Vector2i(32, 19), Vector2i(32, 13)]:
+		_walk_onto(keep, corner)
+	assert_bool(key_bars.is_open()).is_false()
+	_walk_onto(keep, Vector2i(42, 19))
+	assert_bool(key_bars.is_open()).override_failure_message("the rounds walked").is_true()
 	_open(keep, Vector2i(37, 14), Vector2.UP)
 	assert_bool(GameState.get_flag(DungeonState.big_key_flag(&"keep")) == true).is_true()
 	_open(keep, Vector2i(22, 23), Vector2.UP)
 	assert_bool(_reachable(keep, HALL).has(WARDENS_HALL)).override_failure_message("the boss door opens").is_true()
 
 	# 8. The Iron Warden (its touch switched off: this is about the way through, not dodging).
+	# The gallery's three archers took nine of the fifteen arrows; in play the archers' drops and
+	# the Warden's own arrows for an empty quiver make up the rest.
+	assert_int(GameState.item_count(&"arrow")).is_less(5)
+	GameState.add_item(&"arrow", 10)
 	var warden: Boss = keep.interactables.get_node(^"Warden")
 	var heart: HeartContainer = keep.interactables.get_node(^"HeartContainer")
 	warden.hit_box.deactivate()
@@ -254,6 +321,22 @@ func test_the_keep_can_be_finished_start_to_end() -> void:
 	keep.hud.dialogue.confirm()
 	_face(keep, Vector2i(22, 12), Vector2.UP)
 	assert_str(Steps.walk_until_travel(keep, Vector2.UP)).override_failure_message("out to the Old Wood").is_equal(WOOD)
+
+
+func test_the_watchs_rounds_are_four_plates_in_the_order_the_plaque_reads() -> void:
+	var keep: AreaController = _load(KEEP)
+	var places: Array = []
+	var corners: Dictionary = {}
+	for child: Node in keep.interactables.get_children():
+		if child is PressurePlate and (child as PressurePlate).order > 0:
+			places.append((child as PressurePlate).order)
+			corners[(child as PressurePlate).order] = (child as PressurePlate).cell()
+	assert_array(Array(PlateSequence.problems(places))).is_empty()
+	assert_int(places.size()).is_equal(4)
+	# North-east, south-west, north-west, south-east: each corner of the room's open floor.
+	assert_bool(corners[1].x > corners[3].x and corners[1].y < corners[2].y).is_true()
+	assert_bool(corners[2].x < corners[4].x and corners[2].y > corners[3].y).is_true()
+	assert_bool(corners[4].x > corners[2].x and corners[4].y > corners[1].y).is_true()
 
 
 func test_the_warden_starts_over_when_the_hero_leaves_and_never_strands_an_empty_quiver() -> void:
@@ -332,6 +415,21 @@ func _face(area: AreaController, cell: Vector2i, direction: Vector2) -> void:
 func _open(area: AreaController, cell: Vector2i, direction: Vector2) -> void:
 	_face(area, cell, direction)
 	assert_bool(area.interact()).override_failure_message("E at %s" % cell).is_true()
+
+
+## Swings the sword from `cell` toward `direction` and lets the blow land.
+func _swing(area: AreaController, cell: Vector2i, direction: Vector2) -> void:
+	_face(area, cell, direction)
+	area.player.swing()
+	_play(area, 0.4)
+
+
+## Steps off whatever he stands on and onto `cell`, and the plates are checked.
+func _walk_onto(area: AreaController, cell: Vector2i) -> void:
+	_face(area, Vector2i(37, 17), Vector2.UP)
+	area.update_plates()
+	_face(area, cell, Vector2.UP)
+	area.update_plates()
 
 
 ## Every enemy sharing `clear_flag` takes a blow it can't survive.

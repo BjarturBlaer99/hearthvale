@@ -1,0 +1,11 @@
+{
+  "id": "sign_keep_rounds",
+  "start": "read",
+  "nodes": {
+    "read": {
+      "speaker": "",
+      "text": "THE WATCH WALKS ITS ROUNDS: north-east, south-west, north-west, south-east.\nWho walks them otherwise must start again.",
+      "options": []
+    }
+  }
+}
