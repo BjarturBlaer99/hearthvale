@@ -3366,3 +3366,5 @@ room only in the order of their lines and Godot's IDs; those three were put back
 after (about half a minute in a window, the capture's slot 994).
 
 The user saw the pictures and said "Looks good" (2026-11-23).
+The user then played the game with the groves in it, from the title, and said "it feels good"
+(2026-11-23). The game closed cleanly, with nothing in its log.
