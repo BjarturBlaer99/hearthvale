@@ -585,8 +585,16 @@ const MAPS: Dictionary = {
 			[1, 37, 4, 1, 0, "dungeon_wall"],
 			[2, 37, 1, 1, 0, "dungeon_floor"],
 			[8, 38, 1, 1, 0, "pillar"],
-			# The Broken Floor: a trench between the way in and the way on.
+			# The Broken Floor: a trench between the way in and the way on, and (harder dungeons,
+			# 2026-11-23) a pit before the Reliquary's door, for a second block.
 			[1, 26, 13, 1, 0, "pit"],
+			[7, 23, 1, 1, 0, "pit"],
+			# The Lantern's Tomb (2026-11-23): a wall across it with two gaps, each barred, one open
+			# while its crystal is red and one while it is blue; the north half is cut in two.
+			[31, 26, 13, 1, 0, "dungeon_wall"],
+			[33, 26, 1, 1, 0, "dungeon_floor"],
+			[42, 26, 1, 1, 0, "dungeon_floor"],
+			[38, 23, 1, 3, 0, "dungeon_wall"],
 			# The Reliquary: a pit between the hero and the far wall, and the big key's alcove.
 			[1, 14, 13, 2, 0, "pit"],
 			[1, 17, 4, 1, 0, "dungeon_wall"],

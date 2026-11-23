@@ -345,6 +345,9 @@ res://
       block is part of it. With a `block_id` it stays sunk for good (`DungeonState.block_flag` holds the cell);
       without one it's lifted out when its room resets.
     - A drop from something beaten over a pit (a bat) lands on the floor beside it.
+    - **A block added after games were saved** (2026-11-23) names `sunk_if_past`, a flag, and
+      `sinks_at`, a cell: a game with that flag set got past its pit before it stood there, and finds
+      it sunk there (the crypt's `FloorBlockB`, past the Reliquary's door).
   - **Torch** (a standing brazier): E lights it if the hero carries a lantern. Burning, it sets its flag, so
     shutters wait on torches as they do on plates and crystals.
     - `always_lit`: burns from the start (the light of the crypt's first rooms).

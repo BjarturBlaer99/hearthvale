@@ -1,0 +1,11 @@
+{
+  "id": "sign_crypt_ossuary",
+  "start": "read",
+  "nodes": {
+    "read": {
+      "speaker": "",
+      "text": "HERE LIE THE WATCHMEN. Visit them in turn:\nthe south torch, the north torch, then the foot of the pillar. Out of turn, begin again.",
+      "options": []
+    }
+  }
+}

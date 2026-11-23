@@ -18,7 +18,8 @@ const INSCRIPTIONS: Array = [
 	[KEEP, "RoundsPlaque", &"sign_keep_rounds", ["ROUNDS", "north-east, south-west, north-west, south-east", "start again"]],
 	[CRYPT, "NarthexInscription", &"sign_crypt_narthex", ["Four flames", "No blade"]],
 	[CRYPT, "TrenchInscription", &"sign_crypt_trench", ["FALLEN IN", "stone"]],
-	[CRYPT, "Epitaph", &"sign_crypt_epitaph", ["ALDRIC", "sword", "all three"]],
+	[CRYPT, "Epitaph", &"sign_crypt_epitaph", ["ALDRIC", "sword", "all four"]],
+	[CRYPT, "OssuaryInscription", &"sign_crypt_ossuary", ["WATCHMEN", "south torch, the north torch, then the foot of the pillar", "begin again"]],
 	[CRYPT, "ReliquaryInscription", &"sign_crypt_reliquary", ["LOCKED", "key", "bones", "west of the first hall", "two torches"]],
 ]
 

@@ -3437,3 +3437,29 @@ the gallery's three archers take nine of the quiver's fifteen. A new test checks
 plates against the plaque's order. Capture shots 28 to 36, looked at.
 
 **Not yet played by hand.** `tools/playtest.gd -- gate` starts at the keep's gate.
+
+## 2026-11-23 — Harder dungeons, step 4: the Chapel Crypt
+
+Decisions 2, 8 to 11 and 13 to 15 of `docs/progress/dungeon-difficulty-plan.md`, in the crypt:
+- **Narthex and great hall:** their two torches in opposite corners, burning 6 s.
+- **Lantern's Tomb:** a wall across it (31..43, 26) with two barred gaps, (33, 26) open while the new
+  toggling crystal (37, 29) is red, (42, 26) while it is blue; the north half is cut in two at x 38.
+  The Lantern moved to (42, 23), behind the blue gap; the tomb's torch and the way north are behind
+  the red one.
+- **Dark Path:** a torch at each end of the maze, (31, 20) and (39, 12), burning 8 s.
+- **Knight's Tomb:** a fourth torch (43, 5); all four burn 5.5 s. The epitaph says "all four".
+- **Ossuary:** three plates in order (the south torch, the north torch, the pillar's foot), told by a
+  new inscription (`sign_crypt_ossuary`), and its guards beaten; the key's bars stay open once lifted.
+- **Broken Floor:** a pit before the Reliquary's door (7, 23) and a second block (`floor_two`) beyond
+  the first trench. A game that opened that door before the pit was there finds it filled
+  (`PushBlock.sunk_if_past`, tested).
+- **Reliquary:** two crystals across the pit, (2, 13) and (12, 13), turning back after 4 s.
+- **Monsters:** eight more. The crypt's map was re-baked (`build_maps.gd -- crypt`): only its tile data
+  changed.
+
+**Verified:** the whole suite, 1200 cases, exit 0. `crypt_test`'s walkthrough plays every new puzzle and
+its wrong ways (a torch gone out before its pair, crystals turning back, the plates out of turn, the
+Tomb's gaps both ways); new tests for the save guard and the Ossuary's plates. Capture shots 67, 68,
+71, 72 and 74 to 78, looked at.
+
+**Not yet played by hand.** `tools/playtest.gd -- crypt` starts in the crypt.

@@ -94,6 +94,8 @@ func test_ten_rooms_all_joined_once_every_door_is_open_and_every_pit_bridged() -
 			GameState.set_flag(door.open_flag, true)
 		for flag: StringName in door.open_flags:
 			GameState.set_flag(flag, true)
+	# The Tomb's crystal opens one gap or the other: red is the way north.
+	GameState.set_flag(&"crypt_tomb_blue", false)
 	var pits: Array[Vector2i] = HeightGridBuilder.pit_cells(crypt.height_layer)
 	assert_int(pits.size()).override_failure_message("the crypt has pits").is_greater(40)
 	for pit: Vector2i in pits:
@@ -180,6 +182,31 @@ func test_a_block_pushed_into_the_trench_bridges_it_for_good() -> void:
 	assert_that(block.cell()).override_failure_message("and leaving the room doesn't lift it out").is_equal(Vector2i(37, 36))
 
 
+func test_a_game_past_the_reliquarys_door_finds_the_new_pit_filled() -> void:
+	# The pit before the Reliquary's door and its block came after games were saved (harder
+	# dungeons, 2026-11-23): one that opened the door before then is never stuck beyond it.
+	var crypt: AreaController = _load(CRYPT)
+	assert_bool(crypt.terrain.is_pit(Vector2i(7, 23))).override_failure_message("a new game: the pit is open").is_true()
+	assert_bool((crypt.interactables.get_node(^"FloorBlockB") as PushBlock).sunk).is_false()
+	GameState.set_flag(DungeonState.door_flag(&"crypt", &"reliquary_door"), true)
+	crypt = _load(CRYPT)
+	var block: PushBlock = crypt.interactables.get_node(^"FloorBlockB")
+	assert_bool(block.sunk).is_true()
+	assert_that(block.cell()).is_equal(Vector2i(7, 23))
+	assert_bool(crypt.terrain.is_pit(Vector2i(7, 23))).override_failure_message("filled").is_false()
+	assert_bool(_reachable(crypt, RELIQUARY).has(Vector2i(7, 25))).override_failure_message("the way back from the Reliquary").is_true()
+
+
+func test_the_ossuarys_plates_are_one_to_three() -> void:
+	var crypt: AreaController = _load(CRYPT)
+	var places: Array = []
+	for child: Node in crypt.interactables.get_children():
+		if child is PressurePlate and (child as PressurePlate).order > 0:
+			places.append((child as PressurePlate).order)
+	assert_array(Array(PlateSequence.problems(places))).is_empty()
+	assert_int(places.size()).is_equal(3)
+
+
 func test_a_block_without_a_name_is_lifted_out_again_when_the_room_resets() -> void:
 	var crypt: AreaController = _load(CRYPT)
 	var loose: PushBlock = PushBlock.new()
@@ -202,7 +229,7 @@ func test_torches_need_the_lantern_and_open_their_doors_for_good() -> void:
 	var crypt: AreaController = _load(CRYPT)
 	var torch: Torch = crypt.interactables.get_node(^"NarthexTorchA")
 	var bars: DungeonDoor = crypt.interactables.get_node(^"OssuaryBars")
-	_face(crypt, Vector2i(17, 37), Vector2.LEFT)
+	_face(crypt, Vector2i(17, 35), Vector2.UP)
 	assert_str(torch.prompt()).is_equal("An unlit torch")
 	assert_bool(crypt.interact()).override_failure_message("E says it needs a flame").is_true()
 	assert_bool(torch.is_lit()).override_failure_message("no lantern, no light").is_false()
@@ -213,15 +240,20 @@ func test_torches_need_the_lantern_and_open_their_doors_for_good() -> void:
 	assert_bool(GameState.get_flag(&"crypt_narthex_a") == true).is_true()
 	assert_str(torch.prompt()).override_failure_message("nothing more to do with it").is_equal("")
 	assert_bool(bars.is_open()).override_failure_message("one torch of two").is_false()
-	_open(crypt, Vector2i(17, 39), Vector2.LEFT)
+	# They stand apart and burn 6 s (harder dungeons, 2026-11-23): both lit in one run.
+	_burn(crypt, 6.1)
+	assert_bool(torch.is_lit()).override_failure_message("too slow: it went out").is_false()
+	_open(crypt, Vector2i(27, 41), Vector2.DOWN)
+	assert_bool(bars.is_open()).is_false()
+	_open(crypt, Vector2i(17, 35), Vector2.UP)
 	assert_bool(bars.is_open()).is_true()
 	assert_bool(crypt.terrain.is_occupied(Vector2i(14, 38))).is_false()
 	crypt = _load(CRYPT)
 	assert_bool((crypt.interactables.get_node(^"OssuaryBars") as DungeonDoor).is_open()).override_failure_message("still open on the next visit").is_true()
-	assert_bool((crypt.interactables.get_node(^"NarthexTorchA") as Torch).is_lit()).override_failure_message("and the torch still burns").is_true()
+	assert_bool((crypt.interactables.get_node(^"NarthexTorchA") as Torch).is_lit()).override_failure_message("though the torch is out").is_false()
 
 
-func test_brief_torches_go_out_unless_all_three_burn_together() -> void:
+func test_brief_torches_go_out_unless_all_four_burn_together() -> void:
 	GameState.add_item(&"lantern")
 	var crypt: AreaController = _load(CRYPT)
 	var first: Torch = crypt.interactables.get_node(^"KnightTorchA")
@@ -234,13 +266,14 @@ func test_brief_torches_go_out_unless_all_three_burn_together() -> void:
 	assert_bool(first.is_lit()).override_failure_message("then goes out").is_false()
 	assert_bool(GameState.get_flag(&"crypt_knight_a") == true).is_false()
 	assert_bool(bars.is_open()).is_false()
-	_open(crypt, Vector2i(42, 9), Vector2.RIGHT)
-	_burn(crypt, 2.2)
-	_open(crypt, Vector2i(32, 9), Vector2.LEFT)
-	_burn(crypt, 1.8)
-	assert_bool(bars.is_open()).override_failure_message("two of three").is_false()
-	_open(crypt, Vector2i(32, 1), Vector2.LEFT)
-	assert_bool(bars.is_open()).override_failure_message("all three at once").is_true()
+	assert_float(first.burn_time).is_equal_approx(5.5, 0.001)
+	_light_the_knights_torches(crypt, 2.0)
+	assert_bool(bars.is_open()).override_failure_message("too slow: the first went out before the fourth").is_false()
+	_burn(crypt, 6.0)
+	_light_the_knights_torches(crypt, 1.5, true)
+	assert_bool(bars.is_open()).override_failure_message("three of four").is_false()
+	_open(crypt, Vector2i(42, 5), Vector2.RIGHT)
+	assert_bool(bars.is_open()).override_failure_message("all four at once").is_true()
 	_burn(crypt, 8.0)
 	assert_bool(first.is_lit()).is_false()
 	assert_bool(bars.is_open()).override_failure_message("open for good, though the torches have gone out").is_true()
@@ -300,31 +333,41 @@ func test_the_crypt_can_be_finished_start_to_end() -> void:
 	assert_bool(_reachable(crypt, HALL).has(TOMB)).is_true()
 	assert_bool(_reachable(crypt, HALL).has(BROKEN_FLOOR)).is_false()
 
-	# 3. The Lantern's Tomb: the Lantern, held up, and a torch that opens the way north.
-	_open(crypt, Vector2i(41, 28), Vector2.UP)
+	# 3. The Lantern's Tomb: a wall across it, its two gaps barred, one open while the crystal is
+	# red and one while it is blue. The Lantern is behind the blue one, the torch that opens the
+	# way north behind the red one.
+	var crystal: CrystalSwitch = crypt.interactables.get_node(^"TombCrystal")
+	assert_bool(_reachable(crypt, TOMB).has(Vector2i(35, 24))).override_failure_message("red: the torch's side").is_true()
+	assert_bool(_reachable(crypt, TOMB).has(Vector2i(42, 24))).override_failure_message("red: not the Lantern's").is_false()
+	_swing(crypt, Vector2i(37, 28), Vector2.DOWN)
+	assert_bool(crystal.is_on()).is_true()
+	assert_bool(_reachable(crypt, TOMB).has(Vector2i(35, 24))).override_failure_message("blue: the torch's side is shut").is_false()
+	_open(crypt, Vector2i(42, 24), Vector2.UP)
 	assert_int(GameState.item_count(&"lantern")).is_equal(1)
 	assert_bool(crypt.player.is_holding_up()).is_true()
 	var path_bars: DungeonDoor = crypt.interactables.get_node(^"PathBars")
 	assert_bool(path_bars.is_open()).is_false()
+	crystal._process(CrystalSwitch.LOCKOUT + 0.01)
+	_swing(crypt, Vector2i(37, 28), Vector2.DOWN)
+	assert_bool(crystal.is_on()).override_failure_message("red again").is_false()
 	_open(crypt, Vector2i(35, 24), Vector2.UP)
 	assert_bool(path_bars.is_open()).is_true()
 
-	# 4. The Dark Path: a way winds between the pits to two torches.
-	var path: Dictionary = _reachable(crypt, TOMB)
-	assert_bool(path.has(Vector2i(39, 13)) and path.has(Vector2i(35, 13))).override_failure_message("the path reaches both torches").is_true()
+	# 4. The Dark Path: a way winds between the pits; a torch at each end, burning 8 s.
+	var path: Dictionary = _reachable(crypt, DARK_PATH)
+	assert_bool(path.has(Vector2i(39, 13)) and path.has(Vector2i(32, 20))).override_failure_message("the path reaches both torches").is_true()
 	assert_bool(path.has(KNIGHTS_TOMB)).is_false()
+	_open(crypt, Vector2i(32, 20), Vector2.LEFT)
+	_burn(crypt, 8.1)
 	_open(crypt, Vector2i(39, 13), Vector2.UP)
-	_open(crypt, Vector2i(35, 13), Vector2.UP)
-	assert_bool(_reachable(crypt, TOMB).has(KNIGHTS_TOMB)).is_true()
+	assert_bool(_reachable(crypt, DARK_PATH).has(KNIGHTS_TOMB)).override_failure_message("too slow: the first went out").is_false()
+	_burn(crypt, 3.0)
+	_open(crypt, Vector2i(32, 20), Vector2.LEFT)
+	assert_bool(_reachable(crypt, DARK_PATH).has(KNIGHTS_TOMB)).is_true()
 
-	# 5. The Knight's Tomb: three brief torches, and the Iron Sword.
+	# 5. The Knight's Tomb: four brief torches, and the Iron Sword.
 	var sword_bars: DungeonDoor = crypt.interactables.get_node(^"SwordBars")
-	_open(crypt, Vector2i(42, 9), Vector2.RIGHT)
-	_burn(crypt, 2.2)
-	_open(crypt, Vector2i(32, 9), Vector2.LEFT)
-	_burn(crypt, 1.8)
-	assert_bool(sword_bars.is_open()).is_false()
-	_open(crypt, Vector2i(32, 1), Vector2.LEFT)
+	_light_the_knights_torches(crypt, 1.5)
 	assert_bool(sword_bars.is_open()).is_true()
 	_open(crypt, Vector2i(37, 3), Vector2.UP)
 	var best: Dictionary = CombatRules.best_melee_weapon(GameState.inventory, items)
@@ -336,25 +379,42 @@ func test_the_crypt_can_be_finished_start_to_end() -> void:
 	assert_that(crypt.player.sword.blade).override_failure_message("with a steel blade").is_equal(Sword.BLADES[&"iron_sword"])
 	crypt.player.motor.place(crypt.player.motor.cell)
 
-	# 6. The Narthex's two torches open the Ossuary: beat everything in it for the second key.
-	_open(crypt, Vector2i(17, 37), Vector2.LEFT)
-	_open(crypt, Vector2i(17, 39), Vector2.LEFT)
+	# 6. The Narthex's two torches, far apart, open the Ossuary: beat everything in it and visit
+	# the watchmen in the order its inscription gives, for the second key.
+	_open(crypt, Vector2i(17, 35), Vector2.UP)
+	_burn(crypt, 2.0)
+	_open(crypt, Vector2i(27, 41), Vector2.DOWN)
 	assert_bool(_reachable(crypt, NARTHEX).has(OSSUARY)).is_true()
 	var key_bars: DungeonDoor = crypt.interactables.get_node(^"OssuaryKeyBars")
 	assert_bool(key_bars.is_open()).is_false()
 	_beat_all(crypt, &"crypt_ossuary_clear")
+	assert_bool(key_bars.is_open()).override_failure_message("the watchmen not visited").is_false()
+	_walk_onto(crypt, Vector2i(11, 35), Vector2i(9, 39))
+	assert_bool((crypt.interactables.get_node(^"OssuaryPlateNorth") as PressurePlate).pressed).override_failure_message("out of turn").is_false()
+	for plate_cell: Vector2i in [Vector2i(11, 41), Vector2i(11, 35)]:
+		_walk_onto(crypt, plate_cell, Vector2i(9, 39))
+	assert_bool(key_bars.is_open()).is_false()
+	_walk_onto(crypt, Vector2i(7, 38), Vector2i(9, 39))
 	assert_bool(key_bars.is_open()).is_true()
 	_open(crypt, Vector2i(2, 36), Vector2.UP)
 	assert_int(_keys()).is_equal(1)
 
-	# 7. The Hall's two torches open the Broken Floor.
-	_open(crypt, Vector2i(17, 26), Vector2.LEFT)
-	_open(crypt, Vector2i(17, 28), Vector2.LEFT)
+	# 7. The Hall's two torches, in its far corners, open the Broken Floor.
+	_open(crypt, Vector2i(17, 24), Vector2.UP)
+	_burn(crypt, 2.0)
+	_open(crypt, Vector2i(27, 30), Vector2.DOWN)
 	assert_bool(_reachable(crypt, HALL).has(BROKEN_FLOOR)).is_true()
 
-	# 8. The Broken Floor: a block in the far corner bridges the trench; the key opens the door.
-	assert_bool(_reachable(crypt, BROKEN_FLOOR).has(Vector2i(7, 23))).is_false()
+	# 8. The Broken Floor: a block in the far corner bridges the trench; beyond it a second block
+	# fills the pit before the door; the key opens the door.
+	assert_bool(_reachable(crypt, BROKEN_FLOOR).has(Vector2i(7, 24))).is_false()
 	_push(crypt, crypt.interactables.get_node(^"FloorBlock"), Vector2i(3, 31), Vector2.UP, Vector2i(3, 26))
+	assert_bool(_reachable(crypt, BROKEN_FLOOR).has(Vector2i(7, 24))).is_true()
+	assert_bool(_reachable(crypt, BROKEN_FLOOR).has(Vector2i(7, 23))).override_failure_message("a pit before the door").is_false()
+	var second: PushBlock = crypt.interactables.get_node(^"FloorBlockB")
+	_push(crypt, second, Vector2i(12, 24), Vector2.LEFT, Vector2i(7, 24))
+	_push(crypt, second, Vector2i(7, 25), Vector2.UP, Vector2i(7, 23))
+	assert_bool(second.sunk).is_true()
 	assert_bool(_reachable(crypt, BROKEN_FLOOR).has(Vector2i(7, 23))).is_true()
 	_open(crypt, Vector2i(7, 23), Vector2.UP)
 	assert_int(_keys()).is_equal(0)
@@ -362,9 +422,16 @@ func test_the_crypt_can_be_finished_start_to_end() -> void:
 	# 9. The Reliquary: an arrow across the pit into the crystal, and the big key.
 	var bigkey_bars: DungeonDoor = crypt.interactables.get_node(^"BigKeyBars")
 	assert_bool(bigkey_bars.is_open()).is_false()
-	assert_float(crypt.brightness_at(Vector2i(7, 13))).override_failure_message("from the room before, the crystal is in the dark").is_equal(0.0)
-	_shoot(crypt, Vector2i(7, 16), Vector2.UP)
-	assert_float(crypt.brightness_at(Vector2i(7, 13))).override_failure_message("from the pit's edge it shows in the Lantern's light").is_greater(0.0)
+	assert_float(crypt.brightness_at(Vector2i(2, 13))).override_failure_message("from the room before, the crystal is in the dark").is_equal(0.0)
+	var west_crystal: CrystalSwitch = crypt.interactables.get_node(^"ReliquaryCrystal")
+	_shoot(crypt, Vector2i(2, 16), Vector2.UP)
+	assert_float(crypt.brightness_at(Vector2i(2, 13))).override_failure_message("from the pit's edge it shows in the Lantern's light").is_greater(0.0)
+	assert_bool(west_crystal.is_on()).is_true()
+	assert_bool(bigkey_bars.is_open()).override_failure_message("one crystal of two").is_false()
+	west_crystal._process(4.1)
+	_shoot(crypt, Vector2i(12, 16), Vector2.UP)
+	assert_bool(bigkey_bars.is_open()).override_failure_message("too slow: the first turned back").is_false()
+	_shoot(crypt, Vector2i(2, 16), Vector2.UP)
 	assert_bool(bigkey_bars.is_open()).is_true()
 	_open(crypt, Vector2i(3, 19), Vector2.LEFT)
 	assert_bool(GameState.get_flag(DungeonState.big_key_flag(&"crypt")) == true).is_true()
@@ -483,6 +550,33 @@ func _burn(area: AreaController, seconds: float) -> void:
 		for child: Node in area.interactables.get_children():
 			if child is Torch:
 				(child as Torch)._process(FRAME)
+
+
+## Swings the sword from `cell` toward `direction` and lets the blow land.
+func _swing(area: AreaController, cell: Vector2i, direction: Vector2) -> void:
+	_face(area, cell, direction)
+	assert_bool(area.player.swing()).is_true()
+	for i: int in roundi(0.4 / FRAME):
+		area.player.motor.step(Vector2.ZERO, FRAME)
+		area.player.sync_from_motor()
+		area.resolve_combat()
+
+
+## Steps from `off` onto `cell`, and the plates are checked.
+func _walk_onto(area: AreaController, cell: Vector2i, off: Vector2i) -> void:
+	_face(area, off, Vector2.UP)
+	area.update_plates()
+	_face(area, cell, Vector2.UP)
+	area.update_plates()
+
+
+## Lights the Knight's Tomb's torches, `gap` seconds apart: all four, or the first three.
+func _light_the_knights_torches(area: AreaController, gap: float, only_three: bool = false) -> void:
+	var spots: Array = [[Vector2i(42, 9), Vector2.RIGHT], [Vector2i(32, 9), Vector2.LEFT], [Vector2i(32, 1), Vector2.LEFT], [Vector2i(42, 5), Vector2.RIGHT]]
+	for i: int in (3 if only_three else 4):
+		if i > 0:
+			_burn(area, gap)
+		_open(area, spots[i][0], spots[i][1])
 
 
 ## Every enemy sharing `clear_flag` takes a blow it can't survive.

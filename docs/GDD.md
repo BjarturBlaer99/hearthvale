@@ -251,6 +251,21 @@ Enemies sometimes drop hearts or coins.
     slime and an archer in the great hall, two slimes in the plate room, a bat in the armoury, a
     third archer and a bat in the gallery, a third bat by the crystals, and a second archer in the
     big key room: 30 monsters where there were 18.
+- **The Chapel Crypt, made harder (2026-11-23):**
+  - **The Narthex's and the great hall's** two torches stand in opposite corners and burn 6 s: both
+    lit in one run (their bars stay open once lifted).
+  - **The Lantern's Tomb** is cut by a wall with two barred gaps: one open while its crystal is red,
+    the other while it is blue. The Lantern lies behind the blue one, the torch that opens the way
+    north behind the red one.
+  - **The Dark Path's** two torches stand at the two ends of its winding way and burn 8 s.
+  - **The Knight's Tomb** has four torches, burning 5.5 s.
+  - **The Ossuary's** key wants its guards beaten and three plates visited in the order its
+    inscription gives (the south torch, the north torch, the foot of the pillar).
+  - **The Broken Floor** has a pit before the Reliquary's door too, and a second block beyond the
+    first trench to fill it. (A game saved past that door finds it filled.)
+  - **The Reliquary's** two crystals across its pit turn back after 4 s: both blue at once.
+  - **More monsters:** a bat in the Narthex, the Tomb, the Dark Path and the Reliquary, a slime in the
+    Trench and the Broken Floor, an archer in the great hall and the Ossuary.
 - Each mechanic is introduced on its own, then combined.
 
 ## 10. Village & economy

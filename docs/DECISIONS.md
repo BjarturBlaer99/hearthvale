@@ -1698,3 +1698,13 @@ PNG". What building it decided:
   the guards beaten as well, and now stay open once lifted. The quiver keeps its 15 arrows: the
   gallery's three archers take nine, and the archers' drops and the Warden's arrows for an empty
   quiver make up the rest (a test checks the walkthrough with ten more in hand).
+- 2026-11-23 — **Harder dungeons, step 4: the crypt.** The Broken Floor's second "pit row" is one
+  pit, before the Reliquary's door: a whole row would let the second block (which must keep its
+  `block_id`, or the way back from the Reliquary would open again whenever he left the room) sink in
+  the wrong place for good and strand him. With one pit, wherever the block is pushed in it is the
+  right place, and a block that jams is put back by leaving the room. An older save that opened the
+  Reliquary's door before the pit was there finds it filled (`PushBlock.sunk_if_past`), so no game
+  is stuck beyond it. The Tomb's red-and-blue gaps make the hero turn the crystal twice: blue for the
+  Lantern, red again for the torch and the way north. Torches that now burn out (the Narthex's, the
+  hall's, the Dark Path's) open bars that stay open, as before. The Ossuary's order is told by its
+  torches and pillar, the room's own landmarks, so no plate needs a mark.

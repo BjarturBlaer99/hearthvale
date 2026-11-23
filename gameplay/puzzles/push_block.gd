@@ -17,6 +17,11 @@ const STONE: Color = Color(0.74, 0.60, 0.40)
 
 ## Names its flag (DungeonState.block_flag) so that, once sunk, it stays sunk. Optional.
 @export var block_id: StringName
+## A block added after games were saved (harder dungeons, 2026-11-23): a game in which this flag
+## is set got past its pit before the block stood here, and finds it sunk in `sinks_at`, so an
+## older save is never stuck on the far side. Empty: none.
+@export var sunk_if_past: StringName
+@export var sinks_at: Vector2i
 
 ## Whether it lies in a pit it filled.
 var sunk: bool = false
@@ -40,6 +45,9 @@ func set_dungeon(id: StringName) -> void:
 	dungeon_id = id
 	if block_id == &"":
 		return
+	var flag: StringName = DungeonState.block_flag(dungeon_id, block_id)
+	if sunk_if_past != &"" and GameState.get_flag(sunk_if_past) == true and str(GameState.get_flag(flag, "")) == "":
+		GameState.set_flag(flag, "%d,%d" % [sinks_at.x, sinks_at.y])
 	var at: PackedStringArray = str(GameState.get_flag(DungeonState.block_flag(dungeon_id, block_id), "")).split(",")
 	if at.size() == 2:
 		_home = Vector2(int(at[0]), int(at[1])) * PlayerMotor.TILE
