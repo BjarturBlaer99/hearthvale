@@ -19,3 +19,7 @@ desktop.ini
 .DS_Store
 .vscode/
 .idea/
+
+# Art packs (art/packs/): a pack's audio is never used (this game makes its own sound and music)
+# and is left out of git. The rest of each pack is committed untouched.
+art/packs/ninja-adventure/Ninja Adventure - Asset Pack/Audio/

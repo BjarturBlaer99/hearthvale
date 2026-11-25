@@ -512,10 +512,12 @@ trees do not sit well in this game, it is the place to stop, with only two files
 from the page's free download on 2026-11-25: no payment, no account, no details given. 94.0 MB
 zipped (SHA-256 `95a06f4f...df62a7b15`), 109.9 MB unpacked in 2,234 files, the largest 4.6 MB. Its
 own `LICENSE.txt` is the text of CC0 1.0 Universal, and its `README.md` and the page say the same
-words section 3.3 quotes. It lies untouched in `art/packs/ninja-adventure/`. **It is not
-committed:** unpacked it is over the 100 MB the user set as the limit, and 100.1 MB of that is its
-`Audio` folder, which this game never uses. Without the audio it is 9.9 MB. Whether to commit it,
-and how much of it, is the user's to say. Nothing in it looks copied from another game.
+words section 3.3 quotes. It lies untouched in `art/packs/ninja-adventure/`. Unpacked it is
+over the 100 MB the user set as the limit, and 100.1 MB of that is its `Audio` folder, which this
+game never uses, so phase A's commit left it out and asked. **The user's answer (2026-11-25):
+"Yes, without audio".** It is committed without the `Audio` folder: 2,046 files, 9.9 MB, byte for
+byte as downloaded; `.gitignore` leaves the audio out and `art/packs/README.md` says so. Nothing in
+the pack looks copied from another game.
 
 **What is the pack's now** (cut, moved, mirrored and recoloured by a one-off script kept out of
 the project; no map, data or collision changed, and no tile changed place):
@@ -611,6 +613,6 @@ near equal parts), the details may also use the edge sheet's colours and three o
 petal and pebble colours (`ground_details_sheet_test`), and the ground's colours in code are
 checked against the tiles in place of the fringe's (`pixel_grade_test`).
 
-**For the review:** the two answers taken as recommended (F6, F7); whether the pack is committed,
-and with or without its audio; and whether the ground and the trees sit well enough in this game
-to go on to phase B.
+**For the review:** the two answers taken as recommended (F6, F7); whether the marsh keeps its
+green ground; and whether the ground and the trees sit well enough in this game to go on to
+phase B. (The pack's place in git is settled: committed without its audio.)

@@ -1,2 +1,5 @@
 # Normalize EOL for all files that Git considers text files (Godot default).
 * text=auto eol=lf
+
+# Art packs are kept byte for byte as downloaded: no end-of-line conversion.
+art/packs/** -text

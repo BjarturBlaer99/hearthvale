@@ -1831,6 +1831,9 @@ PNG". What building it decided:
     outside it: the land beside water is not always grass here.
   - The marsh keeps a green ground (the pack's flat grass in its darker green), not the pack's
     brown swamp mud, whose purple water this game's one water tile can't be.
-  - The pack is kept untouched in `art/packs/ninja-adventure/` and **is not committed**: unpacked
-    it is 109.9 MB, over the 100 MB the user set, 100.1 MB of it audio this game never uses. The
-    user decides whether it goes in, and whether without the audio (9.9 MB).
+  - The pack is kept untouched in `art/packs/ninja-adventure/`. Unpacked it is 109.9 MB, over
+    the 100 MB the user set, 100.1 MB of it audio this game never uses, so it was left out of
+    phase A's commit and the user was asked. **The user: "Yes, without audio"** (2026-11-25). It
+    is committed without its `Audio` folder (2,046 files, 9.9 MB), which `.gitignore` leaves out;
+    `art/packs/** -text` in `.gitattributes` keeps git from converting line endings in a pack,
+    so what is committed is byte for byte what was downloaded.

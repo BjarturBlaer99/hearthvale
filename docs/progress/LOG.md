@@ -3832,3 +3832,10 @@ recommended and are open at the review; F3, F4, F5, F8 and F9 are open.
 
 **Verified:** the whole suite, 1259 cases, exit 0 (`tests/art/` among them). Seen in the capture
 shots only; not played by hand. Next, on the user's word: the review of phase A, then phase B.
+
+**The pack committed without its audio (2026-11-25).** Asked whether the pack should go into git
+without its `Audio` folder, the user said "Yes, without audio". `art/packs/ninja-adventure/` is
+committed as downloaded but for that folder: 2,046 files, 9.9 MB, the largest 2.0 MB, byte for
+byte (`art/packs/** -text` in `.gitattributes`). `.gitignore` leaves the audio out (188 files,
+100.1 MB, still on this machine), and `art/packs/README.md` says so beside the pack. Phase A
+still waits for the user's review.

@@ -67,8 +67,11 @@ the switch (each byte for byte what was in the repo).
   `95a06f4fdcfd1882f061a45ff313b7c905dbe2de1e8512b281d7937df62a7b15`). Nothing was paid and no
   account or details were given.
 - **Where it is:** untouched in `art/packs/ninja-adventure/` (Godot ignores `art/`), with its
-  `LICENSE.txt`. **It is not committed:** unpacked it is 109.9 MB (2,234 files), 100.1 MB of it
-  audio. Its music and sound are never used: this game makes its own.
+  `LICENSE.txt`. **Committed without its `Audio` folder** (the user's word, 2026-11-25: "Yes,
+  without audio"): 2,046 files, 9.9 MB, byte for byte as downloaded (`.gitattributes` keeps git
+  from converting line endings there). The `Audio` folder (188 files, 100.1 MB of the pack's
+  109.9 MB) is left out by `.gitignore`: its music and sound are never used, this game makes its
+  own. `art/packs/README.md` says so beside the pack.
 - **What came from it:** the ground tiles of `world/tiles/greybox_tiles.png` named in its row,
   `world/tiles/scenery.png`, `world/tiles/ground_details.png` and `world/tiles/ground_edges.png`
   (farm-look plan, phase A). Each was fitted by a script that cuts, moves, mirrors and recolours;
