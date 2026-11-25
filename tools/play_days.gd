@@ -49,7 +49,7 @@ const CROPS: Array[StringName] = [&"turnip", &"wheat", &"carrot", &"potato", &"p
 ## The energy a blow of the pickaxe never costs more than.
 const BLOW: float = 2.0
 ## How near (px) a monster must be for the sword to reach it, and the frames between swings.
-const SWORD_REACH: float = 21.0
+const SWORD_REACH: float = CombatRules.SWORD_REACH + 1.0
 const SWING_EVERY: int = 24
 ## The minute of the day (from the midnight it began on) after which he heads home: 22:00.
 const HOME_BY: float = 22.0 * 60.0

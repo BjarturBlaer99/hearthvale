@@ -3551,3 +3551,29 @@ ui), and then for every finding fixed:
 the second run: a file race on this machine, not the code). New tests: `review_fixes_test.gd`
 (10), two in `unreadable_save_test.gd`, one in `animals_test.gd` (checked to fail without its fix).
 Not played by hand.
+
+## 2026-11-25 — The sword reaches further
+
+The user, after playing: "increase the range of the sword". No amount given.
+
+- **The reach is 28 px from his feet, was 20** (`CombatRules.SWORD_REACH`). With a target's own
+  radius (6) a swing now takes in the cell two straight ahead as well as the next cell and its two
+  aslant; two ahead and one aside is still out. The arc (120°), timing, damage, knockback,
+  cooldown and energy are as they were.
+- **A blow stops at a wall, a closed door and higher ground** (`TerrainQuery.stops_blow`,
+  `CombatRules.clear_between`): nothing checked this before. Higher ground counts because three
+  crystals on raised platforms (the keep's Armoury crystal and west twin, the cistern's combined
+  switch) are the bow's from the floor and the longer sword would have reached them. A line that
+  only grazes a wall's corner is let by; the seam of two walls is not.
+- **A survey of every area** (each crystal, pot, grass, branch, stump, the dummy and the farm's
+  debris, from every cell within three, facing each way) found nothing the old reach hit that the
+  new one doesn't, no new hit across a pit, and no new hit onto higher ground across a ledge.
+- **The picture follows:** the blade is 0.65 of the reach (13 px then, 18 now) and a faint sweep at
+  the reach round his feet shows the ground covered. `tools/capture.gd` has four new films
+  (`sword_reach_down`, `_side`, `_up`, `_left`); the side film shows the weed two cells off cut.
+- `tools/play_days.gd` swings at a monster within `CombatRules.SWORD_REACH` + 1 (was 21).
+
+**Verified:** the whole suite, 1224 cases, exit 0. New tests: the reach and its cells
+(`combat_rules_test`), a wall, a corner graze and the seam of two walls (`combat_rules_test`),
+`stops_blow` (`terrain_query_test`), and in the village a swing at the dummy from two cells off
+with a wall, higher ground and nothing between (`combat_test`). Not played by hand.

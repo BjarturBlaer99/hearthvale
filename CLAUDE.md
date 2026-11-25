@@ -116,8 +116,10 @@ in `docs/DECISIONS.md` are superseded.
   never the WAVs); `tools/art/make_font.gd` bakes the two pixel faces and the theme. No external audio
   or fonts.
 - **What the art passes left, still true:** the hero is two cells tall (16x32), 25 frames a row (walk
-  and run of six, a three-frame swing, four work poses), his feet, collisions and the sword's reach
-  where they always were (`Sword.HAND` only says where the blade is drawn from); the animator only picks
+  and run of six, a three-frame swing, four work poses), his feet and collisions where they always
+  were, and the sword's reach measured from his feet (`Sword.HAND` only says where the blade is drawn
+  from; the reach is `CombatRules.SWORD_REACH`, 28 px since the user's word of 2026-11-25, was 20, and
+  a blow never passes a wall, a closed door or higher ground: `TerrainQuery.stops_blow`); the animator only picks
   pictures, and swing timing and hits belong to the motor. Villagers are as tall, and breathe and blink
   (`Idling`). Trees stand up from their cell (`Scenery`, the hero walks behind them, a crown fades when
   anything that matters is behind it) and block only that cell; cherry trees are `"cherry"` blocks in

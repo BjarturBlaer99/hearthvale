@@ -1755,3 +1755,30 @@ PNG". What building it decided:
   - **The clock never goes back** past where it stands; **push blocks going back let go of their
     cells first**, so two on each other's starts both go home; **an animal left outside a pasture
     that something set down has cut** is put back on its ground.
+- 2026-11-25 — **The sword reaches further** (the user, after playing: "increase the range of the
+  sword"; no amount given).
+  - **28 px from his feet, was 20** (`CombatRules.SWORD_REACH`, one constant: the reach is
+    geometry the motor and the HitBox share, not a weapon's stat, so it stays in code beside the
+    arc's width). With a target's radius of 6 that is 34 px: the cell two straight ahead is now
+    taken in (a weed, a pot, a monster), the cell two ahead and one aside is not. Chosen as half a
+    cell more: a cell more (36) would take in three cells two ahead and cut six weeds a swing.
+    The arc's width (120°), the swing's timing, damage, knockback, cooldown and energy cost are
+    unchanged.
+  - **A blow stops at a wall, a closed door and higher ground** (`TerrainQuery.stops_blow`,
+    `CombatRules.clear_between`). Until now nothing checked: at 20 px it hardly mattered, at 28 a
+    swing would reach a monster or a weed behind a one-cell wall. Higher ground counts as a wall
+    because three timed crystals on raised platforms (the keep's Armoury crystal and its west twin,
+    the cistern's combined switch) were placed one cell in from the edge so only the bow reaches
+    them from the floor; at 28 px the sword would have reached them from two cells off. Lower
+    ground doesn't stop a blow (a blow down from a ledge), nor do stairs, pits or what stands in a
+    cell (the weeds before the weeds). A line that only grazes a wall's corner is let by (3 px), so
+    nothing the old reach hit is lost: a survey of every area's crystals, pots, grass, branches,
+    stumps and the farm's debris found no cell that hit before and doesn't now.
+  - **What you see follows it:** the drawn blade is 0.65 of the reach (13 px before, 18 now), and a
+    faint sweep at the reach round his feet shows the ground the swing covers.
+  - **Balance, reported and left as it is:** a swing into a crowd of weeds cuts four where it cut
+    three (the next cell, its two aslant, and the one two straight ahead); crystals on the floor
+    (among them the timed ones of the keep's twin and armoury puzzles) can be struck from two
+    cells off, a step sooner; every monster and boss can be struck 8 px further off, so a
+    hopper or a bat's dash is met earlier and the Warden and the Shade (radius 12) from 40 px.
+    `tools/play_days.gd` swings when a monster is within the reach and a pixel.

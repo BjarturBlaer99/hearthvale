@@ -62,7 +62,13 @@ func test_the_sword_hits_the_dummy_only_in_front_of_the_hero() -> void:
 		[at + Vector2i.DOWN, Vector2.DOWN, false],
 		[at + Vector2i.LEFT, Vector2.UP, false],
 		[at + Vector2i.LEFT, Vector2.LEFT, false],
+		# Two cells off since the longer reach (2026-11-25), but not two below: the dummy's body
+		# is 4 px above its cell's middle, so from below it is 30 px off, past the 28.
+		[at + Vector2i.LEFT * 2, Vector2.RIGHT, true],
+		[at + Vector2i.UP * 2, Vector2.DOWN, true],
 		[at + Vector2i.DOWN * 2, Vector2.UP, false],
+		[at + Vector2i.LEFT * 3, Vector2.RIGHT, false],
+		[at + Vector2i.LEFT * 2 + Vector2i.UP, Vector2.RIGHT, false],
 	]
 	for case: Array in cases:
 		village.player.motor.place(case[0])
@@ -73,6 +79,29 @@ func test_the_sword_hits_the_dummy_only_in_front_of_the_hero() -> void:
 		var expected: int = 1 if case[2] else 0
 		assert_int(dummy.hits - before).override_failure_message("standing at %s facing %s" % [case[0], case[1]]).is_equal(expected)
 	assert_str(village.terrain.check_move(at + Vector2i.DOWN, at).reason).override_failure_message("the dummy stands in its cell").is_equal("occupied")
+
+
+## The longer reach (2026-11-25) takes in the dummy from two cells off, but not through a wall,
+## nor onto higher ground between, and the blow lands again once the way is open.
+func test_the_sword_never_hits_through_a_wall_or_a_ledge() -> void:
+	GameState.add_item(&"wooden_sword")
+	var village: AreaController = _village()
+	var dummy: TrainingDummy = village.interactables.get_node(^"TrainingDummy")
+	var at: Vector2i = dummy.cell()
+	var between: Vector2i = at + Vector2i.LEFT
+	var grid: HeightGrid = village.terrain.grid
+	var level: int = grid.height_at(between)
+	assert_bool(grid.is_solid(between) or grid.is_solid(at + Vector2i.LEFT * 2)).override_failure_message("open ground beside the dummy").is_false()
+	# [what stands between, whether the swing hits]
+	for case: Array in [["a wall", false], ["higher ground", false], ["nothing", true]]:
+		grid.set_solid(between, case[0] == "a wall")
+		grid.set_height(between, level + 1 if case[0] == "higher ground" else level)
+		village.player.motor.place(at + Vector2i.LEFT * 2)
+		village.player.face(Vector2.RIGHT)
+		var before: int = dummy.hits
+		assert_bool(village.player.swing()).is_true()
+		_play(village, Vector2.ZERO, 0.4)
+		assert_int(dummy.hits - before).override_failure_message("with %s between" % case[0]).is_equal(1 if case[1] else 0)
 
 
 func test_touching_brambles_costs_half_a_heart_with_knockback_and_invincibility() -> void:

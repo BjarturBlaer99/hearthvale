@@ -3,9 +3,15 @@ extends RefCounted
 ## Pure combat geometry and rules (docs/TECH_DESIGN.md §4). Hitboxes and hurtboxes are circles;
 ## the sword's hitbox is a slice of a circle pointing the way the hero faces.
 
-## How far the sword reaches from the hero's feet (px), and the swing's width.
-const SWORD_REACH: float = 20.0
+## How far the sword reaches from the hero's feet (px), and the swing's width. The reach was 20
+## until the user asked for a longer one (2026-11-25): at 28 a swing reaches the cell two before
+## him straight ahead (a target's own radius counts too), where it reached only the next.
+const SWORD_REACH: float = 28.0
 const SWORD_ARC_DEGREES: float = 120.0
+## How finely clear_between() walks its line (px): well under a cell, so no cell is stepped over.
+const LINE_STEP: float = 2.0
+## How far into a blocking cell a line may pass and still be let by as a graze (px).
+const GRAZE: float = 3.0
 ## Used when a weapon's data leaves a stat out.
 const DEFAULT_WEAPON_STATS: Dictionary = {"damage": 1, "knockback": 0.0, "cooldown": 0.3}
 
@@ -23,6 +29,33 @@ static func in_arc(origin: Vector2, facing: Vector2, arc: float, reach: float, t
 	if offset.is_zero_approx() or facing.is_zero_approx():
 		return true
 	return absf(facing.angle_to(offset)) <= arc / 2.0
+
+
+## Whether a blow from `from` reaches `to` with nothing in the way: no cell on the straight line
+## between them, leaving out the cells at either end, is one `blocks` (a Callable(cell) -> bool)
+## says stops it. A line that only grazes a blocking cell, within GRAZE px of an edge with open
+## ground (or either end's cell) across it, is let by: a blow at something diagonally beside him
+## isn't stopped by a wall's corner, but the seam between two walls lets nothing through. A sword
+## stops at a wall as an arrow does (2026-11-25).
+static func clear_between(from: Vector2, to: Vector2, blocks: Callable) -> bool:
+	var first: Vector2i = GridBody.cell_of(from)
+	var last: Vector2i = GridBody.cell_of(to)
+	var stops: Callable = func(cell: Vector2i) -> bool:
+		return cell != first and cell != last and bool(blocks.call(cell))
+	var steps: int = ceili(from.distance_to(to) / LINE_STEP)
+	for i: int in range(1, steps):
+		var point: Vector2 = from.lerp(to, float(i) / float(steps))
+		var cell: Vector2i = GridBody.cell_of(point)
+		if not stops.call(cell):
+			continue
+		var inside: Vector2 = point - Vector2(cell) * GridBody.TILE
+		var grazed: bool = (inside.x < GRAZE and not stops.call(cell + Vector2i.LEFT)) \
+				or (GridBody.TILE - inside.x < GRAZE and not stops.call(cell + Vector2i.RIGHT)) \
+				or (inside.y < GRAZE and not stops.call(cell + Vector2i.UP)) \
+				or (GridBody.TILE - inside.y < GRAZE and not stops.call(cell + Vector2i.DOWN))
+		if not grazed:
+			return false
+	return true
 
 
 ## Knockback for something at `target` hit from `source`: `distance` px straight away from the

@@ -188,8 +188,18 @@ res://
   - Every physics frame, `AreaController.resolve_combat()` lets each active HitBox hit the other team's HurtBoxes
     it touches. A `Hit` carries damage, a push and the source. Contacts are checked in code with `CombatRules`
     (pure), not with physics Area2Ds, so they match the grid-checked movement and stay deterministic in tests.
-  - The sword (`Sword`, a HitBox child of the hero) is a 120° arc with 20 px reach, and hits each target once per
-    swing. Its damage, knockback and cooldown come from the strongest `weapon_melee` item held
+  - The sword (`Sword`, a HitBox child of the hero) is a 120° arc with 28 px reach from his feet
+    (`CombatRules.SWORD_REACH`; it was 20 until the user asked for a longer one on 2026-11-25), and hits each
+    target once per swing. With a target's own radius (6 for a monster, a weed, a pot or a crystal) a swing takes
+    in the next cell all round the front and the cell two straight ahead. **A blow never passes through a wall:**
+    `Sword.touches()` also asks `CombatRules.clear_between()` (pure) whether any cell on the line from his feet
+    to the target, leaving out the two ends, stops a blow (`TerrainQuery.stops_blow(cell, level)`: a solid cell,
+    a closed door, off the map, or ground higher than his own; stairs, pits, lower ground and whatever merely
+    stands in a cell don't). A line that only grazes a blocking cell's corner (within `GRAZE`, 3 px, of an edge
+    with open ground across it) is let by, so a blow at something diagonally beside him is as it was; the seam
+    between two walls lets nothing by. Higher ground stops it so the crystals on raised platforms in the keep and
+    the cistern, placed for the bow, stay the bow's. The drawn blade is `SWORD_REACH * 0.65` long (13 px at 20,
+    18 at 28) and a faint sweep at the reach round his feet shows the ground the swing covers. Its damage, knockback and cooldown come from the strongest `weapon_melee` item held
     (`CombatRules.best_melee_weapon`). Hazards (brambles) are HitBoxes on the enemy team.
   - The hero's HurtBox takes hits through the motor (knockback and invincibility), then `GameState.damage()`.
   - At zero hearts the area waits `RESPAWN_DELAY`, then puts the hero back at its **entrance** (where they

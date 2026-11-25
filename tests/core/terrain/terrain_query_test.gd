@@ -101,3 +101,20 @@ func test_a_pit_on_higher_ground_is_still_out_of_reach() -> void:
 	var terrain: TerrainQuery = TerrainQuery.new(HeightGrid.from_rows(PackedStringArray(["0 1"])))
 	terrain.set_pit(Vector2i(1, 0))
 	assert_that(terrain.check_move(Vector2i(0, 0), Vector2i(1, 0)).kind).is_equal(MoveResult.Kind.BLOCKED)
+
+
+func test_a_blow_is_stopped_by_walls_doors_and_higher_ground() -> void:
+	var terrain: TerrainQuery = TerrainQuery.new(HeightGrid.from_rows(PackedStringArray(["0 0s 0 1 1r 0"])))
+	assert_bool(terrain.stops_blow(Vector2i(0, 0), 0)).override_failure_message("open floor").is_false()
+	assert_bool(terrain.stops_blow(Vector2i(1, 0), 0)).override_failure_message("a wall").is_true()
+	terrain.set_sealed(Vector2i(2, 0))
+	assert_bool(terrain.stops_blow(Vector2i(2, 0), 0)).override_failure_message("a closed door").is_true()
+	assert_bool(terrain.stops_blow(Vector2i(3, 0), 0)).override_failure_message("a ledge's face, struck from below").is_true()
+	assert_bool(terrain.stops_blow(Vector2i(3, 0), 1)).override_failure_message("level with him").is_false()
+	assert_bool(terrain.stops_blow(Vector2i(5, 0), 1)).override_failure_message("lower ground").is_false()
+	assert_bool(terrain.stops_blow(Vector2i(4, 0), 0)).override_failure_message("stairs").is_false()
+	assert_bool(terrain.stops_blow(Vector2i(9, 0), 0)).override_failure_message("off the map").is_true()
+	terrain.set_pit(Vector2i(0, 0))
+	terrain.set_occupied(Vector2i(5, 0))
+	assert_bool(terrain.stops_blow(Vector2i(0, 0), 0)).override_failure_message("a pit").is_false()
+	assert_bool(terrain.stops_blow(Vector2i(5, 0), 0)).override_failure_message("someone standing").is_false()

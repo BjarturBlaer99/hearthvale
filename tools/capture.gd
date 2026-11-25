@@ -88,6 +88,12 @@ const FILMS: Array = [
 	["pick_boulder_copper", Vector2i(13, 7), Vector2.RIGHT, "copper_pick", "use", 3],
 	["sword_log", Vector2i(6, 4), Vector2.RIGHT, "sword", "swing", 3],
 	["sword_stump", Vector2i(25, 2), Vector2.LEFT, "sword", "swing", 3],
+	# The sword's reach (2026-11-25): one swing down into the weeds of the field's column 28,
+	# one to the side along row 18, one up and one to the left on open ground.
+	["sword_reach_down", Vector2i(28, 16), Vector2.DOWN, "sword", "swing", 1],
+	["sword_reach_side", Vector2i(26, 18), Vector2.RIGHT, "sword", "swing", 1],
+	["sword_reach_up", Vector2i(34, 13), Vector2.UP, "sword", "swing", 1],
+	["sword_reach_left", Vector2i(36, 12), Vector2.LEFT, "sword", "swing", 1],
 	["harvest", Vector2i(24, 18), Vector2.RIGHT, "ripe", "interact", 1],
 	["take_wool", Vector2i(6, 13), Vector2.RIGHT, "a:sheep", "interact", 1],
 	["pet_hen", Vector2i(6, 13), Vector2.RIGHT, "a:hen", "interact", 1],

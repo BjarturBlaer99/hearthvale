@@ -71,6 +71,7 @@ func _ready() -> void:
 ## Called by the area once its terrain is known.
 func setup(terrain: TerrainQuery, start_cell: Vector2i, bounds: Rect2i) -> void:
 	motor = PlayerMotor.new(terrain)
+	sword.terrain = terrain
 	motor.place(start_cell)
 	motor.dropped.connect(_on_dropped)
 	set_camera_bounds(bounds)

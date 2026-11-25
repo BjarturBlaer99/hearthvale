@@ -48,6 +48,17 @@ func is_sealed(cell: Vector2i) -> bool:
 	return _sealed.has(cell)
 
 
+## Whether `cell` stops a sword's blow on its way, struck from ground at `level`: a solid cell,
+## a closed door, off the map, or ground higher than his own (a ledge's face is a wall to him;
+## stairs are not). Pits, lower ground and what merely stands in a cell (villagers, weeds,
+## blocks) don't. So the longer reach (2026-11-25) never cuts through a wall or onto a ledge
+## that only the bow could reach.
+func stops_blow(cell: Vector2i, level: int) -> bool:
+	if not grid.in_bounds(cell) or grid.is_solid(cell) or is_sealed(cell):
+		return true
+	return not grid.is_ramp(cell) and grid.height_at(cell) > level
+
+
 ## Opens a pit at `cell`, or closes it (a block filled it).
 func set_pit(cell: Vector2i, open: bool = true) -> void:
 	if open:
