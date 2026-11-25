@@ -10,11 +10,11 @@ extends Node2D
 ##   same level, and water gets a dark line under its bank.
 
 const T: float = 16.0
-const EDGE_COLOR: Color = Color(0.0, 0.0, 0.0, 0.35)
+const EDGE_COLOR: Color = Color(0.16, 0.07, 0.10, 0.35)
 const FACE_COLOR: Color = Color(0.36, 0.28, 0.20, 0.90)
 const FACE_LINE: Color = Color(0.18, 0.13, 0.10, 0.55)
 ## In dungeons the faces are cut stone instead of earth.
-const STONE_FACE_COLOR: Color = Color(0.24, 0.24, 0.29, 0.95)
+const STONE_FACE_COLOR: Color = Color(0.28, 0.24, 0.28, 0.95)
 const STONE_FACE_LINE: Color = Color(0.12, 0.12, 0.15, 0.7)
 
 ## Cut-stone cliff faces (dungeons) instead of earthy ones; the area sets it.
@@ -22,8 +22,8 @@ var stone_faces: bool = false
 const LIP_COLOR: Color = Color(0.14, 0.10, 0.08, 0.95)
 ## Shadows fade out in two steps (P1b): the whole shadow in the faint shade, and the half of
 ## it nearest the thing that casts it darkened again.
-const SHADE_FAR: Color = Color(0.14, 0.06, 0.24, 0.15)
-const SHADE_NEAR: Color = Color(0.14, 0.06, 0.24, 0.18)
+const SHADE_FAR: Color = Color(0.22, 0.09, 0.18, 0.15)
+const SHADE_NEAR: Color = Color(0.22, 0.09, 0.18, 0.18)
 ## The sun stands in the north-west: tall solid things also shade the ground to their east.
 ## How far a shadow reaches (px); its darker half is nearest the thing.
 const CAST: float = 6.0
@@ -32,7 +32,7 @@ const ALL_SIDES: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, 
 ## Kinds of soft edge: grass fraying over a path, and water against its bank.
 const FRINGE: StringName = &"fringe"
 const BANK: StringName = &"bank"
-const BANK_SHADE: Color = Color(0.08, 0.20, 0.38, 0.85)
+const BANK_SHADE: Color = Color(0.06, 0.18, 0.32, 0.85)
 
 var _grid: HeightGrid
 ## Soft edges to draw: [cell, side, kind].

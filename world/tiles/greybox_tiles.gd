@@ -241,9 +241,9 @@ const DATA_SOLID: String = "solid"
 
 ## Meadow grass at the bottom, lighter grass on raised ground, rock on the heights.
 const GROUND_COLORS: Array[Color] = [
-	Color(0.40, 0.64, 0.24),
-	Color(0.45, 0.69, 0.27),
-	Color(0.50, 0.73, 0.30),
+	Color(0.48, 0.65, 0.27),
+	Color(0.55, 0.70, 0.30),
+	Color(0.61, 0.75, 0.34),
 	Color(0.52, 0.56, 0.36),
 	Color(0.56, 0.52, 0.40),
 	Color(0.60, 0.56, 0.47),

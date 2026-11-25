@@ -4,7 +4,7 @@ extends Node2D
 ## (PointLight2D) for everything the area says is shining right now.
 ##
 ## - The ambient colour tints everything in the area (a CanvasModulate): clear outdoors, a warm
-##   dimness in a house, a cool one in a dungeon, near black in a `dark` area.
+##   dimness in a house, a plum-grey one in a dungeon, near black in a `dark` area.
 ## - A POOL light shows what it reaches in its own colours (the engine's "mix" blend): two pools
 ##   that overlap don't glare, and a white pool undoes the dimness exactly.
 ## - A GLOW light adds its colour on top ("add"): the bloom round a flame, a lamp in daylight.
@@ -19,8 +19,8 @@ const GLOW: StringName = &"glow"
 ## By Ambience kind. Houses and dungeons are dim, never dark: an enemy is always easy to see.
 const AMBIENT: Dictionary = {
 	&"outdoor": Color(1.0, 1.0, 1.0),
-	&"interior": Color(0.62, 0.55, 0.66),
-	&"dungeon": Color(0.54, 0.54, 0.72),
+	&"interior": Color(0.68, 0.58, 0.62),
+	&"dungeon": Color(0.62, 0.56, 0.68),
 }
 ## A `dark` area: a hint of the room stays, as it always has.
 const DARK: Color = Color(0.06, 0.05, 0.11)

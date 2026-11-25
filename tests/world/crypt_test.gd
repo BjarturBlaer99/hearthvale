@@ -360,7 +360,7 @@ func test_the_dark_shows_only_what_light_reaches() -> void:
 	assert_float(crypt.brightness_at(Vector2i(39, 13))).is_greater(0.5)
 	GameState.set_time(float(GameState.day_clock().in_day("12:00")))
 	var village: AreaController = _load(VILLAGE)
-	assert_that(village.lighting.ambient).override_failure_message("the village isn't dark (at noon it is clear)").is_equal(Color.WHITE)
+	assert_that(village.lighting.ambient).override_failure_message("the village isn't dark (at noon it is the day's light)").is_equal(GameState.daylight())
 	assert_float(village.brightness_at(Vector2i(2, 30))).is_equal(1.0)
 
 

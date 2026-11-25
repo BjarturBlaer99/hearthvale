@@ -9,9 +9,9 @@ const CODE: String = """
 shader_type canvas_item;
 uniform sampler2D cells : filter_nearest, repeat_disable;
 uniform vec2 map_cells = vec2(1.0);
-uniform vec4 glint : source_color = vec4(0.80, 0.93, 1.0, 0.55);
+uniform vec4 glint : source_color = vec4(0.86, 0.96, 0.92, 0.55);
 uniform vec4 foam : source_color = vec4(0.90, 0.97, 1.0, 0.85);
-uniform vec4 deep : source_color = vec4(0.05, 0.14, 0.34, 0.16);
+uniform vec4 deep : source_color = vec4(0.05, 0.17, 0.32, 0.16);
 varying vec2 at;
 
 void vertex() {

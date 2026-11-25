@@ -6,7 +6,22 @@ look"). Of the qualities offered in its place, the user chose two: **warmer colo
 ground**. This pass takes only that general feel, which belongs to the whole genre of cosy farm
 games. Every colour and tile below is Hearthvale's own, worked out from its own palette.
 
-**This is the plan. Nothing in the game has changed yet.** The pictures in
+## What the user has decided
+
+**Approved as written on 2026-11-25** ("Approve as recommended"), with the recommended answer to each
+of the eight questions in section 7:
+
+1. **Q1:** as warm as in the samples.
+2. **Q2:** a faint gold daylight (1.0 0.98 0.93 from 07:30 to 17:00) in place of white.
+3. **Q3:** the water a little towards teal.
+4. **Q4:** the dungeons and the quarry warmer (plum-grey stone, warmer dim light), and still dim.
+5. **Q5:** details outdoors, in the quarry and in the dungeons; none in houses.
+6. **Q6:** about one grass cell in four, tuned in the user's playtest (step 4).
+7. **Q7:** the details drawn by script in the game's palette; the user may replace them with a
+   PixelLab sheet later.
+8. **Q8:** the order colours, tiles, details, playtest, with a stop after each.
+
+**The plan as it was written follows. When it was written nothing in the game had changed yet.** The pictures in
 `docs/progress/warm-ground-samples/` were made in a scratch copy of the project. Each one shows the
 game as it is on the left and the proposed look on the right, at the same spot and the same hour.
 The detail art in them is a rough first draft, painted by a script in about an hour, to show the

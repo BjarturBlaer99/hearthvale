@@ -1784,3 +1784,14 @@ PNG". What building it decided:
     `tools/play_days.gd` swings when a monster is within the reach and a pixel.
   - **The user kept 28** (2026-11-25, shown the summary and the films: "Keep 28"). Not played by
     hand yet.
+- 2026-11-25 — **Warmer colours and busier ground** (`docs/progress/warm-ground-plan.md`). The user
+  asked for the graphics "1 to 1 to Stardew Valley"; copying another game was declined, and of the
+  qualities offered in its place the user chose warmer colours and busier ground, in Hearthvale's
+  own colours and tiles. **The user approved the plan as written** ("Approve as recommended"),
+  with the recommended answer to each of its eight questions: as warm as the samples; a faint gold
+  daylight (1.0 0.98 0.93) in place of white; the water a little towards teal; the dungeons and the
+  quarry warmer and still dim; ground details outdoors, in the quarry and in the dungeons, none in
+  houses; about one grass cell in four, tuned in the playtest; the details drawn by script (a
+  PixelLab sheet of the user's may replace them); and four steps, colours, tiles, details,
+  playtest, with a stop after each. The crypt's dark (`AreaLighting.DARK`) and the title's sky
+  (`TitlePicture.SKY_TOP`, which changes only with `backdrop.png`) are kept as they are.

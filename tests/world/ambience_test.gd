@@ -62,7 +62,7 @@ func test_lamps_hearths_and_candles_glow_where_their_tiles_are() -> void:
 func test_each_kind_of_place_has_its_ambient_colour() -> void:
 	# Outdoors the light follows the hour (P2a): this is the village at noon.
 	GameState.set_time(float(GameState.day_clock().in_day("12:00")))
-	assert_that(_load(VILLAGE).lighting.ambient).override_failure_message("the sun is out").is_equal(Color.WHITE)
+	assert_that(_load(VILLAGE).lighting.ambient).override_failure_message("the sun is out").is_equal(GameState.daylight())
 	assert_bool(_area.lighting.is_dim()).is_false()
 	var house: Color = _load(ELDER_HOUSE).lighting.ambient
 	var keep: Color = _load(KEEP).lighting.ambient

@@ -3622,3 +3622,38 @@ final dungeon (the Chapel Crypt). Fixed without changing anything seen or played
 **Verified:** the whole suite, 1227 cases, exit 0. New tests: the registry's kept lists are copies
 and follow new data (`data_registry_test`), the hero's light from the lanterns he carries, and a
 dark room's pools and glows (`crypt_test`). Not played by hand.
+
+## 2026-11-25 — Warmer colours and busier ground, step 1: the colours
+
+`docs/progress/warm-ground-plan.md`, approved as written ("Approve as recommended": every
+question's recommended answer, now at the head of the plan and in `docs/DECISIONS.md`). Step 1
+only: the colours. No tile moved, no map was re-baked, nothing of timing, hits or collisions
+changed, and nothing moves that stood still.
+
+- **The PNGs, by role** (a one-off script, not kept: the PNGs stay the source). In
+  `world/tiles/greybox_tiles.png` every pixel of an old colour became its new one, wherever it is:
+  the grass of heights 0 to 2 (`#63a037` to `#7aa540` and its shades; the tree, rock and fence
+  tiles of row 3 and the outcrop's edge follow), the path (all eight heights, a hair more honey),
+  the water (four frames and the solid water tile, towards teal; the lily pads' water follows),
+  the dungeon stone (floor, walls, pillar, both pits, all eight ledges: blue-grey to plum-grey),
+  and the marsh's ground (row 23, six degrees warmer; its moss patch and the hut's mossy wall
+  follow). The silo shares one ledge grey and keeps it. `world/tiles/relief.png`: the dungeon
+  walls' faces, top and pillar follow the stone, so no blue wall stands on a plum floor. The
+  colours are the plan's table to the digit. `art/palettes/greybox_tiles.gpl`, `relief.gpl` and
+  `hearthvale.gpl` name the new colours where the old stood; `docs/ASSETS.md` records it.
+- **In code, as the plan's table:** `GreyboxTiles.GROUND_COLORS[0..2]` (the fringe),
+  `HeightShading`'s shadows plum, its edge line dark plum, its stone faces and bank shade;
+  `WaterSurface`'s glint and deep; `AreaLighting.AMBIENT` interior and dungeon warmer, still dim;
+  `data/rules/time.json` a faint gold from 07:30 to 17:00 (1.0 0.98 0.93) and a warmer night
+  (21:00 0.54 0.56 0.80, 02:00 0.48 0.50 0.76). Kept: `AreaLighting.DARK`, `Ambience`'s fires
+  and lamps, `TitlePicture.SKY_TOP`, `PixelGrade`.
+- **Tests:** `day_clock_test` no longer wants a white noon: warm white (red ≥ green ≥ blue), blue
+  above 0.9, bright; dawn to 07:30 is checked against the 07:30 colour. `ambience_test` and
+  `crypt_test` want the village at noon in the day's light (`GameState.daylight()`), not white.
+- **Pictures:** before and after of capture shots 1, 4, 5, 21, 30, 44, 46, 52, 90, 92, 141, 142,
+  144, 145, 160, 164 and 167, in the session notes (`warm-ground-step1/`, pairs side by side).
+  The keep's walls now match its floor; the quarry reads brown, no longer violet; the night stays
+  blue with the grass green.
+
+**Verified:** the whole suite, 1227 cases, exit 0 (`tests/art/` among them). Seen in the capture
+shots only; not played by hand. Next, on the user's word: step 2, the busier tiles.

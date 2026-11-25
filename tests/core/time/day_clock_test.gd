@@ -60,7 +60,10 @@ func test_the_light_follows_the_hour() -> void:
 	var late_dusk: Color = _clock.light_at(_clock.in_day("19:45"))
 	var night: Color = _clock.light_at(_clock.in_day("23:00"))
 	var small_hours: Color = _clock.light_at(_clock.in_day("02:00"))
-	assert_that(noon).override_failure_message("clear by day").is_equal(Color.WHITE)
+	# By day a faint gold (the warm-ground plan, Q2): warm white, near white, bright.
+	assert_bool(noon.r >= noon.g and noon.g >= noon.b).override_failure_message("warm white by day: %s" % noon).is_true()
+	assert_float(noon.b).override_failure_message("only a tint by day: %s" % noon).is_greater(0.9)
+	assert_float(noon.get_luminance()).override_failure_message("bright by day: %s" % noon).is_greater(0.95)
 	assert_bool(dawn.r > dawn.g and dawn.g > dawn.b).override_failure_message("peach at dawn: %s" % dawn).is_true()
 	assert_bool(dusk.r > dusk.g and dusk.g > dusk.b and dusk.b < dawn.b).override_failure_message("orange at dusk, deeper than dawn: %s" % dusk).is_true()
 	assert_bool(late_dusk.b > late_dusk.g and late_dusk.r > late_dusk.g).override_failure_message("then violet: %s" % late_dusk).is_true()
@@ -68,7 +71,7 @@ func test_the_light_follows_the_hour() -> void:
 	assert_float(small_hours.get_luminance()).override_failure_message("the night is dim, not dark: the hero has no light of his own outdoors").is_greater(0.4)
 	# Between two of the rules' times the light is between their colours, and it never jumps.
 	var half: Color = _clock.light_at((_clock.in_day("06:00") + _clock.in_day("07:30")) / 2.0)
-	assert_bool(half.is_equal_approx(dawn.lerp(Color.WHITE, 0.5))).is_true()
+	assert_bool(half.is_equal_approx(dawn.lerp(_clock.light_at(_clock.in_day("07:30")), 0.5))).is_true()
 	var last: Color = dawn
 	for minute: int in range(_clock.starts, _clock.ends + 1):
 		var now: Color = _clock.light_at(float(minute))
