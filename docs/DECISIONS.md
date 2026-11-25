@@ -1782,3 +1782,5 @@ PNG". What building it decided:
     cells off, a step sooner; every monster and boss can be struck 8 px further off, so a
     hopper or a bat's dash is met earlier and the Warden and the Shade (radius 12) from 40 px.
     `tools/play_days.gd` swings when a monster is within the reach and a pixel.
+  - **The user kept 28** (2026-11-25, shown the summary and the films: "Keep 28"). Not played by
+    hand yet.

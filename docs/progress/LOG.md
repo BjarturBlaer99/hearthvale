@@ -3577,3 +3577,5 @@ The user, after playing: "increase the range of the sword". No amount given.
 (`combat_rules_test`), a wall, a corner graze and the seam of two walls (`combat_rules_test`),
 `stops_blow` (`terrain_query_test`), and in the village a swing at the dummy from two cells off
 with a wall, higher ground and nothing between (`combat_test`). Not played by hand.
+
+**The user kept 28** the same day ("Keep 28"), shown the summary and the films.
