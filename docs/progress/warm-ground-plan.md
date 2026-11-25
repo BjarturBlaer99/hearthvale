@@ -29,7 +29,10 @@ of the eight questions in section 7:
   an 8× close-up and four before-and-after pairs: "Approve, go on").
 - **Step 3, the ground details:** built (`4c8aabb`) and **approved on 2026-11-25** (shown the summary,
   two close-ups before over after, the details at 8×, a fenced yard and the keep: "Approve, let's
-  play"), with the rule below as built. Step 4, the user's playtest, is next. One rule reads
+  play"), with the rule below as built.
+- **Step 4, the playtest:** the user played the game with all three steps in on 2026-11-25 and said
+  "it feels right": nothing was tuned (the densities and colours stand as built). **The pass is
+  finished.** One rule of step 3 reads
   differently from §3.3, as the samples were made: a cell next to something held keeps its detail
   unless that thing stands just below it (`docs/DECISIONS.md`, 2026-11-25).
 

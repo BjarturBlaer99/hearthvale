@@ -3766,3 +3766,5 @@ sheet). Seen in the capture shots only; not played by hand. Next, on the user's 
 playtest and tuning.
 
 **Approved (warm-ground step 3).** Shown the summary, two close-ups before over after, the details at 8x, a fenced yard and the keep, the user approved step 3 on 2026-11-25 ("Approve, let's play"), with the samples' rule for a cell beside something held. Step 4, the user's playtest, began the same day.
+
+**Warm-ground step 4, the playtest (2026-11-25).** The user played the game by hand with the warmer colours, the busier tiles and the ground details, and said "it feels right": nothing was tuned. The pass is finished, and pushed on the user's word.
