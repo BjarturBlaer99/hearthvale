@@ -239,19 +239,21 @@ const DATA_HEIGHT: String = "height"
 const DATA_RAMP: String = "ramp"
 const DATA_SOLID: String = "solid"
 
-## Meadow grass at the bottom, lighter grass on raised ground, rock on the heights.
+## The ground's colour at each height, exactly as its tile is painted (the farm-look plan,
+## phase A: the art pack's flat grass): its green in the meadow, its yellow-green on the second
+## rise and a blend between; above them, where no map goes, its olive, its mud and its sands.
 const GROUND_COLORS: Array[Color] = [
-	Color(0.48, 0.65, 0.27),
-	Color(0.55, 0.70, 0.30),
-	Color(0.61, 0.75, 0.34),
-	Color(0.52, 0.56, 0.36),
-	Color(0.56, 0.52, 0.40),
-	Color(0.60, 0.56, 0.47),
-	Color(0.66, 0.63, 0.56),
-	Color(0.74, 0.72, 0.68),
+	Color("74a334"),
+	Color("91b037"),
+	Color("adbc3a"),
+	Color("a8a129"),
+	Color("b3957f"),
+	Color("f2ad7d"),
+	Color("ffcb8d"),
+	Color("ffcba9"),
 ]
-const STAIRS_COLOR: Color = Color(0.63, 0.60, 0.54)
-const PATH_COLOR: Color = Color(0.78, 0.61, 0.38)
+const STAIRS_COLOR: Color = Color("f2ad7d")
+const PATH_COLOR: Color = Color("d3865f")
 
 
 ## Atlas coordinates for a kind of tile: "ground", "stairs" or "path" at `height`, or a

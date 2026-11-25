@@ -6,6 +6,30 @@ sold commercially. Step 1 is this plan: research and a proposal, nothing downloa
 game changed. Step 2 switches the art in five phases (A terrain and trees, B buildings, interiors and
 props, C crops, items and UI, D villagers, animals and monsters, E the hero), stopping after each.
 
+## What the user has decided
+
+**2026-11-25, shown the shortlist, its licences and what speaks against each pack:**
+
+- **F1, the pack: Ninja Adventure,** by Pixel-Boy and AAA, CC0, free (section 3.3). The user chose
+  it knowing what speaks against it: a feudal-Japan village, a flatter look, no crops or farm poses
+  listed, short people. The repository is public and the other two packs forbid redistribution.
+- **F2 and F10 fall away:** a CC0 pack may sit in a public repository, and there is no artist to
+  ask.
+- **F6 and F7: taken as recommended; the user has not spoken to them; open at the phase A
+  review.** F6: the ground-detail rule is kept and its sheet painted again from the pack. F7: the
+  pack's own edges are drawn where the code drew its fringe, banks and cliff faces.
+- **F3, F4, F5, F8 and F9 are open:** they belong to later phases.
+
+**How far it has come:**
+
+- **Step 1, this plan:** written and committed (`54e1fd7`).
+- **Step 2, phase A (terrain and trees): built on 2026-11-25, and waits for the user's review.**
+  What was built, what the pack did not cover and what fits badly are in section 11.
+- Phases B to E: not begun.
+
+**The plan as it was written follows** (sections 0 to 10). When it was written nothing had been
+downloaded and nothing in the game had changed.
+
 **Nothing was downloaded.** Every fact below was read on the packs' own pages on 2026-11-25, in the
 app's browser. Where a page does not say something, this plan says "the page doesn't say" and the
 answer waits for the files. Prices are as read that day; two of them are sale prices that end about
@@ -481,3 +505,112 @@ trees do not sit well in this game, it is the place to stop, with only two files
 - Hana Caraka, Otterisk: https://itch.io/c/3569702/hana-caraka-series,
   https://otterisk.itch.io/hana-caraka-base-character
 - Sprout Lands, Cup Nooble: https://cupnooble.itch.io/sprout-lands-asset-pack
+
+## 11. Phase A as built (2026-11-25): terrain and trees
+
+**The pack.** "Ninja Adventure - Asset Pack.zip" (the page's update 8, dated 2026-03-29) was taken
+from the page's free download on 2026-11-25: no payment, no account, no details given. 94.0 MB
+zipped (SHA-256 `95a06f4f...df62a7b15`), 109.9 MB unpacked in 2,234 files, the largest 4.6 MB. Its
+own `LICENSE.txt` is the text of CC0 1.0 Universal, and its `README.md` and the page say the same
+words section 3.3 quotes. It lies untouched in `art/packs/ninja-adventure/`. **It is not
+committed:** unpacked it is over the 100 MB the user set as the limit, and 100.1 MB of that is its
+`Audio` folder, which this game never uses. Without the audio it is 9.9 MB. Whether to commit it,
+and how much of it, is the user's to say. Nothing in it looks copied from another game.
+
+**What is the pack's now** (cut, moved, mirrored and recoloured by a one-off script kept out of
+the project; no map, data or collision changed, and no tile changed place):
+
+| Piece | From the pack | How it was fitted |
+|---|---|---|
+| Grass, and the same grass under props (atlas rows 0 and 8) | its flat grass (`TilesetFloor`) | the meadow is its green (`#74a334`), the second rise its yellow-green (`#adbc3a`), the first rise a blend of the two. One flat colour a tile, as the pack draws it: the texture is the details'. Heights 3 to 7, which no map uses, are its olive, mud and sands |
+| Path (row 2) | its dirt, the tile with no edge | in its lighter dirt colours at every height |
+| Stairs (row 1) | its steps (`TilesetReliefDetail`) | the clear corners filled with its own dark brown: a ground tile can't be see-through |
+| Water (row 11, and the old water tile in row 3) | its water colour (`#71ddee`) | flat, all four frames alike: the surface's movement is the shader's. The pack's ripple is not used (one tile for every cell would repeat it) |
+| Dungeon floor (4, 4) | its dark cobbles (`TilesetInteriorFloor`) | as drawn |
+| Raised dungeon floor (row 10) | the same cobbles | each tone one step lighter, in the cobbles' own tones |
+| The quarry's earth (row 25, columns 0 and 1) | its darker dirt | as drawn |
+| The marsh's ground (row 23, columns 0 and 1) | its flat grass | in the darker green it uses for marks on grass (`#56864c`); see the gaps |
+| The closed canopy of thick woods (2, 22) | the middle of its pine | a bough and a half, which has no outline |
+| Trees (`scenery.png`) | its round tree, its large green tree, its pine, its large and small blossom trees, its tree on roots | **the pictures are 48x48 now (they were 32x40)**, in cells of 56x56, the trunk's foot at (24, 45): the pack's large trees fill a picture and its 32x32 trees stand at its foot, none shrunk. Broadleaf: the round tree. Oak: the large green tree. Cherry: the large blossom tree, and the small one as its second picture. Willow: the tree on roots, and the same mirrored |
+| Ground details (`ground_details.png`, F6) | its floor marks, cross mark, mound, petals, pebbles and gravel | the same 26 frames in the same order, each in the pack's colours for its ground; no frame of the old sheet is kept |
+| The ground's edges (`ground_edges.png`, new; F7) | its dirt-and-grass edge tiles, its water's bank, its rock face (`TilesetRelief`) | see below |
+
+**F7, the edges, as built.** `HeightShading` still works out where grass meets a path, where water
+meets land and where the ground drops, exactly as before (`find_ground_edges`, unchanged). What it
+draws there is now a picture from `world/tiles/ground_edges.png`, laid out by `EdgeAtlas`:
+
+- **Grass over a path:** the pack's own edge tile for the sides the grass is on (fifteen pieces: a
+  side, a corner, a lane one cell wide, a dead end), with the dirt cut out so the path's tile shows
+  under it, in the grass's colours at each height. **New:** where grass touches a path cell only
+  at its corner, the pack's small corner piece is drawn (`find_corners`); the code drew nothing
+  there before.
+- **Water's bank:** a band of the pack's earth and a line of its foam, as thick at each step along
+  the edge as in its straight edge tile, laid from the water cell's edge inwards (four pixels or
+  five). The pack draws a strip of grass outside its bank, inside the water's tile; here the land
+  beside water may be grass, marsh, boards or cave floor, so only the bank and the foam were
+  taken. The water's moving foam now laps on from where the bank's picture ends
+  (`WaterSurface.BANK`).
+- **Cliff faces:** the foot of the pack's rock face, as many rows as the drop is tall (4, 8 or
+  12); in dungeons the same in the cobbles' tones. The dark lip and the soft shadows are still
+  drawn in code.
+
+It needed no change to gameplay, maps or collisions, so the fallback (the code's edges, recoloured)
+was not taken.
+
+**In code:** `EdgeAtlas` (new, `world/tiles/`), `HeightShading` (draws the pieces;
+`fringe_color()`, the face and bank colours and the code that drew blades and stripes are gone),
+`GreyboxTiles.GROUND_COLORS` (the tiles' own colours now, a test holds it), `WaterSurface` (the
+pack's water colours, and the foam past the bank), `SceneryAtlas` (the new picture size and foot)
+and `Scenery.CROWN_TOP` (a taller crown). `art/sheets.json` lists 30 PNGs.
+
+**Gaps: what the pack did not cover, or was left for a later phase.**
+
+1. **The marsh.** The pack's swamp is brown mud with purple water. This game's marsh shares the
+   one water tile with every pond, so the purple water can't be used without a new tile and a map
+   change. The ground was kept green instead: the pack's flat grass in its own darker green. **The
+   reeds, the boardwalks, the ruined hut, the cattails, moss, mossy stone and lantern posts are
+   today's art.** The pack has plank decks, mossy ruins and tall grass that could serve some of
+   them in phase B; it has no reeds or cattails by name.
+2. **A willow.** The pack has none; its tree on roots stands in. It has one picture of each tree,
+   so the second willow is the first mirrored.
+3. **The quarry's walls, their faces, the outcrop, the mine's mouth and the ladder** are today's
+   art (phase B, with the walls of `relief.png`). The pack has rock faces, a cave mouth and a
+   ladder.
+4. **The dungeons' walls, pillar and pits** are today's art (phase B). The pack lists no dungeon
+   floor: the dark cobbles are one of its interior floors.
+5. **The small decorations of row 6** (flowers, the tuft, pebbles, mushrooms, lily pads) and every
+   prop are today's art (phase B).
+6. **The first rise's grass** is a blend of the pack's two greens, not a colour of the pack.
+7. **Details on raised grass** are lightened in code as before (`GroundDetail.tint_of`), so their
+   marks are near the pack's olive, not exactly it.
+8. **The title picture** is unchanged.
+
+**What fits badly, said plainly.**
+
+- **The mix is plain to see.** The pack's ground is flat colour with a few marks; today's houses,
+  props, flowers and hero are shaded and textured. Side by side they look like two games until
+  phases B to E.
+- **The trees are outlined in near black and are shorter.** The round tree and the pine are 32
+  pixels tall, as tall as today's hero; in the pack a person is 16. The large blossom and green
+  trees (48) carry the village and the farm better.
+- **The water is a bright cyan,** far brighter than the teal it replaces. It is the pack's colour.
+  It is strongest in the marsh, where it is most of the picture.
+- **The cobbled dungeon floor is busier** than the old flagstones, though monsters and chests
+  still read on it.
+- **The path is redder** than the honey-coloured path it replaces.
+- **The marsh reads as a darker meadow** more than a bog: its mood came from the mossy ground and
+  the dull water, and both are gone.
+
+**Tests:** `tests/art/ground_edges_sheet_test.gd` (new: the sheet's layout, every fringe piece the
+grass of its height along its sides, every bank piece earth and foam along its sides, the faces),
+`tests/world/ground_edges_test.gd` (four more: a cell's sides gathered into one piece, corners of
+grass and of bank, the village's corners), and four older art tests follow the pack: the grass and
+the marsh are checked as flat colours and no longer for grain (`ground_tiles_test`), the dungeon
+floor's plain colour is 100 pixels of 256 at the least (it was 151: cobbles are stone and mortar in
+near equal parts), the details may also use the edge sheet's colours and three of the pack's
+petal and pebble colours (`ground_details_sheet_test`), and the ground's colours in code are
+checked against the tiles in place of the fringe's (`pixel_grade_test`).
+
+**For the review:** the two answers taken as recommended (F6, F7); whether the pack is committed,
+and with or without its audio; and whether the ground and the trees sit well enough in this game
+to go on to phase B.

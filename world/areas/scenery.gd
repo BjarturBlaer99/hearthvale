@@ -15,7 +15,7 @@ const FADE_SPEED: float = 5.0
 ## The part of a tree that can hide something, from its foot: half its width, its height, and
 ## how far above the foot the crown ends.
 const CROWN_HALF_WIDTH: float = 16.0
-const CROWN_TOP: float = 37.0
+const CROWN_TOP: float = 45.0
 const CROWN_BOTTOM: float = 9.0
 ## Every roof tile kind (GreyboxTiles): the solid roofs, their ridge and eave details, and the
 ## house fronts' roofs with gable ends, and the two roofs of the hero's buildings

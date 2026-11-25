@@ -1,7 +1,8 @@
 extends GdUnitTestSuite
 ## PixelGrade (art pass 3): what the game draws in code is warmed to match the baked art, and the
-## grass it draws at runtime matches the grass in the tiles. (The grading of pictures as they were
-## baked retired with the art tools when the art became PNG, 2026-11-19.)
+## ground's colours in code are the tiles' own. (The grading of pictures as they were baked retired
+## with the art tools when the art became PNG, 2026-11-19; the grass's fringe became a picture with
+## the farm-look plan's phase A, tests/art/ground_edges_sheet_test.gd.)
 
 func test_warming_makes_colours_richer_and_keeps_alpha() -> void:
 	var grass: Color = Color(0.40, 0.64, 0.24)
@@ -24,15 +25,15 @@ func test_lights_lean_yellow_and_shadows_lean_violet() -> void:
 	assert_float(dark.b).is_greater(dark.g)
 
 
-func test_the_grass_drawn_at_runtime_matches_the_grass_in_the_tiles() -> void:
+func test_the_ground_colours_in_code_are_the_colours_of_the_tiles() -> void:
 	var image: Image = (load(GreyboxTiles.TEXTURE_PATH) as Texture2D).get_image()
 	var size: int = GreyboxTiles.TILE_SIZE
-	for height: int in 3:
-		var want: Color = HeightShading.fringe_color(GreyboxTiles.GROUND_COLORS[height], 2)
-		assert_float(HeightShading.fringe_color(GreyboxTiles.GROUND_COLORS[height], 0).v).override_failure_message("tone 0 is the darker blade").is_less(want.v)
-		var matching: int = 0
-		for y: int in size:
-			for x: int in size:
-				if PixelGrade.same(image.get_pixel(height * size + x, GreyboxTiles.ROW_GROUND * size + y), want):
-					matching += 1
-		assert_int(matching).override_failure_message("height %d: the fringe's plain blade is the colour of most of the tile" % height).is_greater(150)
+	for height: int in GreyboxTiles.COLUMNS:
+		var want: Color = GreyboxTiles.GROUND_COLORS[height]
+		for row: int in [GreyboxTiles.ROW_GROUND, GreyboxTiles.ROW_SOLID_GROUND]:
+			var matching: int = 0
+			for y: int in size:
+				for x: int in size:
+					if PixelGrade.same(image.get_pixel(height * size + x, row * size + y), want):
+						matching += 1
+			assert_int(matching).override_failure_message("height %d, row %d: the colour in code is the colour of most of the tile" % [height, row]).is_greater(150)

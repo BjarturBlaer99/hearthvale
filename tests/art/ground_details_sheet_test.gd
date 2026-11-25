@@ -1,10 +1,14 @@
 extends GdUnitTestSuite
-## The ground details' sheet (the warm-ground plan, step 3): small, quiet pictures in the
-## ground's own colours, so nothing on it looks like something to pick up, break or cut. A
-## sheet painted anew (or brought from a tool) must keep to this.
+## The ground details' sheet (the warm-ground plan, step 3; the art pack's small ground pieces
+## since the farm-look plan's phase A): small, quiet pictures in the ground's own colours, so
+## nothing on it looks like something to pick up, break or cut. A sheet painted anew (or brought
+## from a tool) must keep to this.
 
 const SHEET: String = "res://world/tiles/ground_details.png"
 const ATLAS: String = "res://world/tiles/greybox_tiles.png"
+const EDGES: String = "res://world/tiles/ground_edges.png"
+## The pack's petals and pebbles: the three colours of its small pieces that no ground tile has.
+const SMALL_PIECES: Array[String] = ["fff7d7", "abc2bc", "f2eaf1"]
 const SIZE: int = GreyboxTiles.TILE_SIZE
 ## The most of a frame's 256 pixels a detail may paint: it is a touch on the ground, not a thing.
 const MOST_PAINTED: int = 48
@@ -12,12 +16,16 @@ const MOST_PAINTED: int = 48
 
 func test_every_detail_is_painted_in_colours_of_the_ground_atlas() -> void:
 	var atlas: Dictionary = {}
-	var tiles: Image = Image.load_from_file(ProjectSettings.globalize_path(ATLAS))
-	for y: int in tiles.get_height():
-		for x: int in tiles.get_width():
-			var pixel: Color = tiles.get_pixel(x, y)
-			if pixel.a == 1.0:
-				atlas[pixel.to_html(false)] = true
+	for hex: String in SMALL_PIECES:
+		atlas[hex] = true
+	# The ground's colours: the tiles', and the edges' (the grass's marks are on the fringe).
+	for path: String in [ATLAS, EDGES]:
+		var tiles: Image = Image.load_from_file(ProjectSettings.globalize_path(path))
+		for y: int in tiles.get_height():
+			for x: int in tiles.get_width():
+				var pixel: Color = tiles.get_pixel(x, y)
+				if pixel.a == 1.0:
+					atlas[pixel.to_html(false)] = true
 	var sheet: Image = _sheet()
 	for y: int in sheet.get_height():
 		for x: int in sheet.get_width():

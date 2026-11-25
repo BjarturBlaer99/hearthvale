@@ -6,20 +6,20 @@ extends Node2D
 ##   dungeon; taller drops, taller faces) with a dark lip and a soft shadow at its foot; below
 ##   solid things (walls, houses) just a soft shadow. A thin dark edge marks a lower neighbour
 ##   to the west, east or north.
-## - Soft edges (ground_edges()): grass frays over the edge of a path where the two meet on the
-##   same level, and water gets a dark line under its bank.
+## - Soft edges (ground_edges()): grass laps over the edge of a path where the two meet on the
+##   same level, and water gets a bank of earth and foam against everything else.
+## The fringe, the bank and the cliff faces are pictures since the farm-look plan's phase A
+## (world/tiles/ground_edges.png, cut from the art pack's own edge tiles; EdgeAtlas says which
+## piece goes where); the shadows, the lip and the thin dark edges are still drawn in code.
 
 const T: float = 16.0
+const SHEET: Texture2D = preload("res://world/tiles/ground_edges.png")
 const EDGE_COLOR: Color = Color(0.16, 0.07, 0.10, 0.35)
-const FACE_COLOR: Color = Color(0.36, 0.28, 0.20, 0.90)
-const FACE_LINE: Color = Color(0.18, 0.13, 0.10, 0.55)
-## In dungeons the faces are cut stone instead of earth.
-const STONE_FACE_COLOR: Color = Color(0.28, 0.24, 0.28, 0.95)
-const STONE_FACE_LINE: Color = Color(0.12, 0.12, 0.15, 0.7)
 
 ## Cut-stone cliff faces (dungeons) instead of earthy ones; the area sets it.
 var stone_faces: bool = false
-const LIP_COLOR: Color = Color(0.14, 0.10, 0.08, 0.95)
+## The dark line along a drop's top: the art pack's outline.
+const LIP_COLOR: Color = Color(0.08, 0.11, 0.11, 0.95)
 ## Shadows fade out in two steps (P1b): the whole shadow in the faint shade, and the half of
 ## it nearest the thing that casts it darkened again.
 const SHADE_FAR: Color = Color(0.22, 0.09, 0.18, 0.15)
@@ -29,26 +29,36 @@ const SHADE_NEAR: Color = Color(0.22, 0.09, 0.18, 0.18)
 const CAST: float = 6.0
 const SIDES: Array[Vector2i] = [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP]
 const ALL_SIDES: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT]
-## Kinds of soft edge: grass fraying over a path, and water against its bank.
+## Kinds of soft edge: grass lapping over a path, and water against its bank.
 const FRINGE: StringName = &"fringe"
 const BANK: StringName = &"bank"
-const BANK_SHADE: Color = Color(0.06, 0.18, 0.32, 0.85)
 
 var _grid: HeightGrid
 ## Soft edges to draw: [cell, side, kind].
 var _edges: Array = []
+## The sides of each cell that have an edge, by kind (sides_of), and the corners where the
+## other ground touches a cell only diagonally (find_corners): what is drawn from the sheet.
+var _sides: Dictionary = {}
+var _corners: Array = []
 
 
 ## Shows `grid`'s heights. With the Height `layer` too, the soft edges of its paths and water.
 func show_grid(grid: HeightGrid, layer: TileMapLayer = null) -> void:
 	_grid = grid
 	_edges = find_ground_edges(grid, layer) if layer != null else []
+	_sides = sides_of(_edges)
+	_corners = find_corners(grid, layer, _sides) if layer != null else []
 	queue_redraw()
 
 
 ## The soft edges drawn: [cell, the side of it the edge is on, FRINGE or BANK].
 func ground_edges() -> Array:
 	return _edges
+
+
+## The corners drawn: [cell, the corner of it (an index into EdgeAtlas.CORNERS), FRINGE or BANK].
+func ground_corners() -> Array:
+	return _corners
 
 
 ## Every side of a path cell that meets grass on the same level (FRINGE: the grass frays over
@@ -71,20 +81,61 @@ static func find_ground_edges(grid: HeightGrid, layer: TileMapLayer) -> Array:
 				if is_water:
 					if other != water:
 						out.append([cell, side, BANK])
-				elif (other.y == GreyboxTiles.ROW_GROUND or other.y == GreyboxTiles.ROW_SOLID_GROUND) \
-						and grid.height_at(neighbour) == grid.height_at(cell):
+				elif _is_grass(other) and grid.height_at(neighbour) == grid.height_at(cell):
 					out.append([cell, side, FRINGE])
+	return out
+
+
+## Whether the atlas tile `tile` is grass, or the same grass under a prop.
+static func _is_grass(tile: Vector2i) -> bool:
+	return tile.y == GreyboxTiles.ROW_GROUND or tile.y == GreyboxTiles.ROW_SOLID_GROUND
+
+
+## `edges` gathered by cell: { FRINGE: { cell: sides }, BANK: { cell: sides } }, the sides as
+## EdgeAtlas.SIDES adds them up. One picture then shows all of a cell's edges of a kind.
+static func sides_of(edges: Array) -> Dictionary:
+	var out: Dictionary = {FRINGE: {}, BANK: {}}
+	for edge: Array in edges:
+		var by_cell: Dictionary = out[edge[2]]
+		by_cell[edge[0]] = int(by_cell.get(edge[0], 0)) | int(EdgeAtlas.SIDES[edge[1]])
+	return out
+
+
+## Every corner of a path cell that grass on the same level touches only diagonally, and every
+## corner of a water cell that land touches only diagonally: [cell, corner, kind], the corner
+## an index into EdgeAtlas.CORNERS. A corner between two sides, one of which has an edge
+## already (`sides`, from sides_of), is that side's picture's to show.
+static func find_corners(grid: HeightGrid, layer: TileMapLayer, sides: Dictionary) -> Array:
+	var out: Array = []
+	var water: Vector2i = GreyboxTiles.coords("water")
+	for y: int in grid.size.y:
+		for x: int in grid.size.x:
+			var cell: Vector2i = Vector2i(x, y)
+			var tile: Vector2i = layer.get_cell_atlas_coords(cell)
+			var is_water: bool = tile == water
+			if not is_water and tile.y != GreyboxTiles.ROW_PATH:
+				continue
+			var kind: StringName = BANK if is_water else FRINGE
+			var edged: int = int((sides.get(kind, {}) as Dictionary).get(cell, 0))
+			for corner: int in EdgeAtlas.CORNERS.size():
+				var way: Vector2i = EdgeAtlas.CORNERS[corner]
+				var between: int = int(EdgeAtlas.SIDES[Vector2i(way.x, 0)]) | int(EdgeAtlas.SIDES[Vector2i(0, way.y)])
+				var neighbour: Vector2i = cell + way
+				if edged & between or not grid.in_bounds(neighbour):
+					continue
+				var other: Vector2i = layer.get_cell_atlas_coords(neighbour)
+				if is_water:
+					if other != water:
+						out.append([cell, corner, BANK])
+				elif _is_grass(other) and grid.height_at(neighbour) == grid.height_at(cell):
+					out.append([cell, corner, FRINGE])
 	return out
 
 
 func _draw() -> void:
 	if _grid == null:
 		return
-	for edge: Array in _edges:
-		if edge[2] == FRINGE:
-			_draw_fringe(edge[0], edge[1])
-		else:
-			_draw_bank(edge[0], edge[1])
+	_draw_edges()
 	for y: int in _grid.size.y:
 		for x: int in _grid.size.x:
 			var cell: Vector2i = Vector2i(x, y)
@@ -153,66 +204,23 @@ func _draw_drop(cell: Vector2i, top: Vector2, levels: int) -> void:
 		draw_rect(Rect2(top, Vector2(T, CAST)), SHADE_FAR)
 		draw_rect(Rect2(top, Vector2(T, CAST / 2.0)), SHADE_NEAR)
 		return
-	var face: float = minf(float(levels) * 4.0, 12.0)
-	var line: Color = STONE_FACE_LINE if stone_faces else FACE_LINE
-	draw_rect(Rect2(top, Vector2(T, face)), STONE_FACE_COLOR if stone_faces else FACE_COLOR)
-	var stripe: float = 3.0
-	while stripe < face:
-		draw_line(top + Vector2(0.0, stripe + 0.5), top + Vector2(T, stripe + 0.5), line)
-		stripe += 3.0
-	var crack: float = float(posmod(cell.x * 7 + cell.y * 3, 11)) + 2.0
-	draw_line(top + Vector2(crack + 0.5, 1.0), top + Vector2(crack + 0.5, face), line)
+	var face: float = minf(float(levels) * 4.0, float(EdgeAtlas.FACE_ROWS))
+	draw_texture_rect_region(SHEET, Rect2(top, Vector2(T, face)), EdgeAtlas.face(stone_faces, int(face)))
 	draw_rect(Rect2(top, Vector2(T, 1.0)), LIP_COLOR)
 	draw_rect(Rect2(top + Vector2(0.0, face), Vector2(T, 4.0)), SHADE_FAR)
 	draw_rect(Rect2(top + Vector2(0.0, face), Vector2(T, 2.0)), SHADE_NEAR)
 
 
-## Grass fraying over a path's edge: blades of different lengths growing in from `side`, with
-## gaps, in the greens of the grass at that height.
-func _draw_fringe(cell: Vector2i, side: Vector2i) -> void:
-	var grass: Color = GreyboxTiles.GROUND_COLORS[clampi(_grid.height_at(cell), 0, GreyboxTiles.GROUND_COLORS.size() - 1)]
-	var origin: Vector2 = Vector2(cell) * T
-	for along: int in int(T):
-		var roll: int = _mix(cell, side, along)
-		if roll % 5 < 2:
-			continue
-		@warning_ignore("integer_division")
-		var depth: float = 1.0 + float((roll / 5) % 3)
-		@warning_ignore("integer_division")
-		var tone: int = (roll / 16) % 3
-		draw_rect(_strip(origin, side, along, depth), fringe_color(grass, tone))
-
-
-## The colour of one blade of fringe on `grass`: darker (tone 0), lighter (1) or plain, and
-## warmed as the baked grass is (PixelGrade), so the fringe matches the tile beside it.
-static func fringe_color(grass: Color, tone: int) -> Color:
-	var shade: Color = grass.darkened(0.14) if tone == 0 else (grass.lightened(0.1) if tone == 1 else grass)
-	return PixelGrade.warm(shade)
-
-
-## Water meeting the land on `side`: a dark line under the bank. The foam beside it moves, so
-## WaterSurface draws that (P1c).
-func _draw_bank(cell: Vector2i, side: Vector2i) -> void:
-	var origin: Vector2 = Vector2(cell) * T
-	for along: int in int(T):
-		draw_rect(_strip(origin, side, along, 1.0), BANK_SHADE)
-
-
-## A strip one pixel wide and `depth` deep, `along` pixels down the `side` of the cell at
-## `origin`, starting `inset` pixels in from that side.
-static func _strip(origin: Vector2, side: Vector2i, along: int, depth: float, inset: float = 0.0) -> Rect2:
-	match side:
-		Vector2i.UP:
-			return Rect2(origin + Vector2(along, inset), Vector2(1.0, depth))
-		Vector2i.DOWN:
-			return Rect2(origin + Vector2(along, T - inset - depth), Vector2(1.0, depth))
-		Vector2i.LEFT:
-			return Rect2(origin + Vector2(inset, along), Vector2(depth, 1.0))
-	return Rect2(origin + Vector2(T - inset - depth, along), Vector2(depth, 1.0))
-
-
-## The same number for the same cell, side and step, every time.
-static func _mix(cell: Vector2i, side: Vector2i, step: int) -> int:
-	var h: int = (cell.x * 73856093) ^ (cell.y * 19349663) ^ ((side.x + 2) * 83492791) ^ ((side.y + 2) * 2654435) ^ (step * 40503)
-	h = (h ^ (h >> 13)) * 1274126177
-	return absi(h ^ (h >> 16))
+## The fringe and the bank, from the edge sheet: for each cell one picture for all its sides,
+## and one for each corner the other ground touches only diagonally.
+func _draw_edges() -> void:
+	for kind: StringName in _sides:
+		var by_cell: Dictionary = _sides[kind]
+		for cell: Vector2i in by_cell:
+			var sides: int = by_cell[cell]
+			var piece: Rect2 = EdgeAtlas.fringe(sides, _grid.height_at(cell)) if kind == FRINGE else EdgeAtlas.bank(sides)
+			draw_texture_rect_region(SHEET, Rect2(Vector2(cell) * T, Vector2(T, T)), piece)
+	for corner: Array in _corners:
+		var cell: Vector2i = corner[0]
+		var piece: Rect2 = EdgeAtlas.fringe_corner(corner[1], _grid.height_at(cell)) if corner[2] == FRINGE else EdgeAtlas.bank_corner(corner[1])
+		draw_texture_rect_region(SHEET, Rect2(Vector2(cell) * T, Vector2(T, T)), piece)

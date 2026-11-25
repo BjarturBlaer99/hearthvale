@@ -277,13 +277,13 @@
 			"path": "res://world/tiles/scenery.png",
 			"what": "the tall trees",
 			"kind": "atlas",
-			"size": [280, 48],
-			"cell": [40, 48],
+			"size": [392, 56],
+			"cell": [56, 56],
 			"pad": [4, 4],
-			"frame": [32, 40],
+			"frame": [48, 48],
 			"frames": ["broadleaf", "oak", "pine", "cherry", "cherry_b", "willow", "willow_b"],
-			"pivot": [16.0, 37.0],
-			"pivot_is": "the trunk's foot, in the 32x40 picture",
+			"pivot": [24.0, 45.0],
+			"pivot_is": "the trunk's foot, in the 48x48 picture (the art pack's sizes since the farm-look plan's phase A: its large trees fill the picture, its 32x32 trees stand at its foot)",
 			"names": "SceneryAtlas.KINDS"
 		},
 		{
@@ -305,6 +305,16 @@
 			"pivot": [0, 0],
 			"pivot_is": "the cell's top-left: each detail covers its cell, on a clear background, drawn over the ground and under everything else",
 			"names": "GroundDetails.FRAMES (which ground has which: data/rules/ground_detail.json)"
+		},
+		{
+			"path": "res://world/tiles/ground_edges.png",
+			"what": "the ground's edges, cut from the art pack's edge tiles (the farm-look plan, phase A): grass lapping over a path (eight rows, one a height; fifteen pieces for the sides it is on and four for corners), the water's bank (one row of the same nineteen), and the foot of a cliff's face in earth and in cut stone (16x12 each)",
+			"kind": "atlas",
+			"size": [304, 160],
+			"frame": [16, 16],
+			"pivot": [0, 0],
+			"pivot_is": "the cell's top-left: each piece covers its cell, clear where the ground under it shows; a face's lowest rows lie along the top of the cell below a drop",
+			"names": "EdgeAtlas"
 		},
 		{
 			"path": "res://ui/title/backdrop.png",

@@ -1809,3 +1809,28 @@ PNG". What building it decided:
   squares, 0.4 in them). The plot is held whole: crops and soil are drawn over a bare bed.
   Something lying to be picked up, and the build ghost's cells, hide the detail under them for as
   long as they are there, without changing the placement.
+- 2026-11-25 — **A cosy farm look from an asset pack: the pack, and phase A** (the farm-look plan,
+  `docs/progress/farm-look-plan.md`). **The user chose Ninja Adventure** (Pixel-Boy and AAA, CC0)
+  of the three packs shortlisted, because this repository is public and the other two forbid
+  redistribution; F2 (a private repository) and F10 (a word to the artist) fall away. Copying
+  another game's art stays ruled out. **Taken as recommended, the user not having spoken to them,
+  and open at the phase A review:** F6 (the ground-detail rule kept, its sheet painted again from
+  the pack) and F7 (the pack's own edges drawn where the code drew its fringe, banks and cliff
+  faces). **Chosen while building phase A, each the simplest that keeps to "art only":**
+  - The grass's two greens are the pack's two grasses: its green in the meadow, its yellow-green
+    on the second rise, a blend on the first. The pack's grass is flat, so the grass tiles are
+    flat and the texture is the ground details'; the test that asked every ground tile for grain
+    now asks the grass and the marsh to be one flat colour.
+  - The tree pictures grew to 48x48 (from 32x40) so the pack's large trees fit unshrunk, as the
+    plan's section 5 foresaw. A tree still fills only its own cell.
+  - The fringe, the bank and the cliff faces are pictures of a new sheet
+    (`world/tiles/ground_edges.png`, `EdgeAtlas`). Grass that touches a path cell only at its
+    corner, and land that touches water only at a corner, get the pack's corner piece: the code
+    drew nothing there before. For show only.
+  - The water's bank is the pack's earth and foam without the strip of grass the pack draws
+    outside it: the land beside water is not always grass here.
+  - The marsh keeps a green ground (the pack's flat grass in its darker green), not the pack's
+    brown swamp mud, whose purple water this game's one water tile can't be.
+  - The pack is kept untouched in `art/packs/ninja-adventure/` and **is not committed**: unpacked
+    it is 109.9 MB, over the 100 MB the user set, 100.1 MB of it audio this game never uses. The
+    user decides whether it goes in, and whether without the audio (9.9 MB).

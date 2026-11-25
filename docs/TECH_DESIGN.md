@@ -70,8 +70,12 @@ res://
   - from the grid: cliff faces with a dark lip below drops (earthy outdoors, cut stone in dungeons), soft shadows
     below solid things, and thin edges beside lower neighbours
   - from the Height layer (`find_ground_edges`, tested), **soft edges**: grass frays over the edge of a path
-    where the two meet on the same level, and water gets a dark line under its bank and foam beside it. No
-    transition tiles: any map gets them.
+    where the two meet on the same level, and water gets a bank and foam beside it. No
+    transition tiles: any map gets them. Since 2026-11-25 (the farm-look plan, phase A) the fringe, the
+    bank and the cliff faces are pictures cut from the art pack's edge tiles
+    (`world/tiles/ground_edges.png`; `EdgeAtlas` says which piece shows which sides): `sides_of` gathers a
+    cell's edges into one piece, and `find_corners` adds a corner piece where the other ground touches a
+    cell only diagonally. The shadows, the lip and the thin edges are still drawn in code.
 - **Tiles** are pixel art in `world/tiles/greybox_tiles.png` (painted in code until the art became PNG,
   2026-11-19; §14); `GreyboxTiles` has the atlas layout. `build_maps.gd` lays out each area's `Height` layer and adds some details by itself:
   - **house fronts** (`GreyboxTiles.HOUSE_KINDS`, all solid at height 3). A map gives a house as three blocks: a
@@ -750,8 +754,9 @@ run headless; see CLAUDE.md for the command and gotchas.
     than its own tile.
   - **Left alone:** the white flash rows, and the villagers' marker colours.
   - A colour painted exactly in the outline colour is treated as outline, so eyes have a colour of their own.
-  - Things drawn at runtime match it: code-drawn outlines use `PixelGrade.INK`, and the grass fringe on paths
-    uses `HeightShading.fringe_color()`, which warms the ground colour as the tiles are warmed.
+  - Things drawn at runtime match it: code-drawn outlines use `PixelGrade.INK`. (The grass fringe on paths
+    was drawn in `HeightShading.fringe_color()` until 2026-11-25; it is a picture now, and
+    `GreyboxTiles.GROUND_COLORS` are the grass tiles' own colours.)
 - **Light and air** (art pass 4), all for show: none of it changes movement, combat or what can be seen.
   - `Ambience` (`world/areas/`) reads what kind of place an area is from its tiles: a dungeon (it has a
     `dungeon_id`), a house's inside (it has inner walls), else outdoors. It also finds the tiles that give light
@@ -797,7 +802,8 @@ run headless; see CLAUDE.md for the command and gotchas.
     None are in the air.
   - **Water** (`WaterSurface`): one rectangle over the water's bounds, just above the Height layer, with a shader
     that reads a one-pixel-a-cell map of the water: a slow swell, glints, sparkles, and foam at the bank one to
-    three pixels wide. `HeightShading` keeps only the dark line under the bank.
+    three pixels wide. `HeightShading` draws the bank's picture over it (earth and a line of foam,
+    `WaterSurface.BANK` pixels deep), and the moving foam laps on from where that ends.
   - **Reflections** (`Reflections`): a mirror `Sprite2D` (flipped, hanging below the feet) for the hero and for
     each tree within three cells north of water, shown only on water cells by a shader with the same map.
   - **Mist** (`Mist`, `gameplay/ambient/`): two layers of noise in four flat steps, pinned to the world, for the

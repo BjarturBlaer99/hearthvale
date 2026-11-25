@@ -12,7 +12,7 @@ func test_the_list_names_every_art_png_in_the_game() -> void:
 	var listed: Array = []
 	for entry: Dictionary in ArtSheets.all():
 		listed.append(str(entry["path"]))
-	assert_int(listed.size()).override_failure_message("art/sheets.json is read").is_equal(29)
+	assert_int(listed.size()).override_failure_message("art/sheets.json is read").is_equal(30)
 	for dir: String in ["res://gameplay/art", "res://gameplay/player", "res://world/tiles", "res://ui/title", "res://ui/art"]:
 		for file: String in DirAccess.get_files_at(dir):
 			if file.ends_with(".png"):
@@ -68,6 +68,11 @@ func test_the_game_names_the_frames_in_the_order_they_stand() -> void:
 	var tiles: Dictionary = ArtSheets.sheet("greybox_tiles")
 	assert_that(Vector2i(tiles["size"][0], tiles["size"][1])).is_equal(Vector2i(GreyboxTiles.COLUMNS, GreyboxTiles.ROWS) * GreyboxTiles.TILE_SIZE)
 	assert_that(Vector2i(ArtSheets.sheet("relief")["size"][0], ArtSheets.sheet("relief")["size"][1])).is_equal(ReliefAtlas.SIZE)
+	assert_that(Vector2i(ArtSheets.sheet("ground_edges")["size"][0], ArtSheets.sheet("ground_edges")["size"][1])).is_equal(EdgeAtlas.SIZE)
+	var trees: Dictionary = ArtSheets.sheet("scenery")
+	assert_that(Vector2i(trees["cell"][0], trees["cell"][1])).is_equal(SceneryAtlas.CELL)
+	assert_that(Vector2i(trees["frame"][0], trees["frame"][1])).is_equal(SceneryAtlas.SIZE)
+	assert_that(Vector2(trees["pivot"][0], trees["pivot"][1])).is_equal(SceneryAtlas.FOOT)
 	assert_that(Vector2i(ArtSheets.sheet("backdrop")["size"][0], ArtSheets.sheet("backdrop")["size"][1])).is_equal(TitlePicture.SIZE)
 
 

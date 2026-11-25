@@ -14,6 +14,8 @@ art/
     <sheet>.gpl       each sheet's own colours, exactly
     villager_markers.gpl   the four colours villagers are painted in
   aseprite/           your .aseprite files, named after their PNG (player_sheet.aseprite)
+  packs/<pack>/       an art pack, untouched, with its licence (docs/ASSETS.md says which, and on
+                      what terms); never edit or run anything in it: cut from it with a script
 ```
 
 ## The workflow
@@ -54,9 +56,10 @@ art/
 | The Warden, the Shade | `warden.png`, `shade.png` | 32x40, 4 and 3 frames + flash row | Warden (16, 39); Shade (16, 42) |
 | Animals, critters | `animals.png` 24x20 x8; `critters.png` 16x16 x8 | + flash row; face left | animals (12, 18); the hen (8, 14) |
 | Tiles | `world/tiles/greybox_tiles.png` | 128x544: 8 x 34 tiles of 16x16. Rows are listed in `world/tiles/greybox_tiles.gd`. Repaint a tile in its place; add new tiles at the end. Rows 12 and 27 are markers (never seen). Row 11 is the water's frames. | the cell |
-| Trees | `world/tiles/scenery.png` | 280x48: 7 cells of 40x48 (broadleaf, oak, pine, cherry, cherry b, willow, willow b), each tree 32x40 at (4, 4) in its cell, clear padding round it | the trunk's foot at (16, 37) of the 32x40 |
+| Trees | `world/tiles/scenery.png` | 392x56: 7 cells of 56x56 (broadleaf, oak, pine, cherry, cherry b, willow, willow b), each picture 48x48 at (4, 4) in its cell, clear padding round it; a smaller tree stands at the picture's foot | the trunk's foot at (24, 45) of the 48x48 |
 | Wall faces, pillar, roof ridges | `world/tiles/relief.png` | 96x112, places in `world/tiles/relief_atlas.gd` | as there |
 | Ground details | `world/tiles/ground_details.png` | 416x16: 26 frames of 16x16 in the order `sheets.json` lists them, clear background, no flash row (below) | the cell's top-left |
+| The ground's edges | `world/tiles/ground_edges.png` | 304x160, places in `world/tiles/edge_atlas.gd`: rows 0 to 7 are grass lapping over a path at heights 0 to 7 (columns 0 to 14: the sides it is on, north 1 + east 2 + south 4 + west 8, less one; columns 15 to 18: a corner alone, north-east, south-east, south-west, north-west); row 8 the water's bank, the same nineteen; row 9 a cliff's face, 16x12, in earth and then in cut stone. Clear where the ground under a piece shows | the cell's top-left |
 | Buildings | tiles of the atlas (houses rows 16 to 20, buildings 28 to 30) and `relief.png` | repaint the tiles in place | the cell |
 | Crops, soil | `crops.png` 16x16 x13; `soil.png` 16x16 x4 | + flash row | the cell's top-left |
 | Items | `items.png` 16x16 x74 | + flash row; one icon per item | the cell's top-left |
@@ -90,9 +93,19 @@ sword's blade, lights and darkness, the water's movement and reflections, mist, 
 dungeon doors, pickups, signposts, plates and push blocks, the hearts, the energy bar, the item bar's slots, the dial's hand, the title's stars and
 window, a building site's string and pegs, and lit windows. Their colours are in the code.
 
-**Two colours in code match the art:** the grass's soft fringe (`HeightShading.fringe_color()`) and
-the title's sky above the picture (`TitlePicture.SKY_TOP`). Repaint the grass or the sky and change
-these too, or a seam shows.
+**Colours in code that match the art:** the ground's colour at each height
+(`GreyboxTiles.GROUND_COLORS`: the grass tiles' own colours, which a test checks, and which tint
+the details on raised grass), the water's glints, foam and swell (`WaterSurface`) and the title's
+sky above the picture (`TitlePicture.SKY_TOP`). Repaint the grass, the water or the sky and change
+these too, or a seam shows. The grass's fringe over a path, the water's bank and the cliff faces
+are pictures since 2026-11-25 (`ground_edges.png`): repaint the grass and repaint its fringe
+pieces in the same colours (`tests/art/ground_edges_sheet_test.gd` checks them).
+
+**Art from a pack** (`docs/progress/farm-look-plan.md`): the ground, the trees, the ground details
+and the ground's edges are Ninja Adventure's (CC0), fitted by cutting, moving, mirroring and
+recolouring. Their colours are the pack's own, not `hearthvale.gpl`'s older ones (the master palette
+lists both while the switch is under way), their outlines are the pack's near black, and the grass
+and the marsh are flat colour. Keep a new piece to one style: the pack's, where the pack has it.
 
 ## Asking an AI tool
 

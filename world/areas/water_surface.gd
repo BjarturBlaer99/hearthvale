@@ -4,14 +4,18 @@ extends Node2D
 ## Thin glints of light drift across it, a few sparkles come and go, and foam laps at the bank,
 ## wider and narrower with the swell. A shader draws it from a small map of which cells are
 ## water (one pixel a cell), in whole pixels. For show only.
+## Since the farm-look plan's phase A the bank itself is a picture (earth, then a line of foam:
+## HeightShading draws it over this, BANK pixels deep), so the foam here laps on from where that
+## picture ends, and the colours are the art pack's water.
 
 const CODE: String = """
 shader_type canvas_item;
 uniform sampler2D cells : filter_nearest, repeat_disable;
 uniform vec2 map_cells = vec2(1.0);
-uniform vec4 glint : source_color = vec4(0.86, 0.96, 0.92, 0.55);
-uniform vec4 foam : source_color = vec4(0.90, 0.97, 1.0, 0.85);
-uniform vec4 deep : source_color = vec4(0.05, 0.17, 0.32, 0.16);
+uniform vec4 glint : source_color = vec4(0.56, 0.94, 0.95, 0.9);
+uniform vec4 foam : source_color = vec4(1.0, 1.0, 1.0, 0.9);
+uniform vec4 deep : source_color = vec4(0.475, 0.722, 0.808, 0.45);
+uniform float bank = 4.0;
 varying vec2 at;
 
 void vertex() {
@@ -48,10 +52,11 @@ void fragment() {
 	if (spark > 0.992 && sin(TIME * 2.0 + spark * 400.0) > 0.6) {
 		colour = vec4(1.0, 1.0, 1.0, 0.9);
 	}
-	// Foam at the bank: one to three pixels wide, breathing with the swell.
-	float reach = 1.0 + floor(1.5 + 1.5 * sin(TIME * 1.3 + (p.x + p.y) * 0.19));
+	// Foam at the bank: one to three pixels wide past the bank's own picture, breathing with
+	// the swell.
+	float reach = bank + 1.0 + floor(1.5 + 1.5 * sin(TIME * 1.3 + (p.x + p.y) * 0.19));
 	float edge = 99.0;
-	for (int d = 1; d <= 3; d++) {
+	for (int d = 1; d <= 7; d++) {
 		float f = float(d);
 		if (wet(p + vec2(f, 0.0)) < 0.5 || wet(p - vec2(f, 0.0)) < 0.5 || wet(p + vec2(0.0, f)) < 0.5 || wet(p - vec2(0.0, f)) < 0.5) {
 			edge = f;
@@ -60,13 +65,16 @@ void fragment() {
 	}
 	if (edge <= reach) {
 		float broken = fract(sin(dot(floor(p / vec2(2.0, 1.0)), vec2(41.3, 17.7))) * 9731.1);
-		if (edge <= 1.0 || broken > 0.35) {
+		if (edge <= bank + 1.0 || broken > 0.35) {
 			colour = foam;
 		}
 	}
 	COLOR = colour;
 }
 """
+
+## How deep the bank's picture lies over the water's edge (px): the shader's `bank`.
+const BANK: float = 4.0
 
 ## The rectangle of the area that holds water (area px).
 var bounds: Rect2 = Rect2()
@@ -94,6 +102,7 @@ static func make(layer: TileMapLayer, map_cells: Vector2i) -> WaterSurface:
 	look.shader = shader
 	look.set_shader_parameter(&"cells", ImageTexture.create_from_image(image))
 	look.set_shader_parameter(&"map_cells", Vector2(map_cells))
+	look.set_shader_parameter(&"bank", BANK)
 	surface.material = look
 	return surface
 

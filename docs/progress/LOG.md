@@ -3768,3 +3768,67 @@ playtest and tuning.
 **Approved (warm-ground step 3).** Shown the summary, two close-ups before over after, the details at 8x, a fenced yard and the keep, the user approved step 3 on 2026-11-25 ("Approve, let's play"), with the samples' rule for a cell beside something held. Step 4, the user's playtest, began the same day.
 
 **Warm-ground step 4, the playtest (2026-11-25).** The user played the game by hand with the warmer colours, the busier tiles and the ground details, and said "it feels right": nothing was tuned. The pass is finished, and pushed on the user's word.
+
+## 2026-11-25 — A cosy farm look from an asset pack, phase A: terrain and trees
+
+The user's request (2026-11-25): the look of a cosy farming RPG from a downloaded pixel-art pack
+that allows commercial use, in one style, in five phases with a stop after each
+(`docs/progress/farm-look-plan.md`). Step 1 was the plan (`54e1fd7`). **The user chose Ninja
+Adventure** (Pixel-Boy and AAA, CC0): the repository is public and the other shortlisted packs
+forbid redistribution. This entry is phase A of step 2. The plan's F6 and F7 were taken as
+recommended and are open at the review; F3, F4, F5, F8 and F9 are open.
+
+- **The pack:** the page's free download, taken on 2026-11-25 with no payment, account or details
+  (94.0 MB zipped; 109.9 MB unpacked, 2,234 files, the largest 4.6 MB). Its `LICENSE.txt` is CC0
+  1.0, as its page and its README say. Untouched in `art/packs/ninja-adventure/`. **Not
+  committed:** it is over the 100 MB the user set (100.1 MB of it is audio, which the game never
+  uses; the rest is 9.9 MB). Recorded in `docs/ASSETS.md`.
+- **The ground tiles** of `world/tiles/greybox_tiles.png`, each in its old place: the grass and
+  the grass under props (the pack's flat green in the meadow, its yellow-green on the second rise,
+  a blend on the first), the path (its dirt), the stairs (its steps), the water (its cyan, flat),
+  the dungeon floor and the ledge (its dark cobbles, the ledge a step lighter), the quarry's earth
+  (its darker dirt), the marsh's ground (its flat grass in its darker green) and the closed canopy
+  (the middle of its pine). Every other tile is as it was.
+- **The trees,** `world/tiles/scenery.png`: the pack's round tree, large green tree, pine, large
+  and small blossom trees and its tree on roots (for the willow, and mirrored for the second).
+  **The pictures are 48x48 now** (they were 32x40), in cells of 56x56, the foot at (24, 45), so the
+  pack's large trees fit unshrunk (`SceneryAtlas`, `art/sheets.json`, `Scenery.CROWN_TOP`). A tree
+  still fills only its own cell and still fades for whoever stands behind it.
+- **The ground details,** `world/tiles/ground_details.png` (F6): the same 26 frames in the same
+  order, each from the pack's small ground pieces in the pack's colours for its ground. The rule
+  that places them is untouched.
+- **The ground's edges** (F7), new: `world/tiles/ground_edges.png`, laid out by `EdgeAtlas`
+  (`world/tiles/edge_atlas.gd`). `HeightShading` finds the edges as before and draws a piece of
+  the sheet where it drew blades, a line and striped rectangles: the pack's own edge tile for the
+  sides grass is on (with the dirt cut out), the pack's earth and foam for the water's bank, and
+  the foot of the pack's rock face under a drop (in the cobbles' tones in a dungeon). **New:**
+  `HeightShading.sides_of()` gathers a cell's sides into one piece, and `find_corners()` adds the
+  pack's corner piece where grass touches a path cell, or land a water cell, only diagonally.
+  `fringe_color()` and the face and bank colours are gone. For show only: nothing that moves,
+  hits or collides reads any of it.
+- **Colours in code:** `GreyboxTiles.GROUND_COLORS` are the grass tiles' own colours;
+  `WaterSurface`'s glint, foam and swell are the pack's water colours, and its moving foam laps on
+  from where the bank's picture ends (`WaterSurface.BANK`, four pixels); the lip along a drop is
+  the pack's outline colour. The shadows keep their plum.
+- **Palettes:** `greybox_tiles.gpl`, `scenery.gpl` and `ground_details.gpl` made again from the
+  PNGs (the most used colour first), `ground_edges.gpl` new, and `hearthvale.gpl` brought up to
+  date: the 27 colours that are gone made room for the 27 commonest new ones.
+- **Not changed:** no map, no `.tscn`, no data, no story, no timing, hit or collision. No tile
+  changed place and none was added to the atlas. Neither `build_maps.gd` nor `build_tileset.gd`
+  was run. Nothing in the scenery moves that did not move before.
+- **What the pack did not cover, and what fits badly:** the plan's section 11. In short: the
+  marsh keeps a green ground, and its reeds, boardwalks, hut and decorations are today's art; the
+  pack has no willow; the quarry's and the dungeons' walls wait for phase B; the flat ground
+  beside the textured houses and hero looks like two games until the later phases; the water is a
+  much brighter cyan; the small trees are no taller than today's hero.
+- **Tests:** `tests/art/ground_edges_sheet_test.gd` (new, 4), `tests/world/ground_edges_test.gd`
+  (4 more), and `ground_tiles_test`, `ground_details_sheet_test`, `pixel_grade_test` and
+  `art_sheets_test` follow the pack (the plan's section 11 says how, and why the grass is no
+  longer asked for grain).
+- **Pictures:** before and after of the same 17 capture shots as the warm-ground steps, three 2x
+  close-ups before over after, and close-ups of the ground tiles, the trees (8x), the edges and
+  the details on their ground, in the session notes (`farm-look-phase-a/`). The fitting script is
+  kept there too, not in the repo: the PNGs are the source.
+
+**Verified:** the whole suite, 1259 cases, exit 0 (`tests/art/` among them). Seen in the capture
+shots only; not played by hand. Next, on the user's word: the review of phase A, then phase B.
