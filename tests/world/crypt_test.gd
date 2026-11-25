@@ -306,6 +306,38 @@ func test_a_brief_torch_starts_every_visit_unlit() -> void:
 	assert_bool(GameState.get_flag(&"crypt_knight_a") == true).override_failure_message("a flag left over from a save mid-burn is cleared").is_false()
 
 
+func test_the_heros_light_is_the_widest_lantern_he_carries() -> void:
+	# Worked out from what he carries alone (the dungeons' lag, 2026-11-25), with the same answer.
+	var crypt: AreaController = _load(CRYPT)
+	GameState.add_item(&"bread", 2)
+	GameState.add_item(&"lantern")
+	var held: Array = AreaController.held_items().map(func(item: Dictionary) -> String: return str(item["id"]))
+	assert_array(held).override_failure_message("what he carries, in the pack's order").is_equal(["bread", "lantern"])
+	assert_float(crypt.hero_light_radius()).is_equal(56.0)
+	GameState.add_item(&"miners_lantern")
+	assert_float(crypt.hero_light_radius()).override_failure_message("the Miner's Lantern reaches further").is_equal(80.0)
+	GameState.add_item(&"miners_lantern", -1)
+	GameState.add_item(&"lantern", -1)
+	assert_float(crypt.hero_light_radius()).is_equal(AreaController.DIM_RADIUS)
+
+
+func test_every_torch_lit_shows_the_rules_pools_and_glows() -> void:
+	# A dark room's lights: one pool for each of the rule's lights, and a glow for each torch
+	# inside a pool's core, whichever way they are worked out.
+	var crypt: AreaController = _load(CRYPT)
+	crypt.player.motor.place(NARTHEX)
+	crypt.player.sync_from_motor()
+	var rules: Array = crypt.lights()
+	var shown: Array = crypt.scene_lights()
+	var pools: Array = shown.filter(func(one: Dictionary) -> bool: return one["exact"])
+	assert_int(pools.size()).is_equal(rules.size())
+	for i: int in rules.size():
+		assert_that(pools[i]["at"]).is_equal(rules[i]["at"])
+		assert_float(float(pools[i]["radius"])).is_equal(float(rules[i]["radius"]))
+	var glows: Array = crypt.glows_now().filter(func(glow: Dictionary) -> bool: return AreaController._inside_a_core(glow, rules))
+	assert_int(shown.size() - pools.size()).is_equal(glows.size())
+
+
 func test_the_dark_shows_only_what_light_reaches() -> void:
 	var crypt: AreaController = _load(CRYPT)
 	assert_bool(crypt.dark).is_true()

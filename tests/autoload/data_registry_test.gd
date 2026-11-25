@@ -52,6 +52,28 @@ func test_unresolved_references_are_reported() -> void:
 	_assert_reported(errors, "can never finish")
 
 
+func test_the_sorted_lists_are_kept_as_copies_and_follow_the_data() -> void:
+	# The lists are worked out once (the dungeons' lag, 2026-11-25): what a caller does to one
+	# never reaches the next, and loading other data gives that data's lists.
+	_registry.load_all()
+	var ids: Array[StringName] = _registry.ids(&"items")
+	var count: int = ids.size()
+	ids.clear()
+	var entries: Array[Dictionary] = _registry.entries(&"items")
+	entries.reverse()
+	assert_int(_registry.ids(&"items").size()).is_equal(count)
+	assert_str(str(_registry.entries(&"items")[0]["id"])).override_failure_message("still in id order").is_equal("arrow")
+	_registry.load_all(FIXTURES.path_join("bad_wood"))
+	var fixture_ids: Array[StringName] = _registry.ids(&"items")
+	assert_bool(fixture_ids.size() < count).override_failure_message("the fixture's own items, not the project's kept list").is_true()
+	var expected: Array = fixture_ids.map(func(id: StringName) -> String: return String(id))
+	expected.sort()
+	assert_array(fixture_ids.map(func(id: StringName) -> String: return String(id))).is_equal(expected)
+	assert_int(_registry.entries(&"items").size()).is_equal(fixture_ids.size())
+	_registry.load_all()
+	assert_int(_registry.ids(&"items").size()).is_equal(count)
+
+
 func test_villagers_and_signs_have_their_conversations() -> void:
 	_registry.load_all()
 	for id: StringName in [&"elder_bram", &"wenna_weaver", &"sign_welcome"]:

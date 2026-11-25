@@ -11,18 +11,27 @@ const TITLE: String = "res://ui/title_screen.tscn"
 const ENDING: String = "res://ui/ending_screen.tscn"
 const SCREEN: Vector2 = Vector2(640, 360)
 
+## A save slot of its own (tests use 940 and up).
+const TEST_SLOT: int = 941
+
 var _area: Node
 
 
 func before_test() -> void:
 	GameState.clear()
 	GameState.new_game()
+	# The title reads the save of the slot in use: an empty one of its own, never the player's
+	# (whose finished game puts the keep's window out).
+	SaveSystem.current_slot = TEST_SLOT
+	SaveSystem.erase_slot(TEST_SLOT)
 
 
 func after_test() -> void:
 	if is_instance_valid(_area):
 		_area.free()
 	_area = null
+	SaveSystem.erase_slot(TEST_SLOT)
+	SaveSystem.current_slot = SaveSystem.GAME_SLOT
 	GameState.clear()
 
 

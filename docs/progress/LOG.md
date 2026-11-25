@@ -3579,3 +3579,46 @@ The user, after playing: "increase the range of the sword". No amount given.
 with a wall, higher ground and nothing between (`combat_test`). Not played by hand.
 
 **The user kept 28** the same day ("Keep 28"), shown the summary and the films.
+
+## 2026-11-25 — The lag in the dungeons
+
+The user, after playing the whole game: "a little laggy in the dungeons", at the beginning of the
+final dungeon (the Chapel Crypt). Fixed without changing anything seen or played.
+
+- **The cause:** in a `dark` area, `scene_lights()` asked `lights()` again for every glow (33
+  torches and 3 crystals in the crypt), and each `lights()` asked `hero_light_radius()`, which
+  went through `DataRegistry.entries(&"items")`, and that sorted every item id with a String
+  comparison on every call (about 0.2 ms). The crypt spent 5 to 11 ms a frame on it, on top of
+  drawing. The same sort ran each frame for the item bar (`HandBar.entries`), and for each
+  Bogwisp asking whether light reaches it.
+- **The fix:** `DataRegistry` keeps each collection's sorted ids and entries, forgotten whenever
+  data is loaded or registered, and hands out a copy each time (same order, same entries).
+  `scene_lights()` asks `lights()` once; `glows_now()` and `holding_lights()` ask the hero's light
+  once; `hero_light_radius()` looks up only what he carries (`AreaController.held_items()`).
+  The lights shown, their places, radii and order are as they were.
+- **Measured** windowed on this machine (Intel graphics), with a script of the session's own that
+  stands the hero in every room, the Lantern carried, 240 frames each, the old build and the new
+  alternately. The scripts' own work per frame:
+
+  | area | before | after |
+  |---|---|---|
+  | Chapel Crypt, every room (Narthex too) | 6.2 to 7.8 ms | 1.0 to 1.3 ms |
+  | Old Keep | 1.6 to 2.1 ms | 0.9 to 1.3 ms |
+  | Cistern, ruin cellar | 1.4 to 1.9 ms | 0.6 to 0.8 ms |
+  | Quarry hall, floor 4 | 1.3 to 1.7 ms | 0.6 to 0.8 ms |
+  | Quarry floors 7 and 9 (Bogwisps) | 2.2 to 2.6 ms | 0.7 to 0.9 ms |
+  | Village | 1.6 to 1.9 ms | 0.9 to 1.0 ms |
+
+  With vsync on, the crypt's frames slower than 20 ms fell from up to a third of them (Narthex
+  33%, the Hall 22%, run one; 17% and 1% in run two) to 0 to 5%. Uncapped, a crypt frame went from
+  11 to 25 ms to 6 to 10. The rest of a frame is drawing: turning every light off changed nothing
+  measurable, so the lights stay as they are. The keep's whole-frame times move both ways from
+  run to run on this GPU; its script time fell in every room.
+
+- **A test fixed on the way:** `polish_test`'s title read the save of slot 1, the player's own, and
+  failed once the user's game said it was finished (the keep's window goes out). It reads an empty
+  slot of its own now (941).
+
+**Verified:** the whole suite, 1227 cases, exit 0. New tests: the registry's kept lists are copies
+and follow new data (`data_registry_test`), the hero's light from the lanterns he carries, and a
+dark room's pools and glows (`crypt_test`). Not played by hand.

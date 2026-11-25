@@ -134,6 +134,11 @@ const REFERENCE_FIELDS: Dictionary = {
 var errors: PackedStringArray = []
 
 var _collections: Dictionary[StringName, Dictionary] = {}
+## Each collection's ids and entries in id order, worked out once and kept until the data
+## changes (load_all, _register): the area asks for every item many times a frame, and
+## sorting them each time was most of the dungeons' lag (2026-11-25).
+var _sorted_ids: Dictionary[StringName, Array] = {}
+var _sorted_entries: Dictionary[StringName, Array] = {}
 
 
 func _ready() -> void:
@@ -157,21 +162,37 @@ func has_entry(collection: StringName, id: StringName) -> bool:
 
 
 ## Every id in `collection`, sorted alphabetically, for stable iteration.
+## A copy each time, so the caller may change it.
 func ids(collection: StringName) -> Array[StringName]:
+	if not _sorted_ids.has(collection):
+		var sorted: Array[StringName] = []
+		sorted.assign(_collections.get(collection, {}).keys())
+		# StringName's own ordering is by internal pointer, not text, so compare as String.
+		sorted.sort_custom(func(a: StringName, b: StringName) -> bool: return String(a) < String(b))
+		_sorted_ids[collection] = sorted
 	var out: Array[StringName] = []
-	out.assign(_collections.get(collection, {}).keys())
-	# StringName's own ordering is by internal pointer, not text, so compare as String.
-	out.sort_custom(func(a: StringName, b: StringName) -> bool: return String(a) < String(b))
+	out.assign(_sorted_ids[collection])
 	return out
 
 
-## Every entry in `collection`, ordered by id.
+## Every entry in `collection`, ordered by id. A new array each time (the entries in it are
+## the stored dictionaries, as get_entry's are).
 func entries(collection: StringName) -> Array[Dictionary]:
+	if not _sorted_entries.has(collection):
+		var sorted: Array[Dictionary] = []
+		var source: Dictionary = _collections.get(collection, {})
+		for id: StringName in ids(collection):
+			sorted.append(source[id])
+		_sorted_entries[collection] = sorted
 	var out: Array[Dictionary] = []
-	var source: Dictionary = _collections.get(collection, {})
-	for id: StringName in ids(collection):
-		out.append(source[id])
+	out.assign(_sorted_entries[collection])
 	return out
+
+
+## Forgets the sorted lists: the collections have changed.
+func _forget_order() -> void:
+	_sorted_ids.clear()
+	_sorted_entries.clear()
 
 
 func get_item(id: StringName) -> Dictionary:
@@ -242,6 +263,7 @@ func get_animal(id: StringName) -> Dictionary:
 ## an empty result means every file is valid and every reference resolves.
 func load_all(root: String = DATA_ROOT) -> PackedStringArray:
 	errors = []
+	_forget_order()
 	_collections = {&"items": {}, &"quests": {}, &"dialogues": {}, &"enemies": {}, &"breakables": {}, &"rules": {}, &"recipes": {}, &"crops": {}, &"shops": {}, &"crafting": {}, &"villagers": {}, &"buildings": {}, &"animals": {}}
 	if not DirAccess.dir_exists_absolute(root):
 		errors.append("%s: data directory does not exist." % root)
@@ -327,6 +349,7 @@ func _register(path: String, entry: Dictionary, kind: StringName, collection: St
 		return false
 	entry["_source"] = path
 	_collections[collection][id] = entry
+	_forget_order()
 	return true
 
 

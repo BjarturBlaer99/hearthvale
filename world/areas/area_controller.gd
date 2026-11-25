@@ -1550,15 +1550,27 @@ func _busy() -> bool:
 ## room on screen (light doesn't pass a dungeon's walls).
 func lights() -> Array:
 	var out: Array = [LightRules.light(player.position + Vector2(0, -8), hero_light_radius())]
+	var room: Vector2i = RoomGrid.room_of(player.motor.cell, room_size)
 	for child: Node in interactables.get_children():
-		if child is Torch and (child as Torch).is_lit() 				and RoomGrid.room_of((child as Torch).cell(), room_size) == RoomGrid.room_of(player.motor.cell, room_size):
+		if child is Torch and (child as Torch).is_lit() and RoomGrid.room_of((child as Torch).cell(), room_size) == room:
 			out.append((child as Torch).light_source())
 	return out
 
 
 ## How far the hero's light reaches: the widest lantern carried, else a dim glow.
 func hero_light_radius() -> float:
-	return Inventory.light_radius(GameState.inventory, DataRegistry.entries(&"items"), DIM_RADIUS)
+	return Inventory.light_radius(GameState.inventory, held_items(), DIM_RADIUS)
+
+
+## The data of each thing he carries, in the pack's order: only those, not every item there is
+## (asked many times a frame in the dark, 2026-11-25).
+static func held_items() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for stack: Dictionary in GameState.inventory:
+		var item: Dictionary = DataRegistry.get_item(StringName(str(stack.get("id", ""))))
+		if not item.is_empty():
+			out.append(item)
+	return out
 
 
 ## How lit `cell` is right now, 0 to 1 (always 1 in an area that isn't dark).
@@ -1662,8 +1674,9 @@ func _on_night_turned(night: bool) -> void:
 ## light to speak of.
 func holding_lights() -> Array:
 	var out: Array = []
-	if hero_light_radius() > DIM_RADIUS:
-		out.append(LightRules.light(player.position + Vector2(0, -8), hero_light_radius()))
+	var radius: float = hero_light_radius()
+	if radius > DIM_RADIUS:
+		out.append(LightRules.light(player.position + Vector2(0, -8), radius))
 	if lanterns_burn():
 		for point: Vector2 in _lantern_points:
 			out.append(LightRules.light(point, Ambience.LANTERN_HOLD))
@@ -1890,10 +1903,11 @@ func scene_lights() -> Array:
 	var out: Array = []
 	var glows: Array = glows_now()
 	if dark:
-		for rule: Dictionary in lights():
+		var rules: Array = lights()
+		for rule: Dictionary in rules:
 			out.append(AreaLighting.light(rule["at"], float(rule["radius"]), RULE_TINT, AreaLighting.POOL, 1.0, false, true))
 		for glow: Dictionary in glows:
-			if _inside_a_core(glow, lights()):
+			if _inside_a_core(glow, rules):
 				out.append(AreaLighting.light(glow["at"], float(glow["radius"]), glow["color"], AreaLighting.GLOW, float(glow["strength"]), glow["flickers"]))
 		return out
 	# Indoors the hero stands in a pool of his own. Outdoors the night is dim, not dark, and
@@ -1934,8 +1948,9 @@ func glows_now() -> Array:
 			var post_glow: Dictionary = (child as PlacedThing).glow_now()
 			if not post_glow.is_empty():
 				out.append(post_glow)
-	if hero_light_radius() > DIM_RADIUS:
-		out.append(Ambience.glow(player.position + Vector2(0, -8), hero_light_radius() * 0.5, Ambience.LAMP, 0.16, true))
+	var radius: float = hero_light_radius()
+	if radius > DIM_RADIUS:
+		out.append(Ambience.glow(player.position + Vector2(0, -8), radius * 0.5, Ambience.LAMP, 0.16, true))
 	return out
 
 
