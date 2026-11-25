@@ -3764,3 +3764,5 @@ timing, hits or collisions changed; nothing in them moves.
 **Verified:** the whole suite, 1250 cases, exit 0 (20 new: 10 placement, 8 in the areas, 2 of the
 sheet). Seen in the capture shots only; not played by hand. Next, on the user's word: step 4, the
 playtest and tuning.
+
+**Approved (warm-ground step 3).** Shown the summary, two close-ups before over after, the details at 8x, a fenced yard and the keep, the user approved step 3 on 2026-11-25 ("Approve, let's play"), with the samples' rule for a cell beside something held. Step 4, the user's playtest, began the same day.
