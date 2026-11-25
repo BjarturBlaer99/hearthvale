@@ -20,12 +20,21 @@ props, C crops, items and UI, D villagers, animals and monsters, E the hero), st
   pack's own edges are drawn where the code drew its fringe, banks and cliff faces.
 - **F3, F4, F5, F8 and F9 are open:** they belong to later phases.
 
+**2026-11-25, shown phase A's summary and pictures: "Approve phase A, go on to phase B".** And of
+the pack in git, the same day: "Yes, without audio".
+
 **How far it has come:**
 
 - **Step 1, this plan:** written and committed (`54e1fd7`).
-- **Step 2, phase A (terrain and trees): built on 2026-11-25, and waits for the user's review.**
-  What was built, what the pack did not cover and what fits badly are in section 11.
-- Phases B to E: not begun.
+- **Step 2, phase A (terrain and trees): built on 2026-11-25 (`558a830`; the pack itself, without
+  its audio, `29db85f`) and approved the same day.** Shown the summary and the before-and-after
+  pictures, the user said: "Approve phase A, go on to phase B". It stands as built, and F6 and F7
+  with it; the user said nothing separately of them, nor of the marsh's green ground. What was
+  built, what the pack did not cover and what fits badly are in section 11.
+- **Phase B (buildings, interiors, props): begun on that word, 2026-11-25,** in a session of its
+  own. F9 (what is drawn in code) has not been answered: phase B takes its recommended answer,
+  leaves those things as drawn and lists them as a gap, open at the phase B review.
+- Phases C to E: not begun.
 
 **The plan as it was written follows** (sections 0 to 10). When it was written nothing had been
 downloaded and nothing in the game had changed.

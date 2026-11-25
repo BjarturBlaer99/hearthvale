@@ -3839,3 +3839,9 @@ committed as downloaded but for that folder: 2,046 files, 9.9 MB, the largest 2.
 byte (`art/packs/** -text` in `.gitattributes`). `.gitignore` leaves the audio out (188 files,
 100.1 MB, still on this machine), and `art/packs/README.md` says so beside the pack. Phase A
 still waits for the user's review.
+
+**Approved (farm look, phase A).** Shown the summary, what the pack did not cover, what fits badly
+and the before-and-after pictures, the user approved phase A on 2026-11-25 ("Approve phase A, go on
+to phase B"). It stands as built, F6 (the details repainted from the pack) and F7 (the pack's edges
+as pictures) with it; the user said nothing separately of them, nor of the marsh's green ground.
+Phase B (buildings, interiors, props) begins on that word, in a session of its own.
