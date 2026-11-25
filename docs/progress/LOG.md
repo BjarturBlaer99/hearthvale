@@ -3657,3 +3657,43 @@ changed, and nothing moves that stood still.
 
 **Verified:** the whole suite, 1227 cases, exit 0 (`tests/art/` among them). Seen in the capture
 shots only; not played by hand. Next, on the user's word: step 2, the busier tiles.
+
+**Step 1 approved (2026-11-25):** the user was shown the summary and five before-and-after pairs
+and answered "Approve, go to step 2". Recorded at the head of the plan.
+
+## 2026-11-25 — Warmer colours and busier ground, step 2: the busier tiles
+
+`docs/progress/warm-ground-plan.md`, step 2 only. The ground tiles were given more grain, in
+place, in `world/tiles/greybox_tiles.png`. No tile moved, no map was re-baked, nothing of timing,
+hits or collisions changed, and nothing moves that stood still. Step 3's details (clover, flowers,
+pebbles, cracks, moss) are not in it.
+
+- **What was grained:** the grass and the solid grass under props (rows 0 and 8, all eight
+  heights), the path (row 2, all heights), the dungeon floor (4, 4), the ledge (row 10, all
+  heights), the marsh's ground and its solid twin (row 23, columns 0 and 1) and the quarry's earth
+  and its solid twin (row 25, columns 0 and 1). The plain colour of each grass tile now covers 165
+  of its 256 pixels (203 before; the samples had 185), the path's 165 (195), the quarry's 177
+  (217), the marsh's 168 (190), the dungeon floor's 169 (184); the ledge has eight new flecks.
+- **How:** a one-off script (not kept: the PNG is the source) turned plain pixels into marks
+  made of the tile's own shades and lights: a shaded blade lit on its right, an upright blade, a
+  sunlit tip on a dark root, specks, short worn streaks and grit on the path, crumbs of stone in the
+  quarry, mottle and hairline cracks in the flagstones. Marks were placed by best-candidate
+  sampling on the wrapped tile (even, no clumps, seamless at every edge) and never beside another
+  mark. A mark's colour is read from the same tile, so each height keeps its own colours and **no
+  new colour entered the atlas**; the palettes are unchanged. The ledge's specks were then placed
+  by hand (the sampler had lined them up like rivets), and one fleck of the dungeon floor taken
+  back for the same reason.
+- **Kept in code:** nothing changed. The plain colours are the same, so the grass fringe
+  (`GreyboxTiles.GROUND_COLORS`) and the shading still match; `pixel_grade_test` keeps its
+  threshold of 150 and finds 165.
+- **A new test, `tests/art/ground_tiles_test.gd`:** each ground row's eight heights share one
+  pattern, the solid ground is the grass and each twin its ground, and the plain colour keeps most
+  of each grained tile.
+- **Pictures:** before and after of the same capture shots as step 1, and 8x close-ups of the
+  tiles before (above) and after (below), in the session notes (`warm-ground-step2/`). At the
+  game's scale a wide field shows grain and no grid; debris, rocks, crops, monsters and pickups
+  read as before.
+
+**Verified:** the whole suite, 1230 cases, exit 0 (`tests/art/` among them, with the three new
+tests). Seen in the capture shots only; not played by hand. Next, on the user's word: step 3, the
+ground details.

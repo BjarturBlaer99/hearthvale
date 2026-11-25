@@ -21,6 +21,12 @@ of the eight questions in section 7:
    PixelLab sheet later.
 8. **Q8:** the order colours, tiles, details, playtest, with a stop after each.
 
+**How far it has come:**
+
+- **Step 1, the colours:** built (`78ed546`) and **approved on 2026-11-25** (shown the summary and
+  five before-and-after pairs: "Approve, go to step 2").
+- **Step 2, the busier tiles:** built on 2026-11-25; waits for the user's review.
+
 **The plan as it was written follows. When it was written nothing in the game had changed yet.** The pictures in
 `docs/progress/warm-ground-samples/` were made in a scratch copy of the project. Each one shows the
 game as it is on the left and the proposed look on the right, at the same spot and the same hour.
