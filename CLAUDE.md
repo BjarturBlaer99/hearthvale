@@ -599,7 +599,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     (`tests/world/story_days_test.gd`), not counted to 150 letters: a stage must end above the line of
     help and be no longer than 200.
   - **In a capture shot the hero hides anything in the cell north of him:** he is two cells tall.
-    `tools/capture.gd`'s shots end at 208 (168 to 176 are phase 2's, 177 to 191 phase 3's, 192 to 203 phase 4's, 204 to 207 phase 5's, 208 the tool polish's); its title shot reads (only reads) the player's slot 1 for its
+    `tools/capture.gd`'s shots end at 209 (168 to 176 are phase 2's, 177 to 191 phase 3's, 192 to 203 phase 4's, 204 to 207 phase 5's, 208 the tool polish's, 209 the ground details'); its title shot reads (only reads) the player's slot 1 for its
     "Continue" line.
   - **A subagent's scratch folder may hold an earlier subagent's files:** work in a subfolder of your
     own, and never run a script there you did not just write.
