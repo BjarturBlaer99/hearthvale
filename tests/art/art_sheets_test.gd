@@ -12,7 +12,7 @@ func test_the_list_names_every_art_png_in_the_game() -> void:
 	var listed: Array = []
 	for entry: Dictionary in ArtSheets.all():
 		listed.append(str(entry["path"]))
-	assert_int(listed.size()).override_failure_message("art/sheets.json is read").is_equal(28)
+	assert_int(listed.size()).override_failure_message("art/sheets.json is read").is_equal(29)
 	for dir: String in ["res://gameplay/art", "res://gameplay/player", "res://world/tiles", "res://ui/title", "res://ui/art"]:
 		for file: String in DirAccess.get_files_at(dir):
 			if file.ends_with(".png"):
@@ -43,6 +43,7 @@ func test_the_game_names_the_frames_in_the_order_they_stand() -> void:
 		"crops": FarmPlot.CROP_FRAMES, "forage": ForageSpot.FRAMES, "crystal": CrystalSwitch.FRAMES, "rocks": Rock.FRAMES,
 		"crafted": Furnishing.FRAMES, "breakables": Breakable.FRAMES, "critters": Critter.FRAMES, "animals": Animal.FRAMES,
 		"torch": Torch.FRAMES, "shade": ShadeBoss.FRAMES, "placed": PlacedArt.FRAMES,
+		"ground_details": GroundDetails.FRAMES,
 	}
 	for file: String in named:
 		var frames: Array = ArtSheets.frames(file)

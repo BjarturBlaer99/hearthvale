@@ -30,6 +30,8 @@ extends Node2D
 ## mouse is two buttons, as ever, and where a click lands doesn't matter.
 
 signal closed
+## The ghost moved, or the thing in hand changed: the cells it covers now (none once closed).
+signal ghost_moved(cells: Array[Vector2i])
 
 ## The ghost's colours: where the thing fits, where it doesn't, and the hand with nothing to do.
 const FITS: Color = Color(0.42, 1.0, 0.52)
@@ -114,6 +116,7 @@ func close() -> void:
 	lifted = {}
 	asked = &""
 	_ghost.visible = false
+	ghost_moved.emit([] as Array[Vector2i])
 	area.hud.hide_build()
 	EventBus.sound.emit(&"menu_select")
 	closed.emit()
@@ -570,6 +573,18 @@ func _refresh() -> void:
 	var held: Array[Dictionary] = entries()
 	area.hud.show_build(held, BuildBar.index_of(held, chosen), words(), why_not().is_empty())
 	_ghost.queue_redraw()
+	ghost_moved.emit(ghost_cells())
+
+
+## The cells the ghost covers: a building's and its doorstep with a building in hand, else the
+## one cell it is on; none while the mode is closed.
+func ghost_cells() -> Array[Vector2i]:
+	if not _open:
+		return []
+	var building: Dictionary = building_in_hand()
+	if not building.is_empty():
+		return Buildings.cells_and_doorstep(building, building_origin())
+	return [cell]
 
 
 ## The colour of the ghost: red where the thing in hand doesn't fit; green where it does, and

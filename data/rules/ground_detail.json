@@ -1,0 +1,32 @@
+{
+	"id": "ground_detail",
+	"places": ["outdoor", "dungeon"],
+	"grounds": {
+		"grass": {
+			"chance": 0.2,
+			"details": { "clover": 3, "clover_b": 1, "daisies": 2, "buttercups": 2, "blades": 3, "blades_b": 2, "pebbles": 1, "worn": 1 },
+			"drifts": { "size": 4, "share": 0.3, "chance": 0.4, "details": ["sunlit", "shaded"] }
+		},
+		"path": {
+			"chance": 0.3,
+			"details": { "path_pebbles": 3, "ruts": 2, "path_sprig": 1, "sandy": 2, "flat_stone": 1, "specks": 2 }
+		},
+		"floor": {
+			"chance": 0.2,
+			"details": { "crack": 2, "moss": 1, "dust": 3 }
+		},
+		"ledge": {
+			"chance": 0.2,
+			"details": { "ledge_crack": 2, "moss": 1 }
+		},
+		"cave": {
+			"chance": 0.33,
+			"details": { "grit": 3, "crumbs": 2, "cave_crack": 2 }
+		},
+		"marsh": {
+			"chance": 0.3,
+			"details": { "marsh_moss": 3, "damp": 2, "marsh_sprig": 2 }
+		}
+	},
+	"unmirrored": ["pebbles", "path_pebbles", "flat_stone", "crumbs"]
+}

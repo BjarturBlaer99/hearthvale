@@ -3697,3 +3697,70 @@ pebbles, cracks, moss) are not in it.
 **Verified:** the whole suite, 1230 cases, exit 0 (`tests/art/` among them, with the three new
 tests). Seen in the capture shots only; not played by hand. Next, on the user's word: step 3, the
 ground details.
+
+**Step 2 approved (2026-11-25):** the user was shown the summary, an 8× close-up and four
+before-and-after pairs and answered "Approve, go on". Recorded at the head of the plan.
+
+## 2026-11-25 — Warmer colours and busier ground, step 3: the ground details
+
+`docs/progress/warm-ground-plan.md`, step 3 only. Small still details are drawn on the ground,
+from a new sheet, under everything else: outdoors, in the quarry and in the dungeons, none in a
+house or a farm building's room. No map was changed or re-baked, no tile moved, and nothing of
+timing, hits or collisions changed; nothing in them moves.
+
+- **The sheet,** `world/tiles/ground_details.png`: 26 frames of 16x16 on a clear background,
+  painted from ASCII by a one-off script (kept in the session notes, not the repo: the PNG is the
+  source). Grass: clover (two), daisies, buttercups, dark blades, light blades, a sunlit and a
+  shaded patch, pebbles, a worn spot. Path: pebbles, ruts, a sprig, a sandy patch, a flat stone,
+  specks. Stone: a crack, moss and dust on the dungeon floor, a crack on the ledge. The quarry:
+  grit, crumbs, a crack. The marsh: moss, a damp patch, a sprig. Every colour is one of the
+  atlas's own ground colours (the flowers its creams and yellows); 48 pixels at the most, none on
+  a cell's outer edge, nothing red. In `art/sheets.json` (a strip, no flash row), its palette in
+  `art/palettes/ground_details.gpl`, and how to swap in a sheet of the user's in `art/README.md`.
+- **Placement,** `GroundDetails` (`core/art/`, pure), from `data/rules/ground_detail.json`
+  (`DataRegistry.RULES_GROUND_DETAIL`, checked as it loads; `docs/data/rules.schema.json`): a fixed
+  hash of the cell says whether it gets a detail and which, and whether it is mirrored. A cell is
+  bare unless it is grass (heights 0 to 2), path, dungeon floor, ledge, the quarry's earth or the
+  marsh; it holds nothing; the cell below it holds nothing; and its four neighbours look as it does
+  (a solid twin under a prop looks like its ground). **The density is one number a ground**
+  (`"chance"`): grass 0.2, with sunlit and shaded patches gathered in drifts of four by four cells
+  (0.3 of the squares, 0.4 of their cells); path 0.3, dungeon floor and ledge 0.2, quarry 0.33,
+  marsh 0.3. Measured: 113 of the village's 427 open grass cells (26%), 98 details on the
+  homestead, 118 on the keep's floor. **A rule reads differently from the plan's §3.3**, as the
+  samples were made: a held neighbour bares a cell only when it is the cell below
+  (`docs/DECISIONS.md`); the strict rule left the village a quarter of its open grass.
+- **Drawing,** `GroundDetail` (`world/areas/`): one node an area, just above the Height layer
+  (under the relief, the water, the shading, the decor and everyone), made by
+  `AreaController._add_ground_detail()` where the rules' `"places"` name the area's kind. What
+  holds a cell: every tile of a layer but the Height layer, everything in Interactables but
+  creatures (monsters, critters, animals), the plot whole, and on the land what lies or stands and
+  every building and site. Drawn into its canvas item once and redrawn only on a change.
+- **The farm:** on `EventBus.homestead_changed` and `farm_changed` it is put together again (once
+  a frame at most): a detail goes from a cell a fence, a path or a site is set on and comes back
+  when it is taken up; one comes where debris is cleared (unless the map's own tuft is under it).
+  **Something lying to be picked up** (a drop, a pickup, a left item) and **the build ghost's
+  cells** (`BuildMode.ghost_moved`, `ghost_cells()`) hide the detail under them while they are
+  there.
+- **Frame cost,** windowed, vsync off, details shown and hidden in turn (240 frames each, three
+  times): the village 3.0 to 3.8 ms a frame either way, the crypt 4.1 to 4.5, the keep 2.5 to 2.8;
+  one draw call more. No work a frame.
+- **Tests:** `tests/core/art/ground_details_test.gd` (the same cell always gets the same detail;
+  none on a held cell or above one, on other ground or beside it; drifts; about one in four; the
+  density is the one number; the rules' problems), `tests/world/ground_detail_test.gd` (which areas
+  have them, their place among the layers, nothing under or beside what the maps hold, a fence
+  set down and taken up, a path, debris cleared, a drop and the ghost, the plot),
+  `tests/art/ground_details_sheet_test.gd` (the atlas's colours, quiet, clear of the edge, nothing
+  red), and the sheet in `art_sheets_test`.
+- **Capture shot 209** (`tools/capture.gd`, "yard_detail"): the yard, a stone lying on grass with
+  details round it, and build mode's ghost on another.
+- **Pictures:** before and after of the same 17 capture shots as steps 1 and 2, two 2x close-ups
+  before over after, an 8x close-up of each detail over its ground, and shots 168, 170 and 209
+  (the ghost, the yard with things set down, a stone and the ghost on detailed grass), in the
+  session notes (`warm-ground-step3/`).
+- **Two older tests follow the new layer:** `buildings_test` (the keep's relief) and `nature_test`
+  (the village's water) wanted their node right above the Height layer; the details now lie
+  between, so each checks the details at +1 and itself at +2.
+
+**Verified:** the whole suite, 1250 cases, exit 0 (20 new: 10 placement, 8 in the areas, 2 of the
+sheet). Seen in the capture shots only; not played by hand. Next, on the user's word: step 4, the
+playtest and tuning.

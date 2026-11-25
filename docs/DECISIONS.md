@@ -1795,3 +1795,17 @@ PNG". What building it decided:
   PixelLab sheet of the user's may replace them); and four steps, colours, tiles, details,
   playtest, with a stop after each. The crypt's dark (`AreaLighting.DARK`) and the title's sky
   (`TitlePicture.SKY_TOP`, which changes only with `backdrop.png`) are kept as they are.
+- 2026-11-25 — **Where ground details may go** (warm-ground plan, step 3). The plan's §3.3 kept a
+  cell bare if any of its four neighbours held something; the step's "done when" asks only for no
+  detail on a held cell or beside other ground. Measured on the maps, the stricter rule left a
+  quarter of the village's open grass (267 cells of 983) and none round any tuft or flower, much
+  sparser than the samples the user approved. **Chosen, as the samples were made:** a cell is bare
+  if it holds something, if the cell below it holds something (what stands there may rise over
+  it), or if any of its four neighbours looks different; **a solid twin under a prop looks like
+  its ground** (`GroundDetails.look_of`: the solid grass, marsh and quarry earth are the same
+  picture, step 2's test holds it), so a prop's neighbours aren't counted as an edge. The prop's
+  own cell is held by its decor tile. With this, 427 of the village's grass cells are open and
+  about one in four of them has a detail (113), with `"chance": 0.2` and drifts (0.3 of the
+  squares, 0.4 in them). The plot is held whole: crops and soil are drawn over a bare bed.
+  Something lying to be picked up, and the build ghost's cells, hide the detail under them for as
+  long as they are there, without changing the placement.

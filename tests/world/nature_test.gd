@@ -223,7 +223,9 @@ func test_water_has_a_moving_surface_and_mirrors_the_hero_and_the_trees_on_its_b
 	for cell: Vector2i in pond:
 		assert_bool(village.water.bounds.has_point(GridBody.cell_center(cell))).override_failure_message("the surface covers %s" % cell).is_true()
 		assert_str(village.ground_at(cell)).is_equal("water")
-	assert_int(village.water.get_index()).override_failure_message("over the water tiles, under the lily pads").is_equal(village.height_layer.get_index() + 1)
+	# Over the water tiles and the ground's details (warm-ground plan, step 3), under the lily pads.
+	assert_int(village.ground_detail.get_index()).is_equal(village.height_layer.get_index() + 1)
+	assert_int(village.water.get_index()).override_failure_message("over the water tiles, under the lily pads").is_equal(village.height_layer.get_index() + 2)
 	assert_int(village.reflections.get_index()).is_equal(village.water.get_index() + 1)
 	village._process(FRAME)
 	var mirror: Sprite2D = village.reflections.hero

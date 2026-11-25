@@ -2,11 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "rules.schema.json",
   "title": "Rules file (data/rules/<id>.json, one set of rules per file)",
-  "description": "The numbers a system runs on, so tuning needs no code (GDD §6). The file's id says which rules it holds. Known ids: 'time' (the day's clock, read by DayClock), 'energy' (the hero's energy, read by EnergyRules), 'hours' (when places are open and villagers are out, read by Hours), 'night' (what the night does to monsters, read by NightRules), 'farm' (the hero's plot, read by Farm), 'skills' (the hero's skills, read by Skills), 'friendship' (what talk and gifts are worth, read by Friendship), 'mine' (the Old Quarry, read by MineRules), 'crafting' (the furnace, the chest and the home's furnishings, checked by Crafting) 'homestead' (which map is the hero's land and the rocks that stand on it, read by HomesteadRules) and 'dungeon' (what each dungeon does to the monsters in it, read by DungeonRules).",
+  "description": "The numbers a system runs on, so tuning needs no code (GDD §6). The file's id says which rules it holds. Known ids: 'time' (the day's clock, read by DayClock), 'energy' (the hero's energy, read by EnergyRules), 'hours' (when places are open and villagers are out, read by Hours), 'night' (what the night does to monsters, read by NightRules), 'farm' (the hero's plot, read by Farm), 'skills' (the hero's skills, read by Skills), 'friendship' (what talk and gifts are worth, read by Friendship), 'mine' (the Old Quarry, read by MineRules), 'crafting' (the furnace, the chest and the home's furnishings, checked by Crafting) 'homestead' (which map is the hero's land and the rocks that stand on it, read by HomesteadRules), 'dungeon' (what each dungeon does to the monsters in it, read by DungeonRules) and 'ground_detail' (the small still details drawn on the ground, read by GroundDetails).",
   "type": "object",
   "required": ["id"],
   "properties": {
-    "id": { "enum": ["time", "energy", "hours", "night", "farm", "skills", "friendship", "mine", "crafting", "homestead", "dungeon"], "description": "Which rules these are." }
+    "id": { "enum": ["time", "energy", "hours", "night", "farm", "skills", "friendship", "mine", "crafting", "homestead", "dungeon", "ground_detail"], "description": "Which rules these are." }
   },
   "allOf": [
     {
@@ -290,9 +290,54 @@
           }
         }
       }
+    },
+    {
+      "if": { "properties": { "id": { "const": "ground_detail" } } },
+      "then": {
+        "required": ["places", "grounds"],
+        "properties": {
+          "places": {
+            "type": "array",
+            "items": { "enum": ["outdoor", "interior", "dungeon"] },
+            "description": "The kinds of area that have details (Ambience: outdoors; a house or a farm building's room; a dungeon, the quarry among them)."
+          },
+          "grounds": {
+            "type": "object",
+            "propertyNames": { "enum": ["grass", "path", "floor", "ledge", "cave", "marsh"] },
+            "description": "For each kind of ground (GroundDetails.ground_of: grass at heights 0 to 2, the path, the dungeon floor, the ledge, the quarry's earth, the marsh), how many of its open cells get a detail and which. A cell is open when it holds nothing, nothing holds the cell below it, and its four neighbours look as it does. Which cell gets which is a fixed hash of the cell.",
+            "additionalProperties": {
+              "type": "object",
+              "required": ["chance", "details"],
+              "properties": {
+                "chance": { "type": "number", "minimum": 0, "maximum": 1, "description": "The share of open cells that get a detail: 0.25 is one in four. The one number to tune." },
+                "details": {
+                  "type": "object", "minProperties": 1,
+                  "description": "A frame of world/tiles/ground_details.png (GroundDetails.FRAMES), then its weight: a detail of weight 2 is chosen twice as often as one of weight 1.",
+                  "additionalProperties": { "type": "integer", "minimum": 1 }
+                },
+                "drifts": {
+                  "type": "object",
+                  "required": ["size", "share", "chance", "details"],
+                  "description": "Details gathered in squares: 'share' of the squares of 'size' by 'size' cells are a drift of one of 'details' (chosen by the square), where an open cell gets it at 'chance' in place of the ground's own.",
+                  "properties": {
+                    "size": { "type": "integer", "minimum": 1 },
+                    "share": { "type": "number", "minimum": 0, "maximum": 1 },
+                    "chance": { "type": "number", "minimum": 0, "maximum": 1 },
+                    "details": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+                  }
+                }
+              }
+            }
+          },
+          "unmirrored": {
+            "type": "array", "items": { "type": "string" },
+            "description": "Details never drawn mirrored (lit from one side). The others are mirrored half the time, by the cell."
+          }
+        }
+      }
     }
   ],
-  "$comment": "One entry of allOf for each id: time, energy, hours, night, farm, skills, mine, friendship, crafting, homestead.",
+  "$comment": "One entry of allOf for each id: time, energy, hours, night, farm, skills, mine, friendship, crafting, homestead, ground_detail.",
   "$defs": {
     "time_of_day": { "type": "string", "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$", "description": "A time on a 24-hour clock, like \"06:00\"." },
     "span": {

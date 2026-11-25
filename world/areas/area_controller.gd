@@ -143,6 +143,8 @@ var tile_glows: Array = []
 var scenery: Scenery
 ## Walls with a front face and a top (P1d), or null in an area with no such walls.
 var relief: WallRelief
+## Small still details on the ground (the warm-ground plan, step 3), or null in a house.
+var ground_detail: GroundDetail
 ## The houses' lit windows (P2e), if the area has any.
 var windows: WindowGlow
 ## The hero's plot (P3), if it lies in this area.
@@ -288,6 +290,7 @@ func _ready() -> void:
 	update_room(true)
 	_add_ambience()
 	_add_building()
+	_add_ground_detail()
 	_add_animals()
 	_update_light()
 	hud.dialogue.closed.connect(_on_dialogue_closed)
@@ -1813,6 +1816,17 @@ func _update_light() -> void:
 		buildings.glow.set_lit(GameState.day_clock().lamps_lit(GameState.minute))
 	var room: Rect2i = RoomGrid.camera_rect(player.motor.cell, room_size, grid.size, GreyboxTiles.TILE_SIZE)
 	lighting.show_lights(scene_lights(), Rect2(room))
+
+
+## Small still details on the ground (the warm-ground plan, step 3), for show only: just above
+## the Height layer, under its relief, water, shading and everything else. None in a house.
+func _add_ground_detail() -> void:
+	ground_detail = GroundDetail.make(self)
+	if ground_detail == null:
+		return
+	add_child(ground_detail)
+	move_child(ground_detail, height_layer.get_index() + 1)
+	ground_detail.setup()
 
 
 ## The area's light and air, for show only: its ambient colour and real lights (P1b), and

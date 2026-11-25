@@ -25,7 +25,11 @@ of the eight questions in section 7:
 
 - **Step 1, the colours:** built (`78ed546`) and **approved on 2026-11-25** (shown the summary and
   five before-and-after pairs: "Approve, go to step 2").
-- **Step 2, the busier tiles:** built on 2026-11-25; waits for the user's review.
+- **Step 2, the busier tiles:** built (`86cd784`) and **approved on 2026-11-25** (shown the summary,
+  an 8× close-up and four before-and-after pairs: "Approve, go on").
+- **Step 3, the ground details:** built on 2026-11-25; waits for the user's review. One rule reads
+  differently from §3.3, as the samples were made: a cell next to something held keeps its detail
+  unless that thing stands just below it (`docs/DECISIONS.md`, 2026-11-25).
 
 **The plan as it was written follows. When it was written nothing in the game had changed yet.** The pictures in
 `docs/progress/warm-ground-samples/` were made in a scratch copy of the project. Each one shows the

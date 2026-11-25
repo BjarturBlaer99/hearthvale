@@ -75,7 +75,8 @@ const RULES_MINE: StringName = &"mine"
 const RULES_CRAFTING: StringName = &"crafting"
 const RULES_HOMESTEAD: StringName = &"homestead"
 const RULES_DUNGEON: StringName = &"dungeon"
-const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM, RULES_SKILLS, RULES_FRIENDSHIP, RULES_MINE, RULES_CRAFTING, RULES_HOMESTEAD, RULES_DUNGEON]
+const RULES_GROUND_DETAIL: StringName = &"ground_detail"
+const RULE_SETS: Array[StringName] = [RULES_TIME, RULES_ENERGY, RULES_HOURS, RULES_NIGHT, RULES_FARM, RULES_SKILLS, RULES_FRIENDSHIP, RULES_MINE, RULES_CRAFTING, RULES_HOMESTEAD, RULES_DUNGEON, RULES_GROUND_DETAIL]
 
 ## Enemy behaviour ids (EnemyBrains makes one brain per id) and drop-table entry types.
 const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden", "shade", "wisp"]
@@ -617,6 +618,8 @@ func _check_rules(rules: Dictionary) -> void:
 			problems = Crafting.rules_problems(rules)
 		RULES_HOMESTEAD:
 			problems = HomesteadRules.problems(rules, func(item_id: String) -> Dictionary: return _collections[&"items"].get(StringName(item_id), {}))
+		RULES_GROUND_DETAIL:
+			problems = GroundDetails.problems(rules)
 	for problem: String in problems:
 		errors.append("%s: rules '%s': %s" % [path, id, problem])
 

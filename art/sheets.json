@@ -296,6 +296,17 @@
 			"names": "ReliefAtlas"
 		},
 		{
+			"path": "res://world/tiles/ground_details.png",
+			"what": "small still details on the ground: grass, path, dungeon floor, ledge, the quarry's earth, the marsh (the warm-ground plan, step 3)",
+			"kind": "strip",
+			"frame": [16, 16],
+			"frames": ["clover", "clover_b", "daisies", "buttercups", "blades", "blades_b", "sunlit", "shaded", "pebbles", "worn", "path_pebbles", "ruts", "path_sprig", "sandy", "flat_stone", "specks", "crack", "moss", "dust", "ledge_crack", "grit", "crumbs", "cave_crack", "marsh_moss", "damp", "marsh_sprig"],
+			"flash_row": false,
+			"pivot": [0, 0],
+			"pivot_is": "the cell's top-left: each detail covers its cell, on a clear background, drawn over the ground and under everything else",
+			"names": "GroundDetails.FRAMES (which ground has which: data/rules/ground_detail.json)"
+		},
+		{
 			"path": "res://ui/title/backdrop.png",
 			"what": "the title screen's picture",
 			"kind": "picture",

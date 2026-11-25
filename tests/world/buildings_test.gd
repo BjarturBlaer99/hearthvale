@@ -65,7 +65,9 @@ func test_a_face_rises_over_the_wall_behind_it_but_not_into_the_next_room() -> v
 func test_the_keeps_walls_have_relief_and_block_exactly_as_before() -> void:
 	var keep: AreaController = _load(KEEP)
 	assert_object(keep.relief).is_not_null()
-	assert_int(keep.relief.get_index()).override_failure_message("drawn just above the Height layer").is_equal(keep.height_layer.get_index() + 1)
+	# Just above the Height layer and the ground's details (warm-ground plan, step 3), which lie under all.
+	assert_int(keep.ground_detail.get_index()).is_equal(keep.height_layer.get_index() + 1)
+	assert_int(keep.relief.get_index()).override_failure_message("drawn just above the Height layer and its details").is_equal(keep.height_layer.get_index() + 2)
 	var wall_tile: Vector2i = GreyboxTiles.coords("dungeon_wall")
 	var faces: int = 0
 	var tops: int = 0

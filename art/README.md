@@ -56,6 +56,7 @@ art/
 | Tiles | `world/tiles/greybox_tiles.png` | 128x544: 8 x 34 tiles of 16x16. Rows are listed in `world/tiles/greybox_tiles.gd`. Repaint a tile in its place; add new tiles at the end. Rows 12 and 27 are markers (never seen). Row 11 is the water's frames. | the cell |
 | Trees | `world/tiles/scenery.png` | 280x48: 7 cells of 40x48 (broadleaf, oak, pine, cherry, cherry b, willow, willow b), each tree 32x40 at (4, 4) in its cell, clear padding round it | the trunk's foot at (16, 37) of the 32x40 |
 | Wall faces, pillar, roof ridges | `world/tiles/relief.png` | 96x112, places in `world/tiles/relief_atlas.gd` | as there |
+| Ground details | `world/tiles/ground_details.png` | 416x16: 26 frames of 16x16 in the order `sheets.json` lists them, clear background, no flash row (below) | the cell's top-left |
 | Buildings | tiles of the atlas (houses rows 16 to 20, buildings 28 to 30) and `relief.png` | repaint the tiles in place | the cell |
 | Crops, soil | `crops.png` 16x16 x13; `soil.png` 16x16 x4 | + flash row | the cell's top-left |
 | Items | `items.png` 16x16 x74 | + flash row; one icon per item | the cell's top-left |
@@ -63,6 +64,22 @@ art/
 | Title | `ui/title/backdrop.png` 640x360 | the keep's window, the stars and the cherry trees must stay where `ui/title_picture.gd` says | the screen |
 | UI: frames, dial | `ui/art/ui_parts.png` 104x32: four gold corners of 7, the top, bottom, left and right edges (6 deep, 16 long, outline outermost), the dial 32x32; places in `ui/ui_parts.gd` | each piece's top-left |
 | UI: the rest | the hearts, bars, slots and the dial's hand are drawn in code, in the UI sheet's colours; the fonts are made in code | | |
+
+**Ground details** (`world/tiles/ground_details.png`, the warm-ground plan, step 3) are small
+still touches drawn on the ground under everything else: clover and flowers on grass, pebbles on
+the path, cracks and moss in the dungeons, grit in the quarry. Which cell gets one is a fixed rule
+of the game (`GroundDetails`), and how many and which kinds each ground gets are numbers in
+`data/rules/ground_detail.json`, so the sheet only says what each looks like. **To swap in your
+own sheet** (PixelLab or any other): keep it 416x16, 26 frames of 16x16 on a clear background, in
+the order of `sheets.json` (frame 0 clover, 1 clover_b, ... 25 marsh_sprig; the first ten are
+grass, then six for the path, four for stone, three for the quarry, three for the marsh). Keep
+each detail small and quiet (48 pixels at most), off the cell's outer row of pixels, in the colours
+of the ground it lies on (the atlas's own: `art/palettes/greybox_tiles.gpl`), with nothing red, no
+mushroom, berry, coin or stone the size of a rock, and no tuft as tall as the grass the sword cuts:
+nothing may look like something to pick up, break or cut. Lit from the north-west, as the rest; a
+detail named in `"unmirrored"` is never drawn mirrored, the others are, half the time. Export over
+the PNG, then import and run the art tests (`tests/art/ground_details_sheet_test.gd` checks size,
+colours, quietness and edges). To have fewer or more, change `"chance"` in the rules, not the sheet.
 
 **Villager markers** (`palettes/villager_markers.gpl`), recoloured for each villager by the game:
 robe `#FF00FF`, robe shade `#800080`, hair `#00FFFF`, hair shade `#008080`. Use them exactly, and no

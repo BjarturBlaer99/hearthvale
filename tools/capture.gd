@@ -45,6 +45,8 @@ extends SceneTree
 ## lamp post lit; "yard_hand": in build mode, the hand moving its bench); "saplings" shows an
 ## oak and a cherry sapling at each age and the hero behind a grown oak; "place_tab" opens the
 ## workbench's "Place" tab; "shop_land" opens Tilda's list on what she sells for the land.
+## "yard_detail" (the warm-ground plan, step 3): the yard, a stone lying on grass with ground
+## details round it, and build mode's ghost on another detail.
 ## The Homestead's buildings (phase 3), "b:<what>": "b:tab" opens the workbench's "Build" tab;
 ## "b:ghost:<x>,<y>" opens build mode with the Coop's kit and its ghost held at that cell; "b:site"
 ## shows the Coop's site set down; "b:farm" the farm with every building standing (BUILT) ("b:night":
@@ -338,6 +340,8 @@ const SHOTS: Array = [
 	["207_oda_hears_the_coop_stands", &"village", Vector2i(15, 32), Vector2.UP, 0, "f:done:farmer_oda"],
 	# The tool polish, step 4: the buildings' windows lit at night, and a site's string.
 	["208_the_farm_at_night_its_windows_lit", &"homestead", Vector2i(16, 13), Vector2.DOWN, 0, "b:night"],
+	# Warmer colours and busier ground, step 3: a stone lying among the ground's details, and the ghost.
+	["209_a_stone_and_the_ghost_on_detailed_grass", &"homestead", Vector2i(30, 15), Vector2.DOWN, 0, "yard_detail"],
 ]
 ## What a build shot carries: enough of each thing for a yard, in the order of the build bar.
 const BUILD_STOCK: Array = [[&"fence", 30], [&"gate", 3], [&"dirt_path", 12], [&"stone_path", 20], [&"wood_path", 12],
@@ -741,6 +745,8 @@ func _capture() -> void:
 				scene.get(&"build").call(&"choose_slot", int(build_parts[2]))
 			scene.get(&"build").call(&"point_at", Vector2i(int(at[0]), int(at[1])))
 			await _frames(3)
+		elif shot[5] == "yard_detail":
+			await _show_ground_detail(scene)
 		elif shot[5] == "yard_hand":
 			# Build mode with the hand chosen: the bench lifted, and the ghost where it would go.
 			scene.call(&"open_build")
@@ -901,6 +907,35 @@ func _set_up_buildings(game_state: Node, action: String) -> void:
 
 
 ## What a "b:" shot does once its area has loaded.
+## A stone lying on a cell of grass that has a detail, and build mode's ghost on another, near
+## the hero (the warm-ground plan, step 3): neither shows the detail under it.
+func _show_ground_detail(scene: Node) -> void:
+	var detail: Node = scene.get(&"ground_detail")
+	var height: TileMapLayer = scene.get(&"height_layer")
+	var hero: Vector2i = Vector2i(30, 15)
+	# Grass with details, below the road and west of the field, nearest the hero first.
+	var shown: Array[Vector2i] = []
+	for y: int in range(hero.y + 2, hero.y + 8):
+		for x: int in range(hero.x - 12, hero.x - 8):
+			if height.get_cell_atlas_coords(Vector2i(x, y)) == Vector2i.ZERO and detail.call(&"shown_at", Vector2i(x, y)) != &"":
+				shown.append(Vector2i(x, y))
+	if shown.size() < 2:
+		push_warning("capture: too few ground details near the hero")
+		return
+	var ghost: Vector2i = shown[1]
+	for cell: Vector2i in shown:
+		if absi(cell.x - shown[0].x) + absi(cell.y - shown[0].y) >= 2:
+			ghost = cell
+			break
+	var drop: Node2D = load("res://gameplay/interactables/item_drop.gd").new()
+	drop.set(&"item_id", &"stone")
+	drop.position = Vector2(shown[0] * 16)
+	scene.get(&"interactables").add_child(drop)
+	scene.call(&"open_build")
+	scene.get(&"build").call(&"point_at", ghost)
+	await _frames(3)
+
+
 func _act_on_buildings(scene: Node, action: String) -> void:
 	if action == "b:tab":
 		# The "Build" tab, the cursor on the Coop, whose needs show what is short.
