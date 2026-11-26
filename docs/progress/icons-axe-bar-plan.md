@@ -156,6 +156,9 @@ the chest (`StoreMenu`), the gift list and the workbench are words only.
   with nothing to eat says "You carry nothing to eat." (the words the area said before), and
   Pack with nothing at all "You carry nothing.". On Pack, Enter, Q and a click only point. The
   pure part is `PackList` (`core/inventory/`). Capture shots 210 to 213. See `LOG.md`.
+- **Approved (2026-11-26).** Shown the summary and four shots of the Tab menu (Food, Pack, a
+  full pack scrolled, Tab with no food), the user said "Approve, go on". It stands as built
+  (`e3bb229`); step A1 begins on that word.
 
 ### Risks
 - A taller line could push the shop's note line or help line past the box: the box grows with it, and
@@ -216,6 +219,20 @@ the chest (`StoreMenu`), the gift list and the workbench are words only.
 of `held_tools.png`, `art/sheets.json`, `HeldTools` and `ItemIcons` names, `docs/ASSETS.md`.
 - **Done when:** `tests/art/` passes with the new frames; a sheet of the frames beside the pickaxe's
   is shown to the user.
+- **Built (2026-11-26), waiting for the user's review.** As written: icons 77 to 79 of
+  `items.png` (`axe`, `copper_axe`, `iron_axe`) and frames 57 to 74 of `held_tools.png` (the plain
+  axe's six, then copper's, then iron's: down, up, side, each raised and struck), named by
+  `ItemIcons.FRAMES` and `HeldTools` (`ADDED`, after every older frame; `ITEMS` knows the three
+  ids, which A2 adds to the items' data). What building it decided: **the axe is cut from the
+  pack's axe layer in the very windows the pickaxe was** (found by matching each pickaxe frame to
+  its layer pixel for pixel), so his hands hold it where they hold the pickaxe; **in two poses
+  (up raised, side struck) it is moved one pixel along its handle,** which lies flat there,
+  because its blade is a column longer than the pickaxe's head and its tip's outline would have
+  been cut by the 40-px frame. **The metals are phase C's** (read off the pickaxe and the hoe):
+  copper's head in the copper bar's oranges and its handle darker wood, iron's head in the pale
+  greys and blues; **the axe's bright edge, which no pickaxe has, is `ffcb8d` in copper and
+  `ffffff` in iron** (both the palette's). No sound, no stroke, no item yet: nothing in play
+  changes until A2. See `LOG.md`.
 
 **Step A2. The axe in play.** The three items, `ToolUse.CHOP`, the stroke in the area, the breakables'
 data, the energy rule, the two recipes, the pickup in the farmhouse, the tools' scripts.

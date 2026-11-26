@@ -3,7 +3,8 @@ extends RefCounted
 ## The tools in the hero's hands (tool polish, 2026-11-19): gameplay/art/held_tools.png
 ## (art/sheets.json lists its frames). Each frame is SIZE, with the hero's feet at FEET,
 ## and is "<item>_<facing>_<pose>": the plain hoe, pickaxe and can, then the sprinkler, then
-## the copper and iron ones. A test checks the order against art/sheets.json.
+## the copper and iron ones, then the axes added after them (icons-axe-bar plan, step A1), plain,
+## copper and iron. A test checks the order against art/sheets.json.
 
 const SHEET: Texture2D = preload("res://gameplay/art/held_tools.png")
 const SIZE: Vector2i = Vector2i(40, 56)
@@ -20,6 +21,11 @@ const BASES: Array = [
 ## The tools made again in each metal, in the tool's order.
 const METALLED: Array[String] = ["hoe", "pickaxe", "watering_can"]
 const METALS: Array[String] = ["copper", "iron"]
+## The tools drawn after the first ones, each plain and then in each metal, at the sheet's end
+## (an older frame never moves).
+const ADDED: Array = [
+	["axe", [ToolStroke.RAISE, ToolStroke.STRIKE]],
+]
 ## Each item that is held: [the drawn tool, its metal ("" for plain)].
 const ITEMS: Dictionary = {
 	&"hoe": ["hoe", ""], &"copper_hoe": ["hoe", "copper"], &"iron_hoe": ["hoe", "iron"],
@@ -27,6 +33,7 @@ const ITEMS: Dictionary = {
 	&"watering_can": ["watering_can", ""], &"copper_watering_can": ["watering_can", "copper"],
 	&"iron_watering_can": ["watering_can", "iron"],
 	&"sprinkler": ["sprinkler", ""],
+	&"axe": ["axe", ""], &"copper_axe": ["axe", "copper"], &"iron_axe": ["axe", "iron"],
 }
 
 static var _frames: Dictionary = {}
@@ -42,6 +49,11 @@ static func frame_names() -> Array[String]:
 			if METALLED.has(str(base[0])):
 				for frame_name: String in _names_of(str(base[0]), base[1]):
 					out.append("%s_%s" % [metal, frame_name])
+	for base: Array in ADDED:
+		out.append_array(_names_of(str(base[0]), base[1]))
+		for metal: String in METALS:
+			for frame_name: String in _names_of(str(base[0]), base[1]):
+				out.append("%s_%s" % [metal, frame_name])
 	return out
 
 

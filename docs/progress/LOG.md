@@ -4026,3 +4026,39 @@ at only"), on the user's word "Approve, go on" for step I1.
   now expect Pack (`items_test`, `item_bar_test`, `food_test`).
 - **Known:** seen in capture shots, not played by hand. The heading and the tab line both name
   the list shown.
+
+**Approved (icons, step I2).** Shown the summary and four shots of the Tab menu (Food, Pack, a
+full pack scrolled, Tab with no food), the user approved step I2 on 2026-11-26 ("Approve, go
+on"). It stands as built (`e3bb229`). Step A1 (the axe's pictures) begins on that word.
+
+## 2026-11-26 — Icons, an axe and the item bar, step A1: the axe's pictures
+
+The third step of `docs/progress/icons-axe-bar-plan.md`, on the user's word "Approve, go on" for
+step I2. Pictures only: no item, stroke or sound, and the sword still cuts wood until A2.
+
+- **What changed:** three icons at the end of `gameplay/art/items.png` (frames 77 to 79: `axe`,
+  `copper_axe`, `iron_axe`) and eighteen frames at the end of `gameplay/art/held_tools.png`
+  (57 to 74: the plain axe, then copper, then iron; each down, up and side, raised and struck),
+  each with its white flash row. No older frame moved. `art/sheets.json` lists them,
+  `ItemIcons.FRAMES` and `HeldTools` name them (`HeldTools.ADDED`: tools drawn after the first
+  ones, plain and then in each metal; `ITEMS` knows `axe`, `copper_axe` and `iron_axe`, which A2
+  adds to the items' data). `docs/ASSETS.md` says where each came from.
+- **How they were cut** (a one-off script kept out of the project): the icon is the pack's
+  `Items/Tool/Axe.png` as it stands. In his hands, the pack's axe layer
+  (`Actor/CharacterAnimated/Weapon/Axe.png`) is cut in the very windows the pickaxe was cut from
+  its own layer (found by matching each pickaxe frame to its layer pixel for pixel: the frames
+  are those windows exactly), so the hands hold it where they hold the pickaxe. In two poses (up
+  raised, side struck) the axe's blade is a column longer than the pickaxe's head and its tip's
+  outline would have fallen outside the 40-px frame: there it is moved one pixel along its
+  handle, which lies flat in both. Copper and iron are phase C's recolouring, read off the
+  pickaxe and the hoe; the axe's bright blade edge, which no pickaxe has, is `ffcb8d` in copper
+  and `ffffff` in iron, both the palette's.
+- **Tests:** `tests/art/axe_art_test.gd` (5: the icons last and in order; the eighteen frames
+  last and in order, and `HeldTools.frame_of()` finds each; the plain axe the pack's pixel for
+  pixel, icon and frames, each frame holding the whole axe of its pack cell; copper and iron the
+  plain shape in the metals' colours; every colour the palette's or one its pickaxe already
+  wears, since the pack's tools wear two, `e66a3a` and `f38c4c`, that its `Palette.png` lacks).
+  `tests/art/animal_icons_test.gd`'s first test now finds the hen, sheep and cow after the
+  custard, not at the sheet's end.
+- **Known:** not seen in play (nothing uses the frames until A2); shown as an 8x close-up beside
+  the pickaxe's, on the hero's work poses.

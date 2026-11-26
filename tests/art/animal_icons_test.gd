@@ -1,5 +1,5 @@
 extends GdUnitTestSuite
-## The three animal icons at the end of items.png (icons, an axe and the item bar, step I1),
+## The three animal icons added to items.png after the custard (icons, an axe and the item bar, step I1),
 ## for Farmer Oda's list: the hen and the cow are the art pack's own first frames as they stand;
 ## the sheep is today's sheep cut to 16 wide (a gap: the pack has none), standing on the frame's
 ## last row but one. Each has its white silhouette in the flash row beneath, as every icon does.
@@ -10,11 +10,12 @@ const ANIMAL_DIR: String = "res://art/packs/ninja-adventure/Ninja Adventure - As
 const SIZE: int = 16
 
 
-func test_the_three_are_the_last_frames_in_their_order() -> void:
+func test_the_three_follow_the_custard_in_their_order() -> void:
 	var frames: Array = ArtSheets.frames("items")
-	assert_array(frames.slice(frames.size() - 3)).is_equal(["hen", "sheep", "cow"])
-	assert_int(int(ItemIcons.FRAMES[&"hen"])).is_equal(frames.size() - 3)
-	assert_int(int(ItemIcons.FRAMES[&"cow"])).is_equal(frames.size() - 1)
+	var at: int = frames.find("custard") + 1
+	assert_array(frames.slice(at, at + 3)).is_equal(["hen", "sheep", "cow"])
+	assert_int(int(ItemIcons.FRAMES[&"hen"])).is_equal(at)
+	assert_int(int(ItemIcons.FRAMES[&"cow"])).is_equal(at + 2)
 
 
 func test_the_hen_and_the_cow_are_the_packs_own_frames() -> void:
