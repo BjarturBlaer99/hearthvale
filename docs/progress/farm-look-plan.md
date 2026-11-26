@@ -41,6 +41,8 @@ place of the user's PixelLab ones).
 hood"** (the pack's one fully animated character recoloured in the pack's own colours; not as
 drawn in green, not brown all over, not one of its plain people).
 
+**2026-11-26, shown phase E's summary and pictures: "Approve phase E".** Step 2 is finished.
+
 **How far it has come:**
 
 - **Step 1, this plan:** written and committed (`54e1fd7`).
@@ -65,11 +67,13 @@ drawn in green, not brown all over, not one of its plain people).
   D, go on to phase E". Begun on phase C's word, in a session of its own. **F3, F4 and F5 were decided by
   the user during the phase** (above). What was built, the gaps and what fits badly are in
   section 14.
-- **Phase E (the hero): built on 2026-11-26 and waits for the user's review.** Begun on phase
+- **Phase E (the hero): built on 2026-11-26 (`2c29583`) and approved the same day.** Shown the
+  summary and the before-and-after pictures, the user said: "Approve phase E". Begun on phase
   D's word, in a session of its own. F3 ("Short, the pack's") holds for the hero too. **F11 was
   decided by the user during the phase,** shown four looks side by side: **"Blue, brown hood"**
   (the pack's one fully animated character, recoloured in its own colours). What was built, the
-  gaps and what fits badly are in section 15. With it, all five phases of step 2 are built.
+  gaps and what fits badly are in section 15. With it, all five phases of step 2 are built and approved: **the farm look is finished.**
+  Nothing further is planned.
 
 **The plan as it was written follows** (sections 0 to 10). When it was written nothing had been
 downloaded and nothing in the game had changed.
@@ -896,7 +900,7 @@ bosses kept as today's); and whether to go on to phase E, the hero, who will be 
 
 ## 15. Phase E as built (2026-11-26): the hero
 
-Built in a session of its own on the user's word of 2026-11-26 ("Approve phase D, go on to phase
+**Approved on 2026-11-26** ("Approve phase E"). Built in a session of its own on the user's word of 2026-11-26 ("Approve phase D, go on to phase
 E"). F3 ("Short, the pack's") holds for him. **F11, decided by the user** during the phase, shown
 four looks side by side (the pack's one fully animated character as drawn in green, recoloured
 blue with a brown hood, recoloured brown; and one of its plain people, Boy, who has far fewer

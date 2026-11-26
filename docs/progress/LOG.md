@@ -3963,3 +3963,8 @@ The farm-look plan's phase E (`docs/progress/farm-look-plan.md`, section 15), on
   lower); his sprite is laid from his feet, the held item rests on his hold pose, the sword is
   drawn from a short hero's belt; his reflection is laid from his soles; a villager's frame is a
   cell wide and as tall as his.
+
+**Approved (farm look, phase E).** Shown the summary, the gaps, what fits badly and the
+before-and-after pictures, the user approved phase E on 2026-11-26 ("Approve phase E"). It stands
+as built, with F11 as the user chose it ("Blue, brown hood"). All five phases of the farm look
+are built and approved: the plan is finished, and nothing further is planned.
