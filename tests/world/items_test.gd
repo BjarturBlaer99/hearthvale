@@ -137,11 +137,15 @@ func test_what_is_in_hand_is_chosen_on_the_bar_and_survives_a_save() -> void:
 	assert_str(AreaController.equipped_text()).is_equal("Item: Bombs x2")
 
 
-func test_the_item_menu_needs_something_to_equip() -> void:
+func test_with_only_a_sword_the_tab_menu_shows_the_pack_and_puts_nothing_in_hand() -> void:
 	GameState.add_item(&"wooden_sword")
 	var village: AreaController = _load(VILLAGE)
-	assert_bool(village.open_item_menu()).is_false()
-	assert_bool(village.hud.item_menu.is_open()).is_false()
+	assert_bool(village.open_item_menu()).is_true()
+	var menu: ItemMenu = village.hud.item_menu
+	assert_that(menu.list).override_failure_message("no food: it opens on Pack").is_equal(ItemMenu.PACK)
+	assert_array(Array(menu.shown_lines())).is_equal(["> Wooden Sword"])
+	assert_that(menu.confirm()).is_equal(&"")
+	menu.close()
 	assert_bool(village.player.controls_enabled).is_true()
 	assert_bool(village.use_item()).override_failure_message("nothing on the button").is_false()
 

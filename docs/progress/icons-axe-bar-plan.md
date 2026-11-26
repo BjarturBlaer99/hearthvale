@@ -131,6 +131,9 @@ the chest (`StoreMenu`), the gift list and the workbench are words only.
   so its middle meets the picture's. Boxes: the shop 258 x 164, the Tab menu 242 x 134, the chest
   336 x 196 (seven lines a side, as before). The sheep is today's first frame with seven columns
   of its fleece taken out, its legs three columns each a column apart. See `LOG.md`.
+- **Approved (2026-11-26).** Shown the summary and four before-and-after pairs (Tilda's list, the
+  Tab menu, the chest, Oda's list), the user said "Approve, go on". It stands as built
+  (`637a466`); step I2 begins on that word.
 
 **Step I2 (only if Q2 is "yes"). A list of everything he carries in the Tab menu.**
 - The Tab menu gets two lists, turned as the shop's are (left and right, or a click on a name):
@@ -141,6 +144,18 @@ the chest (`StoreMenu`), the gift list and the workbench are words only.
   opens with no food; tests pass; pictures.
 - **Tests:** Pack lists coins, keys, quest things, materials and tools; a click on Pack changes
   nothing in hand or in the pack; Tab with no food opens on Pack.
+- **Built (2026-11-26), waiting for the user's review.** As written. What building it decided:
+  the two names stand on a line of their own under the rule ("[Food]   Pack", gold, as the
+  shop's "Buy" and "Sell"), and the heading reads the list shown ("Food" or "Pack"). The box is
+  the shop's width, 258 x 150 (was 242 x 134), so each list's help line fits beside the count:
+  Food's "Click: eat   A / D: turn   Tab: close", Pack's "A / D: turn   Tab: close" (a click
+  is not offered there). Left and right turn the lists (they moved the cursor before; up, down
+  and the wheel still do). What a tool holds is said on its line, not on a line of its own
+  ("Watering Can (Water x10)"), as the chest leaves it out; coins read "412 coins"; a stack
+  says its count even of one ("Small Key x1"), what never stacks only its name ("Hoe"). Food
+  with nothing to eat says "You carry nothing to eat." (the words the area said before), and
+  Pack with nothing at all "You carry nothing.". On Pack, Enter, Q and a click only point. The
+  pure part is `PackList` (`core/inventory/`). Capture shots 210 to 213. See `LOG.md`.
 
 ### Risks
 - A taller line could push the shop's note line or help line past the box: the box grows with it, and

@@ -342,7 +342,21 @@ const SHOTS: Array = [
 	["208_the_farm_at_night_its_windows_lit", &"homestead", Vector2i(16, 13), Vector2.DOWN, 0, "b:night"],
 	# Warmer colours and busier ground, step 3: a stone lying among the ground's details, and the ghost.
 	["209_a_stone_and_the_ghost_on_detailed_grass", &"homestead", Vector2i(30, 15), Vector2.DOWN, 0, "yard_detail"],
+	# Icons, an axe and the item bar, step I2: the Tab menu's two lists, Food and Pack.
+	["210_the_tab_menu_with_a_few_things", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "pack:few:food:0"],
+	["211_the_pack_with_a_few_things", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "pack:few:pack:0"],
+	["212_the_pack_full_scrolled", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "pack:full:pack:9"],
+	["213_tab_with_no_food", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "pack:no_food:pack:0"],
 ]
+## What the Tab menu's shots carry (210 to 213): a few things, a full pack, and no food.
+const PACK_STOCK: Dictionary = {
+	"few": [[&"wooden_sword", 1], [&"coin", 35], [&"bread", 2], [&"wild_berries", 3], [&"stone", 6]],
+	"full": [[&"wooden_sword", 1], [&"coin", 412], [&"bow", 1], [&"arrow", 20], [&"bomb", 5], [&"small_key", 1],
+		[&"hoe", 1], [&"watering_can", 1], [&"water", 10], [&"pickaxe", 1], [&"turnip_seeds", 8], [&"bread", 3],
+		[&"egg", 4], [&"stone", 40], [&"wood", 25], [&"copper_ore", 7], [&"copper_bar", 2], [&"coal", 5],
+		[&"fibre", 12], [&"hay", 8], [&"weavers_shuttle", 1]],
+	"no_food": [[&"wooden_sword", 1], [&"coin", 35], [&"hoe", 1], [&"watering_can", 1], [&"water", 10], [&"stone", 6]],
+}
 ## What a build shot carries: enough of each thing for a yard, in the order of the build bar.
 const BUILD_STOCK: Array = [[&"fence", 30], [&"gate", 3], [&"dirt_path", 12], [&"stone_path", 20], [&"wood_path", 12],
 	[&"wooden_flooring", 12], [&"stone_flooring", 12], [&"hedge", 8], [&"lamp_post", 2], [&"bench", 2],
@@ -798,6 +812,20 @@ func _capture() -> void:
 				game_state.call(&"add_item", item[0], item[1])
 			game_state.call(&"set_energy", 48.0)
 			scene.call(&"open_item_menu")
+			await _frames(2)
+		elif str(shot[5]).begins_with("pack:"):
+			# pack:<stock>:<list>:<steps down>: the Tab menu opened over that stock, turned to
+			# the list named (if it has two: a capture of the game before step I2 shows Food only).
+			var pack_parts: PackedStringArray = str(shot[5]).split(":")
+			for item: Array in PACK_STOCK[pack_parts[1]]:
+				game_state.call(&"add_item", item[0], item[1])
+			game_state.call(&"set_energy", 48.0)
+			scene.call(&"open_item_menu")
+			var tab_menu: Node = scene.get(&"hud").get(&"item_menu")
+			if tab_menu.has_method(&"switch_list") and str(tab_menu.get(&"list")) != pack_parts[2]:
+				tab_menu.call(&"switch_list")
+			if bool(tab_menu.call(&"is_open")):
+				tab_menu.call(&"move_cursor", int(pack_parts[3]))
 			await _frames(2)
 		elif shot[5] == "shoot":
 			scene.call(&"use_item")

@@ -82,14 +82,20 @@ func test_eating_from_the_item_menu_gives_energy_and_uses_the_food() -> void:
 	assert_int(GameState.health).override_failure_message("these mend no hearts").is_equal(GameState.max_health())
 
 
-func test_food_alone_opens_the_item_menu() -> void:
+func test_food_alone_opens_the_item_menu_on_food() -> void:
 	var village: AreaController = _load(VILLAGE)
-	assert_bool(village.open_item_menu()).override_failure_message("nothing to show").is_false()
+	var menu: ItemMenu = village.hud.item_menu
+	assert_bool(village.open_item_menu()).override_failure_message("it always opens").is_true()
+	assert_that(menu.list).override_failure_message("nothing to eat: on Pack").is_equal(ItemMenu.PACK)
+	menu.close()
 	GameState.add_item(&"cherry_blossom", 2)
-	assert_bool(village.open_item_menu()).override_failure_message("an ingredient alone is nothing to show").is_false()
+	assert_bool(village.open_item_menu()).is_true()
+	assert_that(menu.list).override_failure_message("an ingredient is not food").is_equal(ItemMenu.PACK)
+	menu.close()
 	GameState.add_item(&"mushroom", 1)
 	assert_bool(village.open_item_menu()).is_true()
-	assert_array(Array(village.hud.item_menu.shown_lines())).is_equal(["> Mushrooms x1 (+6 energy)"])
+	assert_that(menu.list).is_equal(ItemMenu.FOOD)
+	assert_array(Array(menu.shown_lines())).is_equal(["> Mushrooms x1 (+6 energy)"])
 
 
 func test_there_are_things_to_gather_and_each_is_back_the_next_morning() -> void:

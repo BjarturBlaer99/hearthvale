@@ -36,8 +36,6 @@ const COLLAPSED_WORDS: String = "You collapsed, and woke in your own bed."
 const COINS_LOST_WORDS: String = " You lost %d coins on the way."
 ## The bar's number keys, in the order of its slots.
 const SLOT_ACTIONS: Array[StringName] = [&"slot_1", &"slot_2", &"slot_3", &"slot_4", &"slot_5", &"slot_6", &"slot_7", &"slot_8", &"slot_9"]
-## What is said when the food menu is asked for and he carries nothing to eat.
-const NO_FOOD_WORDS: String = "You carry nothing to eat."
 ## The prompts for a crop the hero faces, and what is said when he has picked one, cleared a
 ## withered one, or has no room for another.
 const PICK_PROMPT: String = "Pick the %s"
@@ -1091,19 +1089,16 @@ func faces_farm_work() -> bool:
 	return (plot != null and plot.covers(front)) or is_water_source(front)
 
 
-## Opens the food menu (Tab): what he carries that can be eaten, with what each gives. What
+## Opens the Tab menu: on Food (what he carries that can be eaten, with what each gives), or on
+## Pack (everything he carries, to look at only) when he has no food, so it always opens. What
 ## goes in hand is chosen on the bar (the wheel, the keys 1 to 9), not here. Returns whether
 ## it opened.
 func open_item_menu() -> bool:
 	if _busy() or not player.controls_enabled:
 		return false
-	var held: Array[Dictionary] = Food.edible_held(GameState.inventory, DataRegistry.entries(&"items"))
-	if held.is_empty():
-		hud.show_message(NO_FOOD_WORDS)
-		return false
 	player.controls_enabled = false
 	hud.set_prompt("")
-	hud.item_menu.open(held, &"")
+	hud.item_menu.open(ItemMenu.first_list())
 	_show_bar()
 	return true
 

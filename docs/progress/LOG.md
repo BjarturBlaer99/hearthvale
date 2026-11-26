@@ -3993,3 +3993,36 @@ is marked changed, to be built in step A2).
   pack's, each whole with its white flash row, the sheep 16 wide on its feet).
 - **Known:** the sheep's icon is today's art, cut; the gift list and the workbench have no
   pictures (not asked). Seen in capture shots, not played by hand.
+
+**Approved (icons, step I1).** Shown the summary and four before-and-after pairs (Tilda's list,
+the Tab menu, the chest, Oda's list), the user approved step I1 on 2026-11-26 ("Approve, go
+on"). It stands as built (`637a466`). Step I2 (the Tab menu's "Pack") begins on that word.
+
+## 2026-11-26 — Icons, an axe and the item bar, step I2: the Tab menu's "Pack"
+
+The second step of `docs/progress/icons-axe-bar-plan.md` (Q2: "yes, a second list Pack, to look
+at only"), on the user's word "Approve, go on" for step I1.
+
+- **What changed:** the Tab menu has two lists, turned with left and right (A / D) or a click on
+  a name, as the shop's are: **Food**, as before (a click or Enter eats and closes), and
+  **Pack**, every stack he carries in the pack's order with its picture and count. Nothing on
+  Pack is eaten, dropped or put in hand: a click, Enter or Q there only points. It opens on Food,
+  or on Pack when he has no food, so **Tab always opens** (before, with no food it did not open
+  and he was told "You carry nothing to eat."; Food now says so as its empty line). What a tool
+  holds is on the tool's line ("Watering Can (Water x10)"), not a line of its own. The names
+  stand on a line under the rule ("[Food]   Pack"), the heading reads the list shown, and the box
+  is the shop's width, 258 x 150 (was 242 x 134), so each list's help line fits beside the
+  count. Left and right turn the lists now (they moved the cursor before; up, down and the wheel
+  still do).
+- **Code:** `PackList` (`core/inventory/`, pure: the entries, what a tool holds, a stack's line);
+  `ItemMenu` (two lists, `list`, `switch_list()`, `tab_under()`, `first_list()`);
+  `AreaController.open_item_menu()` opens on `ItemMenu.first_list()` (`NO_FOOD_WORDS` is gone);
+  `tools/capture.gd` shots 210 to 213.
+- **Tests:** `tests/core/inventory/pack_list_test.gd` (5, pure) and
+  `tests/ui/tab_menu_pack_test.gd` (6: a full pack listed in order with its icons, scrolling, a
+  click on every Pack line changes nothing in hand, in the pack or in energy, Tab with no food
+  opens on Pack and with nothing says so, turning by keys and by a click on a name and Food still
+  eating, the words fitting their labels). Three tests that expected Tab to refuse with no food
+  now expect Pack (`items_test`, `item_bar_test`, `food_test`).
+- **Known:** seen in capture shots, not played by hand. The heading and the tab line both name
+  the list shown.

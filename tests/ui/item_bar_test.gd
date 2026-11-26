@@ -201,11 +201,14 @@ func test_the_tab_menu_lists_only_food() -> void:
 	menu.confirm()
 	assert_float(GameState.energy).is_equal(70.0)
 	assert_that(GameState.equipped).override_failure_message("eating doesn't change what is in hand").is_equal(&"bow")
-	# With nothing to eat there is no list, and he is told.
+	# With nothing to eat it opens on Pack (step I2), and Food says there is nothing.
 	GameState.add_item(&"bread", -1)
 	GameState.add_item(&"wild_berries", -3)
-	assert_bool(village.open_item_menu()).is_false()
-	assert_str(village.hud.message_text()).is_equal("You carry nothing to eat.")
+	assert_bool(village.open_item_menu()).is_true()
+	assert_that(menu.list).is_equal(ItemMenu.PACK)
+	menu.switch_list()
+	assert_array(Array(menu.shown_lines())).is_equal(["You carry nothing to eat."])
+	menu.close()
 	assert_bool(village.player.controls_enabled).is_true()
 
 
