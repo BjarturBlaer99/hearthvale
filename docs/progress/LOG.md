@@ -3871,3 +3871,8 @@ changed, every tile and frame in its old place and size.
 
 **Verified:** the whole suite, 1259 cases, exit 0. Seen in 50 capture shots before and after;
 not played by hand. Waits for the user's review; phase C is not begun.
+
+**Approved (farm look, phase B).** Shown the summary, the gaps, what fits badly and the
+before-and-after pictures, the user approved phase B on 2026-11-26 ("Approve phase B, go on to
+phase C"). It stands as built, F9's recommended answer with it (what is drawn in code stays
+drawn). Phase C (crops, items, UI) begins on that word, in a session of its own.

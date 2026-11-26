@@ -23,6 +23,9 @@ props, C crops, items and UI, D villagers, animals and monsters, E the hero), st
 **2026-11-25, shown phase A's summary and pictures: "Approve phase A, go on to phase B".** And of
 the pack in git, the same day: "Yes, without audio".
 
+**2026-11-26, shown phase B's summary and pictures: "Approve phase B, go on to phase C".** F9 (what
+is drawn in code stays drawn) stands as taken.
+
 **How far it has come:**
 
 - **Step 1, this plan:** written and committed (`54e1fd7`).
@@ -31,10 +34,13 @@ the pack in git, the same day: "Yes, without audio".
   pictures, the user said: "Approve phase A, go on to phase B". It stands as built, and F6 and F7
   with it; the user said nothing separately of them, nor of the marsh's green ground. What was
   built, what the pack did not cover and what fits badly are in section 11.
-- **Phase B (buildings, interiors, props): built on 2026-11-26 and waits for the user's review.**
-  F9 (what is drawn in code): taken as recommended; the user has not spoken to it; open at the
-  phase B review. What was built, the gaps and what fits badly are in section 12.
-- Phases C to E: not begun.
+- **Phase B (buildings, interiors, props): built on 2026-11-26 (`c73d69c`) and approved the same
+  day.** Shown the summary and the before-and-after pictures, the user said: "Approve phase B, go
+  on to phase C". It stands as built, F9's recommended answer with it (what is drawn in code stays
+  drawn); the user said nothing separately of it. What was built, the gaps and what fits badly
+  are in section 12.
+- **Phase C (crops, items, UI): begun on that word, 2026-11-26,** in a session of its own.
+- Phases D and E: not begun.
 
 **The plan as it was written follows** (sections 0 to 10). When it was written nothing had been
 downloaded and nothing in the game had changed.
@@ -628,7 +634,7 @@ phase B. (The pack's place in git is settled: committed without its audio.)
 
 ## 12. Phase B as built (2026-11-26): buildings, interiors, props
 
-**Waits for the user's review.** Built in a session of its own on the user's word of 2026-11-25.
+**Approved on 2026-11-26** ("Approve phase B, go on to phase C"). Built in a session of its own on the user's word of 2026-11-25.
 **F9 (what is drawn in code): taken as recommended; the user has not spoken to it; open at the
 phase B review.** Chests, dungeon doors, signposts, pickups, pressure plates and push blocks are
 drawn as before and are a gap. No colour in code was changed: no seam needed it.
