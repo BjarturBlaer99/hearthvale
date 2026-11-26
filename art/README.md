@@ -102,7 +102,9 @@ are pictures since 2026-11-25 (`ground_edges.png`): repaint the grass and repain
 pieces in the same colours (`tests/art/ground_edges_sheet_test.gd` checks them).
 
 **Art from a pack** (`docs/progress/farm-look-plan.md`): the ground, the trees, the ground details
-and the ground's edges are Ninja Adventure's (CC0), fitted by cutting, moving, mirroring and
+and the ground's edges (phase A), and the buildings, interiors and props (phase B: the atlas's
+house, furniture and prop rows, `relief.png`, `placed`, `crafted`, `rocks`, `breakables`, `forage`
+and `torch`, but the sprinkler and the hand) are Ninja Adventure's (CC0), fitted by cutting, moving, mirroring and
 recolouring. Their colours are the pack's own, not `hearthvale.gpl`'s older ones (the master palette
 lists both while the switch is under way), their outlines are the pack's near black, and the grass
 and the marsh are flat colour. Keep a new piece to one style: the pack's, where the pack has it.

@@ -3845,3 +3845,29 @@ and the before-and-after pictures, the user approved phase A on 2026-11-25 ("App
 to phase B"). It stands as built, F6 (the details repainted from the pack) and F7 (the pack's edges
 as pictures) with it; the user said nothing separately of them, nor of the marsh's green ground.
 Phase B (buildings, interiors, props) begins on that word, in a session of its own.
+
+## Farm look, phase B: buildings, interiors and props (2026-11-26)
+
+The farm-look plan's phase B (`docs/progress/farm-look-plan.md`, section 12), on the user's word
+"Approve phase A, go on to phase B". Art only: no map re-baked, no data, story or collision
+changed, every tile and frame in its old place and size.
+
+- **What changed:** eight PNGs, fitted from Ninja Adventure (CC0) by one script that cuts, moves,
+  mirrors and recolours (kept with the session's notes, not in the repo): the houses, roofs,
+  walls, the chapel, chimneys and signs, floors, furniture, decorations, props, the marsh's and
+  the quarry's pieces and the farm's buildings in `world/tiles/greybox_tiles.png`; the wall
+  faces, tops, pillar and ridges in `world/tiles/relief.png`; and `placed.png`, `crafted.png`,
+  `rocks.png`, `breakables.png`, `forage.png` and `torch.png`, each with its flash row. The
+  palettes were made again; `docs/ASSETS.md` and `docs/DECISIONS.md` say what came from where.
+- **F9 taken as recommended** (the user has not spoken to it; open at the review): chests,
+  dungeon doors, signposts, pickups, plates and push blocks stay drawn in code.
+- **Gaps:** those six, the sprinkler and the build bar's hand (today's art), a loom (a table
+  stands in), a half-timbered house, a slate and a green roof (recoloured), cattails and reeds.
+- **What fits badly:** the village is the pack's Japanese house parts in Hearthvale's shapes;
+  long roofs are flat across their middle; the quarry's walls are peach from above; the fence is
+  lighter; many props are smaller; the silo reads as a big stump.
+- **Tests:** none changed. One failed first (two roofs' gable ridges too empty; the roof is now
+  cut from its first painted row).
+
+**Verified:** the whole suite, 1259 cases, exit 0. Seen in 50 capture shots before and after;
+not played by hand. Waits for the user's review; phase C is not begun.

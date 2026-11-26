@@ -31,9 +31,9 @@ the pack in git, the same day: "Yes, without audio".
   pictures, the user said: "Approve phase A, go on to phase B". It stands as built, and F6 and F7
   with it; the user said nothing separately of them, nor of the marsh's green ground. What was
   built, what the pack did not cover and what fits badly are in section 11.
-- **Phase B (buildings, interiors, props): begun on that word, 2026-11-25,** in a session of its
-  own. F9 (what is drawn in code) has not been answered: phase B takes its recommended answer,
-  leaves those things as drawn and lists them as a gap, open at the phase B review.
+- **Phase B (buildings, interiors, props): built on 2026-11-26 and waits for the user's review.**
+  F9 (what is drawn in code): taken as recommended; the user has not spoken to it; open at the
+  phase B review. What was built, the gaps and what fits badly are in section 12.
 - Phases C to E: not begun.
 
 **The plan as it was written follows** (sections 0 to 10). When it was written nothing had been
@@ -625,3 +625,79 @@ checked against the tiles in place of the fringe's (`pixel_grade_test`).
 **For the review:** the two answers taken as recommended (F6, F7); whether the marsh keeps its
 green ground; and whether the ground and the trees sit well enough in this game to go on to
 phase B. (The pack's place in git is settled: committed without its audio.)
+
+## 12. Phase B as built (2026-11-26): buildings, interiors, props
+
+**Waits for the user's review.** Built in a session of its own on the user's word of 2026-11-25.
+**F9 (what is drawn in code): taken as recommended; the user has not spoken to it; open at the
+phase B review.** Chests, dungeon doors, signposts, pickups, pressure plates and push blocks are
+drawn as before and are a gap. No colour in code was changed: no seam needed it.
+
+**Art only.** No map was re-baked (`build_maps.gd` and `build_tileset.gd` were not run), no data,
+story or collision changed, and every tile and frame is in its old place, at its old size. Eight
+PNGs changed: `world/tiles/greybox_tiles.png` (phase B's rows), `world/tiles/relief.png`, and
+`placed.png`, `crafted.png`, `rocks.png`, `breakables.png`, `forage.png` and `torch.png` in
+`gameplay/art/`, each with its flash row made from the new frames' shape. One script did it all,
+cutting, moving, mirroring and recolouring the pack's own pixels; it is kept with the session's
+notes (`farm-look-phase-b/scripts/fit_phase_b.gd`), not in the project: the PNGs are the source.
+
+**How each part was fitted:**
+
+| Part | From the pack | How |
+|---|---|---|
+| Roofs: clay, thatch (rows 3, 7, 16 to 18) | the red-tiled house's roof; the thatched house's roof | each roof cut into a left gable, a middle and a right gable; the pack's 32 rows made 40 by laying plain rows twice (the clay's tiles repeat every eight rows, so its join is seamless). The first eight rows are the ridge strip (`relief.png`), the next sixteen the top row, the last sixteen the eave and the plain middle |
+| Slate roof (`roof_blue`) | the clay roof | recoloured to the pack's teals |
+| The coop's shingles, the big barn's green boards (rows 30 to 32) | the plank house's board roof | cut the same way; the green is the pack's dark greens |
+| Ground-floor wall, window, door (rows 3, 4, 7) | the stone house's wall, the pack's lattice window, its arched wooden door | a plain stretch of the wall; the lattice laid on it; the door laid on it |
+| Upper floor (row 18) | the thatched house's framed paper panels | the panel, and the panel with the lattice in it |
+| The chapel (row 19) | the same wall | in the pack's grey stone; a lancet of two slits of the lattice; the pack's plank door and its mirror for a pair of leaves |
+| Chimney, cross, shop sign, smoke (rows 20, 21) | the stone column's lip and shaft, the grave cross halved, the fruit shop's sign, two small puffs | the smoke one picture in all four frames: still |
+| Wall faces and tops, pillar (`relief.png`) | the interior walls (`TilesetWallSimple`): plum stone (dungeons), timber (houses), moss green (the ruin); the stone column | the face's rows laid again to make 24 and 16; the top flat in the wall's darkest tone; the column's shaft shortened to 28 rows. The wall tiles under the relief are the top's colour |
+| Floors and ways in (row 4) | dock planks (`TilesetWater`), a patterned floor (the rug), a woven mat, the stairs down, the pack's pit | the doormat on the planks; the pits made opaque |
+| Furniture (rows 5, 15, 33) | its table, bed, shelf, barrel, clay oven (the hearth, with its own fire), chair, chest of drawers, a red table (the loom: a gap), plant, candles, counter, stool, bookcase, a crate of tools, a sack | each on the plank floor |
+| Decorations (row 6) | its little red flowers (and the same in yellow and in blue), a grass tuft, pebbles, orange pebbles (mushrooms), leaves, the lily pad (its water cut out) | |
+| Props (rows 3, 9, 13, 14) | its round bush (the old "tree" marker), grey rock, rail fence, the camp's stone ring with water in it (the well), crate, barrel (keg), hay bale, log pile, stump, lantern on a post (lamp), grave stone (standing stone), bucket, the stall's awning over its counter, washing on a line, the line's post | |
+| The marsh (rows 23, 24) | dock planks (boardwalks, turned for the other way), tall grass (reeds), the mossy ruin's wall and roof, leaves (cattails), a leaf sprig (moss), a plank, a mossy stone, the lantern on its post (dark and burning), a hole | |
+| The quarry (rows 25, 26) | the brown cliff's top and face, its cave mouth and ladder, its wooden ladder turned (rails), pebbles (rubble), a blue crystal plant (the vein), a standing plank (timber prop) | |
+| The farm's buildings (rows 28, 29) | earth with its log pile (the site); the plank house's boards in red (the barn's wall), with the lattice (loft) and the plank door; the round vat (the silo) | |
+| `placed.png` | its dirt, flagstones, planks (paths and floors), rail fence, round bush (hedge), a bench top, the lantern on its post (the lamp post, dark and burning), flowers (beds), sprouts and bushes (saplings; the cherry's in its blossom pinks); the hand as it was | the fence and gate cut into the unit, a rail and lengths of post, so `PlacedArt` joins them as before |
+| `crafted.png` | a desk (workbench), the clay oven cold and burning (furnace), its small chest, its oil lamp, a mattress (the rug's two halves), a quilt (blanket); the sprinkler as it was | |
+| `rocks.png` | its grey rock; its ore rock with the spots in each ore's colour (copper, coal, iron, gold, crystal); its ladder over its pit; its barred hatch (the lift); its large rocks (boulder) and a mossy stone (great boulder) | |
+| `breakables.png` | grass, short grass (cut), its pot, branch, stump, leafy weeds, round bush, log | |
+| `forage.png` | red flowers on leaves (berries; the marsh's in blue), leaves (picked), its tan mushroom (grey for the bog's), pebbles (picked), a white flower and its petals, tall leaves (cattails), a tuft (picked) | |
+| `torch.png` | the dungeon's stone lamp, dark and lit, with two frames of the pack's fire particle over it | |
+
+**Lit windows (point 4):** the lattice lies where `WindowGlow.GLASS` and `BUILDING_GLASS` light
+it, so neither rectangle moved.
+
+**Gaps: kept as they were, or with no fitting piece in the pack.**
+
+1. **What is drawn in code** (F9): chests, dungeon doors, signposts, pickups, pressure plates,
+   push blocks, a site's string and pegs.
+2. **The sprinkler** (crafted) and **the hand** (placed): the pack has neither; today's art.
+3. **A loom:** the pack has none; its red table stands in.
+4. **A half-timbered house:** the pack has none. The houses are the pack's Japanese house parts
+   (clay, thatch and board roofs, paper panels, a lattice window) in Hearthvale's shapes.
+5. **A slate roof and a green-board roof:** the pack's clay and board roofs recoloured in its own
+   teals and greens.
+6. **Cattails and reeds** in the marsh: the pack has none by name; leaves and tall grass stand in.
+
+**What fits badly, said plainly.**
+
+- **The village is a Japanese village now, by its parts.** The roofs are the pack's rounded
+  thatch and red clay tiles, the walls stone below and paper panels above. Built in this game's
+  shapes (six cells wide, a gable at each end, a window every third cell) they read as long low
+  houses of another country, not the half-timbered cottages of before. That is the pack.
+- **Long roofs are flat.** The pack shades a roof only near its edges, so a six-cell roof is one
+  orange or one teal across its middle.
+- **The quarry's walls are a bright peach from above** (the top of the pack's brown cliff),
+  where they were dark stone.
+- **The fence is a short rail between posts;** where `PlacedArt` joins two, the rails meet in the
+  middle of a cell, and a long fence is lighter than before.
+- **Many props are a little smaller,** as the pack draws them inside a cell's middle.
+- **The barn's wall and the silo** are the pack's boards in red and its round vat: they read as
+  a barn and a silo only by their place on the farm.
+
+**Tests:** none needed changing. The first run failed one: the clay and slate roofs' gable-end
+ridge strips were under half painted (`buildings_test`), as the pack's clay roof has two empty rows
+on top; the roof is now cut from its first painted row. Then the whole suite, 1259 cases, exit 0.

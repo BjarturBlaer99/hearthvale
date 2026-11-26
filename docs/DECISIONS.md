@@ -1837,3 +1837,21 @@ PNG". What building it decided:
     is committed without its `Audio` folder (2,046 files, 9.9 MB), which `.gitignore` leaves out;
     `art/packs/** -text` in `.gitattributes` keeps git from converting line endings in a pack,
     so what is committed is byte for byte what was downloaded.
+- 2026-11-26 — **The farm look, phase B: buildings, interiors and props from Ninja Adventure**
+  (`docs/progress/farm-look-plan.md`, section 12). **F9 taken as recommended, the user not having
+  spoken to it, and open at the phase B review:** what is drawn in code (chests, dungeon doors,
+  signposts, pickups, plates, push blocks) stays as drawn and is listed as a gap; no colour in
+  code was changed, as no seam needed it. **Chosen while building it, each the simplest that
+  keeps to "art only":**
+  - Houses stay built from repeating tiles. Each of the pack's roofs is cut into a left gable, a
+    middle and a right gable, its 32 rows made 40 by laying plain rows twice: the first eight are
+    the ridge strip, the rest the top row, the eave and the middle. No map or building's data
+    names a whole picture.
+  - The slate roof and the big barn's green boards are the pack's clay and board roofs in its own
+    teals and greens: the pack has neither.
+  - The wall reliefs come from the pack's interior walls: plum stone for the dungeons, timber for
+    the houses' rooms, moss green for the ruin. Their faces are the pack's rows laid again to the
+    relief's 24 and 16; their tops one flat tone, as the pack draws them.
+  - The lattice window lies where `WindowGlow`'s rectangles light it: neither moved.
+  - The ore rocks are one pack rock with its spots recoloured for each ore.
+  - The sprinkler and the build bar's hand have nothing in the pack and stay as they were.
