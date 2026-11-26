@@ -39,9 +39,7 @@ target_entry = &"elder_door"
 [node name="Bram" type="Node2D" parent="Interactables" unique_id=982404309]
 position = Vector2(80, 48)
 script = ExtResource("7_villager")
-robe_color = Color(0.36, 0.42, 0.55, 1)
-hair_color = Color(0.9, 0.9, 0.88, 1)
-beard = true
+figure = &"bram"
 dialogue_id = &"elder_bram"
 
 [node name="Entries" type="Node2D" parent="." unique_id=2487782]

@@ -2,7 +2,7 @@ extends GdUnitTestSuite
 ## The art is PNG (2026-11-19, docs/progress/png-art-plan.md): every picture the game shows is
 ## checked against art/sheets.json, so a wrong export fails here and not in the game. Its size and
 ## frames; the names the game's scripts give the frames; the white flash rows; the hero's and the
-## villagers' feet; the villagers' marker colours; the trees in their cells; no half-clear pixels in
+## villagers' feet; the villagers' eight figures; the trees in their cells; no half-clear pixels in
 ## the sprites; and lossless import with no mipmaps.
 
 const ArtSheets: GDScript = preload("res://tests/support/art_sheets.gd")
@@ -131,26 +131,25 @@ func test_the_hero_and_the_villagers_stand_on_their_frames_last_row() -> void:
 				assert_int(soles).override_failure_message("%s stands on the frame's last row" % name).is_greater(0)
 
 
-func test_villagers_are_painted_in_the_marker_colours_and_nothing_near_them() -> void:
+func test_villagers_are_eight_short_figures_each_their_own() -> void:
+	# The farm-look plan, phase D (F3 and F5): the art pack's short people, one figure for each
+	# villager (resting, breathing, blinking), painted in the frame's lower half only.
 	var entry: Dictionary = ArtSheets.sheet("villager")
 	var image: Image = ArtSheets.image(entry)
-	var markers: Array[Color] = [Villager.ROBE_MARK, Villager.ROBE_SHADE_MARK, Villager.HAIR_MARK, Villager.HAIR_SHADE_MARK]
-	for hex: String in (entry["markers"] as Dictionary).values():
-		assert_bool(markers.any(func(m: Color) -> bool: return SpriteSheet._close(Color(hex), m))).override_failure_message("%s is one of Villager's marks" % hex).is_true()
-	var found: Array[int] = [0, 0, 0, 0]
-	for y: int in image.get_height() / 2:
-		for x: int in image.get_width():
-			var pixel: Color = image.get_pixel(x, y)
-			if pixel.a == 0.0:
-				continue
-			for i: int in markers.size():
-				if SpriteSheet._close(pixel, markers[i]):
-					found[i] += 1
-				else:
-					var near: bool = absf(pixel.r - markers[i].r) < 0.05 and absf(pixel.g - markers[i].g) < 0.05 and absf(pixel.b - markers[i].b) < 0.05
-					assert_bool(near).override_failure_message("(%d, %d) is near a marker but not it" % [x, y]).is_false()
-	for i: int in found.size():
-		assert_int(found[i]).override_failure_message("marker %d is used" % i).is_greater(0)
+	var frame: Vector2i = Vector2i(entry["frame"][0], entry["frame"][1])
+	assert_int((entry["frames"] as Array).size()).is_equal(Villager.FIGURES.size() * 3)
+	var faces: Dictionary = {}
+	for index: int in (entry["frames"] as Array).size():
+		var picture: Image = image.get_region(Rect2i(index * frame.x, 0, frame.x, frame.y))
+		var used: Rect2i = picture.get_used_rect()
+		var name: String = entry["frames"][index]
+		assert_int(used.position.y).override_failure_message("%s is short: nothing above the frame's middle" % name).is_greater_equal(frame.y / 2)
+		if index % 3 == 0:
+			faces[picture.get_data()] = name
+		else:
+			var rest: Image = image.get_region(Rect2i((index - index % 3) * frame.x, 0, frame.x, frame.y))
+			assert_bool(picture.get_data() == rest.get_data()).override_failure_message("%s differs from its resting frame" % name).is_false()
+	assert_int(faces.size()).override_failure_message("eight faces, no two alike").is_equal(Villager.FIGURES.size())
 
 
 func test_each_tree_stands_in_its_cell_with_clear_padding_round_it() -> void:

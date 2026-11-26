@@ -1,29 +1,7 @@
 extends GdUnitTestSuite
-## Pixel art (H11): villagers are recoloured per look; dungeon ledges are flagstones you can stand
-## on; water is animated; items take their pictures. (Each sheet's size, frames and flash row are
+## Pixel art (H11): dungeon ledges are flagstones you can stand on (villagers were recoloured per
+## look until the farm-look plan's phase D: tests/world/characters_test.gd has their figures); water is animated; items take their pictures. (Each sheet's size, frames and flash row are
 ## tests/art/art_sheets_test.gd's, since the art became PNG.)
-
-
-func test_villagers_wear_their_own_colours() -> void:
-	var robe: Color = Color(0.20, 0.60, 0.30)
-	var hair: Color = Color(0.90, 0.85, 0.10)
-	var texture: Texture2D = SpriteSheet.recoloured(Villager.SHEET, {
-		Villager.ROBE_MARK: robe, Villager.ROBE_SHADE_MARK: robe.darkened(0.3),
-		Villager.HAIR_MARK: hair, Villager.HAIR_SHADE_MARK: hair.darkened(0.3),
-	}, "test:villager")
-	var image: Image = texture.get_image()
-	var robed: int = 0
-	for y: int in image.get_height():
-		for x: int in image.get_width():
-			var pixel: Color = image.get_pixel(x, y)
-			if pixel.a == 0.0:
-				continue
-			for marker: Color in [Villager.ROBE_MARK, Villager.ROBE_SHADE_MARK, Villager.HAIR_MARK, Villager.HAIR_SHADE_MARK]:
-				assert_bool(SpriteSheet._close(pixel, marker)).override_failure_message("a marker colour left at (%d, %d)" % [x, y]).is_false()
-			if SpriteSheet._close(pixel, robe):
-				robed += 1
-	assert_int(robed).override_failure_message("the robe took its colour").is_greater(20)
-	assert_object(SpriteSheet.recoloured(Villager.SHEET, {}, "test:villager")).override_failure_message("made once per look").is_same(texture)
 
 
 func test_dungeon_ledges_are_flagstones_you_can_stand_on_and_water_is_animated() -> void:

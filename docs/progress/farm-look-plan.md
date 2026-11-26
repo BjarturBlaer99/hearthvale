@@ -18,7 +18,8 @@ props, C crops, items and UI, D villagers, animals and monsters, E the hero), st
 - **F6 and F7: taken as recommended; the user has not spoken to them; open at the phase A
   review.** F6: the ground-detail rule is kept and its sheet painted again from the pack. F7: the
   pack's own edges are drawn where the code drew its fringe, banks and cliff faces.
-- **F3, F4, F5, F8 and F9 are open:** they belong to later phases. (F8 decided 2026-11-26, F9 taken: see below.)
+- **F3, F4, F5, F8 and F9 are open:** they belong to later phases. (F8 decided 2026-11-26, F9 taken,
+  F3, F4 and F5 decided 2026-11-26: see below.)
 
 **2026-11-25, shown phase A's summary and pictures: "Approve phase A, go on to phase B".** And of
 the pack in git, the same day: "Yes, without audio".
@@ -28,6 +29,11 @@ is drawn in code stays drawn) stands as taken.
 
 **2026-11-26, shown phase C's summary and pictures: "Approve phase C, go on to phase D".** F8
 was decided during the phase (dark wood, light text).
+
+**2026-11-26, during phase D, shown pictures of each choice:** **F3 "Short, the pack's"** (the
+villagers become the pack's one-cell people, and the hero too in phase E), **F5 "Eight faces"**
+(each villager a pack figure of their own), **F4 "Replace both"** (the pack's slime and bat in
+place of the user's PixelLab ones).
 
 **How far it has come:**
 
@@ -48,8 +54,10 @@ was decided during the phase (dark wood, light text).
   seven screens in each look side by side: **"Dark wood, light text"** (the pack's frame round
   today's dark inside and light writing). What was built, the gaps and what fits badly are in
   section 13.
-- **Phase D (villagers, animals, monsters): begun on that word, 2026-11-26,** in a session of
-  its own. F3, F4 and F5 belong to it.
+- **Phase D (villagers, animals, monsters): built on 2026-11-26 and waits for the user's
+  review.** Begun on phase C's word, in a session of its own. **F3, F4 and F5 were decided by
+  the user during the phase** (above). What was built, the gaps and what fits badly are in
+  section 14.
 - Phase E: not begun.
 
 **The plan as it was written follows** (sections 0 to 10). When it was written nothing had been
@@ -792,3 +800,85 @@ pie `Object/CrateEmpty` (the second with a white top); jam `Potion/WaterPot` in 
 `UiParts` says, clear of the dial, its edges whole and outlined on the outside, the dial in
 place; the soil darker as it is worked. `tests/ui/polish_test.gd`: a box too small for a frame
 is now one smaller than two corners (6 by 6; the frame's corners are 5). Every other test stood.
+
+## 14. Phase D as built (2026-11-26): villagers, animals, monsters
+
+Built in a session of its own on the user's word of 2026-11-26 ("Approve phase C, go on to phase
+D"). **F3, F4 and F5, decided by the user** from pictures of each choice (a row of today's
+villagers beside the tall hero, the pack's one figure recoloured for each, and eight pack faces;
+the user's slime and bat over the pack's): **"Short, the pack's"**, **"Eight faces"** and
+**"Replace both"**.
+
+**Art, and one small drawing change.** Seven PNGs of `gameplay/art/` changed, each with its flash
+row made from the new frames' shape: `villager.png`, `slime.png`, `bat.png`, `wisp.png`,
+`goblin.png`, `critters.png` and `animals.png`. Every monster and animal keeps its frame size, its
+frames in their order and its pivot. `villager.png` is the one whose layout changed (F5): 24
+frames where it had 6, so `art/sheets.json` lists them and `Villager.FRAMES` names them. One
+script did the pictures, cutting, moving, mirroring and recolouring the pack's own pixels; it is
+kept with the session's notes (`farm-look-phase-d/scripts/fit_phase_d.gd`), not in the project.
+No map, data, story, timing, hit or collision changed. `warden.png` and `shade.png` are
+untouched (gaps, below).
+
+**In code:** `Villager` draws the figure its scene names (`figure`; `FIGURES`), and its robe and
+hair colours are gone, with `SpriteSheet.recoloured()`, the marker palette
+(`art/palettes/villager_markers.gpl`) and the markers' test. The eight scenes name their
+villager's figure in place of the colours. `Enemy.WISP_COLOR`, a Bogwisp's light, is the pale
+blue of its new picture (`b8dce5`, was teal): the one colour in code that changed with the art.
+
+**How each part was fitted:**
+
+| Part | From the pack | How |
+|---|---|---|
+| Villagers (F3, F5) | eight of its people facing front (`Actor/Character/<name>/SeparateAnim/Idle.png`): Master for Bram, Woman for Tilda, Princess for Wenna, Villager4 for Pip, Monk for Rolf, Villager3 for Oda, EggGirl for Edda, OldMan3 for Henrik | each 16x16 figure at the foot of the 16x32 frame, feet on its last row, as drawn; breathing: the rows above the head's first pair of like rows moved down one (the head a row lower); blinking: each small patch of ink between light pixels in the face shut to its lowest row, or to skin |
+| Slime (F4) | its green slime (`Monster/Slime2`), facing front | rest, wide, hop: its middle, flattest and tallest frames, its shadow drawn on the ground taken off, standing on row 15 |
+| Bat (F4) | its blue bat (`Monster/BlueBat`), facing front | rest: its wings half down; up and down: its two beats; as drawn (16 wide, 14 to 15 tall: today's was 8 to 13 tall) |
+| Bogwisp | its spirit (`Monster/Spirit`), facing front | two frames, its shadow line taken off (the game draws a shadow when it has a body); the flare: the same with its blue rim white and its white pale blue |
+| Goblin archer | its green goblin-like character (`Character/GreenPig`) | front, back, side (facing left) from its idle; front_draw and side_draw from its attack, with the pack's bow (`Items/Weapons/Bow/Sprite.png`) laid across before it, or turned upright at its front; on the last row of the 16x24 frame (16 tall, today's 18) |
+| Hens | its white hen (`Animal/Chicken/SpriteSheetWhite.png`) | turned to face left; chicken its first frame, chicken_walk and chicken_peck its second (its head bobs down), chicken_blink the first with its eye shut |
+| Cows | its cow from the side (`Animal/Cow/SpriteSheetWhiteSide.png`) | turned to face left, standing on row 19 of 24x20; cow_walk its second frame; cow_graze its head (columns 16 to 23) lifted out and laid three rows lower; cow_blink its eyes shut |
+
+**Gaps: kept as they were, or with no fitting piece in the pack.**
+
+1. **The sheep:** the pack's animals have no sheep. Today's sheep stands beside the pack's cow.
+2. **The butterflies:** the pack's two butterflies are monsters, 16 wide and as big as a slime,
+   with faces; as critters they would read as something to fight. Today's small ones stay.
+3. **The Iron Warden:** the pack has no knight at a boss's size. Its nearest, the Giant Blue
+   Samurai, is 70 wide with its blades and some 40 without, in a 96x48 frame; the Warden's frame
+   is 32x40 and where it can be hit is a circle of 13. Today's Warden stays.
+4. **The Crypt Shade:** the pack's Giant Spirit (a white flame with a smiling face, 38 to 40 wide
+   and 40 to 45 tall) is some 8 pixels wider and taller than the Shade and where it can be hit
+   (point 9: a monster within a pixel or two of today's size). Today's Shade stays. Recoloured in
+   the pack's purples it reads pink, not violet: the pack has no violet.
+5. **No bow in the goblin's hands** but while it draws: the pack's character holds nothing. Its
+   bow is laid before it in the two drawing frames only.
+6. **A hen's peck** is its walk's head-bob: the pack draws two frames.
+
+**What fits badly, said plainly.**
+
+- **The villagers are half the hero's height** until phase E, and big-headed: a short person of
+  the pack beside today's tall hero. They stand where they stood and fill the cell they filled;
+  the hero no longer hides behind them.
+- **Some villagers are the pack's Japanese villagers:** Henrik wears a straw hat, Rolf a monk's
+  topknot, Wenna a red hair-bow, Bram a master's white brows. They were picked as the nearest in
+  age, hair and trade among the pack's ninety people.
+- **The bat is bigger** (16 by 15 where today's was 16 by 8 at rest) and blue, not purple.
+- **The Bogwisp is a white ghost with eyes,** where it was a teal flame; its light is pale blue.
+- **The goblin is a round green creature,** 2 pixels shorter, with a bow only while it draws.
+- **The hen is bigger** (16 by 16, where today's was 12 by 11) and stands a pixel lower.
+- **The cow grazes with its head before its front legs:** the head moved down as a block.
+- **The sheep and the butterflies are today's,** shaded softly beside the pack's flat colours.
+
+**Tests:** `tests/art/art_sheets_test.gd`: the markers' test is now "eight short figures, each
+their own" (24 frames, nothing above a frame's middle, eight resting faces unlike each other,
+breathing and blinking frames unlike resting). `tests/world/characters_test.gd`: a short person's
+head is halfway up the frame (it was at the hero's height); new, every villager in the six areas
+names a figure of the sheet, no two the same, and a villager with an unknown figure shows the
+first. `tests/gameplay/sprites_test.gd` loses its recolouring test with `SpriteSheet.recoloured()`.
+
+**Verified:** the whole suite, 1262 cases, exit 0. Seen in 37 capture shots before and after
+(villagers talking, the village with its people, the animals in their pastures and rooms, hens,
+slimes, bats, Bogwisps at night, the goblin, the Warden and the Shade); not played by hand.
+
+**For the review:** whether the villagers' faces suit who they are (any of the eight can be
+another of the pack's ninety people: a name in the script); the gaps (sheep, butterflies, the two
+bosses kept as today's); and whether to go on to phase E, the hero, who will be short too (F3).

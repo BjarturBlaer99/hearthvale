@@ -858,9 +858,11 @@ run headless; see CLAUDE.md for the command and gotchas.
   - Scripts name frames in dictionaries (`Enemy.SLIME_FRAMES`, `Boss.FRAMES`, `ItemIcons.FRAMES`...), and a test
     checks they match the tool's order.
   - Shadows, glows, sparks, poofs, arrows and the sword's swing stay drawn in code: they're effects, not shapes.
-- **Villagers** are painted in marker colours (magenta robe, cyan hair). `SpriteSheet.recoloured()` swaps them for
-  each villager's `robe_color` and `hair_color`, once per look.
-  - **As tall as the hero** (P1e): 16x32, feet mid-cell where they were. A villager still fills only its own cell.
+- **Villagers** are each a figure of their own (farm-look plan, phase D, 2026-11-26): the art pack's short people,
+  eight on one sheet, each resting, breathing and blinking. A villager names theirs in their scene (`figure`, one
+  of `Villager.FIGURES`). Until then they were one figure in marker colours, recoloured for each.
+  - **A frame as tall as the hero's** (P1e): 16x32, the figure (16x16) at its foot, feet mid-cell where they were.
+    A villager still fills only its own cell.
   - **They breathe and blink** (`Idling`, `core/ambient/`, pure): out for `BREATH_OUT` of every `BREATH_EVERY`
     seconds, eyes shut for `BLINK_TIME` every `BLINK_EVERY`, never mid-breath. Each starts at a moment of their
     own (`phase_of(cell)`), so they don't move as one. A villager redraws only when its look changes.

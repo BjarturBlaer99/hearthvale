@@ -150,23 +150,19 @@ taken_flag = &"took_village_heart_piece"
 [node name="FarmerOda" type="Node2D" parent="Interactables" unique_id=1584778963]
 position = Vector2(240, 496)
 script = ExtResource("v12_villager")
-robe_color = Color(0.55, 0.42, 0.24, 1)
-hair_color = Color(0.52, 0.34, 0.18, 1)
+figure = &"oda"
 dialogue_id = &"farmer_oda"
 
 [node name="Pip" type="Node2D" parent="Interactables" unique_id=70427012]
 position = Vector2(432, 384)
 script = ExtResource("v12_villager")
-robe_color = Color(0.3, 0.56, 0.74, 1)
-hair_color = Color(0.92, 0.74, 0.36, 1)
+figure = &"pip"
 dialogue_id = &"pip"
 
 [node name="GuardRolf" type="Node2D" parent="Interactables" unique_id=2092860401]
 position = Vector2(560, 80)
 script = ExtResource("v12_villager")
-robe_color = Color(0.42, 0.44, 0.5, 1)
-hair_color = Color(0.2, 0.16, 0.12, 1)
-beard = true
+figure = &"rolf"
 dialogue_id = &"guard_rolf"
 
 [node name="CryptBars" type="Node2D" parent="Interactables" unique_id=1560067211]

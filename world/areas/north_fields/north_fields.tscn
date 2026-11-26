@@ -109,8 +109,7 @@ taken_flag = &"took_fields_heart_piece"
 [node name="ShepherdEdda" type="Node2D" parent="Interactables" unique_id=1188521260]
 position = Vector2(400, 336)
 script = ExtResource("v12_villager")
-robe_color = Color(0.68, 0.62, 0.48, 1)
-hair_color = Color(0.7, 0.7, 0.66, 1)
+figure = &"edda"
 dialogue_id = &"shepherd_edda"
 
 [node name="Shuttle" type="Node2D" parent="Interactables" unique_id=1642170952]

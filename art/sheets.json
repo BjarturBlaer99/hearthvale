@@ -73,17 +73,11 @@
 			"what": "villager",
 			"kind": "strip",
 			"frame": [16, 32],
-			"frames": ["plain", "bearded", "plain_breathe", "bearded_breathe", "plain_blink", "bearded_blink"],
+			"frames": ["bram", "bram_breathe", "bram_blink", "tilda", "tilda_breathe", "tilda_blink", "wenna", "wenna_breathe", "wenna_blink", "pip", "pip_breathe", "pip_blink", "rolf", "rolf_breathe", "rolf_blink", "oda", "oda_breathe", "oda_blink", "edda", "edda_breathe", "edda_blink", "henrik", "henrik_breathe", "henrik_blink"],
 			"flash_row": true,
 			"pivot": [8, 31],
-			"pivot_is": "feet on the last row, in their cell",
-			"names": "Villager.FRAMES",
-			"markers": {
-				"robe": "ff00ff",
-				"robe_shade": "800080",
-				"hair": "00ffff",
-				"hair_shade": "008080"
-			}
+			"pivot_is": "feet on the last row, in their cell; the art pack's short people, one figure of 16x16 for each of the eight villagers at the foot of the frame",
+			"names": "Villager.FRAMES"
 		},
 		{
 			"path": "res://gameplay/art/items.png",

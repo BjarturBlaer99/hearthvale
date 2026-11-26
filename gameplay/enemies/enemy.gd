@@ -20,9 +20,9 @@ const SHADOW: Color = Color(0, 0, 0, 0.3)
 ## How long a Bogwisp takes to rise out of the water as night falls, and to fade as it ends.
 const RISE_TIME: float = 0.8
 ## A Bogwisp's own light: how far it glows, its colour, and how see-through it is while it
-## has no body.
+## has no body. The colour matches its picture (the art pack's spirit, pale blue, `b8dce5`).
 const WISP_GLOW: float = 20.0
-const WISP_COLOR: Color = Color(0.62, 0.95, 0.86)
+const WISP_COLOR: Color = Color("b8dce5")
 const WISP_UNLIT: float = 0.62
 ## Where a Bogwisp hangs, above the spot on the ground it is over.
 const WISP_AT: Vector2 = Vector2(0, -10)

@@ -118,9 +118,7 @@ enemy_id = &"bogwisp"
 [node name="OldHenrik" type="Node2D" parent="Interactables" unique_id=731707926]
 position = Vector2(288, 208)
 script = ExtResource("10_villager")
-robe_color = Color(0.36, 0.44, 0.38, 1)
-hair_color = Color(0.78, 0.78, 0.74, 1)
-beard = true
+figure = &"henrik"
 dialogue_id = &"old_henrik"
 
 [node name="Entries" type="Node2D" parent="." unique_id=1936141583]

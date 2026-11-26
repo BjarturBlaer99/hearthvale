@@ -12,7 +12,6 @@ art/
   palettes/
     hearthvale.gpl    the master palette: the 256 colours the art uses most
     <sheet>.gpl       each sheet's own colours, exactly
-    villager_markers.gpl   the four colours villagers are painted in
   aseprite/           your .aseprite files, named after their PNG (player_sheet.aseprite)
   packs/<pack>/       an art pack, untouched, with its licence (docs/ASSETS.md says which, and on
                       what terms); never edit or run anything in it: cut from it with a script
@@ -50,7 +49,7 @@ art/
 |---|---|---|---|
 | Hero | `gameplay/player/player_sheet.png` | 400x96: 25 frames of 16x32 a row, rows facing down, up, left (right is the left row mirrored). Columns: idle, blink, walk 1 to 6, windup, slash, follow, hold (seen from the front in every row), fallen, breathe, hurt, run 1 to 6, raise, strike, pour, reach. No flash row. | his feet, (8, 32): soles on the last row, centred |
 | Tools in his hands | `gameplay/art/held_tools.png` | 2280x112: 57 frames of 40x56 + flash row, order in `sheets.json` | his feet at (20, 40); the fists where his work pose's hands are |
-| Villagers | `gameplay/art/villager.png` | 96x64: 6 frames of 16x32 (plain, bearded, their breathe, their blink) + flash row; robe and hair in the marker colours (below) | feet on the last row |
+| Villagers | `gameplay/art/villager.png` | 384x64: 24 frames of 16x32 + flash row: eight figures (Bram, Tilda, Wenna, Pip, Rolf, Oda, Edda, Henrik), each resting, breathing and blinking; each a short person (16x16) at the foot of the frame, in their own colours. A villager names theirs (`figure` in their scene) | feet on the last row |
 | Slime, wisp, bat | `slime.png`, `wisp.png`, `bat.png` | 16x16, 3 frames each + flash row | slime (8, 15); wisp (8, 18); bat (8, 8) |
 | Goblin | `goblin.png` | 16x24, 5 frames + flash row; side frames face left | (8, 23) |
 | The Warden, the Shade | `warden.png`, `shade.png` | 32x40, 4 and 3 frames + flash row | Warden (16, 39); Shade (16, 42) |
@@ -84,9 +83,10 @@ detail named in `"unmirrored"` is never drawn mirrored, the others are, half the
 the PNG, then import and run the art tests (`tests/art/ground_details_sheet_test.gd` checks size,
 colours, quietness and edges). To have fewer or more, change `"chance"` in the rules, not the sheet.
 
-**Villager markers** (`palettes/villager_markers.gpl`), recoloured for each villager by the game:
-robe `#FF00FF`, robe shade `#800080`, hair `#00FFFF`, hair shade `#008080`. Use them exactly, and no
-colour within two steps of them anywhere else on the sheet.
+**Villagers** were one figure in marker colours, recoloured for each by the game, until the
+farm-look plan's phase D (2026-11-26). Each is now a figure of their own (the user's choice, F5:
+"Eight faces"), drawn in its own colours; a new villager is three frames at the end of the sheet,
+a name in `Villager.FIGURES` and `FRAMES`, and `figure` in their scene.
 
 **Drawn in code, not in a PNG:** shadows and soft edges, sparks, bursts, the pour and the ring, the
 sword's blade, lights and darkness, the water's movement and reflections, mist, fireflies, chests,
@@ -95,8 +95,8 @@ window, a building site's string and pegs, and lit windows. Their colours are in
 
 **Colours in code that match the art:** the ground's colour at each height
 (`GreyboxTiles.GROUND_COLORS`: the grass tiles' own colours, which a test checks, and which tint
-the details on raised grass), the water's glints, foam and swell (`WaterSurface`) and the title's
-sky above the picture (`TitlePicture.SKY_TOP`). Repaint the grass, the water or the sky and change
+the details on raised grass), the water's glints, foam and swell (`WaterSurface`), a Bogwisp's light (`Enemy.WISP_COLOR`, the
+pale blue of its picture since phase D) and the title's sky above the picture (`TitlePicture.SKY_TOP`). Repaint the grass, the water or the sky and change
 these too, or a seam shows. The grass's fringe over a path, the water's bank and the cliff faces
 are pictures since 2026-11-25 (`ground_edges.png`): repaint the grass and repaint its fringe
 pieces in the same colours (`tests/art/ground_edges_sheet_test.gd` checks them).
@@ -105,7 +105,9 @@ pieces in the same colours (`tests/art/ground_edges_sheet_test.gd` checks them).
 and the ground's edges (phase A), the buildings, interiors and props (phase B: the atlas's
 house, furniture and prop rows, `relief.png`, `placed`, `crafted`, `rocks`, `breakables`, `forage`
 and `torch`, but the sprinkler and the hand), and the crops, soil, item icons and the boxes' frame
-(phase C: `crops`, `soil`, `items` but four icons, `ui_parts` but the dial) are Ninja Adventure's (CC0), fitted by cutting, moving, mirroring and
+(phase C: `crops`, `soil`, `items` but four icons, `ui_parts` but the dial), and the villagers,
+the slime, the bat, the Bogwisp, the goblin, the hens and the cow (phase D: `villager`, `slime`,
+`bat`, `wisp`, `goblin`, `critters` but the butterflies, `animals` but the sheep) are Ninja Adventure's (CC0), fitted by cutting, moving, mirroring and
 recolouring. Their colours are the pack's own, not `hearthvale.gpl`'s older ones (the master palette
 lists both while the switch is under way), their outlines are the pack's near black, and the grass
 and the marsh are flat colour. Keep a new piece to one style: the pack's, where the pack has it.

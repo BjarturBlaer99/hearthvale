@@ -2,32 +2,36 @@ class_name Villager
 extends Talkable
 ## A villager who stands in one spot and talks. Their name comes from their conversation (the
 ## start node's speaker, through the dialogue's "speakers" map). Pixel art
-## (gameplay/art/villager.png) in marker colours, swapped for this villager's robe and hair; feet
-## in the middle of the cell like the hero's, and as tall as he is, two cells (P1e). They
-## breathe and blink in their own time (Idling), for show only.
+## (gameplay/art/villager.png): each villager is a figure of their own from the art pack (the
+## farm-look plan, phase D: F5, "Eight faces"), named by `figure`. They are the pack's short
+## people (F3), standing at the foot of a frame as tall as the hero's, feet in the middle of the
+## cell as before. They breathe and blink in their own time (Idling), for show only.
 
 const SHEET: Texture2D = preload("res://gameplay/art/villager.png")
+## The figures, in the sheet's order: each has three frames, resting, breathing out and blinking.
+const FIGURES: Array[StringName] = [&"bram", &"tilda", &"wenna", &"pip", &"rolf", &"oda", &"edda", &"henrik"]
 ## Frames in the order the tool paints them (a test checks).
 const FRAMES: Dictionary = {
-	&"plain": 0, &"bearded": 1, &"plain_breathe": 2, &"bearded_breathe": 3, &"plain_blink": 4, &"bearded_blink": 5,
+	&"bram": 0, &"bram_breathe": 1, &"bram_blink": 2,
+	&"tilda": 3, &"tilda_breathe": 4, &"tilda_blink": 5,
+	&"wenna": 6, &"wenna_breathe": 7, &"wenna_blink": 8,
+	&"pip": 9, &"pip_breathe": 10, &"pip_blink": 11,
+	&"rolf": 12, &"rolf_breathe": 13, &"rolf_blink": 14,
+	&"oda": 15, &"oda_breathe": 16, &"oda_blink": 17,
+	&"edda": 18, &"edda_breathe": 19, &"edda_blink": 20,
+	&"henrik": 21, &"henrik_breathe": 22, &"henrik_blink": 23,
 }
 const SIZE: Vector2i = Vector2i(16, 32)
 ## What each look of Idling adds to the frame's name.
 const LOOKS: Dictionary = {Idling.Look.REST: "", Idling.Look.BREATHE: "_breathe", Idling.Look.BLINK: "_blink"}
-## The marker colours the sheet is painted in, swapped for each villager's own.
-const ROBE_MARK: Color = Color(1.0, 0.0, 1.0)
-const ROBE_SHADE_MARK: Color = Color(0.5, 0.0, 0.5)
-const HAIR_MARK: Color = Color(0.0, 1.0, 1.0)
-const HAIR_SHADE_MARK: Color = Color(0.0, 0.5, 0.5)
 ## How far the figure is drawn up from the bottom of its cell, so its feet are mid-cell (signs
 ## stand the same way).
 const LIFT: float = 5.0
 ## Where the feet are, down from the top of the cell.
 const FEET_Y: float = 14.0 - LIFT
 
-@export var robe_color: Color = Color(0.45, 0.35, 0.60)
-@export var hair_color: Color = Color(0.35, 0.22, 0.12)
-@export var beard: bool = false
+## Which figure of the sheet is theirs (one of FIGURES; any other name shows the first).
+@export var figure: StringName = &"pip"
 
 ## Whether they are here. A villager who stands outdoors goes home for the night (P2e): the area
 ## keeps their hours, and frees their cell while they are away.
@@ -49,9 +53,10 @@ func _process(delta: float) -> void:
 		queue_redraw()
 
 
-## The frame of the sheet showing now: this villager's picture, breathing out or blinking.
+## The frame of the sheet showing now: this villager's figure, resting, breathing out or blinking.
 func frame() -> StringName:
-	return StringName(("bearded" if beard else "plain") + str(LOOKS[_look]))
+	var own: StringName = figure if FIGURES.has(figure) else FIGURES[0]
+	return StringName(String(own) + str(LOOKS[_look]))
 
 
 ## Sends them home, or brings them back.
@@ -80,20 +85,4 @@ func prompt() -> String:
 
 func _draw() -> void:
 	SoftShadow.draw(self, Vector2(8, FEET_Y - 1.0), Vector2(6, 2.5), 1.1)
-	SpriteSheet.draw(self, _sheet(), FRAMES[frame()], SIZE, Vector2(0, FEET_Y - SIZE.y + 1))
-
-
-## The villager sheet in this villager's robe and hair (made once per look).
-func _sheet() -> Texture2D:
-	return SpriteSheet.recoloured(SHEET, {
-		ROBE_MARK: robe_color, ROBE_SHADE_MARK: robe_color.darkened(0.3),
-		HAIR_MARK: hair_color, HAIR_SHADE_MARK: hair_color.darkened(0.3),
-	}, "villager:%s:%s" % [robe_color.to_html(), hair_color.to_html()])
-
-
-func _ellipse(center: Vector2, radius: Vector2, color: Color) -> void:
-	var points: PackedVector2Array = []
-	for i: int in 16:
-		var angle: float = TAU * i / 16.0
-		points.append(center + Vector2(cos(angle) * radius.x, sin(angle) * radius.y))
-	draw_colored_polygon(points, color)
+	SpriteSheet.draw(self, SHEET, FRAMES[frame()], SIZE, Vector2(0, FEET_Y - SIZE.y + 1))

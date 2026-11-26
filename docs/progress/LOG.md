@@ -3908,3 +3908,31 @@ not played by hand. Waits for the user's review; phase D is not begun.
 before-and-after pictures, the user approved phase C on 2026-11-26 ("Approve phase C, go on to
 phase D"). It stands as built, with F8 as the user chose it (dark wood, light text). Phase D
 (villagers, animals, monsters) begins on that word, in a session of its own.
+
+## Farm look, phase D: villagers, animals and monsters (2026-11-26)
+
+The farm-look plan's phase D (`docs/progress/farm-look-plan.md`, section 14), on the user's word
+"Approve phase C, go on to phase D". No map, data, story, timing, hit or collision changed.
+
+- **Decided by the user** from pictures of each choice: F3 "Short, the pack's", F5 "Eight
+  faces", F4 "Replace both".
+- **What changed:** `villager.png` (eight pack figures, each resting, breathing and blinking: 24
+  frames of 16x32), `slime.png`, `bat.png`, `wisp.png`, `goblin.png`, `critters.png` (the hens)
+  and `animals.png` (the cow), each with its flash row, fitted from Ninja Adventure (CC0) by one
+  script that cuts, moves, mirrors and recolours (kept with the session's notes). `Villager`
+  draws the figure its scene names (`figure`) in place of recolouring one figure; its robe and
+  hair colours, `SpriteSheet.recoloured()` and the marker palette are gone. `Enemy.WISP_COLOR`
+  is the new Bogwisp's pale blue. The palettes were made again; `docs/ASSETS.md` and
+  `docs/DECISIONS.md` say what came from where.
+- **Gaps:** the sheep (the pack has none), the butterflies (the pack's are monsters as big as a
+  slime), the Iron Warden and the Crypt Shade (the pack's bosses are 8 to 40 pixels wider than
+  their frames and where they can be hit). All four are today's art.
+- **What fits badly:** the villagers are half the hero's height until phase E, and some wear the
+  pack's Japanese looks (a straw hat, a topknot); the bat and the hen are bigger than before; the
+  Bogwisp is a white ghost with eyes; the goblin holds its bow only while it draws.
+- **Tests:** the villagers' marker test became "eight short figures, each their own"; new, every
+  villager in the six areas names a figure of their own, and an unknown figure shows the first;
+  the recolouring test went with `SpriteSheet.recoloured()`.
+
+**Verified:** the whole suite, 1262 cases, exit 0. Seen in 37 capture shots before and after;
+not played by hand. Waits for the user's review; phase E (the hero) is not begun.

@@ -1880,3 +1880,28 @@ PNG". What building it decided:
     the pack's colours.
   - Kept as they were, the pack having nothing like them: the shuttle, the cattail root, the wisp
     ember and the sprinkler's icons, and the clock's dial.
+- 2026-11-26 — **The farm look, phase D: villagers, animals and monsters from Ninja Adventure**
+  (`docs/progress/farm-look-plan.md`, section 14). **Decided by the user**, shown the pictures of
+  each choice: **F3 "Short, the pack's"** (the villagers are the pack's one-cell people, and the
+  hero will be in phase E), **F5 "Eight faces"** (each villager a pack figure of their own, not
+  one figure recoloured), **F4 "Replace both"** (the PixelLab slime and bat give way to the
+  pack's). **Chosen while building it, each the simplest that keeps to "art only":**
+  - A villager names their figure (`Villager.figure`, set in their scene; `Villager.FIGURES`);
+    the robe and hair colours, the marker palette, the markers' test and
+    `SpriteSheet.recoloured()` are gone with the recolouring. The figure stands at the foot of
+    the 16x32 frame: the frame, the pivot, the feet and the cell they fill are as before.
+    Breathing is the head a row lower, blinking the eyes shut, both cut from the figure.
+  - Who is whom: Master (Bram), Woman (Tilda), Princess (Wenna), Villager4 (Pip), Monk (Rolf),
+    Villager3 (Oda), EggGirl (Edda), OldMan3 (Henrik), picked by eye for age, hair and trade.
+  - Monsters keep their frames, sizes and pivots, each within a pixel or two of today's: the
+    pack's green slime and blue bat, its spirit for the Bogwisp (the flare its rim burnt white),
+    its green goblin-like character for the archer with the pack's bow laid before it while it
+    draws. The pack's shadows drawn on the ground are taken off: the game draws its own.
+    `Enemy.WISP_COLOR` is the spirit's pale blue (`b8dce5`), was teal.
+  - The hen and the cow are the pack's, turned to face left. The pack draws two frames of each:
+    the hen walks and pecks with its second; the cow grazes with its head lifted out and laid
+    three rows lower, and both blink with their eyes shut.
+  - **Kept as they were, the pack having nothing that fits:** the sheep (none in the pack), the
+    butterflies (the pack's are monsters as big as a slime), and the Iron Warden and the Crypt
+    Shade (the pack's bosses are 40 to 70 pixels wide, their frames 32: the nearest, its Giant
+    Spirit, is a smiling flame some 8 pixels wider and taller than where the Shade can be hit).

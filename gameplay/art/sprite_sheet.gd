@@ -2,13 +2,9 @@ class_name SpriteSheet
 extends RefCounted
 ## Draws frames from the sprite strips of gameplay/art/ (docs/TECH_DESIGN.md §14). A strip holds
 ## its frames side by side, in the order art/sheets.json lists them, painted on the
-## top row and as white silhouettes on the bottom row (for hit flashes). It can also swap a
-## sheet's marker colours (a villager's robe and hair), caching each look.
-
-## How close a pixel must be to a marker colour to be swapped (PNG stores 8 bits a channel).
-const MARKER_TOLERANCE: float = 0.01
-
-static var _recoloured: Dictionary = {}
+## top row and as white silhouettes on the bottom row (for hit flashes). (Until the farm-look
+## plan's phase D it also swapped the villagers' marker colours; each villager is a figure of
+## their own now.)
 
 
 ## Draws frame `index` of `texture` (frames of `size` px) on `canvas`, its top-left at `origin`:
@@ -25,29 +21,3 @@ static func draw(canvas: CanvasItem, texture: Texture2D, index: int, size: Vecto
 ## mirrored creature stood a frame's width to the right of where it was).
 static func target_of(origin: Vector2, size: Vector2i, flip_h: bool) -> Rect2:
 	return Rect2(origin.round(), Vector2(-size.x if flip_h else size.x, size.y))
-
-
-## `texture` with each marker colour in `swaps` (marker -> colour) replaced, made once per `key`.
-static func recoloured(texture: Texture2D, swaps: Dictionary, key: String) -> Texture2D:
-	if _recoloured.has(key):
-		return _recoloured[key]
-	var image: Image = texture.get_image()
-	if image.is_compressed():
-		image.decompress()
-	for y: int in image.get_height():
-		for x: int in image.get_width():
-			var pixel: Color = image.get_pixel(x, y)
-			if pixel.a == 0.0:
-				continue
-			for marker: Color in swaps:
-				if _close(pixel, marker):
-					image.set_pixel(x, y, swaps[marker])
-					break
-	var out: ImageTexture = ImageTexture.create_from_image(image)
-	_recoloured[key] = out
-	return out
-
-
-static func _close(a: Color, b: Color) -> bool:
-	return absf(a.r - b.r) < MARKER_TOLERANCE and absf(a.g - b.g) < MARKER_TOLERANCE \
-		and absf(a.b - b.b) < MARKER_TOLERANCE
