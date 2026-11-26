@@ -3903,3 +3903,8 @@ The farm-look plan's phase C (`docs/progress/farm-look-plan.md`, section 13), on
 
 **Verified:** the whole suite, 1261 cases, exit 0. Seen in 36 capture shots before and after;
 not played by hand. Waits for the user's review; phase D is not begun.
+
+**Approved (farm look, phase C).** Shown the summary, the gaps, what fits badly and the
+before-and-after pictures, the user approved phase C on 2026-11-26 ("Approve phase C, go on to
+phase D"). It stands as built, with F8 as the user chose it (dark wood, light text). Phase D
+(villagers, animals, monsters) begins on that word, in a session of its own.

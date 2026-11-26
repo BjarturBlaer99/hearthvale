@@ -26,6 +26,9 @@ the pack in git, the same day: "Yes, without audio".
 **2026-11-26, shown phase B's summary and pictures: "Approve phase B, go on to phase C".** F9 (what
 is drawn in code stays drawn) stands as taken.
 
+**2026-11-26, shown phase C's summary and pictures: "Approve phase C, go on to phase D".** F8
+was decided during the phase (dark wood, light text).
+
 **How far it has come:**
 
 - **Step 1, this plan:** written and committed (`54e1fd7`).
@@ -39,12 +42,15 @@ is drawn in code stays drawn) stands as taken.
   on to phase C". It stands as built, F9's recommended answer with it (what is drawn in code stays
   drawn); the user said nothing separately of it. What was built, the gaps and what fits badly
   are in section 12.
-- **Phase C (crops, items, UI): built on 2026-11-26 and waiting for the user's review.** Begun
-  on that word, in a session of its own. **F8 was decided by the user during the phase,** shown
+- **Phase C (crops, items, UI): built on 2026-11-26 (`ef0504c`) and approved the same day.**
+  Shown the summary and the before-and-after pictures, the user said: "Approve phase C, go on to
+  phase D". Begun on phase B's word, in a session of its own. **F8 was decided by the user during the phase,** shown
   seven screens in each look side by side: **"Dark wood, light text"** (the pack's frame round
   today's dark inside and light writing). What was built, the gaps and what fits badly are in
   section 13.
-- Phases D and E: not begun.
+- **Phase D (villagers, animals, monsters): begun on that word, 2026-11-26,** in a session of
+  its own. F3, F4 and F5 belong to it.
+- Phase E: not begun.
 
 **The plan as it was written follows** (sections 0 to 10). When it was written nothing had been
 downloaded and nothing in the game had changed.
@@ -714,7 +720,7 @@ on top; the roof is now cut from its first painted row. Then the whole suite, 12
 
 ## 13. Phase C as built (2026-11-26): crops, soil, items, the UI
 
-**Waiting for the user's review.** Built in a session of its own on the user's word of
+**Approved on 2026-11-26** ("Approve phase C, go on to phase D"). Built in a session of its own on the user's word of
 2026-11-26 ("Approve phase B, go on to phase C"). **F8, decided by the user** from the same seven
 screens in each look side by side (a mock-up of parchment, made for the picture and taken out
 again): **"Dark wood, light text".** The boxes keep today's dark inside and light writing; the
