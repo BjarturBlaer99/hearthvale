@@ -95,8 +95,9 @@ sections 11 to 15. Seen in capture shots, not played by hand. Nothing further is
 **Icons, an axe and the item bar (the user's request, 2026-11-26; `docs/progress/icons-axe-bar-plan.md`,
 approved as recommended):** six steps, each stopped for review: I1 icons in the lists, I2 the Tab
 menu's "Pack", A1 the axe's pictures, A2 the axe in play (the sword stops cutting wood: D5 changed),
-B1 each item keeps its bar slot, B2 the screen to arrange the bar. **I1 is built (2026-11-26) and
-waits for the user's review.** Build nothing beyond the plan's list.
+B1 each item keeps its bar slot, B2 the screen to arrange the bar. **I1 is built and approved
+(2026-11-26, "Approve, go on"); I2 is built (2026-11-26) and waits for the user's review.** Build
+nothing beyond the plan's list.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -272,7 +273,7 @@ removes the shim, so recreate it after upgrading.
   the menu's list (`label.get_global_transform_with_canvas() * Vector2(4, line_height * (line + 0.5))`), and
   click with an `InputEventMouseButton` at such a point; a list inside a container needs a frame first
   (`await await_idle_frame()`). Put a thing in hand with `AreaController.choose_slot()` / `step_hand()` or
-  `GameState.equip()`, never through the Tab menu, which lists food. After the last bomb or seed
+  `GameState.equip()`, never through the Tab menu, where nothing goes in hand. After the last bomb or seed
   `GameState.equipped` is empty.
 - **News at the top of the screen joins, it doesn't replace** (`AreaHud.show_notice()`, `NoticeLines`): a
   quest's, a skill's, a friendship's and a recipe's news each take a line while earlier news is still up.
@@ -339,7 +340,10 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   the same. A test reads them with `shown_icons()`; one that counts the shop box's parts counts 8.
 - **What is in hand is chosen on the item bar** (the user's request, 2026-11-15), not in a menu: the wheel
   steps through it, the keys 1 to 9 choose a slot (`HandBar`, pure; `GameState.take_in_hand()`,
-  `step_hand()`; `ItemBar` draws it). The Tab menu lists food only. `GameState.equipped` is always something
+  `step_hand()`; `ItemBar` draws it). The Tab menu has two lists (A / D or a click on a name switch
+  them): Food, where a click eats, and Pack (`PackList`), everything he carries, to look at only:
+  nothing on it is eaten, dropped or put in hand. It opens on Food, or on Pack when he has no food,
+  so a test that opens it with no food sees Pack, not a refusal. `GameState.equipped` is always something
   he carries: the last bomb or seed empties the item button. Do not put food, or anything that isn't held in
   the hand, in the bar without asking. **What is set down in build mode is chosen on the build bar, never
   the item bar:** an item of type `placeable` is not in `Inventory.EQUIPPABLE_TYPES`. The build bar's first
@@ -654,7 +658,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     (`tests/world/story_days_test.gd`), not counted to 150 letters: a stage must end above the line of
     help and be no longer than 200.
   - **Since the farm look's phase E the hero is one cell tall** and no longer hides the cell north
-    of him in a capture shot. `tools/capture.gd`'s shots end at 209 (168 to 176 are phase 2's, 177 to 191 phase 3's, 192 to 203 phase 4's, 204 to 207 phase 5's, 208 the tool polish's, 209 the ground details'); its title shot reads (only reads) the player's slot 1 for its
+    of him in a capture shot. `tools/capture.gd`'s shots end at 213 (168 to 176 are phase 2's, 177 to 191 phase 3's, 192 to 203 phase 4's, 204 to 207 phase 5's, 208 the tool polish's, 209 the ground details', 210 to 213 the Tab menu's two lists); its title shot reads (only reads) the player's slot 1 for its
     "Continue" line.
   - **A subagent's scratch folder may hold an earlier subagent's files:** work in a subfolder of your
     own, and never run a script there you did not just write.
