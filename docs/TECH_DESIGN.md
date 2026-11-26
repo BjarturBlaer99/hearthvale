@@ -638,6 +638,14 @@ run headless; see CLAUDE.md for the command and gotchas.
     chosen does nothing. The wheel is up and down in every menu (`MenuInput.is_up()` / `is_down()`), which
     scrolls a list longer than its box. At Tilda's a click on "Buy" or "Sell" turns to that list
     (`ShopMenu.tab_under()`), and a click between them does nothing.
+  - **Pictures beside the lines** (icons, an axe and the item bar, step I1, 2026-11-26): the shop's two
+    lists, the Tab menu and the chest's two lists show each line's 16x16 icon at its left
+    (`ItemIconColumn`, `ui/item_icon_column.gd`, a Control beside the list's Label that only draws), in
+    lines 16 px apart (the Label's `line_spacing` 5 on the 11 px face). The menu hands it the icons of
+    the lines shown, from its first shown line, so they scroll with the words (`shown_icons()`); an
+    item's is `ItemIcons.name_for()`, an animal's its data's `icon` (`Herd.icon_of()`). The words are
+    as they were (`shown_lines()`). The pointer finds a line on its picture too:
+    `MenuInput.line_under(..., lead)` widens each line `ItemIconColumn.WIDTH` to the left.
   - Every menu takes either click as its yes (`MenuInput.is_confirm()`: interact, use_hand or Enter). Tab or
     Esc leaves any list (`MenuInput.is_back()`).
   - **A conversation is answered with the left click** (`MenuInput.is_answer()`: use_hand, Enter, or A on a

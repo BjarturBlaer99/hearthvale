@@ -5,7 +5,7 @@ extends RefCounted
 ## animal nearer its next egg, fleece or pail, what petting it gives, and why one can't be
 ## bought. A kind is data (data/animals/<id>.json):
 ##   { "id": "chicken", "name": "Chicken", "lives_in": "coop", "gives": "egg", "every": 1,
-##     "grazes": 4, "sound": "cluck" }
+##     "grazes": 4, "sound": "cluck", "icon": "hen" }
 ## - `lives_in`: the building it lives in (data/buildings), which has room for so many
 ##   (Buildings.animals_of: 4, or 8 once it is the big one). Sheep and cows share the barn.
 ## - `gives`: the item it gives (an egg, wool, milk), every `every` mornings when it is fed and
@@ -54,6 +54,12 @@ static func grazes(kind: Dictionary) -> int:
 
 static func sound_of(kind: Dictionary) -> StringName:
 	return StringName(str(kind.get("sound", "")))
+
+
+## Its picture in a list (Farmer Oda's stall): a frame of the item icons (ItemIcons), or "" if
+## its data names none.
+static func icon_of(kind: Dictionary) -> StringName:
+	return StringName(str(kind.get("icon", "")))
 
 
 static func name_of(kind: Dictionary) -> String:

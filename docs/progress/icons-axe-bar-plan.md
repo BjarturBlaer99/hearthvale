@@ -3,10 +3,42 @@
 The user's request (2026-11-26, their words): "add icons for every item in the store and in the tab
 inventory also add an axe and an option to customize the item bar which item is in what column".
 
-This is a plan only, waiting for the user's approval. Nothing is built until they say so. It has three
-parts, built in the order below, each step committed and stopped with a summary and pictures, as with
-every plan since the pivot. **The questions are at the end (Q1 to Q14), each with a recommendation.**
+**Approved on 2026-11-26** ("Approve as recommended"). It has three parts, built in the order below,
+each step committed and stopped with a summary and pictures, as with every plan since the pivot. The
+questions are at the end (Q1 to Q14), each with its recommendation; the user's answers are just below.
 Where a step depends on an answer, it says which one.
+
+## What the user has decided
+
+**2026-11-26, shown a summary of the plan and its fourteen questions: "Approve as recommended".**
+Every question is answered with its recommendation:
+
+- **Q1, "the store":** the shops (Tilda's and Oda's stall), the Tab menu **and the chest**, all in
+  step I1. The gift list and the workbench not now.
+- **Q2, the Tab menu:** **yes, a second list "Pack"** of everything he carries, to look at only
+  (step I2 is built).
+- **Q3, size:** 16 px pictures in 16 px lines, five lines as now; **the boxes grow** to hold them.
+- **Q4, the sheep:** its icon is **cut from today's sheep** and listed as a gap.
+- **Q5, what the axe cuts:** branches, stumps and logs. Not grass, weeds, bushes or pots.
+- **Q6, the sword and wood:** **the sword no longer cuts wood;** wood wants the axe, and a bomb
+  still breaks it. **This changes the Homestead's D5** ("The sword and the pickaxe clear it"): it
+  becomes "the sword, the axe and the pickaxe" (recorded in `homestead-plan.md` and
+  `docs/DECISIONS.md`).
+- **Q7, blows and energy:** as the sword's today (branch 1, stump and log 3, the same wood; 0.5
+  energy a blow).
+- **Q8, a skill:** none.
+- **Q9, better axes:** a Copper Axe and an Iron Axe, made at the workbench as the hoe's are.
+- **Q10, how it's had:** it lies in the farmhouse, for new games and old saves alike; Tilda doesn't
+  sell it.
+- **Q11, trees:** not cut.
+- **Q12, where the bar is arranged:** a new line "Item bar" in the pause menu, opening its own
+  screen.
+- **Q13, empty slots:** fixed columns. Each thing keeps its column; used up, its slot stays empty
+  and it comes back there; an upgrade takes its tool's column; anything new takes the first free one.
+- **Q14, the save:** a field read with a default; the version stays 6.
+
+So every step is built, in order: I1 (with the chest), I2, A1, A2, B1, B2. (The plan's "seven steps
+at most" below counts one too many: there are six.)
 
 Pictures of the menus and the bar as they are today (taken with `tools/capture.gd`, shots 105, 114,
 119, 120, 121, 152, 156, 176, 192, 201) are in the session notes folder, `icons-axe-bar-today/`.
@@ -92,6 +124,13 @@ the chest (`StoreMenu`), the gift list and the workbench are words only.
   scrolls (`tests/ui/`); an animal's line has its animal's icon; the line under a point 16 px lines
   apart is the right one (the existing pointer tests, with the new height); `tests/art/` checks the
   three new frames and their flash row.
+- **Built (2026-11-26), waiting for the user's review.** As written, with the chest (Q1). What
+  building it decided: the picture stands left of the cursor mark, and **a point on a picture
+  finds its line** (`MenuInput.line_under()` takes a `lead` of `ItemIconColumn.WIDTH`), so a click
+  on an icon never chooses another line; the text sits three pixels lower than the picture's top,
+  so its middle meets the picture's. Boxes: the shop 258 x 164, the Tab menu 242 x 134, the chest
+  336 x 196 (seven lines a side, as before). The sheep is today's first frame with seven columns
+  of its fleece taken out, its legs three columns each a column apart. See `LOG.md`.
 
 **Step I2 (only if Q2 is "yes"). A list of everything he carries in the Tab menu.**
 - The Tab menu gets two lists, turned as the shop's are (left and right, or a click on a name):

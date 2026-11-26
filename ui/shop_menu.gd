@@ -7,7 +7,8 @@ extends Control
 ## turns to that list. It stays open for as many deals as he likes, and a line says what the last one was,
 ## or why it couldn't be made. Shop (pure) says what is on the lists and what a deal needs;
 ## GameState makes it. The area opens it (a conversation's `shop` effect) and keeps the hero
-## still while it is open.
+## still while it is open. Each line has its picture beside it (ItemIconColumn): the item's, or
+## an animal's own (Herd.icon_of).
 
 signal closed
 
@@ -35,6 +36,7 @@ var top: int = 0
 @onready var _tabs: Label = $Panel/Tabs
 @onready var _coins: Label = $Panel/Coins
 @onready var _list: Label = $Panel/List
+@onready var _icons: ItemIconColumn = $Panel/Icons
 @onready var _note: Label = $Panel/Note
 @onready var _count: Label = $Panel/Count
 
@@ -122,6 +124,19 @@ func shown_lines() -> PackedStringArray:
 	return _list.text.split("\n") if visible else PackedStringArray()
 
 
+## The icons of the lines shown, in order (none when it is closed or the list is empty).
+func shown_icons() -> Array[StringName]:
+	return _icons.icons.duplicate() if visible else ([] as Array[StringName])
+
+
+## The picture of `entry`, a ware or an offer: its item's, or its animal's.
+static func icon_of(entry: Dictionary) -> StringName:
+	if Shop.is_animal(entry):
+		var icon: StringName = Herd.icon_of(DataRegistry.get_animal(StringName(str(entry["animal"]))))
+		return icon if ItemIcons.has(icon) else &"gem"
+	return ItemIcons.name_for(StringName(str(entry["item"])))
+
+
 func note_text() -> String:
 	return _note.text
 
@@ -171,7 +186,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## Puts the cursor on the line the mouse is on in `event`, if it is on one.
 func point_at(event: InputEvent) -> void:
-	var line: int = MenuInput.line_under(_list, event, mini(ROWS, entries().size() - top))
+	var line: int = MenuInput.line_under(_list, event, mini(ROWS, entries().size() - top), ItemIconColumn.WIDTH)
 	if line == MenuPointer.NONE or top + line == selected:
 		return
 	selected = top + line
@@ -204,7 +219,9 @@ func _refresh() -> void:
 	selected = clampi(selected, 0, maxi(list.size() - 1, 0))
 	top = MenuCursor.window_top(top, selected, list.size(), ROWS)
 	var lines: PackedStringArray = []
+	var icons: Array[StringName] = []
 	for i: int in range(top, mini(top + ROWS, list.size())):
+		icons.append(icon_of(list[i]))
 		var words: String = Shop.offer_line(list[i], _name_of(list[i])) if mode == Shop.SELL else Shop.ware_line(list[i], _name_of(list[i]))
 		lines.append((CURSOR if i == selected else "  ") + words)
 	if list.is_empty():
@@ -213,4 +230,5 @@ func _refresh() -> void:
 	_tabs.text = tabs_text()
 	_coins.text = Shop.coins_text(GameState.item_count(GameState.COIN))
 	_list.text = "\n".join(lines)
+	_icons.show_icons(icons, MenuInput.line_height(_list))
 	_count.text = MenuCursor.count_text(top, selected, list.size(), ROWS)

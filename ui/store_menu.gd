@@ -6,7 +6,7 @@ extends Control
 ## under the cursor across, as much of it as there is room for; Tab or Esc leaves. The mouse
 ## points: at a line of either list to put the cursor there. A line says what was moved, or why
 ## not. Store (pure) keeps the stacks; GameState moves them. The area opens it and keeps the
-## hero still while it is open.
+## hero still while it is open. Each line has its item's picture beside it (ItemIconColumn).
 
 signal closed
 
@@ -35,6 +35,8 @@ var tops: Dictionary = {PACK: 0, CHEST: 0}
 @onready var _chest_title: Label = $Panel/ChestTitle
 @onready var _pack: Label = $Panel/PackList
 @onready var _chest: Label = $Panel/ChestList
+@onready var _pack_icons: ItemIconColumn = $Panel/PackIcons
+@onready var _chest_icons: ItemIconColumn = $Panel/ChestIcons
 @onready var _note: Label = $Panel/Note
 @onready var _count: Label = $Panel/Count
 
@@ -117,6 +119,14 @@ func shown_lines(which: StringName = side) -> PackedStringArray:
 	return (_chest if which == CHEST else _pack).text.split("\n")
 
 
+## The icons of the lines list `which` shows, in order (none when it is closed or the list is
+## empty).
+func shown_icons(which: StringName = side) -> Array[StringName]:
+	if not visible:
+		return [] as Array[StringName]
+	return (_chest_icons if which == CHEST else _pack_icons).icons.duplicate()
+
+
 func note_text() -> String:
 	return _note.text
 
@@ -151,7 +161,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func point_at(event: InputEvent) -> void:
 	for which: StringName in SIDES:
 		var label: Label = _chest if which == CHEST else _pack
-		var line: int = MenuInput.line_under(label, event, mini(ROWS, entries(which).size() - int(tops[which])))
+		var line: int = MenuInput.line_under(label, event, mini(ROWS, entries(which).size() - int(tops[which])), ItemIconColumn.WIDTH)
 		if line == MenuPointer.NONE:
 			continue
 		if which == side and int(tops[which]) + line == selected:
@@ -166,6 +176,15 @@ func point_at(event: InputEvent) -> void:
 func _stack_words(item_id: String, count: int) -> String:
 	var words: String = str(DataRegistry.get_item(StringName(item_id)).get("name", item_id))
 	return STACK_LINE % [words, count] if count != 1 else words
+
+
+## The item ids of the lines list `which` shows, from its first shown line.
+func _shown_ids(which: StringName) -> Array:
+	var list: Array[Dictionary] = entries(which)
+	var ids: Array = []
+	for i: int in range(int(tops[which]), mini(int(tops[which]) + ROWS, list.size())):
+		ids.append(str(list[i]["id"]))
+	return ids
 
 
 func _lines(which: StringName) -> PackedStringArray:
@@ -193,6 +212,8 @@ func _refresh() -> void:
 		selected = 0
 	_pack.text = "\n".join(_lines(PACK))
 	_chest.text = "\n".join(_lines(CHEST))
+	_pack_icons.show_icons(ItemIconColumn.icons_of(_shown_ids(PACK)), MenuInput.line_height(_pack))
+	_chest_icons.show_icons(ItemIconColumn.icons_of(_shown_ids(CHEST)), MenuInput.line_height(_chest))
 	_pack_title.text = PACK_TITLE
 	_chest_title.text = CHEST_TITLE % [GameState.store(key).used_slots(), GameState.store(key).slots]
 	_count.text = MenuCursor.count_text(int(tops[side]), selected, entries().size(), ROWS)

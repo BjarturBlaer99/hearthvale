@@ -51,12 +51,14 @@ static func line_height(label: Label) -> float:
 
 ## Which line of `label` the mouse is on in `event` (the mouse moving, or one of its buttons):
 ## 0 for the first of the `lines` it shows, or MenuPointer.NONE if it is on none of them, the
-## list isn't showing, or `event` isn't the mouse's.
-static func line_under(label: Label, event: InputEvent, lines: int) -> int:
+## list isn't showing, or `event` isn't the mouse's. `lead` widens each line that far to the
+## left of the label: a list with its pictures beside it (ItemIconColumn.WIDTH) is pointed at on
+## a picture too.
+static func line_under(label: Label, event: InputEvent, lines: int, lead: float = 0.0) -> int:
 	if not event is InputEventMouse or label == null or not label.is_visible_in_tree():
 		return MenuPointer.NONE
-	var local: Vector2 = (label.make_input_local(event) as InputEventMouse).position
-	return MenuPointer.line_at(local, label.size.x, line_height(label), lines)
+	var local: Vector2 = (label.make_input_local(event) as InputEventMouse).position + Vector2(lead, 0.0)
+	return MenuPointer.line_at(local, label.size.x + lead, line_height(label), lines)
 
 
 ## How wide `words` are in `label`'s own face (px).

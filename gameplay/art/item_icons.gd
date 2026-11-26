@@ -25,6 +25,7 @@ const FRAMES: Dictionary = {
 	&"fibre": 64,
 	&"hay": 65, &"kit": 66,
 	&"egg": 67, &"wool": 68, &"milk": 69, &"cloth": 70, &"fried_egg": 71, &"omelette": 72, &"custard": 73,
+	&"hen": 74, &"sheep": 75, &"cow": 76,
 }
 
 

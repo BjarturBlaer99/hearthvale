@@ -3968,3 +3968,28 @@ The farm-look plan's phase E (`docs/progress/farm-look-plan.md`, section 15), on
 before-and-after pictures, the user approved phase E on 2026-11-26 ("Approve phase E"). It stands
 as built, with F11 as the user chose it ("Blue, brown hood"). All five phases of the farm look
 are built and approved: the plan is finished, and nothing further is planned.
+
+## 2026-11-26 — Icons, an axe and the item bar, step I1: pictures in the shops, the Tab menu and the chest
+
+The first step of `docs/progress/icons-axe-bar-plan.md`, approved by the user the same day
+("Approve as recommended": every one of its fourteen questions answered as recommended, now at the
+head of the plan as "What the user has decided", and in `docs/DECISIONS.md`; the Homestead's D5
+is marked changed, to be built in step A2).
+
+- **What changed:** every line of Tilda's two lists, Farmer Oda's stall, the Tab menu (Food) and
+  the chest's two lists has its 16x16 icon at its left (`ItemIconColumn`, new), in lines 16 px
+  apart (they were 11). The boxes grew to hold five lines (the chest seven): the shop 258 x 164
+  (was 240 x 142), the Tab menu 242 x 134 (224 x 112), the chest 336 x 196 (300 x 164). The words
+  of every line are as they were. The pointer finds a line on its picture as well as on its words
+  (`MenuInput.line_under()` takes a `lead`).
+- **Art:** three icons at the end of `items.png` (77 frames now) for Oda's list: the hen and the
+  cow are the pack's first frames as they stand; **the sheep is cut from today's sheep** (a gap,
+  as the sheep is). The animals' data name their icon (`"icon"`, read by `Herd.icon_of()`), so a
+  new animal is still data and pictures. `art/sheets.json`, `ItemIcons.FRAMES`, `docs/ASSETS.md`.
+- **Tests:** `tests/ui/item_icons_in_lists_test.gd` (11: the column, the animals' icons, Tilda's
+  two lists scrolling, Oda's three, the Tab menu and a long one scrolling, the chest's two and a
+  long one, the pointer on a word and on a picture in all three, the boxes holding their lines);
+  `tests/art/animal_icons_test.gd` (3: the frames' order, the hen and cow pixel for pixel the
+  pack's, each whole with its white flash row, the sheep 16 wide on its feet).
+- **Known:** the sheep's icon is today's art, cut; the gift list and the workbench have no
+  pictures (not asked). Seen in capture shots, not played by hand.

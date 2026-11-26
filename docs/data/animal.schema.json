@@ -12,6 +12,7 @@
     "gives": { "type": "string", "minLength": 1, "description": "The item it gives (data/items): an egg, wool, milk. Taken with a right click, if the pack has room; else it waits, and stops the next." },
     "every": { "type": "integer", "minimum": 1, "description": "The mornings between one product and the next when it is fed and petted." },
     "grazes": { "type": "integer", "minimum": 1, "description": "The cells of pasture grass it eats in a morning." },
-    "sound": { "type": "string", "description": "The sound effect it makes when petted (Audio.SFX): cluck, bleat, low." }
+    "sound": { "type": "string", "description": "The sound effect it makes when petted (Audio.SFX): cluck, bleat, low." },
+    "icon": { "type": "string", "description": "Its 16x16 picture in a list (Farmer Oda's stall): a frame of gameplay/art/items.png (ItemIcons.FRAMES): hen, sheep, cow. Without one, the list shows the gem." }
   }
 }

@@ -297,7 +297,7 @@ func test_the_keys_and_the_clicks_work_her_list() -> void:
 	# Closed, it hears nothing.
 	counter._unhandled_input(_click(MOUSE_BUTTON_LEFT))
 	assert_int(GameState.item_count(&"bread")).is_equal(2)
-	assert_int((counter.get_node(^"Panel") as PanelFrame).get_child_count()).override_failure_message("a title, the tabs, the coins, the list, a note, a count, the help").is_equal(7)
+	assert_int((counter.get_node(^"Panel") as PanelFrame).get_child_count()).override_failure_message("a title, the tabs, the coins, the list and its pictures, a note, a count, the help").is_equal(8)
 
 
 func test_the_shop_effect_asks_for_a_shop_and_a_talk_that_names_none_opens_none() -> void:

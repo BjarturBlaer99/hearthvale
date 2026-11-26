@@ -1942,3 +1942,21 @@ PNG". What building it decided:
     hands: the pack has none.
   - **The master palette is the pack's own** (`art/palettes/hearthvale.gpl`: the 53 colours of
     its `Palette.png`), as the plan's section 6.3 says it should be after phase E.
+
+## 2026-11-26 — Icons, an axe and the item bar: the plan approved
+The user approved `docs/progress/icons-axe-bar-plan.md` ("Approve as recommended"), shown a summary
+of it and its fourteen questions, with the recommended answer to every one: Q1 icons in the shops,
+the Tab menu and the chest; Q2 a second Tab list, "Pack", of everything he carries, to look at only;
+Q3 16 px lines, five to a list, the boxes grown to hold them; Q4 the sheep's icon cut from today's
+sheep, a gap; Q5 the axe cuts branches, stumps and logs; Q6 **the sword no longer cuts wood** (a bomb
+still does); Q7 the axe's blows and energy as the sword's today; Q8 no skill for chopping; Q9 a
+Copper Axe and an Iron Axe at the workbench; Q10 the axe lies in the farmhouse, for new games and old
+saves, and is not sold; Q11 trees are not felled; Q12 the bar is arranged from a new pause-menu line,
+"Item bar"; Q13 fixed columns (a used-up thing's slot stays empty and it returns there; an upgrade
+takes its tool's column); Q14 the save gains a field read with a default and stays version 6. Built
+in six steps (I1, I2, A1, A2, B1, B2), each stopping for the user's review.
+- **The Homestead's D5 changes** (Q6): "The sword and the pickaxe clear it" becomes **"the sword,
+  the axe and the pickaxe clear it"**: logs and stumps, on the land and in the countryside, want the
+  axe. It is built in step A2; until then the sword still cuts wood. `homestead-plan.md`'s D5 says so.
+- **Q14 bends CLAUDE.md's save rule** (a new version for any change to the save) by decision, as
+  crafting's and the Homestead's phases 2 to 4 did: the field `bar` is read with a default.

@@ -5,7 +5,8 @@ extends Control
 ## cursor; a click picks the highlighted item and closes; Tab or Esc closes without changing anything. The
 ## area equips or eats the chosen item (`chosen`) and keeps the hero still while the menu is
 ## open. The box shows ROWS lines: a longer list (tools, seeds and a harvest, P3b) scrolls to
-## keep the cursor in view, and a corner says where in the list he is.
+## keep the cursor in view, and a corner says where in the list he is. Each line has its
+## item's picture beside it (ItemIconColumn).
 
 signal chosen(item_id: StringName)
 signal closed
@@ -20,6 +21,7 @@ var selected: int = 0
 var top: int = 0
 
 @onready var _list: Label = $Panel/List
+@onready var _icons: ItemIconColumn = $Panel/Icons
 @onready var _count: Label = $Panel/Count
 
 
@@ -94,6 +96,11 @@ func shown_lines() -> PackedStringArray:
 	return _list.text.split("\n") if visible else PackedStringArray()
 
 
+## The icons of the lines shown, in order (none when it is closed).
+func shown_icons() -> Array[StringName]:
+	return _icons.icons.duplicate() if visible else ([] as Array[StringName])
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
@@ -118,7 +125,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## Puts the cursor on the line the mouse is on in `event`, if it is on one.
 func point_at(event: InputEvent) -> void:
-	var line: int = MenuInput.line_under(_list, event, mini(ROWS, items.size() - top))
+	var line: int = MenuInput.line_under(_list, event, mini(ROWS, items.size() - top), ItemIconColumn.WIDTH)
 	if line == MenuPointer.NONE or top + line == selected:
 		return
 	selected = top + line
@@ -129,7 +136,10 @@ func point_at(event: InputEvent) -> void:
 func _refresh() -> void:
 	top = MenuCursor.window_top(top, selected, items.size(), ROWS)
 	var lines: PackedStringArray = []
+	var ids: Array = []
 	for i: int in range(top, mini(top + ROWS, items.size())):
 		lines.append((CURSOR if i == selected else "  ") + describe(items[i]))
+		ids.append(str(items[i].get("id", "")))
 	_list.text = "\n".join(lines)
+	_icons.show_icons(ItemIconColumn.icons_of(ids), MenuInput.line_height(_list))
 	_count.text = MenuCursor.count_text(top, selected, items.size(), ROWS)
