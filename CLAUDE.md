@@ -95,9 +95,11 @@ sections 11 to 15. Seen in capture shots, not played by hand. Nothing further is
 **Icons, an axe and the item bar (the user's request, 2026-11-26; `docs/progress/icons-axe-bar-plan.md`,
 approved as recommended):** six steps, each stopped for review: I1 icons in the lists, I2 the Tab
 menu's "Pack", A1 the axe's pictures, A2 the axe in play (the sword stops cutting wood: D5 changed),
-B1 each item keeps its bar slot, B2 the screen to arrange the bar. **I1 is built and approved
-(2026-11-26, "Approve, go on"); I2 is built (2026-11-26) and waits for the user's review.** Build
-nothing beyond the plan's list.
+B1 each item keeps its bar slot, B2 the screen to arrange the bar. **I1 and I2 are built and
+approved (2026-11-26, "Approve, go on" each); A1 is built (2026-11-26) and waits for the user's
+review.** The axe's pictures are the pack's: three icons at the end of `items.png` (after the hen,
+sheep and cow, so a test wanting the last icons gets the axes) and 18 frames at the end of
+`held_tools.png` (`HeldTools.ADDED`: plain, copper, iron). Build nothing beyond the plan's list.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
