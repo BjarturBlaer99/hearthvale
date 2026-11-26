@@ -92,6 +92,11 @@ dark inside and light writing in the pack's frame), F9 what is drawn in code sta
 "Replace both" (the pack's slime and bat), F11 "Blue, brown hood" (the hero is the pack's animated
 character, recoloured). What each phase built, its gaps and what fits badly are the plan's
 sections 11 to 15. Seen in capture shots, not played by hand. Nothing further is planned.
+**Icons, an axe and the item bar (the user's request, 2026-11-26; `docs/progress/icons-axe-bar-plan.md`,
+approved as recommended):** six steps, each stopped for review: I1 icons in the lists, I2 the Tab
+menu's "Pack", A1 the axe's pictures, A2 the axe in play (the sword stops cutting wood: D5 changed),
+B1 each item keeps its bar slot, B2 the screen to arrange the bar. **I1 is built (2026-11-26) and
+waits for the user's review.** Build nothing beyond the plan's list.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -127,7 +132,7 @@ in `docs/DECISIONS.md` are superseded.
   furniture and props, `relief.png`, `placed`, `crafted`, `rocks`, `breakables`, `forage`, `torch`;
   `crops`, `soil`, `items`, the boxes' frame in `ui_parts`; `villager`, `slime`, `bat`, `wisp`,
   `goblin`, the hens of `critters`, the cow of `animals`; `player_sheet` and `held_tools`. **Still
-  today's (gaps):** the sheep, the butterflies, the Iron Warden, the Crypt Shade, the clock's dial,
+  today's (gaps):** the sheep (and its icon in Oda's list), the butterflies, the Iron Warden, the Crypt Shade, the clock's dial,
   four icons (the shuttle, the cattail root, the wisp ember, the sprinkler), the sprinkler and the
   hand on the ground, the sprinkler in his hands, and the title picture. `art/sheets.json` lists 30
   PNGs. **Each villager is a figure of their own** on `villager.png` (24 frames: eight figures, each
@@ -329,6 +334,9 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   click chooses that line; a click on no line chooses the highlighted one, as before. Every new menu or list
   does the same (`MenuInput.line_under()`, `MenuPointer`, and `MenuCursor.select()` / `take_click()`), takes
   the wheel as up and down (`MenuInput.is_up()` / `is_down()`), and leaves on Tab or Esc (`is_back()`).
+  **The shops, the Tab menu and the chest show each line's icon** (`ItemIconColumn`), lines 16 px apart:
+  a point on an icon finds its line (`MenuInput.line_under(..., lead)`), and a new list with icons does
+  the same. A test reads them with `shown_icons()`; one that counts the shop box's parts counts 8.
 - **What is in hand is chosen on the item bar** (the user's request, 2026-11-15), not in a menu: the wheel
   steps through it, the keys 1 to 9 choose a slot (`HandBar`, pure; `GameState.take_in_hand()`,
   `step_hand()`; `ItemBar` draws it). The Tab menu lists food only. `GameState.equipped` is always something
@@ -755,8 +763,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
 - **The Homestead, phase 4 (2026-11-19; `docs/progress/homestead-plan.md`, TECH_DESIGN §30): animals.**
   - **A kind of animal is a file in `data/animals/`** (`docs/data/animal.schema.json`): `lives_in`
     (`coop`; sheep and cows share the `barn`), `gives` (`egg`, `wool`, `milk`), `every` (1, 3, 2 mornings
-    fed and petted), `grazes` (4, 6, 8 cells) and `sound` (`cluck`, `bleat`, `low`). `Herd`
-    (`core/homestead/`, pure) reads it. **A new animal is data and pictures.**
+    fed and petted), `grazes` (4, 6, 8 cells), `sound` (`cluck`, `bleat`, `low`) and `icon` (its
+    picture in Oda's list, `Herd.icon_of()`). `Herd` (`core/homestead/`, pure) reads it. **A new animal is data and pictures.**
   - **The herd** is `GameState.homestead().animals()`, in the order bought; `animal(index)` is
     `{ "kind", "petted", "progress", "ready", "hungry" }`, and an animal's place in the herd is its name
     (none is ever taken away). It lives in its kind's building wherever that stands (4, or 8 upgraded).
