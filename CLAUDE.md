@@ -80,6 +80,18 @@ decided", which stands in for the `docs/HOMESTEAD-NOTES.md` the request names) a
 coordinator's to edit, not a phase's** (a phase says in its report what should change here). The rules
 below describe the game as it stands, with all five phases built. Build nothing beyond the
 plan's list, and nothing of a later phase early. Nothing beyond it is planned: ask before building more.
+**The farm look (the user's request, 2026-11-25; `docs/progress/farm-look-plan.md`):** the game's art
+switched to one CC0 pixel-art pack, **Ninja Adventure** by Pixel-Boy and AAA (F1), in five phases
+with a stop after each: A terrain and trees, B buildings, interiors and props, C crops, items and
+the UI, D villagers, animals and monsters, E the hero. **All five are built and approved
+(2026-11-25 and 2026-11-26)**, each shown to the user in a summary and before-and-after pictures.
+The user's decisions, at the head of the plan: F6 the ground details painted again from the pack,
+F7 the pack's own edges where the code drew them, F8 "Dark wood, light text" (the boxes keep their
+dark inside and light writing in the pack's frame), F9 what is drawn in code stays drawn, F3
+"Short, the pack's" (villagers and hero), F5 "Eight faces" (a pack figure for each villager), F4
+"Replace both" (the pack's slime and bat), F11 "Blue, brown hood" (the hero is the pack's animated
+character, recoloured). What each phase built, its gaps and what fits badly are the plan's
+sections 11 to 15. Seen in capture shots, not played by hand. Nothing further is planned.
 
 It is Hearthvale's own game: take the genre's mechanics, never another game's art, interface or characters.
 
@@ -100,37 +112,70 @@ in `docs/DECISIONS.md` are superseded.
   `ui/title/`), edited by hand (Aseprite, files in `art/aseprite/`) or replaced with art the user
   brings, AI-made art included; each is listed in `docs/ASSETS.md` with where it came from. **New art
   fits as the old does:** the size, frames, order, rows and pivot in `art/sheets.json` (tests in
-  `tests/art/` check them), a white flash row under every sheet of `gameplay/art/`, villagers in the
-  marker colours (`art/palettes/villager_markers.gpl`), colours from `art/palettes/hearthvale.gpl`,
-  and tiles in their atlas places (an older tile never changes place; new tiles go at the end).
+  `tests/art/` check them), a white flash row under every sheet of `gameplay/art/`, colours from
+  `art/palettes/hearthvale.gpl` (the art pack's own 53 colours since the farm look's phase E), and
+  tiles in their atlas places (an older tile never changes place; new tiles go at the end).
   How-to: `art/README.md`. Art never changes timing, hits or collisions. Hearthvale's own look: never
   another game's art. The six tools that painted the art until then are retired in `tools/retired/`
   (Godot ignores it): never run them, they would paint over the PNGs.
+- **Most of the art is the pack's (the farm look, 2026-11-25/26):** Ninja Adventure lies untouched in
+  `art/packs/ninja-adventure/` with its licence, without its `Audio` folder: never edit it or run
+  anything in it. Its art is fitted by one-off scripts that cut, move, mirror and recolour, kept out
+  of the project (the PNGs are the source); nothing is generated from it, and a piece the pack does
+  not cover keeps today's art (one style, never a second). The pack's: the ground, the trees, the
+  ground details and `world/tiles/ground_edges.png` (laid out by `EdgeAtlas`); the atlas's buildings,
+  furniture and props, `relief.png`, `placed`, `crafted`, `rocks`, `breakables`, `forage`, `torch`;
+  `crops`, `soil`, `items`, the boxes' frame in `ui_parts`; `villager`, `slime`, `bat`, `wisp`,
+  `goblin`, the hens of `critters`, the cow of `animals`; `player_sheet` and `held_tools`. **Still
+  today's (gaps):** the sheep, the butterflies, the Iron Warden, the Crypt Shade, the clock's dial,
+  four icons (the shuttle, the cattail root, the wisp ember, the sprinkler), the sprinkler and the
+  hand on the ground, the sprinkler in his hands, and the title picture. `art/sheets.json` lists 30
+  PNGs. **Each villager is a figure of their own** on `villager.png` (24 frames: eight figures, each
+  resting, breathing, blinking), named by `figure` in their scene (`Villager.FIGURES`); nothing is
+  recoloured.
 - **Drawn in code, and kept in code:** shadows, cast shadows and soft edges (`HeightShading`), bursts
   and sparks, the sword's blade, lights and darkness (`AreaLighting`, `Ambience`), the water's movement
-  and reflections, mist, the boxes' frames (`PanelFrame`), villager recolouring, the title's stars,
-  window and petals, a building site's string and pegs (`BuildingArt.twine()`), lit windows, and the things outlined in `PixelGrade.INK` (chests, doors, pickups). Two colours
-  in code match the art and change with it: the grass's fringe (`HeightShading.fringe_color()`) and
-  the title's sky (`TitlePicture.SKY_TOP`).
+  and reflections, mist, the boxes' frames (`PanelFrame`, from the frame's pieces in `ui_parts`), the
+  hearts, the energy bar and the item bar's slots, the title's stars, window and petals, a building
+  site's string and pegs (`BuildingArt.twine()`), lit windows, and the things outlined in
+  `PixelGrade.INK` (chests, doors, signposts, pickups, plates, push blocks). The grass's fringe over a
+  path, the water's bank and the cliff faces are pictures since the farm look (`ground_edges.png`):
+  `HeightShading` still finds the edges and draws the shadows, the lip and the thin dark edges.
+  **Colours in code that match the art and change with it:** the ground's colour at each height
+  (`GreyboxTiles.GROUND_COLORS`, the grass tiles' own; a test holds it), the water's glint, foam and
+  swell (`WaterSurface`; `WaterSurface.BANK` is how deep the bank's picture lies), the hearts
+  (`HeartsBar`), the energy bar (`EnergyBar`), the item bar's slots (`ItemBar`), the boxes' rule
+  (`PanelFrame.GOLD`), the plot's rim (`FarmPlot.RIM`), a Bogwisp's light (`Enemy.WISP_COLOR`) and the
+  title's sky (`TitlePicture.SKY_TOP`).
 - **Sound and fonts are made in code:** `tools/audio/make_audio.gd` bakes `audio/` (edit the tool,
   never the WAVs); `tools/art/make_font.gd` bakes the two pixel faces and the theme. No external audio
   or fonts.
-- **What the art passes left, still true:** the hero is two cells tall (16x32), 25 frames a row (walk
-  and run of six, a three-frame swing, four work poses), his feet and collisions where they always
-  were, and the sword's reach measured from his feet (`Sword.HAND` only says where the blade is drawn
-  from; the reach is `CombatRules.SWORD_REACH`, 28 px since the user's word of 2026-11-25, was 20, and
-  a blow never passes a wall, a closed door or higher ground: `TerrainQuery.stops_blow`); the animator only picks
-  pictures, and swing timing and hits belong to the motor. Villagers are as tall, and breathe and blink
-  (`Idling`). Trees stand up from their cell (`Scenery`, the hero walks behind them, a crown fades when
-  anything that matters is behind it) and block only that cell; cherry trees are `"cherry"` blocks in
-  `build_maps.gd`. Walls have faces and tops (`WallRelief`), pillars stand taller, roofs have a ridge;
+- **What the art passes left, still true:** the hero is the art pack's short character (farm look,
+  phase E) in its 32x32 frames (`PlayerAnimator.FRAME_SIZE`), his feet at `PlayerAnimator.FEET`
+  (16, 24): soles on row 23, and a lunge or a fall reaches up to three rows lower. 25 frames a row in
+  three rows (walk and run of six, a three-frame swing, four work poses), his feet and collisions
+  where they always were, and the sword's reach measured from his feet (`Sword.HAND`, his belt at
+  (0, -6), only says where the blade is drawn from; the reach is `CombatRules.SWORD_REACH`, 28 px
+  since the user's word of 2026-11-25, was 20, and a blow never passes a wall, a closed door or
+  higher ground: `TerrainQuery.stops_blow`). What he holds up is drawn at
+  `PlayerController.HOLD_OFFSET` (-8, -31), and his reflection is laid from his soles. The animator
+  only picks pictures, and swing timing and hits belong to the motor. The tools in his hands are
+  40x56 with his feet at (20, 40) (`HeldTools`). Villagers are the pack's short people too, each
+  16x16 at the foot of a 16x32 frame (feet and cell as before), and breathe and blink (`Idling`).
+  Trees stand up from their cell (`Scenery`, the hero walks behind them, a crown fades when
+  anything that matters is behind it) and block only that cell; their pictures are 48x48 in cells
+  of 56x56, the trunk's foot at (24, 45) (`SceneryAtlas`); cherry trees are `"cherry"` blocks in
+  `build_maps.gd`. The grass and the marsh's ground are flat colour: the ground details carry the
+  texture. The houses are the pack's clay, thatch and board roofs, stone below and paper panels
+  above, built from the same tiles; the window glass (`WindowGlow`) did not move. Walls have faces
+  and tops (`WallRelief`, the pack's interior walls), pillars stand taller, roofs have a ridge;
   no map is re-baked for looks. Lamps, hearths, torches and crystals glow (`AreaLighting`); houses and
   dungeons are dim away from their lights (for show only; the crypt's dark is the only light that
   matters to play). Labels are whole multiples of 8, boxes wear `PanelFrame`, headings use the
   `Heading` face (`ui/font/hearth_heading.tres`). The marsh's tiles are two rows at the end of the
   atlas, and a map names the ground its props stand on (`"prop_ground"`). The plans of each pass are
   in `docs/progress/` (`art-pass-2-plan.md` to `art-pass-4-plan.md`, `hero-pass-plan.md`, `P1c` to
-  `P1f`).
+  `P1f`, and `farm-look-plan.md` for the pack).
 - **A still world (user's request, 2026-11-13):** the scenery doesn't move, except the water (its tile,
   its surface, its reflections). Grass, flowers, washing and trees stand still, fallen petals lie where
   they are, the mist doesn't drift, chimney smoke is one picture, and there are no specks in the air
@@ -200,10 +245,12 @@ removes the shim, so recreate it after upgrading.
 
 **Testing gotchas:**
 - `--ignoreHeadlessMode` is required headless. InputEvents aren't delivered headless, so tests that need input must run windowed.
-- Headless, a texture's `get_image()` hands back the same picture every time, and
-  `SpriteSheet.recoloured()` paints on it: the first villager made in a run colours the sheet for the rest.
-  The whole suite runs `tests/gameplay` before `tests/world`, so it passes; a hand-picked run that loads a
-  villager's area before `sprites_test.gd` fails its colour test. It is the run's order, not the code.
+- **The hero's frame is 32 wide** (farm look, phase E): a test that reads his column from
+  `shown_region()` divides by `PlayerAnimator.FRAME_SIZE.x`, never by 16, and lays him from
+  `PlayerAnimator.FEET`, not the frame's last row.
+- **The ground's edges are sides and corners** (farm look, phase A): `HeightShading.ground_edges()`
+  gives the sides, `ground_corners()` and `find_corners()` the corner pieces; a test that counts what
+  is drawn at a path's or the water's edge counts them apart.
 - gdUnit4's CLI is **fail-fast by default**: it stops at the first failing test, and "Executed test cases (n/n)"
   only counts what ran. Always pass `--continue` (`-c`) to see every failure.
 - `StringName` sorts by internal pointer, not text. Compare as `String` when order matters.
@@ -598,8 +645,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **The main quest's words are measured against the quest log's box**
     (`tests/world/story_days_test.gd`), not counted to 150 letters: a stage must end above the line of
     help and be no longer than 200.
-  - **In a capture shot the hero hides anything in the cell north of him:** he is two cells tall.
-    `tools/capture.gd`'s shots end at 209 (168 to 176 are phase 2's, 177 to 191 phase 3's, 192 to 203 phase 4's, 204 to 207 phase 5's, 208 the tool polish's, 209 the ground details'); its title shot reads (only reads) the player's slot 1 for its
+  - **Since the farm look's phase E the hero is one cell tall** and no longer hides the cell north
+    of him in a capture shot. `tools/capture.gd`'s shots end at 209 (168 to 176 are phase 2's, 177 to 191 phase 3's, 192 to 203 phase 4's, 204 to 207 phase 5's, 208 the tool polish's, 209 the ground details'); its title shot reads (only reads) the player's slot 1 for its
     "Continue" line.
   - **A subagent's scratch folder may hold an earlier subagent's files:** work in a subfolder of your
     own, and never run a script there you did not just write.
@@ -742,7 +789,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **The save is still version 6:** `homestead` gains `"animals"`, written only when there is one. The
     fixture `tests/fixtures/saves/v6_buildings_before_animals.json` was written by the game at the end
     of phase 3.
-  - **Pictures and tools:** `animals.png` (the sheep and the cow; the hen is `critters.png`'s chicken),
+  - **Pictures and tools:** `animals.png` (the sheep and the cow; the hen is `critters.png`'s chicken; the cow and the hen are the pack's since the farm look's phase D),
     seven icons, the blanket in `crafted.png`; Oda's stall is the market stall's tiles, re-baked in the
     village at (16..18, 30..31); `tools/playtest.gd -- animals`; capture shots 192 to 203.
   - **Do not** let an animal die, run off, block anyone or use a door, sell one back, give a product the
