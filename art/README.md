@@ -10,7 +10,7 @@ art/
   README.md           this how-to
   sheets.json         every art PNG: size, frames in order, rows, flash row, pivot (tests read it)
   palettes/
-    hearthvale.gpl    the master palette: the 256 colours the art uses most
+    hearthvale.gpl    the master palette: the art pack's own 53 colours (since the farm-look plan's phase E)
     <sheet>.gpl       each sheet's own colours, exactly
   aseprite/           your .aseprite files, named after their PNG (player_sheet.aseprite)
   packs/<pack>/       an art pack, untouched, with its licence (docs/ASSETS.md says which, and on
@@ -33,9 +33,9 @@ art/
   edges; keep to what is there.)
 - **Exact sizes, frames in the order `sheets.json` lists them.** Never move a frame or a tile; add new
   ones at the end, and tell the code (a frame name in the script that draws it).
-- **Hearthvale's look:** colours from `hearthvale.gpl`; dark outlines in a deep shade of what they
-  surround (not black); light from the top left (the north-west), shadows to the south-east. Never
-  another game's art.
+- **Hearthvale's look:** colours from `hearthvale.gpl` (the art pack's palette); the pack's outlines
+  in its near black (`141b1b`); light from the top left (the north-west), shadows to the
+  south-east. Never another game's art.
 - **The flash row:** every sheet in `gameplay/art/` is two frames tall: the frames, and under them the
   same frames as white silhouettes (the hit flash). In Aseprite: duplicate the frames' layer, lock its
   alpha, fill it white, and place it one frame height lower. The hero's sheet has no flash row.
@@ -47,8 +47,8 @@ art/
 
 | Kind | File | Export | Pivot |
 |---|---|---|---|
-| Hero | `gameplay/player/player_sheet.png` | 400x96: 25 frames of 16x32 a row, rows facing down, up, left (right is the left row mirrored). Columns: idle, blink, walk 1 to 6, windup, slash, follow, hold (seen from the front in every row), fallen, breathe, hurt, run 1 to 6, raise, strike, pour, reach. No flash row. | his feet, (8, 32): soles on the last row, centred |
-| Tools in his hands | `gameplay/art/held_tools.png` | 2280x112: 57 frames of 40x56 + flash row, order in `sheets.json` | his feet at (20, 40); the fists where his work pose's hands are |
+| Hero | `gameplay/player/player_sheet.png` | 800x96: 25 frames of 32x32 a row (the art pack's frame, since phase E), rows facing down, up, left (right is the left row mirrored). Columns: idle, blink, walk 1 to 6, windup, slash, follow, hold (seen from the front in every row), fallen (the same in every row), breathe, hurt, run 1 to 6, raise, strike, pour, reach. A short person (about 15x15) in the middle of the frame. No flash row. | his feet, (16, 24): soles on row 23, centred; a lunge or a fall may reach a row or three lower |
+| Tools in his hands | `gameplay/art/held_tools.png` | 2280x112: 57 frames of 40x56 + flash row, order in `sheets.json` | his feet at (20, 40); the tool where his work pose's hands are (the pack's pickaxe layer is a 64x64 cell with his feet at (32, 40): cut at (12, 0)) |
 | Villagers | `gameplay/art/villager.png` | 384x64: 24 frames of 16x32 + flash row: eight figures (Bram, Tilda, Wenna, Pip, Rolf, Oda, Edda, Henrik), each resting, breathing and blinking; each a short person (16x16) at the foot of the frame, in their own colours. A villager names theirs (`figure` in their scene) | feet on the last row |
 | Slime, wisp, bat | `slime.png`, `wisp.png`, `bat.png` | 16x16, 3 frames each + flash row | slime (8, 15); wisp (8, 18); bat (8, 8) |
 | Goblin | `goblin.png` | 16x24, 5 frames + flash row; side frames face left | (8, 23) |
@@ -107,10 +107,14 @@ house, furniture and prop rows, `relief.png`, `placed`, `crafted`, `rocks`, `bre
 and `torch`, but the sprinkler and the hand), and the crops, soil, item icons and the boxes' frame
 (phase C: `crops`, `soil`, `items` but four icons, `ui_parts` but the dial), and the villagers,
 the slime, the bat, the Bogwisp, the goblin, the hens and the cow (phase D: `villager`, `slime`,
-`bat`, `wisp`, `goblin`, `critters` but the butterflies, `animals` but the sheep) are Ninja Adventure's (CC0), fitted by cutting, moving, mirroring and
-recolouring. Their colours are the pack's own, not `hearthvale.gpl`'s older ones (the master palette
-lists both while the switch is under way), their outlines are the pack's near black, and the grass
-and the marsh are flat colour. Keep a new piece to one style: the pack's, where the pack has it.
+`bat`, `wisp`, `goblin`, `critters` but the butterflies, `animals` but the sheep), and the hero and
+the tools in his hands (phase E: `player_sheet`, `held_tools` but the sprinkler) are Ninja
+Adventure's (CC0), fitted by cutting, moving, mirroring and recolouring. Their colours are the
+pack's own, and since phase E `hearthvale.gpl` is the pack's palette (its `Palette.png`); the
+pieces the pack did not cover (the sheep, the butterflies, the Warden, the Shade, the dial, four
+icons, the sprinkler, the hand, the title picture) still use their older colours. Their outlines
+are the pack's near black, and the grass and the marsh are flat colour. Keep a new piece to one
+style: the pack's, where the pack has it, drawn in `hearthvale.gpl`.
 
 ## Asking an AI tool
 

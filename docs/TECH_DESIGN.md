@@ -142,8 +142,11 @@ res://
   - poses for a hit (`HURT`, a flinch) and for landing from a ledge hop (`LAND`, for `LAND_TIME`)
   - a pose that overrides both: swinging the sword, lying fallen at zero hearts, or holding an item
     overhead (always seen from the front)
-  - **He is two cells tall** (P1e): frames are 16x32 with the soles on the last row, drawn up from his feet,
-    so he stands on the same spot and collides as he did
+  - **He is short, the art pack's own** (farm-look plan, phase E, 2026-11-26; he was two cells tall from P1e):
+    frames are the pack's 32x32 (`FRAME_SIZE`) with his feet at `FEET` (16, 24), his soles on row 23 and room
+    below for a lunge or a fall, drawn up from his feet, so he stands on the same spot and collides as he did.
+    `Sword.HAND` is his belt at (0, -6); what he holds up is drawn at `HOLD_OFFSET` (-8, -31), resting on his
+    hold pose; his reflection in water is laid from his soles (`Reflections`)
 
   `hold_up(icon)` shows that last pose, with the item's picture above the hands, for `HOLD_TIME`. The area calls
   it when the hero picks up an item, opens a chest or takes a heart container. It's for show only: moving or
@@ -714,7 +717,8 @@ run headless; see CLAUDE.md for the command and gotchas.
   is how the art was made and what it is; the frames and their order are the same in the PNGs.
 - **Every actor is pixel art**, painted in code until the switch, like the hero. The art lived as ASCII in `tools/art/`:
   - `make_player_sprite.gd`: the hero, brown-haired with his blue hood down, a blue tunic with a gold hem and a
-    red scarf. Three rows (down, up, side; right is the side row mirrored) of twenty-five 16x32 frames (twenty-one until the tool polish added four work poses).
+    red scarf. Three rows (down, up, side; right is the side row mirrored) of twenty-five 16x32 frames (twenty-one until the tool polish added four work poses). Since the farm-look plan's phase E (2026-11-26) the sheet is the art pack's animated character instead (32x32
+    frames, `docs/progress/farm-look-plan.md` section 15); what follows is how the tall hero was made.
     - **He is put together from parts** (P1e), so every frame of a facing has the same head and clothes:
       `HEADS` (rows 0-11), `BODIES` (a pose, rows 12-22) and legs (`LEGS_FRONT`, `LEGS_SIDE`, rows 23-31), joined
       by `frame()` as `RECIPES` says. The second half of the walk is the first on the other foot: the legs
@@ -861,7 +865,8 @@ run headless; see CLAUDE.md for the command and gotchas.
 - **Villagers** are each a figure of their own (farm-look plan, phase D, 2026-11-26): the art pack's short people,
   eight on one sheet, each resting, breathing and blinking. A villager names theirs in their scene (`figure`, one
   of `Villager.FIGURES`). Until then they were one figure in marker colours, recoloured for each.
-  - **A frame as tall as the hero's** (P1e): 16x32, the figure (16x16) at its foot, feet mid-cell where they were.
+  - **A frame as tall as the hero's** (P1e): 16x32, the figure (16x16) at its foot, feet mid-cell where they were
+    (the hero's is 32x32 since the farm-look plan's phase E: as tall, wider).
     A villager still fills only its own cell.
   - **They breathe and blink** (`Idling`, `core/ambient/`, pure): out for `BREATH_OUT` of every `BREATH_EVERY`
     seconds, eyes shut for `BLINK_TIME` every `BLINK_EVERY`, never mid-breath. Each starts at a moment of their
@@ -1570,7 +1575,7 @@ buildings, under "Buildings" below. **Phase 4 is built** (2026-11-19): animals, 
     farm as he arrives, the farmhouse, the locked cottage's words, the pond, a boulder refusing the
     plain pickaxe, the overgrown land, the farm at night, weeds cut on the field, and the field with
     its clear corner. The action `boulder` swings the plain Pickaxe at a boulder (the hero stands
-    beside it: from below, he is two cells tall and hides it).
+    beside it: from below, he was two cells tall and hid it).
   - `tools/play_days.gd` knows that home is the farmhouse (`TOWARD_VILLAGE`: home, then the homestead,
     then the village) and that the plot is on the homestead (`PLOT_AREA`). It works the cells with
     nothing standing on them, the clear corner, and fills the can at the pond. It does not clear land.

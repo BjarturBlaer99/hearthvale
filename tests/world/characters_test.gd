@@ -29,7 +29,9 @@ func after_test() -> void:
 
 
 func test_villagers_stand_where_they_stood_in_a_frame_as_tall_as_the_heros() -> void:
-	assert_that(Villager.SIZE).is_equal(PlayerAnimator.FRAME_SIZE)
+	# Since the farm-look plan's phase E the hero's frame is the art pack's, 32 wide: a
+	# villager's is as tall, a cell wide, and both are short people of the pack.
+	assert_that(Villager.SIZE).is_equal(Vector2i(16, PlayerAnimator.FRAME_SIZE.y))
 	assert_that(Vector2i(Villager.SHEET.get_size())).is_equal(Vector2i(Villager.SIZE.x * Villager.FRAMES.size(), Villager.SIZE.y * 2))
 	assert_float(Villager.FEET_Y).override_failure_message("their feet are where they were, mid-cell").is_equal(9.0)
 	# The lowest painted row of every frame is the frame's last: nobody floats.

@@ -3,7 +3,8 @@ extends GdUnitTestSuite
 ## hero moves, or for a moment; a chest's treasure too; a swing shows the lunge; out of hearts,
 ## the hero lies fallen. And the hero pass (2026-11-11): a swing winds up, slashes and follows
 ## through without changing when it hits; a sprint leans; a hit makes the hero flinch. Since
-## P1e he is two cells tall, standing on the same spot.
+## P1e he was two cells tall; since the farm-look plan's phase E he is the art pack's short hero
+## in a 32x32 frame, standing on the same spot.
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
@@ -74,7 +75,7 @@ func test_a_swing_winds_up_slashes_follows_through_and_ends() -> void:
 		village.player.motor.step(Vector2.ZERO, 1.0 / 240.0)
 		village.player.sync_from_motor()
 		@warning_ignore("integer_division")
-		var column: int = int(village.player.shown_region().position.x) / 16
+		var column: int = int(village.player.shown_region().position.x) / PlayerAnimator.FRAME_SIZE.x
 		if shown[-1] != column:
 			shown.append(column)
 		if not village.player.motor.is_attacking():
@@ -83,24 +84,25 @@ func test_a_swing_winds_up_slashes_follows_through_and_ends() -> void:
 	assert_int(int(village.player.shown_region().position.y)).override_failure_message("still facing the same way").is_equal(int(PlayerAnimator.Facing.SIDE) * PlayerAnimator.FRAME_SIZE.y)
 
 
-func test_the_taller_hero_stands_on_the_same_spot() -> void:
+func test_the_short_hero_stands_on_the_same_spot() -> void:
 	var village: AreaController = _load(VILLAGE)
 	var sprite: Sprite2D = village.player.get_node(^"Sprite")
 	village.player.sync_from_motor()
-	assert_that(sprite.region_rect.size).override_failure_message("a cell wide, two cells tall").is_equal(Vector2(16, 32))
-	assert_float(sprite.position.y + sprite.region_rect.size.y).override_failure_message("his soles are at his feet").is_equal(0.0)
+	assert_that(sprite.region_rect.size).override_failure_message("the art pack's frame").is_equal(Vector2(PlayerAnimator.FRAME_SIZE))
+	assert_float(sprite.position.y + PlayerAnimator.FEET.y).override_failure_message("his soles are at his feet").is_equal(0.0)
 	assert_float(sprite.position.x + sprite.region_rect.size.x / 2.0).override_failure_message("and he is centred on them").is_equal(0.0)
 	assert_float((village.player.get_node(^"Collision") as CollisionShape2D).shape.get_rect().size.y).override_failure_message("the feet he collides with are no bigger").is_equal(8.0)
-	# What he holds up sits on his raised hands: the top painted row of the hold frame.
+	# What he holds up sits on top of his hold pose: the top painted row of the hold frame.
 	var sheet: Image = village.player.sheet().get_image()
 	var top: int = -1
 	for y: int in PlayerAnimator.FRAME_SIZE.y:
 		for x: int in PlayerAnimator.FRAME_SIZE.x:
 			if top < 0 and sheet.get_pixel(PlayerAnimator.HOLD * PlayerAnimator.FRAME_SIZE.x + x, y).a > 0.0:
 				top = y
-	var hands: float = top - PlayerAnimator.FRAME_SIZE.y
+	var hands: float = top - PlayerAnimator.FEET.y
 	assert_float(PlayerController.HOLD_OFFSET.y + ItemIcons.SIZE.y).override_failure_message("the item rests on his hands, neither floating nor sunk into them").is_equal(hands)
-	assert_float(Sword.HAND.y).override_failure_message("the sword is drawn from his belt, not his boots or his head").is_between(-16.0, -8.0)
+	# The short hero is 15 pixels tall: his belt is a third of the way up.
+	assert_float(Sword.HAND.y).override_failure_message("the sword is drawn from his belt, not his boots or his head").is_between(-9.0, -3.0)
 
 
 func test_a_sprint_leans_and_a_walk_does_not() -> void:
@@ -147,15 +149,15 @@ func test_out_of_hearts_the_hero_lies_fallen() -> void:
 	var village: AreaController = _load(VILLAGE)
 	GameState.damage(99)
 	assert_bool(village.is_dying()).is_true()
-	assert_int(int(village.player.shown_region().position.x)).is_equal(PlayerAnimator.FALLEN * 16)
+	assert_int(int(village.player.shown_region().position.x)).is_equal(PlayerAnimator.FALLEN * PlayerAnimator.FRAME_SIZE.x)
 	village.respawn()
-	assert_int(int(village.player.shown_region().position.x)).override_failure_message("up again").is_equal(PlayerAnimator.IDLE * 16)
+	assert_int(int(village.player.shown_region().position.x)).override_failure_message("up again").is_equal(PlayerAnimator.IDLE * PlayerAnimator.FRAME_SIZE.x)
 
 
 ## The sheet column the hero shows.
 func _column(area: AreaController) -> int:
 	@warning_ignore("integer_division")
-	return int(area.player.shown_region().position.x) / 16
+	return int(area.player.shown_region().position.x) / PlayerAnimator.FRAME_SIZE.x
 
 
 func _frame(column: int, facing: PlayerAnimator.Facing) -> Rect2:

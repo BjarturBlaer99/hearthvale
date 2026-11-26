@@ -5,12 +5,12 @@
 			"path": "res://gameplay/player/player_sheet.png",
 			"what": "the hero",
 			"kind": "grid",
-			"frame": [16, 32],
+			"frame": [32, 32],
 			"frames": ["idle", "blink", "walk_1", "walk_2", "walk_3", "walk_4", "walk_5", "walk_6", "windup", "slash", "follow", "hold", "fallen", "breathe", "hurt", "run_1", "run_2", "run_3", "run_4", "run_5", "run_6", "raise", "strike", "pour", "reach"],
 			"rows": ["down", "up", "side"],
 			"flash_row": false,
-			"pivot": [8, 32],
-			"pivot_is": "his feet: soles on the last row, centred; the side row faces left",
+			"pivot": [16, 24],
+			"pivot_is": "his feet: the art pack's short hero (farm-look plan, phase E) with his soles on row 23, centred; a lunge or a fall reaches below it; the side row faces left",
 			"names": "PlayerAnimator (columns)"
 		},
 		{
@@ -252,7 +252,7 @@
 			"frames": ["hoe_down_raise", "hoe_down_strike", "hoe_up_raise", "hoe_up_strike", "hoe_side_raise", "hoe_side_strike", "pickaxe_down_raise", "pickaxe_down_strike", "pickaxe_up_raise", "pickaxe_up_strike", "pickaxe_side_raise", "pickaxe_side_strike", "watering_can_down_pour", "watering_can_down_dip", "watering_can_up_pour", "watering_can_up_dip", "watering_can_side_pour", "watering_can_side_dip", "sprinkler_down_reach", "sprinkler_up_reach", "sprinkler_side_reach", "copper_hoe_down_raise", "copper_hoe_down_strike", "copper_hoe_up_raise", "copper_hoe_up_strike", "copper_hoe_side_raise", "copper_hoe_side_strike", "copper_pickaxe_down_raise", "copper_pickaxe_down_strike", "copper_pickaxe_up_raise", "copper_pickaxe_up_strike", "copper_pickaxe_side_raise", "copper_pickaxe_side_strike", "copper_watering_can_down_pour", "copper_watering_can_down_dip", "copper_watering_can_up_pour", "copper_watering_can_up_dip", "copper_watering_can_side_pour", "copper_watering_can_side_dip", "iron_hoe_down_raise", "iron_hoe_down_strike", "iron_hoe_up_raise", "iron_hoe_up_strike", "iron_hoe_side_raise", "iron_hoe_side_strike", "iron_pickaxe_down_raise", "iron_pickaxe_down_strike", "iron_pickaxe_up_raise", "iron_pickaxe_up_strike", "iron_pickaxe_side_raise", "iron_pickaxe_side_strike", "iron_watering_can_down_pour", "iron_watering_can_down_dip", "iron_watering_can_up_pour", "iron_watering_can_up_dip", "iron_watering_can_side_pour", "iron_watering_can_side_dip"],
 			"flash_row": true,
 			"pivot": [20, 40],
-			"pivot_is": "the hero's feet; the fists where his work pose's hands are",
+			"pivot_is": "the hero's feet; the art pack's pickaxe layer, cut round the short hero's frame; his hands where his work pose's are",
 			"names": "HeldTools.frame_names()"
 		},
 		{

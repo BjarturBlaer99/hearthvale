@@ -11,9 +11,10 @@ const WOOD: Color = Color(0.84, 0.66, 0.42)
 const EDGE: Color = Color(0.10, 0.08, 0.12)
 const HILT: Color = Color(0.55, 0.36, 0.18)
 const TRAIL: Color = Color(1.0, 1.0, 1.0, 0.35)
-## Where the hand is, relative to the hero's feet: at his belt. Only the drawing uses it; the
-## arc that hits is measured from his feet, as it always was.
-const HAND: Vector2 = Vector2(0.0, -11.0)
+## Where the hand is, relative to the hero's feet: at the belt of the short hero (farm-look
+## plan, phase E; it was -11 on the tall one). Only the drawing uses it; the arc that hits is
+## measured from his feet, as it always was.
+const HAND: Vector2 = Vector2(0.0, -6.0)
 ## The drawn blade grows with the reach (13 px at the old 20, 18 at 28), so a longer reach shows.
 const BLADE_LENGTH: float = CombatRules.SWORD_REACH * 0.65
 ## How faint the sweep at the reach is: the ground the swing covers, drawn round his feet.

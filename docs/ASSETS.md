@@ -14,8 +14,8 @@ painted each picture from ASCII art written for this game (no outside art) and a
 
 | File | What it is | Made by | Date | Terms |
 |---|---|---|---|---|
-| `gameplay/player/player_sheet.png` | the hero, 25 frames x 3 facings | code: `make_player_sprite.gd`; redrawn by a script in the look of PixelLab's `art/incoming/hero.png` (its colours, spiky hair, a deeper scarf), every pixel in its place (new-art plan, step 3) | 2026-11-20 | Hearthvale's own; PixelLab, free plan, made 2026-11-20: see "PixelLab" below |
-| `gameplay/art/held_tools.png` | the tools in his hands | code: `make_sprites.gd` | 2026-11-19 | Hearthvale's own |
+| `gameplay/player/player_sheet.png` | the hero, 25 frames x 3 facings, 32x32 | **Ninja Adventure since 2026-11-26** (farm-look plan, phase E; F3 "Short, the pack's", F11 "Blue, brown hood"): its one fully animated character (`Actor/CharacterAnimated/NinjaGreen/Separate/`), each pose in the pack's own 32x32 frame as drawn: idle, walk, attack, item, dead, hit, push and pick-up, facing down, up and left; recoloured in the pack's own colours (its olive hood to a light brown, its greens to two blues), blinking its eyes shut, running its walk leaning a pixel forward, by a one-off script. Until then the code's `make_player_sprite.gd`, redrawn in the look of PixelLab's `art/incoming/hero.png` (2026-11-20; see "PixelLab" below) | 2026-11-26 | CC0: see "Ninja Adventure" below |
+| `gameplay/art/held_tools.png` | the tools in his hands | **Ninja Adventure since 2026-11-26** (farm-look plan, phase E): the pickaxe its pickaxe layer (`Actor/CharacterAnimated/Weapon/Pickaxe.png`), raised and struck; the hoe the same with one arm of its head cut away; the can its watering can (`Items/Tool/WateringCan.png`) held at his side or before him; copper and iron in its bars' colours (phase C's recolouring), by a one-off script. **The sprinkler is still `make_sprites.gd`'s** (Hearthvale's own, 2026-11-19), lowered to the short hero's hands | 2026-11-26 | CC0 (the sprinkler Hearthvale's own): see "Ninja Adventure" below |
 | `gameplay/art/villager.png` | villagers: eight figures, each resting, breathing and blinking | **Ninja Adventure since 2026-11-26** (farm-look plan, phase D; F3 "Short, the pack's", F5 "Eight faces"): eight of its people facing front (`Actor/Character/<name>/SeparateAnim/Idle.png`): Master (Bram), Woman (Tilda), Princess (Wenna), Villager4 (Pip), Monk (Rolf), Villager3 (Oda), EggGirl (Edda), OldMan3 (Henrik), each at the foot of a 16x32 frame; breathing is the head a row lower, blinking the eyes shut, by a one-off script; no marker colours since | 2026-11-26 | CC0: see "Ninja Adventure" below |
 | `gameplay/art/slime.png` | slime | **Ninja Adventure since 2026-11-26** (farm-look plan, phase D; F4 "Replace both"): its green slime (`Actor/Monster/Slime2`) facing front, three of its frames, its drawn shadow taken off, standing on row 15. Until then the user's PixelLab slime (2026-11-23; see "PixelLab" below) | 2026-11-26 | CC0: see "Ninja Adventure" below |
 | `gameplay/art/wisp.png` | Bogwisp | **Ninja Adventure since 2026-11-26** (farm-look plan, phase D): its spirit (`Actor/Monster/Spirit`) facing front, two frames, its shadow line taken off; the flare the same with its blue rim white | 2026-11-26 | CC0: see "Ninja Adventure" below |
@@ -78,7 +78,7 @@ the switch (each byte for byte what was in the repo).
   `greybox_tiles.png`, `world/tiles/relief.png`, and `placed.png` (but the hand), `crafted.png`
   (but the sprinkler), `rocks.png`, `breakables.png`, `forage.png` and `torch.png` in
   `gameplay/art/`. Each was fitted by a script that cuts, moves, mirrors and recolours;
-  nothing was generated from it, and nothing was drawn anew in its style. Since phase C (2026-11-26) also `crops.png`, `soil.png`, `items.png` (but four icons) and the frame of `ui/art/ui_parts.png`; since phase D (2026-11-26) the villagers (`villager.png`), the slime, the bat, the Bogwisp, the goblin archer, the hens and the cow (`slime.png`, `bat.png`, `wisp.png`, `goblin.png`, `critters.png` but the butterflies, `animals.png` but the sheep). The Iron Warden and the Crypt Shade are not: the pack's bosses are larger than their frames.
+  nothing was generated from it, and nothing was drawn anew in its style. Since phase C (2026-11-26) also `crops.png`, `soil.png`, `items.png` (but four icons) and the frame of `ui/art/ui_parts.png`; since phase D (2026-11-26) the villagers (`villager.png`), the slime, the bat, the Bogwisp, the goblin archer, the hens and the cow (`slime.png`, `bat.png`, `wisp.png`, `goblin.png`, `critters.png` but the butterflies, `animals.png` but the sheep). Since phase E (2026-11-26) the hero (`gameplay/player/player_sheet.png`: its one fully animated character, recoloured in its own colours) and the tools in his hands (`held_tools.png`, but the sprinkler), and the master palette `art/palettes/hearthvale.gpl` is the pack's own `Palette.png`. The Iron Warden and the Crypt Shade are not: the pack's bosses are larger than their frames.
 
 ## PixelLab
 
@@ -97,7 +97,8 @@ Two more, `art/incoming/slime.png` and `bat.png`, were made by the user with Pix
 at 10:24 and 10:29 (the user's word). The terms above are as they were read on 2026-11-20; they were
 not read again for these two. Since 2026-11-26 the game no longer shows them (farm-look plan, phase D, F4: "Replace both"):
 the slime and the bat are the art pack's; the user's files are still in `art/incoming/` and the
-PixelLab sheets in git history.
+PixelLab sheets in git history. Since the same day the hero is the art pack's too (phase E): the game no longer shows the
+hero redrawn in the look of PixelLab's `hero.png`.
 
 Every PNG that holds PixelLab's pictures, or is drawn in their colours, says so in its row above.
 

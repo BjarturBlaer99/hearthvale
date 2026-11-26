@@ -22,7 +22,12 @@ extends RefCounted
 enum Facing { DOWN, UP, SIDE }
 enum Pose { NONE, ATTACK, HOLD, FALLEN, HURT, LAND, WORK }
 
-const FRAME_SIZE: Vector2i = Vector2i(16, 32)
+## A frame of the sheet: the art pack's own (farm-look plan, phase E), the short hero standing
+## in the middle of it with room round him for a swing, a lunge or lying down.
+const FRAME_SIZE: Vector2i = Vector2i(32, 32)
+## Where his feet are in a frame: his soles are on the row above, and a lunge or a fall may
+## reach a row or three below.
+const FEET: Vector2i = Vector2i(16, 24)
 ## Pixels travelled per animation step; six steps make one walk cycle (28 px, as it was when
 ## the cycle had four).
 const STRIDE: float = 28.0 / 6.0

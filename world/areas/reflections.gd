@@ -68,7 +68,8 @@ func setup(surface: WaterSurface, scenery: Scenery) -> void:
 		mirror.position = tree.position
 		trees[cell] = mirror
 	hero = _mirror()
-	hero.offset = Vector2(-PlayerAnimator.FRAME_SIZE.x / 2.0, 0.0)
+	# Upside down from his soles: the rows of the frame below his feet are above the mirror's top.
+	hero.offset = Vector2(-PlayerAnimator.FEET.x, -(PlayerAnimator.FRAME_SIZE.y - PlayerAnimator.FEET.y))
 
 
 ## Whether water lies within REACH cells south of `cell`, straight down or one cell to a side.

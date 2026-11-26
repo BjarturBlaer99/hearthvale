@@ -18,8 +18,9 @@ const HURT_TINT: Color = Color(1.0, 0.55, 0.55)
 const DUST_EVERY: float = 0.16
 ## How long an item just taken is held overhead (moving or swinging ends it sooner).
 const HOLD_TIME: float = 1.1
-## Where a held item's picture is drawn, from the hero's feet: just above the raised hands.
-const HOLD_OFFSET: Vector2 = Vector2(-8.0, -47.0)
+## Where a held item's picture is drawn, from the hero's feet: resting on the top of his hold
+## pose (his raised hands and head).
+const HOLD_OFFSET: Vector2 = Vector2(-8.0, -31.0)
 ## Work by hand (tool polish, D7): how long he reaches before him, and how long he then holds up
 ## what he took (a crop, an egg). Moving ends either at once.
 const REACH_TIME: float = 0.15
@@ -381,7 +382,7 @@ func _update_visuals() -> void:
 	# Falling into a pit, the hero shrinks toward their feet and is gone.
 	var shrink: float = _fall_left / _fall_time if _falling else 1.0
 	_sprite.scale = Vector2(shrink, shrink)
-	_sprite.position = Vector2(-PlayerAnimator.FRAME_SIZE.x / 2.0, -PlayerAnimator.FRAME_SIZE.y + _animator.bob() - roundi(lift)) * shrink
+	_sprite.position = Vector2(-PlayerAnimator.FEET.x, -PlayerAnimator.FEET.y + _animator.bob() - roundi(lift)) * shrink
 	_shadow.visible = not _falling
 	_sprite.flip_h = _animator.shows_flipped()
 	_sprite.modulate = HURT_TINT if motor.state_name == PlayerMotor.HURT else Color.WHITE

@@ -2,12 +2,13 @@ extends GdUnitTestSuite
 ## PlayerAnimator: which way the sprite faces, the six-frame walk and run cycles, the blink and
 ## the breath while standing, the poses (a three-frame swing, an item held up, fallen) and the
 ## sheet region. Also that its columns are the ones art/sheets.json lists for the hero's sheet,
-## and that every frame of the sheet is painted and stands on its last row.
+## and that every frame of the sheet is painted and stands on his feet's row (farm-look plan,
+## phase E: the art pack's 32x32 frame, the short hero's soles on row 23).
 
 const DIAGONAL: float = 0.70710678
 const ArtSheets: GDScript = preload("res://tests/support/art_sheets.gd")
 const SHEET: String = "res://gameplay/player/player_sheet.png"
-const W: int = 16
+const W: int = 32
 const H: int = 32
 
 var _anim: PlayerAnimator
@@ -190,7 +191,8 @@ func test_an_item_is_always_held_up_facing_front() -> void:
 
 
 func test_region_picks_the_frame_and_row() -> void:
-	assert_that(PlayerAnimator.FRAME_SIZE).override_failure_message("a cell wide, two cells tall").is_equal(Vector2i(W, H))
+	assert_that(PlayerAnimator.FRAME_SIZE).override_failure_message("the art pack's frame, two cells square").is_equal(Vector2i(W, H))
+	assert_that(PlayerAnimator.FEET).override_failure_message("his feet in its middle, room below them").is_equal(Vector2i(16, 24))
 	_anim.update(Vector2.UP, PlayerAnimator.STRIDE)
 	assert_that(_anim.region()).is_equal(Rect2(PlayerAnimator.WALK_1 * W, H, W, H))
 	_anim.update(Vector2.LEFT, 0.0)
@@ -217,14 +219,15 @@ func test_the_columns_are_the_ones_the_sheet_list_names() -> void:
 	for row: int in 3:
 		for column: int in PlayerAnimator.COLUMNS:
 			var painted: int = 0
-			var soles: int = 0
+			var lowest: int = -1
 			for y: int in H:
 				for x: int in W:
 					if image.get_pixel(column * W + x, row * H + y).a > 0.0:
 						painted += 1
-						soles += 1 if y == H - 1 else 0
+						lowest = y
 			assert_int(painted).override_failure_message("row %d column %d is painted" % [row, column]).is_greater(40)
-			assert_int(soles).override_failure_message("row %d column %d stands on the frame's last row" % [row, column]).is_greater(0)
+			# Nobody floats: his soles are on the row above his feet, or a lunge or a fall reaches lower.
+			assert_int(lowest).override_failure_message("row %d column %d stands on his feet" % [row, column]).is_between(PlayerAnimator.FEET.y - 1, PlayerAnimator.FEET.y + 3)
 
 
 func test_the_work_poses_are_the_last_four_columns() -> void:

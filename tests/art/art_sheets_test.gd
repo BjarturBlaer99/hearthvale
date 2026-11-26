@@ -111,24 +111,32 @@ func test_no_sprite_has_half_clear_pixels() -> void:
 					return
 
 
-func test_the_hero_and_the_villagers_stand_on_their_frames_last_row() -> void:
+func test_the_hero_and_the_villagers_stand_on_their_feet() -> void:
+	# A villager's soles are on the frame's last row. The hero's are on the row above his pivot
+	# (farm-look plan, phase E: the art pack's frame, with room below his feet for a lunge or a
+	# fall), and his standing and walking frames are on it exactly.
 	for file: String in ["player_sheet", "villager"]:
 		var entry: Dictionary = ArtSheets.sheet(file)
 		var image: Image = ArtSheets.image(entry)
 		var frame: Vector2i = Vector2i(entry["frame"][0], entry["frame"][1])
+		var soles_row: int = frame.y - 1 if file == "villager" else int(entry["pivot"][1]) - 1
 		var rows: int = (entry["rows"] as Array).size() if entry.has("rows") else 1
 		for row: int in rows:
 			for column: int in (entry["frames"] as Array).size():
 				var painted: int = 0
-				var soles: int = 0
+				var lowest: int = -1
 				for y: int in frame.y:
 					for x: int in frame.x:
 						if image.get_pixel(column * frame.x + x, row * frame.y + y).a > 0.0:
 							painted += 1
-							soles += 1 if y == frame.y - 1 else 0
-				var name: String = "%s row %d %s" % [file, row, entry["frames"][column]]
+							lowest = y
+				var frame_name: String = str(entry["frames"][column])
+				var name: String = "%s row %d %s" % [file, row, frame_name]
 				assert_int(painted).override_failure_message("%s is painted" % name).is_greater(40)
-				assert_int(soles).override_failure_message("%s stands on the frame's last row" % name).is_greater(0)
+				if file == "villager" or frame_name == "idle" or frame_name.begins_with("walk_"):
+					assert_int(lowest).override_failure_message("%s stands on its soles' row" % name).is_equal(soles_row)
+				else:
+					assert_int(lowest).override_failure_message("%s stands on its feet" % name).is_between(soles_row, soles_row + 4)
 
 
 func test_villagers_are_eight_short_figures_each_their_own() -> void:

@@ -37,6 +37,10 @@ place of the user's PixelLab ones).
 
 **2026-11-26, shown phase D's summary and pictures: "Approve phase D, go on to phase E".**
 
+**2026-11-26, during phase E, shown four looks for the hero side by side:** **F11 "Blue, brown
+hood"** (the pack's one fully animated character recoloured in the pack's own colours; not as
+drawn in green, not brown all over, not one of its plain people).
+
 **How far it has come:**
 
 - **Step 1, this plan:** written and committed (`54e1fd7`).
@@ -61,8 +65,11 @@ place of the user's PixelLab ones).
   D, go on to phase E". Begun on phase C's word, in a session of its own. **F3, F4 and F5 were decided by
   the user during the phase** (above). What was built, the gaps and what fits badly are in
   section 14.
-- **Phase E (the hero): begun on that word, 2026-11-26,** in a session of its own. F3 ("Short,
-  the pack's") holds for the hero too.
+- **Phase E (the hero): built on 2026-11-26 and waits for the user's review.** Begun on phase
+  D's word, in a session of its own. F3 ("Short, the pack's") holds for the hero too. **F11 was
+  decided by the user during the phase,** shown four looks side by side: **"Blue, brown hood"**
+  (the pack's one fully animated character, recoloured in its own colours). What was built, the
+  gaps and what fits badly are in section 15. With it, all five phases of step 2 are built.
 
 **The plan as it was written follows** (sections 0 to 10). When it was written nothing had been
 downloaded and nothing in the game had changed.
@@ -886,3 +893,95 @@ slimes, bats, Bogwisps at night, the goblin, the Warden and the Shade); not play
 **For the review:** whether the villagers' faces suit who they are (any of the eight can be
 another of the pack's ninety people: a name in the script); the gaps (sheep, butterflies, the two
 bosses kept as today's); and whether to go on to phase E, the hero, who will be short too (F3).
+
+## 15. Phase E as built (2026-11-26): the hero
+
+Built in a session of its own on the user's word of 2026-11-26 ("Approve phase D, go on to phase
+E"). F3 ("Short, the pack's") holds for him. **F11, decided by the user** during the phase, shown
+four looks side by side (the pack's one fully animated character as drawn in green, recoloured
+blue with a brown hood, recoloured brown; and one of its plain people, Boy, who has far fewer
+poses): **"Blue, brown hood".**
+
+**Art, and the slicing.** Two PNGs changed: `gameplay/player/player_sheet.png` (no flash row, as
+before) and `gameplay/art/held_tools.png` (with its flash row made from the new frames' shape).
+One script did the pictures, cutting, moving, mirroring and recolouring the pack's own pixels; it
+is kept with the session's notes (`farm-look-phase-e/scripts/fit_phase_e.gd`), not in the
+project. **The hero's frame is the pack's own, 32x32, his feet at (16, 24)** (it was 16x32 at
+(8, 32)): the pack draws its swing up to 19 wide, and its lunges, its pick-up and its fall up to
+three rows below the soles. Only the slicing changed (point 6): `PlayerAnimator.FRAME_SIZE`, the
+new `PlayerAnimator.FEET`, the sprite laid from them, `art/sheets.json` and their tests. He
+stands, collides and is hit where he always was; no map, data, story, timing or hit changed.
+`HeldTools` did not change: the pack's pickaxe layer is a 64x64 cell with his feet at (32, 40),
+so its 40x56 cut at (12, 0) has them at (20, 40), where they were.
+
+**In code:** `PlayerController.HOLD_OFFSET` (-8, -31), was (-8, -47): what he holds up rests on
+his hold pose. `Sword.HAND` (0, -6), was (0, -11): the blade is drawn from the short hero's belt;
+its reach is still `CombatRules.SWORD_REACH` from his feet. `Reflections` lays his mirror in water
+from his soles (the frame's rows below his feet would otherwise leave a gap). No colour in code
+changed: none matches the hero.
+
+**How each part was fitted** (the pack's `Actor/CharacterAnimated/NinjaGreen/Separate/`, whose
+columns face down, up, left and right; the side row is its left):
+
+| Column | From the pack | How |
+|---|---|---|
+| idle, breathe | `Idle`, its first and last frames | the last has the head a row lower |
+| blink | `Idle`'s first | each eye (its ink round its white glint) shut to its lowest row, the row above it the face's colour beside it; seen from behind nothing changes |
+| walk 1 to 6 | `Walk`'s four (passing, a step, passing with the weight down, the other step) | a step twice, passing with the weight down, the other step twice, passing; the game's 1-pixel bob on the second of each step, as before |
+| run 1 to 6 | none (a gap) | the walk's frame with the head (rows 0 to 18) a pixel forward: down on the front and back rows, to the left on the side row |
+| windup, slash, follow | `Attack`, its first three frames | the pack's character holds nothing: the blade is drawn in code, as before |
+| hold | `Item`, its second frame (both hands up) | seen from the front in every row, as before |
+| fallen | `Dead`, its last frame | the same in every row, as before |
+| hurt | `Hit`, its first frame (eyes wide) | |
+| raise, strike | `Attack`, its first and third frames | the pack's tool layers are swung as its attack is |
+| pour | `Push`, its first frame (arms held out) | a gap: the pack has no watering |
+| reach | `Pickup`'s first (crouched, a hand down) facing front; `Push`'s second facing up and to the side | `Pickup` is drawn facing front only |
+| colours | its olive hood `a8a129` to `c8966b`, its green `56864c` to `548789`, its dark green `345a52` to `2d697b` | all three the pack's own; its outline, skin, red and eyes as drawn |
+| pickaxe in his hands | its pickaxe layer (`Actor/CharacterAnimated/Weapon/Pickaxe.png`): raise its first frame, strike its third | cut to 40x56; copper and iron by phase C's recolouring |
+| hoe in his hands | the same layer | one arm of the head cut away and its end closed with the outline, so the head is a blade on one side; struck facing front (seen end on) it is left whole |
+| can in his hands | its watering can (`Items/Tool/WateringCan.png`) | at his side facing front, before him facing sideways (its spout the way he faces), all but hidden behind him facing up; lower to fill; copper and iron by phase C's recolouring |
+
+**The master palette** (`art/palettes/hearthvale.gpl`) is now the pack's own: the 53 colours of
+its `Palette.png`, by role, as section 6.3 said it would be after phase E. The sheets' own
+palettes were made again.
+
+**Gaps: kept as they were, or with no fitting piece in the pack.**
+
+1. **Run:** the pack has no run. The walk leaning a pixel forward stands in.
+2. **Blink:** the pack's idle doesn't blink; its eyes are shut by the script.
+3. **The hoe and the can:** the pack's tool layers are a pickaxe, an axe, a hammer, a katana and
+   a net. The hoe is cut from the pickaxe; the can is its icon, never tipped.
+4. **Pour and reach** have no frames of their own but `Pickup` facing front: its push stands in.
+5. **The sprinkler in his hands** is today's, lowered eight pixels to the short hero's hands.
+6. **The colours of the pieces left from earlier phases** (the sheep, the butterflies, the
+   Warden, the Shade, the dial, four icons, the sprinkler, the hand, the title picture) are not
+   in the new master palette.
+7. **The title picture** is unchanged (point 14).
+
+**What fits badly, said plainly.**
+
+- **He is a ninja in a hood,** the pack's one animated character recoloured: a masked face with
+  red cheeks under a brown hood, in blue. He no longer has hair, a scarf or a coat.
+- **He is short and round:** about 15 by 15, the villagers' height, where he was 16 by 32. He no
+  longer hides the cell north of him, and the camera, his collisions and his reach are as they
+  were, so the world looks a little larger round him.
+- **The can is as big as he is,** the pack's icon at its size; it is held at his side, not
+  before him, facing front.
+- **The hoe is a pickaxe with half a head:** it reads as a hoe from the side, less so from the
+  front.
+- **The pack's swing lunges:** facing down his body moves two rows lower during the slash, and
+  the sword's blade (drawn in code from his belt) does not follow the lunge.
+- **Hurt** is the pack's wide-eyed hit frame; with the game's red tint it reads as surprise
+  more than pain.
+
+**Tests:** `tests/gameplay/player_animator_test.gd` (the frame is the pack's 32x32, his feet at
+(16, 24); every frame stands on his feet, a lunge or a fall up to three rows lower);
+`tests/art/art_sheets_test.gd` (the hero's standing and walking frames on his soles' row exactly,
+the others within three rows; villagers on their last row); `tests/world/hero_test.gd` (the short
+hero stands on the same spot: his sprite laid from his feet, the held item on his hold pose, the
+sword drawn from a short hero's belt); `tests/world/nature_test.gd` (his reflection laid from his
+soles); `tests/world/characters_test.gd` (a villager's frame is a cell wide and as tall as his).
+
+**For the review:** whether the hero suits Hearthvale as the pack's hooded character in blue (or
+another of the four looks); the gaps (run, the hoe, the can, the sprinkler); and whether the farm
+look is finished, all five phases built.

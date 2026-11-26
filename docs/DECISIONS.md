@@ -1905,3 +1905,40 @@ PNG". What building it decided:
     butterflies (the pack's are monsters as big as a slime), and the Iron Warden and the Crypt
     Shade (the pack's bosses are 40 to 70 pixels wide, their frames 32: the nearest, its Giant
     Spirit, is a smiling flame some 8 pixels wider and taller than where the Shade can be hit).
+- 2026-11-26 — **The farm look, phase E: the hero and the tools in his hands from Ninja Adventure**
+  (`docs/progress/farm-look-plan.md`, section 15). **Decided by the user**, shown four looks side
+  by side: **F11 "Blue, brown hood"** (the pack's one fully animated character, recoloured in the
+  pack's own colours: its olive hood a light brown, its greens two blues; not as drawn in green,
+  not brown all over, and not one of its plain people, who have a walk, one swing frame, an item
+  pose and a fallen pose and nothing else). F3 ("Short, the pack's") holds for him. **Chosen while
+  building it, each the simplest that keeps to "art only":**
+  - **The frame is the pack's own, 32x32,** with his feet at (16, 24) (`PlayerAnimator.FRAME_SIZE`
+    and the new `PlayerAnimator.FEET`; `art/sheets.json`'s pivot). The pack draws its swings,
+    its lunges, its pick-up and its fall up to 19 wide and up to three rows below the feet; a
+    16-wide frame with the soles on its last row would cut them. Only the slicing changed: he
+    stands, collides and is hit where he always was. The reflection in water is laid from his
+    soles (`Reflections`), the item he holds up rests on his hold pose (`HOLD_OFFSET` -31, was
+    -47), and the sword is drawn from the short hero's belt (`Sword.HAND` (0, -6), was -11); its
+    reach is `CombatRules.SWORD_REACH` from his feet, as before.
+  - **Each pose from the pack's own frame:** idle and breathe its idle's first and last frames;
+    the walk its four laid on the game's six (a step twice, passing with the weight down, the
+    other step twice, passing); the swing its attack's first three frames (the pack's character
+    holds nothing: the blade is drawn in code, as before); hold its "show an item" frame and
+    fallen its dead frame, both seen from the front in every row as before; hurt its hit frame.
+    The work poses are its attack too (raise its first frame, strike its third), as the pack's
+    own tool layers are swung; pour is its push (arms held out), reach its pick-up facing front
+    and its push facing up and to the side.
+  - **Made from its frames, where it has none:** blink (the idle with each eye shut to its
+    lowest row) and run (the walk with the head a pixel forward: down on the front and back rows,
+    to the left on the side row).
+  - **The tools:** the pickaxe is the pack's pickaxe layer (a 64x64 cell round its 32x32 frame,
+    cut to `HeldTools`' 40x56 with his feet at (20, 40), so `HeldTools` did not change). The pack
+    has no hoe layer: the hoe is the pickaxe layer with one arm of its head cut away, a blade on
+    one side (left whole when struck facing front, seen end on). It has no can layer: the can is
+    its watering-can icon, held at his side facing front, before him facing sideways, hidden
+    behind him facing up, and lower to fill; it is never tipped (turning it by less than a
+    quarter would spoil its pixels). Copper and iron are phase C's recolouring of the tools'
+    heads and handles. **The sprinkler is today's,** lowered eight pixels to the short hero's
+    hands: the pack has none.
+  - **The master palette is the pack's own** (`art/palettes/hearthvale.gpl`: the 53 colours of
+    its `Palette.png`), as the plan's section 6.3 says it should be after phase E.

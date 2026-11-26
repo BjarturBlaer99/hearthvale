@@ -232,6 +232,10 @@ func test_water_has_a_moving_surface_and_mirrors_the_hero_and_the_trees_on_its_b
 	assert_bool(mirror.flip_v).override_failure_message("upside down").is_true()
 	assert_that(mirror.region_rect).override_failure_message("the frame the hero shows").is_equal(village.player.shown_region())
 	assert_that(mirror.position).override_failure_message("under their feet").is_equal(village.player.position.round())
+	# Upside down, the frame's rows below his feet (farm-look plan, phase E) lie above the
+	# mirror's top: his soles' row is the first row under his feet.
+	assert_float(mirror.offset.x).is_equal(float(-PlayerAnimator.FEET.x))
+	assert_float(mirror.offset.y + PlayerAnimator.FRAME_SIZE.y - PlayerAnimator.FEET.y).override_failure_message("his soles mirrored at his feet").is_equal(0.0)
 	assert_bool(village.reflections.trees.has(Vector2i(34, 25))).override_failure_message("the cherry by the pond's corner is mirrored").is_true()
 	assert_bool(village.reflections.trees.has(Vector2i(16, 4))).override_failure_message("the one by the chapel is nowhere near water").is_false()
 	var wet: Dictionary = {Vector2i(5, 7): true}

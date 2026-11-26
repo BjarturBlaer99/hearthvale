@@ -3941,3 +3941,25 @@ not played by hand. Waits for the user's review; phase E (the hero) is not begun
 before-and-after pictures, the user approved phase D on 2026-11-26 ("Approve phase D, go on to
 phase E"). It stands as built, with F3, F4 and F5 as the user chose them. Phase E (the hero)
 begins on that word, in a session of its own.
+
+## Farm look, phase E: the hero (2026-11-26)
+
+The farm-look plan's phase E (`docs/progress/farm-look-plan.md`, section 15), on the user's word
+"Approve phase D, go on to phase E". No map, data, story, timing, hit or collision changed.
+
+- **Decided by the user** from pictures of four looks: F11 "Blue, brown hood" (the pack's one
+  fully animated character, recoloured in the pack's colours).
+- **What changed:** `player_sheet.png` (25 poses in three rows, now 32x32 frames, his feet at
+  (16, 24)) and `held_tools.png` (the pack's pickaxe layer, the hoe cut from it, the pack's can;
+  copper and iron recoloured), fitted from Ninja Adventure (CC0) by one script that cuts, moves,
+  mirrors and recolours (kept with the session's notes). In code: `PlayerAnimator.FRAME_SIZE`
+  (32x32) and `FEET`, the sprite laid from his feet, `PlayerController.HOLD_OFFSET`, `Sword.HAND`,
+  and the reflection laid from his soles. The palettes were made again and the master is now the
+  pack's own; `docs/ASSETS.md`, `docs/DECISIONS.md` and `art/README.md` say what came from where.
+- **Gaps:** run, blink, the hoe and the can have no frames of their own in the pack (made from
+  its walk, its idle, its pickaxe layer and its can icon); the sprinkler in his hands is today's.
+- **Tests:** the hero's frame is the pack's (32x32, feet at (16, 24)); every frame stands on his
+  feet (standing and walking exactly on the soles' row, a lunge or a fall up to three rows
+  lower); his sprite is laid from his feet, the held item rests on his hold pose, the sword is
+  drawn from a short hero's belt; his reflection is laid from his soles; a villager's frame is a
+  cell wide and as tall as his.
