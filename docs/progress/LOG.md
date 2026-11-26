@@ -3936,3 +3936,8 @@ The farm-look plan's phase D (`docs/progress/farm-look-plan.md`, section 14), on
 
 **Verified:** the whole suite, 1262 cases, exit 0. Seen in 37 capture shots before and after;
 not played by hand. Waits for the user's review; phase E (the hero) is not begun.
+
+**Approved (farm look, phase D).** Shown the summary, the gaps, what fits badly and the
+before-and-after pictures, the user approved phase D on 2026-11-26 ("Approve phase D, go on to
+phase E"). It stands as built, with F3, F4 and F5 as the user chose them. Phase E (the hero)
+begins on that word, in a session of its own.

@@ -35,6 +35,8 @@ villagers become the pack's one-cell people, and the hero too in phase E), **F5 
 (each villager a pack figure of their own), **F4 "Replace both"** (the pack's slime and bat in
 place of the user's PixelLab ones).
 
+**2026-11-26, shown phase D's summary and pictures: "Approve phase D, go on to phase E".**
+
 **How far it has come:**
 
 - **Step 1, this plan:** written and committed (`54e1fd7`).
@@ -54,11 +56,13 @@ place of the user's PixelLab ones).
   seven screens in each look side by side: **"Dark wood, light text"** (the pack's frame round
   today's dark inside and light writing). What was built, the gaps and what fits badly are in
   section 13.
-- **Phase D (villagers, animals, monsters): built on 2026-11-26 and waits for the user's
-  review.** Begun on phase C's word, in a session of its own. **F3, F4 and F5 were decided by
+- **Phase D (villagers, animals, monsters): built on 2026-11-26 (`6982052`) and approved the
+  same day.** Shown the summary and the before-and-after pictures, the user said: "Approve phase
+  D, go on to phase E". Begun on phase C's word, in a session of its own. **F3, F4 and F5 were decided by
   the user during the phase** (above). What was built, the gaps and what fits badly are in
   section 14.
-- Phase E: not begun.
+- **Phase E (the hero): begun on that word, 2026-11-26,** in a session of its own. F3 ("Short,
+  the pack's") holds for the hero too.
 
 **The plan as it was written follows** (sections 0 to 10). When it was written nothing had been
 downloaded and nothing in the game had changed.
@@ -803,8 +807,8 @@ is now one smaller than two corners (6 by 6; the frame's corners are 5). Every o
 
 ## 14. Phase D as built (2026-11-26): villagers, animals, monsters
 
-Built in a session of its own on the user's word of 2026-11-26 ("Approve phase C, go on to phase
-D"). **F3, F4 and F5, decided by the user** from pictures of each choice (a row of today's
+**Approved on 2026-11-26** ("Approve phase D, go on to phase E"). Built in a session of its own
+on the user's word of 2026-11-26 ("Approve phase C, go on to phase D"). **F3, F4 and F5, decided by the user** from pictures of each choice (a row of today's
 villagers beside the tall hero, the pack's one figure recoloured for each, and eight pack faces;
 the user's slime and bat over the pack's): **"Short, the pack's"**, **"Eight faces"** and
 **"Replace both"**.
