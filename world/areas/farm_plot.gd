@@ -22,8 +22,9 @@ const CROP_FRAMES: Dictionary = {
 	&"wheat_growing": 7, &"wheat_ripe": 8, &"potato_growing": 9, &"potato_ripe": 10,
 	&"pumpkin_growing": 11, &"pumpkin_ripe": 12,
 }
-## The bed's rim: a dark shade of the soil, a pixel wide, so it reads as dug and not as a path.
-const RIM: Color = Color(0.30, 0.20, 0.13)
+## The bed's rim: a dark shade of the soil (the pack's brown of watered soil), a
+## pixel wide, so it reads as dug and not as a path.
+const RIM: Color = Color("695953")
 
 ## The cells (the plot's own) drawn as they were, each { "soil", "crop", "phase", "sprinkler" }.
 var _held: Dictionary = {}

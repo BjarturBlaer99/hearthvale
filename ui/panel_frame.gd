@@ -1,16 +1,18 @@
 class_name PanelFrame
 extends ColorRect
-## The look every box on screen shares (new art, step 4, from PixelLab's UI sheet): the dialogue
-## box, the menus, the HUD's corner. Its inside is dark wood, and over it it draws, in whole pixels:
+## The look every box on screen shares (new art, step 4; its frame the Ninja Adventure pack's since
+## the farm look's phase C): the dialogue box, the menus, the HUD's corner. Its inside is dark
+## wood, and over it it draws, in whole pixels:
 ## - a soft shadow under the box
 ## - a lighter band along the top
-## - a wooden frame with a gold cap in each corner (UiParts), laid over the box's outermost pixel
-##   so it covers the gold edge of its Border sibling
-## - under a heading (`rule_y`), a rule across the box with a small diamond in its middle
+## - the pack's wooden frame (UiParts), laid over the box's outermost pixel so it covers the edge
+##   of its Border sibling
+## - under a heading (`rule_y`), a rule across the box with a small diamond in its middle, in the
+##   frame's orange
 
-const GOLD: Color = Color(0.85, 0.66, 0.39)
-const GOLD_LIGHT: Color = Color(0.95, 0.85, 0.59)
-const RULE: Color = Color(0.85, 0.66, 0.39, 0.6)
+const GOLD: Color = Color("f06733")
+const GOLD_LIGHT: Color = Color("ffad55")
+const RULE: Color = Color(Color("f06733"), 0.6)
 const SHEEN: Color = Color(1.0, 0.95, 0.85, 0.05)
 const SHADOW: Color = Color(0.03, 0.02, 0.06, 0.45)
 ## The box's inside: the dark wood of the sheet's slots (its own alpha is kept).

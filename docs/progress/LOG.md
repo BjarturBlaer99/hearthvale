@@ -3876,3 +3876,30 @@ not played by hand. Waits for the user's review; phase C is not begun.
 before-and-after pictures, the user approved phase B on 2026-11-26 ("Approve phase B, go on to
 phase C"). It stands as built, F9's recommended answer with it (what is drawn in code stays
 drawn). Phase C (crops, items, UI) begins on that word, in a session of its own.
+
+## Farm look, phase C: crops, soil, items and the UI (2026-11-26)
+
+The farm-look plan's phase C (`docs/progress/farm-look-plan.md`, section 13), on the user's word
+"Approve phase B, go on to phase C". Art only: no map, data, story, timing or collision changed.
+
+- **What changed:** `crops.png`, `soil.png`, `items.png` (each with its flash row) and
+  `ui_parts.png`, fitted from Ninja Adventure (CC0) by one script that cuts, moves, turns and
+  recolours (kept with the session's notes, not in the repo). `UiParts` has the pack frame's
+  places (corners 5, edges 5 deep and 6 long); the colours in code of the hearts, the energy bar,
+  the item bar's slots, the boxes' rule and the plot's rim are the pack's. The palettes were made
+  again; `docs/ASSETS.md` and `docs/DECISIONS.md` say what came from where.
+- **F8, decided by the user** from pictures of both: "Dark wood, light text". The theme and the
+  menus' text colours are unchanged.
+- **Gaps:** the pack has no crops (its plants and roots stand in); four icons are today's (the
+  shuttle, the cattail root, the wisp ember, the sprinkler); the clock's dial is today's.
+- **What fits badly:** growing crops are as large and leafy as the field's weeds, told apart by
+  the soil under them; some icons are the pack's pieces read for another thing (a fried egg is
+  its egg sushi, the seed packets its money pouch with a seed); hay is the pack's straw square.
+- **Tests:** `tests/art/farm_look_ui_and_soil_test.gd` (new: the frame's pieces where `UiParts`
+  says, its edges whole and outlined outside, the dial in place; soil darker as it is worked);
+  `tests/ui/polish_test.gd`'s box too small for a frame is now smaller than two corners. The first
+  run failed one (`farm_test`: watered soil not darker than tilled by enough); watered is now
+  three steps darker than bare in the pack's browns, not two.
+
+**Verified:** the whole suite, 1261 cases, exit 0. Seen in 36 capture shots before and after;
+not played by hand. Waits for the user's review; phase D is not begun.

@@ -1855,3 +1855,28 @@ PNG". What building it decided:
   - The lattice window lies where `WindowGlow`'s rectangles light it: neither moved.
   - The ore rocks are one pack rock with its spots recoloured for each ore.
   - The sprinkler and the build bar's hand have nothing in the pack and stay as they were.
+- 2026-11-26 — **The farm look, phase C: crops, soil, item icons and the boxes' frame from Ninja
+  Adventure** (`docs/progress/farm-look-plan.md`, section 13). **F8 decided by the user**, shown
+  the same seven screens in each look side by side: **"Dark wood, light text"**. The boxes keep
+  today's dark inside and light writing, in the pack's wood frame; the font tool's theme and the
+  menus' text colours are unchanged. **Chosen while building it, each the simplest that keeps to
+  "art only":**
+  - The pack has no crops. A crop's pictures are the pack's plants and roots: its seed, its
+    seedling (browned when withered), a plant of its nature sheet growing and the crop's root or
+    fruit ripe; wheat is the same tuft green and gold, the pumpkin a green ball and an orange
+    one. None of them is a plant the field's overgrowth already uses.
+  - The soil is the pack's dirt: bare plain or with a twig (its pebble looked like a stone to
+    pick up), tilled and watered the same dirt one and three steps darker in the pack's own browns.
+    The plot's rim in code (`FarmPlot.RIM`) is the darker of them.
+  - Items are picked by meaning, centred in the cell, never shrunk. Where the pack's piece is
+    named for something else but reads as this game's thing it is used (its "honey" a custard,
+    its "fortune cookie" an omelette, its "crate of dynamite" a cake, its "crate" a pie dish, its
+    "sushi" a bread roll). The copper and iron tools are its tools with their heads in its bars'
+    colours; the ores are its rock in each ore's colour, so an ore lying where a rock was is not
+    the rock again.
+  - The frame is the pack's wood panel cut into corners of 5 and edges 5 deep and 6 long
+    (`UiParts`; the sheet's size unchanged); a box drawn smaller than two corners has none. The
+    hearts, the energy bar, the item bar's slots and the boxes' rule stay drawn in code (F9) in
+    the pack's colours.
+  - Kept as they were, the pack having nothing like them: the shuttle, the cattail root, the wisp
+    ember and the sprinkler's icons, and the clock's dial.

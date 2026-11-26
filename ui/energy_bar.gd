@@ -12,12 +12,14 @@ const HEIGHT: int = 5
 const BAR_X: float = 9.0
 ## At or under this share of the whole, energy counts as low.
 const LOW: float = 0.25
-const FULL_COLOR: Color = Color("6cb055")
-const MID_COLOR: Color = Color("e7c072")
-const LOW_COLOR: Color = Color("e14a3d")
+## The Ninja Adventure pack's colours (the farm look's phase C): its grass green, its gold and
+## its heart red, in a slot of its dark slate framed in its wood's orange.
+const FULL_COLOR: Color = Color("74a334")
+const MID_COLOR: Color = Color("f1c471")
+const LOW_COLOR: Color = Color("e0394c")
 const SHINE: Color = Color(1.0, 1.0, 1.0, 0.28)
-const BACK: Color = Color("593a2a")
-const FRAME: Color = Color("c79357")
+const BACK: Color = Color("3b3643")
+const FRAME: Color = Color("f06733")
 ## The line between two segments of the bar, darker than what fills it.
 const SEGMENT: int = 8
 const SEGMENT_LINE: Color = Color(0.0, 0.0, 0.0, 0.22)
@@ -30,7 +32,7 @@ const BOLT: Array[String] = [
 	".oYo...",
 	".oo....",
 ]
-const BOLT_COLORS: Dictionary = {"o": Color("4e2e1f"), "Y": Color("e7c072")}
+const BOLT_COLORS: Dictionary = {"o": Color("141b1b"), "Y": Color("ffe18d")}
 
 var _current: float = 0.0
 var _maximum: float = 1.0

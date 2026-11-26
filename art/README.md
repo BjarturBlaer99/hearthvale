@@ -65,8 +65,8 @@ art/
 | Items | `items.png` 16x16 x74 | + flash row; one icon per item | the cell's top-left |
 | Placed things, furnishings, rocks, breakables, forage | `placed`, `crafted`, `rocks`, `breakables`, `forage`, 16x16 | + flash row | the cell's top-left |
 | Title | `ui/title/backdrop.png` 640x360 | the keep's window, the stars and the cherry trees must stay where `ui/title_picture.gd` says | the screen |
-| UI: frames, dial | `ui/art/ui_parts.png` 104x32: four gold corners of 7, the top, bottom, left and right edges (6 deep, 16 long, outline outermost), the dial 32x32; places in `ui/ui_parts.gd` | each piece's top-left |
-| UI: the rest | the hearts, bars, slots and the dial's hand are drawn in code, in the UI sheet's colours; the fonts are made in code | | |
+| UI: frames, dial | `ui/art/ui_parts.png` 104x32: four corners of 5, the top, bottom, left and right edges (5 deep, 6 long, outline outermost; the pack's wood panel), the dial 32x32; places in `ui/ui_parts.gd` | each piece's top-left |
+| UI: the rest | the hearts, bars, slots and the dial's hand are drawn in code, in the pack's colours (hearts, energy bar, item bar slots, the boxes' rule) and the dial's; the fonts are made in code | | |
 
 **Ground details** (`world/tiles/ground_details.png`, the warm-ground plan, step 3) are small
 still touches drawn on the ground under everything else: clover and flowers on grass, pebbles on
@@ -102,9 +102,10 @@ are pictures since 2026-11-25 (`ground_edges.png`): repaint the grass and repain
 pieces in the same colours (`tests/art/ground_edges_sheet_test.gd` checks them).
 
 **Art from a pack** (`docs/progress/farm-look-plan.md`): the ground, the trees, the ground details
-and the ground's edges (phase A), and the buildings, interiors and props (phase B: the atlas's
+and the ground's edges (phase A), the buildings, interiors and props (phase B: the atlas's
 house, furniture and prop rows, `relief.png`, `placed`, `crafted`, `rocks`, `breakables`, `forage`
-and `torch`, but the sprinkler and the hand) are Ninja Adventure's (CC0), fitted by cutting, moving, mirroring and
+and `torch`, but the sprinkler and the hand), and the crops, soil, item icons and the boxes' frame
+(phase C: `crops`, `soil`, `items` but four icons, `ui_parts` but the dial) are Ninja Adventure's (CC0), fitted by cutting, moving, mirroring and
 recolouring. Their colours are the pack's own, not `hearthvale.gpl`'s older ones (the master palette
 lists both while the switch is under way), their outlines are the pack's near black, and the grass
 and the marsh are flat colour. Keep a new piece to one style: the pack's, where the pack has it.

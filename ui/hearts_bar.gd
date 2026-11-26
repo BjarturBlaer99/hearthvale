@@ -15,14 +15,15 @@ const HEART: Array[String] = [
 ]
 const SPACING: Vector2 = Vector2(9, 9)
 const PER_ROW: int = 10
-## The colours of PixelLab's UI sheet (new art, step 4): a red heart lit at its top left, an
-## empty one in dark wood.
-const FULL: Color = Color("e14a3d")
-const SHINE: Color = Color("f88783")
-const EMPTY: Color = Color("593a2a")
-const OUTLINE: Color = Color("392015")
-const PIECE: Color = Color("e7c072")
-const PIECE_EMPTY: Color = Color("5b5035")
+## The colours of the Ninja Adventure pack's hearts (the farm look's phase C): a red heart lit
+## at its top left, an empty one in its dark slate, outlined in its near black; the piece heart
+## in its gold.
+const FULL: Color = Color("e0394c")
+const SHINE: Color = Color("fe9d80")
+const EMPTY: Color = Color("3b3643")
+const OUTLINE: Color = Color("141b1b")
+const PIECE: Color = Color("f1c471")
+const PIECE_EMPTY: Color = Color("695953")
 ## The pixel of a heart that catches the light (its left lobe), when that half is full.
 const SHINE_AT: Vector2i = Vector2i(1, 1)
 

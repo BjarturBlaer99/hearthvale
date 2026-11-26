@@ -117,7 +117,7 @@ func test_the_frame_has_a_gold_cap_in_each_corner_wood_all_round_and_a_rule_unde
 	for y: int in range(int(whole.position.y), int(whole.end.y)):
 		for x: float in [whole.position.x, whole.end.x - 1.0]:
 			assert_bool(_covered(pieces, Vector2(x + 0.5, y + 0.5))).override_failure_message("the frame covers (%d, %d)" % [x, y]).is_true()
-	assert_array(PanelFrame.pieces(Vector2(8.0, 8.0))).override_failure_message("a box too small has none").is_empty()
+	assert_array(PanelFrame.pieces(Vector2(6.0, 6.0))).override_failure_message("a box too small for two corners has none").is_empty()
 	var parts: Array[Rect2] = PanelFrame.rule_parts(box, 25.0)
 	assert_int(parts.size()).override_failure_message("the rule runs either side of its diamond").is_equal(2)
 	assert_float(parts[0].position.x).is_equal(PanelFrame.RULE_MARGIN)

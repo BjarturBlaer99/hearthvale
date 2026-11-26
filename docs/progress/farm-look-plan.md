@@ -18,7 +18,7 @@ props, C crops, items and UI, D villagers, animals and monsters, E the hero), st
 - **F6 and F7: taken as recommended; the user has not spoken to them; open at the phase A
   review.** F6: the ground-detail rule is kept and its sheet painted again from the pack. F7: the
   pack's own edges are drawn where the code drew its fringe, banks and cliff faces.
-- **F3, F4, F5, F8 and F9 are open:** they belong to later phases.
+- **F3, F4, F5, F8 and F9 are open:** they belong to later phases. (F8 decided 2026-11-26, F9 taken: see below.)
 
 **2026-11-25, shown phase A's summary and pictures: "Approve phase A, go on to phase B".** And of
 the pack in git, the same day: "Yes, without audio".
@@ -39,7 +39,11 @@ is drawn in code stays drawn) stands as taken.
   on to phase C". It stands as built, F9's recommended answer with it (what is drawn in code stays
   drawn); the user said nothing separately of it. What was built, the gaps and what fits badly
   are in section 12.
-- **Phase C (crops, items, UI): begun on that word, 2026-11-26,** in a session of its own.
+- **Phase C (crops, items, UI): built on 2026-11-26 and waiting for the user's review.** Begun
+  on that word, in a session of its own. **F8 was decided by the user during the phase,** shown
+  seven screens in each look side by side: **"Dark wood, light text"** (the pack's frame round
+  today's dark inside and light writing). What was built, the gaps and what fits badly are in
+  section 13.
 - Phases D and E: not begun.
 
 **The plan as it was written follows** (sections 0 to 10). When it was written nothing had been
@@ -707,3 +711,78 @@ it, so neither rectangle moved.
 **Tests:** none needed changing. The first run failed one: the clay and slate roofs' gable-end
 ridge strips were under half painted (`buildings_test`), as the pack's clay roof has two empty rows
 on top; the roof is now cut from its first painted row. Then the whole suite, 1259 cases, exit 0.
+
+## 13. Phase C as built (2026-11-26): crops, soil, items, the UI
+
+**Waiting for the user's review.** Built in a session of its own on the user's word of
+2026-11-26 ("Approve phase B, go on to phase C"). **F8, decided by the user** from the same seven
+screens in each look side by side (a mock-up of parchment, made for the picture and taken out
+again): **"Dark wood, light text".** The boxes keep today's dark inside and light writing; the
+font tool's theme and the menus' text colours did not change.
+
+**Art only.** No map, data, story, timing or collision changed. Four PNGs changed, each at its
+old size and with its frames in their old order: `gameplay/art/crops.png`, `soil.png` and
+`items.png` (each with its flash row made from the new frames' shape) and `ui/art/ui_parts.png`.
+One script did it all, cutting, moving, turning and recolouring the pack's own pixels; it is kept
+with the session's notes (`farm-look-phase-c/scripts/fit_phase_c.gd`), not in the project.
+
+**How each part was fitted:**
+
+| Part | From the pack | How |
+|---|---|---|
+| Seeded, sprout, withered | its seed (`Items/Food/Seed1`), its seedling (`TilesetFloorDetail.png` (0, 2)) | the seedling browned in its twigs' colours for withered; each stood on the cell's foot |
+| Turnip | a dark leafy rosette (`TilesetNature.png` (4, 11)); its white root with leaves (`SeedBig2`) | growing, ripe |
+| Carrot | a ferny plant (9, 10); its orange root with leaves (`SeedBig1`) | |
+| Wheat | a spiky tuft (7, 10); the same in its golds | |
+| Potato | a round leafy plant (10, 10); its large seed (`SeedLarge`), which is potato-shaped | |
+| Pumpkin | a green ball (10, 9); an orange one (9, 9) | |
+| Soil | its dirt, the darker grass set's (`TilesetFloor.png`) | bare: plain (12, 8) and with a twig (11, 11); tilled and watered: the plain dirt one and three steps darker in its own browns, its dashes the furrows |
+| Items | its `Items/` (food, tools, bars, gems, jars, seeds, bomb, key, coin, arrow, bow, swords, a pouch, scrolls), its hearts (`Ui/Receptacle/`), and from its tilesets the lantern, mushroom, blossom, crystal, hay and the cauldron | picked by meaning and centred; the bow turned upright; the tools' copper and iron tiers its tools with their heads in its bars' colours; the ores its rock in each ore's colour (not its ore rocks: an ore lying where a rock was would look like the rock); the seed packets its pouch with the crop's seed in front; jam its water jar in red; the marsh's berries and mushroom recoloured as phase B's forage; egg, wool and cloth recoloured from its pale seed, nut and scroll |
+| The boxes' frame | its wood panel (`Ui/Theme/Theme Wood/nine_path_panel_2.png`) | cut into four corners of 5 and edges 5 deep and 6 long (`UiParts`); the sheet stays 104x32 |
+| Colours in code (point 15) | its heart, slate, near black, grass green, gold, wood orange, inventory cell | `HeartsBar` (hearts), `EnergyBar` (bar, frame, bolt), `ItemBar` (slots; the build bar shares them), `PanelFrame` (the heading's rule and diamond), `FarmPlot.RIM` (the plot's rim) |
+
+Which icon is which piece, in full: sword `Weapons/Sword2`; bow `Weapons/Bow` turned; arrows
+`Projectile/Arrow`; bomb `Projectile/Bomb` (dim: its spark put out); key `Treasure/GoldKey`;
+coin `Treasure/Coin2`'s first frame; heart `Ui/Receptacle/IconHeart`; heart container and piece
+`Ui/Receptacle/Heart` full and a quarter; gem `Resource/GemGreen`; lantern the lantern of
+`TilesetElement` (6, 3) (the miner's: its glass and glow in greys); iron sword `Weapons/BigSword`;
+berries `Food/SeedBig3`; mushroom `TilesetElement` (1, 1); bread `Food/Sushi`; blossom
+`TilesetFloorDetail` (2, 0); tea `Food/TeaLeaf` (ember tea: in its fire colours); hoe, watering
+can and pickaxe `Tool/`; water `Resource/Water`; turnip, carrot, potato as the crops; wheat the
+golden tuft; pumpkin `Object/Gourd`; roast turnip `Food/Yakitori`; soup `Food/Noodle`; stew and
+marsh stew the cauldron of `tileset_camp` (6, 3) with a brown and a green stew; pie and shepherd's
+pie `Object/CrateEmpty` (the second with a white top); jam `Potion/WaterPot` in red; cake
+`Projectile/CrateDynamite`; stone `Resource/Rock`; crystal `TilesetNature` (1, 15); wood
+`Resource/Branch`; the bars `Resource/Bar*`; fibre `Resource/Grass`; hay `TilesetElement` (12, 5)
+(the silo's hay of phase B); kit `Scroll/ScrollEmpty`; egg `Food/SeedLargeWhite` in creams; wool
+`Food/Nut` in white and grey; milk `Potion/MilkPot`; cloth `Scroll/Scroll` in blues; fried egg
+`Food/Sushi2`; omelette `Food/FortuneCookie`; custard `Food/Honey`.
+
+**Gaps: kept as they were, or with no fitting piece in the pack.**
+
+1. **Crops.** The pack has none: its plants and roots stand in, one picture for growing and one
+   for ripe, as before.
+2. **Four icons** are today's art: the shuttle, the cattail root, the wisp ember and the
+   sprinkler (as its picture on the ground, phase B).
+3. **The clock's dial** is today's (PixelLab's colours); its hand is drawn in code as before.
+4. **What is drawn in code** (F9): the hearts, the energy bar and the item bar's slots are still
+   drawn in code, now in the pack's colours; the pack's own heart pictures are 16 wide, too large
+   for the HUD's row of 9.
+
+**What fits badly, said plainly.**
+
+- **Growing crops are large and leafy,** as large as the field's weeds; they are told apart by
+  the tilled soil under them and by being other plants of the pack's sheet.
+- **Some icons are the pack's pieces read as another thing:** a fried egg is its egg sushi, the
+  seed packets its money pouch with a seed in front, the kit its blank scroll, a cake its crate of
+  dynamite (it reads as a cake), hay its straw square.
+- **The potato is its large seed,** an orange almond shape; the carrot a round orange root.
+- **The boxes' frame is thinner** (5 pixels, was 6 with gold caps): the pack's panel has no caps.
+- **Tilled soil's furrows are fainter** than the old stripes: the pack's dirt has only short
+  dashes. Watered soil is a dark grey-brown.
+- **The item bar's slots are grey-green,** the pack's inventory cell, under a dark-wood HUD.
+
+**Tests:** `tests/art/farm_look_ui_and_soil_test.gd` (new): the frame's pieces lie where
+`UiParts` says, clear of the dial, its edges whole and outlined on the outside, the dial in
+place; the soil darker as it is worked. `tests/ui/polish_test.gd`: a box too small for a frame
+is now one smaller than two corners (6 by 6; the frame's corners are 5). Every other test stood.

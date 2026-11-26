@@ -15,15 +15,15 @@ const SLOT: int = 20
 const GAP: int = 2
 ## How far the bar sits from the bottom of the screen (px).
 const MARGIN: int = 4
-## PixelLab's UI sheet's slots (new art, step 4): dark wood with a wooden rim, the one in hand
-## rimmed in pale gold.
-const BACK: Color = Color(0.35, 0.23, 0.16, 0.85)
-const EDGE: Color = Color("a7744a")
-const LIT_BACK: Color = Color(0.42, 0.27, 0.19, 0.95)
-const LIT_EDGE: Color = Color("f2da96")
+## The Ninja Adventure pack's inventory cell (the farm look's phase C): grey-green in a dark rim,
+## the one in hand lighter and rimmed in the orange of its focus mark.
+const BACK: Color = Color(Color("8d977f"), 0.9)
+const EDGE: Color = Color("46402e")
+const LIT_BACK: Color = Color(Color("abc2bc"), 0.95)
+const LIT_EDGE: Color = Color("ffad55")
 const COUNT: Color = Color(1.0, 1.0, 1.0)
 const COUNT_SHADE: Color = Color(0.05, 0.03, 0.09, 0.95)
-const MORE: Color = Color("e7c072")
+const MORE: Color = Color("ffad55")
 const FONT_SIZE: int = 8
 
 ## What can be in hand (item data entries, HandBar's order), which of them is (HandBar.NONE:
