@@ -97,8 +97,8 @@ approved as recommended):** six steps, each stopped for review: I1 icons in the 
 menu's "Pack", A1 the axe's pictures, A2 the axe in play (the sword stops cutting wood: D5 changed),
 B1 each item keeps its bar slot, B2 the screen to arrange the bar. **I1 and I2 are built and
 approved (2026-11-26, "Approve, go on" each); A1 is built and approved (2026-11-27, "okay
-continue"); A2 is built and approved (2026-11-27, "Approve, go on"); B1 is built (2026-11-27)
-and waits for the user's review.** The axe's pictures are the pack's: three icons at the end of `items.png` (after the hen,
+continue"); A2 and B1 are built and approved (2026-11-27, "Approve, go on" each); B2 is built
+(2026-11-27) and waits for the user's review: all six steps are built.** The axe's pictures are the pack's: three icons at the end of `items.png` (after the hen,
 sheep and cow, so a test wanting the last icons gets the axes) and 18 frames at the end of
 `held_tools.png` (`HeldTools.ADDED`: plain, copper, iron). Build nothing beyond the plan's list.
 
@@ -352,7 +352,13 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   B1; `GameState.bar`, `HandBar.settled()`): used up, its slot stays empty and it comes back there; a
   better tool takes its tool's slot; the wheel skips empty slots and a key on one does nothing; empty
   slots at the end aren't drawn. The save's `"bar"` (still version 6) is read as the old order when
-  missing. `GameState.equipped` is always something
+  missing. **The pause menu's "Item bar"** (step B2) opens `BarMenu` (`hud.pause_menu.bar_menu`, the
+  option `PauseMenu.BAR`), a page of the pause menu; the game stays paused. A click lifts, a click on
+  another slot swaps or moves into an empty one, and Esc, Tab or a right click puts back; the wheel
+  steps a slot, up and down a row. Each move is made at once through `GameState.move_on_bar(from, to)`.
+  A test opens it with `choose(PauseMenu.BAR)`, clicks at `bar_menu.slot_point(i)` handed to
+  `_unhandled_input()`, and reads `shown_ids()`, `lifted_id()`, `shown_name()` and `cursor`
+  (`BarCursor`). `GameState.equipped` is always something
   he carries: the last bomb or seed empties the item button. Do not put food, or anything that isn't held in
   the hand, in the bar without asking. **What is set down in build mode is chosen on the build bar, never
   the item bar:** an item of type `placeable` is not in `Inventory.EQUIPPABLE_TYPES`. The build bar's first
@@ -473,7 +479,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   `greet()`, `give_gift()` and `add_friendship()`. The answer "I brought you something." is added by
   `AreaController.talk_to()` to a copy of the conversation: **never write it into a dialogue file.** It shows
   only when a gift can be given today and he carries food or an ingredient, so **a test that lists a
-  villager's answers with food in the pack sees it.** The pause menu has six lines now (Friends).
+  villager's answers with food in the pack sees it.** The pause menu has seven lines now: Resume, Save, Quests, Friends, Item bar, Settings, Quit to title.
 - **What friendship opens (P4d):** it is in each villager's conversation, as `openings` on the condition
   `friendship` (a villager, so many marks): a present at four marks (the flag `present/<villager>`), and at
   two a favour (a quest) or a recipe. **A new favour, recipe or present is data only.** A recipe marked
@@ -676,7 +682,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     (`tests/world/story_days_test.gd`), not counted to 150 letters: a stage must end above the line of
     help and be no longer than 200.
   - **Since the farm look's phase E the hero is one cell tall** and no longer hides the cell north
-    of him in a capture shot. `tools/capture.gd`'s shots end at 221 (168 to 176 are phase 2's, 177 to 191 phase 3's, 192 to 203 phase 4's, 204 to 207 phase 5's, 208 the tool polish's, 209 the ground details', 210 to 213 the Tab menu's two lists, 214 to 218 the axe, 219 to 221 the bar's slots); its title shot reads (only reads) the player's slot 1 for its
+    of him in a capture shot. `tools/capture.gd`'s shots end at 224 (168 to 176 are phase 2's, 177 to 191 phase 3's, 192 to 203 phase 4's, 204 to 207 phase 5's, 208 the tool polish's, 209 the ground details', 210 to 213 the Tab menu's two lists, 214 to 218 the axe, 219 to 221 the bar's slots, 222 to 224 arranging the bar); its title shot reads (only reads) the player's slot 1 for its
     "Continue" line.
   - **A subagent's scratch folder may hold an earlier subagent's files:** work in a subfolder of your
     own, and never run a script there you did not just write.
