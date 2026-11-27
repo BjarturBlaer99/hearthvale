@@ -4200,3 +4200,5 @@ The sixth and last step of `docs/progress/icons-axe-bar-plan.md` (the user's Q12
   (nothing it does goes through the pause menu). All six steps of the plan are built.
 
 **Approved (icons, axe and bar, step B2).** Shown the summary and three screenshots (the pause menu with "Item bar", the axe lifted over the hoe's slot, the bar after the swap), the user approved step B2 on 2026-11-27 ("Approve and push"). The plan is finished: all six steps built and approved, none played by hand. Pushed on the user's word.
+
+**Icons, axe and bar, played by hand (2026-11-27).** The user played the game with all six steps in and said "it feels right": nothing to change.
