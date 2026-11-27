@@ -96,8 +96,8 @@ sections 11 to 15. Seen in capture shots, not played by hand. Nothing further is
 approved as recommended):** six steps, each stopped for review: I1 icons in the lists, I2 the Tab
 menu's "Pack", A1 the axe's pictures, A2 the axe in play (the sword stops cutting wood: D5 changed),
 B1 each item keeps its bar slot, B2 the screen to arrange the bar. **I1 and I2 are built and
-approved (2026-11-26, "Approve, go on" each); A1 is built (2026-11-26) and waits for the user's
-review.** The axe's pictures are the pack's: three icons at the end of `items.png` (after the hen,
+approved (2026-11-26, "Approve, go on" each); A1 is built and approved (2026-11-27, "okay
+continue"); A2 is built (2026-11-27) and waits for the user's review.** The axe's pictures are the pack's: three icons at the end of `items.png` (after the hen,
 sheep and cow, so a test wanting the last icons gets the axes) and 18 frames at the end of
 `held_tools.png` (`HeldTools.ADDED`: plain, copper, iron). Build nothing beyond the plan's list.
 
@@ -556,7 +556,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **The workbench's list** is `hud.craft_menu` (`AreaController.open_craft()`): `entries()`,
     `shown_lines()`, `greyed_lines()`, `need_lines()`, `confirm()`. Greyed lines are on a second label
     in the same place (`bright_lines()` is what the bright one shows). **It has three tabs:** "Make"
-    (thirteen, and cloth and the wool blanket once wool and cloth are found), "Place" (nine, known from the first day) and "Build" (ten: five plans, two
+    (thirteen, cloth and the wool blanket once wool and cloth are found, and the Copper and Iron Axes at its end once a copper or iron bar is found: fifteen with everything found), "Place" (nine, known from the first day) and "Build" (ten: five plans, two
     upgrades, the shed's two chests and furnace). `hud.craft_menu.tab` is the one
     showing (`Crafting.TAB_MAKE` each time it opens); `switch_tab()` and `show_tab(Crafting.TAB_PLACE)`
     turn it, and `entries()`, `shown_lines()` and `confirm()` are the showing tab's.
@@ -574,11 +574,20 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     stacks with `GameState.store_put(item_id)` and `store_take(index)`; its lists are
     `hud.store_menu` (`AreaController.open_store()`). It never holds coins, keys, quest things, or what
     a tool holds.
+  - **Wood is cut by the axe** (since step A2, 2026-11-27; the Homestead's D5 changed): branches,
+    stumps and logs, from the item button or a left click, 0.5 energy a stroke (`chop` in
+    `EnergyRules.COSTS`, eased by no skill). A blow counts `ToolUse.hits_of_blow(item)` (1 +
+    `fewer_blows`: the Copper Axe fells a stump or log in 2, the Iron in 1). **A test that cuts wood
+    equips the axe, faces it, calls `use_item()` and lets the stroke finish** (forty frames), as for a
+    rock. A sword blow on wood only knocks (`Breakable.knock()`, "It wants an axe." once a visit); a
+    bomb still breaks it; grass, weeds, bushes and pots stay the sword's. The axe lies in the farmhouse
+    at (4, 7) (the pickup `Axe`, flag `took_axe`; don't move it); Tilda doesn't sell it. The `farm`,
+    `homestead` and `build` scenarios carry one.
   - **Wood:** branches and stumps are breakables with `"returns": "daily"`; a stump has `"hits": 3`.
     Cut, a flag `cut/<area>/<x>,<y>` keeps the day: **a test that wants it back sets the next day
     (`GameState.start_next_day()`) and loads the area again.** Grass and pots are back on every visit,
     as before. **The meadow's tall grass on the homestead** (`meadow_grass`, fourteen tufts) is
-    `"returns": "daily"` and leaves a hay lying. **On the homestead what the sword clears is gone for good** (the breakables `weeds`,
+    `"returns": "daily"` and leaves a hay lying. **On the homestead what the sword and the axe clear is gone for good** (the breakables `weeds`,
     `bush`, `log` and `farm_stump`, whose data says `"returns": "never"`; their cells are kept in
     `GameState.homestead()`, not in flags). **A test that wants one back starts a new game.** A swing
     cuts everything in its arc, so **a test that counts blows uses one that stands alone:** weeds
@@ -643,8 +652,8 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
   - **Debris** is weeds, bushes, logs and stumps (breakables that never return) and rocks, boulders and
     great boulders (`Rock` nodes). 145 stand in a new game, 54 of them on the field.
     `AreaController.debris()` is what still stands and `debris_at(cell)` what stands in a cell; each
-    fills its cell until cleared. **A test that clears one equips the sword or the right pickaxe, faces
-    it, and lets each blow finish** (forty frames; for the sword call `player.sync_from_motor()` and
+    fills its cell until cleared. **A test that clears one equips the sword (weeds, bushes), the axe
+    (logs, stumps) or the right pickaxe, faces it, and lets each blow finish** (forty frames; for the sword call `player.sync_from_motor()` and
     `resolve_combat()` each frame, as `tests/world/debris_test.gd` does).
   - **Where each stands is a spawn marker baked from the map's sketch** (`"marks"` in `build_maps.gd`; a
     sketch may have a `"legend"` of its own). The land's markers are a row of their own at the end of
@@ -660,7 +669,7 @@ sample the texture again, pass the tint from `vertex()` in a varying; multiplyin
     (`tests/world/story_days_test.gd`), not counted to 150 letters: a stage must end above the line of
     help and be no longer than 200.
   - **Since the farm look's phase E the hero is one cell tall** and no longer hides the cell north
-    of him in a capture shot. `tools/capture.gd`'s shots end at 213 (168 to 176 are phase 2's, 177 to 191 phase 3's, 192 to 203 phase 4's, 204 to 207 phase 5's, 208 the tool polish's, 209 the ground details', 210 to 213 the Tab menu's two lists); its title shot reads (only reads) the player's slot 1 for its
+    of him in a capture shot. `tools/capture.gd`'s shots end at 218 (168 to 176 are phase 2's, 177 to 191 phase 3's, 192 to 203 phase 4's, 204 to 207 phase 5's, 208 the tool polish's, 209 the ground details', 210 to 213 the Tab menu's two lists, 214 to 218 the axe); its title shot reads (only reads) the player's slot 1 for its
     "Continue" line.
   - **A subagent's scratch folder may hold an earlier subagent's files:** work in a subfolder of your
     own, and never run a script there you did not just write.
