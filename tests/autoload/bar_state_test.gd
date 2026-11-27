@@ -160,6 +160,44 @@ func test_every_old_save_loads_with_the_bar_it_had() -> void:
 	assert_array(_ids()).is_equal(["wooden_sword", "hoe", "watering_can", "", "pickaxe"])
 
 
+func test_a_thing_moved_on_the_bar_keeps_its_new_slot_and_stays_in_hand() -> void:
+	for item: Array in [[&"wooden_sword", 1], [&"hoe", 1], [&"watering_can", 1], [&"bomb", 2]]:
+		GameState.add_item(item[0], item[1])
+	GameState.equip(&"hoe")
+	assert_bool(GameState.move_on_bar(1, 3)).override_failure_message("the hoe swaps with the bombs").is_true()
+	assert_array(_ids()).is_equal(["wooden_sword", "bomb", "watering_can", "hoe"])
+	assert_that(GameState.equipped).override_failure_message("still in hand, in its new slot").is_equal(&"hoe")
+	assert_int(GameState.hand_index()).is_equal(3)
+	assert_bool(GameState.move_on_bar(0, 6)).override_failure_message("the sword into an empty slot past the end").is_true()
+	assert_array(_ids()).is_equal(["", "bomb", "watering_can", "hoe", "", "", "wooden_sword"])
+	assert_bool(GameState.move_on_bar(2, 2)).override_failure_message("set down where it was lifted").is_false()
+	assert_bool(GameState.move_on_bar(9, 0)).override_failure_message("nothing there").is_false()
+	# The last bomb: its slot stays where it was put, and they come back to it.
+	GameState.add_item(&"bomb", -2)
+	GameState.add_item(&"carrot_seeds", 3)
+	assert_array(_ids()).override_failure_message("something new takes the first free slot").is_equal(["carrot_seeds", "", "watering_can", "hoe", "", "", "wooden_sword"])
+	GameState.add_item(&"bomb", 1)
+	assert_array(_ids()).is_equal(["carrot_seeds", "bomb", "watering_can", "hoe", "", "", "wooden_sword"])
+	# The save keeps it, version 6.
+	assert_int(SaveSystem.save_game()).is_equal(OK)
+	GameState.clear()
+	assert_int(SaveSystem.load_game()).is_equal(OK)
+	assert_array(GameState.bar).is_equal(["carrot_seeds", "bomb", "watering_can", "hoe", "", "", HandBar.SWORD])
+	assert_array(_ids()).is_equal(["carrot_seeds", "bomb", "watering_can", "hoe", "", "", "wooden_sword"])
+
+
+func test_a_move_counts_the_columns_as_the_bar_shows_them() -> void:
+	# A thing put in the pack without add_item (as a test may) has no column yet: the move counts
+	# the columns hand_entries() shows, where it has one.
+	GameState.add_item(&"wooden_sword", 1)
+	GameState.inventory.append({"id": &"hoe", "count": 1})
+	assert_array(GameState.bar).is_equal([HandBar.SWORD])
+	assert_array(_ids()).is_equal(["wooden_sword", "hoe"])
+	assert_bool(GameState.move_on_bar(1, 0)).is_true()
+	assert_array(GameState.bar).is_equal(["hoe", HandBar.SWORD])
+	assert_array(_ids()).is_equal(["hoe", "wooden_sword"])
+
+
 func _ids() -> Array:
 	return _entry_ids(GameState.hand_entries())
 

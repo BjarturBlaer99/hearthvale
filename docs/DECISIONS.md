@@ -2010,3 +2010,28 @@ written; building it decided these, none of which the plan named:
   list is read as missing (today's order). Columns of free slots at the end are left off.
 - **A save from before has no `"bar"`** and gets the sword and the pack's order (`HandBar.default_bar()`),
   so every older save (the eight fixtures, v1 to v6) loads with the bar it had. The version stays 6.
+
+## 2026-11-27 — Icons, an axe and the item bar, step B2: what building the screen decided
+Built on the user's word "Approve, go on" for step B1. The plan's answer (Q12) stands as written;
+building it decided these, none of which the plan named:
+- **"Item bar" is the pause menu's fifth line,** after Friends and before Settings: Resume, Save,
+  Quests, Friends, Item bar, Settings, Quit to title (seven lines). The game's own pages come first,
+  then the settings, then leaving.
+- **The screen is a page of the pause menu** (`PauseMenu.bar_menu`), as the quest log and the
+  Friends page are, not a box of its own on the HUD: it opens in the pause panel's place, the game
+  stays paused behind it (so the clock stands still), Esc with nothing lifted goes back to the pause
+  menu, and resuming closes it.
+- **Each set-down is made at once** (`GameState.move_on_bar()`), not when the screen closes: there
+  is nothing to cancel but a lift, and Esc puts a lifted thing back without moving anything. The bar
+  in play shows the new order as the game resumes.
+- **The wheel steps a slot and the movement keys up and down a row,** as the plan says; in the
+  other menus the wheel and up and down are the same, but a grid has two ways to go. Left and right
+  step a slot too; both go round, from the end of a row to the start of the next.
+- **What a lifted thing looks like:** it rises over the slot under the cursor (where it would go),
+  and the slot it came from keeps its picture faint in an orange rim until it is set down.
+- **A column that remembers something used up shows as an empty slot,** and is one: a thing set
+  down there swaps with it, so the remembered thing is now remembered in the slot the other came
+  from. An empty slot can't be lifted (a click on it with nothing lifted says "nope").
+- **The rows:** two always, and as many more as the columns fill (`BarCursor.rows_for()`); a thing
+  can be set down in any slot of them, so the bar can be spread past nine.
+- **Sounds:** a lift is `take_up`, a set-down `set_down` (build mode's), a put-back the menu's move.

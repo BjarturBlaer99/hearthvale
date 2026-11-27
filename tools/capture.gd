@@ -360,6 +360,11 @@ const SHOTS: Array = [
 	["219_the_bar_after_the_last_seed", &"homestead", Vector2i(30, 13), Vector2.DOWN, 0, "bar_seed_gone"],
 	["220_the_bar_with_the_seeds_back", &"homestead", Vector2i(30, 13), Vector2.DOWN, 0, "bar_seed_back"],
 	["221_the_bar_with_a_copper_hoe", &"homestead", Vector2i(30, 13), Vector2.DOWN, 0, "bar_copper_hoe"],
+	# Icons, an axe and the item bar, step B2: the pause menu's "Item bar", its screen with the
+	# axe lifted over the hoe's slot, and the bar after the two swapped.
+	["222_the_pause_menu_with_item_bar", &"homestead", Vector2i(30, 13), Vector2.DOWN, 0, "bar_pause"],
+	["223_the_item_bar_screen_with_the_axe_lifted", &"homestead", Vector2i(30, 13), Vector2.DOWN, 0, "bar_lifted"],
+	["224_the_bar_after_the_axe_and_hoe_swapped", &"homestead", Vector2i(30, 13), Vector2.DOWN, 0, "bar_swapped"],
 ]
 ## What the Tab menu's shots carry (210 to 213): a few things, a full pack, and no food.
 const PACK_STOCK: Dictionary = {
@@ -626,7 +631,7 @@ func _capture() -> void:
 				game_state.call(&"add_item", item[0], item[1])
 		if shot[5] == "shop_land":
 			game_state.call(&"add_item", &"coin", 34)
-		if shot[5] in ["chop", "axe_bar"]:
+		if shot[5] in ["chop", "axe_bar", "bar_pause", "bar_lifted", "bar_swapped"]:
 			# The axe in hand (the bar's own things with it), facing wood.
 			for item: Array in [[&"wooden_sword", 1], [&"hoe", 1], [&"watering_can", 1], [&"pickaxe", 1], [&"axe", 1]]:
 				game_state.call(&"add_item", item[0], item[1])
@@ -916,6 +921,25 @@ func _capture() -> void:
 			scene.call(&"open_pause_menu")
 			scene.get(&"hud").get(&"pause_menu").call(&"choose", &"quests")
 			await _frames(2)
+		elif shot[5] in ["bar_pause", "bar_lifted", "bar_swapped"]:
+			# The screen that arranges the bar (step B2): the axe (the fifth slot) lifted and
+			# held over the hoe's (the second), then set down there, and the game resumed.
+			scene.call(&"open_pause_menu")
+			var pause_menu: Node = scene.get(&"hud").get(&"pause_menu")
+			if shot[5] == "bar_pause":
+				for step: int in 4:
+					pause_menu.call(&"move_cursor", 1)
+			else:
+				pause_menu.call(&"choose", &"bar")
+				var bar_menu: Node = pause_menu.get(&"bar_menu")
+				bar_menu.call(&"choose", 4)
+				bar_menu.get(&"cursor").call(&"point", 1)
+				bar_menu.call(&"_refresh")
+				if shot[5] == "bar_swapped":
+					bar_menu.call(&"choose", 1)
+					bar_menu.call(&"back")
+					pause_menu.call(&"resume")
+			await _frames(4)
 		elif shot[5] in ["pause", "settings", "skills_pause"]:
 			scene.call(&"open_pause_menu")
 			if shot[5] == "settings":

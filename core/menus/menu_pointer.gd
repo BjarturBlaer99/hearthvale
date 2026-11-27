@@ -28,3 +28,19 @@ static func part_at(x: float, widths: PackedFloat32Array, gap: float) -> int:
 			return i
 		left += widths[i] + gap
 	return NONE
+
+
+## Which cell of a grid `local` is on: 0 for the top-left one, then along each row (the screen
+## that arranges the item bar). `local` is measured from the grid's top-left corner; the grid is
+## `columns` cells wide and has `cells` in all, each `cell_size`, with `gap` between them both
+## ways. NONE if the point is on a gap, outside the grid, or past the last cell.
+static func cell_at(local: Vector2, cell_size: Vector2, gap: float, columns: int, cells: int) -> int:
+	if columns <= 0 or cells <= 0 or cell_size.x <= 0.0 or cell_size.y <= 0.0 or local.x < 0.0 or local.y < 0.0:
+		return NONE
+	var pitch: Vector2 = cell_size + Vector2(gap, gap)
+	var column: int = floori(local.x / pitch.x)
+	var row: int = floori(local.y / pitch.y)
+	if column >= columns or local.x - float(column) * pitch.x >= cell_size.x or local.y - float(row) * pitch.y >= cell_size.y:
+		return NONE
+	var cell: int = row * columns + column
+	return cell if cell < cells else NONE

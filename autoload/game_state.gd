@@ -1358,6 +1358,21 @@ func _settle_bar() -> void:
 	bar = HandBar.settled(bar, inventory, DataRegistry.entries(&"items"))
 
 
+## Lifts the thing in column `from` of the bar and sets it down in column `to` (the screen that
+## arranges the bar, step B2): the two swap, or it moves into an empty column. Columns count as
+## hand_entries() does. What is in hand stays in hand, in its new slot. Returns whether the bar
+## changed.
+func move_on_bar(from: int, to: int) -> bool:
+	var items: Array = DataRegistry.entries(&"items")
+	var settled: Array[String] = HandBar.settled(bar, inventory, items)
+	var moved: Array[String] = HandBar.moved(settled, from, to)
+	if moved == settled:
+		bar = settled
+		return false
+	bar = moved
+	return true
+
+
 ## Which of hand_entries() is in hand: the sword with nothing on the item button, else what
 ## is on it. HandBar.NONE if he has neither.
 func hand_index() -> int:

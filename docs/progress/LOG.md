@@ -4157,3 +4157,44 @@ The fifth step of `docs/progress/icons-axe-bar-plan.md` (the user's Q13 and Q14,
 - **Known:** seen in capture shots and the tests, not played by hand; `play_days.gd` was not run (it
   finds a thing's slot through `hand_entries()`, which now has empty columns, and skips them).
   There is no way yet to arrange the bar: that is step B2.
+
+**Approved (the bar's columns, step B1).** Shown the summary and a before-and-after sheet of the
+bar (after the last seed, with the seeds back, with a copper hoe), the user approved step B1 on
+2026-11-27 ("Approve, go on"). It stands as built (`12f89a5`). Step B2 (the screen to arrange the
+bar) begins on that word.
+
+## 2026-11-27 — Icons, an axe and the item bar, step B2: the screen to arrange the bar
+The sixth and last step of `docs/progress/icons-axe-bar-plan.md` (the user's Q12, as recommended).
+- **What it does:** the pause menu has a new line, "Item bar" (its fifth; seven lines now:
+  Resume, Save, Quests, Friends, Item bar, Settings, Quit to title). It opens a screen in the pause
+  panel's place: the bar's slots in rows of nine (two rows, more if the bar is longer), the first
+  row numbered 1 to 9, and the name of the thing under the cursor below. The slot under the mouse is
+  lit. A click on a slot lifts what is in it (it rises over the slot under the cursor; its own slot
+  keeps a faint picture in an orange rim); a click on another slot sets it down there, swapping with
+  what was there or into an empty slot; a click on its own slot, a right click, Esc or Tab puts it
+  back; a click on no slot does nothing. The movement keys step a slot (left, right) or a row (up,
+  down), the wheel a slot, and Enter lifts and sets down. Esc or Tab with nothing lifted goes back to
+  the pause menu. The game stays paused (the clock stands still). Each move is made at once, so
+  leaving keeps it; the bar in play shows it as the game resumes, and the save keeps it in `"bar"`
+  (still version 6). What is in hand stays in hand, in its new slot.
+- **Code:** `BarMenu` (`ui/bar_menu.gd`, `.tscn`), a page of `PauseMenu` (`bar_menu`, the option
+  `PauseMenu.BAR`); `BarSlots` (`ui/bar_slots.gd`) draws the slots in the bar's colours;
+  `BarCursor` (`core/menus/bar_cursor.gd`, pure): the rows, the cursor, the lift, the move;
+  `MenuPointer.cell_at()` (pure): the cell of a grid under a point; `GameState.move_on_bar(from, to)`
+  (through `HandBar.moved()`, counting the columns as `hand_entries()` does). The pause menu's box
+  grew by a line.
+- **Tools:** `tools/capture.gd` shots 222 to 224 (the pause menu with "Item bar", the screen with
+  the axe lifted over the hoe's slot, the bar after the two swapped).
+- **Tests:** `tests/core/menus/bar_cursor_test.gd` (5, pure), `menu_pointer_test.gd` (+2:
+  `cell_at()`), `tests/autoload/bar_state_test.gd` (+2: a move keeps its slot and its thing in hand,
+  through a used-up thing and a save; a move counts the columns as shown), `tests/ui/bar_menu_test.gd`
+  (5: the pause menu's seven lines and the screen opened, left by Esc and Tab and by resuming, the
+  clock still; clicks lift, swap, move into an empty slot, do nothing on no slot or an empty slot, put
+  back on their own slot; the keys and the wheel, Esc and a right click putting back; leaving kept,
+  the bar showing it at once and the save keeping it; a third row past eighteen columns).
+  `menus_test` and `pointer_test` count seven lines (Settings is the sixth).
+- **Checked:** all 1339 tests pass. Capture shots 222 to 224 taken: the pause menu with its seven
+  lines and "Item bar" lit; the screen with the axe lifted over the hoe's slot ("Axe: swap with the
+  Hoe"); the bar after the swap (sword, axe in hand, can, pickaxe, hoe).
+- **Known:** seen in capture shots and the tests, not played by hand; `play_days.gd` was not run
+  (nothing it does goes through the pause menu). All six steps of the plan are built.

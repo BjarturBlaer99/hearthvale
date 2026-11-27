@@ -93,7 +93,7 @@ func test_the_pause_menu_and_its_pages_follow_the_pointer() -> void:
 	assert_str(menu.shown_lines()[3]).is_equal("> Friends")
 	# The wheel moves the highlight, a line a notch.
 	menu._unhandled_input(_wheel(MOUSE_BUTTON_WHEEL_DOWN))
-	assert_that(menu.cursor.selected_id()).is_equal(PauseMenu.SETTINGS)
+	assert_that(menu.cursor.selected_id()).is_equal(PauseMenu.BAR)
 	menu._unhandled_input(_wheel(MOUSE_BUTTON_WHEEL_UP))
 	menu._unhandled_input(_wheel(MOUSE_BUTTON_WHEEL_UP))
 	assert_that(menu.cursor.selected_id()).is_equal(PauseMenu.QUESTS)
@@ -119,7 +119,7 @@ func test_the_pause_menu_and_its_pages_follow_the_pointer() -> void:
 
 	# Settings: pointing at "Back" and a click closes it; nothing was changed.
 	var before: Array = Array(SettingsData.KEYS).map(func(key: StringName) -> String: return Settings.data.describe(key))
-	menu._unhandled_input(_click(list, 4))
+	menu._unhandled_input(_click(list, 5))
 	var settings: SettingsMenu = menu.settings_menu
 	assert_bool(settings.is_open()).is_true()
 	var lines: Label = settings.get_node(^"Panel/List")

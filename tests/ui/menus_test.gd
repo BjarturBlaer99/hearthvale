@@ -97,7 +97,7 @@ func test_the_pause_menu_stops_the_game_and_saves() -> void:
 	assert_bool(village.can_process()).override_failure_message("the area stops").is_false()
 	assert_bool(village.hud.pause_menu.can_process()).override_failure_message("the menu doesn't").is_true()
 	var menu: PauseMenu = village.hud.pause_menu
-	assert_array(Array(menu.shown_lines())).is_equal(["> Resume", "  Save", "  Quests", "  Friends", "  Settings", "  Quit to title"])
+	assert_array(Array(menu.shown_lines())).is_equal(["> Resume", "  Save", "  Quests", "  Friends", "  Item bar", "  Settings", "  Quit to title"])
 	var status: String = (menu.get_node(^"Panel/Status") as Label).text
 	assert_str(status).contains("Hearts 3").contains("Heart pieces 0 of 4").contains("Time played")
 	menu.choose(PauseMenu.SAVE)

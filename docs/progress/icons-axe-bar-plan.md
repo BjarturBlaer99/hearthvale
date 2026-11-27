@@ -37,7 +37,8 @@ Every question is answered with its recommendation:
   and it comes back there; an upgrade takes its tool's column; anything new takes the first free one.
 - **Q14, the save:** a field read with a default; the version stays 6.
 
-So every step is built, in order: I1 (with the chest), I2, A1, A2, B1, B2. (The plan's "seven steps
+So every step is built, in order: I1 (with the chest), I2, A1, A2, B1, B2. **All six are built
+(2026-11-27); B2 waits for the user's review.** (The plan's "seven steps
 at most" below counts one too many: there are six.)
 
 Pictures of the menus and the bar as they are today (taken with `tools/capture.gd`, shots 105, 114,
@@ -351,7 +352,7 @@ different until something is used up (its slot now stays empty) or upgraded (it 
   ways, and with only the sword; `moved()` swaps and moves into an empty column; a remembered column
   is not given to something new; a save round-trips `bar`; an old save has none and gets today's
   order. The existing bar tests pass unchanged (the default is today's order).
-- **Built (2026-11-27), waiting for the user's review.** As written: `HandBar.SWORD` and `EMPTY`,
+- **Built (2026-11-27).** As written: `HandBar.SWORD` and `EMPTY`,
   `column_of()`, `default_bar()`, `cleaned()`, `settled()`, `columns()`, `moved()` and
   `is_empty_column()`, with `stepped()` and `index_of()` over empty columns; `GameState.bar`, settled by
   `add_item()` when something for the hand comes in and by `from_dict()`; `"bar"` in the save, version
@@ -362,6 +363,9 @@ different until something is used up (its slot now stays empty) or upgraded (it 
   steps from thing to thing; **more than nine:** the columns count, empty ones too, and the bar moves
   along as before. Capture shots 219 to 221. Nothing looks different in play until something is used
   up or upgraded. See `LOG.md`.
+- **Approved (2026-11-27).** Shown the summary and a before-and-after sheet of the bar (after the
+  last seed, with the seeds back, with a copper hoe), the user said "Approve, go on". It stands as
+  built (`12f89a5`); step B2 begins on that word.
 
 **Step B2. The screen.** `BarMenu`, the pause menu's line, `MenuPointer.cell_at()`.
 - **Done when:** the pause menu's "Item bar" opens it; mouse and keys lift and set down, swap and
@@ -370,6 +374,19 @@ different until something is used up (its slot now stays empty) or upgraded (it 
 - **Tests:** `MenuPointer.cell_at()` (pure); keys and clicks on the screen (`_unhandled_input()` with
   mouse events at a slot's point, windowed where a test needs input); a lifted thing put back on Esc;
   the arrangement saved and loaded; the pause menu has seven lines (tests that count six change).
+- **Built (2026-11-27), waiting for the user's review.** As written: the pause menu's fifth line
+  "Item bar" (seven lines: Resume, Save, Quests, Friends, Item bar, Settings, Quit to title) opens
+  `BarMenu` (`ui/bar_menu.gd`, `.tscn`) in the pause panel's place, with its slots drawn by
+  `BarSlots` (`ui/bar_slots.gd`) in rows of nine, the first numbered 1 to 9, and the name of the thing
+  under the cursor below; the cursor and the lift are `BarCursor` (`core/menus/`, pure);
+  `MenuPointer.cell_at()` finds the slot under a point; `GameState.move_on_bar()` makes each move at
+  once through `HandBar.moved()`. A click lifts, a click on another slot sets down (a swap, or into
+  an empty slot), a click on its own slot, a right click, Esc or Tab puts back; a click on no slot
+  does nothing; the movement keys step a slot or a row, the wheel a slot, Enter lifts and sets down.
+  The save's `"bar"` keeps it, still version 6. What building it decided is in `docs/DECISIONS.md`
+  (2026-11-27): the line's place, the screen as a page of the pause menu, each move made at once, the
+  wheel a slot, the look of a lifted thing, remembered columns shown empty. Capture shots 222 to 224.
+  See `LOG.md`.
 
 ### Risks
 - **Every test that assumes the bar closes up** after the last seed or bomb (`HandBar`, `ItemBar`, the
