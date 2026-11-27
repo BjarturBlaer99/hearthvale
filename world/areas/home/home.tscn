@@ -66,6 +66,12 @@ item_id = &"turnip_seeds"
 count = 5
 taken_flag = &"took_first_seeds"
 
+[node name="Axe" type="Node2D" parent="Interactables"]
+position = Vector2(64, 112)
+script = ExtResource("p3_pickup")
+item_id = &"axe"
+taken_flag = &"took_axe"
+
 [node name="Workbench" type="Node2D" parent="Interactables"]
 position = Vector2(144, 48)
 script = ExtResource("m2_furnishing")

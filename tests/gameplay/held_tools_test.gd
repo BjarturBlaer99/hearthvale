@@ -37,7 +37,7 @@ func test_every_tool_and_the_sprinkler_is_held() -> void:
 		held += 1
 		var id: StringName = StringName(str(item["id"]))
 		assert_bool(HeldTools.has_item(id)).override_failure_message("%s is held" % id).is_true()
-	assert_int(held).override_failure_message("three hoes, three cans, three pickaxes, the sprinkler").is_equal(10)
+	assert_int(held).override_failure_message("three hoes, three cans, three pickaxes, three axes, the sprinkler").is_equal(13)
 
 
 func test_each_stroke_has_its_pictures_and_shows_something_but_from_behind() -> void:

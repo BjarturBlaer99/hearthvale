@@ -295,7 +295,8 @@ func test_the_mouse_points_and_the_wheel_steps_in_the_workbenchs_list() -> void:
 
 
 func test_a_long_list_scrolls_and_opens_at_the_top_each_time() -> void:
-	# Everything found and both skills risen: all thirteen recipes are known.
+	# Everything found and both skills risen: all fifteen recipes are known (thirteen, and the
+	# two axes since the icons-axe-bar plan's step A2).
 	for item: StringName in [&"copper_ore", &"wood", &"coal", &"copper_bar", &"iron_bar", &"crystal"]:
 		GameState.add_item(item, 1)
 	GameState.skill_points[Skills.FARMING] = 10
@@ -305,7 +306,7 @@ func test_a_long_list_scrolls_and_opens_at_the_top_each_time() -> void:
 	var menu: CraftMenu = home.hud.craft_menu
 	var list: Label = menu.get_node(^"Panel/List")
 	await await_idle_frame()
-	assert_int(menu.entries().size()).is_equal(13)
+	assert_int(menu.entries().size()).is_equal(15)
 	assert_int(CraftMenu.ROWS).override_failure_message("the box has room for six").is_equal(6)
 	assert_int(menu.shown_lines().size()).override_failure_message("six lines, however many he knows").is_equal(6)
 	assert_str(menu.shown_lines()[0]).is_equal("> Furnace")

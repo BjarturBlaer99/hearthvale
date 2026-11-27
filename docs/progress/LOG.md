@@ -4066,3 +4066,53 @@ step I2. Pictures only: no item, stroke or sound, and the sword still cuts wood 
 **Approved (axe, step A1).** Shown the summary and two 8x close-ups (the axes on the hero's work
 poses beside the pickaxe's, and the frames alone), the user approved step A1 on 2026-11-27 ("okay
 continue"). It stands as built (`0b6c8c1`). Step A2 (the axe in play) begins on that word.
+
+## 2026-11-27 — Icons, an axe and the item bar, step A2: the axe in play
+
+The fourth step of `docs/progress/icons-axe-bar-plan.md`, on the user's word "okay continue" for
+step A1. Wood wants the axe now: the Homestead's D5 is "the sword, the axe and the pickaxe".
+
+- **What changed in play:** the Axe lies in the farmhouse, on the floor west of the doorway (cell
+  (4, 7), beside the first seeds, the hoe and the can; nothing in the room moved), for a new game
+  and an old save alike (the flag `took_axe`). On the item bar it cuts the branch, stump or log he
+  faces, from the item button or a left click: a branch in one blow, a stump or a log in three, the
+  same wood as before, 0.5 energy a stroke paid once, no skill. The Copper Axe (the axe and 2 copper
+  bars, once a copper bar is found) cuts a stump or a log in two, the Iron Axe (the copper axe and 2
+  iron bars, once an iron bar is found) in one; both are at the end of the workbench's "Make" tab
+  (fifteen lines with everything found, cloth and the blanket aside). **The sword no longer cuts
+  wood:** its blow knocks (the sound `plate`) and "It wants an axe." is said once a visit. A bomb
+  still breaks wood. Grass, weeds, bushes and pots are the sword's still; trees are not cut; Tilda
+  doesn't sell the axe (her list stays sixteen). On the land a log or stump the axe cuts is cleared
+  for good, as before.
+- **Code:** the items `axe`, `copper_axe`, `iron_axe` (`"tool": "chop"`); `ToolUse.CHOP`, `CUT`,
+  `decide_chop()`, `hits_of_blow()`, `CHOP_NOTHING`, and `fewer_blows()` reading any tool's stat;
+  `ToolStroke.CHOP` (raised, then struck, as the pickaxe); `EnergyRules.CHOP` (`"chop": 0.5`);
+  `AreaController.wood_in_front()`, `_swing_axe()`, `_on_knocked()`, `WANTS_AXE_WORDS`;
+  `Breakable.strike(kind, count, show_now)`, `show_blow()`, `knock()`, `wants_axe()`, the signal
+  `knocked` (`smash()` is the old cut, now `_give_way()` and `_show_break()`); `DataRegistry.BREAKS_ON`
+  (the breakables' list, apart from a boss's `WEAK_POINTS`); the four wood breakables' `breaks_on`;
+  two recipes `data/crafting/copper_axe.json` and `iron_axe.json`; the pickup in `home.tscn`. The
+  schemas (`breakable`, `items`, `rules`) and `rules_energy.example.json` say so. Save version 6.
+- **Tools:** `tools/play_days.gd` picks the axe up on day 1 with the tools by the door, hands it
+  over in the farm trial, and clears logs and stumps with his best axe (a left click), never the
+  sword; `tools/playtest.gd`'s `farm`, `homestead` and `build` carry an axe; `tools/capture.gd`
+  shots 214 to 218 (chopping a stump to the side, one facing down and one facing up; the "Make" tab with the axes;
+  the bar with the axe in hand) and the films `axe_stump_side`, `axe_log_up`, `axe_log_down` and `sword_knocks_on_a_stump`
+  (in place of `sword_log` and `sword_stump`).
+- **Tests:** `tests/core/farming/axe_tool_test.gd` (5, pure: `decide_chop()`, the three axes and
+  how much a blow counts, `fewer_blows()` of any tool, the stroke's poses, the energy and no skill)
+  and `tests/world/axe_test.gd` (10: the axe in the farmhouse on open floor with nothing moved,
+  three old saves finding it, the bar, a stump in 3, 2 and 1 blows with 2 wood, a stroke paid once
+  and shown at the blow, nothing but wood cut, a log and a stump cleared for good on the land, the
+  sword's knock told once a visit, a bomb, the recipes). Moved from the sword to the axe:
+  `wood_test`, `debris_test`, `tool_blow_test`'s log; counts that grew: the items' ids, the tools in
+  his hands (13), the "Make" tab (15: `crafting_chain_test` now also makes both axes, on a seventh
+  day, from six more copper and iron ore and four coal; `workbench_test`, `upgrades_test`,
+  `chest_test`), a bad tool's words (`... pick or chop.`), the costs a skill may ease.
+- **Checked:** all 1307 tests pass. Twenty-two bugs planted one at a time in the new code and data
+  (`ToolUse`, `ToolStroke`, the area's stroke, `Breakable`, the breakables', energy, items', recipe
+  and farmhouse data) were each caught; two were caught only after `axe_test` gained checks for
+  them (a breakable both the sword and the axe cut is no knock; a stump felled is drawn whole until
+  the axe comes down, `Breakable.looks_whole()`).
+- **Known:** seen in capture shots and the tests, not played by hand. `play_days.gd` was not run
+  (its new route is untried).

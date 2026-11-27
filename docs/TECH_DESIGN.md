@@ -1410,7 +1410,18 @@ pass (phase 3: Tilda buys ore and bars, two favours, eight days played) is §29.
   stump three) and `"returns": "daily"`: broken, it stays broken until the next morning. The day is kept
   in the flag `cut/<area>/<x>,<y>`, so nothing new is saved. Ten branches and five stumps lie at chosen
   cells of the North Fields, the Old Wood and the South Field (`build_maps.gd`; those three maps were
-  re-baked for their markers). The sword cuts them, as it cuts grass.
+  re-baked for their markers). The sword cut them, as it cuts grass, until the axe (below).
+- **The axe** (icons-axe-bar plan, step A2, 2026-11-27): the items `axe`, `copper_axe` and `iron_axe`,
+  of type `tool` with `"tool": "chop"` (`ToolUse.CHOP`); the better two say `fewer_blows` 1 and 2. The
+  four wood breakables (branch, stump, log, farm stump) say `"axe"` in `breaks_on` and not `"sword"`.
+  `AreaController._swing_axe()` strikes the whole one in the cell he faces (`wood_in_front()`,
+  `ToolUse.decide_chop()`): `GameState.energy_cost("chop")` (0.5, no skill eases it) is paid once a
+  stroke, and `Breakable.strike(&"axe", ToolUse.hits_of_blow(item), false)` takes `1 + fewer_blows` of its
+  hits at once; its chips or its fall, and its drop, show at the stroke's blow (`show_blow()`), as a
+  rock's do. A sword's blow on wood `knock()`s (the sound `plate`), and `knocked` tells the area, which
+  says "It wants an axe." once a visit. A bomb still breaks wood. The axe lies in the farmhouse
+  (`ItemPickup` `Axe` at (4, 7), flag `took_axe`), so an old save finds it too; the copper and iron
+  axes are "Make" recipes laid out as the hoe's.
 - **Tool tiers** are items of their own (`copper_hoe`, `iron_hoe`, and so on), made from the tool before
   them. A hoe's or a can's stats may say `reach`: `ToolUse.reach()` and `ToolUse.line()` give the cells
   one use works, from the cell he faces onward. The cell he faces decides whether the stroke is made

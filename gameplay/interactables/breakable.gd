@@ -15,6 +15,13 @@ extends Node2D
 ## (`clear_debris()`), not a flag.
 ## A blow that doesn't break it shows (tool polish, D6): it shudders a pixel and flashes white,
 ## as a rock does, and throws a little of its burst (splinters, for wood).
+## Wood wants the axe (icons-axe-bar plan, step A2: "breaks_on" names the axe, not the sword).
+## The axe strikes it with `strike()`, at the stroke's blow, and a better axe's blow counts for
+## more of its hits; the sword only knocks on it (a dull sound, and `knocked` tells the area,
+## which says why once a visit). A bomb still breaks it.
+
+## A blow of the sword knocked on it, and it wants an axe.
+signal knocked
 
 const SHEET: Texture2D = preload("res://gameplay/art/breakables.png")
 ## Frames in the order they stand in the sheet (art/sheets.json; a test checks).
@@ -31,6 +38,11 @@ const RETURNS: Array[String] = [DAILY, NEVER]
 ## How long a blow that doesn't break it shudders it, and flashes it white (s).
 const SHAKE_TIME: float = 0.14
 const FLASH_TIME: float = 0.06
+## The dull knock of a sword's blow on wood.
+const KNOCK_SOUND: StringName = &"plate"
+## What strikes wood, and what only knocks on it.
+const AXE: StringName = &"axe"
+const SWORD: StringName = &"sword"
 
 @export var breakable_id: StringName = &"grass"
 
@@ -49,6 +61,10 @@ var hurt_box: HurtBox
 var _terrain: TerrainQuery
 var _shake: float = 0.0
 var _flash: float = 0.0
+## A blow struck that has not been shown yet (a stroke of the axe shows it at its blow).
+var _blow_due: bool = false
+## Broken, but still drawn whole until its last blow is shown.
+var _shown_whole: bool = false
 
 
 func _ready() -> void:
@@ -114,14 +130,54 @@ func cut_today() -> bool:
 	return int(GameState.get_flag(cut_flag(), 0)) >= GameState.day
 
 
+## Whether a blow of `kind` only knocks on it: the sword on wood, which wants an axe.
+func wants_axe(kind: StringName) -> bool:
+	return kind == SWORD and breaks_on(AXE) and not breaks_on(SWORD)
+
+
 func _on_hit(hit: Hit) -> void:
-	if broken or not breaks_on(hit.kind):
+	if broken:
 		return
-	hits_left -= 1
+	if wants_axe(hit.kind):
+		knock()
+		return
+	strike(hit.kind)
+
+
+## A blow of `kind` that counts for `count` of its hits (a blow of a better axe counts for
+## more: ToolUse.hits_of_blow). Nothing if it is broken or `kind` doesn't break it. What the
+## blow does is done at once; it is shown at once, or with `show_now` false when show_blow()
+## is called (at a stroke's blow). Returns whether that broke it.
+func strike(kind: StringName, count: int = 1, show_now: bool = true) -> bool:
+	if broken or not breaks_on(kind):
+		return false
+	hits_left -= maxi(count, 1)
 	if hits_left <= 0:
-		smash()
+		_give_way()
+		_shown_whole = true
+	_blow_due = true
+	if show_now:
+		show_blow()
+	return broken
+
+
+## Shows the last blow struck: it shudders and throws a little of its burst, or, broken, is
+## cut down with its sound and its burst. Nothing if no blow waits.
+func show_blow() -> void:
+	if not _blow_due:
+		return
+	_blow_due = false
+	if broken:
+		_shown_whole = false
+		_show_break()
 	else:
 		chip()
+
+
+## A sword's blow on wood: a dull knock, and nothing comes of it.
+func knock() -> void:
+	EventBus.sound.emit(KNOCK_SOUND)
+	knocked.emit()
 
 
 ## A blow that doesn't break it yet: its sound, and a little of what it throws up.
@@ -138,6 +194,13 @@ func chip() -> void:
 func smash() -> Node2D:
 	if broken:
 		return null
+	_give_way()
+	_show_break()
+	return dropped
+
+
+## Broken: its cell freed, the day or the clearing remembered, and its drop left lying.
+func _give_way() -> void:
 	broken = true
 	hurt_box.enabled = false
 	if is_daily():
@@ -146,12 +209,15 @@ func smash() -> Node2D:
 		GameState.clear_debris(area_id, cell())
 	if _terrain != null:
 		_terrain.set_occupied(cell(), false)
+	dropped = _drop()
+
+
+## Shows it cut down: its sound and its burst, and what is left of it.
+func _show_break() -> void:
 	EventBus.sound.emit(StringName(str(data.get("sound", "cut"))))
 	if get_parent() != null:
 		Burst.spawn(get_parent(), position + Vector2(8, 8), StringName(str(data.get("burst", "leaves"))))
-	dropped = _drop()
 	queue_redraw()
-	return dropped
 
 
 func _drop() -> Node2D:
@@ -171,6 +237,11 @@ func _drop() -> Node2D:
 	return node
 
 
+## Whether it is drawn whole: until it is broken, and broken by a stroke whose blow hasn't come.
+func looks_whole() -> bool:
+	return not broken or _shown_whole
+
+
 ## Whether it is flashing white (a blow that didn't break it).
 func is_flashing() -> bool:
 	return _flash > 0.0
@@ -185,13 +256,14 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var frames: Dictionary = data.get("frames", {})
-	var frame: StringName = StringName(str(frames.get("broken" if broken else "whole", "")))
+	var whole: bool = looks_whole()
+	var frame: StringName = StringName(str(frames.get("whole" if whole else "broken", "")))
 	if not FRAMES.has(frame):
 		return
-	if not broken:
+	if whole:
 		SoftShadow.draw(self, Vector2(8, 14), Vector2(5, 1.5), 0.8)
 	# A blow that doesn't break it knocks it a pixel sideways and back.
 	var nudge: Vector2 = Vector2(1, 0) if _shake > SHAKE_TIME * 0.5 else (Vector2(-1, 0) if _shake > 0.0 else Vector2.ZERO)
-	SpriteSheet.draw(self, SHEET, FRAMES[frame], SIZE, nudge if not broken else Vector2.ZERO)
-	if _flash > 0.0 and not broken:
+	SpriteSheet.draw(self, SHEET, FRAMES[frame], SIZE, nudge if whole else Vector2.ZERO)
+	if _flash > 0.0 and whole:
 		SpriteSheet.draw(self, SHEET, FRAMES[frame], SIZE, nudge, false, true, Rock.FLASH_TINT)

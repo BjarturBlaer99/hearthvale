@@ -55,7 +55,7 @@ func test_the_three_are_made_at_the_workbench_from_what_the_plan_says() -> void:
 	GameState.add_item(&"wood", 1)
 	assert_array(_ids(Crafting.of_tab(GameState.known_crafts(Crafting.WORKBENCH), Crafting.TAB_MAKE))).is_equal(["chest", "rug"])
 	GameState.add_item(&"copper_bar", 1)
-	assert_array(_ids(Crafting.of_tab(GameState.known_crafts(Crafting.WORKBENCH), Crafting.TAB_MAKE))).override_failure_message("a copper bar opens the lamp, and the copper hoe and can with it").is_equal(["chest", "copper_hoe", "copper_watering_can", "rug", "lamp"])
+	assert_array(_ids(Crafting.of_tab(GameState.known_crafts(Crafting.WORKBENCH), Crafting.TAB_MAKE))).override_failure_message("a copper bar opens the lamp, and the copper hoe, can and axe with it").is_equal(["chest", "copper_hoe", "copper_watering_can", "rug", "lamp", "copper_axe"])
 	assert_array(Array(DataRegistry.errors)).is_empty()
 
 

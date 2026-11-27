@@ -1,8 +1,8 @@
 extends GdUnitTestSuite
 ## The overgrowth (the Homestead, phase 1, step 1b): weeds, bushes, fallen logs, old stumps,
-## rocks, boulders and great boulders stand on the hero's land. The sword clears the first
-## four and the pickaxe the rocks; a boulder wants the Copper Pickaxe and a great boulder the
-## Iron. What one leaves lies in its cell. Cleared is cleared: no visit, morning or save
+## rocks, boulders and great boulders stand on the hero's land. The sword clears weeds and
+## bushes, the axe logs and stumps (icons-axe-bar plan, step A2: the sword did until then),
+## and the pickaxe the rocks; a boulder wants the Copper Pickaxe and a great boulder the Iron. What one leaves lies in its cell. Cleared is cleared: no visit, morning or save
 ## brings it back. A cell with something on it can't be tilled.
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
@@ -26,9 +26,9 @@ const ON_THE_LAND: Dictionary = {
 	&"weeds": 70, &"bush": 16, &"log": 10, &"farm_stump": 14, &"rock": 24, &"boulder": 8, &"great_boulder": 3,
 }
 const ON_THE_FIELD: Dictionary = {&"weeds": 40, &"bush": 5, &"log": 2, &"farm_stump": 2, &"rock": 5}
-## What the sword clears: [kind, blows, what it leaves, how many].
+## What the sword and the axe clear: [kind, blows, what it leaves, how many, what cuts it].
 const SWORD_KINDS: Array = [
-	[&"weeds", 1, &"fibre", 1], [&"bush", 2, &"fibre", 2], [&"log", 3, &"wood", 3], [&"farm_stump", 3, &"wood", 2],
+	[&"weeds", 1, &"fibre", 1, "sword"], [&"bush", 2, &"fibre", 2, "sword"], [&"log", 3, &"wood", 3, "axe"], [&"farm_stump", 3, &"wood", 2, "axe"],
 ]
 ## One of each with nothing else near it (a swing catches only it) and grass below it.
 const ALONE: Dictionary = {
@@ -72,7 +72,7 @@ func test_the_seven_kinds_are_data_and_fibre_is_a_material() -> void:
 	for row: Array in SWORD_KINDS:
 		var kind: Dictionary = DataRegistry.get_breakable(row[0])
 		assert_bool(kind.is_empty()).override_failure_message("%s is data" % row[0]).is_false()
-		assert_array(kind["breaks_on"]).override_failure_message("%s: the sword and a bomb, and nothing else" % row[0]).contains_exactly_in_any_order(["sword", "bomb"])
+		assert_array(kind["breaks_on"]).override_failure_message("%s: the %s and a bomb, and nothing else" % [row[0], row[4]]).contains_exactly_in_any_order([row[4], "bomb"])
 		assert_str(str(kind["returns"])).override_failure_message("%s never comes back" % row[0]).is_equal("never")
 		assert_int(int(kind.get("hits", 1))).override_failure_message("%s: blows" % row[0]).is_equal(row[1])
 		assert_bool(Breakable.FRAMES.has(StringName(str(kind["frames"]["whole"])))).is_true()
@@ -144,7 +144,7 @@ func test_the_land_carries_what_the_plan_counted() -> void:
 				banks += 1
 				break
 	assert_int(banks).override_failure_message("a bank of the pond can be walked to").is_greater(0)
-	# And with the sword and the plain pickaxe he can open up every cell of the land but the
+	# And with the sword, the axe and the plain pickaxe he can open up every cell of the land but the
 	# boulders' own: nothing is walled in behind a tool he has to wait for.
 	var all_open: Dictionary = _reach(farm, WAY_IN, [&"weeds", &"bush", &"log", &"farm_stump", &"rock"])
 	for y: int in farm.grid.size.y:
@@ -162,7 +162,8 @@ func test_the_land_carries_what_the_plan_counted() -> void:
 			assert_bool(all_open.has(cell)).override_failure_message("%s can be reached with the plain tools" % cell).is_true()
 
 
-func test_the_sword_clears_weeds_bushes_logs_and_stumps_and_each_leaves_its_drop() -> void:
+func test_the_sword_clears_weeds_and_bushes_the_axe_logs_and_stumps_and_each_leaves_its_drop() -> void:
+	GameState.add_item(&"axe")
 	var farm: AreaController = _load(FARM)
 	var swings: int = 0
 	for row: Array in SWORD_KINDS:
@@ -172,14 +173,14 @@ func test_the_sword_clears_weeds_bushes_logs_and_stumps_and_each_leaves_its_drop
 		assert_that(thing.breakable_id).is_equal(kind)
 		assert_int(thing.hits_left).is_equal(row[1])
 		for blow: int in int(row[1]) - 1:
-			_swing_at(farm, thing)
+			_cut(farm, thing, row[4])
 			swings += 1
 			assert_bool(thing.broken).override_failure_message("%s: blow %d doesn't clear it" % [kind, blow + 1]).is_false()
 			assert_bool(farm.terrain.is_occupied(thing.cell())).is_true()
 			assert_object(thing.dropped).is_null()
 			assert_bool(GameState.homestead().is_cleared(thing.cell())).is_false()
 		var changes: int = _changes
-		_swing_at(farm, thing)
+		_cut(farm, thing, row[4])
 		swings += 1
 		assert_bool(thing.broken).override_failure_message("%s is cleared by blow %d" % [kind, row[1]]).is_true()
 		assert_bool(farm.terrain.is_occupied(thing.cell())).override_failure_message("its cell is free").is_false()
@@ -199,7 +200,7 @@ func test_the_sword_clears_weeds_bushes_logs_and_stumps_and_each_leaves_its_drop
 	assert_int(GameState.item_count(&"wood")).is_equal(5)
 	assert_bool(GameState.has_found(&"fibre")).is_true()
 	assert_int(swings).is_equal(9)
-	assert_float(GameState.energy).override_failure_message("nine swings of the sword, no more").is_equal(100.0 - 9 * 0.5)
+	assert_float(GameState.energy).override_failure_message("nine blows of the sword and the axe, no more").is_equal(100.0 - 9 * 0.5)
 	assert_int(GameState.homestead().cleared_count()).is_equal(4)
 	# A swing at a rock does nothing to it: only the pickaxe breaks a rock.
 	var rock: Rock = farm.debris_at(ALONE[&"rock"]) as Rock
@@ -501,7 +502,7 @@ func test_the_hoe_refuses_a_cell_under_debris_until_it_is_cleared() -> void:
 	assert_that(farm.plot.soil_at(rock_cell)).is_equal(Farm.TILLED)
 
 
-func test_a_bomb_cuts_what_the_sword_cuts_and_never_a_rock() -> void:
+func test_a_bomb_cuts_what_the_sword_and_the_axe_cut_and_never_a_rock() -> void:
 	GameState.add_item(&"bomb", 2)
 	var farm: AreaController = _load(FARM)
 	# Beside the log at (27, 6): the blast catches it.
@@ -580,6 +581,18 @@ func _reach(farm: AreaController, start: Vector2i, kinds: Array) -> Dictionary:
 	return seen
 
 
+## One blow at `what` of the sword ("sword") or the axe ("axe", from the item button).
+func _cut(farm: AreaController, what: Node2D, with: String) -> void:
+	if with == "sword":
+		_swing_at(farm, what)
+		return
+	GameState.equip(&"axe")
+	_face(farm, what)
+	assert_bool(farm.use_item()).override_failure_message("a stroke of the axe").is_true()
+	_finish(farm)
+	GameState.equip(&"")
+
+
 ## Stands the hero below `what`, facing it, swings the sword once and lets the blow land.
 func _swing_at(farm: AreaController, what: Node2D) -> void:
 	_swing_at_from(farm, what, what.call(&"cell") + Vector2i.DOWN, Vector2.UP)
@@ -597,9 +610,9 @@ func _swing_at_from(farm: AreaController, what: Node2D, from: Vector2i, facing: 
 		farm.resolve_combat()
 
 
-## Stands the hero below `rock`, facing it.
-func _face(farm: AreaController, rock: Rock) -> void:
-	farm.player.motor.place(rock.cell() + Vector2i.DOWN)
+## Stands the hero below `rock` (or anything that stands in a cell), facing it.
+func _face(farm: AreaController, rock: Node2D) -> void:
+	farm.player.motor.place(rock.call(&"cell") + Vector2i.DOWN)
 	farm.player.face(Vector2.UP)
 
 

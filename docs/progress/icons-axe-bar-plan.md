@@ -248,6 +248,23 @@ data, the energy rule, the two recipes, the pickup in the farmhouse, the tools' 
   says why; a bomb still breaks it; on the land a cleared log never comes back; the energy cost of a
   stroke; the recipes' unlocks; an old save (the v6 fixtures) loads and finds the axe in the
   farmhouse; the debris tests' wood cases move from the sword to the axe.
+- **Built (2026-11-27), waiting for the user's review.** As written: the three axes are items
+  (`"tool": "chop"`, `fewer_blows` 1 and 2 on the better two); `ToolUse.CHOP`, `decide_chop()`,
+  `hits_of_blow()`, and `fewer_blows()` reading any tool's stat; `AreaController._swing_axe()` beside
+  `_swing_pick()`, paying `"chop": 0.5` once a stroke and striking with `Hit.kind` `axe`; the four wood
+  breakables say `"axe"` and not `"sword"`; a sword's blow on wood knocks and says "It wants an axe."
+  once a visit; a bomb still breaks wood; the Copper Axe and the Iron Axe on the "Make" tab (fifteen
+  lines with everything found, cloth and the blanket aside); the axe lying in the farmhouse at (4, 7);
+  `play_days.gd` takes the axe (picked up on day 1, handed over in the farm trial) to logs and stumps;
+  `playtest.gd`'s `homestead`, `build` and `farm` carry one; capture shots 214 to 218, and the films
+  `axe_stump_side`, `axe_log_up`, `axe_log_down` and `sword_knocks_on_a_stump` in place of the sword's two wood films. The save
+  is still version 6. What building decided (in `docs/DECISIONS.md`, 2026-11-27): **the axe lies on
+  the open floor west of the doorway,** in the row of the seeds, the hoe and the can, and nothing in
+  the room moved; **a blow is struck at once and shown at the blow,** as the pickaxe's is (the wood is
+  down and its drop lying, hidden, until the axe comes down); **the knock is the sound `plate`** with no
+  shudder or splinters, so it never looks like a blow that counted; **the axe facing no wood** says
+  "There is no wood here to cut." and costs nothing; **the two recipes stand at the end of the tab**
+  (no earlier line moved). See `LOG.md`.
 
 ### Risks
 - **Taking the sword's wood away is a change to the game the user has played**, and to the

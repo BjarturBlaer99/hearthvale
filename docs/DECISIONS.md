@@ -1096,6 +1096,7 @@ Format: `YYYY-MM-DD — Decision — Why — Alternatives considered`
     land carry debris, 145 in all. What is cleared is gone for good.
   - **D5.** The sword clears weeds, bushes, logs and stumps; the Pickaxe clears rocks; eight boulders
     want the Copper Pickaxe and three great boulders the Iron. Nothing on the field needs a better tool.
+    (Changed 2026-11-26: logs and stumps want the axe. See "Icons, an axe and the item bar".)
   - **D6.** A small pond in the south-west corner fills the can; there is no well until one is built.
   - **D7.** No monsters, villagers or forage on the homestead.
   - **D8.** The area `home` keeps its room and becomes the farmhouse's inside, cell for cell; only its
@@ -1960,3 +1961,29 @@ in six steps (I1, I2, A1, A2, B1, B2), each stopping for the user's review.
   axe. It is built in step A2; until then the sword still cuts wood. `homestead-plan.md`'s D5 says so.
 - **Q14 bends CLAUDE.md's save rule** (a new version for any change to the save) by decision, as
   crafting's and the Homestead's phases 2 to 4 did: the field `bar` is read with a default.
+
+## 2026-11-27 — Icons, an axe and the item bar, step A2: what building the axe decided
+Built on the user's word "okay continue" for step A1. The plan's answers (Q5 to Q11) stand as written;
+building it decided these, none of which the plan named:
+- **Where the axe lies:** the farmhouse's cell (4, 7), the open floor west of the doorway, in the row
+  of the first seeds, the hoe and the can (6..8, 7). Nothing in the room moved. The flag `took_axe`
+  keeps it taken, as the hoe's does, so an old save, which has no such flag, finds it.
+- **A blow of the axe is struck at once and shown at the blow,** as the pickaxe's is: the wood is
+  cut (its cell freed, cleared for good on the land, its drop lying but hidden) the moment the stroke
+  begins, and its chips, its sound, its fall and its drop show when the axe comes down
+  (`Breakable.strike(..., show_now = false)`, `show_blow()`). The sword's and a bomb's blows show at
+  once, as before.
+- **The sword's knock is the sound `plate`** (a short, low thump: no new sound), with no shudder, no
+  flash and no splinters, so a knock never looks like a blow that counted. "It wants an axe." is said
+  the first time a visit, by the area; every knock is heard.
+- **The axe facing nothing it cuts** says "There is no wood here to cut." (`ToolUse.CHOP_NOTHING`) and
+  costs nothing, as the pickaxe does at no rock; a left click there with the axe in hand swings the
+  sword instead, as with every tool.
+- **The two recipes' places on the "Make" tab** are its end (`order` 16 and 17, after the wool
+  blanket), so no line before them moved; they need the axe (or the copper axe) and 2 bars, and are
+  known once a copper (or iron) bar is found, as the hoe's are.
+- **`fewer_blows` is read from any tool** (`ToolUse.fewer_blows()`), not only a pickaxe; the hoes and
+  cans say none. `ToolUse.hits_of_blow()` is `1 + fewer_blows`: a stump of three falls to two copper
+  blows (two hits, then one) and one iron blow.
+- **What can break a breakable** is its own list in `DataRegistry` (`BREAKS_ON`: the sword, an arrow,
+  a bomb and the axe); a boss's weak point (`WEAK_POINTS`) can't be the axe.

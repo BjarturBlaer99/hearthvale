@@ -46,7 +46,7 @@
           "maximum": { "type": "number", "exclusiveMinimum": 0, "description": "A full bar." },
           "costs": {
             "type": "object",
-            "required": ["sprint_per_second", "swing", "shot", "hoe", "water", "mine"],
+            "required": ["sprint_per_second", "swing", "shot", "hoe", "water", "mine", "chop"],
             "description": "What things cost. Anything not named here is free.",
             "properties": {
               "sprint_per_second": { "type": "number", "minimum": 0, "description": "Each second the hero runs." },
@@ -54,7 +54,8 @@
               "shot": { "type": "number", "minimum": 0, "description": "A shot of the bow." },
               "hoe": { "type": "number", "minimum": 0, "description": "Tilling a cell of the plot with the hoe." },
               "water": { "type": "number", "minimum": 0, "description": "Watering a cell of the plot with the can." },
-              "mine": { "type": "number", "minimum": 0, "description": "A blow of the pickaxe on a rock." }
+              "mine": { "type": "number", "minimum": 0, "description": "A blow of the pickaxe on a rock." },
+              "chop": { "type": "number", "minimum": 0, "description": "A blow of the axe on a branch, a stump or a log (no skill eases it)." }
             }
           },
           "low": {

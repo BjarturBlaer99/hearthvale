@@ -39,9 +39,9 @@ func test_everything_on_the_list_is_made_from_what_the_mine_and_the_fields_give(
 	# A few days' work, and nothing more than it takes. From the mine: stone and copper ore (the
 	# top floors), iron ore and coal (the middle floors), three gold ore and a crystal (the
 	# deep). From the fields: wood, wheat off the plot, blossom from under the cherry trees. The
-	# hoe and the can lie at home, the Pickaxe is Tilda's, the Lantern is the crypt's.
-	for item: Array in [[&"hoe", 1], [&"watering_can", 1], [&"pickaxe", 1], [&"lantern", 1], [&"stone", 23], [&"copper_ore", 30],
-			[&"coal", 21], [&"iron_ore", 24], [&"gold_ore", 3], [&"crystal", 1], [&"wood", 12], [&"wheat", 8], [&"cherry_blossom", 3]]:
+	# hoe, the can and the axe lie at home, the Pickaxe is Tilda's, the Lantern is the crypt's.
+	for item: Array in [[&"hoe", 1], [&"watering_can", 1], [&"axe", 1], [&"pickaxe", 1], [&"lantern", 1], [&"stone", 23], [&"copper_ore", 30],
+			[&"coal", 25], [&"iron_ore", 30], [&"gold_ore", 3], [&"crystal", 1], [&"wood", 12], [&"wheat", 8], [&"cherry_blossom", 3]]:
 		assert_int(GameState.add_item(item[0], item[1])).override_failure_message("%s fits in the pack" % item[0]).is_equal(item[1])
 	# The skills come from the work itself: twenty-five rocks of ore, ten cells tilled.
 	for rock: int in 25:
@@ -55,7 +55,7 @@ func test_everything_on_the_list_is_made_from_what_the_mine_and_the_fields_give(
 	# Cloth and the wool blanket are woven from what the animals give (the Homestead, phase 4:
 	# tests/world/animal_products_test.gd): known once wool is found, so not here.
 	all = all.filter(func(id: String) -> bool: return not id in ["cloth", "wool_blanket"])
-	assert_int(all.size()).is_equal(13)
+	assert_int(all.size()).override_failure_message("thirteen, and the two axes").is_equal(15)
 
 	# Day 1. Stone and ore make the furnace; nothing of metal can be made before it has burned.
 	_make(home, "furnace")
@@ -85,23 +85,32 @@ func test_everything_on_the_list_is_made_from_what_the_mine_and_the_fields_give(
 	assert_bool(_listed(home, "iron_hoe")).override_failure_message("no iron bar yet").is_false()
 	_smelt(home, IRON, 5)
 
-	# Day 4. The sprinkler, the iron hoe and the iron can. What ore is left makes three bars.
+	# Day 4. The sprinkler, the iron hoe and the iron can. What ore is left makes five bars.
 	_take_out(home, &"iron_bar", 5)
 	_make(home, "sprinkler")
 	_make(home, "iron_hoe")
 	_make(home, "iron_watering_can")
 	assert_bool(_can_make(home, "iron_pickaxe")).override_failure_message("three bars short").is_false()
-	_smelt(home, IRON, 3)
+	_smelt(home, IRON, 5)
 
-	# Day 5. The iron pickaxe; and the gold goes in.
-	_take_out(home, &"iron_bar", 3)
+	# Day 5. The iron pickaxe, two iron bars kept for the iron axe; and the gold goes in.
+	_take_out(home, &"iron_bar", 5)
 	_make(home, "iron_pickaxe")
+	assert_bool(_can_make(home, "iron_axe")).override_failure_message("no copper axe yet").is_false()
 	_smelt(home, GOLD, 1)
 
-	# Day 6. The Miner's Lantern is the last thing on the list.
+	# Day 6. The Miner's Lantern; six more copper ore from the mine go in.
 	_take_out(home, &"gold_bar", 1)
 	_make(home, "miners_lantern")
 	assert_int(GameState.day).is_equal(6)
+	GameState.add_item(&"copper_ore", 6)
+	_smelt(home, COPPER, 2)
+
+	# Day 7. The copper axe, and the iron axe from it, are the last things on the list.
+	_take_out(home, &"copper_bar", 2)
+	_make(home, "copper_axe")
+	_make(home, "iron_axe")
+	assert_int(GameState.day).is_equal(7)
 
 	# Everything on the workbench's list has been made, each once.
 	var made: Array = _made.duplicate()
@@ -114,19 +123,19 @@ func test_everything_on_the_list_is_made_from_what_the_mine_and_the_fields_give(
 		assert_bool(GameState.is_furnished(StringName(furnishing))).override_failure_message(furnishing).is_true()
 		assert_bool((home.interactables.get_node(NodePath(furnishing.capitalize())) as Furnishing).is_there()).override_failure_message("%s stands in the cottage" % furnishing).is_true()
 	# What he holds at the end: the best of each tool, and the things made to be used.
-	for held: Array in [[&"iron_hoe", 1], [&"iron_watering_can", 1], [&"iron_pickaxe", 1], [&"sprinkler", 1], [&"miners_lantern", 1], [&"bomb", 3]]:
+	for held: Array in [[&"iron_hoe", 1], [&"iron_watering_can", 1], [&"iron_pickaxe", 1], [&"iron_axe", 1], [&"sprinkler", 1], [&"miners_lantern", 1], [&"bomb", 3]]:
 		assert_int(GameState.item_count(held[0])).override_failure_message(String(held[0])).is_equal(held[1])
 	# And nothing is left over: every stone, ore, coal, bar and plank went into something, and
 	# every tool before the last was used up in the next.
 	for spent: StringName in [&"stone", &"copper_ore", &"coal", &"iron_ore", &"gold_ore", &"crystal", &"wood", &"wheat", &"cherry_blossom",
 			&"copper_bar", &"iron_bar", &"gold_bar", &"hoe", &"watering_can", &"pickaxe", &"lantern", &"copper_hoe",
-			&"copper_watering_can", &"copper_pickaxe"]:
+			&"copper_watering_can", &"copper_pickaxe", &"axe", &"copper_axe"]:
 		assert_int(GameState.item_count(spent)).override_failure_message("no %s left" % spent).is_equal(0)
 	# The whole list is still known, and there is nothing left to make any of it with.
 	var menu: CraftMenu = home.hud.craft_menu
 	home.open_craft()
-	assert_int(menu.entries().size()).is_equal(13)
-	for index: int in 13:
+	assert_int(menu.entries().size()).is_equal(15)
+	for index: int in 15:
 		assert_bool(menu.can_make(index)).override_failure_message(str(menu.entries()[index]["id"])).is_false()
 	assert_bool(GameState.furnace().is_empty()).is_true()
 
@@ -156,7 +165,7 @@ func test_all_that_the_list_is_made_of_comes_from_the_mine_the_fields_or_the_ben
 	# ...and what the animals give (the Homestead, phase 4).
 	for kind: Dictionary in DataRegistry.entries(&"animals"):
 		given[str(kind["gives"])] = "the %s" % kind["id"]
-	for raw: String in ["stone", "copper_ore", "coal", "iron_ore", "gold_ore", "crystal", "wood", "wheat", "hoe", "watering_can", "pickaxe"]:
+	for raw: String in ["stone", "copper_ore", "coal", "iron_ore", "gold_ore", "crystal", "wood", "wheat", "hoe", "watering_can", "axe", "pickaxe"]:
 		assert_bool(given.has(raw)).override_failure_message("%s is given by the world" % raw).is_true()
 	# What the bench and the furnace make.
 	var made: Dictionary = {}

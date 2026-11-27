@@ -431,7 +431,7 @@ func test_bad_tools_and_bad_farm_rules_are_reported() -> void:
 	assert_str(errors).contains("rules 'energy': 'costs' needs 'water', a number of 0 or more.")
 	var other: Node = auto_free(DataRegistryScript.new())
 	errors = "\n".join(other.load_all("res://tests/fixtures/bad_tools"))
-	assert_str(errors).contains("item 'spade': a tool's stats must name its 'tool': hoe or water or pick.")
+	assert_str(errors).contains("item 'spade': a tool's stats must name its 'tool': hoe or water or pick or chop.")
 	assert_str(errors).contains("item 'jug': the watering can's stats must name what it holds ('ammo').")
 	assert_str(errors).contains("item 'bucket' ammo")
 

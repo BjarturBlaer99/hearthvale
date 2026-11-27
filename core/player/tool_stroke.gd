@@ -4,7 +4,7 @@ extends RefCounted
 ## and how far through it the hero is (the motor's own progress, 0 to 1), it says which pose he
 ## shows and the tool in his hands. It only picks pictures: how long a stroke lasts is the
 ## tool's (ToolUse.time_of()), and the work is done the moment it begins, as it always was.
-## - the hoe and the pickaxe: raised until the blow (BLOW), then struck
+## - the hoe, the pickaxe and the axe: raised until the blow (BLOW), then struck
 ## - the can: tipped (pouring) all through, or dipped (filling)
 ## - a seed and the sprinkler: a reach down before him (the sprinkler leaves his hands at the
 ##   blow, holds())
@@ -12,11 +12,12 @@ extends RefCounted
 ## The kinds of stroke.
 const HOE: StringName = &"hoe"
 const PICK: StringName = &"pick"
+const CHOP: StringName = &"chop"
 const POUR: StringName = &"pour"
 const FILL: StringName = &"fill"
 const SOW: StringName = &"sow"
 const PLACE: StringName = &"place"
-const KINDS: Array[StringName] = [HOE, PICK, POUR, FILL, SOW, PLACE]
+const KINDS: Array[StringName] = [HOE, PICK, POUR, FILL, SOW, PLACE, CHOP]
 ## The poses of a tool in his hands (HeldTools names its pictures by them).
 const RAISE: StringName = &"raise"
 const STRIKE: StringName = &"strike"
@@ -43,13 +44,15 @@ static func of_use(does: StringName) -> StringName:
 			return PLACE
 		ToolUse.MINE:
 			return PICK
+		ToolUse.CUT:
+			return CHOP
 	return &""
 
 
 ## The pose of the tool `progress` (0 to 1) through a stroke of `kind`, or "" for none.
 static func pose(kind: StringName, progress: float) -> StringName:
 	match kind:
-		HOE, PICK:
+		HOE, PICK, CHOP:
 			return RAISE if progress < BLOW else STRIKE
 		POUR:
 			return TIP

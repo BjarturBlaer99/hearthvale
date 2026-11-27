@@ -96,42 +96,42 @@ const SCENARIOS: Dictionary = {
 		"flags": [],
 	},
 	# On the homestead's road above the field's clear corner, with the hoe, the watering can
-	# (empty: the pond is in the south-west corner of the land), seeds of every crop and a sword:
-	# for trying the farm. The bed in the farmhouse, up the path, ends a day.
+	# (empty: the pond is in the south-west corner of the land), seeds of every crop, a sword and
+	# the axe: for trying the farm. The bed in the farmhouse, up the path, ends a day.
 	"farm": {
 		"area": &"homestead",
 		"cell": Vector2i(25, 15),
-		"items": [[&"wooden_sword", 1], [&"hoe", 1], [&"watering_can", 1], [&"turnip_seeds", 5], [&"carrot_seeds", 3],
+		"items": [[&"wooden_sword", 1], [&"hoe", 1], [&"watering_can", 1], [&"axe", 1], [&"turnip_seeds", 5], [&"carrot_seeds", 3],
 			[&"wheat_seeds", 3], [&"potato_seeds", 3], [&"pumpkin_seeds", 2], [&"coin", 30]],
-		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds"],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"took_axe"],
 	},
-	# Arriving on the homestead by the lane from Hearthvale, with a sword and all three pickaxes
-	# (the plain one for rocks, the Copper for boulders, the Iron for great boulders), the hoe,
-	# the can and a few seeds: for trying the land, clearing it, and the farm's two tunes (add an
-	# hour for the night's: -- homestead 20:30).
+	# Arriving on the homestead by the lane from Hearthvale, with a sword, the axe (for logs and
+	# stumps) and all three pickaxes (the plain one for rocks, the Copper for boulders, the Iron
+	# for great boulders), the hoe, the can and a few seeds: for trying the land, clearing it, and
+	# the farm's two tunes (add an hour for the night's: -- homestead 20:30).
 	"homestead": {
 		"area": &"homestead",
 		"cell": Vector2i(37, 14),
-		"items": [[&"wooden_sword", 1], [&"pickaxe", 1], [&"copper_pickaxe", 1], [&"iron_pickaxe", 1], [&"hoe", 1],
+		"items": [[&"wooden_sword", 1], [&"axe", 1], [&"pickaxe", 1], [&"copper_pickaxe", 1], [&"iron_pickaxe", 1], [&"hoe", 1],
 			[&"watering_can", 1], [&"turnip_seeds", 5], [&"bread", 3], [&"coin", 30]],
-		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds"],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"took_axe"],
 	},
 	# On the homestead east of the farmhouse's door, where the ground is cleared (columns 29 to
 	# 37, rows 8 to 13, and the strip below the road), with a stock of everything that can be set
 	# down: for trying build mode. B opens it; the mouse points at a cell and the movement keys
 	# move the ghost; a left click sets down and a right click takes up; the wheel and 1 to 9
 	# choose (the hand, the bar's first slot, lifts a thing to move it); B, Tab or Esc leave.
-	# A sword too, to clear more ground; wood, stone and coins for the workbench's "Place" tab
+	# A sword and the axe too, to clear more ground; wood, stone and coins for the workbench's "Place" tab
 	# (in the farmhouse) and Tilda's hedges, flower beds and saplings. A lamp post lights at
 	# 18:30 (-- build 18:20), and a sapling grows a stage with the bed's mornings.
 	"build": {
 		"area": &"homestead",
 		"cell": Vector2i(30, 13),
-		"items": [[&"wooden_sword", 1], [&"fence", 40], [&"gate", 4], [&"dirt_path", 20], [&"stone_path", 20], [&"wood_path", 20],
+		"items": [[&"wooden_sword", 1], [&"axe", 1], [&"fence", 40], [&"gate", 4], [&"dirt_path", 20], [&"stone_path", 20], [&"wood_path", 20],
 			[&"wooden_flooring", 20], [&"stone_flooring", 20], [&"hedge", 12], [&"lamp_post", 4], [&"bench", 2],
 			[&"flower_bed_red", 4], [&"flower_bed_yellow", 4], [&"flower_bed_blue", 4], [&"oak_sapling", 3], [&"cherry_sapling", 2],
 			[&"wood", 20], [&"stone", 20], [&"coin", 60]],
-		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds"],
+		"flags": [&"took_wooden_sword", &"took_hoe", &"took_watering_can", &"took_first_seeds", &"took_axe"],
 		"cleared": [Rect2i(29, 8, 9, 6), Rect2i(20, 16, 18, 1)],
 	},
 	# On the homestead with the coins, materials and skill to buy every building's plan at the

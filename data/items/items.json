@@ -89,6 +89,9 @@
     { "id": "cloth", "name": "Cloth", "type": "material", "icon": "cloth", "stackable": true, "max_stack": 30 },
     { "id": "fried_egg", "name": "Fried Egg", "type": "food", "icon": "fried_egg", "stackable": true, "max_stack": 10, "stats": { "energy": 20 } },
     { "id": "omelette", "name": "Omelette", "type": "food", "icon": "omelette", "stackable": true, "max_stack": 10, "stats": { "energy": 50, "hearts": 0.5 } },
-    { "id": "custard", "name": "Custard", "type": "food", "icon": "custard", "stackable": true, "max_stack": 10, "stats": { "energy": 65, "hearts": 1 } }
+    { "id": "custard", "name": "Custard", "type": "food", "icon": "custard", "stackable": true, "max_stack": 10, "stats": { "energy": 65, "hearts": 1 } },
+    { "id": "axe", "name": "Axe", "type": "tool", "icon": "axe", "stats": { "tool": "chop", "cooldown": 0.4 } },
+    { "id": "copper_axe", "name": "Copper Axe", "type": "tool", "icon": "copper_axe", "stats": { "tool": "chop", "cooldown": 0.4, "fewer_blows": 1 } },
+    { "id": "iron_axe", "name": "Iron Axe", "type": "tool", "icon": "iron_axe", "stats": { "tool": "chop", "cooldown": 0.4, "fewer_blows": 2 } }
   ]
 }

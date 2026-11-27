@@ -1,0 +1,22 @@
+{
+	"id": "iron_axe",
+	"station": "workbench",
+	"order": 17,
+	"needs": [
+		{
+			"item": "copper_axe",
+			"count": 1
+		},
+		{
+			"item": "iron_bar",
+			"count": 2
+		}
+	],
+	"makes": {
+		"item": "iron_axe",
+		"count": 1
+	},
+	"unlock": {
+		"found": "iron_bar"
+	}
+}

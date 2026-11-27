@@ -9,7 +9,8 @@ var damage: int = 0
 var push: Vector2 = Vector2.ZERO
 ## Where the blow came from, in area pixels.
 var source: Vector2 = Vector2.ZERO
-## What dealt it: &"sword", &"arrow", &"bomb" or &"contact" (switches and cracked walls care).
+## What dealt it: &"sword", &"arrow", &"bomb", &"axe" (a stroke at wood) or &"contact"
+## (switches, cracked walls and breakables care).
 var kind: StringName = &"contact"
 ## Energy it takes from the hero as well (a Bogwisp's touch); nothing against anything else.
 var energy: float = 0.0

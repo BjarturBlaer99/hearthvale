@@ -39,6 +39,10 @@ const PLOT_AREA: StringName = &"homestead"
 const FOODS: Array[StringName] = [&"bread", &"shepherds_pie", &"blossom_tea"]
 ## His pickaxes, the best first.
 const PICKAXES: Array[StringName] = [&"iron_pickaxe", &"copper_pickaxe", &"pickaxe"]
+## His axes, the best first: logs and stumps want one (icons-axe-bar plan, step A2).
+const AXES: Array[StringName] = [&"iron_axe", &"copper_axe", &"axe"]
+## What of the overgrowth is wood, which the axe cuts and the sword doesn't.
+const WOOD_DEBRIS: Array[StringName] = [&"log", &"farm_stump"]
 const HOES: Array[StringName] = [&"iron_hoe", &"copper_hoe", &"hoe"]
 const CANS: Array[StringName] = [&"iron_watering_can", &"copper_watering_can", &"watering_can"]
 ## What a rock may hold besides stone.
@@ -180,12 +184,12 @@ func _the_deep_floors_alone() -> void:
 
 # --- The eight days -----------------------------------------------------------------------
 
-## A first day: the tools by the door, five turnips in the ground, the sword, a lost shuttle
+## A first day: the tools by the door (the axe among them), five turnips in the ground, the sword, a lost shuttle
 ## for the weaver (30 coins), the Pickaxe (25), and the first rocks.
 func _day_1() -> void:
 	_plan("the plot and a first look at the quarry")
 	await _travel_to(&"home")
-	for thing: String in ["TurnipSeeds", "Hoe", "WateringCan"]:
+	for thing: String in ["TurnipSeeds", "Hoe", "WateringCan", "Axe"]:
 		await _pick_up(thing)
 	_shot("d1_01_tools_taken")
 	await _travel_to(PLOT_AREA)
@@ -336,8 +340,8 @@ func _farm_day(all: bool = false, tools: Array[StringName] = []) -> void:
 ## and set down; then hens bought and tended.
 func _the_farm_alone() -> void:
 	_begin_day(1)
-	_set_up("a trial of the farm: a sword, the Copper Pickaxe, a hoe and a can, 700 coins, 30 wood, 50 stone, 20 fibre and 2 copper bars were handed to him")
-	for item: Array in [[&"wooden_sword", 1], [&"copper_pickaxe", 1], [&"hoe", 1], [&"watering_can", 1], [&"coin", 700], [&"wood", 30],
+	_set_up("a trial of the farm: a sword, the Copper Pickaxe, an axe, a hoe and a can, 700 coins, 30 wood, 50 stone, 20 fibre and 2 copper bars were handed to him")
+	for item: Array in [[&"wooden_sword", 1], [&"copper_pickaxe", 1], [&"axe", 1], [&"hoe", 1], [&"watering_can", 1], [&"coin", 700], [&"wood", 30],
 			[&"stone", 50], [&"fibre", 20], [&"copper_bar", 2], [&"turnip_seeds", 5]]:
 		_gs.call(&"add_item", item[0], item[1])
 	await _travel_to(PLOT_AREA)
@@ -440,10 +444,13 @@ func _debris_kind(thing: Node2D) -> StringName:
 	return StringName(thing.get(&"breakable_id")) if &"breakable_id" in thing else StringName(thing.get(&"kind"))
 
 
-## What clears `thing`: the sword for what grows and lies, a pickaxe good enough for a rock
-## (a boulder wants the copper one, a great boulder the iron one). "" for nothing he has.
+## What clears `thing`: the sword for what grows, his best axe for logs and stumps, a pickaxe
+## good enough for a rock (a boulder wants the copper one, a great boulder the iron one). ""
+## for nothing he has.
 func _tool_for(thing: Node2D) -> StringName:
 	if &"breakable_id" in thing:
+		if WOOD_DEBRIS.has(_debris_kind(thing)):
+			return _best(AXES)
 		return &"sword" if _armed() else &""
 	match _debris_kind(thing):
 		&"boulder":
@@ -453,7 +460,8 @@ func _tool_for(thing: Node2D) -> StringName:
 	return _best(PICKAXES)
 
 
-## Clears one thing: blows of the sword (Space) or the pickaxe (a left click) until it is gone.
+## Clears one thing: blows of the sword (Space), or the axe or the pickaxe (a left click), until
+## it is gone.
 func _clear_one(thing: Node2D, reserve: float) -> bool:
 	var here: StringName = _area_id()
 	var cell: Vector2i = _cell_of(thing)

@@ -2,7 +2,7 @@
 	"id": "log",
 	"name": "Fallen log",
 	"breaks_on": [
-		"sword",
+		"axe",
 		"bomb"
 	],
 	"hits": 3,

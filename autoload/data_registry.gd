@@ -83,9 +83,10 @@ const ENEMY_BEHAVIOURS: Array[String] = ["hopper", "archer", "flier", "warden", 
 ## When an enemy may be there at all, if its data says ("appears"): only by night.
 const ENEMY_APPEARS: Array[String] = ["night"]
 const DROP_TYPES: Array[String] = ["heart", "item", "nothing"]
-## What a boss's weak point can take (Hit kinds dealt by the hero's weapons). Also what can
-## cut or break a breakable.
+## What a boss's weak point can take (Hit kinds dealt by the hero's weapons).
 const WEAK_POINTS: Array[String] = ["sword", "arrow", "bomb"]
+## What can cut or break a breakable: those, and the axe (icons-axe-bar plan, step A2).
+const BREAKS_ON: Array[String] = ["sword", "arrow", "bomb", "axe"]
 ## The bursts a breakable can throw up (Burst kinds).
 const BREAK_BURSTS: Array[String] = ["leaves", "shards", "dust", "spark", "sparkle", "splinters"]
 ## What a breakable's "returns" may say (Breakable.RETURNS): back the next morning, or never.
@@ -631,8 +632,8 @@ func _check_breakable(breakable: Dictionary) -> void:
 	if breaks_on.is_empty():
 		errors.append("%s: %s needs something in 'breaks_on' that can break it." % [path, label])
 	for kind: Variant in breaks_on:
-		if not WEAK_POINTS.has(str(kind)):
-			errors.append("%s: %s 'breaks_on' has unknown '%s'. Known: %s." % [path, label, kind, ", ".join(WEAK_POINTS)])
+		if not BREAKS_ON.has(str(kind)):
+			errors.append("%s: %s 'breaks_on' has unknown '%s'. Known: %s." % [path, label, kind, ", ".join(BREAKS_ON)])
 	if breakable.has("burst") and not BREAK_BURSTS.has(str(breakable["burst"])):
 		errors.append("%s: %s has unknown burst '%s'. Known: %s." % [path, label, breakable["burst"], ", ".join(BREAK_BURSTS)])
 	var hits: Variant = breakable.get("hits", 1)

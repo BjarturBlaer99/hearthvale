@@ -412,9 +412,11 @@ beyond the hero's homestead (§15: the farm and the farmhouse's inside; the user
 - **The chest** holds 24 stacks, and may hold several stacks of one thing. Its two lists are the pack
   and the chest; choosing a line moves that stack across, as much of it as there is room for. It keeps
   what stacks; coins, keys and quest things stay with the hero.
-- **Wood** comes from fallen branches (one blow of the sword, 1 wood) and old stumps (three blows, 2
+- **Wood** comes from fallen branches (one blow of the axe, 1 wood) and old stumps (three blows, 2
   wood): ten branches and five stumps across the North Fields, the Old Wood and the South Field, back
-  each morning.
+  each morning. **The axe** (since 2026-11-27) lies in the farmhouse and is not sold; it cuts the wood
+  he faces, a blow for half a point of energy, and nothing else (not grass, weeds, bushes, pots or
+  trees). The sword only knocks on wood ("It wants an axe."); a bomb still breaks it.
 - **Bombs** can be made: 1 coal and 3 stone for three.
 - **Better tools** are made from the tool before them, and cost the same energy to use:
 
@@ -423,9 +425,10 @@ beyond the hero's homestead (§15: the farm and the farmhouse's inside; the user
 | Hoe | tills 1 cell | 2 cells in a line | 3 cells in a line |
 | Watering Can | waters 1 cell a pour | 2 cells a pour | 3 cells a pour |
 | Pickaxe | 2 or 3 blows a rock | one blow fewer | two fewer (every rock in one) |
+| Axe | 1 blow a branch, 3 a stump or a log | a stump or a log in 2 | in 1 |
 
 - The cell he faces decides whether a stroke is made; the cells beyond it get it if they can. The
-  pickaxes wait on Mining 2 and 3; the hoes and cans on a first bar of their metal.
+  pickaxes wait on Mining 2 and 3; the hoes, cans and axes on a first bar of their metal.
 - **The sprinkler** (1 copper bar, 1 iron bar; Farming 2) is set on a tilled, empty cell of the plot from
   the item bar, and taken up again with a right click. Each morning it waters the four cells beside it,
   not the corners. Nothing can be planted in its own cell.
@@ -461,8 +464,9 @@ animals. Phase 5, the balance, is planned and not built.)*
 - **Nobody lives there, nothing hunts there, and nothing grows to be gathered.**
 - **The land starts overgrown.** The field's corner by the house (18 cells) is clear; the other 54 cells
   of it, and about ninety places round the land, carry something: 145 in all.
-  - **The sword clears** weeds (one blow, 1 fibre), a bush (two, 2 fibre), a fallen log (three, 3 wood)
-    and an old stump (three, 2 wood). A bomb does what the sword does.
+  - **The sword clears** weeds (one blow, 1 fibre) and a bush (two, 2 fibre); **the axe** a fallen log
+    (three, 3 wood) and an old stump (three, 2 wood; since 2026-11-27, the sword's until then). A bomb
+    does what either does.
   - **The pickaxe clears** a rock (two blows, 1 stone). A boulder wants the Copper Pickaxe (three blows,
     or two of the Iron; 4 stone) and a great boulder the Iron (three; 8 stone). A lesser pickaxe is told
     "It wants a better pickaxe." and spends nothing. Nothing on the field needs a better tool.

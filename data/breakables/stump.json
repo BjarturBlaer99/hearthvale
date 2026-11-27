@@ -2,7 +2,7 @@
 	"id": "stump",
 	"name": "Old stump",
 	"breaks_on": [
-		"sword",
+		"axe",
 		"bomb"
 	],
 	"hits": 3,

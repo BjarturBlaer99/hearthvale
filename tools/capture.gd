@@ -71,7 +71,7 @@ extends SceneTree
 ## the homestead instead, each a grid of FILM_PICTURES pictures FILM_EVERY seconds apart, cropped
 ## round the hero and enlarged (a stroke of several blows takes a row of pictures a blow). A film
 ## is [name, hero cell, facing, what he carries ("hoe", "can", "can_empty", "seed", "sprinkler",
-## "pick", "copper_pick", "sword", "ripe"; or the farm of the "a:" shots: "a:sheep" with a sheep
+## "pick", "copper_pick", "sword", "axe", "ripe"; or the farm of the "a:" shots: "a:sheep" with a sheep
 ## that has wool before him, "a:hen" with a hen that has nothing, "a:silo" with hay in his pack),
 ## what he does ("use", "swing" or "interact"), blows].
 const FILMS: Array = [
@@ -88,8 +88,11 @@ const FILMS: Array = [
 	["sprinkler_down", Vector2i(24, 16), Vector2.DOWN, "sprinkler", "use", 1],
 	["pick_rock", Vector2i(34, 9), Vector2.RIGHT, "pick", "use", 2],
 	["pick_boulder_copper", Vector2i(13, 7), Vector2.RIGHT, "copper_pick", "use", 3],
-	["sword_log", Vector2i(6, 4), Vector2.RIGHT, "sword", "swing", 3],
-	["sword_stump", Vector2i(25, 2), Vector2.LEFT, "sword", "swing", 3],
+	# The axe (icons-axe-bar plan, step A2): the wood the sword cut until then.
+	["axe_stump_side", Vector2i(20, 12), Vector2.LEFT, "axe", "use", 3],
+	["axe_log_up", Vector2i(27, 7), Vector2.UP, "axe", "use", 3],
+	["axe_log_down", Vector2i(27, 5), Vector2.DOWN, "axe", "use", 3],
+	["sword_knocks_on_a_stump", Vector2i(20, 12), Vector2.LEFT, "sword", "swing", 1],
 	# The sword's reach (2026-11-25): one swing down into the weeds of the field's column 28,
 	# one to the side along row 18, one up and one to the left on open ground.
 	["sword_reach_down", Vector2i(28, 16), Vector2.DOWN, "sword", "swing", 1],
@@ -347,6 +350,13 @@ const SHOTS: Array = [
 	["211_the_pack_with_a_few_things", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "pack:few:pack:0"],
 	["212_the_pack_full_scrolled", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "pack:full:pack:9"],
 	["213_tab_with_no_food", &"village", Vector2i(23, 20), Vector2.DOWN, 0, "pack:no_food:pack:0"],
+	# Icons, an axe and the item bar, step A2: the axe in play, struck at the blow in three
+	# facings; the workbench's "Make" tab with the two better axes; the bar with the axe in hand.
+	["214_chopping_a_stump_to_the_side", &"homestead", Vector2i(20, 12), Vector2.LEFT, 0, "chop"],
+	["215_chopping_a_stump_facing_down", &"north_fields", Vector2i(3, 16), Vector2.DOWN, 0, "chop"],
+	["216_chopping_a_stump_facing_up", &"north_fields", Vector2i(31, 25), Vector2.UP, 0, "chop"],
+	["217_the_make_tab_with_the_axes", &"home", Vector2i(8, 3), Vector2.RIGHT, 0, "axe_make"],
+	["218_the_bar_with_the_axe_in_hand", &"homestead", Vector2i(30, 13), Vector2.DOWN, 0, "axe_bar"],
 ]
 ## What the Tab menu's shots carry (210 to 213): a few things, a full pack, and no food.
 const PACK_STOCK: Dictionary = {
@@ -613,6 +623,17 @@ func _capture() -> void:
 				game_state.call(&"add_item", item[0], item[1])
 		if shot[5] == "shop_land":
 			game_state.call(&"add_item", &"coin", 34)
+		if shot[5] in ["chop", "axe_bar"]:
+			# The axe in hand (the bar's own things with it), facing wood.
+			for item: Array in [[&"wooden_sword", 1], [&"hoe", 1], [&"watering_can", 1], [&"pickaxe", 1], [&"axe", 1]]:
+				game_state.call(&"add_item", item[0], item[1])
+			game_state.call(&"set_flag", &"took_wooden_sword", true)
+			game_state.call(&"equip", &"axe")
+		if shot[5] == "axe_make":
+			# The axe, two copper bars and an iron bar: both better axes are known, the copper one
+			# within reach and the iron one greyed (it wants the copper axe).
+			for item: Array in [[&"axe", 1], [&"copper_bar", 2], [&"iron_bar", 1]]:
+				game_state.call(&"add_item", item[0], item[1])
 		if shot[5] == "boulder":
 			# The plain Pickaxe in hand, at a boulder that wants the Copper one.
 			game_state.call(&"add_item", &"pickaxe", 1)
@@ -804,6 +825,18 @@ func _capture() -> void:
 		elif shot[5] in ["hoe", "fill", "plant", "boulder"]:
 			scene.call(&"use_item")
 			await _frames(7)
+		elif shot[5] == "chop":
+			# Caught just after the blow: the axe struck, the splinters flying.
+			scene.call(&"use_item")
+			await _frames(11)
+		elif shot[5] == "axe_make":
+			# The "Make" tab scrolled to its end, both axes in view, the cursor on the Copper Axe.
+			scene.call(&"open_craft")
+			var axe_list: Node = scene.get(&"hud").get(&"craft_menu")
+			var ids: Array = (axe_list.call(&"entries") as Array).map(func(recipe: Dictionary) -> String: return str(recipe["id"]))
+			axe_list.call(&"move_cursor", ids.find("iron_axe"))
+			axe_list.call(&"move_cursor", -1)
+			await _frames(2)
 		elif shot[5] == "skill_up":
 			scene.call(&"use_item")
 			await _frames(20)
@@ -1196,6 +1229,9 @@ func _set_up_film(game_state: Node, what: String) -> void:
 		"sword":
 			game_state.call(&"add_item", &"wooden_sword", 1)
 			game_state.call(&"set_flag", &"took_wooden_sword", true)
+		"axe":
+			game_state.call(&"add_item", &"axe", 1)
+			game_state.call(&"equip", &"axe")
 		_:
 			for item: Array in [[&"hoe", 1], [&"watering_can", 1], [&"turnip_seeds", 3], [&"sprinkler", 1]]:
 				game_state.call(&"add_item", item[0], item[1])

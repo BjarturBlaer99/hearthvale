@@ -149,7 +149,10 @@ func test_a_better_tool_reaches_further_or_strikes_harder() -> void:
 	# What isn't a tool reaches one cell and saves no blows; a bad number is one cell.
 	assert_int(ToolUse.reach({"id": "turnip", "type": "food"})).is_equal(1)
 	assert_int(ToolUse.reach({"id": "odd", "type": "tool", "stats": {"tool": "hoe", "reach": 0}})).is_equal(1)
-	assert_int(ToolUse.fewer_blows({"id": "copper_hoe", "type": "tool", "stats": {"tool": "hoe", "fewer_blows": 2}})).override_failure_message("only a pickaxe saves blows").is_equal(0)
+	# Any tool's stat is read (the axes, step A2), and the hoes' and cans' say nothing.
+	assert_int(ToolUse.fewer_blows({"id": "odd_hoe", "type": "tool", "stats": {"tool": "hoe", "fewer_blows": 2}})).override_failure_message("any tool's stat is read").is_equal(2)
+	for id: StringName in [&"copper_hoe", &"iron_hoe", &"copper_watering_can", &"iron_watering_can"]:
+		assert_int(ToolUse.fewer_blows(DataRegistry.get_item(id))).override_failure_message("%s saves no blows" % id).is_equal(0)
 
 
 func test_the_cells_a_stroke_works_run_in_a_line_the_way_he_faces() -> void:

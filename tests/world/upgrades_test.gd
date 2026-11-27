@@ -45,6 +45,8 @@ func test_every_upgrade_is_made_from_the_tool_before_it() -> void:
 		[&"iron_hoe", "copper_hoe", "iron_bar", 2, {"found": "iron_bar"}],
 		[&"iron_watering_can", "copper_watering_can", "iron_bar", 2, {"found": "iron_bar"}],
 		[&"iron_pickaxe", "copper_pickaxe", "iron_bar", 3, {"skill": "mining", "level": 3.0}],
+		[&"copper_axe", "axe", "copper_bar", 2, {"found": "copper_bar"}],
+		[&"iron_axe", "copper_axe", "iron_bar", 2, {"found": "iron_bar"}],
 	]
 	for case: Array in cases:
 		var recipe: Dictionary = DataRegistry.get_crafting(case[0])
@@ -56,10 +58,10 @@ func test_every_upgrade_is_made_from_the_tool_before_it() -> void:
 	assert_array(Crafting.needs_of(DataRegistry.get_crafting(&"miners_lantern"))).is_equal([{"item": "lantern", "count": 1}, {"item": "gold_bar", "count": 1}, {"item": "crystal", "count": 1}])
 	assert_dict(DataRegistry.get_crafting(&"miners_lantern")["unlock"]).is_equal({"found": "crystal"})
 	# The whole list, in the workbench's order (cloth and the wool blanket since the Homestead's
-	# phase 4: tests/world/animal_products_test.gd).
+	# phase 4: tests/world/animal_products_test.gd; the axes since the icons-axe-bar plan's A2).
 	var all: Array = Crafting.of_tab(Crafting.of_station(DataRegistry.entries(&"crafting"), Crafting.WORKBENCH), Crafting.TAB_MAKE).map(func(recipe: Dictionary) -> String: return str(recipe["id"]))
 	assert_array(all).is_equal(["furnace", "chest", "bombs", "sprinkler", "copper_hoe", "copper_watering_can", "copper_pickaxe",
-		"iron_hoe", "iron_watering_can", "iron_pickaxe", "miners_lantern", "rug", "lamp", "cloth", "wool_blanket"])
+		"iron_hoe", "iron_watering_can", "iron_pickaxe", "miners_lantern", "rug", "lamp", "cloth", "wool_blanket", "copper_axe", "iron_axe"])
 	assert_array(Array(DataRegistry.errors)).is_empty()
 
 

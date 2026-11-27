@@ -139,18 +139,21 @@ func test_a_rock_is_struck_at_once_and_shows_each_blow_when_the_pickaxe_lands() 
 
 
 func test_a_log_shudders_and_flashes_on_a_blow_and_throws_splinters() -> void:
-	GameState.add_item(&"wooden_sword")
+	# The axe's blow (icons-axe-bar plan, step A2; the sword's until then): struck at once,
+	# shown when the axe comes down.
+	GameState.add_item(&"axe")
+	GameState.equip(&"axe")
 	var farm: AreaController = _load()
 	var wood: Breakable = farm.debris_at(LOG) as Breakable
 	_stand(farm, LOG + Vector2i.LEFT, Vector2.RIGHT)
-	assert_bool(farm.player.swing()).is_true()
-	for i: int in 4:
-		farm.player.motor.step(Vector2.ZERO, FRAME)
-		farm.player.sync_from_motor()
-		farm.resolve_combat()
+	assert_bool(farm.use_item()).is_true()
 	assert_int(wood.hits_left).override_failure_message("one blow of three").is_equal(2)
+	assert_bool(wood.is_flashing()).override_failure_message("not before the blow").is_false()
+	assert_int(_bursts(farm, &"splinters")).is_equal(0)
+	_to_the_blow(farm)
 	assert_bool(wood.is_flashing()).is_true()
 	assert_int(_bursts(farm, &"splinters")).is_equal(1)
+	assert_array(_heard).contains([&"cut"])
 
 
 func _load() -> AreaController:

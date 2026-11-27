@@ -56,6 +56,8 @@ const LADDER_WORDS: String = "A ladder leads down."
 const FELL_WORDS: String = "You wake up back at the entrance."
 ## What is said when the watering can has been filled.
 const CAN_FILLED_WORDS: String = "The watering can is full."
+## A sword's blow on wood (icons-axe-bar plan, Q6): said once a visit.
+const WANTS_AXE_WORDS: String = "It wants an axe."
 ## The well's four tiles (GreyboxTiles kinds, on the Decor layer): the can fills at any of them.
 const WELL_KINDS: Array[String] = ["well_nw", "well_ne", "well_sw", "well_se"]
 ## The tune that plays outdoors at night in place of the area's own.
@@ -207,6 +209,8 @@ var _ladder: LadderHole
 ## the new look of what it worked. Run by `_on_struck()` when the motor says the blow has come.
 var _at_blow: Array[Callable] = []
 var _blow_waits: bool = false
+## Whether he has been told on this visit that wood wants an axe.
+var _told_wants_axe: bool = false
 ## The tune this area last asked for.
 var _tune: StringName = &""
 ## Where the hero arrived in this area, facing which way: where they come back after falling.
@@ -246,6 +250,8 @@ func _ready() -> void:
 			child.call(&"set_dungeon", flag_scope())
 		if child.has_method(&"set_terrain"):
 			child.call(&"set_terrain", terrain, rng)
+		if child is Breakable:
+			(child as Breakable).knocked.connect(_on_knocked)
 		if child.has_method(&"occupies") and child.call(&"occupies"):
 			terrain.set_occupied(child.call(&"cell"))
 		# A block that sank for good: its pit is floor.
@@ -567,6 +573,49 @@ func _swing_pick(item: Dictionary) -> bool:
 		at_the_blow(func() -> void: EventBus.sound.emit(&"pick"))
 	player.sync_from_motor()
 	return true
+
+
+## The whole branch, stump or log in the cell the hero faces (what the axe cuts), or null.
+func wood_in_front() -> Breakable:
+	var front: Vector2i = player.front_cell()
+	for child: Node in interactables.get_children():
+		if child is Breakable and not (child as Breakable).broken and (child as Breakable).cell() == front 				and (child as Breakable).breaks_on(Breakable.AXE):
+			return child as Breakable
+	return null
+
+
+## Swings the axe on the item button at the wood the hero faces (icons-axe-bar plan, step A2):
+## a blow costs energy and counts for one of its hits, or more with a better axe. Cut, it
+## frees its cell and leaves its wood; on his land it is gone for good (Breakable gives way
+## through GameState.clear_debris()). Says so and costs nothing with no wood there. No skill
+## rises (Q8). Returns whether a blow fell.
+func _swing_axe(item: Dictionary) -> bool:
+	var wood: Breakable = wood_in_front()
+	var use: Dictionary = ToolUse.decide_chop(wood != null)
+	if use["does"] == ToolUse.NOTHING:
+		EventBus.sound.emit(&"nope")
+		hud.show_message(str(use["says"]))
+		return false
+	if not player.motor.attack(player.facing_direction(), ToolUse.time_of(item), ToolStroke.BLOW):
+		return false
+	_blow_waits = true
+	GameState.spend_energy(GameState.energy_cost(EnergyRules.CHOP))
+	_show_stroke(item, ToolStroke.CHOP, wood.position)
+	# Struck now, shown at the blow (with its sound and its splinters or leaves).
+	var cut: bool = wood.strike(Breakable.AXE, ToolUse.hits_of_blow(item), false)
+	at_the_blow(wood.show_blow)
+	if cut and wood.dropped != null:
+		_hide_until_the_blow(wood.dropped)
+	player.sync_from_motor()
+	return true
+
+
+## A sword's blow knocked on wood: he is told, once a visit, that it wants an axe.
+func _on_knocked() -> void:
+	if _told_wants_axe:
+		return
+	_told_wants_axe = true
+	hud.show_message(WANTS_AXE_WORDS)
 
 
 ## A rock gave way: it stays broken until tomorrow, and breaking it is practice at mining.
@@ -1075,11 +1124,13 @@ func use_hand() -> bool:
 	return player.swing()
 
 
-## Whether the hero faces what the tool or seed `item` is for: a rock for the pickaxe, his
-## plot or water for the rest.
+## Whether the hero faces what the tool or seed `item` is for: a rock for the pickaxe, wood
+## for the axe, his plot or water for the rest.
 func faces_work(item: Dictionary) -> bool:
 	if ToolUse.kind_of(item) == ToolUse.PICK:
 		return rock_in_front() != null
+	if ToolUse.kind_of(item) == ToolUse.CHOP:
+		return wood_in_front() != null
 	return faces_farm_work()
 
 
@@ -1297,6 +1348,8 @@ func _shoot(bow: Dictionary, ammo: StringName) -> bool:
 func _use_tool(item: Dictionary) -> bool:
 	if ToolUse.kind_of(item) == ToolUse.PICK:
 		return _swing_pick(item)
+	if ToolUse.kind_of(item) == ToolUse.CHOP:
+		return _swing_axe(item)
 	var front: Vector2i = player.front_cell()
 	var holds: Dictionary = DataRegistry.get_item(StringName(Inventory.ammo_for(item)))
 	var held: StringName = StringName(str(holds.get("id", "")))

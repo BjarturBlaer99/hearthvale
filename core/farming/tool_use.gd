@@ -6,22 +6,27 @@ extends RefCounted
 ## can waters tilled soil and fills at water. A seed (an item of type "seed") is planted in
 ## tilled soil that has nothing in it. The pickaxe (2026-11-17) is a tool too, of the kind "pick":
 ## it strikes the rock he faces (decide_pick), and its stats may say it needs `fewer_blows`.
+## The axe (icons-axe-bar plan, step A2) is a tool of the kind "chop": it strikes the wood he
+## faces, a branch, a stump or a log (decide_chop), and a better axe's `fewer_blows` makes each
+## blow count for more.
 
 const TYPE: String = "tool"
 const HOE: String = "hoe"
 const CAN: String = "water"
 const SEED: String = "seed"
 const PICK: String = "pick"
+const CHOP: String = "chop"
 ## A sprinkler (an item of type "sprinkler"): set on tilled soil of the plot like a seed.
 const SPRINKLER: String = "sprinkler"
 ## The tools an item of type "tool" can be.
-const KINDS: Array[String] = [HOE, CAN, PICK]
+const KINDS: Array[String] = [HOE, CAN, PICK, CHOP]
 ## What a use can do.
 const TILL: StringName = &"till"
 const WATER: StringName = &"water"
 const FILL: StringName = &"fill"
 const PLANT: StringName = &"plant"
 const MINE: StringName = &"mine"
+const CUT: StringName = &"cut"
 const PLACE: StringName = &"place"
 const NOTHING: StringName = &""
 ## What is said when a use does nothing.
@@ -47,6 +52,8 @@ const SPRINKLER_NONE: String = "You have no more sprinklers."
 const CLEAR_FIRST: String = "Clear this first."
 ## The pickaxe at a rock that wants a better one (a boulder of the hero's land).
 const PICK_WEAK: String = "It wants a better pickaxe."
+## The axe facing nothing it cuts.
+const CHOP_NOTHING: String = "There is no wood here to cut."
 
 
 static func is_farm_tool(item: Dictionary) -> bool:
@@ -150,13 +157,27 @@ static func decide_pick(at_rock: bool, too_hard: bool = false) -> Dictionary:
 	return _no(PICK_WEAK) if too_hard else _do(MINE)
 
 
-## How many blows fewer than the plain pickaxe `item` needs to break a rock (a better
-## pickaxe's stats say so: "fewer_blows"). Nothing for anything else.
+## What swinging the axe does: { "does": CUT or NOTHING, "says": words }. `at_wood` is
+## whether something the axe cuts (a whole branch, stump or log) stands in the cell he faces.
+static func decide_chop(at_wood: bool) -> Dictionary:
+	return _do(CUT) if at_wood else _no(CHOP_NOTHING)
+
+
+## How many blows fewer than the plain tool of its kind `item` needs (a better tool's stats
+## say so: "fewer_blows"): a pickaxe at a rock, an axe at wood. Nothing for anything that
+## isn't a tool, or says nothing.
 static func fewer_blows(item: Dictionary) -> int:
 	var stats: Variant = item.get("stats", {})
-	if kind_of(item) != PICK or typeof(stats) != TYPE_DICTIONARY:
+	if not is_farm_tool(item) or typeof(stats) != TYPE_DICTIONARY:
 		return 0
 	return maxi(int((stats as Dictionary).get("fewer_blows", 0)), 0)
+
+
+## How many of a breakable's hits one blow of the axe `item` counts for: one, and one more
+## for each blow a better axe saves (a stump of three hits: three blows of the plain axe, two
+## of the copper, one of the iron).
+static func hits_of_blow(item: Dictionary) -> int:
+	return 1 + fewer_blows(item)
 
 
 ## What is wrong with `item` as a tool, in words: nothing, if it can be used.

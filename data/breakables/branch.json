@@ -2,7 +2,7 @@
 	"id": "branch",
 	"name": "Fallen branch",
 	"breaks_on": [
-		"sword",
+		"axe",
 		"bomb"
 	],
 	"returns": "daily",

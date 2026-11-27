@@ -63,6 +63,6 @@ func test_the_games_tools_are_items() -> void:
 
 
 func test_a_bad_tool_is_named() -> void:
-	assert_array(Array(ToolUse.problems({"id": "spade", "type": "tool", "stats": {"tool": "dig"}}))).contains_exactly(["a tool's stats must name its 'tool': hoe or water or pick."])
-	assert_array(Array(ToolUse.problems({"id": "rake", "type": "tool"}))).contains_exactly(["a tool's stats must name its 'tool': hoe or water or pick."])
+	assert_array(Array(ToolUse.problems({"id": "spade", "type": "tool", "stats": {"tool": "dig"}}))).contains_exactly(["a tool's stats must name its 'tool': hoe or water or pick or chop."])
+	assert_array(Array(ToolUse.problems({"id": "rake", "type": "tool"}))).contains_exactly(["a tool's stats must name its 'tool': hoe or water or pick or chop."])
 	assert_array(Array(ToolUse.problems({"id": "jug", "type": "tool", "stats": {"tool": "water"}}))).contains_exactly(["the watering can's stats must name what it holds ('ammo')."])

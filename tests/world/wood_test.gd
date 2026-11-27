@@ -1,8 +1,10 @@
 extends GdUnitTestSuite
 ## Wood (crafting, phase 2b): fallen branches and old stumps in the North Fields, the Old Wood
-## and the South Field. The sword cuts them: a branch in one blow for one wood, a stump in
-## three for two. They lie off the paths and clear of the crowns, stand in their cells until
-## cut, and are back the next morning, not on the next visit.
+## and the South Field. The axe cuts them (icons-axe-bar plan, step A2: the sword did until
+## then): a branch in one blow for one wood, a stump in three for two, and the better axes in
+## fewer. The sword only knocks on them, and says why once a visit; a bomb still breaks them.
+## They lie off the paths and clear of the crowns, stand in their cells until cut, and are back
+## the next morning, not on the next visit.
 
 const Steps: GDScript = preload("res://tests/support/area_steps.gd")
 
@@ -41,7 +43,7 @@ func test_a_branch_and_a_stump_are_data_and_wood_is_a_material() -> void:
 	var branch: Dictionary = DataRegistry.get_breakable(&"branch")
 	var stump: Dictionary = DataRegistry.get_breakable(&"stump")
 	for kind: Dictionary in [branch, stump]:
-		assert_array(kind["breaks_on"]).override_failure_message("the sword cuts it: no axe").contains(["sword"])
+		assert_array(kind["breaks_on"]).override_failure_message("the axe and a bomb cut it, not the sword").contains_exactly_in_any_order(["axe", "bomb"])
 		assert_str(str(kind["returns"])).is_equal("daily")
 		assert_bool(Breakable.FRAMES.has(StringName(str(kind["frames"]["whole"])))).is_true()
 		for roll: float in [0.0, 0.5, 0.999]:
@@ -90,10 +92,10 @@ func test_ten_branches_and_five_stumps_lie_off_the_paths_and_clear_of_the_crowns
 	assert_dict(counts).is_equal({&"branch": 10, &"stump": 5})
 
 
-func test_the_sword_cuts_a_branch_in_one_blow_and_a_stump_in_three() -> void:
+func test_the_axe_cuts_a_branch_in_one_blow_and_a_stump_in_three() -> void:
 	var fields: AreaController = _load(&"north_fields")
 	var branch: Breakable = _wood_at(fields, Vector2i(23, 15))
-	_swing_at(fields, branch)
+	_chop_at(fields, branch)
 	assert_bool(branch.broken).is_true()
 	assert_bool(fields.terrain.is_occupied(branch.cell())).override_failure_message("its cell is free").is_false()
 	assert_object(branch.dropped).is_not_null()
@@ -104,13 +106,13 @@ func test_the_sword_cuts_a_branch_in_one_blow_and_a_stump_in_three() -> void:
 	assert_int(stump.hits_left).is_equal(3)
 	for blow: int in 2:
 		_heard.clear()
-		_swing_at(fields, stump)
+		_chop_at(fields, stump)
 		assert_array(_heard).override_failure_message("blow %d is heard, though it fells nothing" % (blow + 1)).contains([&"cut"])
 		assert_bool(stump.broken).override_failure_message("blow %d doesn't fell it" % (blow + 1)).is_false()
 		assert_int(stump.hits_left).is_equal(2 - blow)
 		assert_object(stump.dropped).is_null()
 		assert_bool(fields.terrain.is_occupied(stump.cell())).is_true()
-	_swing_at(fields, stump)
+	_chop_at(fields, stump)
 	assert_bool(stump.broken).is_true()
 	assert_int((stump.dropped as ItemDrop).count).is_equal(2)
 	# Walked onto, the wood is his.
@@ -120,13 +122,14 @@ func test_the_sword_cuts_a_branch_in_one_blow_and_a_stump_in_three() -> void:
 		fields.collect_pickups()
 	assert_int(GameState.item_count(&"wood")).is_equal(3)
 	assert_bool(GameState.has_found(&"wood")).is_true()
-	assert_float(GameState.energy).override_failure_message("four swings of the sword, no more").is_equal(98.0)
+	assert_float(GameState.energy).override_failure_message("four strokes of the axe, no more").is_equal(98.0)
+	assert_int(int(GameState.skill_points.get(Skills.FARMING, 0)) + int(GameState.skill_points.get(Skills.COMBAT, 0))).override_failure_message("chopping is no practice at anything (Q8)").is_equal(0)
 
 
 func test_cut_wood_is_gone_for_the_day_and_back_the_next_morning() -> void:
 	var fields: AreaController = _load(&"north_fields")
 	var branch: Breakable = _wood_at(fields, Vector2i(23, 15))
-	_swing_at(fields, branch)
+	_chop_at(fields, branch)
 	assert_that(GameState.get_flag(&"cut/north_fields/23,15", 0)).is_equal(1)
 	# Leaving and coming back the same day: still cut, nothing in the way, nothing to cut.
 	fields = _load(&"north_fields")
@@ -184,6 +187,21 @@ func _wood_at(area: AreaController, cell: Vector2i) -> Breakable:
 			return child
 	fail("nothing to cut at %s" % cell)
 	return null
+
+
+## Stands the hero below `what`, facing it, strikes it once with the axe `axe` (from the item
+## button) and lets the stroke finish.
+func _chop_at(area: AreaController, what: Breakable, axe: StringName = &"axe") -> void:
+	if GameState.item_count(axe) <= 0:
+		GameState.add_item(axe)
+	GameState.equip(axe)
+	area.player.motor.place(what.cell() + Vector2i.DOWN)
+	area.player.face(Vector2.UP)
+	area.player.sync_from_motor()
+	assert_bool(area.use_item()).override_failure_message("a stroke of the %s" % axe).is_true()
+	for i: int in 40:
+		area.player.motor.step(Vector2.ZERO, FRAME)
+		area.player.sync_from_motor()
 
 
 ## Stands the hero below `what`, facing it, swings the sword once and lets the blow land.

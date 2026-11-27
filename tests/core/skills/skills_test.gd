@@ -124,7 +124,7 @@ func test_rules_that_cant_be_used_say_why() -> void:
 		[{"skills": {"combat": {"name": "Combat"}}}, "skill 'combat' needs 'gains': the points each deed gives."],
 		[{"skills": {"combat": {"name": "Combat", "gains": {"monster": 0}}}}, "skill 'combat' gains by 'monster' must be a whole number of 1 or more."],
 		[{"skills": {"combat": {"name": "Combat", "gains": {"monster": 1}, "eases": "swing"}}}, "skill 'combat' 'eases' must list the costs it makes cheaper."],
-		[{"skills": {"combat": {"name": "Combat", "gains": {"monster": 1}, "eases": ["dodge"]}}}, "skill 'combat' eases an unknown cost 'dodge'. Known: sprint_per_second, swing, shot, hoe, water, mine."],
+		[{"skills": {"combat": {"name": "Combat", "gains": {"monster": 1}, "eases": ["dodge"]}}}, "skill 'combat' eases an unknown cost 'dodge'. Known: sprint_per_second, swing, shot, hoe, water, mine, chop."],
 		[{"skills": {"cooking": {"name": "Cooking", "gains": {"dish": 2}, "enriches_dishes": "yes"}}}, "skill 'cooking' 'enriches_dishes' must be true or false."],
 	]
 	for case: Array in cases:
