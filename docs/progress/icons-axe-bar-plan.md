@@ -233,6 +233,9 @@ of `held_tools.png`, `art/sheets.json`, `HeldTools` and `ItemIcons` names, `docs
   greys and blues; **the axe's bright edge, which no pickaxe has, is `ffcb8d` in copper and
   `ffffff` in iron** (both the palette's). No sound, no stroke, no item yet: nothing in play
   changes until A2. See `LOG.md`.
+- **Approved (2026-11-27).** Shown the summary and two 8x close-ups (the axes on the hero's work
+  poses beside the pickaxe's, and the frames alone), the user said "okay continue". It stands as
+  built (`0b6c8c1`); step A2 begins on that word.
 
 **Step A2. The axe in play.** The three items, `ToolUse.CHOP`, the stroke in the area, the breakables'
 data, the energy rule, the two recipes, the pickup in the farmhouse, the tools' scripts.

@@ -4062,3 +4062,7 @@ step I2. Pictures only: no item, stroke or sound, and the sword still cuts wood 
   custard, not at the sheet's end.
 - **Known:** not seen in play (nothing uses the frames until A2); shown as an 8x close-up beside
   the pickaxe's, on the hero's work poses.
+
+**Approved (axe, step A1).** Shown the summary and two 8x close-ups (the axes on the hero's work
+poses beside the pickaxe's, and the frames alone), the user approved step A1 on 2026-11-27 ("okay
+continue"). It stands as built (`0b6c8c1`). Step A2 (the axe in play) begins on that word.
