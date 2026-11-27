@@ -40,6 +40,10 @@ var quests: Dictionary[StringName, StringName] = {}
 var inventory: Array[Dictionary] = []
 ## The item on the item button (bow, bombs), or empty.
 var equipped: StringName = &""
+## The item bar's columns (HandBar, step B1 of the icons, axe and bar plan): an item id, or
+## HandBar.SWORD, or HandBar.EMPTY for a column that remembers nothing. A thing used up keeps
+## its column, which shows empty. Settled whenever something for the hand comes in.
+var bar: Array[String] = []
 ## Seconds played, counted while an area runs unpaused (add_play_time).
 var play_time: float = 0.0
 ## The day of the game: 1 is the first.
@@ -1276,6 +1280,9 @@ func add_item(item_id: StringName, count: int = 1) -> int:
 		if count < 0:
 			return 0
 		inventory.append({"id": item_id, "count": count})
+		# Something for the hand that he didn't have: it takes its column on the bar.
+		if Inventory.is_equippable(item) or HandBar.is_sword(item):
+			_settle_bar()
 		EventBus.item_added.emit(item_id, count)
 		return count
 	var held: int = inventory[index]["count"]
@@ -1338,10 +1345,17 @@ func equip(item_id: StringName) -> void:
 
 # --- In hand ---------------------------------------------------------------
 
-## What can be in the hero's hand, in the order of the bar at the bottom of the screen
-## (HandBar): his best sword, then what he holds for the item button.
+## What can be in the hero's hand, column by column of the bar at the bottom of the screen
+## (HandBar.columns): his best sword, and what he holds for the item button, each in its own
+## column; {} for an empty one (a thing used up). The empty columns at the end are left off.
 func hand_entries() -> Array[Dictionary]:
-	return HandBar.entries(inventory, DataRegistry.entries(&"items"))
+	var items: Array = DataRegistry.entries(&"items")
+	return HandBar.columns(HandBar.settled(bar, inventory, items), HandBar.entries(inventory, items))
+
+
+## Gives everything for the hand he carries its column on the bar (HandBar.settled).
+func _settle_bar() -> void:
+	bar = HandBar.settled(bar, inventory, DataRegistry.entries(&"items"))
 
 
 ## Which of hand_entries() is in hand: the sword with nothing on the item button, else what
@@ -1351,10 +1365,11 @@ func hand_index() -> int:
 
 
 ## Puts entry `index` of hand_entries() in hand (a number key of the bar). Returns whether
-## that changed what is in hand: false for no such entry, or the one in hand already.
+## that changed what is in hand: false for no such entry, an empty column, or the one in hand
+## already.
 func take_in_hand(index: int) -> bool:
 	var held: Array[Dictionary] = hand_entries()
-	if index < 0 or index >= held.size() or index == HandBar.index_of(held, equipped):
+	if HandBar.is_empty_column(held, index) or index == HandBar.index_of(held, equipped):
 		return false
 	equip(HandBar.equipped_for(held, index))
 	return true
@@ -1446,6 +1461,7 @@ func clear() -> void:
 	quests.clear()
 	inventory.clear()
 	equipped = &""
+	bar.clear()
 	player.clear()
 
 
@@ -1468,6 +1484,7 @@ func to_dict() -> Dictionary:
 		"quests": _json_safe(quests),
 		"inventory": stacks,
 		"equipped": String(equipped),
+		"bar": Array(bar),
 		"player": _json_safe(player),
 		"farm": farm().to_dict(),
 		"mine": mine().to_dict(),
@@ -1536,6 +1553,12 @@ func from_dict(data: Dictionary) -> void:
 	for key: Variant in src_quests:
 		quests[StringName(str(key))] = StringName(str(src_quests[key]))
 	_load_inventory(data.get("inventory"))
+	# The bar's columns (step B1, read with a default: the save stays version 6). A save from
+	# before has none: its bar is as it was, the sword, then the pack's order.
+	var items: Array = DataRegistry.entries(&"items")
+	var saved_bar: Variant = data.get("bar")
+	bar = HandBar.cleaned(saved_bar, items) if typeof(saved_bar) == TYPE_ARRAY else HandBar.default_bar(inventory, items)
+	_settle_bar()
 	equipped = StringName(str(data.get("equipped", "")))
 	# A save from before the bar could keep bombs on the button with none left.
 	if equipped != &"" and item_count(equipped) <= 0:

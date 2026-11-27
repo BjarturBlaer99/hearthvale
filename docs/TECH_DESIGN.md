@@ -629,6 +629,16 @@ run headless; see CLAUDE.md for the command and gotchas.
     draws it in code: slots of 20 px in the middle of the bottom of the screen, the one in hand lit, a mark
     at an end where the bar goes on. It is hidden during a conversation and behind the lists, and takes no
     clicks. The prompt and the message line sit above it.
+    **Columns** (step B1 of `docs/progress/icons-axe-bar-plan.md`, 2026-11-27): `GameState.bar` is a list of
+    columns, each an item id, `HandBar.SWORD` (`"@sword"`, whichever sword is best) or `HandBar.EMPTY` (`""`, a
+    column that remembers nothing). `HandBar.settled()` gives everything for the hand he carries a column
+    (the first sword the front one; a tool the column of a tool of its `"tool"` kind he no longer carries;
+    else the first column that remembers nothing, else a new one at the end), and is applied by
+    `add_item()` when something for the hand comes in and by `from_dict()`. A thing used up keeps its
+    column: `HandBar.columns()` shows it as `{}` (an empty slot: its rim, no picture), and leaves off the
+    empty columns at the end. `stepped()` steps over empty columns, `take_in_hand()` refuses one, and
+    `moved()` (a swap) is for the screen of step B2. The save keeps `"bar"` in version 6; a save without it
+    gets `HandBar.default_bar()`, the sword and the pack's order, as the bar always was.
   - **The mouse points in menus** (the user's request, 2026-11-15). `MenuPointer` (`core/menus/`, pure) says
     which line of a list a point is on; `MenuInput.line_under(label, event, lines)` asks it about a menu's
     own list (the event made local to the label, lines `MenuInput.line_height()` high). Each menu, on the

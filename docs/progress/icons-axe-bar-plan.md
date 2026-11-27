@@ -265,6 +265,9 @@ data, the energy rule, the two recipes, the pickup in the farmhouse, the tools' 
   shudder or splinters, so it never looks like a blow that counted; **the axe facing no wood** says
   "There is no wood here to cut." and costs nothing; **the two recipes stand at the end of the tab**
   (no earlier line moved). See `LOG.md`.
+- **Approved (2026-11-27).** Shown the summary and four pictures (chopping a stump, a film of
+  three blows, the "Make" tab with both axes, the bar with the axe in hand), the user said
+  "Approve, go on". It stands as built (`0ccd68c`); step B1 begins on that word.
 
 ### Risks
 - **Taking the sword's wood away is a change to the game the user has played**, and to the
@@ -348,6 +351,17 @@ different until something is used up (its slot now stays empty) or upgraded (it 
   ways, and with only the sword; `moved()` swaps and moves into an empty column; a remembered column
   is not given to something new; a save round-trips `bar`; an old save has none and gets today's
   order. The existing bar tests pass unchanged (the default is today's order).
+- **Built (2026-11-27), waiting for the user's review.** As written: `HandBar.SWORD` and `EMPTY`,
+  `column_of()`, `default_bar()`, `cleaned()`, `settled()`, `columns()`, `moved()` and
+  `is_empty_column()`, with `stepped()` and `index_of()` over empty columns; `GameState.bar`, settled by
+  `add_item()` when something for the hand comes in and by `from_dict()`; `"bar"` in the save, version
+  6, read with today's order when missing; `ItemBar` drawing an empty slot (its rim, no picture) and
+  `is_empty_slot()`; `take_in_hand()` refusing one. What building it decided (in `docs/DECISIONS.md`,
+  2026-11-27): **the first sword takes the front column**, so the sword is first as always; **a tool's
+  kind is its `"tool"` stat**; **empty columns at the end are not drawn** (kept all the same); the wheel
+  steps from thing to thing; **more than nine:** the columns count, empty ones too, and the bar moves
+  along as before. Capture shots 219 to 221. Nothing looks different in play until something is used
+  up or upgraded. See `LOG.md`.
 
 **Step B2. The screen.** `BarMenu`, the pause menu's line, `MenuPointer.cell_at()`.
 - **Done when:** the pause menu's "Item bar" opens it; mouse and keys lift and set down, swap and

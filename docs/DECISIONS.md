@@ -1987,3 +1987,26 @@ building it decided these, none of which the plan named:
   blows (two hits, then one) and one iron blow.
 - **What can break a breakable** is its own list in `DataRegistry` (`BREAKS_ON`: the sword, an arrow,
   a bomb and the axe); a boss's weak point (`WEAK_POINTS`) can't be the axe.
+
+## 2026-11-27 — Icons, an axe and the item bar, step B1: what building the columns decided
+Built on the user's word "Approve, go on" for step A2. The plan's answers (Q13, Q14) stand as
+written; building it decided these, none of which the plan named:
+- **The first sword takes the front column,** put in before the others, so a new game's bar is the
+  sword first, as it always was, whichever came into the pack first. It happens once a game at most
+  (a sword is never taken away; a better one is in the same column, `"@sword"`).
+- **"Of its own kind" is a tool's `"tool"` stat** (hoe, water, pick, chop): the Copper Hoe takes the
+  column of a hoe he no longer carries, the Iron Watering Can that of a can. Seeds of another crop are
+  not of the turnip seeds' kind: they take a column of their own. A tool he still carries keeps its
+  column, and a second of its kind (a plain pickaxe bought after the copper one) goes on.
+- **Empty columns at the end are not drawn:** the last bomb, with nothing after it on the bar, leaves
+  no empty slot to see (the bar is as short as before), but its column is still kept.
+- **The wheel steps from thing to thing,** over any empty slots between; a number key on an empty
+  slot does nothing and is not heard.
+- **More than nine:** the columns count, empty ones too, so a bar with an empty slot in the middle
+  and nine things is ten slots long and moves along as before, with the one in hand in view. The
+  number keys choose among the nine slots showing.
+- **A saved bar is made sound when read:** a column naming food, a placeable, a kit, a sword by its
+  id, a thing the game hasn't, or a second of one is read as a free column; a `"bar"` that isn't a
+  list is read as missing (today's order). Columns of free slots at the end are left off.
+- **A save from before has no `"bar"`** and gets the sword and the pack's order (`HandBar.default_bar()`),
+  so every older save (the eight fixtures, v1 to v6) loads with the bar it had. The version stays 6.

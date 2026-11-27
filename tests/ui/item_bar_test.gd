@@ -226,7 +226,7 @@ func test_the_last_bomb_or_seed_leaves_the_sword_in_hand() -> void:
 	assert_int(GameState.item_count(&"bomb")).is_equal(0)
 	assert_that(GameState.equipped).override_failure_message("nothing is on the item button that he doesn't have").is_equal(&"")
 	field._update_hud()
-	assert_array(bar.shown_ids()).override_failure_message("the bombs' slot is gone").is_equal([&"wooden_sword"])
+	assert_array(bar.shown_ids()).override_failure_message("the bombs' slot is empty, and an empty slot at the end isn't drawn").is_equal([&"wooden_sword"])
 	assert_int(bar.lit_slot()).is_equal(0)
 	_heard.clear()
 	assert_bool(field.use_hand()).is_true()
@@ -252,6 +252,41 @@ func test_the_last_bomb_or_seed_leaves_the_sword_in_hand() -> void:
 	assert_that(GameState.equipped).is_equal(&"bow")
 	field._update_hud()
 	assert_str(bar.shown_counts()[bar.lit_slot()]).is_equal("0")
+
+
+func test_a_thing_used_up_keeps_its_slot_empty_and_the_wheel_and_keys_pass_it_by() -> void:
+	for item: Array in [[&"wooden_sword", 1], [&"turnip_seeds", 1], [&"hoe", 1], [&"watering_can", 1]]:
+		GameState.add_item(item[0], item[1])
+	GameState.equip(&"turnip_seeds")
+	GameState.add_item(&"turnip_seeds", -1)
+	var village: AreaController = _load(VILLAGE)
+	village.player.motor.place(GRASS)
+	village._update_hud()
+	var bar: ItemBar = village.hud.item_bar
+	assert_array(bar.shown_ids()).override_failure_message("the seeds' slot, empty").is_equal([&"wooden_sword", &"", &"hoe", &"watering_can"])
+	assert_array(Array(bar.shown_counts())).is_equal(["", "", "", "0"])
+	assert_bool(bar.is_empty_slot(1)).is_true()
+	assert_bool(bar.is_empty_slot(2)).is_false()
+	assert_float(bar.size.x).override_failure_message("four slots wide").is_equal(4.0 * ItemBar.SLOT + 3.0 * ItemBar.GAP)
+	assert_int(bar.lit_slot()).is_equal(0)
+	# A number key on the empty slot does nothing, and is not heard.
+	_heard.clear()
+	village._unhandled_input(_key(KEY_2))
+	assert_that(GameState.equipped).is_equal(&"")
+	assert_int(bar.lit_slot()).is_equal(0)
+	assert_array(_heard).is_empty()
+	# The wheel steps over it, both ways.
+	village._unhandled_input(_wheel(MOUSE_BUTTON_WHEEL_DOWN))
+	assert_that(GameState.equipped).is_equal(&"hoe")
+	assert_int(bar.lit_slot()).is_equal(2)
+	village._unhandled_input(_wheel(MOUSE_BUTTON_WHEEL_UP))
+	assert_that(GameState.equipped).is_equal(&"")
+	# Seeds again: in their own slot, the hoe where it was.
+	GameState.add_item(&"turnip_seeds", 4)
+	village._update_hud()
+	assert_array(bar.shown_ids()).is_equal([&"wooden_sword", &"turnip_seeds", &"hoe", &"watering_can"])
+	village._unhandled_input(_key(KEY_2))
+	assert_that(GameState.equipped).is_equal(&"turnip_seeds")
 
 
 func test_an_old_save_with_nothing_left_on_the_item_button_loads_with_the_sword_in_hand() -> void:

@@ -335,11 +335,13 @@ func test_the_sword_can_be_taken_in_hand_again_on_the_bar() -> void:
 	GameState.add_item(&"iron_sword")
 	village._update_hud()
 	assert_array(bar.shown_ids()).is_equal([&"iron_sword", &"bow"])
-	# With no sword at all the bar begins with the bow, and the Tab menu is the food's alone.
+	# With no sword at all (never so in play) the sword's slot stays, empty (step B1: each thing
+	# keeps its slot), and the Tab menu is the food's alone.
 	GameState.add_item(&"wooden_sword", -1)
 	GameState.add_item(&"iron_sword", -1)
 	village._update_hud()
-	assert_array(bar.shown_ids()).is_equal([&"bow"])
+	assert_array(bar.shown_ids()).is_equal([&"", &"bow"])
+	assert_bool(village.choose_slot(0)).override_failure_message("an empty slot is never in hand").is_false()
 	assert_bool(village.open_item_menu()).is_true()
 	assert_array(Array(village.hud.item_menu.shown_lines())).is_equal(["> Bread x1 (+30 energy)"])
 

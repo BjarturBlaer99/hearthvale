@@ -2,7 +2,8 @@ class_name ItemBar
 extends Control
 ## The bar at the bottom of the screen (the user's request, 2026-11-15): a slot for each thing
 ## that can be in the hero's hand, his sword first, then the bow, bombs, tools and seeds in the
-## order he picked them up. The slot in hand is lit: it is what the left click uses. A slot
+## order he picked them up, each in its own column (step B1): a thing used up leaves its slot
+## empty (the rim, no picture) until he has it again. The slot in hand is lit: it is what the left click uses. A slot
 ## shows how many it has left to use (arrows, bombs, seeds, pours in the can). The mouse wheel
 ## steps through the slots and the keys 1 to 9 choose one; the area does that (GameState's
 ## hand), and tells this what to show. HandBar (pure) says what is in the bar and in what
@@ -26,8 +27,8 @@ const COUNT_SHADE: Color = Color(0.05, 0.03, 0.09, 0.95)
 const MORE: Color = Color("ffad55")
 const FONT_SIZE: int = 8
 
-## What can be in hand (item data entries, HandBar's order), which of them is (HandBar.NONE:
-## none), and the first one showing.
+## What can be in hand (item data entries, HandBar's columns: {} for an empty one), which of
+## them is (HandBar.NONE: none), and the first one showing.
 var entries: Array[Dictionary] = []
 var selected: int = HandBar.NONE
 var top: int = 0
@@ -61,7 +62,7 @@ func shown_count() -> int:
 	return clampi(entries.size() - top, 0, HandBar.SLOTS)
 
 
-## The item in each slot showing, left to right.
+## The item in each slot showing, left to right ("" for an empty slot).
 func shown_ids() -> Array[StringName]:
 	var out: Array[StringName] = []
 	for slot: int in shown_count():
@@ -82,9 +83,15 @@ func icon_of(entry: Dictionary) -> StringName:
 	return ItemIcons.name_for(StringName(str(entry.get("id", ""))))
 
 
-## The number `entry`'s slot shows ("" for none): how many it has left to use.
+## The number `entry`'s slot shows ("" for none, and for an empty slot): how many it has left
+## to use.
 func count_of(entry: Dictionary) -> String:
-	return HandBar.count_text(entry, GameState.item_count)
+	return "" if entry.is_empty() else HandBar.count_text(entry, GameState.item_count)
+
+
+## Whether slot `slot` of those showing is empty: a thing used up, which keeps its column.
+func is_empty_slot(slot: int) -> bool:
+	return HandBar.is_empty_column(entries, top + slot)
 
 
 ## Which of the slots showing is lit (0 is the leftmost), or HandBar.NONE.
@@ -114,7 +121,8 @@ func _draw() -> void:
 		var lit: bool = slot == lit_slot()
 		draw_rect(rect, LIT_BACK if lit else BACK)
 		_draw_edge(rect, LIT_EDGE if lit else EDGE)
-		ItemIcons.draw(self, icon_of(entries[top + slot]), rect.position + Vector2(2, 2))
+		if not entries[top + slot].is_empty():
+			ItemIcons.draw(self, icon_of(entries[top + slot]), rect.position + Vector2(2, 2))
 		if not counts[slot].is_empty():
 			var at: Vector2 = Vector2(rect.position.x, rect.end.y - 2.0 - font.get_descent(FONT_SIZE))
 			draw_string(font, at + Vector2(0, 1), counts[slot], HORIZONTAL_ALIGNMENT_RIGHT, SLOT - 1.0, FONT_SIZE, COUNT_SHADE)

@@ -752,7 +752,7 @@ func step_hand(step: int) -> bool:
 
 
 ## A number key: puts the thing in slot `slot` of the bar in hand (0 is the leftmost slot
-## showing). Returns whether what is in hand changed.
+## showing). Returns whether what is in hand changed: an empty slot does nothing.
 func choose_slot(slot: int) -> bool:
 	return not _busy() and slot < hud.item_bar.shown_count() and _took_in_hand(GameState.take_in_hand(hud.item_bar.top + slot))
 

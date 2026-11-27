@@ -4116,3 +4116,44 @@ step A1. Wood wants the axe now: the Homestead's D5 is "the sword, the axe and t
   the axe comes down, `Breakable.looks_whole()`).
 - **Known:** seen in capture shots and the tests, not played by hand. `play_days.gd` was not run
   (its new route is untried).
+
+**Approved (axe, step A2).** Shown the summary and four pictures (chopping a stump, a film of
+three blows, the "Make" tab with both axes, the bar with the axe in hand), the user approved step
+A2 on 2026-11-27 ("Approve, go on"). It stands as built (`0ccd68c`). Step B1 (each item keeps its
+bar slot) begins on that word.
+
+## 2026-11-27 — Icons, an axe and the item bar, step B1: each thing keeps its slot on the bar
+The fifth step of `docs/progress/icons-axe-bar-plan.md` (the user's Q13 and Q14, as recommended).
+- **What it does:** the item bar is a list of columns, and each thing keeps its own. The last seed
+  of a kind, or the last bomb, leaves its slot empty (the rim, no picture), and bought or found again
+  it comes back to that slot. A better tool takes the slot of the tool it was made from (the Copper
+  Hoe the hoe's, by the tool's kind). Anything else new takes the first slot that remembers nothing,
+  else a new one at the end; the first sword the front one. Without arranging (step B2) the bar is
+  as it always was: the sword, then the pack's order. The wheel steps from thing to thing over empty
+  slots; a number key on one does nothing; empty slots at the end are not drawn; with more than nine
+  slots (empty ones count) the bar moves along with the one in hand, as before.
+  `GameState.equipped` is still always something he carries, and nothing but what goes in the hand
+  is on the bar.
+- **Code:** `HandBar.SWORD` (`"@sword"`), `EMPTY`, `column_of()`, `default_bar()`, `cleaned()`,
+  `settled()`, `columns()`, `moved()` (for B2), `is_empty_column()`, and `stepped()` / `index_of()`
+  over empty columns; `GameState.bar`, settled in `add_item()` when something for the hand comes in
+  and in `from_dict()`; `hand_entries()` is the columns (`{}` for an empty one), `take_in_hand()`
+  refuses an empty one; `ItemBar` draws an empty slot and has `is_empty_slot()`.
+- **The save:** `"bar"`, the columns as ids (`["@sword", "turnip_seeds", "hoe"]`), still version 6
+  (Q14). A save without it gets `HandBar.default_bar()`; a damaged one is made sound.
+- **Tools:** `tools/capture.gd` shots 219 to 221 (the bar after the last seed, with the seeds back,
+  with a copper hoe made from the hoe).
+- **Tests:** `tests/core/inventory/hand_bar_test.gd` (+9, pure: today's order, a thing used up and
+  back, empty columns at the end, a better tool, the first free column, the first sword, a saved bar
+  made sound, `moved()`, the wheel over empty columns both ways and with only the sword),
+  `tests/autoload/bar_state_test.gd` (8: the last seed, an empty slot never in hand, a copper hoe
+  crafted into the hoe's slot, the first free slot, a save round trip, a damaged bar, a save from
+  before, and every fixture v1 to v6 with the bar it had), `tests/ui/item_bar_test.gd` (+1: the empty
+  slot drawn, a key on it does nothing, the wheel passes it). `mouse_test` changed: with every sword
+  taken away (never so in play) the sword's slot stays, empty.
+- **Checked:** all 1325 tests pass. Capture shots 219 to 221 taken before (the step's shots run on
+  `d285e71`) and after: before, the bar closes up after the last seed and puts the seeds and the
+  copper hoe at its end; after, each keeps its slot.
+- **Known:** seen in capture shots and the tests, not played by hand; `play_days.gd` was not run (it
+  finds a thing's slot through `hand_entries()`, which now has empty columns, and skips them).
+  There is no way yet to arrange the bar: that is step B2.

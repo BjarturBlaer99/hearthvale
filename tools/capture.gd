@@ -357,6 +357,9 @@ const SHOTS: Array = [
 	["216_chopping_a_stump_facing_up", &"north_fields", Vector2i(31, 25), Vector2.UP, 0, "chop"],
 	["217_the_make_tab_with_the_axes", &"home", Vector2i(8, 3), Vector2.RIGHT, 0, "axe_make"],
 	["218_the_bar_with_the_axe_in_hand", &"homestead", Vector2i(30, 13), Vector2.DOWN, 0, "axe_bar"],
+	["219_the_bar_after_the_last_seed", &"homestead", Vector2i(30, 13), Vector2.DOWN, 0, "bar_seed_gone"],
+	["220_the_bar_with_the_seeds_back", &"homestead", Vector2i(30, 13), Vector2.DOWN, 0, "bar_seed_back"],
+	["221_the_bar_with_a_copper_hoe", &"homestead", Vector2i(30, 13), Vector2.DOWN, 0, "bar_copper_hoe"],
 ]
 ## What the Tab menu's shots carry (210 to 213): a few things, a full pack, and no food.
 const PACK_STOCK: Dictionary = {
@@ -629,6 +632,23 @@ func _capture() -> void:
 				game_state.call(&"add_item", item[0], item[1])
 			game_state.call(&"set_flag", &"took_wooden_sword", true)
 			game_state.call(&"equip", &"axe")
+		if shot[5] in ["bar_seed_gone", "bar_seed_back", "bar_copper_hoe"]:
+			# The bar's columns (step B1): his tools, with the turnip seeds second. The last seed
+			# sown leaves their slot empty; bought again, they come back to it; a copper hoe made
+			# from the hoe takes the hoe's slot.
+			for item: Array in [[&"wooden_sword", 1], [&"turnip_seeds", 1], [&"hoe", 1], [&"watering_can", 1], [&"pickaxe", 1], [&"axe", 1]]:
+				game_state.call(&"add_item", item[0], item[1])
+			game_state.call(&"set_flag", &"took_wooden_sword", true)
+			if shot[5] != "bar_copper_hoe":
+				game_state.call(&"equip", &"turnip_seeds")
+				game_state.call(&"add_item", &"turnip_seeds", -1)
+			if shot[5] == "bar_seed_back":
+				game_state.call(&"add_item", &"turnip_seeds", 5)
+				game_state.call(&"equip", &"turnip_seeds")
+			if shot[5] == "bar_copper_hoe":
+				game_state.call(&"add_item", &"copper_bar", 2)
+				game_state.call(&"equip", &"hoe")
+				game_state.call(&"craft", &"copper_hoe")
 		if shot[5] == "axe_make":
 			# The axe, two copper bars and an iron bar: both better axes are known, the copper one
 			# within reach and the iron one greyed (it wants the copper axe).
