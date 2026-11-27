@@ -4198,3 +4198,5 @@ The sixth and last step of `docs/progress/icons-axe-bar-plan.md` (the user's Q12
   Hoe"); the bar after the swap (sword, axe in hand, can, pickaxe, hoe).
 - **Known:** seen in capture shots and the tests, not played by hand; `play_days.gd` was not run
   (nothing it does goes through the pause menu). All six steps of the plan are built.
+
+**Approved (icons, axe and bar, step B2).** Shown the summary and three screenshots (the pause menu with "Item bar", the axe lifted over the hoe's slot, the bar after the swap), the user approved step B2 on 2026-11-27 ("Approve and push"). The plan is finished: all six steps built and approved, none played by hand. Pushed on the user's word.

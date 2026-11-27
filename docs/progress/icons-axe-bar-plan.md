@@ -38,7 +38,7 @@ Every question is answered with its recommendation:
 - **Q14, the save:** a field read with a default; the version stays 6.
 
 So every step is built, in order: I1 (with the chest), I2, A1, A2, B1, B2. **All six are built
-(2026-11-27); B2 waits for the user's review.** (The plan's "seven steps
+(2026-11-27); B2 was approved the same day ("Approve and push", shown the summary and three screenshots), and the plan is finished.** (The plan's "seven steps
 at most" below counts one too many: there are six.)
 
 Pictures of the menus and the bar as they are today (taken with `tools/capture.gd`, shots 105, 114,

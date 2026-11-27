@@ -98,7 +98,8 @@ menu's "Pack", A1 the axe's pictures, A2 the axe in play (the sword stops cuttin
 B1 each item keeps its bar slot, B2 the screen to arrange the bar. **I1 and I2 are built and
 approved (2026-11-26, "Approve, go on" each); A1 is built and approved (2026-11-27, "okay
 continue"); A2 and B1 are built and approved (2026-11-27, "Approve, go on" each); B2 is built
-(2026-11-27) and waits for the user's review: all six steps are built.** The axe's pictures are the pack's: three icons at the end of `items.png` (after the hen,
+and approved (2026-11-27, "Approve and push"): the plan is finished. None of it has been played
+by hand.** Nothing further is planned: ask before building more. The axe's pictures are the pack's: three icons at the end of `items.png` (after the hen,
 sheep and cow, so a test wanting the last icons gets the axes) and 18 frames at the end of
 `held_tools.png` (`HeldTools.ADDED`: plain, copper, iron). Build nothing beyond the plan's list.
 
